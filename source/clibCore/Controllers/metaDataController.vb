@@ -2310,15 +2310,11 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Public Function GetContentFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As Object
-            Dim result As String = ""
-            Dim Contentdefinition As cdefModel
-            Dim UcaseFieldName As String
-            '
-            result = ""
-            If True Then
-                UcaseFieldName = genericController.vbUCase(genericController.encodeText(FieldName))
-                Contentdefinition = getCdef(genericController.encodeText(ContentName))
+        Public Function GetContentFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As String
+            Dim result As String = String.Empty
+            Try
+                Dim UcaseFieldName As String = genericController.vbUCase(genericController.encodeText(FieldName))
+                Dim Contentdefinition As cdefModel = getCdef(genericController.encodeText(ContentName))
                 If (UcaseFieldName = "") Or (Contentdefinition.fields.Count < 1) Then
                     Throw (New ApplicationException("Content Name [" & genericController.encodeText(ContentName) & "] or FieldName [" & genericController.encodeText(FieldName) & "] was not valid")) ' handleLegacyError14(MethodName, "")
                 Else
@@ -2358,7 +2354,12 @@ ErrorTrap:
                         End With
                     Next
                 End If
-            End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
+
+
         End Function
         '
         '========================================================================

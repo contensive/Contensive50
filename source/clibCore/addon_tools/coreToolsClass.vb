@@ -2890,18 +2890,18 @@ ErrorTrap:
             Try
                 '
                 Dim SQL As String
-                Dim DataSourceName As String
+                Dim DataSourceName As String = String.Empty
                 Dim ToolButton As String
                 Dim ContentID As Integer
                 Dim RecordCount As Integer
                 Dim RecordPointer As Integer
                 Dim CSPointer As Integer
                 Dim formFieldId As Integer
-                Dim ContentName As String
-                Dim CDef As cdefModel
+                Dim ContentName As String = String.Empty
+                Dim CDef As cdefModel = Nothing
                 Dim formFieldName As String
                 Dim formFieldTypeId As Integer
-                Dim TableName As String
+                Dim TableName As String = String.Empty
                 Dim ContentFieldsCID As Integer
                 Dim StatusMessage As String = ""
                 Dim ErrorMessage As String = ""
@@ -2939,104 +2939,105 @@ ErrorTrap:
                         CDef = cpCore.metaData.getCdef(ContentID, True, True)
                     End If
                 End If
-                '
-                If (ToolButton <> "") Then
-                    If (ToolButton <> ButtonCancel) Then
-                        '
-                        ' Save the form changes
-                        '
-                        AllowContentAutoLoad = cp.Site.GetBoolean("AllowContentAutoLoad", "true")
-                        Call cp.Site.SetProperty("AllowContentAutoLoad", "false")
-                        '
-                        ' ----- Save the input
-                        '
-                        RecordCount = genericController.EncodeInteger(cp.Doc.GetInteger("dtfaRecordCount"))
-                        If RecordCount > 0 Then
-                            For RecordPointer = 0 To RecordCount - 1
-                                '
-                                formFieldName = cp.Doc.GetText("dtfaName." & RecordPointer)
-                                formFieldTypeId = cp.Doc.GetInteger("dtfaType." & RecordPointer)
-                                formFieldId = genericController.EncodeInteger(cp.Doc.GetInteger("dtfaID." & RecordPointer))
-                                formFieldInherited = cp.Doc.GetBoolean("dtfaInherited." & RecordPointer)
-                                '
-                                ' problem - looking for the name in the Db using the form's name, but it could have changed.
-                                ' have to look field up by id
-                                '
-                                For Each cdefFieldKvp As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
-                                    If cdefFieldKvp.Value.id = formFieldId Then
-                                        '
-                                        ' Field was found in CDef
-                                        '
-                                        With cdefFieldKvp.Value
-                                            If .inherited And (Not formFieldInherited) Then
-                                                '
-                                                ' Was inherited, but make a copy of the field
-                                                '
-                                                CSTarget = cpCore.db.cs_insertRecord("Content Fields")
-                                                If (cpCore.db.cs_ok(CSTarget)) Then
-                                                    CSSource = cpCore.db.cs_openContentRecord("Content Fields", formFieldId)
-                                                    If (cpCore.db.cs_ok(CSSource)) Then
-                                                        Call cpCore.db.cs_copyRecord(CSSource, CSTarget)
-                                                    End If
-                                                    Call cpCore.db.cs_Close(CSSource)
-                                                    formFieldId = cpCore.db.cs_getInteger(CSTarget, "ID")
-                                                    Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
-                                                End If
-                                                Call cpCore.db.cs_Close(CSTarget)
-                                                ReloadCDef = True
-                                            ElseIf (Not .inherited) And (formFieldInherited) Then
-                                                '
-                                                ' Was a field, make it inherit from it's parent
-                                                '
-                                                CSTarget = CSTarget
-                                                Call cpCore.db.deleteContentRecord("Content Fields", formFieldId)
-                                                ReloadCDef = True
-                                            ElseIf (Not .inherited) And (Not formFieldInherited) Then
-                                                '
-                                                ' not inherited, save the field values and mark for a reload
-                                                '
-                                                If True Then
-                                                    If (InStr(1, formFieldName, " ") <> 0) Then
-                                                        '
-                                                        ' remoave spaces from new name
-                                                        '
-                                                        StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was renamed [" & genericController.vbReplace(formFieldName, " ", "") & "] because the field name can not include spaces.</LI>"
-                                                        formFieldName = genericController.vbReplace(formFieldName, " ", "")
-                                                    End If
+                If (CDef IsNot Nothing) Then
+                    '
+                    If (ToolButton <> "") Then
+                        If (ToolButton <> ButtonCancel) Then
+                            '
+                            ' Save the form changes
+                            '
+                            AllowContentAutoLoad = cp.Site.GetBoolean("AllowContentAutoLoad", "true")
+                            Call cp.Site.SetProperty("AllowContentAutoLoad", "false")
+                            '
+                            ' ----- Save the input
+                            '
+                            RecordCount = genericController.EncodeInteger(cp.Doc.GetInteger("dtfaRecordCount"))
+                            If RecordCount > 0 Then
+                                For RecordPointer = 0 To RecordCount - 1
+                                    '
+                                    formFieldName = cp.Doc.GetText("dtfaName." & RecordPointer)
+                                    formFieldTypeId = cp.Doc.GetInteger("dtfaType." & RecordPointer)
+                                    formFieldId = genericController.EncodeInteger(cp.Doc.GetInteger("dtfaID." & RecordPointer))
+                                    formFieldInherited = cp.Doc.GetBoolean("dtfaInherited." & RecordPointer)
+                                    '
+                                    ' problem - looking for the name in the Db using the form's name, but it could have changed.
+                                    ' have to look field up by id
+                                    '
+                                    For Each cdefFieldKvp As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
+                                        If cdefFieldKvp.Value.id = formFieldId Then
+                                            '
+                                            ' Field was found in CDef
+                                            '
+                                            With cdefFieldKvp.Value
+                                                If .inherited And (Not formFieldInherited) Then
                                                     '
-                                                    If (formFieldName <> "") And (formFieldTypeId <> 0) And ((.nameLc = "") Or (.fieldTypeId = 0)) Then
-                                                        '
-                                                        ' Create Db field, Field is good but was not before
-                                                        '
-                                                        Call cpCore.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId)
-                                                        StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was saved to this content definition and a database field was created in [" & CDef.ContentTableName & "].</LI>"
-                                                    ElseIf (formFieldName = "") Or (formFieldTypeId = 0) Then
-                                                        '
-                                                        ' name blank or type=0 - do nothing but tell them
-                                                        '
-                                                        If formFieldName = "" And formFieldTypeId = 0 Then
-                                                            ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a name and field type are required.</LI>"
-                                                        ElseIf formFieldName = "unnamedfield" & coreToolsClass.fieldId.ToString Then
-                                                            ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a field name is required.</LI>"
-                                                        Else
-                                                            ErrorMessage &= "<LI>Field [" & formFieldName & "] was saved to this content definition but no database field was created because a field type are required.</LI>"
+                                                    ' Was inherited, but make a copy of the field
+                                                    '
+                                                    CSTarget = cpCore.db.cs_insertRecord("Content Fields")
+                                                    If (cpCore.db.cs_ok(CSTarget)) Then
+                                                        CSSource = cpCore.db.cs_openContentRecord("Content Fields", formFieldId)
+                                                        If (cpCore.db.cs_ok(CSSource)) Then
+                                                            Call cpCore.db.cs_copyRecord(CSSource, CSTarget)
                                                         End If
-                                                    ElseIf (formFieldName = .nameLc) And (formFieldTypeId <> .fieldTypeId) Then
-                                                        '
-                                                        ' Field Type changed, must be done manually
-                                                        '
-                                                        ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.db.getRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.db.getRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
-                                                        Dim DataSourceTypeID As Integer
-                                                        DataSourceTypeID = cpCore.db.getDataSourceType(DataSourceName)
-                                                        Select Case DataSourceTypeID
-                                                            Case DataSourceTypeODBCMySQL
-                                                                SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.db.getSQLAlterColumnType(DataSourceName, fieldType) & ";"
-                                                            Case Else
-                                                                SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.db.getSQLAlterColumnType(DataSourceName, fieldType) & ";"
-                                                        End Select
-                                                        Call cpCore.db.executeSql(SQL, DataSourceName)
+                                                        Call cpCore.db.cs_Close(CSSource)
+                                                        formFieldId = cpCore.db.cs_getInteger(CSTarget, "ID")
+                                                        Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
                                                     End If
-                                                    SQL = "Update ccFields" _
+                                                    Call cpCore.db.cs_Close(CSTarget)
+                                                    ReloadCDef = True
+                                                ElseIf (Not .inherited) And (formFieldInherited) Then
+                                                    '
+                                                    ' Was a field, make it inherit from it's parent
+                                                    '
+                                                    CSTarget = CSTarget
+                                                    Call cpCore.db.deleteContentRecord("Content Fields", formFieldId)
+                                                    ReloadCDef = True
+                                                ElseIf (Not .inherited) And (Not formFieldInherited) Then
+                                                    '
+                                                    ' not inherited, save the field values and mark for a reload
+                                                    '
+                                                    If True Then
+                                                        If (InStr(1, formFieldName, " ") <> 0) Then
+                                                            '
+                                                            ' remoave spaces from new name
+                                                            '
+                                                            StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was renamed [" & genericController.vbReplace(formFieldName, " ", "") & "] because the field name can not include spaces.</LI>"
+                                                            formFieldName = genericController.vbReplace(formFieldName, " ", "")
+                                                        End If
+                                                        '
+                                                        If (formFieldName <> "") And (formFieldTypeId <> 0) And ((.nameLc = "") Or (.fieldTypeId = 0)) Then
+                                                            '
+                                                            ' Create Db field, Field is good but was not before
+                                                            '
+                                                            Call cpCore.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId)
+                                                            StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was saved to this content definition and a database field was created in [" & CDef.ContentTableName & "].</LI>"
+                                                        ElseIf (formFieldName = "") Or (formFieldTypeId = 0) Then
+                                                            '
+                                                            ' name blank or type=0 - do nothing but tell them
+                                                            '
+                                                            If formFieldName = "" And formFieldTypeId = 0 Then
+                                                                ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a name and field type are required.</LI>"
+                                                            ElseIf formFieldName = "unnamedfield" & coreToolsClass.fieldId.ToString Then
+                                                                ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a field name is required.</LI>"
+                                                            Else
+                                                                ErrorMessage &= "<LI>Field [" & formFieldName & "] was saved to this content definition but no database field was created because a field type are required.</LI>"
+                                                            End If
+                                                        ElseIf (formFieldName = .nameLc) And (formFieldTypeId <> .fieldTypeId) Then
+                                                            '
+                                                            ' Field Type changed, must be done manually
+                                                            '
+                                                            ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.db.getRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.db.getRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
+                                                            Dim DataSourceTypeID As Integer
+                                                            DataSourceTypeID = cpCore.db.getDataSourceType(DataSourceName)
+                                                            Select Case DataSourceTypeID
+                                                                Case DataSourceTypeODBCMySQL
+                                                                    SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.db.getSQLAlterColumnType(DataSourceName, fieldType) & ";"
+                                                                Case Else
+                                                                    SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.db.getSQLAlterColumnType(DataSourceName, fieldType) & ";"
+                                                            End Select
+                                                            Call cpCore.db.executeSql(SQL, DataSourceName)
+                                                        End If
+                                                        SQL = "Update ccFields" _
                                                     & " Set name=" & cpCore.db.encodeSQLText(formFieldName) _
                                                     & ",type=" & formFieldTypeId _
                                                     & ",caption=" & cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." & RecordPointer)) _
@@ -3053,61 +3054,62 @@ ErrorTrap:
                                                     & ",EditTab=" & cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." & RecordPointer)) _
                                                     & ",Scramble=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." & RecordPointer)) _
                                                     & ""
-                                                    If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
-                                                        SQL &= ",adminonly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." & RecordPointer))
+                                                        If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                                                            SQL &= ",adminonly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." & RecordPointer))
+                                                        End If
+                                                        If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                                                            SQL &= ",DeveloperOnly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." & RecordPointer))
+                                                        End If
+                                                        SQL &= " where ID=" & formFieldId
+                                                        Call cpCore.db.executeSql(SQL)
+                                                        ReloadCDef = True
                                                     End If
-                                                    If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
-                                                        SQL &= ",DeveloperOnly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." & RecordPointer))
-                                                    End If
-                                                    SQL &= " where ID=" & formFieldId
-                                                    Call cpCore.db.executeSql(SQL)
-                                                    ReloadCDef = True
                                                 End If
-                                            End If
-                                        End With
-                                        Exit For
-                                    End If
+                                            End With
+                                            Exit For
+                                        End If
+                                    Next
                                 Next
-                            Next
+                            End If
+                            cpCore.cache.invalidateAll()
+                            cpCore.metaData.clear()
                         End If
-                        cpCore.cache.invalidateAll()
-                        cpCore.metaData.clear()
-                    End If
-                    If (ToolButton = ButtonAdd) Then
-                        debugController.debug_testPoint(cpCore, "ConfigureEdit, Process Add Button")
-                        '
-                        ' ----- Insert a blank Field
-                        '
-                        CSPointer = cpCore.db.cs_insertRecord("Content Fields")
-                        If cpCore.db.cs_ok(CSPointer) Then
-                            Call cpCore.db.cs_set(CSPointer, "name", "unnamedField" & cpCore.db.cs_getInteger(CSPointer, "id").ToString())
-                            Call cpCore.db.cs_set(CSPointer, "ContentID", ContentID)
-                            Call cpCore.db.cs_set(CSPointer, "EditSortPriority", 0)
-                            ReloadCDef = True
+                        If (ToolButton = ButtonAdd) Then
+                            debugController.debug_testPoint(cpCore, "ConfigureEdit, Process Add Button")
+                            '
+                            ' ----- Insert a blank Field
+                            '
+                            CSPointer = cpCore.db.cs_insertRecord("Content Fields")
+                            If cpCore.db.cs_ok(CSPointer) Then
+                                Call cpCore.db.cs_set(CSPointer, "name", "unnamedField" & cpCore.db.cs_getInteger(CSPointer, "id").ToString())
+                                Call cpCore.db.cs_set(CSPointer, "ContentID", ContentID)
+                                Call cpCore.db.cs_set(CSPointer, "EditSortPriority", 0)
+                                ReloadCDef = True
+                            End If
+                            Call cpCore.db.cs_Close(CSPointer)
                         End If
-                        Call cpCore.db.cs_Close(CSPointer)
-                    End If
-                    ''
-                    '' ----- Button Reload CDef
-                    ''
-                    If (ToolButton = ButtonSaveandInvalidateCache) Then
-                        cpCore.cache.invalidateAll()
-                        cpCore.metaData.clear()
-                    End If
-                    '
-                    ' ----- Restore Content Autoload site property
-                    '
-                    If AllowContentAutoLoad Then
-                        Call cp.Site.SetProperty("AllowContentAutoLoad", AllowContentAutoLoad.ToString())
-                    End If
-                    '
-                    ' ----- Cancel or Save, reload CDef and go
-                    '
-                    If (ToolButton = ButtonCancel) Or (ToolButton = ButtonOK) Then
+                        ''
+                        '' ----- Button Reload CDef
+                        ''
+                        If (ToolButton = ButtonSaveandInvalidateCache) Then
+                            cpCore.cache.invalidateAll()
+                            cpCore.metaData.clear()
+                        End If
                         '
-                        ' ----- Exit back to menu
+                        ' ----- Restore Content Autoload site property
                         '
-                        Call cpCore.webServer.redirect(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & cpCore.webServer.requestPath & cpCore.webServer.requestPage & "?af=" & AdminFormTools)
+                        If AllowContentAutoLoad Then
+                            Call cp.Site.SetProperty("AllowContentAutoLoad", AllowContentAutoLoad.ToString())
+                        End If
+                        '
+                        ' ----- Cancel or Save, reload CDef and go
+                        '
+                        If (ToolButton = ButtonCancel) Or (ToolButton = ButtonOK) Then
+                            '
+                            ' ----- Exit back to menu
+                            '
+                            Call cpCore.webServer.redirect(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & cpCore.webServer.requestPath & cpCore.webServer.requestPage & "?af=" & AdminFormTools)
+                        End If
                     End If
                 End If
                 '
@@ -4708,7 +4710,7 @@ ErrorTrap:
         '''' <param name="ErrDescription"></param>
         '''' <remarks></remarks>
         'Private Sub handleLegacyClassErrors2(ByVal MethodName As String, ByVal ErrDescription As String)
-        '    Call Err.Raise(ignoreInteger, "App.EXEName", ErrDescription)
+        '    fixme-- cpCore.handleException(New ApplicationException("")) ' -----ignoreInteger, "App.EXEName", ErrDescription)
         'End Sub
     End Class
 End Namespace

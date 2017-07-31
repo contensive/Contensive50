@@ -17,13 +17,16 @@ Public Class configurationClass
             '
             serverConfig.allowTaskRunnerService = False
             serverConfig.allowTaskSchedulerService = False
+            serverConfig.appConfig.name = ConfigurationManager.AppSettings("ContensiveAppName")
+            'If (String.IsNullOrEmpty(serverConfig.appConfig.name)) Then
+            '    serverConfig.appConfig.name = System.Web.Hosting.HostingEnvironment.ApplicationHost.GetSiteName()
+            'End If
             serverConfig.appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")
             serverConfig.appConfig.appRootFilesPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")
             serverConfig.appConfig.cdnFilesNetprefix = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
             serverConfig.appConfig.cdnFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
             serverConfig.appConfig.domainList.Add(ConfigurationManager.AppSettings("ContensivePrimaryDomain"))
             serverConfig.appConfig.enabled = True
-            serverConfig.appConfig.name = ConfigurationManager.AppSettings("ContensiveAppName")
             serverConfig.appConfig.privateFilesPath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
             serverConfig.appConfig.privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
             serverConfig.apps.Add(serverConfig.appConfig.name, serverConfig.appConfig)

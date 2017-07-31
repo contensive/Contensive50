@@ -6,12 +6,12 @@ Imports Microsoft.Web.Administration
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     ''' <summary>
     ''' Code dedicated to processing iis input and output. lazy Constructed. (see coreHtmlClass for html processing)
     ''' What belongs here is everything that would have to change if we converted to apache
     ''' </summary>
-    Public Class webServerController
+    Public Class iisController
         '
         Dim cpCore As coreClass
         '
@@ -22,60 +22,59 @@ Namespace Contensive.Core
         '   State values that must be initialized before Init()
         '   Everything else is derived from these
         '
-        Public webServerIO_InitCounter As Integer = 0
+        Public Property initCounter As Integer = 0        '
         '
-        Public RequestLanguage As String = ""            ' set externally from HTTP_Accept_LANGUAGE
-        Public requestHttpAccept As String = ""
-        Public requestHttpAcceptCharset As String = ""
-        Public requestHttpProfile As String = ""
-        Public requestxWapProfile As String = ""
-        Public requestHTTPVia As String = ""                   ' informs the server of proxies used during the request
-        Public requestHTTPFrom As String = ""                  ' contains the email address of the requestor
-        Public requestPathPage As String = ""               ' The Path and Page part of the current URI
-        Public requestReferrer As String = ""
-        Public requestDomain As String = ""                 ' The Host part of the current URI
-        Public requestSecure As Boolean = False             ' Set in InitASPEnvironment, true if https
-        Public requestRemoteIP As String = ""               '
-        Public requestBrowser As String = ""                ' The browser for this visit
-        Public requestQueryString As String = ""            ' The QueryString of the current URI
-        Public requestFormUseBinaryHeader As Boolean = False ' When set true with RequestNameBinaryRead=true, InitEnvironment reads the form in with a binary read
-        Public requestFormBinaryHeader As Byte()            ' For asp pages, this is the full multipart header
-        'Public requestFormString As String = ""             ' String from an HTML form post - buffered to remove passwords
-        Public requestFormDict As New Dictionary(Of String, String)
-        'Public requesFilesString As String = ""             ' String from an HTML form post
-        'Public requestCookieString As String = ""          ' Set in InitASPEnvironment, the full cookie string
-        Public requestSpaceAsUnderscore As Boolean = False  ' when true, is it assumed that dots in request variable names will convert
-        Public requestDotAsUnderscore As Boolean = False    ' (php converts spaces and dots to underscores)
-        Public requestUrlSource As String = ""
-        '
-        Public webServerIO_LinkForwardSource As String = ""          ' main_ServerPathPage -- set during init
-        Public webServerIO_LinkForwardError As String = ""           ' always 404
-        Public webServerIO_ReadStreamJSForm As Boolean = False                  ' When true, the request comes from a browser handling a JSPage script line
-        Public webServerIO_PageExcludeFromAnalytics As Boolean = False    ' For this page - true for remote methods and ajax
-        Public webServerIO_BlockClosePageCopyright As Boolean = False ' if true, block the copyright message
+        ' -- Buffer request
+        Public Property requestLanguage As String = ""            ' set externally from HTTP_Accept_LANGUAGE
+        Public Property requestHttpAccept As String = ""
+        Public Property requestHttpAcceptCharset As String = ""
+        Public Property requestHttpProfile As String = ""
+        Public Property requestxWapProfile As String = ""
+        Public Property requestHTTPVia As String = ""                   ' informs the server of proxies used during the request
+        Public Property requestHTTPFrom As String = ""                  ' contains the email address of the requestor
+        Public Property requestPathPage As String = ""               ' The Path and Page part of the current URI
+        Public Property requestReferrer As String = ""
+        Public Property requestDomain As String = ""                 ' The Host part of the current URI
+        Public Property requestSecure As Boolean = False             ' Set in InitASPEnvironment, true if https
+        Public Property requestRemoteIP As String = ""               '
+        Public Property requestBrowser As String = ""                ' The browser for this visit
+        Public Property requestQueryString As String = ""            ' The QueryString of the current URI
+        Public Property requestFormUseBinaryHeader As Boolean = False ' When set true with RequestNameBinaryRead=true, InitEnvironment reads the form in with a binary read
+        Public Property requestFormBinaryHeader As Byte()            ' For asp pages, this is the full multipart header
+        Public Property requestFormDict As New Dictionary(Of String, String)
+        Public Property requestSpaceAsUnderscore As Boolean = False  ' when true, is it assumed that dots in request variable names will convert
+        Public Property requestDotAsUnderscore As Boolean = False    ' (php converts spaces and dots to underscores)
+        Public Property requestUrlSource As String = ""
+        Public Property linkForwardSource As String = ""          ' main_ServerPathPage -- set during init
+        Public Property linkForwardError As String = ""           ' always 404
+        Public Property readStreamJSForm As Boolean = False                  ' When true, the request comes from a browser handling a JSPage script line
+        Public Property pageExcludeFromAnalytics As Boolean = False    ' For this page - true for remote methods and ajax
+        Public Property blockClosePageCopyright As Boolean = False ' if true, block the copyright message
         '
         ' refactor - this method stears the stream between controllers, put it in cpcore
-        Public webServerIO_OutStreamDevice As Integer = 0
-        Public webServerIO_MemberAction As Integer = 0              ' action to be performed during init
-        Public webServerIO_AdminMessage As String = ""          ' For more information message
-        Public webServerIO_requestPageReferer As String = ""                    ' replaced by main_ServerReferrer
-        Public webServerIO_requestReferer As String = ""
-        Public webServerIO_ServerFormActionURL As String = ""        ' The Action for all internal forms, if not set, default
-        Public webServerIO_requestContentWatchPrefix As String = ""   ' The different between the URL and the main_ContentWatch Pathpage
-        Public webServerIO_requestProtocol As String = ""             ' Set in InitASPEnvironment, http or https
-        Public requestUrl As String = ""                 ' The current URL, from protocol to end of quesrystring
-        Public webServerIO_requestVirtualFilePath As String = ""          ' The Virtual path for the site (host+main_ServerVirtualPath+"/" is site URI)
-        Public webServerIO_requestDomain As String = ""               ' This is the proper domain for the site (may not always match the current SERVER_NAME
-        Public requestPath As String = ""                 ' The path part of the current URI
-        Public requestPage As String = ""                 ' The page part of the current URI
-        Public webServerIO_requestSecureURLRoot As String = ""        ' The URL to the root of the secure area for this site
+        Public Property outStreamDevice As Integer = 0
+        Public Property memberAction As Integer = 0              ' action to be performed during init
+        Public Property adminMessage As String = ""          ' For more information message
+        Public Property requestPageReferer As String = ""                    ' replaced by main_ServerReferrer
+        Public Property requestReferer As String = ""
+        Public Property serverFormActionURL As String = ""        ' The Action for all internal forms, if not set, default
+        Public Property requestContentWatchPrefix As String = ""   ' The different between the URL and the main_ContentWatch Pathpage
+        Public Property requestProtocol As String = ""             ' Set in InitASPEnvironment, http or https
+        Public Property requestUrl As String = ""                 ' The current URL, from protocol to end of quesrystring
+        Public Property requestVirtualFilePath As String = ""          ' The Virtual path for the site (host+main_ServerVirtualPath+"/" is site URI)
+        Public Property requestPath As String = ""                 ' The path part of the current URI
+        Public Property requestPage As String = ""                 ' The page part of the current URI
+        Public Property requestSecureURLRoot As String = ""        ' The URL to the root of the secure area for this site
         '
-        Public webServerIO_response_NoFollow As Boolean = False   ' when set, Meta no follow is added
-        Public webServerIO_bufferRedirect As String = ""
-        Public webServerIO_bufferContentType As String = ""
-        Public webServerIO_bufferCookies As String = ""
-        Public webServerIO_bufferResponseHeader As String = ""
-        Public webServerIO_bufferResponseStatus As String = ""
+        ' -- response
+        Public Property response_NoFollow As Boolean = False   ' when set, Meta no follow is added
+        '
+        ' -- Buffer responses
+        Public Property bufferRedirect As String = ""
+        Public Property bufferContentType As String = ""
+        Public Property bufferCookies As String = ""
+        Public Property bufferResponseHeader As String = ""
+        Public Property bufferResponseStatus As String = ""
         '------------------------------------------------------------------------
         '
         '   QueryString, Form and cookie Processing variables
@@ -202,14 +201,9 @@ Namespace Contensive.Core
         '
         Public Function initWebContext(httpContext As System.Web.HttpContext) As Boolean
             Try
-                '
-                ' web client initialize
-                '
                 iisContext = httpContext
                 Dim key As String
-                'Dim isMultipartPost As Boolean
                 Dim keyValue As String
-                Dim parser As HttpMultipartParser.MultipartFormDataParser
                 Dim isAdmin As Boolean = False
                 Dim pos As Integer
                 Dim aliasRoute As String
@@ -272,7 +266,7 @@ Namespace Contensive.Core
                 requestSecure = CBool(iisContext.Request.ServerVariables("SERVER_PORT_SECURE"))
                 requestRemoteIP = CStr(iisContext.Request.ServerVariables("REMOTE_ADDR"))
                 requestBrowser = CStr(iisContext.Request.ServerVariables("HTTP_USER_AGENT"))
-                RequestLanguage = CStr(iisContext.Request.ServerVariables("HTTP_ACCEPT_LANGUAGE"))
+                requestLanguage = CStr(iisContext.Request.ServerVariables("HTTP_ACCEPT_LANGUAGE"))
                 requestHttpAccept = CStr(iisContext.Request.ServerVariables("HTTP_ACCEPT"))
                 requestHttpAcceptCharset = CStr(iisContext.Request.ServerVariables("HTTP_ACCEPT_CHARSET"))
                 requestHttpProfile = CStr(iisContext.Request.ServerVariables("HTTP_PROFILE"))
@@ -402,7 +396,7 @@ Namespace Contensive.Core
                     '
                     ' continue
                     '
-                    webServerIO_InitCounter += 1
+                    initCounter += 1
                     '
                     Call cpCore.html.enableOutputBuffer(True)
                     cpCore.continueProcessing = True
@@ -413,8 +407,8 @@ Namespace Contensive.Core
                     '       Do this first to set cpcore.main_ReadStreamJSForm, cpcore.main_ReadStreamJSProcess, cpcore.main_ReadStreamBinaryRead (must be in QS)
                     '--------------------------------------------------------------------------
                     '
-                    webServerIO_LinkForwardSource = ""
-                    webServerIO_LinkForwardError = ""
+                    linkForwardSource = ""
+                    linkForwardError = ""
                     '
                     ' start with the best guess for the source url, then improve the guess based on what iis might have done
                     '
@@ -437,15 +431,15 @@ Namespace Contensive.Core
                     ' ----- Handle RequestJSForm (hit caused by a browser processing the <script...></script> tag)
                     '--------------------------------------------------------------------------
                     '
-                    If webServerIO_ReadStreamJSForm Then
+                    If readStreamJSForm Then
                         '
                         ' Request comes from the browser while processing the javascript line
                         ' Add JSProcessQuery to QS
                         ' Add cpcore.main_ServerReferrerQS to QS
                         ' Add JSProcessForm to form
                         '
-                        webServerIO_BlockClosePageCopyright = True
-                        webServerIO_OutStreamDevice = docController.htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
+                        blockClosePageCopyright = True
+                        outStreamDevice = docController.htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
                         Call setResponseContentType("application/javascript") ' refactor -- this should be setContentType
                         '
                         ' Add the cpcore.main_ServerReferrer QS to the cpcore.doc.main_InStreamArray()
@@ -476,27 +470,27 @@ Namespace Contensive.Core
                     ' Set misc Server publics
                     '--------------------------------------------------------------------------
                     '
-                    webServerIO_MemberAction = cpCore.docProperties.getInteger("ma")
-                    If (webServerIO_MemberAction = 3) Or (webServerIO_MemberAction = 2) Then
-                        webServerIO_MemberAction = 0
+                    memberAction = cpCore.docProperties.getInteger("ma")
+                    If (memberAction = 3) Or (memberAction = 2) Then
+                        memberAction = 0
                         HardCodedPage = HardCodedPageLogoutLogin
                     End If
                     '
                     ' calculate now - but recalculate later - this does not include the /RemoteMethodFromQueryString case
                     '
                     '
-                    webServerIO_PageExcludeFromAnalytics = (AjaxFunction <> "") Or (AjaxFastFunction <> "") Or (RemoteMethodFromQueryString <> "")
+                    pageExcludeFromAnalytics = (AjaxFunction <> "") Or (AjaxFastFunction <> "") Or (RemoteMethodFromQueryString <> "")
                     '
                     '
                     ' Other Server variables
                     '
-                    webServerIO_requestReferer = requestReferrer
-                    webServerIO_requestPageReferer = requestReferrer
+                    requestReferer = requestReferrer
+                    requestPageReferer = requestReferrer
                     '
                     If requestSecure Then
-                        webServerIO_requestProtocol = "https://"
+                        requestProtocol = "https://"
                     Else
-                        webServerIO_requestProtocol = "http://"
+                        requestProtocol = "http://"
                     End If
                     '
                     cpCore.blockExceptionReporting = False
@@ -541,7 +535,7 @@ Namespace Contensive.Core
                     cpCore.domainLegacyCache.domainDetails.visited = False
                     cpCore.domainLegacyCache.domainDetails.id = 0
                     cpCore.domainLegacyCache.domainDetails.forwardUrl = ""
-                    webServerIO_requestDomain = requestDomain
+                    requestDomain = requestDomain
                     '
                     ' REFACTOR -- move to cpcore.domains class 
                     cpCore.domainLegacyCache.domainDetailsList = cpCore.cache.getObject(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))("domainContentList")
@@ -681,7 +675,7 @@ Namespace Contensive.Core
                             End If
                         End If
                         If cpCore.domainLegacyCache.domainDetails.noFollow Then
-                            webServerIO_response_NoFollow = True
+                            response_NoFollow = True
                         End If
 
                     Else
@@ -722,10 +716,10 @@ Namespace Contensive.Core
                         'Call cpCore.cache.setObject("domainContentList", domainDetailsListText, "domains")
                     End If
                     '
-                    webServerIO_requestVirtualFilePath = "/" & cpCore.serverConfig.appConfig.name
+                    requestVirtualFilePath = "/" & cpCore.serverConfig.appConfig.name
                     '
-                    webServerIO_requestContentWatchPrefix = webServerIO_requestProtocol & requestDomain & requestAppRootPath
-                    webServerIO_requestContentWatchPrefix = Mid(webServerIO_requestContentWatchPrefix, 1, Len(webServerIO_requestContentWatchPrefix) - 1)
+                    requestContentWatchPrefix = requestProtocol & requestDomain & requestAppRootPath
+                    requestContentWatchPrefix = Mid(requestContentWatchPrefix, 1, Len(requestContentWatchPrefix) - 1)
                     '
                     'ServerSocketLoaded = False
                     '
@@ -742,7 +736,7 @@ Namespace Contensive.Core
                         requestPage = Mid(requestPathPage, TextStartPointer + 1)
                     End If
                     ' cpcore.web_requestAppPath = Mid(cpcore.web_requestPath, Len(appRootPath) + 1)
-                    webServerIO_requestSecureURLRoot = "https://" & webServerIO_requestDomain & requestAppRootPath
+                    requestSecureURLRoot = "https://" & requestDomain & requestAppRootPath
                     ''
                     '' ----- If virtual site, check RootPath case against current URL
                     ''
@@ -778,7 +772,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Create Server Link property
                     '
-                    requestUrl = webServerIO_requestProtocol & requestDomain & requestAppRootPath & requestPath & requestPage
+                    requestUrl = requestProtocol & requestDomain & requestAppRootPath & requestPath & requestPage
                     If requestQueryString <> "" Then
                         requestUrl = requestUrl & "?" & requestQueryString
                     End If
@@ -792,7 +786,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Style tag
                     '
-                    webServerIO_AdminMessage = "For more information, please contact the <a href=""mailto:" & cpCore.siteProperties.emailAdmin & "?subject=Re: " & webServerIO_requestDomain & """>Site Administrator</A>."
+                    adminMessage = "For more information, please contact the <a href=""mailto:" & cpCore.siteProperties.emailAdmin & "?subject=Re: " & requestDomain & """>Site Administrator</A>."
 
                     '
                     '
@@ -808,7 +802,7 @@ Namespace Contensive.Core
                     ' ----- Create Server Link property
                     '--------------------------------------------------------------------------
                     '
-                    requestUrl = webServerIO_requestProtocol & requestDomain & requestAppRootPath & requestPath & requestPage
+                    requestUrl = requestProtocol & requestDomain & requestAppRootPath & requestPath & requestPage
                     If requestQueryString <> "" Then
                         requestUrl = requestUrl & "?" & requestQueryString
                     End If
@@ -820,15 +814,15 @@ Namespace Contensive.Core
                     '
                     'Call AppendLog("main_init(), 2300")
                     '
-                    If (RedirectLink = "") And (LCase(requestDomain) <> genericController.vbLCase(webServerIO_requestDomain)) Then
+                    If (RedirectLink = "") And (LCase(requestDomain) <> genericController.vbLCase(requestDomain)) Then
                         '
                         'Call AppendLog("main_init(), 2310 - exit in domain and path check")
                         '
-                        Copy = "Redirecting to domain [" & webServerIO_requestDomain & "] because this site is configured to run on the current domain [" & requestDomain & "]"
+                        Copy = "Redirecting to domain [" & requestDomain & "] because this site is configured to run on the current domain [" & requestDomain & "]"
                         If requestQueryString <> "" Then
-                            Call redirect(webServerIO_requestProtocol & webServerIO_requestDomain & requestPath & requestPage & "?" & requestQueryString, Copy, False)
+                            Call redirect(requestProtocol & requestDomain & requestPath & requestPage & "?" & requestQueryString, Copy, False)
                         Else
-                            Call redirect(webServerIO_requestProtocol & webServerIO_requestDomain & requestPath & requestPage, Copy, False)
+                            Call redirect(requestProtocol & requestDomain & requestPath & requestPage, Copy, False)
                         End If
                         cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                         Return cpCore.continueProcessing
@@ -850,8 +844,8 @@ Namespace Contensive.Core
                     '
                     ' ----- Create cpcore.main_ServerFormActionURL if it has not been overridden manually
                     '
-                    If webServerIO_ServerFormActionURL = "" Then
-                        webServerIO_ServerFormActionURL = webServerIO_requestProtocol & requestDomain & requestPath & requestPage
+                    If serverFormActionURL = "" Then
+                        serverFormActionURL = requestProtocol & requestDomain & requestPath & requestPage
                     End If
                     ''
                     ''--------------------------------------------------------------------------
@@ -928,7 +922,7 @@ Namespace Contensive.Core
             If requestCookies.ContainsKey(cookieKey) Then
                 '
             Else
-                Dim newCookie As New webServerController.cookieClass
+                Dim newCookie As New iisController.cookieClass
                 newCookie.name = cookieKey
                 newCookie.value = cookieValue
                 requestCookies.Add(cookieKey, newCookie)
@@ -941,16 +935,11 @@ Namespace Contensive.Core
         '
         Public Sub addResponseCookie(ByVal CookieName As String, ByVal CookieValue As String, Optional ByVal DateExpires As Date = Nothing, Optional ByVal domain As String = "", Optional ByVal Path As String = "", Optional ByVal Secure As Boolean = False)
             Try
-                '
-                Dim Link As String
                 Dim iCookieName As String
                 Dim iCookieValue As String
                 Dim MethodName As String
                 Dim s As String
-                Dim domainListSplit() As String
-                Dim domainSet As String
                 Dim usedDomainList As String = ""
-                Dim Ptr As Integer
                 '
                 iCookieName = genericController.encodeText(CookieName)
                 iCookieValue = genericController.encodeText(CookieValue)
@@ -1074,35 +1063,35 @@ Namespace Contensive.Core
                             ' Pass Cookie to non-asp parent
                             '   crlf delimited list of name,value,expires,domain,path,secure
                             '
-                            If webServerIO_bufferCookies <> "" Then
-                                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf
+                            If bufferCookies <> "" Then
+                                bufferCookies = bufferCookies & vbCrLf
                             End If
-                            webServerIO_bufferCookies = webServerIO_bufferCookies & CookieName
-                            webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & iCookieValue
+                            bufferCookies = bufferCookies & CookieName
+                            bufferCookies = bufferCookies & vbCrLf & iCookieValue
                             '
                             s = ""
                             If Not isMinDate(DateExpires) Then
                                 s = DateExpires.ToString
                             End If
-                            webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
+                            bufferCookies = bufferCookies & vbCrLf & s
                             '
                             s = ""
                             If Not isMissing(domain) Then
                                 s = genericController.encodeText(domain)
                             End If
-                            webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
+                            bufferCookies = bufferCookies & vbCrLf & s
                             '
                             s = "/"
                             If Not isMissing(Path) Then
                                 s = genericController.encodeText(Path)
                             End If
-                            webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
+                            bufferCookies = bufferCookies & vbCrLf & s
                             '
                             s = "false"
                             If genericController.EncodeBoolean(Secure) Then
                                 s = "true"
                             End If
-                            webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
+                            bufferCookies = bufferCookies & vbCrLf & s
                         End If
                     End If
                 End If
@@ -1114,13 +1103,13 @@ Namespace Contensive.Core
         '
         '
         Public Sub setResponseStatus(status As String)
-            webServerIO_bufferResponseStatus = status
+            bufferResponseStatus = status
         End Sub
         '
         '
         '
         Public Sub setResponseContentType(ContentType As Object)
-            webServerIO_bufferContentType = CStr(ContentType)
+            bufferContentType = CStr(ContentType)
         End Sub
         '
         '
@@ -1129,10 +1118,10 @@ Namespace Contensive.Core
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetStreamHeader")
             '
             If cpCore.continueProcessing Then
-                If webServerIO_bufferResponseHeader <> "" Then
-                    webServerIO_bufferResponseHeader = webServerIO_bufferResponseHeader & vbCrLf
+                If bufferResponseHeader <> "" Then
+                    bufferResponseHeader = bufferResponseHeader & vbCrLf
                 End If
-                webServerIO_bufferResponseHeader = webServerIO_bufferResponseHeader _
+                bufferResponseHeader = bufferResponseHeader _
                     & genericController.vbReplace(genericController.encodeText(HeaderName), vbCrLf, "") _
                     & vbCrLf & genericController.vbReplace(genericController.encodeText(HeaderValue), vbCrLf, "")
             End If
@@ -1158,7 +1147,7 @@ ErrorTrap:
                 Const rnRedirectCycleFlag = "cycleFlag"
                 Dim EncodedLink As String
                 Dim Copy As String
-                Dim ShortLink As String
+                Dim ShortLink As String = String.Empty
                 Dim FullLink As String
                 Dim redirectCycles As Integer
                 '
@@ -1171,26 +1160,26 @@ ErrorTrap:
                         FullLink = NonEncodedLink
                     Else
                         ShortLink = NonEncodedLink
-                        ShortLink = genericController.ConvertLinkToShortLink(ShortLink, requestDomain, webServerIO_requestVirtualFilePath)
-                        ShortLink = genericController.EncodeAppRootPath(ShortLink, webServerIO_requestVirtualFilePath, requestAppRootPath, requestDomain)
-                        FullLink = webServerIO_requestProtocol & requestDomain & ShortLink
+                        ShortLink = genericController.ConvertLinkToShortLink(ShortLink, requestDomain, requestVirtualFilePath)
+                        ShortLink = genericController.EncodeAppRootPath(ShortLink, requestVirtualFilePath, requestAppRootPath, requestDomain)
+                        FullLink = requestProtocol & requestDomain & ShortLink
                     End If
                     If (NonEncodedLink = "") Then
                         '
                         ' Link is not valid
                         '
-                        Call Err.Raise(ignoreInteger, "dll", "Redirect was called with a blank Link. Redirect Reason [" & RedirectReason & "]")
+                        cpCore.handleException(New ApplicationException("Redirect was called with a blank Link. Redirect Reason [" & RedirectReason & "]"))
                         Exit Sub
                         '
                         ' changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
                         ' the same as the destination of the link forward, this throws an error and does not forward. the only case where main_ServerLinksource is different
                         ' then main_ServerLink is the linkfforward/linkalias case.
                         '
-                    ElseIf (requestFormdict.Count = 0) And (requestUrlSource = FullLink) Then
+                    ElseIf (requestFormDict.Count = 0) And (requestUrlSource = FullLink) Then
                         '
                         ' Loop redirect error, throw trap and block redirect to prevent loop
                         '
-                        Call Err.Raise(ignoreInteger, "dll", "Redirect was called to the same URL, main_ServerLink is [" & requestUrl & "], main_ServerLinkSource is [" & requestUrlSource & "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" & RedirectReason & "]")
+                        cpCore.handleException(New ApplicationException("Redirect was called to the same URL, main_ServerLink is [" & requestUrl & "], main_ServerLinkSource is [" & requestUrlSource & "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" & RedirectReason & "]"))
                         Exit Sub
                     ElseIf IsPageNotFound Then
                         '
@@ -1232,7 +1221,7 @@ ErrorTrap:
                                 iisContext.Response.Redirect(NonEncodedLink, False)
                                 iisContext.ApplicationInstance.CompleteRequest()
                             Else
-                                webServerIO_bufferRedirect = NonEncodedLink
+                                bufferRedirect = NonEncodedLink
                             End If
                         End If
                     End If
@@ -1251,5 +1240,291 @@ ErrorTrap:
                 iisContext.Response.Flush()
             End If
         End Sub
+        ''
+        ''====================================================================================================
+        ''
+        'Private Structure fieldTypePrivate
+        '    Dim Name As String
+        '    Dim fieldTypePrivate As Integer
+        'End Structure
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Verify a site exists, it not add it, it is does, verify all its settings
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="appName"></param>
+        ''' <param name="DomainName"></param>
+        ''' <param name="rootPublicFilesPath"></param>
+        ''' <param name="defaultDocOrBlank"></param>
+        ''' '
+        Public Shared Sub verifySite(cpCore As coreClass, ByVal appName As String, ByVal DomainName As String, ByVal rootPublicFilesPath As String, ByVal defaultDocOrBlank As String)
+            Try
+                verifyAppPool(cpCore, appName)
+                verifyWebsite(cpCore, appName, DomainName, rootPublicFilesPath, appName)
+            Catch ex As Exception
+                cpCore.handleException(ex, "verifySite")
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' verify the application pool. If it exists, update it. If not, create it
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="poolName"></param>
+        Private Shared Sub verifyAppPool(cpCore As coreClass, poolName As String)
+            Try
+                Using serverManager As ServerManager = New ServerManager()
+                    Dim poolFound As Boolean = False
+                    Dim appPool As ApplicationPool
+                    For Each appPool In serverManager.ApplicationPools
+                        If (appPool.Name = poolName) Then
+                            poolFound = True
+                            Exit For
+                        End If
+                    Next
+                    If Not poolFound Then
+                        appPool = serverManager.ApplicationPools.Add(poolName)
+                    Else
+                        appPool = serverManager.ApplicationPools(poolName)
+                    End If
+                    appPool.ManagedRuntimeVersion = "v4.0"
+                    appPool.Enable32BitAppOnWin64 = True
+                    appPool.ManagedPipelineMode = ManagedPipelineMode.Integrated
+                    serverManager.CommitChanges()
+                End Using
+            Catch ex As Exception
+                cpCore.handleException(ex, "verifyAppPool")
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' verify the website. If it exists, update it. If not, create it
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="appName"></param>
+        ''' <param name="domainName"></param>
+        ''' <param name="phyPath"></param>
+        ''' <param name="appPool"></param>
+        Private Shared Sub verifyWebsite(cpCore As coreClass, appName As String, domainName As String, phyPath As String, appPool As String)
+            Try
+
+                Using iisManager As ServerManager = New ServerManager()
+                    Dim site As Site
+                    Dim found As Boolean = False
+                    '
+                    ' -- verify the site exists
+                    For Each site In iisManager.Sites
+                        If site.Name.ToLower() = appName.ToLower() Then
+                            found = True
+                            Exit For
+                        End If
+                    Next
+                    If Not found Then
+                        iisManager.Sites.Add(appName, "http", "*:80:" & appName, phyPath)
+                    End If
+                    site = iisManager.Sites(appName)
+                    '
+                    ' -- verify the bindings
+                    verifyWebsite_Binding(cpCore, site, "*:80:" & appName, "http")
+                    verifyWebsite_Binding(cpCore, site, "*:80:" & domainName, "http")
+                    '
+                    ' -- verify the application pool
+                    site.ApplicationDefaults.ApplicationPoolName = appPool
+                    For Each iisApp As Application In site.Applications
+                        iisApp.ApplicationPoolName = appPool
+                    Next
+                    '
+                    ' -- verify the cdn virtual directory (if configured)
+                    Dim cdnFilesPrefix As String = cpCore.serverConfig.appConfig.cdnFilesNetprefix
+                    If (cdnFilesPrefix.IndexOf("://") < 0) Then
+                        verifyWebsite_VirtualDirectory(cpCore, site, appName, cdnFilesPrefix, cpCore.serverConfig.appConfig.cdnFilesPath)
+                    End If
+                    '
+                    ' -- commit any changes
+                    iisManager.CommitChanges()
+                End Using
+            Catch ex As Exception
+                cpCore.handleException(ex, "verifyWebsite")
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Verify the binding
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="site"></param>
+        ''' <param name="bindingInformation"></param>
+        ''' <param name="bindingProtocol"></param>
+        Private Shared Sub verifyWebsite_Binding(cpCore As coreClass, site As Site, bindingInformation As String, bindingProtocol As String)
+            Try
+                Using iisManager As ServerManager = New ServerManager()
+                    Dim binding As Binding
+                    Dim found As Boolean = False
+                    found = False
+                    For Each binding In site.Bindings
+                        If (binding.BindingInformation = bindingInformation) And (binding.Protocol = bindingProtocol) Then
+                            found = True
+                            Exit For
+                        End If
+                    Next
+                    If Not found Then
+                        binding = site.Bindings.CreateElement()
+                        binding.BindingInformation = bindingInformation
+                        binding.Protocol = bindingProtocol
+                        site.Bindings.Add(binding)
+                        iisManager.CommitChanges()
+                    End If
+                End Using
+            Catch ex As Exception
+                cpCore.handleException(ex, "verifyWebsite_Binding")
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Private Shared Sub verifyWebsite_VirtualDirectory(cpCore As coreClass, site As Site, appName As String, virtualFolder As String, physicalPath As String)
+            Try
+                Dim found As Boolean = False
+                For Each iisApp As Application In site.Applications
+                    If iisApp.ApplicationPoolName.ToLower() = appName.ToLower() Then
+                        For Each virtualDirectory As VirtualDirectory In iisApp.VirtualDirectories
+                            If virtualDirectory.Path = virtualFolder Then
+                                found = True
+                                Exit For
+                            End If
+                        Next
+                        If Not found Then
+                            Dim vpList As List(Of String) = virtualFolder.Split("/"c).ToList
+                            Dim newDirectoryPath As String = ""
+
+                            For Each newDirectoryFolderName As String In vpList
+                                If (Not String.IsNullOrEmpty(newDirectoryFolderName)) Then
+                                    newDirectoryPath &= "/" & newDirectoryFolderName
+                                    Dim directoryFound As Boolean = False
+                                    For Each currentDirectory As VirtualDirectory In iisApp.VirtualDirectories
+                                        If (currentDirectory.Path.ToLower() = newDirectoryPath.ToLower()) Then
+                                            directoryFound = True
+                                            Exit For
+                                        End If
+                                    Next
+                                    If (Not directoryFound) Then
+                                        iisApp.VirtualDirectories.Add(newDirectoryPath, physicalPath)
+                                    End If
+                                End If
+                            Next
+                        End If
+                    End If
+                    If found Then Exit For
+                Next
+            Catch ex As Exception
+                cpCore.handleException(ex, "verifyWebsite_VirtualDirectory")
+            End Try
+        End Sub
+        '========================================================================
+        ' main_RedirectByRecord( iContentName, iRecordID )
+        '   looks up the record
+        '   increments the 'clicks' field and redirects to the 'link' field
+        '   returns true if the redirect happened OK
+        '========================================================================
+        '
+        Public Shared Function main_RedirectByRecord_ReturnStatus(cpcore As coreClass, ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal FieldName As String = "") As Boolean
+            Dim CSPointer As Integer
+            Dim MethodName As String
+            Dim ContentID As Integer
+            Dim CSHost As Integer
+            Dim HostContentName As String
+            Dim HostRecordID As Integer
+            Dim BlockRedirect As Boolean
+            Dim iContentName As String
+            Dim iRecordID As Integer
+            Dim iFieldName As String
+            Dim LinkPrefix As String = String.Empty
+            Dim EncodedLink As String
+            Dim NonEncodedLink As String = ""
+            '
+            iContentName = genericController.encodeText(ContentName)
+            iRecordID = genericController.EncodeInteger(RecordID)
+            iFieldName = genericController.encodeEmptyText(FieldName, "link")
+            '
+            MethodName = "main_RedirectByRecord_ReturnStatus( " & iContentName & ", " & iRecordID & ", " & genericController.encodeEmptyText(FieldName, "(fieldname empty)") & ")"
+            '
+            main_RedirectByRecord_ReturnStatus = False
+            BlockRedirect = False
+            CSPointer = cpcore.db.cs_open(iContentName, "ID=" & iRecordID)
+            If cpcore.db.cs_ok(CSPointer) Then
+                ' 2/18/2008 - EncodeLink change
+                '
+                ' Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
+                '
+                EncodedLink = Trim(cpcore.db.cs_getText(CSPointer, iFieldName))
+                If EncodedLink = "" Then
+                    BlockRedirect = True
+                Else
+                    '
+                    ' ----- handle content special cases (prevent redirect to deleted records)
+                    '
+                    NonEncodedLink = cpcore.html.main_DecodeUrl(EncodedLink)
+                    Select Case genericController.vbUCase(iContentName)
+                        Case "CONTENT WATCH"
+                            '
+                            ' ----- special case
+                            '       if this is a content watch record, check the underlying content for
+                            '       inactive or expired before redirecting
+                            '
+                            LinkPrefix = cpcore.webServer.requestContentWatchPrefix
+                            ContentID = (cpcore.db.cs_getInteger(CSPointer, "ContentID"))
+                            HostContentName = cpcore.metaData.getContentNameByID(ContentID)
+                            If (HostContentName = "") Then
+                                '
+                                ' ----- Content Watch with a bad ContentID, mark inactive
+                                '
+                                BlockRedirect = True
+                                Call cpcore.db.cs_set(CSPointer, "active", 0)
+                            Else
+                                HostRecordID = (cpcore.db.cs_getInteger(CSPointer, "RecordID"))
+                                If HostRecordID = 0 Then
+                                    '
+                                    ' ----- Content Watch with a bad iRecordID, mark inactive
+                                    '
+                                    BlockRedirect = True
+                                    Call cpcore.db.cs_set(CSPointer, "active", 0)
+                                Else
+                                    CSHost = cpcore.db.cs_open(HostContentName, "ID=" & HostRecordID)
+                                    If Not cpcore.db.cs_ok(CSHost) Then
+                                        '
+                                        ' ----- Content Watch host record not found, mark inactive
+                                        '
+                                        BlockRedirect = True
+                                        Call cpcore.db.cs_set(CSPointer, "active", 0)
+                                    End If
+                                End If
+                                Call cpcore.db.cs_Close(CSHost)
+                            End If
+                            If BlockRedirect Then
+                                '
+                                ' ----- if a content watch record is blocked, delete the content tracking
+                                '
+                                Call cpcore.db.deleteContentRules(cpcore.metaData.getContentId(HostContentName), HostRecordID)
+                            End If
+                    End Select
+                End If
+                If Not BlockRedirect Then
+                    '
+                    ' If link incorrectly includes the LinkPrefix, take it off first, then add it back
+                    '
+                    NonEncodedLink = genericController.ConvertShortLinkToLink(NonEncodedLink, LinkPrefix)
+                    If cpcore.db.cs_isFieldSupported(CSPointer, "Clicks") Then
+                        Call cpcore.db.cs_set(CSPointer, "Clicks", (cpcore.db.cs_getNumber(CSPointer, "Clicks")) + 1)
+                    End If
+                    Call cpcore.webServer.redirect(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
+                    main_RedirectByRecord_ReturnStatus = True
+                End If
+            End If
+            Call cpcore.db.cs_Close(CSPointer)
+        End Function
     End Class
 End Namespace

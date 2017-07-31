@@ -1,4 +1,6 @@
+
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
@@ -45,7 +47,7 @@ Namespace Contensive.Core
             Me.disposed = True
         End Sub
 
-        Public Overrides ReadOnly Property Browser() As String 'Inherits BaseClasses.CPRequestBaseClass.Browser
+        Public Overrides ReadOnly Property Browser() As String
             Get
                 If True Then
                     Return cpCore.webServer.requestBrowser
@@ -55,7 +57,7 @@ Namespace Contensive.Core
             End Get
         End Property
 
-        Public Overrides ReadOnly Property BrowserIsIE() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsIE
+        Public Overrides ReadOnly Property BrowserIsIE() As Boolean
             Get
                 If True Then
                     Return cpCore.authContext.visit_browserIsIE
@@ -65,7 +67,7 @@ Namespace Contensive.Core
             End Get
         End Property
 
-        Public Overrides ReadOnly Property BrowserIsMac() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsMac
+        Public Overrides ReadOnly Property BrowserIsMac() As Boolean
             Get
                 If True Then
                     Return cpCore.authContext.visit_browserIsMac
@@ -75,7 +77,7 @@ Namespace Contensive.Core
             End Get
         End Property
 
-        Public Overrides ReadOnly Property BrowserIsMobile() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsMobile
+        Public Overrides ReadOnly Property BrowserIsMobile() As Boolean
             Get
                 If True Then
                     Return cpCore.authContext.visit.Mobile
@@ -85,7 +87,7 @@ Namespace Contensive.Core
             End Get
         End Property
 
-        Public Overrides ReadOnly Property BrowserIsWindows() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsWindows
+        Public Overrides ReadOnly Property BrowserIsWindows() As Boolean
             Get
                 If True Then
                     Return cpCore.authContext.visit_browserIsWindows
@@ -95,7 +97,7 @@ Namespace Contensive.Core
             End Get
         End Property
 
-        Public Overrides ReadOnly Property BrowserVersion() As String 'Inherits BaseClasses.CPRequestBaseClass.BrowserVersion
+        Public Overrides ReadOnly Property BrowserVersion() As String
             Get
                 If True Then
                     Return cpCore.authContext.visit_browserVersion
@@ -105,7 +107,7 @@ Namespace Contensive.Core
             End Get
         End Property
 
-        Public Overrides Function Cookie(ByVal CookieName As String) As String 'Inherits BaseClasses.CPRequestBaseClass.Cookie
+        Public Overrides Function Cookie(ByVal CookieName As String) As String
             If True Then
                 Return cpCore.webServer.getRequestCookie(CookieName)
             Else
@@ -117,10 +119,10 @@ Namespace Contensive.Core
         ''' return a string that includes the simple name value pairs for all request cookies
         ''' </summary>
         ''' <returns></returns>
-        Public Overrides ReadOnly Property CookieString() As String 'Inherits BaseClasses.CPRequestBaseClass.CookieString
+        Public Overrides ReadOnly Property CookieString() As String
             Get
                 Dim returnCookies As String = ""
-                For Each kvp As KeyValuePair(Of String, webServerController.cookieClass) In cpCore.webServer.requestCookies
+                For Each kvp As KeyValuePair(Of String, iisController.cookieClass) In cpCore.webServer.requestCookies
                     returnCookies &= "&" & kvp.Key & "=" & kvp.Value.value
                 Next
                 If returnCookies.Length > 0 Then
@@ -130,242 +132,142 @@ Namespace Contensive.Core
             End Get
         End Property
 
-        Public Overrides ReadOnly Property Form() As String 'Inherits BaseClasses.CPRequestBaseClass.Form
+        Public Overrides ReadOnly Property Form() As String
             Get
-                If True Then
-                    Return Controllers.genericController.convertNameValueDictToREquestString(cpCore.webServer.requestFormDict)
-                Else
-                    Return ""
-                End If
+                Return Controllers.genericController.convertNameValueDictToREquestString(cpCore.webServer.requestFormDict)
             End Get
         End Property
 
-        Public Overrides ReadOnly Property FormAction() As String 'Inherits BaseClasses.CPRequestBaseClass.FormAction
+        Public Overrides ReadOnly Property FormAction() As String
             Get
-                If True Then
-                    Return cpCore.webServer.webServerIO_ServerFormActionURL
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.serverFormActionURL
             End Get
         End Property
 
-        Public Overrides Function GetBoolean(ByVal RequestName As String) As Boolean 'Inherits BaseClasses.CPRequestBaseClass.GetBoolean
-            If True Then
-                Return cpCore.docproperties.getBoolean(RequestName)
-            Else
-                Return False
-            End If
+        Public Overrides Function GetBoolean(ByVal RequestName As String) As Boolean
+            Return cpCore.docProperties.getBoolean(RequestName)
         End Function
 
-        Public Overrides Function GetDate(ByVal RequestName As String) As Date 'Inherits BaseClasses.CPRequestBaseClass.GetDate
-            If True Then
-                Return cpCore.docproperties.getDate(RequestName)
-            Else
-                Return New Date
-            End If
+        Public Overrides Function GetDate(ByVal RequestName As String) As Date
+            Return cpCore.docProperties.getDate(RequestName)
         End Function
 
-        Public Overrides Function GetInteger(ByVal RequestName As String) As Integer 'Inherits BaseClasses.CPRequestBaseClass.GetInteger
-            If True Then
-                Return cpCore.docProperties.getInteger(RequestName)
-            Else
-                Return 0
-            End If
+        Public Overrides Function GetInteger(ByVal RequestName As String) As Integer
+            Return cpCore.docProperties.getInteger(RequestName)
         End Function
 
-        Public Overrides Function GetNumber(ByVal RequestName As String) As Double 'Inherits BaseClasses.CPRequestBaseClass.GetNumber
-            If True Then
-                Return cpCore.docProperties.getNumber(RequestName)
-            Else
-                Return 0
-            End If
+        Public Overrides Function GetNumber(ByVal RequestName As String) As Double
+            Return cpCore.docProperties.getNumber(RequestName)
         End Function
 
-        Public Overrides Function GetText(ByVal RequestName As String) As String 'Inherits BaseClasses.CPRequestBaseClass.GetText
-            If True Then
-                Return cpCore.docProperties.getText(RequestName)
-            Else
-                Return ""
-            End If
+        Public Overrides Function GetText(ByVal RequestName As String) As String
+            Return cpCore.docProperties.getText(RequestName)
         End Function
 
-        Public Overrides ReadOnly Property Host() As String 'Inherits BaseClasses.CPRequestBaseClass.Host
+        Public Overrides ReadOnly Property Host() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestDomain
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestDomain
             End Get
         End Property
 
-        Public Overrides ReadOnly Property HTTPAccept() As String 'Inherits BaseClasses.CPRequestBaseClass.HTTPAccept
+        Public Overrides ReadOnly Property HTTPAccept() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestHttpAccept
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestHttpAccept
             End Get
         End Property
 
-        Public Overrides ReadOnly Property HTTPAcceptCharset() As String 'Inherits BaseClasses.CPRequestBaseClass.HTTPAcceptCharset
+        Public Overrides ReadOnly Property HTTPAcceptCharset() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestHttpAcceptCharset
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestHttpAcceptCharset
             End Get
         End Property
 
-        Public Overrides ReadOnly Property HTTPProfile() As String 'Inherits BaseClasses.CPRequestBaseClass.HTTPProfile
+        Public Overrides ReadOnly Property HTTPProfile() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestHttpProfile
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestHttpProfile
             End Get
         End Property
 
-        Public Overrides ReadOnly Property HTTPXWapProfile() As String 'Inherits BaseClasses.CPRequestBaseClass.HTTPXWapProfile
+        Public Overrides ReadOnly Property HTTPXWapProfile() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestxWapProfile
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestxWapProfile
             End Get
         End Property
 
-        Public Overrides ReadOnly Property Language() As String 'Inherits BaseClasses.CPRequestBaseClass.Language
+        Public Overrides ReadOnly Property Language() As String
             Get
-                If True Then
-                    Return cpcore.authContext.user.language
-                Else
-                    Return ""
-                End If
+                Return cpCore.authContext.user.language
             End Get
         End Property
 
-        Public Overrides ReadOnly Property Link() As String 'Inherits BaseClasses.CPRequestBaseClass.Link
+        Public Overrides ReadOnly Property Link() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestUrl
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestUrl
             End Get
         End Property
 
-        Public Overrides ReadOnly Property LinkForwardSource() As String 'Inherits BaseClasses.CPRequestBaseClass.LinkForwardSource
+        Public Overrides ReadOnly Property LinkForwardSource() As String
             Get
-                If True Then
-                    Return cpCore.webServer.webServerIO_LinkForwardSource
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.linkForwardSource
             End Get
         End Property
 
-        Public Overrides ReadOnly Property LinkSource() As String 'Inherits BaseClasses.CPRequestBaseClass.LinkSource
+        Public Overrides ReadOnly Property LinkSource() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestUrlSource
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestUrlSource
             End Get
         End Property
 
-        Public Overrides ReadOnly Property Page() As String 'Inherits BaseClasses.CPRequestBaseClass.Page
+        Public Overrides ReadOnly Property Page() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestPage
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestPage
             End Get
         End Property
 
-        Public Overrides ReadOnly Property Path() As String 'Inherits BaseClasses.CPRequestBaseClass.Path
+        Public Overrides ReadOnly Property Path() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestPath
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestPath
             End Get
         End Property
 
-        Public Overrides ReadOnly Property PathPage() As String 'Inherits BaseClasses.CPRequestBaseClass.PathPage
+        Public Overrides ReadOnly Property PathPage() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestPathPage
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestPathPage
             End Get
         End Property
 
-        Public Overrides ReadOnly Property Protocol() As String 'Inherits BaseClasses.CPRequestBaseClass.Protocol
+        Public Overrides ReadOnly Property Protocol() As String
             Get
-                If True Then
-                    Return cpCore.webServer.webServerIO_requestProtocol
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestProtocol
             End Get
         End Property
 
-        Public Overrides ReadOnly Property QueryString() As String 'Inherits BaseClasses.CPRequestBaseClass.QueryString
+        Public Overrides ReadOnly Property QueryString() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestQueryString
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestQueryString
             End Get
         End Property
 
-        Public Overrides ReadOnly Property Referer() As String 'Inherits BaseClasses.CPRequestBaseClass.Referer
+        Public Overrides ReadOnly Property Referer() As String
             Get
-                If True Then
-                    Return cpCore.webServer.webServerIO_requestReferer
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestReferer
             End Get
         End Property
 
-        Public Overrides ReadOnly Property RemoteIP() As String 'Inherits BaseClasses.CPRequestBaseClass.RemoteIP
+        Public Overrides ReadOnly Property RemoteIP() As String
             Get
-                If True Then
-                    Return cpCore.webServer.requestRemoteIP
-                Else
-                    Return ""
-                End If
+                Return cpCore.webServer.requestRemoteIP
             End Get
         End Property
 
-        Public Overrides ReadOnly Property Secure() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.Secure
+        Public Overrides ReadOnly Property Secure() As Boolean
             Get
-                If True Then
-                    Return cpCore.webServer.requestSecure
-                Else
-                    Return False
-                End If
+                Return cpCore.webServer.requestSecure
             End Get
         End Property
 
-        Public Overrides Function OK(ByVal RequestName As String) As Boolean 'Inherits BaseClasses.CPRequestBaseClass.OK
-            If True Then
-                Return cpCore.docProperties.containsKey(RequestName)
-            Else
-                Return False
-            End If
+        Public Overrides Function OK(ByVal RequestName As String) As Boolean
+            Return cpCore.docProperties.containsKey(RequestName)
         End Function
         '
         '

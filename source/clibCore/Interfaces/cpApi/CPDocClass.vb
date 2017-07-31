@@ -101,14 +101,14 @@ Namespace Contensive.Core
         Public Overrides Property noFollow() As Boolean
             Get
                 If True Then
-                    Return cpCore.webServer.webServerIO_response_NoFollow
+                    Return cpCore.webServer.response_NoFollow
                 Else
                     Return False
                 End If
             End Get
             Set(ByVal value As Boolean)
                 If True Then
-                    cpCore.webServer.webServerIO_response_NoFollow = value
+                    cpCore.webServer.response_NoFollow = value
                 End If
             End Set
         End Property
@@ -218,9 +218,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="NewCode"></param>
         Public Overrides Sub addHeadJavascript(ByVal NewCode As String)
-            If True Then
-                Call cpCore.html.main_AddHeadJavascript(NewCode)
-            End If
+            Call cpCore.html.addHeadJavascriptCode(NewCode, "")
         End Sub
         '
         '====================================================================================================
@@ -230,7 +228,7 @@ Namespace Contensive.Core
         ''' <param name="HeadTag"></param>
         Public Overrides Sub addHeadTag(ByVal HeadTag As String)
             If True Then
-                Call cpCore.html.main_AddHeadTag(HeadTag)
+                Call cpCore.html.addHeadTag(HeadTag)
             End If
         End Sub
         '
@@ -254,7 +252,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addOnLoadJavascript(ByVal NewCode As String)
             If True Then
-                Call cpCore.html.main_AddOnLoadJavascript(NewCode)
+                Call cpCore.html.addOnLoadJavascript(NewCode, "")
             End If
         End Sub
         '
@@ -285,9 +283,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub addHeadStyleLink(ByVal StyleSheetLink As String)
-            If True Then
-                Call cpCore.html.main_AddStylesheetLink(StyleSheetLink)
-            End If
+            Call cpCore.html.addStyleLink(StyleSheetLink, "")
         End Sub
         '
         '====================================================================================================
@@ -318,9 +314,10 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
+        <Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", True)>
         Public Overrides ReadOnly Property siteStylesheet() As String
             Get
-                Return cpCore.html.html_getStyleSheet2(0, 0)
+                Return "" 'cpCore.html.html_getStyleSheet2(0, 0)
             End Get
         End Property
         '

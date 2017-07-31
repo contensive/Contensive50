@@ -31,7 +31,7 @@ Namespace Contensive.Core.Controllers
             Dim result As String = ""
             Try
                 Dim Delimiter As String
-                Dim Copy As String
+                Dim Copy As String = String.Empty
                 Dim TableName As String
                 Dim CSPointer As Integer
                 Dim FieldNameVariant As String

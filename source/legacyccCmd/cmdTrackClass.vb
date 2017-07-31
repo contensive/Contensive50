@@ -1,6 +1,8 @@
 ﻿
-Imports Contensive.Core.coreCommonModule
-'Imports Interop.adodb
+Option Explicit On
+Option Strict On
+
+
 Imports System.Xml
 
 Namespace Contensive.Core
@@ -55,7 +57,7 @@ Namespace Contensive.Core
             Dim localByName As Process() = Process.GetProcessesByName("notepad")
             '
             '            Get
-            Dim lRet as integer, hM as integer
+            Dim lRet As Long, hM As Integer
             Dim InstancePtr as integer
             '
             m_hMutex = 0&

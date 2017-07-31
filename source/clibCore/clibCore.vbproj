@@ -396,6 +396,7 @@
   <ItemGroup>
     <Compile Include="addon_emailProcess\processEmailClass.vb" />
     <Compile Include="addon_housekeeping\houseKeepClass.vb" />
+    <Compile Include="addon_login\addon_loginClass.vb" />
     <Compile Include="addon_pageManager\childPageResortClass.vb" />
     <Compile Include="addon_pageManager\pageManager.vb" />
     <Compile Include="constants.vb" />
@@ -412,7 +413,6 @@
     <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />
     <Compile Include="Controllers\genericController.vb" />
-    <Compile Include="Controllers\iisController.vb" />
     <Compile Include="Models\addonLegacyModel.vb" />
     <Compile Include="Controllers\addonController.vb" />
     <Compile Include="Controllers\cacheController.vb" />
@@ -426,8 +426,8 @@
     <Compile Include="Models\Entity\libraryFileLogModel.vb" />
     <Compile Include="Models\Entity\addonIncludeModel.vb" />
     <Compile Include="Models\Entity\linkAliasModel.vb" />
-    <Compile Include="Models\Entity\SharedStylesIncludeRuleModel.vb" />
-    <Compile Include="Models\Entity\SharedStylesTemplateRuleModel.vb" />
+    <Compile Include="Models\Entity\xSharedStylesIncludeRuleModel.vb" />
+    <Compile Include="Models\Entity\xSharedStylesTemplateRuleModel.vb" />
     <Compile Include="Models\Entity\TemplateDomainRuleModel.vb" />
     <Compile Include="Models\Entity\pageContentModel.vb" />
     <Compile Include="Models\Entity\NavigatorEntryModel.vb" />
@@ -512,7 +512,7 @@
     <Compile Include="Models\Entity\sitePropertyModel.vb" />
     <Compile Include="Models\Entity\_oldaddonModel.vb" />
     <Compile Include="Models\Entity\contentModel.vb" />
-    <Compile Include="Models\Entity\miniCollectionModel.vb" />
+    <Compile Include="Models\Context\miniCollectionModel.vb" />
     <Compile Include="Models\Entity\domainModel.vb" />
     <Compile Include="Models\Entity\pageTemplateModel.vb" />
     <Compile Include="Models\Entity\_oldBaseModel.vb" />
@@ -591,12 +591,18 @@
     <Folder Include="Models\View\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="aoBase5.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Models\dataModelFields.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="ADODB">
       <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
       <VersionMajor>2</VersionMajor>
       <VersionMinor>8</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
@@ -609,12 +615,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="aoBase5.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Models\dataModelFields.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

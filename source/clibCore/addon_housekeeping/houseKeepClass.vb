@@ -27,125 +27,57 @@ Namespace Contensive.Core
         Public Sub HouseKeep(ByVal DebugMode As Boolean)
             Dim EmailDropArchiveAgeDays As Integer
             Dim Pos As Integer
-            Dim DomainNameList As String
             Dim DomainNamePrimary As String
-            Dim MissingDatePtr As Integer
             Dim workingDate As Date
             Dim OldestVisitSummaryWeCareAbout As Date
             Dim DefaultMemberName As String
             Dim PeopleCID As Integer
-            Dim IISResetRequired As Boolean
             Dim RegisterList As String = ""
-            Dim ArchiveDeleteNoCookie As Boolean
             Dim Content As String
             Dim ServerHousekeepTime As Date
             Dim ErrorMessage As String
-            Dim OldestSummarizedDateNumber As Double
             Dim Yesterday As Date
             Dim LastTimeSummaryWasRun As Date
             Dim NextSummaryStartDate As Date
-            Dim RightNowHour As Date
             Dim ALittleWhileAgo As Date
             Dim PeriodStartDate As Date
             Dim PeriodDatePtr As Double
             Dim PeriodStep As Double
             Dim StartOfHour As Date
-            Dim DateNumber As Integer
-            Dim TimeNumber As Integer
-            Dim SumStartTime As Double
-            Dim SumStopTime As Double
             Dim HoursPerDay As Integer
-            Dim DateStart As Date
-            Dim DateEnd As Date
-            Dim NewVisitorVisits As Integer
-            Dim SinglePageVisits As Integer
-            Dim AuthenticatedVisits As Integer
-            Dim NoCookieVisits As Integer
-            Dim AveTimeOnSite As Double
-            Dim PagesViewed As Integer
-            Dim VisitCnt As Integer
             Dim OldestDateAdded As Date
             Dim emptyData As Object
             Dim NeedToClearCache As Boolean
             Dim ArchiveParentID As Integer
             Dim RecordID As Integer
             Dim CS As Integer
-            Dim LoopPtr As Integer
-            Dim Ptr As Integer
-            Dim LocalFile As String
-            Dim LocalFilename As String
-            Dim Folders() As String
-            Dim FolderCnt As Integer
-            Dim CollectionGUID As String
-            Dim CollectionName As String
-            Dim LastChangeDate As String
-            Dim SubFolderList As String
-            Dim SubFolders() As String
-            Dim SubFolder As String
-            Dim Cnt As Integer
-            Dim LocalGUID As String
-            Dim LocalLastChangeDateStr As String
-            Dim LocalLastChangeDate As Date
-            Dim LibGUID As String
-            Dim LibLastChangeDateStr As String
-            Dim LibLastChangeDate As Date
-            Dim LibListNode As XmlNode
-            Dim LocalListNode As XmlNode
-            Dim CollectionNode As XmlNode
             Dim LibraryCollections As New XmlDocument
             Dim LocalCollections As New XmlDocument
             Dim Doc As New XmlDocument
-            ''Dim AppService As appServicesClass
-            'Dim cpCore As coreClass
-            '   Dim CSConnection As appEnvironmentStruc
             Dim AlarmTimeString As String
             Dim AlarmTimeMinutesSinceMidnight As Double
-            Dim LogDate As Date
             Dim FolderName As String
-            Dim FileList As String
-            Dim FileArray() As String
-            Dim FileArrayCount As Integer
-            Dim FileArrayPointer As Integer
-            Dim FileSplit() As String
-            Dim FolderList As String
-            Dim FolderArray() As String
-            Dim FolderArrayCount As Integer
-            Dim FolderArrayPointer As Integer
-            Dim FolderSplit() As String
-            'Dim fs As New fileSystemClass
             Dim VisitArchiveAgeDays As Integer
             Dim GuestArchiveAgeDays As Integer
             Dim VisitArchiveDate As Date
             Dim RunServerHousekeep As Boolean
             Dim NewHour As Boolean
-            '
             Dim rightNow As Date
             Dim LastCheckDateTime As Date
-            '
             Dim LastCheckMinutesFromMidnight As Double
             Dim minutesSinceMidnight As Double
-            '
             Dim ConfigFilename As String
             Dim Config As String
             Dim ConfigLines() As String
-            '
             Dim Line As String
             Dim LineCnt As Integer
             Dim LinePtr As Integer
             Dim NameValue() As String
-            'Dim dataBuildVersion As String
             Dim SQLNow As String
             Dim SQL As String
             Dim DataSourceType As Integer
-            'Dim KernelService As New KernelServicesClass
-            'Dim DatePtr As Integer
             Dim AddonInstall As addonInstallClass
             Dim cp As CPClass
-            Dim appList As List(Of String)
-            'Dim control As New controlClass
-            Dim apps() As String
-            'Dim appRow As String = ""
-            Dim appArg() As String
             '
             ' put token in a config file
             '

@@ -568,7 +568,7 @@ Namespace Contensive.Core.Models.Context
                             '
                             ' -- Save anything that changed
                             resultAuthContext.visit.ExcludeFromAnalytics = resultAuthContext.visit.ExcludeFromAnalytics Or resultAuthContext.visit.Bot Or resultAuthContext.user.ExcludeFromAnalytics Or resultAuthContext.user.Admin Or resultAuthContext.user.Developer
-                            If Not cpCore.webServer.webServerIO_PageExcludeFromAnalytics Then
+                            If Not cpCore.webServer.pageExcludeFromAnalytics Then
                                 resultAuthContext.visit.PageVisits += 1
                                 visit_changes = True
                             End If

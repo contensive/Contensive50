@@ -27,7 +27,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property Admin As Boolean
         Public Property ArgumentList As String
         Public Property AsAjax As Boolean
-        Public Property BlockDefaultStyles As Boolean
+        'Public Property BlockDefaultStyles As Boolean
         Public Property BlockEditTools As Boolean
         'Public Property ccGuid As String
         Public Property CollectionID As Integer
@@ -38,7 +38,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property CopyText As String
         'Public Property CreatedBy As Integer
         'Public Property CreateKey As Integer
-        Public Property CustomStylesFilename As String
+        'Public Property CustomStylesFilename As String
         'Public Property DateAdded As Date
         Public Property DotNetClass As String
         Public Property EditArchive As Boolean

@@ -1250,46 +1250,46 @@ Namespace Contensive.Core
         ' Indexes into the SiteSectionCache
         ' Created from "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID,JSOnLoad,JSHead,JSEndBody"
         '
-        Public Const SSC_ID = 0
-        Public Const SSC_Name = 1
-        Public Const SSC_TemplateID = 2
-        Public Const SSC_ContentID = 3
-        Public Const SSC_MenuImageFilename = 4
-        Public Const SSC_Caption = 5
-        Public Const SSC_MenuImageOverFilename = 6
-        Public Const SSC_HideMenu = 7
-        Public Const SSC_BlockSection = 8
-        Public Const SSC_RootPageID = 9
-        Public Const SSC_JSOnLoad = 10
-        Public Const SSC_JSHead = 11
-        Public Const SSC_JSEndBody = 12
-        Public Const SSC_JSFilename = 13
-        Public Const SSC_cnt = 14
+        'Public Const SSC_ID = 0
+        'Public Const SSC_Name = 1
+        'Public Const SSC_TemplateID = 2
+        'Public Const SSC_ContentID = 3
+        'Public Const SSC_MenuImageFilename = 4
+        'Public Const SSC_Caption = 5
+        'Public Const SSC_MenuImageOverFilename = 6
+        'Public Const SSC_HideMenu = 7
+        'Public Const SSC_BlockSection = 8
+        'Public Const SSC_RootPageID = 9
+        'Public Const SSC_JSOnLoad = 10
+        'Public Const SSC_JSHead = 11
+        'Public Const SSC_JSEndBody = 12
+        'Public Const SSC_JSFilename = 13
+        'Public Const SSC_cnt = 14
         '
         ' Indexes into the TemplateCache
         ' Created from "t.ID,t.Name,t.Link,t.BodyHTML,t.JSOnLoad,t.JSHead,t.JSEndBody,t.StylesFilename,r.StyleID"
         '
-        Public Const TC_ID = 0
-        Public Const TC_Name = 1
-        Public Const TC_Link = 2
-        Public Const TC_BodyHTML = 3
-        Public Const TC_JSOnLoad = 4
-        Public Const TC_JSInHeadLegacy = 5
-        'Public Const TC_JSHead = 5
-        Public Const TC_JSEndBody = 6
-        Public Const TC_StylesFilename = 7
-        Public Const TC_SharedStylesIDList = 8
-        Public Const TC_MobileBodyHTML = 9
-        Public Const TC_MobileStylesFilename = 10
-        Public Const TC_OtherHeadTags = 11
-        Public Const TC_BodyTag = 12
-        Public Const TC_JSInHeadFilename = 13
-        'Public Const TC_JSFilename = 13
-        Public Const TC_IsSecure = 14
-        Public Const TC_DomainIdList = 15
-        ' for now, Mobile templates do not have shared styles
-        'Public Const TC_MobileSharedStylesIDList = 11
-        Public Const TC_cnt = 16
+        'Public Const TC_ID = 0
+        'Public Const TC_Name = 1
+        'Public Const TC_Link = 2
+        'Public Const TC_BodyHTML = 3
+        'Public Const TC_JSOnLoad = 4
+        'Public Const TC_JSInHeadLegacy = 5
+        ''Public Const TC_JSHead = 5
+        'Public Const TC_JSEndBody = 6
+        'Public Const TC_StylesFilename = 7
+        'Public Const TC_SharedStylesIDList = 8
+        'Public Const TC_MobileBodyHTML = 9
+        'Public Const TC_MobileStylesFilename = 10
+        'Public Const TC_OtherHeadTags = 11
+        'Public Const TC_BodyTag = 12
+        'Public Const TC_JSInHeadFilename = 13
+        ''Public Const TC_JSFilename = 13
+        'Public Const TC_IsSecure = 14
+        'Public Const TC_DomainIdList = 15
+        '' for now, Mobile templates do not have shared styles
+        ''Public Const TC_MobileSharedStylesIDList = 11
+        'Public Const TC_cnt = 16
         '
         ' DTD
         '
@@ -1504,7 +1504,7 @@ Namespace Contensive.Core
         Public Const main_cookieNameVisitor = "visitor"
         Public Const html_quickEdit_fpo = "<quickeditor>"
         '
-        Public Const sqlAddonStyles As String = "select addonid,styleid from ccSharedStylesAddonRules where (active<>0) order by id"
+        'Public Const sqlAddonStyles As String = "select addonid,styleid from ccSharedStylesAddonRules where (active<>0) order by id"
         '
         Public Const cacheNameAddonStyleRules As String = "addon styles"
         '

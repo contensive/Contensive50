@@ -248,7 +248,7 @@ ErrorTrap:
         Public Function GetButtonsFromList(ByVal ButtonList As String, ByVal AllowDelete As Boolean, ByVal AllowAdd As Boolean, ByVal ButtonName As String) As String
             On Error GoTo ErrorTrap
             '
-            Dim s As String
+            Dim s As String = String.Empty
             Dim Buttons() As String
             Dim Ptr As Integer
             '
@@ -328,7 +328,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             '
             Dim Ptr As Integer
-            Dim Nav As String
+            Dim Nav As String = String.Empty
             Dim NavStart As Integer
             Dim NavEnd As Integer
             '
@@ -380,74 +380,36 @@ ErrorTrap:
         '========================================================================
         '
         Public Function GetBody(ByVal Caption As String, ByVal ButtonListLeft As String, ByVal ButtonListRight As String, ByVal AllowAdd As Boolean, ByVal AllowDelete As Boolean, ByVal Description As String, ByVal ContentSummary As String, ByVal ContentPadding As Integer, ByVal Content As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim ContentCell As String
-            Dim Stream As New stringBuilderLegacyController
-            Dim ButtonBarLeft As String
-            Dim ButtonBarRight As String
-            Dim Buttons() As String
-            Dim Button As String
-            Dim Ptr As Integer
-            Dim ButtonBar As String
-            Dim ButtonList As String
-            Dim Copy As String
-            Dim LeftButtons As String
-            Dim RightButtons As String
-            Dim CellContentSummary As String
-            '
-            ' Build ButtonBar
-            '
-            If Trim(ButtonListLeft) <> "" Then
-                LeftButtons = GetButtonsFromList(ButtonListLeft, AllowDelete, AllowAdd, "Button")
-            End If
-            If Trim(ButtonListRight) <> "" Then
-                RightButtons = GetButtonsFromList(ButtonListRight, AllowDelete, AllowAdd, "Button")
-            End If
-            ButtonBar = GetButtonBar(LeftButtons, RightButtons)
-            '    '
-            '    ' ButtonBar Top
-            '    '
-            '    Stream.Add( ButtonBar
-            '    '
-            '    ' Header
-            '    '
-            '    Stream.Add( GetTitleBar( Caption, Description))
-            '    '
-            '    ' Content Summary
-            '    '
-            If ContentSummary <> "" Then
-                CellContentSummary = "" _
+            Dim result As String = String.Empty
+            Try
+                Dim ContentCell As String = String.Empty
+                Dim Stream As New stringBuilderLegacyController
+                Dim ButtonBar As String
+                Dim LeftButtons As String = String.Empty
+                Dim RightButtons As String = String.Empty
+                Dim CellContentSummary As String = String.Empty
+                '
+                ' Build ButtonBar
+                '
+                If Trim(ButtonListLeft) <> "" Then
+                    LeftButtons = GetButtonsFromList(ButtonListLeft, AllowDelete, AllowAdd, "Button")
+                End If
+                If Trim(ButtonListRight) <> "" Then
+                    RightButtons = GetButtonsFromList(ButtonListRight, AllowDelete, AllowAdd, "Button")
+                End If
+                ButtonBar = GetButtonBar(LeftButtons, RightButtons)
+                If ContentSummary <> "" Then
+                    CellContentSummary = "" _
                     & cr & "<div class=""ccPanelBackground"" style=""padding:10px;"">" _
                     & htmlIndent(cpCore.html.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) _
                     & cr & "</div>"
-            End If
-            '
-            ' Content
-            '
-            '    Stream.Add( "" _
-            '        & CR  & "<table border=0 cellpadding=" & ContentPadding & " cellspacing=0 width=""100%"">" _
-            '        & CR  & vbTab & "<tr>" _
-            '        & CR  & vbTab & vbTab & "<td style=""width:100%;vertical-align:top;text-align:left;"">" & Content & "</td>" _
-            '        & CR  & vbTab & vbTab & "<td style=""width:1px;""><img src="""" width=""1"" height=""400""></td>" _
-            '        & CR  & vbTab & "</tr>" _
-            '        & CR  & "</table>" _
-            '        & ""
-            '    If ContentPadding > 0 Then
-            '        Stream.Add( "<table border=0 cellpadding=" & ContentPadding & " cellspacing=0 width=""100%""><tr><td>")
-            '        Stream.Add( Content)
-            '        Stream.Add( "</td></tr></table>")
-            '    Else
-            '        Stream.Add( Content)
-            '    End If
-            '
-            ' ButtonBar Bottom
-            '
-            ContentCell = "" _
+                End If
+                '
+                ContentCell = "" _
                 & cr & "<div style=""padding:" & ContentPadding & "px;"">" _
                 & htmlIndent(Content) _
                 & cr & "</div>"
-            GetBody = GetBody _
+                result = result _
                 & htmlIndent(ButtonBar) _
                 & htmlIndent(GetTitleBar(Caption, Description)) _
                 & htmlIndent(CellContentSummary) _
@@ -455,17 +417,14 @@ ErrorTrap:
                 & htmlIndent(ButtonBar) _
                 & ""
 
-            GetBody = "" _
+                result = "" _
                 & cr & cpCore.html.html_GetUploadFormStart() _
-                & htmlIndent(GetBody) _
+                & htmlIndent(result) _
                 & cr & cpCore.html.html_GetUploadFormEnd
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError("GetBody")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '
@@ -571,34 +530,29 @@ ErrorTrap:
         '========================================================================
         '
         Public Function GetEditPanel(ByVal AllowHeading As Boolean, ByVal PanelHeading As String, ByVal PanelDescription As String, ByVal PanelBody As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim FastString As New stringBuilderLegacyController
-            '
-            GetEditPanel = GetEditPanel & "<div class=""ccPanel3DReverse ccAdminEditBody"">"
-            '
-            ' ----- Subhead
-            '
-            If AllowHeading And (PanelHeading <> "") Then
-                GetEditPanel = GetEditPanel & "<div class=""ccAdminEditHeading"">" & PanelHeading & "</div>"
-            End If
-            '
-            ' ----- Description
-            '
-            If PanelDescription <> "" Then
-                GetEditPanel = GetEditPanel & "<div class=""ccAdminEditDescription"">" & PanelDescription & "</div>"
-            End If
-            '
-            GetEditPanel = GetEditPanel & PanelBody & "</div>"
-            '
-            ' ----- finish up panel
-            '
-            'EditSectionPanelCount = EditSectionPanelCount + 1
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyClassError("GetEditPanel")
+            Dim result As String = String.Empty
+            Try
+                Dim FastString As New stringBuilderLegacyController
+                '
+                result = result & "<div class=""ccPanel3DReverse ccAdminEditBody"">"
+                '
+                ' ----- Subhead
+                '
+                If AllowHeading And (PanelHeading <> "") Then
+                    result = result & "<div class=""ccAdminEditHeading"">" & PanelHeading & "</div>"
+                End If
+                '
+                ' ----- Description
+                '
+                If PanelDescription <> "" Then
+                    result = result & "<div class=""ccAdminEditDescription"">" & PanelDescription & "</div>"
+                End If
+                '
+                result = result & PanelBody & "</div>"
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '========================================================================
@@ -810,171 +764,167 @@ ErrorTrap:
         '=============================================================================
         '
         Public Function GetReport2(ByVal RowCount As Integer, ByVal ColCaption() As String, ByVal ColAlign() As String, ByVal ColWidth() As String, ByVal Cells As String(,), ByVal PageSize As Integer, ByVal PageNumber As Integer, ByVal PreTableCopy As String, ByVal PostTableCopy As String, ByVal DataRowCount As Integer, ByVal ClassStyle As String, ByVal ColSortable() As Boolean, ByVal DefaultSortColumnPtr As Integer) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim RQS As String
-            Dim SortMethod As Integer
-            'Dim ButtonBar As String
-            Dim RowBAse As Integer
-            Dim Content As New stringBuilderLegacyController
-            Dim Stream As New stringBuilderLegacyController
-            Dim ColumnCount As Integer
-            Dim ColumnPtr As Integer
-            Dim ColumnWidth As String
-            Dim RowPointer As Integer
-            Dim WorkingQS As String
-            '
-            Dim PageCount As Integer
-            Dim PagePointer As Integer
-            Dim LinkCount As Integer
-            Dim ReportPageNumber As Integer
-            Dim ReportPageSize As Integer
-            Dim iClassStyle As String
-            Dim SortColPtr As Integer
-            Dim SortColType As Integer
-            '
-            ReportPageNumber = PageNumber
-            If ReportPageNumber = 0 Then
-                ReportPageNumber = 1
-            End If
-            ReportPageSize = PageSize
-            If ReportPageSize < 1 Then
-                ReportPageSize = 50
-            End If
-            '
-            iClassStyle = ClassStyle
-            If iClassStyle = "" Then
-                iClassStyle = "ccPanel"
-            End If
-            'If IsArray(Cells) Then
-            ColumnCount = UBound(Cells, 2)
-            'End If
-            RQS = cpcore.doc.refreshQueryString
-            '
-            SortColPtr = GetReportSortColumnPtr(DefaultSortColumnPtr)
-            SortColType = GetReportSortType()
-            '
-            ' ----- Start the table
-            '
-            Call Content.Add(StartTable(3, 1, 0))
-            '
-            ' ----- Header
-            '
-            Call Content.Add(vbCrLf & "<tr>")
-            Call Content.Add(GetReport_CellHeader(0, "Row", "50", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable))
-            For ColumnPtr = 0 To ColumnCount - 1
-                ColumnWidth = ColWidth(ColumnPtr)
-                If Not ColSortable(ColumnPtr) Then
-                    '
-                    ' not sortable column
-                    '
-                    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortingStateEnum.NotSortable))
-                ElseIf ColumnPtr = SortColPtr Then
-                    '
-                    ' This is the current sort column
-                    '
-                    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, DirectCast(SortColType, SortingStateEnum)))
-                Else
-                    '
-                    ' Column is sortable, but not selected
-                    '
-                    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet))
+            Dim result As String = String.Empty
+            Try
+                Dim RQS As String
+                Dim RowBAse As Integer
+                Dim Content As New stringBuilderLegacyController
+                Dim Stream As New stringBuilderLegacyController
+                Dim ColumnCount As Integer
+                Dim ColumnPtr As Integer
+                Dim ColumnWidth As String
+                Dim RowPointer As Integer
+                Dim WorkingQS As String
+                '
+                Dim PageCount As Integer
+                Dim PagePointer As Integer
+                Dim LinkCount As Integer
+                Dim ReportPageNumber As Integer
+                Dim ReportPageSize As Integer
+                Dim iClassStyle As String
+                Dim SortColPtr As Integer
+                Dim SortColType As Integer
+                '
+                ReportPageNumber = PageNumber
+                If ReportPageNumber = 0 Then
+                    ReportPageNumber = 1
                 End If
-
-                'If ColumnPtr = SortColPtr Then
-                '    '
-                '    ' This column is currently the active sort
-                '    '
-                '    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortColType))
-                'Else
-                '    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet))
+                ReportPageSize = PageSize
+                If ReportPageSize < 1 Then
+                    ReportPageSize = 50
+                End If
+                '
+                iClassStyle = ClassStyle
+                If iClassStyle = "" Then
+                    iClassStyle = "ccPanel"
+                End If
+                'If IsArray(Cells) Then
+                ColumnCount = UBound(Cells, 2)
                 'End If
-            Next
-            Call Content.Add(vbCrLf & "</tr>")
-            '
-            ' ----- Data
-            '
-            If RowCount = 0 Then
+                RQS = cpCore.doc.refreshQueryString
+                '
+                SortColPtr = GetReportSortColumnPtr(DefaultSortColumnPtr)
+                SortColType = GetReportSortType()
+                '
+                ' ----- Start the table
+                '
+                Call Content.Add(StartTable(3, 1, 0))
+                '
+                ' ----- Header
+                '
                 Call Content.Add(vbCrLf & "<tr>")
-                Call Content.Add(GetReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer))
-                Call Content.Add(GetReport_Cell("-- End --", "left", ColumnCount, 0))
+                Call Content.Add(GetReport_CellHeader(0, "Row", "50", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable))
+                For ColumnPtr = 0 To ColumnCount - 1
+                    ColumnWidth = ColWidth(ColumnPtr)
+                    If Not ColSortable(ColumnPtr) Then
+                        '
+                        ' not sortable column
+                        '
+                        Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortingStateEnum.NotSortable))
+                    ElseIf ColumnPtr = SortColPtr Then
+                        '
+                        ' This is the current sort column
+                        '
+                        Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, DirectCast(SortColType, SortingStateEnum)))
+                    Else
+                        '
+                        ' Column is sortable, but not selected
+                        '
+                        Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet))
+                    End If
+
+                    'If ColumnPtr = SortColPtr Then
+                    '    '
+                    '    ' This column is currently the active sort
+                    '    '
+                    '    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortColType))
+                    'Else
+                    '    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet))
+                    'End If
+                Next
                 Call Content.Add(vbCrLf & "</tr>")
-            Else
-                RowBAse = (ReportPageSize * (ReportPageNumber - 1)) + 1
-                For RowPointer = 0 To RowCount - 1
+                '
+                ' ----- Data
+                '
+                If RowCount = 0 Then
                     Call Content.Add(vbCrLf & "<tr>")
                     Call Content.Add(GetReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer))
-                    For ColumnPtr = 0 To ColumnCount - 1
-                        Call Content.Add(GetReport_Cell(Cells(RowPointer, ColumnPtr), ColAlign(ColumnPtr), 1, RowPointer))
-                    Next
+                    Call Content.Add(GetReport_Cell("-- End --", "left", ColumnCount, 0))
                     Call Content.Add(vbCrLf & "</tr>")
-                Next
-            End If
-            '
-            ' ----- End Table
-            '
-            Call Content.Add(kmaEndTable)
-            GetReport2 = GetReport2 & Content.Text
-            '
-            ' ----- Post Table copy
-            '
-            If (DataRowCount / ReportPageSize) <> Int((DataRowCount / ReportPageSize)) Then
-                PageCount = CInt((DataRowCount / ReportPageSize) + 0.5)
-            Else
-                PageCount = CInt(DataRowCount / ReportPageSize)
-            End If
-            If PageCount > 1 Then
-                GetReport2 = GetReport2 & "<br>Page " & ReportPageNumber & " (Row " & (RowBAse) & " of " & DataRowCount & ")"
-                If PageCount > 20 Then
-                    PagePointer = ReportPageNumber - 10
+                Else
+                    RowBAse = (ReportPageSize * (ReportPageNumber - 1)) + 1
+                    For RowPointer = 0 To RowCount - 1
+                        Call Content.Add(vbCrLf & "<tr>")
+                        Call Content.Add(GetReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer))
+                        For ColumnPtr = 0 To ColumnCount - 1
+                            Call Content.Add(GetReport_Cell(Cells(RowPointer, ColumnPtr), ColAlign(ColumnPtr), 1, RowPointer))
+                        Next
+                        Call Content.Add(vbCrLf & "</tr>")
+                    Next
                 End If
-                If PagePointer < 1 Then
-                    PagePointer = 1
+                '
+                ' ----- End Table
+                '
+                Call Content.Add(kmaEndTable)
+                result = result & Content.Text
+                '
+                ' ----- Post Table copy
+                '
+                If (DataRowCount / ReportPageSize) <> Int((DataRowCount / ReportPageSize)) Then
+                    PageCount = CInt((DataRowCount / ReportPageSize) + 0.5)
+                Else
+                    PageCount = CInt(DataRowCount / ReportPageSize)
                 End If
                 If PageCount > 1 Then
-                    GetReport2 = GetReport2 & "<br>Go to Page "
-                    If PagePointer <> 1 Then
-                        WorkingQS = cpcore.doc.refreshQueryString
-                        WorkingQS = genericController.ModifyQueryString(WorkingQS, "GotoPage", "1", True)
-                        GetReport2 = GetReport2 & "<a href=""" & cpCore.webServer.requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
+                    result = result & "<br>Page " & ReportPageNumber & " (Row " & (RowBAse) & " of " & DataRowCount & ")"
+                    If PageCount > 20 Then
+                        PagePointer = ReportPageNumber - 10
                     End If
-                    WorkingQS = cpcore.doc.refreshQueryString
-                    WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageSize, CStr(ReportPageSize), True)
-                    Do While (PagePointer <= PageCount) And (LinkCount < 20)
-                        If PagePointer = ReportPageNumber Then
-                            GetReport2 = GetReport2 & PagePointer & "&nbsp;"
-                        Else
-                            WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PagePointer), True)
-                            GetReport2 = GetReport2 & "<a href=""" & cpCore.webServer.requestPage & "?" & WorkingQS & """>" & PagePointer & "</A>&nbsp;"
+                    If PagePointer < 1 Then
+                        PagePointer = 1
+                    End If
+                    If PageCount > 1 Then
+                        result = result & "<br>Go to Page "
+                        If PagePointer <> 1 Then
+                            WorkingQS = cpCore.doc.refreshQueryString
+                            WorkingQS = genericController.ModifyQueryString(WorkingQS, "GotoPage", "1", True)
+                            result = result & "<a href=""" & cpCore.webServer.requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
                         End If
-                        PagePointer = PagePointer + 1
-                        LinkCount = LinkCount + 1
-                    Loop
-                    If PagePointer < PageCount Then
-                        WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PageCount), True)
-                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServer.requestPage & "?" & WorkingQS & """>" & PageCount & "</A>&nbsp;"
+                        WorkingQS = cpCore.doc.refreshQueryString
+                        WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageSize, CStr(ReportPageSize), True)
+                        Do While (PagePointer <= PageCount) And (LinkCount < 20)
+                            If PagePointer = ReportPageNumber Then
+                                result = result & PagePointer & "&nbsp;"
+                            Else
+                                WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PagePointer), True)
+                                result = result & "<a href=""" & cpCore.webServer.requestPage & "?" & WorkingQS & """>" & PagePointer & "</A>&nbsp;"
+                            End If
+                            PagePointer = PagePointer + 1
+                            LinkCount = LinkCount + 1
+                        Loop
+                        If PagePointer < PageCount Then
+                            WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PageCount), True)
+                            result = result & "...<a href=""" & cpCore.webServer.requestPage & "?" & WorkingQS & """>" & PageCount & "</A>&nbsp;"
+                        End If
+                        If ReportPageNumber < PageCount Then
+                            WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(ReportPageNumber + 1), True)
+                            result = result & "...<a href=""" & cpCore.webServer.requestPage & "?" & WorkingQS & """>next</A>&nbsp;"
+                        End If
+                        result = result & "<br>&nbsp;"
                     End If
-                    If ReportPageNumber < PageCount Then
-                        WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(ReportPageNumber + 1), True)
-                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServer.requestPage & "?" & WorkingQS & """>next</A>&nbsp;"
-                    End If
-                    GetReport2 = GetReport2 & "<br>&nbsp;"
                 End If
-            End If
-            '
-            GetReport2 = "" _
+                '
+                result = "" _
                 & PreTableCopy _
                 & "<table border=0 cellpadding=0 cellspacing=0 width=""100%""><tr><td style=""padding:10px;"">" _
-                & GetReport2 _
+                & result _
                 & "</td></tr></table>" _
                 & PostTableCopy _
                 & ""
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError("GetReport2")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '========================================================================
@@ -1016,12 +966,12 @@ ErrorTrap:
         '=============================================================================
         '
         Public Function GetReportFilter(ByVal Title As String, ByVal Body As String) As String
-            '
-            GetReportFilter = GetReportFilter & "<div class=""ccReportFilter"">"
-            GetReportFilter = GetReportFilter & "<div class=""Title"">" & Title & "</div>"
-            GetReportFilter = GetReportFilter & "<div class=""Body"">" & Body & "</div>"
-            GetReportFilter = GetReportFilter & "</div>"
-            '
+            Dim result As String = ""
+            result = result & "<div class=""ccReportFilter"">"
+            result = result & "<div class=""Title"">" & Title & "</div>"
+            result = result & "<div class=""Body"">" & Body & "</div>"
+            result = result & "</div>"
+            Return result
         End Function
         '
         '===========================================================================

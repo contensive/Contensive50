@@ -226,6 +226,7 @@ Namespace Contensive.Core.Controllers
                 defaultConnString &= "" _
                     & "Provider=sqloledb;" _
                     & "Data Source=" & serverUrl & ";" _
+                    & "Initial Catalog=" & catalogName & ";" _
                     & "User Id=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
                     & "Password=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
                     & ""
@@ -4116,7 +4117,6 @@ Namespace Contensive.Core.Controllers
         '
         Public Sub deleteContentRules(ByVal ContentID As Integer, ByVal RecordID As Integer)
             Try
-                Dim CS As Integer
                 Dim ContentRecordKey As String
                 Dim Criteria As String
                 Dim ContentName As String
@@ -4974,7 +4974,7 @@ Namespace Contensive.Core.Controllers
                     '----------------------------------------------------------------
                     '
                     ContentID = cpCore.metaData.getContentId(ContentName)
-                    If (ContentID < 0) Then
+                    If (ContentID <= 0) Then
                         '
                         ' ----- Content definition not found, create it
                         '
@@ -5371,12 +5371,12 @@ Namespace Contensive.Core.Controllers
                     '
                     ' records did not delete
                     '
-                    Call Err.Raise(ignoreInteger, "dll", "Error deleting record chunks. No records were deleted and the process was not complete.")
+                    cpCore.handleException(New ApplicationException("Error deleting record chunks. No records were deleted and the process was not complete."))
                 ElseIf (LoopCount >= iChunkCount) Then
                     '
                     ' records did not delete
                     '
-                    Call Err.Raise(ignoreInteger, "dll", "Error deleting record chunks. The maximum chunk count was exceeded while deleting records.")
+                    cpCore.handleException(New ApplicationException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."))
                 End If
             End If
         End Sub
@@ -5387,94 +5387,100 @@ Namespace Contensive.Core.Controllers
         '=============================================================================
         '
         Public Function main_GetLinkByContentRecordKey(ByVal ContentRecordKey As String, Optional ByVal DefaultLink As String = "") As String
-            Dim CSPointer As Integer
-            Dim KeySplit() As String
-            Dim ContentID As Integer
-            Dim RecordID As Integer
-            Dim ContentName As String
-            Dim templateId As Integer
-            Dim ParentID As Integer
-            Dim DefaultTemplateLink As String
-            Dim TableName As String
-            Dim DataSource As String
-            Dim ParentContentID As Integer
-            Dim recordfound As Boolean
-            '
-            If ContentRecordKey <> "" Then
+            Dim result As String = String.Empty
+            Try
+                Dim CSPointer As Integer
+                Dim KeySplit() As String
+                Dim ContentID As Integer
+                Dim RecordID As Integer
+                Dim ContentName As String
+                Dim templateId As Integer
+                Dim ParentID As Integer
+                Dim DefaultTemplateLink As String
+                Dim TableName As String
+                Dim DataSource As String
+                Dim ParentContentID As Integer
+                Dim recordfound As Boolean
                 '
-                ' First try main_ContentWatch table for a link
-                '
-                CSPointer = cs_open("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
-                If cs_ok(CSPointer) Then
-                    main_GetLinkByContentRecordKey = cpCore.db.cs_getText(CSPointer, "Link")
-                End If
-                Call cpCore.db.cs_Close(CSPointer)
-                '
-                If main_GetLinkByContentRecordKey = "" Then
+                If ContentRecordKey <> "" Then
                     '
-                    ' try template for this page
+                    ' First try main_ContentWatch table for a link
                     '
-                    KeySplit = Split(ContentRecordKey, ".")
-                    If UBound(KeySplit) = 1 Then
-                        ContentID = genericController.EncodeInteger(KeySplit(0))
-                        If ContentID <> 0 Then
-                            ContentName = cpCore.metaData.getContentNameByID(ContentID)
-                            RecordID = genericController.EncodeInteger(KeySplit(1))
-                            If ContentName <> "" And RecordID <> 0 Then
-                                If cpCore.metaData.getContentTablename(ContentName) = "ccPageContent" Then
-                                    CSPointer = cpCore.db.csOpenRecord(ContentName, RecordID, , , "TemplateID,ParentID")
-                                    If cs_ok(CSPointer) Then
-                                        recordfound = True
-                                        templateId = cs_getInteger(CSPointer, "TemplateID")
-                                        ParentID = cs_getInteger(CSPointer, "ParentID")
-                                    End If
-                                    Call cs_Close(CSPointer)
-                                    If Not recordfound Then
-                                        '
-                                        ' This content record does not exist - remove any records with this ContentRecordKey pointer
-                                        '
-                                        Call deleteContentRecords("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                        Call cpCore.db.deleteContentRules(cpCore.metaData.getContentId(ContentName), RecordID)
-                                    Else
+                    CSPointer = cs_open("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
+                    If cs_ok(CSPointer) Then
+                        result = cpCore.db.cs_getText(CSPointer, "Link")
+                    End If
+                    Call cpCore.db.cs_Close(CSPointer)
+                    '
+                    If result = "" Then
+                        '
+                        ' try template for this page
+                        '
+                        KeySplit = Split(ContentRecordKey, ".")
+                        If UBound(KeySplit) = 1 Then
+                            ContentID = genericController.EncodeInteger(KeySplit(0))
+                            If ContentID <> 0 Then
+                                ContentName = cpCore.metaData.getContentNameByID(ContentID)
+                                RecordID = genericController.EncodeInteger(KeySplit(1))
+                                If ContentName <> "" And RecordID <> 0 Then
+                                    If cpCore.metaData.getContentTablename(ContentName) = "ccPageContent" Then
+                                        CSPointer = cpCore.db.csOpenRecord(ContentName, RecordID, , , "TemplateID,ParentID")
+                                        If cs_ok(CSPointer) Then
+                                            recordfound = True
+                                            templateId = cs_getInteger(CSPointer, "TemplateID")
+                                            ParentID = cs_getInteger(CSPointer, "ParentID")
+                                        End If
+                                        Call cs_Close(CSPointer)
+                                        If Not recordfound Then
+                                            '
+                                            ' This content record does not exist - remove any records with this ContentRecordKey pointer
+                                            '
+                                            Call deleteContentRecords("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
+                                            Call cpCore.db.deleteContentRules(cpCore.metaData.getContentId(ContentName), RecordID)
+                                        Else
 
-                                        If templateId <> 0 Then
-                                            CSPointer = cpCore.db.csOpenRecord("Page Templates", templateId, , , "Link")
-                                            If cs_ok(CSPointer) Then
-                                                main_GetLinkByContentRecordKey = cs_getText(CSPointer, "Link")
+                                            If templateId <> 0 Then
+                                                CSPointer = cpCore.db.csOpenRecord("Page Templates", templateId, , , "Link")
+                                                If cs_ok(CSPointer) Then
+                                                    result = cs_getText(CSPointer, "Link")
+                                                End If
+                                                Call cs_Close(CSPointer)
                                             End If
-                                            Call cs_Close(CSPointer)
-                                        End If
-                                        If main_GetLinkByContentRecordKey = "" And ParentID <> 0 Then
-                                            TableName = cpCore.metaData.getContentTablename(ContentName)
-                                            DataSource = cpCore.metaData.getContentDataSource(ContentName)
-                                            CSPointer = cs_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
-                                            If cs_ok(CSPointer) Then
-                                                ParentContentID = genericController.EncodeInteger(cs_getText(CSPointer, "ContentControlID"))
+                                            If result = "" And ParentID <> 0 Then
+                                                TableName = cpCore.metaData.getContentTablename(ContentName)
+                                                DataSource = cpCore.metaData.getContentDataSource(ContentName)
+                                                CSPointer = cs_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
+                                                If cs_ok(CSPointer) Then
+                                                    ParentContentID = genericController.EncodeInteger(cs_getText(CSPointer, "ContentControlID"))
+                                                End If
+                                                Call cs_Close(CSPointer)
+                                                If ParentContentID <> 0 Then
+                                                    result = main_GetLinkByContentRecordKey(CStr(ParentContentID & "." & ParentID), "")
+                                                End If
                                             End If
-                                            Call cs_Close(CSPointer)
-                                            If ParentContentID <> 0 Then
-                                                main_GetLinkByContentRecordKey = main_GetLinkByContentRecordKey(CStr(ParentContentID & "." & ParentID), "")
+                                            If result = "" Then
+                                                DefaultTemplateLink = cpCore.siteProperties.getText("SectionLandingLink", requestAppRootPath & cpCore.siteProperties.serverPageDefault)
                                             End If
-                                        End If
-                                        If main_GetLinkByContentRecordKey = "" Then
-                                            DefaultTemplateLink = cpCore.siteProperties.getText("SectionLandingLink", requestAppRootPath & cpCore.siteProperties.serverPageDefault)
                                         End If
                                     End If
                                 End If
                             End If
                         End If
-                    End If
-                    If main_GetLinkByContentRecordKey <> "" Then
-                        main_GetLinkByContentRecordKey = genericController.modifyLinkQuery(main_GetLinkByContentRecordKey, rnPageId, CStr(RecordID), True)
+                        If result <> "" Then
+                            result = genericController.modifyLinkQuery(result, rnPageId, CStr(RecordID), True)
+                        End If
                     End If
                 End If
-            End If
-            '
-            If main_GetLinkByContentRecordKey = "" Then
-                main_GetLinkByContentRecordKey = DefaultLink
-            End If
-            '
-            main_GetLinkByContentRecordKey = genericController.EncodeAppRootPath(main_GetLinkByContentRecordKey, cpCore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
+                '
+                If result = "" Then
+                    result = DefaultLink
+                End If
+                '
+                result = genericController.EncodeAppRootPath(result, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '============================================================================
@@ -5527,26 +5533,16 @@ Namespace Contensive.Core.Controllers
             Dim Filename As String
             Dim FilenameExt As String
             Dim FilenameNoExt As String
-            Dim FilePath As String
+            Dim FilePath As String = String.Empty
             Dim Pos As Integer
             Dim AltSizeList As String
-            'Dim innovaEditor As innovaEditorAddonClassFPO
             Dim sf As imageEditController
             Dim RebuildSizes As Boolean
-            Dim AddonStatusOK As Boolean
-            Dim pageContentName As String
-            Dim PageContentID As Integer
-            Dim rootPageId As Integer
-            Dim Cmd As String
             Dim CS As Integer
             Dim TableName As String
-            Dim PageName As String
             Dim ContentID As Integer
             Dim ActivityLogOrganizationID As Integer
-            Dim ActivityLogName As String
-            Dim hint As String
             '
-            'hint = hint & ",000"
             ContentID = cpCore.metaData.getContentId(ContentName)
             TableName = cpCore.metaData.getContentTablename(ContentName)
             Call markRecordReviewed(ContentName, RecordID)
@@ -5628,34 +5624,34 @@ Namespace Contensive.Core.Controllers
                         '
                         Call executeSql("delete from cclinkAliases where PageID=" & RecordID)
                     End If
-                Case "cctemplates", "ccsharedstyles"
-                    '
-                    ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
-                    '
-                    'hint = hint & ",150"
-                    If Not IsNothing(cpCore.addonStyleRulesIndex) Then
-                        Call cpCore.addonStyleRulesIndex.clear()
-                    End If
+                'Case "cctemplates" ', "ccsharedstyles"
+                '    '
+                '    ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
+                '    '
+                '    'hint = hint & ",150"
+                '    If Not IsNothing(cpCore.addonStyleRulesIndex) Then
+                '        Call cpCore.addonStyleRulesIndex.clear()
+                '    End If
 
-                Case "ccaggregatefunctions"
-                    '
-                    ' Update wysiwyg addon menus
-                    '
-                    'hint = hint & ",170"
-                    Call cpCore.addonLegacyCache.clear()
-                    If Not IsNothing(cpCore.addonStyleRulesIndex) Then
-                        Call cpCore.addonStyleRulesIndex.clear()
-                    End If
-                Case "ccsharedstylesaddonrules"
-                    '
-                    ' Update wysiwyg addon menus
-                    '
-                    'hint = hint & ",175"
-                    If Not IsNothing(cpCore.addonStyleRulesIndex) Then
-                        Call cpCore.addonStyleRulesIndex.clear()
-                    End If
+                'Case "ccaggregatefunctions"
+                '    '
+                '    ' Update wysiwyg addon menus
+                '    '
+                '    'hint = hint & ",170"
+                '    Call cpCore.addonLegacyCache.clear()
+                '    If Not IsNothing(cpCore.addonStyleRulesIndex) Then
+                '        Call cpCore.addonStyleRulesIndex.clear()
+                '    End If
+                'Case "ccsharedstylesaddonrules"
+                '    '
+                '    ' Update wysiwyg addon menus
+                '    '
+                '    'hint = hint & ",175"
+                '    If Not IsNothing(cpCore.addonStyleRulesIndex) Then
+                '        Call cpCore.addonStyleRulesIndex.clear()
+                '    End If
 
-                    Call cpCore.addonLegacyCache.clear()
+                '    Call cpCore.addonLegacyCache.clear()
                 Case "cclibraryfiles"
                     '
                     ' if a AltSizeList is blank, make large,medium,small and thumbnails
@@ -5882,7 +5878,7 @@ Namespace Contensive.Core.Controllers
             '
             ' ----- Determine Language by browser
             '
-            AcceptLanguageString = genericController.encodeText(cpCore.webServer.RequestLanguage) & ","
+            AcceptLanguageString = genericController.encodeText(cpCore.webServer.requestLanguage) & ","
             CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",")
             Do While CommaPosition <> 0 And LanguageID = 0
                 AcceptLanguage = Trim(Mid(AcceptLanguageString, 1, CommaPosition - 1))

@@ -2147,7 +2147,7 @@ Namespace Contensive.Core.Controllers
         '        Case Else
         '            EncodeSQL = app.EncodeSQLText(expression)
         '            On Error GoTo 0
-        '            Call Err.Raise(ignoreInteger, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
+        '            fixme-- cpCore.handleException(New ApplicationException("")) ' -----ignoreInteger, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
         '    End Select
         '    '
         'End Function
@@ -2275,410 +2275,40 @@ Namespace Contensive.Core.Controllers
             End If
             '
         End Function
-        '    '
-        '    '==========================================================================================================================
-        '    '   To convert from site license to server licenses, we still need the URLEncoder in the site license
-        '    '   This routine generates a site license that is just the URL encoder.
-        '    '==========================================================================================================================
-        '    '
-        '    Public shared Function GetURLEncoder() As String
-        '        Randomize()
-        '        GetURLEncoder = CStr(Int(1 + (Rnd() * 8))) & CStr(Int(1 + (Rnd() * 8))) & CStr(Int(1000000000 + (Rnd() * 899999999)))
-        '    End Function
-        '    '
-        '    '==========================================================================================================================
-        '    '   To convert from site license to server licenses, we still need the URLEncoder in the site license
-        '    '   This routine generates a site license that is just the URL encoder.
-        '    '==========================================================================================================================
-        '    '
-        '    Public shared Function GetSiteLicenseKey() As String
-        '        GetSiteLicenseKey = "00000-00000-00000-" & GetURLEncoder
-        '    End Function
-        '    '
-        '    '
-        '    '
-        'Public shared sub ccAddTabEntry(Caption As String, Link As String, IsHit As Boolean, Optional StylePrefix as string = "", Optional LiveBody as string = "")
-        '        On Error GoTo ErrorTrap
-        '        '
-        '        If TabsCnt <= TabsSize Then
-        '            TabsSize = TabsSize + 10
-        '            ReDim Preserve Tabs(TabsSize)
-        '        End If
-        '        With Tabs(TabsCnt)
-        '            .Caption = Caption
-        '            .Link = Link
-        '            .IsHit = IsHit
-        '            .StylePrefix = encodeMissingText(StylePrefix, "cc")
-        '            .LiveBody = encodeMissingText(LiveBody, "")
-        '        End With
-        '        TabsCnt = TabsCnt + 1
-        '        '
-        '        Exit Sub
-        '        '
-        'ErrorTrap:
-        '        Call Err.Raise(Err.Number, Err.Source, "Error in ccAddTabEntry-" & Err.Description)
-        '    End Sub
-        '    '
-        '    '
-        '    '
-        '    Public shared Function OldccGetTabs() As String
-        '        On Error GoTo ErrorTrap
-        '        '
-        '        Dim TabPtr As Integer
-        '        Dim HitPtr As Integer
-        '        Dim IsLiveTab As Boolean
-        '        Dim TabBody As String
-        '        Dim TabLink As String
-        '        Dim TabID As String
-        '        Dim FirstLiveBodyShown As Boolean
-        '        '
-        '        If TabsCnt > 0 Then
-        '            HitPtr = 0
-        '            '
-        '            ' Create TabBar
-        '            '
-        '            OldccGetTabs = OldccGetTabs & "<table border=0 cellspacing=0 cellpadding=0 align=center ><tr>"
-        '            For TabPtr = 0 To TabsCnt - 1
-        '                TabID = CStr(GetRandomInteger)
-        '                If Tabs(TabPtr).LiveBody = "" Then
-        '                    '
-        '                    ' This tab is linked to a page
-        '                    '
-        '                    TabLink = encodeHTML(Tabs(TabPtr).Link)
-        '                Else
-        '                    '
-        '                    ' This tab has a live body
-        '                    '
-        '                    TabLink = encodeHTML(Tabs(TabPtr).Link)
-        '                    If Not FirstLiveBodyShown Then
-        '                        FirstLiveBodyShown = True
-        '                        TabBody = TabBody & "<div style=""visibility: visible; position: absolute; left: 0px;"" class=""" & Tabs(TabPtr).StylePrefix & "Body"" id=""" & TabID & """></div>"
-        '                    Else
-        '                        TabBody = TabBody & "<div style=""visibility: hidden; position: absolute; left: 0px;"" class=""" & Tabs(TabPtr).StylePrefix & "Body"" id=""" & TabID & """></div>"
-        '                    End If
-        '                End If
-        '                OldccGetTabs = OldccGetTabs & "<td valign=bottom>"
-        '                If Tabs(TabPtr).IsHit And (HitPtr = 0) Then
-        '                    HitPtr = TabPtr
-        '                    '
-        '                    ' This tab is hit
-        '                    '
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<table cellspacing=0 cellPadding=0 border=0>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=2 height=1 width=2></td>" _
-        '                        & "<td colspan=1 height=1 bgcolor=black></td>" _
-        '                        & "<td colspan=3 height=1 width=3></td>" _
-        '                        & "</tr>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=1 height=1 width=1></td>" _
-        '                        & "<td colspan=1 height=1 width=1 bgcolor=black></td>" _
-        '                        & "<td colspan=1 height=1></td>" _
-        '                        & "<td colspan=1 height=1 width=1 bgcolor=black></td>" _
-        '                        & "<td colspan=2 height=1 width=2></td>" _
-        '                        & "</tr>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=1 height=2 bgcolor=black></td>" _
-        '                        & "<td colspan=1 height=2></td>" _
-        '                        & "<td colspan=1 height=2></td>" _
-        '                        & "<td colspan=1 height=2></td>" _
-        '                        & "<td colspan=1 height=2 width=1 bgcolor=black></td>" _
-        '                        & "<td colspan=1 height=2 width=1></td>" _
-        '                        & "</tr>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "<td></td>" _
-        '                        & "<td>" _
-        '                        & "<table cellspacing=0 cellPadding=2 border=0><tr>" _
-        '                        & "<td Class=""ccTabHit"">&nbsp;<a href=""" & TabLink & """ Class=""ccTabHit"">" & Tabs(TabPtr).Caption & "</a>&nbsp;</td>" _
-        '                        & "</tr></table >" _
-        '                        & "</td>" _
-        '                        & "<td></td>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "<td></td>" _
-        '                        & "</tr>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "<td></td>" _
-        '                        & "<td></td>" _
-        '                        & "<td></td>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "</tr>" _
-        '                        & "</table >"
-        '                Else
-        '                    '
-        '                    ' This tab is not hit
-        '                    '
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<table cellspacing=0 cellPadding=0 border=0>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=6 height=1></td>" _
-        '                        & "</tr>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=2 height=1></td>" _
-        '                        & "<td colspan=1 height=1 bgcolor=black></td>" _
-        '                        & "<td colspan=3 height=1></td>" _
-        '                        & "</tr>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td width=1></td>" _
-        '                        & "<td width=1 bgcolor=black></td>" _
-        '                        & "<td></td>" _
-        '                        & "<td width=1 bgcolor=black></td>" _
-        '                        & "<td width=2 colspan=2></td>" _
-        '                        & "</tr>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td width=1 bgcolor=black></td>" _
-        '                        & "<td width=1></td>" _
-        '                        & "<td nowrap>" _
-        '                        & "<table cellspacing=0 cellPadding=2 border=0><tr>" _
-        '                        & "<td Class=""ccTab"">&nbsp;<a href=""" & TabLink & """ Class=""ccTab"">" & Tabs(TabPtr).Caption & "</a>&nbsp;</td>" _
-        '                        & "</tr></table >" _
-        '                        & "</td>" _
-        '                        & "<td width=1></td>" _
-        '                        & "<td width=1 bgcolor=black></td>" _
-        '                        & "<td width=1></td>" _
-        '                        & "</tr>"
-        '                    OldccGetTabs = OldccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=6 height=1 bgcolor=black></td>" _
-        '                        & "</tr>" _
-        '                        & "</table >"
-        '                End If
-        '                OldccGetTabs = OldccGetTabs & "</td>"
-        '            Next
-        '            OldccGetTabs = OldccGetTabs & "<td class=""ccTabEnd"">&nbsp;</td></tr>"
-        '            If TabBody <> "" Then
-        '                OldccGetTabs = OldccGetTabs & "<tr><td colspan=6>" & TabBody & "</td></tr>"
-        '            End If
-        '            OldccGetTabs = OldccGetTabs & "</tr></table >"
-        '            TabsCnt = 0
-        '        End If
-        '        '
-        '        Exit Function
-        '        '
-        'ErrorTrap:
-        '        Call Err.Raise(Err.Number, Err.Source, "Error in OldccGetTabs-" & Err.Description)
-        '    End Function
-
-
-        '    '
-        '    '
-        '    '
-        '    Public shared Function ccGetTabs() As String
-        '        On Error GoTo ErrorTrap
-        '        '
-        '        Dim TabPtr As Integer
-        '        Dim HitPtr As Integer
-        '        Dim IsLiveTab As Boolean
-        '        Dim TabBody As String
-        '        Dim TabLink As String
-        '        Dim TabID As String
-        '        Dim FirstLiveBodyShown As Boolean
-        '        '
-        '        If TabsCnt > 0 Then
-        '            HitPtr = 0
-        '            '
-        '            ' Create TabBar
-        '            '
-        '            ccGetTabs = ccGetTabs & "<table border=0 cellspacing=0 cellpadding=0 align=center ><tr>"
-        '            For TabPtr = 0 To TabsCnt - 1
-        '                TabID = CStr(GetRandomInteger)
-        '                If Tabs(TabPtr).LiveBody = "" Then
-        '                    '
-        '                    ' This tab is linked to a page
-        '                    '
-        '                    TabLink = encodeHTML(Tabs(TabPtr).Link)
-        '                Else
-        '                    '
-        '                    ' This tab has a live body
-        '                    '
-        '                    TabLink = encodeHTML(Tabs(TabPtr).Link)
-        '                    If Not FirstLiveBodyShown Then
-        '                        FirstLiveBodyShown = True
-        '                        TabBody = TabBody & "<div style=""visibility: visible; position: absolute; left: 0px;"" class=""" & Tabs(TabPtr).StylePrefix & "Body"" id=""" & TabID & """>" & Tabs(TabPtr).LiveBody & "</div>"
-        '                    Else
-        '                        TabBody = TabBody & "<div style=""visibility: hidden; position: absolute; left: 0px;"" class=""" & Tabs(TabPtr).StylePrefix & "Body"" id=""" & TabID & """>" & Tabs(TabPtr).LiveBody & "</div>"
-        '                    End If
-        '                End If
-        '                ccGetTabs = ccGetTabs & "<td valign=bottom>"
-        '                If Tabs(TabPtr).IsHit And (HitPtr = 0) Then
-        '                    HitPtr = TabPtr
-        '                    '
-        '                    ' This tab is hit
-        '                    '
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<table cellspacing=0 cellPadding=0 border=0>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=2 height=1 width=2></td>" _
-        '                        & "<td colspan=1 height=1 bgcolor=black></td>" _
-        '                        & "<td colspan=3 height=1 width=3></td>" _
-        '                        & "</tr>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=1 height=1 width=1></td>" _
-        '                        & "<td colspan=1 height=1 width=1 bgcolor=black></td>" _
-        '                        & "<td Class=""ccTabHit"" colspan=1 height=1></td>" _
-        '                        & "<td colspan=1 height=1 width=1 bgcolor=black></td>" _
-        '                        & "<td colspan=2 height=1 width=2></td>" _
-        '                        & "</tr>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=1 height=2 bgcolor=black></td>" _
-        '                        & "<td Class=""ccTabHit"" colspan=1 height=2></td>" _
-        '                        & "<td Class=""ccTabHit"" colspan=1 height=2></td>" _
-        '                        & "<td Class=""ccTabHit"" colspan=1 height=2></td>" _
-        '                        & "<td colspan=1 height=2 bgcolor=black></td>" _
-        '                        & "<td colspan=1 height=2></td>" _
-        '                        & "</tr>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "<td Class=""ccTabHit""></td>" _
-        '                        & "<td Class=""ccTabHit"">" _
-        '                        & "<table cellspacing=0 cellPadding=2 border=0><tr>" _
-        '                        & "<td Class=""ccTabHit"">&nbsp;<a href=""" & TabLink & """ Class=""ccTabHit"">" & Tabs(TabPtr).Caption & "</a>&nbsp;</td>" _
-        '                        & "</tr></table >" _
-        '                        & "</td>" _
-        '                        & "<td Class=""ccTabHit""></td>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "<td></td>" _
-        '                        & "</tr>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "<td Class=""ccTabHit""></td>" _
-        '                        & "<td Class=""ccTabHit""></td>" _
-        '                        & "<td Class=""ccTabHit""></td>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "<td bgcolor=black></td>" _
-        '                        & "</tr>" _
-        '                        & "</table >"
-        '                Else
-        '                    '
-        '                    ' This tab is not hit
-        '                    '
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<table cellspacing=0 cellPadding=0 border=0>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=6 height=1></td>" _
-        '                        & "</tr>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=2 height=1></td>" _
-        '                        & "<td colspan=1 height=1 bgcolor=black></td>" _
-        '                        & "<td colspan=3 height=1></td>" _
-        '                        & "</tr>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td width=1></td>" _
-        '                        & "<td width=1 bgcolor=black></td>" _
-        '                        & "<td Class=""ccTab""></td>" _
-        '                        & "<td width=1 bgcolor=black></td>" _
-        '                        & "<td width=2 colspan=2></td>" _
-        '                        & "</tr>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td width=1 bgcolor=black></td>" _
-        '                        & "<td width=1 Class=""ccTab""></td>" _
-        '                        & "<td nowrap Class=""ccTab"">" _
-        '                        & "<table cellspacing=0 cellPadding=2 border=0><tr>" _
-        '                        & "<td Class=""ccTab"">&nbsp;<a href=""" & TabLink & """ Class=""ccTab"">" & Tabs(TabPtr).Caption & "</a>&nbsp;</td>" _
-        '                        & "</tr></table >" _
-        '                        & "</td>" _
-        '                        & "<td width=1 Class=""ccTab""></td>" _
-        '                        & "<td width=1 bgcolor=black></td>" _
-        '                        & "<td width=1></td>" _
-        '                        & "</tr>"
-        '                    ccGetTabs = ccGetTabs _
-        '                        & "<tr>" _
-        '                        & "<td colspan=6 height=1 bgcolor=black></td>" _
-        '                        & "</tr>" _
-        '                        & "</table >"
-        '                End If
-        '                ccGetTabs = ccGetTabs & "</td>"
-        '            Next
-        '            ccGetTabs = ccGetTabs & "<td class=""ccTabEnd"">&nbsp;</td></tr>"
-        '            If TabBody <> "" Then
-        '                ccGetTabs = ccGetTabs & "<tr><td colspan=6>" & TabBody & "</td></tr>"
-        '            End If
-        '            ccGetTabs = ccGetTabs & "</tr></table >"
-        '            TabsCnt = 0
-        '        End If
-        '        '
-        '        Exit Function
-        '        '
-        'ErrorTrap:
-        '        Call Err.Raise(Err.Number, Err.Source, "Error in ccGetTabs-" & Err.Description)
-        '    End Function
-        '
-        '
-        '
         Public Shared Function ConvertLinksToAbsolute(ByVal Source As String, ByVal RootLink As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim s As String
-            '
-            s = Source
-            '
-            s = vbReplace(s, " href=""", " href=""/", 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=""/http", " href=""http", 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=""/mailto", " href=""mailto", 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=""//", " href=""" & RootLink, 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=""/?", " href=""" & RootLink & "?", 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=""/", " href=""" & RootLink, 1, 99, vbTextCompare)
-            '
-            s = vbReplace(s, " href=", " href=/", 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=/""", " href=""", 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=/http", " href=http", 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=//", " href=" & RootLink, 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=/?", " href=" & RootLink & "?", 1, 99, vbTextCompare)
-            s = vbReplace(s, " href=/", " href=" & RootLink, 1, 99, vbTextCompare)
-            '
-            s = vbReplace(s, " src=""", " src=""/", 1, 99, vbTextCompare)
-            s = vbReplace(s, " src=""/http", " src=""http", 1, 99, vbTextCompare)
-            s = vbReplace(s, " src=""//", " src=""" & RootLink, 1, 99, vbTextCompare)
-            s = vbReplace(s, " src=""/?", " src=""" & RootLink & "?", 1, 99, vbTextCompare)
-            s = vbReplace(s, " src=""/", " src=""" & RootLink, 1, 99, vbTextCompare)
-            '
-            s = vbReplace(s, " src=", " src=/", 1, 99, vbTextCompare)
-            s = vbReplace(s, " src=/""", " src=""", 1, 99, vbTextCompare)
-            s = vbReplace(s, " src=/http", " src=http", 1, 99, vbTextCompare)
-            s = vbReplace(s, " src=//", " src=" & RootLink, 1, 99, vbTextCompare)
-            s = vbReplace(s, " src=/?", " src=" & RootLink & "?", 1, 99, vbTextCompare)
-            s = vbReplace(s, " src=/", " src=" & RootLink, 1, 99, vbTextCompare)
-            '
-            ConvertLinksToAbsolute = s
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call Err.Raise(Err.Number, Err.Source, "Error in ConvertLinksToAbsolute-" & Err.Description)
+            Dim result As String = Source
+            Try
+                result = vbReplace(result, " href=""", " href=""/", 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=""/http", " href=""http", 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=""/mailto", " href=""mailto", 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=""//", " href=""" & RootLink, 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=""/?", " href=""" & RootLink & "?", 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=""/", " href=""" & RootLink, 1, 99, vbTextCompare)
+                '
+                result = vbReplace(result, " href=", " href=/", 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=/""", " href=""", 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=/http", " href=http", 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=//", " href=" & RootLink, 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=/?", " href=" & RootLink & "?", 1, 99, vbTextCompare)
+                result = vbReplace(result, " href=/", " href=" & RootLink, 1, 99, vbTextCompare)
+                '
+                result = vbReplace(result, " src=""", " src=""/", 1, 99, vbTextCompare)
+                result = vbReplace(result, " src=""/http", " src=""http", 1, 99, vbTextCompare)
+                result = vbReplace(result, " src=""//", " src=""" & RootLink, 1, 99, vbTextCompare)
+                result = vbReplace(result, " src=""/?", " src=""" & RootLink & "?", 1, 99, vbTextCompare)
+                result = vbReplace(result, " src=""/", " src=""" & RootLink, 1, 99, vbTextCompare)
+                '
+                result = vbReplace(result, " src=", " src=/", 1, 99, vbTextCompare)
+                result = vbReplace(result, " src=/""", " src=""", 1, 99, vbTextCompare)
+                result = vbReplace(result, " src=/http", " src=http", 1, 99, vbTextCompare)
+                result = vbReplace(result, " src=//", " src=" & RootLink, 1, 99, vbTextCompare)
+                result = vbReplace(result, " src=/?", " src=" & RootLink & "?", 1, 99, vbTextCompare)
+                result = vbReplace(result, " src=/", " src=" & RootLink, 1, 99, vbTextCompare)
+            Catch ex As Exception
+                Throw New ApplicationException("Error in ConvertLinksToAbsolute")
+            End Try
+            Return result
         End Function
-        '    '
-        '    '
-        '    '
-        'Public shared Function getAppPath() As String
-        '    Dim Ptr As Integer
-        '    getAppPath = App.Path
-        '    Ptr = vbInstr(1, getAppPath, "\github\", vbTextCompare)
-        '    If Ptr <> 0 Then
-        '        ' for ...\github\contensive4?\bin"
-        '        Ptr = vbInstr(Ptr + 8, getAppPath, "\")
-        '        getAppPath = Left(getAppPath, Ptr) & "bin"
-        '    End If
-        'End Function
         ''
         ''
         ''

@@ -25,7 +25,7 @@ Namespace Contensive.Core.Models.Entity
         ' ----- addon cache
         '
         Public Const cacheName = "cache_addon"
-        Public Const cache_addon2_fieldList = "id,active,name,ccguid,collectionid,Copy,ccguid,Link,ObjectProgramID,DotNetClass,ArgumentList,CopyText,IsInline,BlockDefaultStyles,StylesFilename,CustomStylesFilename,formxml,RemoteAssetLink,AsAjax,InFrame,ScriptingEntryPoint,ScriptingLanguageID,ScriptingCode,BlockEditTools,ScriptingTimeout,inlineScript,help,helplink,JavaScriptOnLoad,JavaScriptBodyEnd,PageTitle,MetaDescription,MetaKeywordList,OtherHeadTags,JSFilename,remoteMethod,onBodyStart,onBodyEnd,OnPageStartEvent,OnPageEndEvent,robotsTxt"
+        Public Const cache_addon2_fieldList = "id,active,name,ccguid,collectionid,Copy,ccguid,Link,ObjectProgramID,DotNetClass,ArgumentList,CopyText,IsInline,'' as BlockDefaultStyles,StylesFilename,'' as CustomStylesFilename,formxml,RemoteAssetLink,AsAjax,InFrame,ScriptingEntryPoint,ScriptingLanguageID,ScriptingCode,BlockEditTools,ScriptingTimeout,inlineScript,help,helplink,JavaScriptOnLoad,JavaScriptBodyEnd,PageTitle,MetaDescription,MetaKeywordList,OtherHeadTags,JSFilename,remoteMethod,onBodyStart,onBodyEnd,OnPageStartEvent,OnPageEndEvent,robotsTxt"
         Public Class addonClass
             Public id As Integer
             Public active As Boolean
@@ -40,9 +40,9 @@ Namespace Contensive.Core.Models.Entity
             Public ArgumentList As String
             Public copyText As String
             Public isInline As Boolean
-            Public blockDefaultStyles As Boolean
+            'Public blockDefaultStyles As Boolean
             Public stylesFilename As String
-            Public customStylesFilename As String
+            'Public customStylesFilename As String
             Public formxml As String
             Public remoteAssetLink As String
             Public asAjax As Boolean
@@ -161,9 +161,9 @@ Namespace Contensive.Core.Models.Entity
                                 addon.ArgumentList = genericController.encodeText(.Item(10))
                                 addon.copyText = genericController.encodeText(.Item(11))
                                 addon.isInline = genericController.EncodeBoolean(.Item(12))
-                                addon.blockDefaultStyles = genericController.EncodeBoolean(.Item(13))
+                                'addon.blockDefaultStyles = genericController.EncodeBoolean(.Item(13))
                                 addon.stylesFilename = genericController.encodeText(.Item(14))
-                                addon.customStylesFilename = genericController.encodeText(.Item(15))
+                                'addon.customStylesFilename = genericController.encodeText(.Item(15))
                                 addon.formxml = genericController.encodeText(.Item(16))
                                 addon.remoteAssetLink = genericController.encodeText(.Item(17))
                                 addon.asAjax = genericController.EncodeBoolean(.Item(18))
@@ -394,13 +394,13 @@ Namespace Contensive.Core.Models.Entity
                                     addon.active = genericController.EncodeBoolean(dr.Item("active"))
                                     addon.ArgumentList = genericController.encodeText(dr.Item("ArgumentList"))
                                     addon.asAjax = genericController.EncodeBoolean(dr.Item("AsAjax"))
-                                    addon.blockDefaultStyles = genericController.EncodeBoolean(dr.Item("BlockDefaultStyles"))
+                                    'addon.blockDefaultStyles = genericController.EncodeBoolean(dr.Item("BlockDefaultStyles"))
                                     addon.blockEditTools = genericController.EncodeBoolean(dr.Item("BlockEditTools"))
                                     addon.addonCache_ccguid = genericController.encodeText(dr.Item("ccguid"))
                                     addon.collectionid = genericController.EncodeInteger(dr.Item("collectionid"))
                                     addon.Copy = genericController.encodeText(dr.Item("Copy"))
                                     addon.copyText = genericController.encodeText(dr.Item("CopyText"))
-                                    addon.customStylesFilename = genericController.encodeText(dr.Item("CustomStylesFilename"))
+                                    'addon.customStylesFilename = genericController.encodeText(dr.Item("CustomStylesFilename"))
                                     addon.DotNetClass = genericController.encodeText(dr.Item("DotNetClass"))
                                     addon.formxml = genericController.encodeText(dr.Item("formxml"))
                                     addon.ccguid = RecordGuid

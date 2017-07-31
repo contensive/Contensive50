@@ -150,10 +150,10 @@ Namespace Contensive.Core
         '
         Public Property acceptLanguage() As String
             Get
-                Return cp.core.webServer.RequestLanguage
+                Return cp.core.webServer.requestLanguage
             End Get
             Set(ByVal value As String)
-                cp.core.webServer.RequestLanguage = value
+                cp.core.webServer.requestLanguage = value
             End Set
         End Property
         '
@@ -231,7 +231,7 @@ Namespace Contensive.Core
         Public Property cookies() As String
             Get
                 Dim cookieString As String = ""
-                For Each kvp As KeyValuePair(Of String, webServerController.cookieClass) In cp.core.webServer.requestCookies
+                For Each kvp As KeyValuePair(Of String, iisController.cookieClass) In cp.core.webServer.requestCookies
                     cookieString &= "&" & kvp.Key & "=" & kvp.Value.value
                 Next
                 If cookieString.Length > 0 Then
@@ -246,7 +246,7 @@ Namespace Contensive.Core
                     ampSplit = Split(value, "&")
                     ampSplitCount = UBound(ampSplit) + 1
                     For ampSplitPointer = 0 To ampSplitCount - 1
-                        Dim newCookie As New webServerController.cookieClass
+                        Dim newCookie As New iisController.cookieClass
                         Dim cookieName As String
                         With newCookie
                             Dim NameValue As String = ampSplit(ampSplitPointer)
@@ -334,7 +334,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseRedirect() As String
             Get
-                Return cp.core.webServer.webServerIO_bufferRedirect
+                Return cp.core.webServer.bufferRedirect
             End Get
         End Property
         '
@@ -350,7 +350,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseContentType() As String
             Get
-                Return cp.core.webServer.webServerIO_bufferContentType
+                Return cp.core.webServer.bufferContentType
             End Get
         End Property
         '
@@ -358,7 +358,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseCookies() As String
             Get
-                Return cp.core.webServer.webServerIO_bufferCookies
+                Return cp.core.webServer.bufferCookies
             End Get
         End Property
         '
@@ -366,7 +366,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseHeaders() As String
             Get
-                Return cp.core.webServer.webServerIO_bufferResponseHeader
+                Return cp.core.webServer.bufferResponseHeader
             End Get
         End Property
         '
@@ -374,7 +374,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseStatus() As String
             Get
-                Return cp.core.webServer.webServerIO_bufferResponseStatus
+                Return cp.core.webServer.bufferResponseStatus
             End Get
         End Property
         '

@@ -5502,79 +5502,6 @@ instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").def
 instance.Name = genericController.EncodeText(.fields("Name").defaultValue)
 instance.SortOrder = genericController.EncodeText(.fields("SortOrder").defaultValue)
 
----------------------------------------------
-Add-onScriptingModuleRuleModel
-
-public ID as Integer
-public Active as Boolean
-public AddonID as Integer
-public ccGuid as String
-public ContentCategoryID as Integer
-public ContentControlID as Integer
-public CreatedBy as Integer
-public CreateKey as Integer
-public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
-public ModifiedBy as Integer
-public ModifiedDate as Date
-public Name as String
-public ScriptingModuleID as Integer
-public SortOrder as String
-
-.ID = cs.getInteger("ID")
-.Active = cs.getBoolean("Active")
-.AddonID = cs.getInteger("AddonID")
-.ccGuid = cs.getText("ccGuid")
-.ContentCategoryID = cs.getInteger("ContentCategoryID")
-.ContentControlID = cs.getInteger("ContentControlID")
-.CreatedBy = cs.getInteger("CreatedBy")
-.CreateKey = cs.getInteger("CreateKey")
-.DateAdded = cs.getDate("DateAdded")
-.EditArchive = cs.getBoolean("EditArchive")
-.EditBlank = cs.getBoolean("EditBlank")
-.EditSourceID = cs.getInteger("EditSourceID")
-.ModifiedBy = cs.getInteger("ModifiedBy")
-.ModifiedDate = cs.getDate("ModifiedDate")
-.Name = cs.getText("Name")
-.ScriptingModuleID = cs.getInteger("ScriptingModuleID")
-.SortOrder = cs.getText("SortOrder")
-
-cs.SetField("Active", Active.ToString())
-cs.SetField("AddonID", AddonID.ToString())
-cs.SetField("ccGuid", ccGuid)
-cs.SetField("ContentCategoryID", ContentCategoryID.ToString())
-cs.SetField("ContentControlID", ContentControlID.ToString())
-cs.SetField("CreatedBy", CreatedBy.ToString())
-cs.SetField("CreateKey", CreateKey.ToString())
-cs.SetField("DateAdded", DateAdded.ToString())
-cs.SetField("EditArchive", EditArchive.ToString())
-cs.SetField("EditBlank", EditBlank.ToString())
-cs.SetField("EditSourceID", EditSourceID.ToString())
-cs.SetField("ModifiedBy", ModifiedBy.ToString())
-cs.SetField("ModifiedDate", ModifiedDate.ToString())
-cs.SetField("Name", Name)
-cs.SetField("ScriptingModuleID", ScriptingModuleID.ToString())
-cs.SetField("SortOrder", SortOrder)
-if (String.IsNullOrEmpty(ccGuid)) Then ccGuid = Controllers.genericController.getGUID()
-
-instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
-instance.AddonID = genericController.EncodeInteger(.fields("AddonID").defaultValue)
-instance.ccGuid = genericController.EncodeText(.fields("ccGuid").defaultValue)
-instance.ContentCategoryID = genericController.EncodeInteger(.fields("ContentCategoryID").defaultValue)
-instance.ContentControlID = cdef.id
-instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
-instance.CreateKey = genericController.EncodeInteger(.fields("CreateKey").defaultValue)
-instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultValue)
-instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
-instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
-instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
-instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)
-instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").defaultValue)
-instance.Name = genericController.EncodeText(.fields("Name").defaultValue)
-instance.ScriptingModuleID = genericController.EncodeInteger(.fields("ScriptingModuleID").defaultValue)
-instance.SortOrder = genericController.EncodeText(.fields("SortOrder").defaultValue)
 
 ---------------------------------------------
 AddonIncludeRuleModel
@@ -5946,7 +5873,6 @@ public Active as Boolean
 public Admin as Boolean
 public ArgumentList as String
 public AsAjax as Boolean
-public BlockDefaultStyles as Boolean
 public BlockEditTools as Boolean
 public ccGuid as String
 public CollectionID as Integer
@@ -6013,7 +5939,6 @@ public Template as Boolean
 .Admin = cs.getBoolean("Admin")
 .ArgumentList = cs.getText("ArgumentList")
 .AsAjax = cs.getBoolean("AsAjax")
-.BlockDefaultStyles = cs.getBoolean("BlockDefaultStyles")
 .BlockEditTools = cs.getBoolean("BlockEditTools")
 .ccGuid = cs.getText("ccGuid")
 .CollectionID = cs.getInteger("CollectionID")
@@ -6079,7 +6004,6 @@ cs.SetField("Active", Active.ToString())
 cs.SetField("Admin", Admin.ToString())
 cs.SetField("ArgumentList", ArgumentList)
 cs.SetField("AsAjax", AsAjax.ToString())
-cs.SetField("BlockDefaultStyles", BlockDefaultStyles.ToString())
 cs.SetField("BlockEditTools", BlockEditTools.ToString())
 cs.SetField("ccGuid", ccGuid)
 cs.SetField("CollectionID", CollectionID.ToString())
@@ -6146,7 +6070,6 @@ instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue
 instance.Admin = genericController.EncodeBoolean(.fields("Admin").defaultValue)
 instance.ArgumentList = genericController.EncodeText(.fields("ArgumentList").defaultValue)
 instance.AsAjax = genericController.EncodeBoolean(.fields("AsAjax").defaultValue)
-instance.BlockDefaultStyles = genericController.EncodeBoolean(.fields("BlockDefaultStyles").defaultValue)
 instance.BlockEditTools = genericController.EncodeBoolean(.fields("BlockEditTools").defaultValue)
 instance.ccGuid = genericController.EncodeText(.fields("ccGuid").defaultValue)
 instance.CollectionID = genericController.EncodeInteger(.fields("CollectionID").defaultValue)
@@ -6437,7 +6360,6 @@ public EditSourceID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
-public ScriptingModuleID as Integer
 public SortOrder as String
 
 .ID = cs.getInteger("ID")
@@ -6455,7 +6377,6 @@ public SortOrder as String
 .ModifiedBy = cs.getInteger("ModifiedBy")
 .ModifiedDate = cs.getDate("ModifiedDate")
 .Name = cs.getText("Name")
-.ScriptingModuleID = cs.getInteger("ScriptingModuleID")
 .SortOrder = cs.getText("SortOrder")
 
 cs.SetField("Active", Active.ToString())
@@ -6472,7 +6393,6 @@ cs.SetField("EditSourceID", EditSourceID.ToString())
 cs.SetField("ModifiedBy", ModifiedBy.ToString())
 cs.SetField("ModifiedDate", ModifiedDate.ToString())
 cs.SetField("Name", Name)
-cs.SetField("ScriptingModuleID", ScriptingModuleID.ToString())
 cs.SetField("SortOrder", SortOrder)
 if (String.IsNullOrEmpty(ccGuid)) Then ccGuid = Controllers.genericController.getGUID()
 
@@ -6490,7 +6410,6 @@ instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").
 instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)
 instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").defaultValue)
 instance.Name = genericController.EncodeText(.fields("Name").defaultValue)
-instance.ScriptingModuleID = genericController.EncodeInteger(.fields("ScriptingModuleID").defaultValue)
 instance.SortOrder = genericController.EncodeText(.fields("SortOrder").defaultValue)
 
 ---------------------------------------------

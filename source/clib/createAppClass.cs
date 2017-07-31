@@ -115,9 +115,12 @@ namespace  Contensive.CLI {
                             appConfig.cdnFilesNetprefix = cliController.promptForReply("CDN files Url (website)", "http://" + cdnDomainName + "/");
                             break;
                     }
+                    FileIOPermission f2;
+                    //
+                    // -- setup appRoot
                     System.IO.Directory.CreateDirectory(appConfig.appRootFilesPath);
-                    FileIOPermission f2 = new FileIOPermission(FileIOPermissionAccess.Read, appConfig.appRootFilesPath);
-                    f2.AddPathList(FileIOPermissionAccess.Write | FileIOPermissionAccess.Read, appConfig.appRootFilesPath);
+                    f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.appRootFilesPath);
+                    //f2.AddPathList(FileIOPermissionAccess.AllAccess, appConfig.appRootFilesPath);
                     try
                     {
                         f2.Demand();
@@ -126,8 +129,42 @@ namespace  Contensive.CLI {
                     {
                         Console.WriteLine(s.Message);
                     }
+                    //
+                    // -- setup cdn
                     System.IO.Directory.CreateDirectory(appConfig.cdnFilesPath);
+                    f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.cdnFilesPath);
+                    try
+                    {
+                        f2.Demand();
+                    }
+                    catch (SecurityException s)
+                    {
+                        Console.WriteLine(s.Message);
+                    }
+                    //
+                    // -- setup private
                     System.IO.Directory.CreateDirectory(appConfig.privateFilesPath);
+                    f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.privateFilesPath);
+                    try
+                    {
+                        f2.Demand();
+                    }
+                    catch (SecurityException s)
+                    {
+                        Console.WriteLine(s.Message);
+                    }
+                    //
+                    // -- setup temp
+                    System.IO.Directory.CreateDirectory(appConfig.tempFilesPath);
+                    f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.tempFilesPath);
+                    try
+                    {
+                        f2.Demand();
+                    }
+                    catch (SecurityException s)
+                    {
+                        Console.WriteLine(s.Message);
+                    }
 
                     //
                     // -- save the app configuration and reload the server using this app
@@ -157,7 +194,7 @@ namespace  Contensive.CLI {
                     //
                     cp.core.programFiles.copyFolder("resources\\iisDefaultSite\\", "\\", cp.core.appRootFiles);
                     //
-                    // replace "appName" with the name of this app in the default document in the apps public folder
+                    // replace "appName" with blank to use iis siteName as appName, or the name of this app in the default document in the apps public folder
                     //
                     string defaultContent = cp.core.appRootFiles.readFile("web.config");
                     defaultContent = defaultContent.Replace("{{appName}}", appName);

@@ -71,6 +71,7 @@ Namespace Contensive.Core.Controllers
                 Me.clusterFileEndpoint = remoteFileEndpoint
                 Me.fileSyncMode = fileSyncMode
                 Me.rootLocalPath = normalizePath(rootLocalPath)
+                'CreatefullPath(rootLocalPath)
             End If
         End Sub
         '
@@ -124,7 +125,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '   Read in a file from a given PathFilename, return content
         '
-        '   Do error trapping alittle different, always Call Err.Raise(ccObjectError_UnderlyingObject, , ErrorDescription) and print
+        '   Do error trapping alittle different, always fixme-- cpCore.handleException(New ApplicationException("")) ' -----ccObjectError_UnderlyingObject, , ErrorDescription) and print
         '   something out if there was a problem.
         '
         '========================================================================

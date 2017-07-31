@@ -315,24 +315,17 @@ Namespace Contensive.Core.Controllers
         Public Function getHtmlDocBody(cpCore As coreClass) As String
             Dim returnBody As String = ""
             Try
-                '
                 Dim AddonReturn As String
                 Dim Ptr As Integer
                 Dim Cnt As Integer
-                Dim layoutError As String
+                Dim layoutError As String = String.Empty
                 Dim FilterStatusOK As Boolean
-                Dim BlockFormatting As Boolean
-                Dim IndentCnt As Integer
                 Dim Result As New stringBuilderLegacyController
-                Dim Content As String
-                Dim ContentIndent As String
-                Dim ContentCnt As Integer
                 Dim PageContent As String
                 Dim Stream As New stringBuilderLegacyController
                 Dim LocalTemplateID As Integer
                 Dim LocalTemplateName As String
                 Dim LocalTemplateBody As String
-                Dim Parse As htmlParserController
                 Dim blockSiteWithLogin As Boolean
                 Dim addonCachePtr As Integer
                 Dim addonId As Integer
@@ -397,7 +390,7 @@ Namespace Contensive.Core.Controllers
                     '
                     If Not cpCore.doc.isPrintVersion Then
                         LocalTemplateBody = cpCore.html.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
-                        returnBody = returnBody & cpCore.html.encodeContent9(LocalTemplateBody, cpCore.authContext.user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
+                        returnBody = returnBody & cpCore.html.encodeContent9(LocalTemplateBody, cpCore.authContext.user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
@@ -475,8 +468,6 @@ Namespace Contensive.Core.Controllers
                 Dim htmlDocBody As String
                 Dim htmlDocHead As String
                 Dim bodyTag As String
-                'Dim bodyAddonId As Integer
-                Dim bodyAddonStatusOK As Boolean
                 Dim Clip As String
                 Dim ClipParentRecordID As Integer
                 Dim ClipParentContentID As Integer
@@ -507,7 +498,7 @@ Namespace Contensive.Core.Controllers
                     Dim AllowCookieTest As Boolean
                     AllowCookieTest = cpCore.siteProperties.allowVisitTracking And (cpCore.authContext.visit.PageVisits = 1)
                     If AllowCookieTest Then
-                        Call cpCore.html.main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.authContext.visit.id, cpCore.app_startTime) & "')};", "Cookie Test")
+                        Call cpCore.html.addOnLoadJavascript("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.authContext.visit.id, cpCore.app_startTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -516,8 +507,8 @@ Namespace Contensive.Core.Controllers
                     '--------------------------------------------------------------------------
                     '
                     If cpCore.docProperties.getInteger("ContensiveUserForm") = 1 Then
-                        Dim FromAddress As String = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServer.webServerIO_requestDomain)
-                        Call cpCore.email.sendForm(cpCore.siteProperties.emailAdmin, FromAddress, "Form Submitted on " & cpCore.webServer.webServerIO_requestReferer)
+                        Dim FromAddress As String = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServer.requestDomain)
+                        Call cpCore.email.sendForm(cpCore.siteProperties.emailAdmin, FromAddress, "Form Submitted on " & cpCore.webServer.requestReferer)
                         Dim cs As Integer = cpCore.db.cs_insertRecord("User Form Response")
                         If cpCore.db.cs_ok(cs) Then
                             Call cpCore.db.cs_set(cs, "name", "Form " & cpCore.webServer.requestReferrer)
@@ -594,7 +585,7 @@ Namespace Contensive.Core.Controllers
                                     End If
                                     '
                                     ' -- and go
-                                    Dim link As String = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, link)
+                                    Dim link As String = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, file.Filename)
                                     Call cpCore.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
                                 End If
                             End If
@@ -982,7 +973,8 @@ Namespace Contensive.Core.Controllers
                                     'Call AppendLog("main_init(), 3410 - exit for login block")
                                     '
                                     Call cpCore.html.main_SetMetaContent(0, 0)
-                                    Call cpCore.html.writeAltBuffer(cpCore.html.getLoginPage(False) & cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
+                                    Dim login As New Addons.addon_loginClass(cpCore)
+                                    Call cpCore.html.writeAltBuffer(login.getLoginPage(False))
                                     cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                     Return cpCore.doc.docBuffer
                                 Case 2
@@ -993,7 +985,7 @@ Namespace Contensive.Core.Controllers
                                     'Call AppendLog("main_init(), 3420 - exit for custom content block")
                                     '
                                     Call cpCore.html.main_SetMetaContent(0, 0)
-                                    Call cpCore.html.main_AddOnLoadJavascript2("document.body.style.overflow='scroll'", "Anonymous User Block")
+                                    Call cpCore.html.addOnLoadJavascript("document.body.style.overflow='scroll'", "Anonymous User Block")
                                     Dim Copy As String = cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
                                     ' -- already encoded
                                     'Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
@@ -1028,20 +1020,20 @@ Namespace Contensive.Core.Controllers
                     'End If
                     '
                     ' -- add template and page details to document
-                    Call cpCore.html.main_AddOnLoadJavascript2(template.JSOnLoad, "template")
-                    Call cpCore.html.main_AddHeadScriptCode(template.JSHead, "template")
-                    Call cpCore.html.main_AddEndOfBodyJavascript2(template.JSEndBody, "template")
+                    Call cpCore.html.addOnLoadJavascript(template.JSOnLoad, "template")
+                    Call cpCore.html.addHeadJavascriptCode(template.JSHead, "template")
+                    Call cpCore.html.addBodyJavascriptCode(template.JSEndBody, "template")
                     Call cpCore.html.main_AddHeadTag2(template.OtherHeadTags, "template")
                     If template.StylesFilename <> "" Then
-                        cpCore.doc.metaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, template.StylesFilename) & """ >"
+                        cpCore.doc.metaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, template.StylesFilename) & """ >"
                     End If
-                    '
-                    ' -- add shared styles
-                    Dim sqlCriteria As String = "(templateId=" & template.ID & ")"
-                    Dim styleList As List(Of Models.Entity.SharedStylesTemplateRuleModel) = Models.Entity.SharedStylesTemplateRuleModel.createList(cpCore, sqlCriteria, "sortOrder,id")
-                    For Each rule As SharedStylesTemplateRuleModel In styleList
-                        Call cpCore.html.main_AddSharedStyleID2(rule.StyleID, "template")
-                    Next
+                    ''
+                    '' -- add shared styles
+                    'Dim sqlCriteria As String = "(templateId=" & template.ID & ")"
+                    'Dim styleList As List(Of Models.Entity.SharedStylesTemplateRuleModel) = Models.Entity.SharedStylesTemplateRuleModel.createList(cpCore, sqlCriteria, "sortOrder,id")
+                    'For Each rule As SharedStylesTemplateRuleModel In styleList
+                    '    Call cpCore.html.addSharedStyleID2(rule.StyleID, "template")
+                    'Next
                     '
                     ' -- check secure certificate required
                     Dim SecureLink_Template_Required As Boolean = template.IsSecure
@@ -1092,7 +1084,7 @@ Namespace Contensive.Core.Controllers
                         If (Not allowTemplate) Then
                             '
                             ' -- must redirect to a domain's landing page
-                            RedirectLink = cpCore.webServer.webServerIO_requestProtocol & domain.Name
+                            RedirectLink = cpCore.webServer.requestProtocol & domain.Name
                             redirectBecausePageNotFound = False
                             Me.redirectReason = "Redirecting because this domain has template requiements set, and this template is not configured [" & template.Name & "]."
                             Return ""
@@ -1187,13 +1179,13 @@ Namespace Contensive.Core.Controllers
                         End If
                         Dim linkDst As String
                         'main_ServerPage = main_ServerPage
-                        If main_ServerReferrerURL <> cpCore.webServer.webServerIO_ServerFormActionURL Then
+                        If main_ServerReferrerURL <> cpCore.webServer.serverFormActionURL Then
                             '
                             ' remove any methods from referrer
                             '
                             Dim Copy As String
-                            Copy = "Redirecting because a Contensive Form was detected, source URL [" & main_ServerReferrerURL & "] does not equal the current URL [" & cpCore.webServer.webServerIO_ServerFormActionURL & "]. This may be from a Contensive Add-on that now needs to redirect back to the host page."
-                            linkDst = cpCore.webServer.webServerIO_requestReferer
+                            Copy = "Redirecting because a Contensive Form was detected, source URL [" & main_ServerReferrerURL & "] does not equal the current URL [" & cpCore.webServer.serverFormActionURL & "]. This may be from a Contensive Add-on that now needs to redirect back to the host page."
+                            linkDst = cpCore.webServer.requestReferer
                             If main_ServerReferrerQs <> "" Then
                                 linkDst = main_ServerReferrerURL
                                 main_ServerReferrerQs = genericController.ModifyQueryString(main_ServerReferrerQs, "method", "")
@@ -1252,8 +1244,8 @@ Namespace Contensive.Core.Controllers
                 '
                 Dim CS As Integer
                 Dim SQL As String
-                Dim Formhtml As String
-                Dim FormInstructions As String
+                Dim Formhtml As String = String.Empty
+                Dim FormInstructions As String = String.Empty
                 Dim f As docController.main_FormPagetype
                 Dim Ptr As Integer
                 Dim CSPeople As Integer
@@ -1261,12 +1253,12 @@ Namespace Contensive.Core.Controllers
                 Dim WasInGroup As Boolean
                 Dim FormValue As String
                 Dim Success As Boolean
-                Dim PeopleFirstName As String
-                Dim PeopleLastName As String
+                Dim PeopleFirstName As String = String.Empty
+                Dim PeopleLastName As String = String.Empty
                 Dim PeopleUsername As String
                 Dim PeoplePassword As String
-                Dim PeopleName As String
-                Dim PeopleEmail As String
+                Dim PeopleName As String = String.Empty
+                Dim PeopleEmail As String = String.Empty
                 Dim Groups() As String
                 Dim GroupName As String
                 Dim GroupIDToJoinOnSuccess As Integer
@@ -1416,14 +1408,9 @@ Namespace Contensive.Core.Controllers
             Dim returnHtml As String = ""
             Try
                 Dim allowPageWithoutSectionDislay As Boolean
-                Dim domainIds() As String
-                Dim setdomainId As Integer
-                Dim linkDomain As String
-                Dim templatedomainIdList As String
                 Dim FieldRows As Integer
-                Dim templateId As Integer
+                'Dim templateId As Integer
                 Dim RootPageContentName As String
-                Dim Ptr As Integer
                 Dim PageID As Integer
                 Dim UseContentWatchLink As Boolean = cpCore.siteProperties.useContentWatchLink
                 '
@@ -1527,7 +1514,7 @@ Namespace Contensive.Core.Controllers
                 '
                 ' -- if fpo_QuickEdit it there, replace it out
                 Dim Editor As String
-                Dim styleOptionList As String
+                Dim styleOptionList As String = String.Empty
                 Dim addonListJSON As String
                 If redirectLink = "" And (InStr(1, returnHtml, html_quickEdit_fpo) <> 0) Then
                     FieldRows = genericController.EncodeInteger(cpCore.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"))
@@ -1535,7 +1522,7 @@ Namespace Contensive.Core.Controllers
                         FieldRows = 50
                         Call cpCore.userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50)
                     End If
-                    Dim stylesheetCommaList As String = cpCore.html.main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
+                    Dim stylesheetCommaList As String = "" 'cpCore.html.main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
                     addonListJSON = cpCore.html.main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
                     Editor = cpCore.html.html_GetFormInputHTML3("copyFilename", quickEditCopy, CStr(FieldRows), "100%", False, True, addonListJSON, stylesheetCommaList, styleOptionList)
                     returnHtml = genericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor)
@@ -1740,7 +1727,8 @@ Namespace Contensive.Core.Controllers
                                     BlockCopy = "" _
                                         & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                         & ""
-                                    BlockForm = cpcore.html.getLoginForm()
+                                    Dim loginAddon As New Addons.addon_loginClass(cpcore)
+                                    BlockForm = loginAddon.getLoginForm()
                                 Else
                                     '
                                     ' recognized, not authenticated
@@ -1748,7 +1736,8 @@ Namespace Contensive.Core.Controllers
                                     BlockCopy = "" _
                                         & "<p>This content has limited access. You were recognized as ""<b>" & cpcore.authContext.user.Name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
                                         & ""
-                                    BlockForm = cpcore.html.getLoginForm()
+                                    Dim loginAddon As New Addons.addon_loginClass(cpcore)
+                                    BlockForm = loginAddon.getLoginForm()
                                 End If
                             Else
                                 '
@@ -1758,7 +1747,8 @@ Namespace Contensive.Core.Controllers
                                     & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
                                     & ""
-                                BlockForm = cpcore.html.getLoginForm()
+                                Dim loginAddon As New Addons.addon_loginClass(cpcore)
+                                BlockForm = loginAddon.getLoginForm()
                             End If
                             returnHtml = "" _
                                 & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
@@ -1776,7 +1766,8 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' login subform form
                                 '
-                                BlockForm = cpcore.html.getLoginForm()
+                                Dim loginAddon As New Addons.addon_loginClass(cpcore)
+                                BlockForm = loginAddon.getLoginForm()
                                 BlockCopy = "" _
                                     & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                     & "<p>If you do not have an account, <a href=?" & cpcore.doc.refreshQueryString & "&subform=0>click here to register</a>.</p>" _
@@ -1899,7 +1890,7 @@ Namespace Contensive.Core.Controllers
                                 Body = Body & "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>"
                                 Body = Body & genericController.StartTable(4, 1, 1)
                                 Body = Body & "<tr><td align=""right"" width=""150"" Class=""ccPanelHeader"">Description<br><img alt=""image"" src=""http://" & cpcore.webServer.requestDomain & "/ccLib/images/spacer.gif"" width=""150"" height=""1""></td><td align=""left"" width=""100%"" Class=""ccPanelHeader"">Value</td></tr>"
-                                Body = Body & getTableRow("Domain", cpcore.webServer.webServerIO_requestDomain, True)
+                                Body = Body & getTableRow("Domain", cpcore.webServer.requestDomain, True)
                                 Body = Body & getTableRow("Link", cpcore.webServer.requestUrl, False)
                                 Body = Body & getTableRow("Page Name", PageName, True)
                                 Body = Body & getTableRow("Member Name", cpcore.authContext.user.Name, False)
@@ -1912,7 +1903,7 @@ Namespace Contensive.Core.Controllers
                                 Body = Body & getTableRow("Visit Authenticated", CStr(cpcore.authContext.visit.VisitAuthenticated), True)
                                 Body = Body & getTableRow("Visit Referrer", cpcore.authContext.visit.HTTP_REFERER, False)
                                 Body = Body & kmaEndTable
-                                Call cpcore.email.sendPerson(page.ContactMemberID, cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.webServerIO_requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
+                                Call cpcore.email.sendPerson(page.ContactMemberID, cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
                             End If
                         End If
                         '
@@ -1993,12 +1984,12 @@ Namespace Contensive.Core.Controllers
                     ' ----- Store page javascript
                     '---------------------------------------------------------------------------------
                     '
-                    Call cpcore.html.main_AddOnLoadJavascript2(page.JSOnLoad, "page content")
-                    Call cpcore.html.main_AddHeadScriptCode(page.JSHead, "page content")
+                    Call cpcore.html.addOnLoadJavascript(page.JSOnLoad, "page content")
+                    Call cpcore.html.addHeadJavascriptCode(page.JSHead, "page content")
                     If page.JSFilename <> "" Then
-                        Call cpcore.html.main_AddHeadScriptLink(genericController.getCdnFileLink(cpcore, page.JSFilename), "page content")
+                        Call cpcore.html.addJavaScriptLinkHead(genericController.getCdnFileLink(cpcore, page.JSFilename), "page content")
                     End If
-                    Call cpcore.html.main_AddEndOfBodyJavascript2(page.JSEndBody, "page content")
+                    Call cpcore.html.addBodyJavascriptCode(page.JSEndBody, "page content")
                     '
                     '---------------------------------------------------------------------------------
                     ' Set the Meta Content flag
@@ -2130,49 +2121,9 @@ Namespace Contensive.Core.Controllers
         Friend Function getContentBox_content_Body(OrderByClause As String, AllowChildList As Boolean, Authoring As Boolean, rootPageId As Integer, AllowReturnLink As Boolean, RootPageContentName As String, ArchivePage As Boolean) As String
             Dim result As String = ""
             Try
-                'Dim Cell As String
-                'Dim AddonStatusOK As Boolean
-                'Dim ChildListInstanceOptions As String
-                'Dim Name As String
-                'Dim DateReviewed As Date
-                'Dim ReviewedBy As Integer
-                'Dim CS As Integer
-                'Dim IconRow As String
-                ''Dim contactMemberID As Integer
-                'Dim QueryString As String
-                'Dim LastModified As Date
-                'Dim childListSortMethodId As Integer
-                'Dim AllowEmailPage As Boolean
-                'Dim AllowPrinterVersion As Boolean
-                'Dim Caption As String
-                ''Dim PageID As Integer
-                ''Dim parentPageID As Integer
-                'Dim allowChildListDisplay As Boolean
-                'Dim dateArchive As Date
-
-                '
-                'Dim allowReturnLinkDisplay As Boolean
-                'Dim headline As String
-                'Dim copyFilename As String
-                'Dim Copy As String
-                'Dim EmailBody As String
-                'Dim Body As String
-                'Dim allowSeeAlso As Boolean
-                'Dim allowMoreInfo As Boolean
-                'Dim allowFeedback As Boolean
-                'Dim allowLastModifiedFooter As Boolean
-                'Dim ModifiedBy As Integer
-                'Dim allowReviewedFooter As Boolean
-                'Dim allowMessageFooter As Boolean
-                'Dim pageContentMessageFooter As String
-                '
                 Dim allowChildListComposite As Boolean = AllowChildList And page.AllowChildListDisplay
                 Dim allowReturnLinkComposite As Boolean = AllowReturnLink And page.AllowReturnLinkDisplay
                 Dim bodyCopy As String = page.Copyfilename.copy
-                'If page.Copyfilename <> "" Then
-                '    bodyCopy = cpcore.privateFiles.readFile(page.Copyfilename)
-                'End If
-                '
                 Dim breadCrumb As String = ""
                 Dim BreadCrumbDelimiter As String
                 Dim BreadCrumbPrefix As String
@@ -2210,7 +2161,7 @@ Namespace Contensive.Core.Controllers
                             If QueryString <> "" Then
                                 QueryString = "?" & QueryString
                             End If
-                            Dim EmailBody As String = cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.webServer.requestPathPage & QueryString
+                            Dim EmailBody As String = cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & cpcore.webServer.requestPathPage & QueryString
                             Dim Caption As String = cpcore.siteProperties.getText("PageAllowEmailCaption", "Email This Page")
                             Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """><img alt=""image"" src=""/ccLib/images/IconSmallEmail.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """ style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
@@ -2228,7 +2179,7 @@ Namespace Contensive.Core.Controllers
                 '
                 Dim Cell As String = ""
                 If cpcore.authContext.isQuickEditing(cpcore, pageContentModel.contentName) Then
-                    Cell = Cell & getQuickEditing(pageContentModel.contentName, rootPageId, RootPageContentName, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, page.ContactMemberID, page.ChildListSortMethodID, allowChildListComposite, ArchivePage)
+                    Cell = Cell & getQuickEditing(rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, page.ContactMemberID, page.ChildListSortMethodID, allowChildListComposite, ArchivePage)
                 Else
                     '
                     ' ----- Headline
@@ -2388,7 +2339,7 @@ Namespace Contensive.Core.Controllers
                             If SeeAlsoLink <> "" Then
                                 result = result & cr & "<li class=""ccListItem"">"
                                 If genericController.vbInstr(1, SeeAlsoLink, "://") = 0 Then
-                                    SeeAlsoLink = Me.cpcore.webServer.webServerIO_requestProtocol & SeeAlsoLink
+                                    SeeAlsoLink = Me.cpcore.webServer.requestProtocol & SeeAlsoLink
                                 End If
                                 If IsEditingLocal Then
                                     result = result & Me.cpcore.html.main_GetRecordEditLink2("See Also", (cpcore.db.cs_getInteger(CS, "ID")), False, "", Me.cpcore.authContext.isEditing("See Also"))
@@ -2453,7 +2404,7 @@ Namespace Contensive.Core.Controllers
                 Dim Panel As String
                 Dim Copy As String
                 Dim FeedbackButton As String
-                Dim NoteCopy As String
+                Dim NoteCopy As String = String.Empty
                 Dim NoteFromEmail As String
                 Dim NoteFromName As String
                 Dim CS As Integer
@@ -2511,12 +2462,12 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- Note sent, say thanks
                         '
-                        main_GetFeedbackForm = main_GetFeedbackForm & "<p>Thank you. Your feedback was received.</p>"
+                        result = result & "<p>Thank you. Your feedback was received.</p>"
                     Case Else
                         '
                         ' ----- print the feedback submit form
                         '
-                        Panel = "<form Action=""" & Me.cpcore.webServer.webServerIO_ServerFormActionURL & "?" & Me.cpcore.doc.refreshQueryString & """ Method=""post"">"
+                        Panel = "<form Action=""" & Me.cpcore.webServer.serverFormActionURL & "?" & Me.cpcore.doc.refreshQueryString & """ Method=""post"">"
                         Panel = Panel & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""100%"">"
                         Panel = Panel & "<tr>"
                         Panel = Panel & "<td colspan=""2""><p>Your feedback is welcome</p></td>"
@@ -2556,6 +2507,7 @@ Namespace Contensive.Core.Controllers
             Catch ex As Exception
                 Me.cpcore.handleException(ex)
             End Try
+            Return result
         End Function
         '
         '========================================================================
@@ -2772,7 +2724,7 @@ Namespace Contensive.Core.Controllers
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li id=""main_ContentWatch" & RecordID & """ class=""ccListItem"">"
                             If (Link <> "") Then
-                                result = result & "<a href=""http://" & Me.cpcore.webServer.webServerIO_requestDomain & requestAppRootPath & Me.cpcore.webServer.requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
+                                result = result & "<a href=""http://" & Me.cpcore.webServer.requestDomain & requestAppRootPath & Me.cpcore.webServer.requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
                             Else
                                 result = result & LinkLabel
                             End If
@@ -2818,9 +2770,11 @@ Namespace Contensive.Core.Controllers
         '   Use for both Root and non-root pages
         '=============================================================================
         '
-        Friend Function getQuickEditing(LiveRecordContentName As String, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, contactMemberID As Integer, childListSortMethodId As Integer, main_AllowChildListComposite As Boolean, ArchivePage As Boolean) As String
-            Dim result As String
+        Friend Function getQuickEditing(rootPageId As Integer, OrderByClause As String, AllowPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, contactMemberID As Integer, childListSortMethodId As Integer, main_AllowChildListComposite As Boolean, ArchivePage As Boolean) As String
+            Dim result As String = String.Empty
             '
+            Dim RootPageContentName As String = Models.Entity.pageContentModel.contentName
+            Dim LiveRecordContentName As String = Models.Entity.pageContentModel.contentName
             Dim AddonStatusOK As Boolean
             Dim Link As String
             Dim page_ParentID As Integer
@@ -2839,13 +2793,13 @@ Namespace Contensive.Core.Controllers
             Dim CDef As cdefModel
             Dim readOnlyField As Boolean
             Dim IsEditLocked As Boolean
-            Dim main_EditLockMemberName As String
+            Dim main_EditLockMemberName As String = String.Empty
             Dim main_EditLockDateExpires As Date
             Dim SubmittedDate As Date
             Dim ApprovedDate As Date
             Dim ModifiedDate As Date
             '
-            Call cpcore.html.main_AddStylesheetLink2("/ccLib/styles/ccQuickEdit.css", "Quick Editor")
+            Call cpcore.html.addStyleLink("/quickEditor/styles.css", "Quick Editor")
             '
             ' ----- First Active Record - Output Quick Editor form
             '
@@ -2937,16 +2891,16 @@ Namespace Contensive.Core.Controllers
             & ""
             If readOnlyField Then
                 result = result & "" _
-            & cr & "<tr>" _
-            & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:34px;"">Body</td>" _
-            & cr2 & "<td class=""qeRow qeRight"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
-            & cr & "</tr>"
+                    & cr & "<tr>" _
+                    & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:34px;"">Body</td>" _
+                    & cr2 & "<td class=""qeRow qeRight"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
+                    & cr & "</tr>"
             Else
                 result = result & "" _
-            & cr & "<tr>" _
-            & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:111px;"">Body</td>" _
-            & cr2 & "<td class=""qeRow qeRight"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
-            & cr & "</tr>"
+                    & cr & "<tr>" _
+                    & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:111px;"">Body</td>" _
+                    & cr2 & "<td class=""qeRow qeRight"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
+                    & cr & "</tr>"
             End If
             '
             ' ----- Parent pages
@@ -3003,11 +2957,11 @@ Namespace Contensive.Core.Controllers
             & cr & result _
             & cr & cpcore.html.html_GetUploadFormEnd()
 
-            getQuickEditing = "" _
+            result = "" _
             & cr & "<div class=""ccCon"">" _
             & genericController.htmlIndent(result) _
             & cr & "</div>"
-            '
+            Return result
         End Function
         '
         '========================================================================
@@ -3136,7 +3090,7 @@ Namespace Contensive.Core.Controllers
             Dim Button As String
             Dim RecordID As Integer
             Dim RecordModified As Boolean
-            Dim RecordName As String
+            Dim RecordName As String = String.Empty
             '
             Dim IsEditLocked As Boolean
             Dim IsSubmitted As Boolean
@@ -3382,7 +3336,7 @@ Namespace Contensive.Core.Controllers
                 Dim Link As String
                 Dim LinkedText As String
                 Dim ActiveList As String = ""
-                Dim InactiveList As String
+                Dim InactiveList As String = String.Empty
                 Dim archiveLink As String
                 Dim PageLink As String
                 Dim pageMenuHeadline As String
@@ -3396,8 +3350,8 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
                 archiveLink = cpcore.webServer.requestPathPage
-                archiveLink = genericController.ConvertLinkToShortLink(archiveLink, cpcore.webServer.requestDomain, cpcore.webServer.webServerIO_requestVirtualFilePath)
-                archiveLink = genericController.EncodeAppRootPath(archiveLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+                archiveLink = genericController.ConvertLinkToShortLink(archiveLink, cpcore.webServer.requestDomain, cpcore.webServer.requestVirtualFilePath)
+                archiveLink = genericController.EncodeAppRootPath(archiveLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
                 '
                 Dim sqlCriteria As String = "(parentId=" & page.id & ")"
                 Dim sqlOrderBy As String = "sortOrder"
@@ -3611,62 +3565,56 @@ ErrorTrap:
         '========================================================================
         '
         Public Function deleteChildRecords(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal ReturnListWithoutDelete As Boolean = False) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("DeleteChildRecords")
-            '
-            Dim QuickEditing As Boolean
-            Dim SQL As String
-            'dim dt as datatable
-            Dim IDList As String
-            Dim IDs() As String
-            Dim IDCnt As Integer
-            Dim Ptr As Integer
-            Dim CS As Integer
-            '
-            Dim ChildList As String
-            Dim SingleEntry As Boolean
-            '
-            '
-            ' For now, the child delete only works in non-workflow
-            '
-            CS = cpcore.db.cs_open(ContentName, "parentid=" & RecordID, , , , ,, "ID")
-            Do While cpcore.db.cs_ok(CS)
-                deleteChildRecords = deleteChildRecords & "," & cpcore.db.cs_getInteger(CS, "ID")
-                cpcore.db.cs_goNext(CS)
-            Loop
-            Call cpcore.db.cs_Close(CS)
-            If deleteChildRecords <> "" Then
-                deleteChildRecords = Mid(deleteChildRecords, 2)
+            Dim result As String = String.Empty
+            Try
+                Dim QuickEditing As Boolean
+                Dim IDs() As String
+                Dim IDCnt As Integer
+                Dim Ptr As Integer
+                Dim CS As Integer
+                Dim ChildList As String
+                Dim SingleEntry As Boolean
                 '
-                ' main_Get a list of all pages, but do not delete anything yet
+                ' For now, the child delete only works in non-workflow
                 '
-                IDs = Split(deleteChildRecords, ",")
-                IDCnt = UBound(IDs) + 1
-                SingleEntry = (IDCnt = 1)
-                For Ptr = 0 To IDCnt - 1
-                    ChildList = deleteChildRecords(ContentName, genericController.EncodeInteger(IDs(Ptr)), True)
-                    If ChildList <> "" Then
-                        deleteChildRecords = deleteChildRecords & "," & ChildList
-                        SingleEntry = False
-                    End If
-                Next
-                If Not ReturnListWithoutDelete Then
+                CS = cpcore.db.cs_open(ContentName, "parentid=" & RecordID, , , , ,, "ID")
+                Do While cpcore.db.cs_ok(CS)
+                    result = result & "," & cpcore.db.cs_getInteger(CS, "ID")
+                    cpcore.db.cs_goNext(CS)
+                Loop
+                Call cpcore.db.cs_Close(CS)
+                If result <> "" Then
+                    result = Mid(result, 2)
                     '
-                    ' Do the actual delete
+                    ' main_Get a list of all pages, but do not delete anything yet
                     '
-                    IDs = Split(deleteChildRecords, ",")
+                    IDs = Split(result, ",")
                     IDCnt = UBound(IDs) + 1
                     SingleEntry = (IDCnt = 1)
-                    QuickEditing = cpcore.authContext.isQuickEditing(cpcore, "page content")
                     For Ptr = 0 To IDCnt - 1
-                        Call cpcore.db.deleteContentRecord("page content", genericController.EncodeInteger(IDs(Ptr)))
+                        ChildList = deleteChildRecords(ContentName, genericController.EncodeInteger(IDs(Ptr)), True)
+                        If ChildList <> "" Then
+                            result = result & "," & ChildList
+                            SingleEntry = False
+                        End If
                     Next
+                    If Not ReturnListWithoutDelete Then
+                        '
+                        ' Do the actual delete
+                        '
+                        IDs = Split(result, ",")
+                        IDCnt = UBound(IDs) + 1
+                        SingleEntry = (IDCnt = 1)
+                        QuickEditing = cpcore.authContext.isQuickEditing(cpcore, "page content")
+                        For Ptr = 0 To IDCnt - 1
+                            Call cpcore.db.deleteContentRecord("page content", genericController.EncodeInteger(IDs(Ptr)))
+                        Next
+                    End If
                 End If
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_DeleteChildRecords")
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '========================================================================
@@ -3719,9 +3667,9 @@ ErrorTrap:
             Dim IsModified As Boolean
             Dim EditingName As String
             Dim EditingExpires As Date
-            Dim SubmittedName As String
-            Dim ApprovedName As String
-            Dim ModifiedName As String
+            Dim SubmittedName As String = String.Empty
+            Dim ApprovedName As String = String.Empty
+            Dim ModifiedName As String = String.Empty
             Dim CDef As cdefModel
             Dim ModifiedDate As Date
             Dim SubmittedDate As Date
@@ -3920,7 +3868,7 @@ ErrorTrap:
             CDef = cpcore.metaData.getCdef(ContentName)
             Link = cpcore.siteProperties.adminURL & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
-            Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & genericController.encodeHTML(Link) & """>" & cpcore.webServer.webServerIO_requestDomain & "</a>")
+            Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & genericController.encodeHTML(Link) & """>" & cpcore.webServer.requestDomain & "</a>")
             Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName)
             Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName)
             Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString)
@@ -3999,99 +3947,81 @@ ErrorTrap:
         '   {{FIELD}} tags -- main_Gets the form field for each instruction line
         '
         Friend Function loadFormPageInstructions(FormInstructions As String, Formhtml As String) As main_FormPagetype
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_LoadFormPageInstructions")
-            '
-            Dim RepeatBody As String
-            Dim PtrFront As Integer
-            Dim PtrBack As Integer
-            Dim i() As String
-            Dim IPtr As Integer
-            Dim IStart As Integer
-            Dim IArgs() As String
-            Dim IArgPtr As Integer
-            Dim CSPeople As Integer
-            Dim Body As String
-            Dim Instruction As String
-            Dim CS As Integer
-            Dim HasRequiredFields As Boolean
-            Dim ArgCaption As String
-            Dim ArgType As Integer
-            Dim ArgRequired As Boolean
-            Dim GroupName As String
-            Dim GroupValue As Boolean
-            Dim GroupRowPtr As Integer
-            Dim FormPageID As Integer
-            Dim f As main_FormPagetype
-            '
-            If True Then
-                PtrFront = genericController.vbInstr(1, Formhtml, "{{REPEATSTART", vbTextCompare)
-                If PtrFront > 0 Then
-                    PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}")
-                    If PtrBack > 0 Then
-                        f.PreRepeat = Mid(Formhtml, 1, PtrFront - 1)
-                        PtrFront = genericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", vbTextCompare)
-                        If PtrFront > 0 Then
-                            f.RepeatCell = Mid(Formhtml, PtrBack + 2, PtrFront - PtrBack - 2)
-                            PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}")
-                            If PtrBack > 0 Then
-                                f.PostRepeat = Mid(Formhtml, PtrBack + 2)
-                                '
-                                ' Decode instructions and build output
-                                '
-                                i = genericController.SplitCRLF(FormInstructions)
-                                If UBound(i) > 0 Then
-                                    If Trim(i(0)) >= "1" Then
-                                        '
-                                        ' decode Version 1 arguments, then start instructions line at line 1
-                                        '
-                                        f.AddGroupNameList = genericController.encodeText(i(1))
-                                        f.AuthenticateOnFormProcess = genericController.EncodeBoolean(i(2))
-                                        IStart = 3
-                                    End If
+            Dim result As New main_FormPagetype
+            Try
+                Dim RepeatBody As String
+                Dim PtrFront As Integer
+                Dim PtrBack As Integer
+                Dim i() As String
+                Dim IPtr As Integer
+                Dim IStart As Integer
+                Dim IArgs() As String
+                Dim CSPeople As Integer
+                '
+                If True Then
+                    PtrFront = genericController.vbInstr(1, Formhtml, "{{REPEATSTART", vbTextCompare)
+                    If PtrFront > 0 Then
+                        PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}")
+                        If PtrBack > 0 Then
+                            result.PreRepeat = Mid(Formhtml, 1, PtrFront - 1)
+                            PtrFront = genericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", vbTextCompare)
+                            If PtrFront > 0 Then
+                                result.RepeatCell = Mid(Formhtml, PtrBack + 2, PtrFront - PtrBack - 2)
+                                PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}")
+                                If PtrBack > 0 Then
+                                    result.PostRepeat = Mid(Formhtml, PtrBack + 2)
                                     '
-                                    ' read in and compose the repeat lines
+                                    ' Decode instructions and build output
                                     '
+                                    i = genericController.SplitCRLF(FormInstructions)
+                                    If UBound(i) > 0 Then
+                                        If Trim(i(0)) >= "1" Then
+                                            '
+                                            ' decode Version 1 arguments, then start instructions line at line 1
+                                            '
+                                            result.AddGroupNameList = genericController.encodeText(i(1))
+                                            result.AuthenticateOnFormProcess = genericController.EncodeBoolean(i(2))
+                                            IStart = 3
+                                        End If
+                                        '
+                                        ' read in and compose the repeat lines
+                                        '
 
-                                    RepeatBody = ""
-                                    CSPeople = -1
-                                    ReDim f.Inst(UBound(i))
-                                    For IPtr = 0 To UBound(i) - IStart
-                                        With f.Inst(IPtr)
-                                            IArgs = Split(i(IPtr + IStart), ",")
-                                            If UBound(IArgs) >= main_IPosMax Then
-                                                .Caption = IArgs(main_IPosCaption)
-                                                .Type = genericController.EncodeInteger(IArgs(main_IPosType))
-                                                .REquired = genericController.EncodeBoolean(IArgs(main_IPosRequired))
-                                                Select Case .Type
-                                                    Case 1
-                                                        '
-                                                        ' People Record
-                                                        '
-                                                        .PeopleField = IArgs(main_IPosPeopleField)
-                                                    Case 2
-                                                        '
-                                                        ' Group main_MemberShip
-                                                        '
-                                                        .GroupName = IArgs(main_IPosGroupName)
-                                                End Select
-                                            End If
-                                        End With
-                                    Next
+                                        RepeatBody = ""
+                                        CSPeople = -1
+                                        ReDim result.Inst(UBound(i))
+                                        For IPtr = 0 To UBound(i) - IStart
+                                            With result.Inst(IPtr)
+                                                IArgs = Split(i(IPtr + IStart), ",")
+                                                If UBound(IArgs) >= main_IPosMax Then
+                                                    .Caption = IArgs(main_IPosCaption)
+                                                    .Type = genericController.EncodeInteger(IArgs(main_IPosType))
+                                                    .REquired = genericController.EncodeBoolean(IArgs(main_IPosRequired))
+                                                    Select Case .Type
+                                                        Case 1
+                                                            '
+                                                            ' People Record
+                                                            '
+                                                            .PeopleField = IArgs(main_IPosPeopleField)
+                                                        Case 2
+                                                            '
+                                                            ' Group main_MemberShip
+                                                            '
+                                                            .GroupName = IArgs(main_IPosGroupName)
+                                                    End Select
+                                                End If
+                                            End With
+                                        Next
+                                    End If
                                 End If
                             End If
                         End If
                     End If
                 End If
-            End If
-            '
-            loadFormPageInstructions = f
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_LoadFormPageInstructions")
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '
@@ -4110,8 +4040,8 @@ ErrorTrap:
             Dim CSPeople As Integer
             Dim Body As String
             Dim Instruction As String
-            Dim Formhtml As String
-            Dim FormInstructions As String
+            Dim Formhtml As String = String.Empty
+            Dim FormInstructions As String = String.Empty
             Dim CS As Integer
             Dim HasRequiredFields As Boolean
             Dim ArgCaption As String
@@ -4396,55 +4326,55 @@ ErrorTrap:
         Friend Function getLandingLink() As String
             If _landingLink = "" Then
                 _landingLink = cpcore.siteProperties.getText("SectionLandingLink", requestAppRootPath & cpcore.siteProperties.serverPageDefault)
-                _landingLink = genericController.ConvertLinkToShortLink(_landingLink, cpcore.webServer.requestDomain, cpcore.webServer.webServerIO_requestVirtualFilePath)
-                _landingLink = genericController.EncodeAppRootPath(_landingLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+                _landingLink = genericController.ConvertLinkToShortLink(_landingLink, cpcore.webServer.requestDomain, cpcore.webServer.requestVirtualFilePath)
+                _landingLink = genericController.EncodeAppRootPath(_landingLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
             End If
             getLandingLink = _landingLink
         End Function
         Private Property _landingLink As String = ""                              ' Default Landing page - managed through main_GetLandingLink()        '
 
-        '
-        '
-        Public Function getStyleTagPublic() As String
-            Dim StyleSN As Integer
-            '
-            getStyleTagPublic = ""
-            If cpcore.siteProperties.getBoolean("Allow CSS Reset") Then
-                getStyleTagPublic = getStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
-            End If
-            StyleSN = genericController.EncodeInteger(cpcore.siteProperties.getText("StylesheetSerialNumber", "0"))
-            If StyleSN < 0 Then
-                '
-                ' Linked Styles
-                ' Bump the Style Serial Number so next fetch is not cached
-                '
-                StyleSN = 1
-                Call cpcore.siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
-                '
-                ' Save new public stylesheet
-                '
-                'Dim kmafs As New fileSystemClass
-                Call cpcore.cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), cpcore.html.html_getStyleSheet2(0, 0))
-                Call cpcore.cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), cpcore.html.getStyleSheetDefault)
+        ''
+        ''
+        'Public Function getStyleTagPublic() As String
+        '    Dim StyleSN As Integer
+        '    '
+        '    getStyleTagPublic = ""
+        '    'If cpcore.siteProperties.getBoolean("Allow CSS Reset") Then
+        '    '    getStyleTagPublic = getStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
+        '    'End If
+        '    StyleSN = genericController.EncodeInteger(cpcore.siteProperties.getText("StylesheetSerialNumber", "0"))
+        '    If StyleSN < 0 Then
+        '        '
+        '        ' Linked Styles
+        '        ' Bump the Style Serial Number so next fetch is not cached
+        '        '
+        '        StyleSN = 1
+        '        Call cpcore.siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
+        '        '
+        '        ' Save new public stylesheet
+        '        '
+        '        'Dim kmafs As New fileSystemClass
+        '        'Call cpcore.cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), cpcore.html.html_getStyleSheet2(0, 0))
+        '        'Call cpcore.cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), cpcore.html.getStyleSheetDefault)
 
-            End If
-            If (StyleSN = 0) Then
-                '
-                ' Put styles inline if requested, and if there has been an upgrade
-                '
-                getStyleTagPublic = getStyleTagPublic & cr & StyleSheetStart & cpcore.html.html_getStyleSheet2(0, 0) & cr & StyleSheetEnd
-            ElseIf (cpcore.siteProperties.dataBuildVersion <> cpcore.codeVersion()) Then
-                '
-                ' Put styles inline if requested, and if there has been an upgrade
-                '
-                getStyleTagPublic = getStyleTagPublic & cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & cpcore.html.html_getStyleSheet2(0, 0) & cr & StyleSheetEnd
-            Else
-                '
-                ' cached stylesheet
-                '
-                getStyleTagPublic = getStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.webServerIO_requestDomain & genericController.getCdnFileLink(cpcore, "templates/Public" & StyleSN & ".css") & """ >"
-            End If
-        End Function
+        '    End If
+        '    If (StyleSN = 0) Then
+        '        '
+        '        ' Put styles inline if requested, and if there has been an upgrade
+        '        '
+        '        'getStyleTagPublic = getStyleTagPublic & cr & StyleSheetStart & cpcore.html.html_getStyleSheet2(0, 0) & cr & StyleSheetEnd
+        '    ElseIf (cpcore.siteProperties.dataBuildVersion <> cpcore.codeVersion()) Then
+        '        '
+        '        ' Put styles inline if requested, and if there has been an upgrade
+        '        '
+        '        'getStyleTagPublic = getStyleTagPublic & cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & cpcore.html.html_getStyleSheet2(0, 0) & cr & StyleSheetEnd
+        '    Else
+        '        '
+        '        ' cached stylesheet
+        '        '
+        '        getStyleTagPublic = getStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.webServerIO_requestDomain & genericController.getCdnFileLink(cpcore, "templates/Public" & StyleSN & ".css") & """ >"
+        '    End If
+        'End Function
         Public Function main_GetPageNotFoundPageId() As Integer
             Dim pageId As Integer
             Try
@@ -4501,105 +4431,112 @@ ErrorTrap:
         '========================================================================
         '
         Friend Function main_IsChildRecord_Recurse(ByVal DataSourceName As String, ByVal TableName As String, ByVal ChildRecordID As Integer, ByVal ParentRecordID As Integer, ByVal History As String) As Boolean
-            '
-            Dim SQL As String
-            Dim CS As Integer
-            Dim ChildRecordParentID As Integer
-            '
-            SQL = "select ParentID from " & TableName & " where id=" & ChildRecordID
-            CS = cpcore.db.cs_openSql(SQL)
-            If cpcore.db.cs_ok(CS) Then
-                ChildRecordParentID = cpcore.db.cs_getInteger(CS, "ParentID")
-            End If
-            Call cpcore.db.cs_Close(CS)
-            If (ChildRecordParentID <> 0) And (Not genericController.IsInDelimitedString(History, CStr(ChildRecordID), ",")) Then
-                main_IsChildRecord_Recurse = (ParentRecordID = ChildRecordParentID)
-                If Not main_IsChildRecord_Recurse Then
-                    main_IsChildRecord_Recurse = main_IsChildRecord_Recurse(DataSourceName, TableName, ChildRecordParentID, ParentRecordID, History & "," & CStr(ChildRecordID))
+            Dim result As Boolean = False
+            Try
+                Dim SQL As String
+                Dim CS As Integer
+                Dim ChildRecordParentID As Integer
+                '
+                SQL = "select ParentID from " & TableName & " where id=" & ChildRecordID
+                CS = cpcore.db.cs_openSql(SQL)
+                If cpcore.db.cs_ok(CS) Then
+                    ChildRecordParentID = cpcore.db.cs_getInteger(CS, "ParentID")
                 End If
-            End If
-            '
+                Call cpcore.db.cs_Close(CS)
+                If (ChildRecordParentID <> 0) And (Not genericController.IsInDelimitedString(History, CStr(ChildRecordID), ",")) Then
+                    result = (ParentRecordID = ChildRecordParentID)
+                    If Not result Then
+                        result = main_IsChildRecord_Recurse(DataSourceName, TableName, ChildRecordParentID, ParentRecordID, History & "," & CStr(ChildRecordID))
+                    End If
+                End If
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '
         '
         Friend Function main_ProcessPageNotFound_GetLink(ByVal adminMessage As String, Optional ByVal BackupPageNotFoundLink As String = "", Optional ByVal PageNotFoundLink As String = "", Optional ByVal EditPageID As Integer = 0, Optional ByVal EditSectionID As Integer = 0) As String
-            '
-            Dim Pos As Integer
-            Dim DefaultLink As String
-            Dim PageNotFoundPageID As Integer
-            Dim PCCPtr As Integer
-            Dim Link As String
-            '
-            PageNotFoundPageID = main_GetPageNotFoundPageId()
-            If PageNotFoundPageID = 0 Then
+            Dim result As String = String.Empty
+            Try
+                Dim Pos As Integer
+                Dim DefaultLink As String
+                Dim PageNotFoundPageID As Integer
+                Dim Link As String
                 '
-                ' No PageNotFound was set -- use the backup link
-                '
-                If BackupPageNotFoundLink = "" Then
-                    adminMessage = adminMessage & " The Site Property 'PageNotFoundPageID' is not set so the Landing Page was used."
-                    Link = getLandingLink()
+                PageNotFoundPageID = main_GetPageNotFoundPageId()
+                If PageNotFoundPageID = 0 Then
+                    '
+                    ' No PageNotFound was set -- use the backup link
+                    '
+                    If BackupPageNotFoundLink = "" Then
+                        adminMessage = adminMessage & " The Site Property 'PageNotFoundPageID' is not set so the Landing Page was used."
+                        Link = getLandingLink()
+                    Else
+                        adminMessage = adminMessage & " The Site Property 'PageNotFoundPageID' is not set."
+                        Link = BackupPageNotFoundLink
+                    End If
                 Else
-                    adminMessage = adminMessage & " The Site Property 'PageNotFoundPageID' is not set."
-                    Link = BackupPageNotFoundLink
-                End If
-            Else
-                '
-                ' Set link
-                '
-                Link = getPageLink(PageNotFoundPageID, "", True, False)
-                DefaultLink = getPageLink(0, "", True, False)
-                If Link <> DefaultLink Then
-                Else
-                    adminMessage = adminMessage & "</p><p>The current 'Page Not Found' could not be used. It is not valid, or it is not associated with a valid site section. To configure a valid 'Page Not Found' page, first create the page as a child page on your site and check the 'Page Not Found' checkbox on it's control tab. The Landing Page was used."
-                End If
-            End If
-            '
-            ' Add the Admin Message to the link
-            '
-            If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
-                If PageNotFoundLink = "" Then
-                    PageNotFoundLink = cpcore.webServer.requestUrl
-                End If
-                '
-                ' Add the Link to the Admin Msg
-                '
-                adminMessage = adminMessage & "<p>The URL was " & PageNotFoundLink & "."
-                '
-                ' Add the Referrer to the Admin Msg
-                '
-                If cpcore.webServer.webServerIO_requestReferer <> "" Then
-                    Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningPageID=", vbTextCompare)
-                    If Pos <> 0 Then
-                        cpcore.webServer.requestReferrer = Left(cpcore.webServer.requestReferrer, Pos - 2)
+                    '
+                    ' Set link
+                    '
+                    Link = getPageLink(PageNotFoundPageID, "", True, False)
+                    DefaultLink = getPageLink(0, "", True, False)
+                    If Link <> DefaultLink Then
+                    Else
+                        adminMessage = adminMessage & "</p><p>The current 'Page Not Found' could not be used. It is not valid, or it is not associated with a valid site section. To configure a valid 'Page Not Found' page, first create the page as a child page on your site and check the 'Page Not Found' checkbox on it's control tab. The Landing Page was used."
                     End If
-                    Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningMsg=", vbTextCompare)
-                    If Pos <> 0 Then
-                        cpcore.webServer.requestReferrer = Left(cpcore.webServer.requestReferrer, Pos - 2)
+                End If
+                '
+                ' Add the Admin Message to the link
+                '
+                If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                    If PageNotFoundLink = "" Then
+                        PageNotFoundLink = cpcore.webServer.requestUrl
                     End If
-                    Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "blockcontenttracking=", vbTextCompare)
-                    If Pos <> 0 Then
-                        cpcore.webServer.requestReferrer = Left(cpcore.webServer.requestReferrer, Pos - 2)
+                    '
+                    ' Add the Link to the Admin Msg
+                    '
+                    adminMessage = adminMessage & "<p>The URL was " & PageNotFoundLink & "."
+                    '
+                    ' Add the Referrer to the Admin Msg
+                    '
+                    If cpcore.webServer.requestReferer <> "" Then
+                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningPageID=", vbTextCompare)
+                        If Pos <> 0 Then
+                            cpcore.webServer.requestReferrer = Left(cpcore.webServer.requestReferrer, Pos - 2)
+                        End If
+                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningMsg=", vbTextCompare)
+                        If Pos <> 0 Then
+                            cpcore.webServer.requestReferrer = Left(cpcore.webServer.requestReferrer, Pos - 2)
+                        End If
+                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "blockcontenttracking=", vbTextCompare)
+                        If Pos <> 0 Then
+                            cpcore.webServer.requestReferrer = Left(cpcore.webServer.requestReferrer, Pos - 2)
+                        End If
+                        adminMessage = adminMessage & " The referring page was " & cpcore.webServer.requestReferrer & "."
                     End If
-                    adminMessage = adminMessage & " The referring page was " & cpcore.webServer.requestReferrer & "."
+                    '
+                    adminMessage = adminMessage & "</p>"
+                    '
+                    If EditPageID <> 0 Then
+                        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningPageID", CStr(EditPageID), True)
+                    End If
+                    '
+                    If EditSectionID <> 0 Then
+                        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningSectionID", CStr(EditSectionID), True)
+                    End If
+                    '
+                    Link = genericController.modifyLinkQuery(Link, RequestNameBlockContentTracking, "1", True)
+                    Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "<p>" & adminMessage & "</p>", True)
                 End If
                 '
-                adminMessage = adminMessage & "</p>"
-                '
-                If EditPageID <> 0 Then
-                    Link = genericController.modifyLinkQuery(Link, "main_AdminWarningPageID", CStr(EditPageID), True)
-                End If
-                '
-                If EditSectionID <> 0 Then
-                    Link = genericController.modifyLinkQuery(Link, "main_AdminWarningSectionID", CStr(EditSectionID), True)
-                End If
-                '
-                Link = genericController.modifyLinkQuery(Link, RequestNameBlockContentTracking, "1", True)
-                Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "<p>" & adminMessage & "</p>", True)
-            End If
-            '
-            main_ProcessPageNotFound_GetLink = Link
-            '
+                result = Link
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '---------------------------------------------------------------------------
@@ -4653,7 +4590,7 @@ ErrorTrap:
                     '
                     ' protocol provided, do not fixup
                     '
-                    verifyTemplateLink = genericController.EncodeAppRootPath(verifyTemplateLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+                    verifyTemplateLink = genericController.EncodeAppRootPath(verifyTemplateLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
                 Else
                     '
                     ' no protocol, convert to short link
@@ -4664,8 +4601,8 @@ ErrorTrap:
                         '
                         verifyTemplateLink = "/" & verifyTemplateLink
                     End If
-                    verifyTemplateLink = genericController.ConvertLinkToShortLink(verifyTemplateLink, cpcore.webServer.requestDomain, cpcore.webServer.webServerIO_requestVirtualFilePath)
-                    verifyTemplateLink = genericController.EncodeAppRootPath(verifyTemplateLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+                    verifyTemplateLink = genericController.ConvertLinkToShortLink(verifyTemplateLink, cpcore.webServer.requestDomain, cpcore.webServer.requestVirtualFilePath)
+                    verifyTemplateLink = genericController.EncodeAppRootPath(verifyTemplateLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
                 End If
             End If
         End Function
@@ -4694,7 +4631,7 @@ ErrorTrap:
             End If
             Call cpcore.db.cs_Close(CSPointer)
             '
-            getContentWatchLinkByKey = genericController.EncodeAppRootPath(getContentWatchLinkByKey, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+            getContentWatchLinkByKey = genericController.EncodeAppRootPath(getContentWatchLinkByKey, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
             '
             Exit Function
             '
@@ -4776,7 +4713,7 @@ ErrorTrap:
             Dim SectionID As Integer
             Dim IsRootPage As Boolean
             Dim templateId As Integer
-            Dim MenuLinkOverRide As String
+            Dim MenuLinkOverRide As String = String.Empty
             '
             '
             ' Convert default page to default link
@@ -4850,7 +4787,7 @@ ErrorTrap:
                         End If
                     End If
                 End If
-                resultLink = genericController.EncodeAppRootPath(resultLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+                resultLink = genericController.EncodeAppRootPath(resultLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
             Catch ex As Exception
                 cpcore.handleException(ex) : Throw
             End Try
@@ -4987,12 +4924,7 @@ ErrorTrap:
             Dim PageContentCID As Integer
             Dim WorkingLinkAlias As String
             Dim CS As Integer
-            Dim LoopCnt As Integer
-            'Dim fs As New fileSystemClass
-            Dim FolderCheck As String
-            Dim SQL As String
             Dim AllowLinkAlias As Boolean
-            'dim buildversion As String
             '
             If (True) Then
                 AllowLinkAlias = cpcore.siteProperties.getBoolean("allowLinkAlias", False)

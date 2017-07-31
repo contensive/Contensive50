@@ -296,7 +296,7 @@ Namespace Contensive.Core.Controllers
                 '---------------------------------------------------------------------
                 '
                 If cpcore.upgradeInProgress Then
-                    Call Err.Raise(ignoreInteger, "ccCSv", ignoreString)
+                    ' leftover from 4.1
                 Else
                     cpcore.upgradeInProgress = True
                     '
@@ -1607,7 +1607,7 @@ Namespace Contensive.Core.Controllers
         '                '
         '                ' Problem
         '                '
-        '                Call Err.Raise(ignoreInteger, "dll", "Survey Question Types content definition was not found")
+        '                fixme-- cpCore.handleException(New ApplicationException("")) ' -----ignoreInteger, "dll", "Survey Question Types content definition was not found")
         '            Else
         '                Do While RowsNeeded > 0
         '                    Call cpCore.app.executeSql("Insert into ccSurveyQuestionTypes (active,contentcontrolid)values(1," & CID & ")")

@@ -97,6 +97,7 @@
     <Import Include="System.Web.UI.HtmlControls" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="adminSite\styles.css" />
     <Content Include="ccLib\ClientSide\AdminMenu.js" />
     <Content Include="ccLib\ClientSide\ccDynamicTab-display.js" />
     <Content Include="ccLib\ClientSide\ccDynamicTab-positioned.js" />
@@ -572,15 +573,6 @@
     <Content Include="ccLib\Popup\WaitForIISReset.htm" />
     <Content Include="ccLib\Popup\WaitPageClose.htm" />
     <Content Include="ccLib\Popup\WaitPageOpen.htm" />
-    <Content Include="ccLib\Styles\ccDefault-legacy3.css" />
-    <Content Include="ccLib\Styles\ccDefault.r5.css" />
-    <Content Include="ccLib\Styles\ccDefaultLegacy.css" />
-    <Content Include="ccLib\Styles\ccDefaultLegacy2.css" />
-    <Content Include="ccLib\Styles\ccDynamicTab.css" />
-    <Content Include="ccLib\Styles\ccQuickEdit.css" />
-    <Content Include="ccLib\Styles\ccReset.css" />
-    <Content Include="ccLib\Styles\ccTabs.css" />
-    <Content Include="ccLib\Styles\ReportingStyles.css" />
     <Content Include="default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -588,6 +580,7 @@
     <Content Include="helloworld.html" />
     <Content Include="pageManager\pageManager.css" />
     <Content Include="pageManager\pageManager.js" />
+    <Content Include="quickEditor\styles.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

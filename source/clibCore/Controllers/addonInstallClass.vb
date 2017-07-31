@@ -387,7 +387,7 @@ Namespace Contensive.Core
             Dim returnOk As Boolean = True
             Try
                 Dim localCollectionUpToDate As Boolean
-                Dim GuidArray() As String
+                Dim GuidArray As String() = {}
                 Dim GuidCnt As Integer
                 Dim GuidPtr As Integer
                 Dim RequestPtr As Integer
@@ -399,11 +399,11 @@ Namespace Contensive.Core
                 Dim LocalGuid As String
                 Dim LocalLastChangeDateStr As String
                 Dim LocalLastChangeDate As Date
-                Dim LibName As String
+                Dim LibName As String = String.Empty
                 Dim LibSystem As Boolean
                 Dim LibGUID As String
                 Dim LibLastChangeDateStr As String
-                Dim LibContensiveVersion As String
+                Dim LibContensiveVersion As String = String.Empty
                 Dim LibLastChangeDate As Date
                 Dim LibListNode As XmlNode
                 Dim LocalListNode As XmlNode
@@ -729,7 +729,7 @@ Namespace Contensive.Core
             Dim result As Boolean = True
             Try
                 Dim ResourceType As String
-                Dim CollectionVersionFolderName As String
+                Dim CollectionVersionFolderName As String = String.Empty
                 Dim ChildCollectionLastChangeDate As Date
                 Dim ChildWorkingPath As String
                 Dim ChildCollectionGUID As String
@@ -737,14 +737,14 @@ Namespace Contensive.Core
                 Dim Found As Boolean
                 Dim CollectionFile As New XmlDocument
                 Dim UpdatingCollection As Boolean
-                Dim Collectionname As String
+                Dim Collectionname As String = String.Empty
                 Dim NowTime As Date
                 Dim NowPart As Integer
                 Dim SrcFileNamelist As IO.FileInfo()
                 Dim TimeStamp As String
                 Dim Pos As Integer
                 Dim CollectionFolder As String
-                Dim CollectionGuid As String
+                Dim CollectionGuid As String = String.Empty
                 Dim AOGuid As String
                 Dim AOName As String
                 Dim IsFound As Boolean
@@ -1134,9 +1134,9 @@ Namespace Contensive.Core
                 Dim wwwFileList As String
                 Dim ContentFileList As String
                 Dim FileExt As String
-                Dim OtherXML As String
+                Dim OtherXML As String = String.Empty
                 Dim ContentID As Integer
-                Dim ScriptingModuleID As Integer
+                'Dim ScriptingModuleID As Integer
                 Dim CSCollection As Integer
                 Dim FileList As String
                 Dim Parent_NavID As Integer
@@ -1170,11 +1170,11 @@ Namespace Contensive.Core
                 Dim CollectionVersionFolder As String
                 Dim Pos As Integer
                 Dim FieldName As String
-                Dim FieldValue As String
+                Dim FieldValue As String = String.Empty
                 Dim CS As Integer
                 Dim Criteria As String
                 Dim DstFilePath As String
-                Dim AOName As String
+                Dim AOName As String = String.Empty
                 Dim IsFound As Boolean
                 Dim UserError As String
                 Dim Filename As String
@@ -1186,7 +1186,7 @@ Namespace Contensive.Core
                 Dim UpgradeOK As Boolean
                 Dim CollectionVersionFolderName As String = ""
                 Dim FileGuid As String
-                Dim DataRecordList As String
+                Dim DataRecordList As String = String.Empty
                 Dim ChildNode As XmlNode
                 Dim ContentNode As XmlNode
                 Dim NavDoc As XmlDocument
@@ -1543,7 +1543,7 @@ Namespace Contensive.Core
                                                                         '
                                                                         Call cpCore.db.deleteContentRecords("Add-on Collection Rules", "CollectionID=" & CollectionID)
                                                                     End If
-                                                                    Call cpCore.db.deleteContentRecords("Add-on Collection Module Rules", "CollectionID=" & CollectionID)
+                                                                    'Call cpCore.db.deleteContentRecords("Add-on Collection Module Rules", "CollectionID=" & CollectionID)
                                                                     Call cpCore.db.deleteContentRecords("Add-on Collection CDef Rules", "CollectionID=" & CollectionID)
                                                                     Call cpCore.db.deleteContentRecords("Add-on Collection Parent Rules", "ParentID=" & CollectionID)
                                                                     '
@@ -1962,131 +1962,131 @@ Namespace Contensive.Core
                                                                                         Call cpCore.db.cs_Close(CS)
                                                                                     End If
                                                                                 End If
-                                                                            Case "scriptingmodule", "scriptingmodules"
-                                                                                '
-                                                                                ' Scripting modules
-                                                                                '
-                                                                                ScriptingModuleID = 0
-                                                                                ScriptingName = GetXMLAttribute(IsFound, CDefSection, "name", "No Name")
-                                                                                If ScriptingName = "" Then
-                                                                                    ScriptingName = "No Name"
-                                                                                End If
-                                                                                ScriptingGuid = GetXMLAttribute(IsFound, CDefSection, "guid", AOName)
-                                                                                If ScriptingGuid = "" Then
-                                                                                    ScriptingGuid = ScriptingName
-                                                                                End If
-                                                                                Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ScriptingGuid) & ")"
-                                                                                ScriptingModuleID = 0
-                                                                                CS = cpCore.db.cs_open("Scripting Modules", Criteria)
-                                                                                If cpCore.db.cs_ok(CS) Then
-                                                                                    '
-                                                                                    ' Update the Addon
-                                                                                    '
-                                                                                    Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing scripting module, Updating module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
-                                                                                Else
-                                                                                    '
-                                                                                    ' not found by GUID - search name against name to update legacy Add-ons
-                                                                                    '
-                                                                                    Call cpCore.db.cs_Close(CS)
-                                                                                    Criteria = "(name=" & cpCore.db.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
-                                                                                    CS = cpCore.db.cs_open("Scripting Modules", Criteria)
-                                                                                    If cpCore.db.cs_ok(CS) Then
-                                                                                        Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
-                                                                                    End If
-                                                                                End If
-                                                                                If Not cpCore.db.cs_ok(CS) Then
-                                                                                    '
-                                                                                    ' not found by GUID or by name, Insert a new
-                                                                                    '
-                                                                                    Call cpCore.db.cs_Close(CS)
-                                                                                    CS = cpCore.db.cs_insertRecord("Scripting Modules", 0)
-                                                                                    If cpCore.db.cs_ok(CS) Then
-                                                                                        Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
-                                                                                    End If
-                                                                                End If
-                                                                                If Not cpCore.db.cs_ok(CS) Then
-                                                                                    '
-                                                                                    ' Could not create new
-                                                                                    '
-                                                                                    Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
-                                                                                Else
-                                                                                    ScriptingModuleID = cpCore.db.cs_getInteger(CS, "ID")
-                                                                                    Call cpCore.db.cs_set(CS, "code", CDefSection.InnerText)
-                                                                                    Call cpCore.db.cs_set(CS, "name", ScriptingName)
-                                                                                    Call cpCore.db.cs_set(CS, "ccguid", ScriptingGuid)
-                                                                                End If
-                                                                                Call cpCore.db.cs_Close(CS)
-                                                                                If ScriptingModuleID <> 0 Then
-                                                                                    '
-                                                                                    ' Add Add-on Collection Module Rule
-                                                                                    '
-                                                                                    CS = cpCore.db.cs_insertRecord("Add-on Collection Module Rules", 0)
-                                                                                    If cpCore.db.cs_ok(CS) Then
-                                                                                        Call cpCore.db.cs_set(CS, "Collectionid", CollectionID)
-                                                                                        Call cpCore.db.cs_set(CS, "ScriptingModuleID", ScriptingModuleID)
-                                                                                    End If
-                                                                                    Call cpCore.db.cs_Close(CS)
-                                                                                End If
-                                                                            Case "sharedstyle"
-                                                                                '
-                                                                                ' added 9/3/2012
-                                                                                ' Shared Style
-                                                                                '
-                                                                                sharedStyleId = 0
-                                                                                NodeName = GetXMLAttribute(IsFound, CDefSection, "name", "No Name")
-                                                                                If NodeName = "" Then
-                                                                                    NodeName = "No Name"
-                                                                                End If
-                                                                                nodeGuid = GetXMLAttribute(IsFound, CDefSection, "guid", AOName)
-                                                                                If nodeGuid = "" Then
-                                                                                    nodeGuid = NodeName
-                                                                                End If
-                                                                                Criteria = "(ccguid=" & cpCore.db.encodeSQLText(nodeGuid) & ")"
-                                                                                ScriptingModuleID = 0
-                                                                                CS = cpCore.db.cs_open("Shared Styles", Criteria)
-                                                                                If cpCore.db.cs_ok(CS) Then
-                                                                                    '
-                                                                                    ' Update the Addon
-                                                                                    '
-                                                                                    Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing shared style, Updating [" & NodeName & "], Guid [" & nodeGuid & "]")
-                                                                                Else
-                                                                                    '
-                                                                                    ' not found by GUID - search name against name to update legacy Add-ons
-                                                                                    '
-                                                                                    Call cpCore.db.cs_Close(CS)
-                                                                                    Criteria = "(name=" & cpCore.db.encodeSQLText(NodeName) & ")and(ccguid is null)"
-                                                                                    CS = cpCore.db.cs_open("shared styles", Criteria)
-                                                                                    If cpCore.db.cs_ok(CS) Then
-                                                                                        Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
-                                                                                    End If
-                                                                                End If
-                                                                                If Not cpCore.db.cs_ok(CS) Then
-                                                                                    '
-                                                                                    ' not found by GUID or by name, Insert a new
-                                                                                    '
-                                                                                    Call cpCore.db.cs_Close(CS)
-                                                                                    CS = cpCore.db.cs_insertRecord("shared styles", 0)
-                                                                                    If cpCore.db.cs_ok(CS) Then
-                                                                                        Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
-                                                                                    End If
-                                                                                End If
-                                                                                If Not cpCore.db.cs_ok(CS) Then
-                                                                                    '
-                                                                                    ' Could not create new
-                                                                                    '
-                                                                                    Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
-                                                                                Else
-                                                                                    sharedStyleId = cpCore.db.cs_getInteger(CS, "ID")
-                                                                                    Call cpCore.db.cs_set(CS, "StyleFilename", CDefSection.InnerText)
-                                                                                    Call cpCore.db.cs_set(CS, "name", NodeName)
-                                                                                    Call cpCore.db.cs_set(CS, "ccguid", nodeGuid)
-                                                                                    Call cpCore.db.cs_set(CS, "alwaysInclude", GetXMLAttribute(IsFound, CDefSection, "alwaysinclude", "0"))
-                                                                                    Call cpCore.db.cs_set(CS, "prefix", GetXMLAttribute(IsFound, CDefSection, "prefix", ""))
-                                                                                    Call cpCore.db.cs_set(CS, "suffix", GetXMLAttribute(IsFound, CDefSection, "suffix", ""))
-                                                                                    Call cpCore.db.cs_set(CS, "suffix", GetXMLAttribute(IsFound, CDefSection, "suffix", ""))
-                                                                                    Call cpCore.db.cs_set(CS, "sortOrder", GetXMLAttribute(IsFound, CDefSection, "sortOrder", ""))
-                                                                                End If
-                                                                                Call cpCore.db.cs_Close(CS)
+                                                                            'Case "scriptingmodule", "scriptingmodules"
+                                                                            '    '
+                                                                            '    ' Scripting modules
+                                                                            '    '
+                                                                            '    ScriptingModuleID = 0
+                                                                            '    ScriptingName = GetXMLAttribute(IsFound, CDefSection, "name", "No Name")
+                                                                            '    If ScriptingName = "" Then
+                                                                            '        ScriptingName = "No Name"
+                                                                            '    End If
+                                                                            '    ScriptingGuid = GetXMLAttribute(IsFound, CDefSection, "guid", AOName)
+                                                                            '    If ScriptingGuid = "" Then
+                                                                            '        ScriptingGuid = ScriptingName
+                                                                            '    End If
+                                                                            '    Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ScriptingGuid) & ")"
+                                                                            '    ScriptingModuleID = 0
+                                                                            '    CS = cpCore.db.cs_open("Scripting Modules", Criteria)
+                                                                            '    If cpCore.db.cs_ok(CS) Then
+                                                                            '        '
+                                                                            '        ' Update the Addon
+                                                                            '        '
+                                                                            '        Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing scripting module, Updating module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                            '    Else
+                                                                            '        '
+                                                                            '        ' not found by GUID - search name against name to update legacy Add-ons
+                                                                            '        '
+                                                                            '        Call cpCore.db.cs_Close(CS)
+                                                                            '        Criteria = "(name=" & cpCore.db.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
+                                                                            '        CS = cpCore.db.cs_open("Scripting Modules", Criteria)
+                                                                            '        If cpCore.db.cs_ok(CS) Then
+                                                                            '            Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                            '        End If
+                                                                            '    End If
+                                                                            '    If Not cpCore.db.cs_ok(CS) Then
+                                                                            '        '
+                                                                            '        ' not found by GUID or by name, Insert a new
+                                                                            '        '
+                                                                            '        Call cpCore.db.cs_Close(CS)
+                                                                            '        CS = cpCore.db.cs_insertRecord("Scripting Modules", 0)
+                                                                            '        If cpCore.db.cs_ok(CS) Then
+                                                                            '            Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                            '        End If
+                                                                            '    End If
+                                                                            '    If Not cpCore.db.cs_ok(CS) Then
+                                                                            '        '
+                                                                            '        ' Could not create new
+                                                                            '        '
+                                                                            '        Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                            '    Else
+                                                                            '        ScriptingModuleID = cpCore.db.cs_getInteger(CS, "ID")
+                                                                            '        Call cpCore.db.cs_set(CS, "code", CDefSection.InnerText)
+                                                                            '        Call cpCore.db.cs_set(CS, "name", ScriptingName)
+                                                                            '        Call cpCore.db.cs_set(CS, "ccguid", ScriptingGuid)
+                                                                            '    End If
+                                                                            '    Call cpCore.db.cs_Close(CS)
+                                                                            '    If ScriptingModuleID <> 0 Then
+                                                                            '        '
+                                                                            '        ' Add Add-on Collection Module Rule
+                                                                            '        '
+                                                                            '        CS = cpCore.db.cs_insertRecord("Add-on Collection Module Rules", 0)
+                                                                            '        If cpCore.db.cs_ok(CS) Then
+                                                                            '            Call cpCore.db.cs_set(CS, "Collectionid", CollectionID)
+                                                                            '            Call cpCore.db.cs_set(CS, "ScriptingModuleID", ScriptingModuleID)
+                                                                            '        End If
+                                                                            '        Call cpCore.db.cs_Close(CS)
+                                                                            '    End If
+                                                                            'Case "sharedstyle"
+                                                                            '    '
+                                                                            '    ' added 9/3/2012
+                                                                            '    ' Shared Style
+                                                                            '    '
+                                                                            '    sharedStyleId = 0
+                                                                            '    NodeName = GetXMLAttribute(IsFound, CDefSection, "name", "No Name")
+                                                                            '    If NodeName = "" Then
+                                                                            '        NodeName = "No Name"
+                                                                            '    End If
+                                                                            '    nodeGuid = GetXMLAttribute(IsFound, CDefSection, "guid", AOName)
+                                                                            '    If nodeGuid = "" Then
+                                                                            '        nodeGuid = NodeName
+                                                                            '    End If
+                                                                            '    Criteria = "(ccguid=" & cpCore.db.encodeSQLText(nodeGuid) & ")"
+                                                                            '    ScriptingModuleID = 0
+                                                                            '    CS = cpCore.db.cs_open("Shared Styles", Criteria)
+                                                                            '    If cpCore.db.cs_ok(CS) Then
+                                                                            '        '
+                                                                            '        ' Update the Addon
+                                                                            '        '
+                                                                            '        Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing shared style, Updating [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                            '    Else
+                                                                            '        '
+                                                                            '        ' not found by GUID - search name against name to update legacy Add-ons
+                                                                            '        '
+                                                                            '        Call cpCore.db.cs_Close(CS)
+                                                                            '        Criteria = "(name=" & cpCore.db.encodeSQLText(NodeName) & ")and(ccguid is null)"
+                                                                            '        CS = cpCore.db.cs_open("shared styles", Criteria)
+                                                                            '        If cpCore.db.cs_ok(CS) Then
+                                                                            '            Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                            '        End If
+                                                                            '    End If
+                                                                            '    If Not cpCore.db.cs_ok(CS) Then
+                                                                            '        '
+                                                                            '        ' not found by GUID or by name, Insert a new
+                                                                            '        '
+                                                                            '        Call cpCore.db.cs_Close(CS)
+                                                                            '        CS = cpCore.db.cs_insertRecord("shared styles", 0)
+                                                                            '        If cpCore.db.cs_ok(CS) Then
+                                                                            '            Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                            '        End If
+                                                                            '    End If
+                                                                            '    If Not cpCore.db.cs_ok(CS) Then
+                                                                            '        '
+                                                                            '        ' Could not create new
+                                                                            '        '
+                                                                            '        Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                            '    Else
+                                                                            '        sharedStyleId = cpCore.db.cs_getInteger(CS, "ID")
+                                                                            '        Call cpCore.db.cs_set(CS, "StyleFilename", CDefSection.InnerText)
+                                                                            '        Call cpCore.db.cs_set(CS, "name", NodeName)
+                                                                            '        Call cpCore.db.cs_set(CS, "ccguid", nodeGuid)
+                                                                            '        Call cpCore.db.cs_set(CS, "alwaysInclude", GetXMLAttribute(IsFound, CDefSection, "alwaysinclude", "0"))
+                                                                            '        Call cpCore.db.cs_set(CS, "prefix", GetXMLAttribute(IsFound, CDefSection, "prefix", ""))
+                                                                            '        Call cpCore.db.cs_set(CS, "suffix", GetXMLAttribute(IsFound, CDefSection, "suffix", ""))
+                                                                            '        Call cpCore.db.cs_set(CS, "suffix", GetXMLAttribute(IsFound, CDefSection, "suffix", ""))
+                                                                            '        Call cpCore.db.cs_set(CS, "sortOrder", GetXMLAttribute(IsFound, CDefSection, "sortOrder", ""))
+                                                                            '    End If
+                                                                            '    Call cpCore.db.cs_Close(CS)
                                                                             Case "addon", "add-on"
                                                                                 '
                                                                                 ' Add-on Node, do part 1 of 2
@@ -2193,8 +2193,7 @@ Namespace Contensive.Core
         Public Function getCollectionListFile() As String
             Dim returnXml As String = ""
             Try
-                '
-                Dim LastChangeDate As String
+                Dim LastChangeDate As String = String.Empty
                 Dim SubFolder As IO.DirectoryInfo
                 Dim SubFolderList As IO.DirectoryInfo()
                 Dim FolderName As String
@@ -2264,7 +2263,6 @@ Namespace Contensive.Core
                 Dim NewCollectionNode As XmlNode
                 Dim NewAttrNode As XmlNode
                 Dim CollectionFound As Boolean
-                Dim Ptr As Integer
                 '
                 loadOK = True
                 Try
@@ -2368,14 +2366,14 @@ Namespace Contensive.Core
         Public Sub GetCollectionConfig(ByVal CollectionGuid As String, ByRef return_CollectionPath As String, ByRef return_LastChagnedate As Date, ByRef return_CollectionName As String)
             Try
                 Dim LocalPath As String
-                Dim LocalGuid As String
+                Dim LocalGuid As String = String.Empty
                 Dim Doc As New XmlDocument
                 Dim CollectionNode As XmlNode
                 Dim LocalListNode As XmlNode
                 Dim CollectionFound As Boolean
-                Dim CollectionPath As String
+                Dim CollectionPath As String = String.Empty
                 Dim LastChangeDate As Date
-                Dim hint As String
+                Dim hint As String = String.Empty
                 Dim MatchFound As Boolean
                 Dim LocalName As String
                 Dim loadOK As Boolean
@@ -2657,16 +2655,6 @@ Namespace Contensive.Core
                 '
                 Dim sharedStyleId As Integer
                 Dim nodeNameOrGuid As String
-                Dim SrcMainNode As XmlElement
-                Dim SrcAddonNode As XmlElement
-                Dim SrcAddonGuid As String
-                Dim SrcAddonName As String
-                Dim SrcAddonID As Integer
-                Dim CollectionFile As String
-                Dim TestGuid As String
-                Dim TestName As String
-                Dim TestObject As Object
-                Dim TestObject2 As Object
                 Dim fieldTypeID As Integer
                 Dim fieldType As String
                 Dim test As String
@@ -2675,17 +2663,15 @@ Namespace Contensive.Core
                 Dim navTypeId As Integer
                 Dim scriptinglanguageid As Integer
                 Dim ScriptingCode As String
-                Dim AddRule As Boolean
-                Dim UserError As String
                 Dim FieldName As String
                 Dim NodeName As String
                 Dim NewValue As String
                 Dim NavIconTypeString As String
                 Dim menuNameSpace As String
-                Dim FieldValue As String
+                Dim FieldValue As String = String.Empty
                 Dim CS2 As Integer
-                Dim ScriptingNameorGuid As String
-                Dim ScriptingModuleID As Integer
+                Dim ScriptingNameorGuid As String = String.Empty
+                '  Dim ScriptingModuleID As Integer
                 Dim ScriptingEntryPoint As String
                 Dim ScriptingTimeout As Integer
                 Dim ScriptingLanguage As String
@@ -2703,7 +2689,6 @@ Namespace Contensive.Core
                 Dim navTypeName As String
                 Dim addonId As Integer
                 Dim Basename As String
-                Dim Doc As XmlDocument
                 '
                 Basename = genericController.vbLCase(AddonNode.Name)
                 If (Basename = "page") Or (Basename = "process") Or (Basename = "addon") Or (Basename = "add-on") Then
@@ -2759,8 +2744,8 @@ Namespace Contensive.Core
                         ' Initialize the add-on
                         ' Delete any existing related records - so if this is an update with removed relationships, those are removed
                         '
-                        Call cpCore.db.deleteContentRecords("Shared Styles Add-on Rules", "addonid=" & addonId)
-                        Call cpCore.db.deleteContentRecords("Add-on Scripting Module Rules", "addonid=" & addonId)
+                        'Call cpCore.db.deleteContentRecords("Shared Styles Add-on Rules", "addonid=" & addonId)
+                        'Call cpCore.db.deleteContentRecords("Add-on Scripting Module Rules", "addonid=" & addonId)
                         Call cpCore.db.deleteContentRecords("Add-on Include Rules", "addonid=" & addonId)
                         Call cpCore.db.deleteContentRecords("Add-on Content Trigger Rules", "addonid=" & addonId)
                         '
@@ -2828,15 +2813,15 @@ Namespace Contensive.Core
                                                         TriggerContentID = cpCore.db.cs_getInteger(CS2, "ID")
                                                     End If
                                                     Call cpCore.db.cs_Close(CS2)
-                                                    If TriggerContentID = 0 Then
-                                                        CS2 = cpCore.db.cs_insertRecord("Scripting Modules", 0)
-                                                        If cpCore.db.cs_ok(CS2) Then
-                                                            Call cpCore.db.cs_set(CS2, "name", ScriptingNameorGuid)
-                                                            Call cpCore.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
-                                                            TriggerContentID = cpCore.db.cs_getInteger(CS2, "ID")
-                                                        End If
-                                                        Call cpCore.db.cs_Close(CS2)
-                                                    End If
+                                                    'If TriggerContentID = 0 Then
+                                                    '    CS2 = cpCore.db.cs_insertRecord("Scripting Modules", 0)
+                                                    '    If cpCore.db.cs_ok(CS2) Then
+                                                    '        Call cpCore.db.cs_set(CS2, "name", ScriptingNameorGuid)
+                                                    '        Call cpCore.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
+                                                    '        TriggerContentID = cpCore.db.cs_getInteger(CS2, "ID")
+                                                    '    End If
+                                                    '    Call cpCore.db.cs_Close(CS2)
+                                                    'End If
                                                     If TriggerContentID = 0 Then
                                                         '
                                                         ' could not find the content
@@ -2874,47 +2859,47 @@ Namespace Contensive.Core
                                             Select Case genericController.vbLCase(ScriptingNode.Name)
                                                 Case "code"
                                                     ScriptingCode = ScriptingCode & ScriptingNode.InnerText
-                                                Case "includemodule"
+                                                    'Case "includemodule"
 
-                                                    ScriptingModuleID = 0
-                                                    ScriptingNameorGuid = ScriptingNode.InnerText
-                                                    If ScriptingNameorGuid = "" Then
-                                                        ScriptingNameorGuid = GetXMLAttribute(IsFound, ScriptingNode, "guid", "")
-                                                        If ScriptingNameorGuid = "" Then
-                                                            ScriptingNameorGuid = GetXMLAttribute(IsFound, ScriptingNode, "name", "")
-                                                        End If
-                                                    End If
-                                                    Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ScriptingNameorGuid) & ")"
-                                                    CS2 = cpCore.db.cs_open("Scripting Modules", Criteria)
-                                                    If Not cpCore.db.cs_ok(CS2) Then
-                                                        Call cpCore.db.cs_Close(CS2)
-                                                        Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(ScriptingNameorGuid) & ")"
-                                                        CS2 = cpCore.db.cs_open("Scripting Modules", Criteria)
-                                                    End If
-                                                    If cpCore.db.cs_ok(CS2) Then
-                                                        ScriptingModuleID = cpCore.db.cs_getInteger(CS2, "ID")
-                                                    End If
-                                                    Call cpCore.db.cs_Close(CS2)
-                                                    If ScriptingModuleID = 0 Then
-                                                        CS2 = cpCore.db.cs_insertRecord("Scripting Modules", 0)
-                                                        If cpCore.db.cs_ok(CS2) Then
-                                                            Call cpCore.db.cs_set(CS2, "name", ScriptingNameorGuid)
-                                                            Call cpCore.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
-                                                            ScriptingModuleID = cpCore.db.cs_getInteger(CS2, "ID")
-                                                        End If
-                                                        Call cpCore.db.cs_Close(CS2)
-                                                    End If
-                                                    Criteria = "(addonid=" & addonId & ")and(scriptingmoduleid=" & ScriptingModuleID & ")"
-                                                    CS2 = cpCore.db.cs_open("Add-on Scripting Module Rules", Criteria)
-                                                    If Not cpCore.db.cs_ok(CS2) Then
-                                                        Call cpCore.db.cs_Close(CS2)
-                                                        CS2 = cpCore.db.cs_insertRecord("Add-on Scripting Module Rules", 0)
-                                                        If cpCore.db.cs_ok(CS2) Then
-                                                            Call cpCore.db.cs_set(CS2, "addonid", addonId)
-                                                            Call cpCore.db.cs_set(CS2, "scriptingmoduleid", ScriptingModuleID)
-                                                        End If
-                                                    End If
-                                                    Call cpCore.db.cs_Close(CS2)
+                                                    '    ScriptingModuleID = 0
+                                                    '    ScriptingNameorGuid = ScriptingNode.InnerText
+                                                    '    If ScriptingNameorGuid = "" Then
+                                                    '        ScriptingNameorGuid = GetXMLAttribute(IsFound, ScriptingNode, "guid", "")
+                                                    '        If ScriptingNameorGuid = "" Then
+                                                    '            ScriptingNameorGuid = GetXMLAttribute(IsFound, ScriptingNode, "name", "")
+                                                    '        End If
+                                                    '    End If
+                                                    '    Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ScriptingNameorGuid) & ")"
+                                                    '    CS2 = cpCore.db.cs_open("Scripting Modules", Criteria)
+                                                    '    If Not cpCore.db.cs_ok(CS2) Then
+                                                    '        Call cpCore.db.cs_Close(CS2)
+                                                    '        Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(ScriptingNameorGuid) & ")"
+                                                    '        CS2 = cpCore.db.cs_open("Scripting Modules", Criteria)
+                                                    '    End If
+                                                    '    If cpCore.db.cs_ok(CS2) Then
+                                                    '        ScriptingModuleID = cpCore.db.cs_getInteger(CS2, "ID")
+                                                    '    End If
+                                                    '    Call cpCore.db.cs_Close(CS2)
+                                                    '    If ScriptingModuleID = 0 Then
+                                                    '        CS2 = cpCore.db.cs_insertRecord("Scripting Modules", 0)
+                                                    '        If cpCore.db.cs_ok(CS2) Then
+                                                    '            Call cpCore.db.cs_set(CS2, "name", ScriptingNameorGuid)
+                                                    '            Call cpCore.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
+                                                    '            ScriptingModuleID = cpCore.db.cs_getInteger(CS2, "ID")
+                                                    '        End If
+                                                    '        Call cpCore.db.cs_Close(CS2)
+                                                    '    End If
+                                                    '    Criteria = "(addonid=" & addonId & ")and(scriptingmoduleid=" & ScriptingModuleID & ")"
+                                                    '    CS2 = cpCore.db.cs_open("Add-on Scripting Module Rules", Criteria)
+                                                    '    If Not cpCore.db.cs_ok(CS2) Then
+                                                    '        Call cpCore.db.cs_Close(CS2)
+                                                    '        CS2 = cpCore.db.cs_insertRecord("Add-on Scripting Module Rules", 0)
+                                                    '        If cpCore.db.cs_ok(CS2) Then
+                                                    '            Call cpCore.db.cs_set(CS2, "addonid", addonId)
+                                                    '            Call cpCore.db.cs_set(CS2, "scriptingmoduleid", ScriptingModuleID)
+                                                    '        End If
+                                                    '    End If
+                                                    '    Call cpCore.db.cs_Close(CS2)
                                             End Select
                                         Next
                                         Call cpCore.db.cs_set(CS, "ScriptingCode", ScriptingCode)
@@ -2963,46 +2948,46 @@ Namespace Contensive.Core
                                             NewValue = NewValue & "}"
                                         End If
                                         StyleSheet = StyleSheet & vbCrLf & NodeName & " " & NewValue
-                                    Case "includesharedstyle"
-                                        '
-                                        ' added 9/3/2012
-                                        '
-                                        sharedStyleId = 0
-                                        nodeNameOrGuid = GetXMLAttribute(IsFound, PageInterface, "guid", "")
-                                        If nodeNameOrGuid = "" Then
-                                            nodeNameOrGuid = GetXMLAttribute(IsFound, PageInterface, "name", "")
-                                        End If
-                                        Criteria = "(ccguid=" & cpCore.db.encodeSQLText(nodeNameOrGuid) & ")"
-                                        CS2 = cpCore.db.cs_open("shared styles", Criteria)
-                                        If Not cpCore.db.cs_ok(CS2) Then
-                                            Call cpCore.db.cs_Close(CS2)
-                                            Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(nodeNameOrGuid) & ")"
-                                            CS2 = cpCore.db.cs_open("shared styles", Criteria)
-                                        End If
-                                        If cpCore.db.cs_ok(CS2) Then
-                                            sharedStyleId = cpCore.db.cs_getInteger(CS2, "ID")
-                                        End If
-                                        Call cpCore.db.cs_Close(CS2)
-                                        If sharedStyleId = 0 Then
-                                            CS2 = cpCore.db.cs_insertRecord("shared styles", 0)
-                                            If cpCore.db.cs_ok(CS2) Then
-                                                Call cpCore.db.cs_set(CS2, "name", nodeNameOrGuid)
-                                                Call cpCore.db.cs_set(CS2, "ccguid", nodeNameOrGuid)
-                                                sharedStyleId = cpCore.db.cs_getInteger(CS2, "ID")
-                                            End If
-                                            Call cpCore.db.cs_Close(CS2)
-                                        End If
-                                        Criteria = "(addonid=" & addonId & ")and(StyleId=" & sharedStyleId & ")"
-                                        CS2 = cpCore.db.cs_open("Shared Styles Add-on Rules", Criteria)
-                                        If Not cpCore.db.cs_ok(CS2) Then
-                                            Call cpCore.db.cs_Close(CS2)
-                                            CS2 = cpCore.db.cs_insertRecord("Shared Styles Add-on Rules", 0)
-                                            If cpCore.db.cs_ok(CS2) Then
-                                                Call cpCore.db.cs_set(CS2, "addonid", addonId)
-                                                Call cpCore.db.cs_set(CS2, "StyleId", sharedStyleId)
-                                            End If
-                                        End If
-                                        Call cpCore.db.cs_Close(CS2)
+                                    'Case "includesharedstyle"
+                                    '    '
+                                    '    ' added 9/3/2012
+                                    '    '
+                                    '    sharedStyleId = 0
+                                    '    nodeNameOrGuid = GetXMLAttribute(IsFound, PageInterface, "guid", "")
+                                    '    If nodeNameOrGuid = "" Then
+                                    '        nodeNameOrGuid = GetXMLAttribute(IsFound, PageInterface, "name", "")
+                                    '    End If
+                                    '    Criteria = "(ccguid=" & cpCore.db.encodeSQLText(nodeNameOrGuid) & ")"
+                                    '    CS2 = cpCore.db.cs_open("shared styles", Criteria)
+                                    '    If Not cpCore.db.cs_ok(CS2) Then
+                                    '        Call cpCore.db.cs_Close(CS2)
+                                    '        Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(nodeNameOrGuid) & ")"
+                                    '        CS2 = cpCore.db.cs_open("shared styles", Criteria)
+                                    '    End If
+                                    '    If cpCore.db.cs_ok(CS2) Then
+                                    '        sharedStyleId = cpCore.db.cs_getInteger(CS2, "ID")
+                                    '    End If
+                                    '    Call cpCore.db.cs_Close(CS2)
+                                    '    If sharedStyleId = 0 Then
+                                    '        CS2 = cpCore.db.cs_insertRecord("shared styles", 0)
+                                    '        If cpCore.db.cs_ok(CS2) Then
+                                    '            Call cpCore.db.cs_set(CS2, "name", nodeNameOrGuid)
+                                    '            Call cpCore.db.cs_set(CS2, "ccguid", nodeNameOrGuid)
+                                    '            sharedStyleId = cpCore.db.cs_getInteger(CS2, "ID")
+                                    '        End If
+                                    '        Call cpCore.db.cs_Close(CS2)
+                                    '    End If
+                                    '    Criteria = "(addonid=" & addonId & ")and(StyleId=" & sharedStyleId & ")"
+                                    '    CS2 = cpCore.db.cs_open("Shared Styles Add-on Rules", Criteria)
+                                    '    If Not cpCore.db.cs_ok(CS2) Then
+                                    '        Call cpCore.db.cs_Close(CS2)
+                                    '        CS2 = cpCore.db.cs_insertRecord("Shared Styles Add-on Rules", 0)
+                                    '        If cpCore.db.cs_ok(CS2) Then
+                                    '            Call cpCore.db.cs_set(CS2, "addonid", addonId)
+                                    '            Call cpCore.db.cs_set(CS2, "StyleId", sharedStyleId)
+                                    '        End If
+                                    '    End If
+                                    '    Call cpCore.db.cs_Close(CS2)
                                     Case "stylesheet", "styles"
                                         '
                                         ' import exclusive stylesheet if more then whitespace
@@ -3999,7 +3984,7 @@ Namespace Contensive.Core
                 Dim ContentTableName As String
                 Dim IsNavigator As Boolean
                 Dim ActiveText As String
-                Dim Name As String
+                Dim Name As String = String.Empty
                 Dim MenuName As String
                 Dim IndexName As String
                 Dim TableName As String
@@ -4022,19 +4007,23 @@ Namespace Contensive.Core
                 returnCollection = New miniCollectionModel()
                 '
                 If String.IsNullOrEmpty(srcCollecionXml) Then
+                    '
+                    ' -- empty collection is an error
                     Throw (New ApplicationException("UpgradeCDef_LoadDataToCollection, srcCollectionXml is blank or null"))
                 Else
-                    'hint = "loading xmlText file"
                     Try
                         srcXmlDom.LoadXml(srcCollecionXml)
                     Catch ex As Exception
+                        '
+                        ' -- xml load error
                         logController.appendLog(cpCore, "UpgradeCDef_LoadDataToCollection Error reading xml archive, ex=[" & ex.ToString & "]")
                         Throw New Exception("Error in UpgradeCDef_LoadDataToCollection, during doc.loadXml()", ex)
                     End Try
                     With srcXmlDom.DocumentElement
-                        'hint = "verify basename"
                         If (LCase(.Name) <> CollectionFileRootNode) And (LCase(.Name) <> "contensivecdef") Then
-                            Call Err.Raise(ignoreInteger, "dll", "the archive file has a syntax error. Application name must be the first node.")
+                            '
+                            ' -- root node must be collection (or legacy contensivecdef)
+                            cpCore.handleException(New ApplicationException("the archive file has a syntax error. Application name must be the first node."))
                         Else
                             returnCollection.isBaseCollection = IsccBaseFile
                             '
@@ -4540,14 +4529,14 @@ Namespace Contensive.Core
                 Dim fieldId As Integer
                 Dim FieldName As String
                 'Dim AddonClass As addonInstallClass
-                Dim StyleSheetAdd As String
+                Dim StyleSheetAdd As String = String.Empty
                 Dim NewStyleValue As String
                 Dim SiteStyles As String
                 Dim PosNameLineEnd As Integer
                 Dim PosNameLineStart As Integer
                 Dim SiteStylePtr As Integer
                 Dim StyleLine As String
-                Dim SiteStyleSplit() As String
+                Dim SiteStyleSplit As String() = {}
                 Dim SiteStyleCnt As Integer
                 Dim NewStyleName As String
                 Dim TestStyleName As String
@@ -5171,7 +5160,6 @@ Namespace Contensive.Core
         Private Function installCollection_AddMiniCollectionSrcToDst(ByRef dstCollection As miniCollectionModel, ByVal srcCollection As miniCollectionModel, ByVal SrcIsUserCDef As Boolean) As Boolean
             Dim returnOk As Boolean = True
             Try
-                '
                 Dim HelpSrc As String
                 Dim HelpCustomChanged As Boolean
                 Dim HelpDefaultChanged As Boolean
@@ -5182,30 +5170,18 @@ Namespace Contensive.Core
                 Dim dstCollectionCdef As cdefModel
                 Dim dstCollectionCdefField As CDefFieldModel
                 Dim IsMatch As Boolean
-                Dim TEmpName As String
                 Dim DstKey As String
                 Dim SrcKey As String
-                'Dim MatchSrcOnNameSpace As Boolean
                 Dim DataBuildVersion As String
                 Dim SrcIsNavigator As Boolean
                 Dim DstIsNavigator As Boolean
-                Dim NameSplit() As String
-                Dim Ptr As Integer
                 Dim SrcContentName As String
                 Dim DstName As String
-                'Dim SrcFieldPtr As Integer
-                'Dim DstFieldPtr As Integer
                 Dim SrcFieldName As String
-                'Dim DstPtr As Integer
-                'Dim DstFPtr As Integer
-                'Dim SrcPtr As Integer
-                'Dim SrcFPtr As Integer
                 Dim okToUpdateDstFromSrc As Boolean
                 Dim srcCollectionCdef As cdefModel
-                'Dim DebugName As String
                 Dim DebugSrcFound As Boolean
                 Dim DebugDstFound As Boolean
-                Dim IsFound As Boolean
                 '
                 ' If the Src is the BaseCollection, the Dst must be the Application Collectio
                 '   in this case, reset any BaseContent or BaseField attributes in the application that are not in the base
@@ -6271,7 +6247,7 @@ Namespace Contensive.Core
                         '
                         ' Problem
                         '
-                        Call Err.Raise(ignoreInteger, "dll", "Content Field Types content definition was not found")
+                        cpCore.handleException(New ApplicationException("Content Field Types content definition was not found"))
                     Else
                         Do While RowsNeeded > 0
                             Call cpCore.db.executeSql("Insert into ccFieldTypes (active,contentcontrolid)values(1," & CID & ")")

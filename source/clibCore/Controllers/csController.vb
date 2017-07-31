@@ -440,14 +440,14 @@ Namespace Contensive.Core
         '
         Public Shared Function main_cs_getEncodedField(cpcore As coreClass, ByVal CSPointer As Integer, ByVal FieldName As String) As String
             Dim result As String = ""
-            Dim ContentName As String
+            Dim ContentName As String = String.Empty
             Dim RecordID As Integer
             '
             If cpcore.db.cs_isFieldSupported(CSPointer, "id") And cpcore.db.cs_isFieldSupported(CSPointer, "contentcontrolId") Then
                 RecordID = cpcore.db.cs_getInteger(CSPointer, "id")
                 ContentName = cpcore.metaData.getContentNameByID(cpcore.db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
-            result = cpcore.html.html_encodeContent10(cpcore.db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything())
+            result = cpcore.html.encodeContent10(cpcore.db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything())
             Return result
         End Function
 

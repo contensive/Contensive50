@@ -76,25 +76,25 @@ Namespace Contensive.Core
         Public Property docGuid As String                        ' Random number (semi) unique to this hit
         Friend Property addonsRunOnThisPageIdList As New List(Of Integer)
         Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
-        Public Structure csv_stylesheetCacheType
-            Dim templateId As Integer
-            Dim EmailID As Integer
-            Dim StyleSheet As String
-        End Structure
-        Public Property stylesheetCache As csv_stylesheetCacheType()
-        Public Property stylesheetCacheCnt As Integer
+        'Public Structure csv_stylesheetCacheType
+        '    Dim templateId As Integer
+        '    Dim EmailID As Integer
+        '    Dim StyleSheet As String
+        'End Structure
+        'Public Property stylesheetCache As csv_stylesheetCacheType()
+        'Public Property stylesheetCacheCnt As Integer
         Public Property pageAddonCnt As Integer = 0
-        '
-        '===================================================================================================
-        Public ReadOnly Property addonStyleRulesIndex() As keyPtrIndexController
-            Get
-                If (_cache_addonStyleRules Is Nothing) Then
-                    _cache_addonStyleRules = New keyPtrIndexController(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
-                End If
-                Return _cache_addonStyleRules
-            End Get
-        End Property
-        Private _cache_addonStyleRules As keyPtrIndexController = Nothing
+        ''
+        ''===================================================================================================
+        'Public ReadOnly Property addonStyleRulesIndex() As keyPtrIndexController
+        '    Get
+        '        If (_cache_addonStyleRules Is Nothing) Then
+        '            _cache_addonStyleRules = New keyPtrIndexController(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
+        '        End If
+        '        Return _cache_addonStyleRules
+        '    End Get
+        'End Property
+        'Private _cache_addonStyleRules As keyPtrIndexController = Nothing
         '
         '===================================================================================================
         Public ReadOnly Property dataSourceDictionary() As Dictionary(Of String, Models.Entity.dataSourceModel)
@@ -235,15 +235,15 @@ Namespace Contensive.Core
         Private _siteProperties As Models.Context.siteContextModel = Nothing
         '
         '===================================================================================================
-        Public ReadOnly Property webServer As webServerController
+        Public ReadOnly Property webServer As iisController
             Get
                 If (_webServer Is Nothing) Then
-                    _webServer = New webServerController(Me)
+                    _webServer = New iisController(Me)
                 End If
                 Return _webServer
             End Get
         End Property
-        Private _webServer As webServerController
+        Private _webServer As iisController
         '
         '===================================================================================================
         Public ReadOnly Property security() As securityController
@@ -576,7 +576,7 @@ Namespace Contensive.Core
                     Dim pairValue As String
                     Dim addonRoute As String = ""
                     Dim routeTest As String
-                    Dim workingRoute As String
+                    Dim normalRoute As String
                     Dim adminRoute As String = serverConfig.appConfig.adminRoute.ToLower
                     Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
                     Dim AjaxFastFunction As String = docProperties.getText(RequestNameAjaxFastFunction)
@@ -590,22 +590,23 @@ Namespace Contensive.Core
                         '
                         ' route privided as argument
                         '
-                        workingRoute = route
+                        normalRoute = route
                     ElseIf (Not String.IsNullOrEmpty(RemoteMethodFromQueryString)) Then
                         '
                         ' route comes from a remoteMethod=route querystring argument
                         '
-                        workingRoute = "/" & RemoteMethodFromQueryString.ToLower()
+                        normalRoute = "/" & RemoteMethodFromQueryString.ToLower()
                     Else
                         '
                         ' routine comes from the url
                         '
-                        workingRoute = webServer.requestPathPage.ToLower
+                        normalRoute = webServer.requestPathPage.ToLower
                     End If
                     '
                     ' normalize route to /path/page or /path
                     '
-                    workingRoute = genericController.normalizeRoute(workingRoute)
+                    normalRoute = genericController.normalizeRoute(normalRoute)
+                    addonRoute = ""
                     '
                     ' call with no addon route returns admin site
                     '
@@ -619,20 +620,30 @@ Namespace Contensive.Core
                         '------------------------------------------------------------------------------------------
                         '
                         ' if route is a remote method, use it
-                        '
-                        routeTest = workingRoute
-                        Dim addonPtr As Integer = addonLegacyCache.getPtr(routeTest)
-                        If addonPtr >= 0 Then
-                            If addonLegacyCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
-                                addonRoute = routeTest
-                            End If
+                        Dim addonPtr As Integer = addonLegacyCache.getPtr(normalRoute)
+                        If (addonPtr >= 0) Then
+                            addonRoute = normalRoute
                         Else
-                            If (InStr(routeTest, "/", CompareMethod.Text) = 1) Then
-                                routeTest = routeTest.Substring(1)
-                                addonPtr = addonLegacyCache.getPtr(routeTest)
-                                If addonPtr >= 0 Then
-                                    If addonLegacyCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
-                                        addonRoute = routeTest
+                            '
+                            ' -- try testRoute2
+                            Dim testRoute2 As String = normalRoute & "/"
+                            addonPtr = addonLegacyCache.getPtr(testRoute2)
+                            If (addonPtr >= 0) Then
+                                addonRoute = testRoute2
+                            Else
+                                '
+                                ' -- try testRoute3
+                                Dim testRoute3 As String = normalRoute.Substring(1)
+                                addonPtr = addonLegacyCache.getPtr(testRoute3)
+                                If (addonPtr >= 0) Then
+                                    addonRoute = testRoute3
+                                Else
+                                    '
+                                    ' -- try testRoute4
+                                    Dim testRoute4 As String = testRoute3 & "/"
+                                    addonPtr = addonLegacyCache.getPtr(testRoute4)
+                                    If (addonPtr >= 0) Then
+                                        addonRoute = testRoute4
                                     End If
                                 End If
                             End If
@@ -650,7 +661,7 @@ Namespace Contensive.Core
                             '   Verify Add-ons are run from Referrers on the Aggregate Access List
                             '--------------------------------------------------------------------------
                             '
-                            If webServer.webServerIO_ReadStreamJSForm Then
+                            If webServer.readStreamJSForm Then
                                 If webServer.requestReferrer = "" Then
                                     '
                                     ' Allow it to be hand typed
@@ -748,9 +759,9 @@ Namespace Contensive.Core
                             '
                             ' deliver styles, javascript and other head tags as javascript appends
                             '
-                            webServer.webServerIO_BlockClosePageCopyright = True
+                            webServer.blockClosePageCopyright = True
                             html_BlockClosePageLink = True
-                            If (webServer.webServerIO_OutStreamDevice = docController.htmlDoc_OutStreamJavaScript) Then
+                            If (webServer.outStreamDevice = docController.htmlDoc_OutStreamJavaScript) Then
                                 If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
                                     Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
                                     returnResult = FormSplit(0)
@@ -950,7 +961,7 @@ Namespace Contensive.Core
                                 '
                                 'Call AppendLog("main_init(), 2810 - exit for ajax hook")
                                 '
-                                webServer.webServerIO_BlockClosePageCopyright = True
+                                webServer.blockClosePageCopyright = True
                                 html_BlockClosePageLink = True
                                 'Call AppendLog("call main_getEndOfBody, from main_initf")
                                 returnResult = returnResult & html.getHtmlDoc_beforeEndOfBodyHtml(False, False, True, False)
@@ -991,7 +1002,7 @@ Namespace Contensive.Core
                                     Call db.cs_set(CSLog, "LogType", EmailLogTypeOpen)
                                 End If
                                 Call db.cs_Close(CSLog)
-                                RedirectLink = webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/images/spacer.gif"
+                                RedirectLink = webServer.requestProtocol & webServer.requestDomain & "/ccLib/images/spacer.gif"
                                 Call webServer.redirect(RedirectLink, "Group Email Open hit, redirecting to a dummy image", False)
                             End If
                             '
@@ -1043,7 +1054,7 @@ Namespace Contensive.Core
                                     End If
                                     Call db.cs_Close(CSLog)
                                 End If
-                                Call webServer.redirect(webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
+                                Call webServer.redirect(webServer.requestProtocol & webServer.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
                             End If
                         End If
                         '
@@ -1086,8 +1097,8 @@ Namespace Contensive.Core
                                                 '
                                                 ' Save new public stylesheet
                                                 '
-                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", html.html_getStyleSheet2(0, 0))
-                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", html.getStyleSheetDefault())
+                                                'Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", html.html_getStyleSheet2(0, 0))
+                                                'Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", html.getStyleSheetDefault())
                                             End If
                                         End If
                                     Case FormTypeAddonStyleEditor
@@ -1097,7 +1108,6 @@ Namespace Contensive.Core
                                         If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
                                             Dim addonId As Integer
                                             Dim contentName As String = ""
-                                            Dim tableName As String
                                             Dim nothingObject As Object = Nothing
                                             Dim cs As Integer
                                             addonId = docProperties.getInteger("AddonID")
@@ -1127,17 +1137,20 @@ Namespace Contensive.Core
                                         '
                                         '
                                         '
-                                        Call html.processFormJoin()
+                                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                                        Call loginAddon.processFormJoin()
                                     Case FormTypeSendPassword
                                         '
                                         '
                                         '
-                                        Call html.processFormSendPassword()
+                                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                                        Call loginAddon.processFormSendPassword()
                                     Case FormTypeLogin, "l09H58a195"
                                         '
                                         '
                                         '
-                                        Call html.processFormLoginDefault()
+                                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                                        Call loginAddon.processFormLoginDefault()
                                     Case FormTypeToolsPanel
                                         '
                                         ' ----- Administrator Tools Panel
@@ -1179,7 +1192,7 @@ Namespace Contensive.Core
                         ' normalize adminRoute and test for hit
                         '--------------------------------------------------------------------------
                         '
-                        If (workingRoute = genericController.normalizeRoute(adminRoute)) Then
+                        If (normalRoute = genericController.normalizeRoute(adminRoute)) Then
                             '
                             'debugLog("executeRoute, route is admin")
                             '
@@ -1262,8 +1275,8 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 Dim SQLQuery As String
                 Dim maxRows As Integer
-                Dim ArgName() As String
-                Dim ArgValue() As String
+                Dim ArgName As String() = {}
+                Dim ArgValue As String() = {}
                 Dim Ptr As Integer
                 Dim QueryType As Integer
                 Dim ContentName As String = ""
@@ -1582,20 +1595,15 @@ Namespace Contensive.Core
         Private Function executeRoute_hardCodedPage(ByVal HardCodedPage As String) As Boolean
             Dim result As Boolean = False
             Try
-                Dim allowPageWithoutSectionDisplay As Boolean
                 Dim InsertTestOK As Boolean
                 Dim ConfirmOrderID As Integer
                 Dim PageSize As Integer
                 Dim PageNumber As Integer
                 Dim ContentName As String
                 Dim MsgLabel As String
-                Dim PageID As Integer
-                Dim rootPageId As Integer
-                Dim Pos As Integer
                 Dim TrapID As Integer
                 Dim CS As Integer
-                Dim Name As String
-                Dim Copy As String
+                Dim Copy As String = String.Empty
                 Dim Recipient As String
                 Dim Sender As String
                 Dim subject As String
@@ -1634,10 +1642,10 @@ Namespace Contensive.Core
                             ' Open a page compatible with a dialog
                             '
                             Call doc.addRefreshQueryString("EditorObjectName", EditorObjectName)
-                            Call html.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                            Call html.addJavaScriptLinkHead("/ccLib/ClientSide/dialogs.js", "Resource Library")
                             'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                             Call html.main_SetMetaContent(0, 0)
-                            Call html.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                            Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Resource Library")
                             Copy = html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2b")
                             Copy = "" _
@@ -1672,10 +1680,10 @@ Namespace Contensive.Core
                             ' Open a page compatible with a dialog
                             '
                             Call doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
-                            Call html.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                            Call html.addJavaScriptLinkHead("/ccLib/ClientSide/dialogs.js", "Resource Library")
                             'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                             Call html.main_SetMetaContent(0, 0)
-                            Call html.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                            Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Resource Library")
                             Copy = html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2c")
                             Copy = "" _
@@ -1700,7 +1708,8 @@ Namespace Contensive.Core
                         ' 9/4/2012 added to prevent lockout if login addon fails
                         doc.refreshQueryString = webServer.requestQueryString
                         'Call main_AddRefreshQueryString("method", "")
-                        Call html.writeAltBuffer(html.getLoginPage(True))
+                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                        Call html.writeAltBuffer(loginAddon.getLoginPage(True))
                         result = True
                     Case HardCodedPageLogin, HardCodedPageLogoutLogin
                         '
@@ -1714,9 +1723,8 @@ Namespace Contensive.Core
                             Call authContext.logout(Me)
                         End If
                         doc.refreshQueryString = webServer.requestQueryString
-                        'Call main_AddRefreshQueryString("method", "")
-                        Call html.writeAltBuffer(html.getLoginPage(False))
-                        'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
+                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                        Call html.writeAltBuffer(loginAddon.getLoginPage(False))
                         result = True
                     Case HardCodedPageLogout
                         '
@@ -1738,7 +1746,7 @@ Namespace Contensive.Core
                             Call html.main_AddPagetitle("Site Explorer")
                             Call html.main_SetMetaContent(0, 0)
                             Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
-                            Call html.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
+                            Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Site Explorer")
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
                             Copy = "" _
                             & siteProperties.docTypeDeclaration() _
@@ -1761,7 +1769,7 @@ Namespace Contensive.Core
                         '
                         ' Status call
                         '
-                        webServer.webServerIO_BlockClosePageCopyright = True
+                        webServer.blockClosePageCopyright = True
                         '
                         ' test default data connection
                         '
@@ -1794,7 +1802,7 @@ Namespace Contensive.Core
                         Else
                             Call html.writeAltBuffer("Contensive Error Count = " & app_errorCount)
                         End If
-                        webServer.webServerIO_BlockClosePageCopyright = True
+                        webServer.blockClosePageCopyright = True
                         html_BlockClosePageLink = True
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
                         Call html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)
@@ -1846,14 +1854,15 @@ Namespace Contensive.Core
                         '
                         ' ----- Create a Javascript login page
                         '
-                        webServer.webServerIO_BlockClosePageCopyright = True
+                        webServer.blockClosePageCopyright = True
                         Copy = Copy & "<p align=""center""><CENTER>"
                         If Not authContext.isAuthenticated() Then
-                            Copy = Copy & html.getLoginPanel()
+                            Dim loginAddon As New Addons.addon_loginClass(Me)
+                            Copy = Copy & loginAddon.getLoginPanel()
                         ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
                             'Copy = Copy & main_GetToolsPanel
                         Else
-                            Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
+                            Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.serverFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
                         End If
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
                         Copy = Copy & html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False)
@@ -1882,7 +1891,7 @@ Namespace Contensive.Core
                                 Call iisController.main_RedirectByRecord_ReturnStatus(Me, ContentName, doc.redirectRecordID)
                             End If
                         End If
-                        webServer.webServerIO_BlockClosePageCopyright = True
+                        webServer.blockClosePageCopyright = True
                         html_BlockClosePageLink = True
                         result = False '--- should be disposed by caller --- Call dispose
                         result = True
@@ -1898,7 +1907,7 @@ Namespace Contensive.Core
                             '
                             Call html.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
                         Else
-                            webServer.webServerIO_BlockClosePageCopyright = True
+                            webServer.blockClosePageCopyright = True
                             ContentName = docProperties.getText("content")
                             PageSize = docProperties.getInteger("PageSize")
                             If PageSize = 0 Then
@@ -1915,7 +1924,7 @@ Namespace Contensive.Core
                             End If
                         End If
                         result = True
-                        webServer.webServerIO_BlockClosePageCopyright = True
+                        webServer.blockClosePageCopyright = True
                         html_BlockClosePageLink = True
                         result = False '--- should be disposed by caller --- Call dispose
                         result = True
@@ -1967,12 +1976,12 @@ Namespace Contensive.Core
                                 Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
                             Else
                                 Sender = siteProperties.getText("EmailOrderFromAddress")
-                                subject = webServer.webServerIO_requestDomain & " Online Order Pending, #" & ConfirmOrderID
-                                Message = "<p>An order confirmation has been recieved from PayPal for " & webServer.webServerIO_requestDomain & "</p>"
+                                subject = webServer.requestDomain & " Online Order Pending, #" & ConfirmOrderID
+                                Message = "<p>An order confirmation has been recieved from PayPal for " & webServer.requestDomain & "</p>"
                                 Call email.send_Legacy(Recipient, Sender, subject, Message, , False, True)
                             End If
                         End If
-                        webServer.webServerIO_BlockClosePageCopyright = True
+                        webServer.blockClosePageCopyright = True
                         html_BlockClosePageLink = True
                         result = False '--- should be disposed by caller --- Call dispose
                         result = True
@@ -2189,7 +2198,7 @@ Namespace Contensive.Core
                                     & ",1" _
                                     & "," & db.encodeSQLNumber(CSMax) _
                                     & "," & db.encodeSQLNumber(PageID)
-                                    SQL &= "," & db.encodeSQLBoolean(webServer.webServerIO_PageExcludeFromAnalytics)
+                                    SQL &= "," & db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
                                     SQL &= "," & db.encodeSQLText(doc.metaContent_Title)
                                     SQL &= ");"
                                     Call db.executeSql(SQL)

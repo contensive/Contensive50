@@ -187,66 +187,40 @@ Namespace Contensive.Core.Controllers
         'todo convert to addon model, and pass new model to subroutines to enhandle error reporting
         '
         '====================================================================================================
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <param name="addonId"></param>
-        ''' <param name="AddonNameOrGuid"></param>
-        ''' <param name="OptionString"></param>
-        ''' <param name="Context"></param>
-        ''' <param name="HostContentName"></param>
-        ''' <param name="HostRecordID"></param>
-        ''' <param name="HostFieldName"></param>
-        ''' <param name="ACInstanceID"></param>
-        ''' <param name="IsIncludeAddon"></param>
-        ''' <param name="DefaultWrapperID"></param>
-        ''' <param name="ignore_TemplateCaseOnly_PageContent"></param>
-        ''' <param name="return_StatusOK"></param>
-        ''' <param name="nothingObject"></param>
-        ''' <param name="ignore_addonCallingItselfIdList"></param>
-        ''' <param name="nothingObject2"></param>
-        ''' <param name="ignore_AddonsRunOnThisPageIdList"></param>
-        ''' <param name="personalizationPeopleId"></param>
-        ''' <param name="personalizationIsAuthenticated"></param>
-        ''' <returns></returns>
+        '
         Public Function execute(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
-            Dim returnVal As String
+            Dim returnVal As String = ""
             Try
                 Dim AddonName As String = "unknown"
-                '
-                Dim styleId As Integer
-                Dim inlineScriptContent As String
-                Dim inlineScript As String
+                Dim inlineScriptContent As String = String.Empty
+                Dim inlineScript As String = String.Empty
                 Dim blockJavascriptAndCss As Boolean
-                Dim JSOnLoad As String
-                Dim JSBodyEnd As String
-                Dim JSFilename As String
-                Dim DefaultStylesFilename As String
-                Dim CustomStylesFilename As String
+                Dim JSOnLoad As String = String.Empty
+                Dim JSBodyEnd As String = String.Empty
+                Dim JSFilename As String = String.Empty
+                Dim DefaultStylesFilename As String = String.Empty
+                'Dim CustomStylesFilename As String = String.Empty
                 Dim TestString As String
-                'Dim addon_IncludedAddonIDList As String
-                'Dim includedAddonId As Integer
-                'Dim includedAddonIds() As String
                 Dim ReplaceSource As String
                 Dim ReplaceValue As String
                 Dim AddonStylesEditIcon As String
-                Dim SiteStylesEditIcon As String
-                Dim DialogList As String
+                Dim SiteStylesEditIcon As String = String.Empty
+                Dim DialogList As String = String.Empty
                 Dim ToolBar As String
                 Dim ScriptingTimeout As Integer
-                Dim ScriptCallbackContent As String
-                Dim errorMessageForAdmin As String
-                Dim CollectionGuid As String
-                Dim DotNetClassFullName As String
+                Dim ScriptCallbackContent As String = String.Empty
+                Dim errorMessageForAdmin As String = String.Empty
+                Dim CollectionGuid As String = String.Empty
+                Dim DotNetClassFullName As String = String.Empty
                 Dim CodeFilename As String
-                Dim ScriptingEntryPoint As String
+                Dim ScriptingEntryPoint As String = String.Empty
                 Dim scriptinglanguageid As Integer
-                Dim ScriptingLanguage As String
-                Dim ScriptingCode As String
+                Dim ScriptingLanguage As String = String.Empty
+                Dim ScriptingCode As String = String.Empty
                 Dim AddonStatusOK As Boolean
                 Dim EditWrapperHTMLID As String
-                Dim AddonNameOrGuid_Local As String
-                Dim AddonGuid As String
+                Dim AddonNameOrGuid_Local As String = String.Empty
+                Dim AddonGuid As String = String.Empty
                 Dim QS As String
                 Dim QSSplit() As String
                 Dim NVPair As String
@@ -255,62 +229,61 @@ Namespace Contensive.Core.Controllers
                 Dim AsAjaxID As String
                 Dim OptionNames() As String
                 Dim OptionValues() As String
-                Dim OptionsForCPVars() As NameValuePrivateType
+                Dim OptionsForCPVars As NameValuePrivateType() = {}
                 Dim OptionsForCPVars_Cnt As Integer
-                Dim RemoteAssetContent As String
+                Dim RemoteAssetContent As String = String.Empty
                 Dim kmaHTTP As httpRequestController
                 Dim WorkingLink As String
-                Dim FormContent As String
+                Dim FormContent As String = String.Empty
                 Dim ExitAddonWithBlankResponse As Boolean
-                Dim RemoteAssetLink As String
+                Dim RemoteAssetLink As String = String.Empty
                 Dim AsAjax As Boolean
                 Dim InFrame As Boolean
                 Dim IncludeEditWrapper As Boolean
-                Dim AddedByName As String
+                Dim AddedByName As String = String.Empty
                 Dim AddonCommentName As String
                 Dim GroupIDList As String
-                Dim AddonOptionConstructor As String
-                Dim AddonOptionExpandedConstructor As String
-                Dim OptionString_ForObjectCall As String
+                Dim AddonOptionConstructor As String = String.Empty
+                Dim AddonOptionExpandedConstructor As String = String.Empty
+                Dim OptionString_ForObjectCall As String = String.Empty
                 Dim Pos As Integer
                 Dim Ptr As Integer
                 Dim SQL As String
                 Dim CSRules As Integer
-                Dim HelpIcon As String
+                Dim HelpIcon As String = String.Empty
                 Dim InstanceSettingsEditIcon As String
-                Dim OptionPair() As String
+                Dim OptionPair As String() = {}
                 Dim OptionPtr As Integer
                 Dim OptionCnt As Integer
-                Dim Link As String
-                Dim ProgramID As String
+                Dim Link As String = String.Empty
+                Dim ProgramID As String = String.Empty
                 Dim Options() As String
                 Dim OptionName As String
                 Dim OptionValue As String
-                Dim HTMLContent As String
-                Dim TextContent As String
-                Dim ObjectContent As String
-                Dim AssemblyContent As String
-                Dim ScriptContent As String
-                Dim helpCopy As String
-                Dim helpLink As String
-                Dim PageTitle As String
-                Dim MetaDescription As String
-                Dim MetaKeywordList As String
-                Dim OtherHeadTags As String
+                Dim HTMLContent As String = String.Empty
+                Dim TextContent As String = String.Empty
+                Dim ObjectContent As String = String.Empty
+                Dim AssemblyContent As String = String.Empty
+                Dim ScriptContent As String = String.Empty
+                Dim helpCopy As String = String.Empty
+                Dim helpLink As String = String.Empty
+                Dim PageTitle As String = String.Empty
+                Dim MetaDescription As String = String.Empty
+                Dim MetaKeywordList As String = String.Empty
+                Dim OtherHeadTags As String = String.Empty
                 Dim AddonEditIcon As String
                 Dim FoundAddon As Boolean
-                Dim FormXML As String
+                Dim FormXML As String = String.Empty
                 Dim WrapperID As Integer
-                Dim ContainerCssID As String
-                Dim ContainerCssClass As String
+                Dim ContainerCssID As String = String.Empty
+                Dim ContainerCssClass As String = String.Empty
                 Dim IsInline As Boolean
                 Dim WorkingOptionString As String
                 Dim HTMLViewerEditIcon As String
                 Dim AddonBlockEditTools As Boolean
                 Dim ReplaceCnt As Integer
-                Dim ReplaceNames() As String
-                Dim ReplaceValues() As String
-                Dim isMainOk As Boolean
+                Dim ReplaceNames As String() = {}
+                Dim ReplaceValues As String() = {}
                 Dim StartTickCount As Integer
                 Dim addonCachePtr As Integer
                 Dim addonCollectionId As Integer
@@ -323,16 +296,12 @@ Namespace Contensive.Core.Controllers
                 Dim PushOptionString As String
                 PushOptionString = OptionString
                 '
-                isMainOk = True
-                '
                 ' ----- Debug timer
                 '
-                If isMainOk Then
-                    StartTickCount = GetTickCount
-                End If
+                StartTickCount = GetTickCount
                 return_StatusOK = True
                 WrapperID = DefaultWrapperID
-                If (personalizationPeopleId = 0) And isMainOk Then
+                If (personalizationPeopleId = 0) Then
                     '
                     ' just in case - during transition from cpCoreClass to csv, in case a call is missing.
                     '
@@ -382,19 +351,20 @@ Namespace Contensive.Core.Controllers
                     FormXML = ""
                     TextContent = genericController.encodeText(addonCache.copyText)
                     IsInline = genericController.EncodeBoolean(addonCache.isInline)
-                    '
-                    ' Support BlockDefaultStyles and CustomStylesFilename
-                    '
-                    If Not addonCache.blockDefaultStyles Then
-                        '
-                        ' Add default styles
-                        '
-                        DefaultStylesFilename = genericController.encodeText(addonCache.stylesFilename)
-                    End If
+                    DefaultStylesFilename = genericController.encodeText(addonCache.stylesFilename)
+                    ''
+                    '' Support BlockDefaultStyles and CustomStylesFilename
+                    ''
+                    'If Not addonCache.blockDefaultStyles Then
+                    '    '
+                    '    ' Add default styles
+                    '    '
+                    '    DefaultStylesFilename = genericController.encodeText(addonCache.stylesFilename)
+                    'End If
                     '
                     ' Add custom styles
                     '
-                    CustomStylesFilename = genericController.encodeText(addonCache.customStylesFilename)
+                    'CustomStylesFilename = genericController.encodeText(addonCache.customStylesFilename)
                     FormXML = genericController.encodeText(addonCache.formxml)
                     RemoteAssetLink = genericController.encodeText(addonCache.remoteAssetLink)
                     AsAjax = genericController.EncodeBoolean(addonCache.asAjax)
@@ -425,7 +395,7 @@ Namespace Contensive.Core.Controllers
                     OtherHeadTags = genericController.encodeText(addonCache.OtherHeadTags)
                     JSFilename = genericController.encodeText(addonCache.JSFilename)
                     If JSFilename <> "" Then
-                        JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
+                        JSFilename = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
                     End If
                 End If
                 If Not String.IsNullOrEmpty(ProgramID) Then
@@ -434,39 +404,39 @@ Namespace Contensive.Core.Controllers
                     '
                     Throw New ApplicationException("This add-on [#" & addonId & ", " & AddonName & "] is no longer supported because it contains an active-X component.")
                 Else
-                    '
-                    '----------------------------------------------------------------------------------------------------
-                    ' add shared styles
-                    '----------------------------------------------------------------------------------------------------
-                    '
-                    Dim addonIdKey As String
-                    addonIdKey = addonId.ToString
-                    Ptr = cpCore.addonStyleRulesIndex.getFirstPtr(addonIdKey)
-                    Do While Ptr >= 0
-                        styleId = genericController.EncodeInteger(cpCore.addonStyleRulesIndex.getValue(Ptr))
-                        Call cpCore.html.main_AddSharedStyleID2(styleId, AddonName)
-                        Ptr = cpCore.addonStyleRulesIndex.getNextPtr()
-                    Loop
-                    '
-                    '----------------------------------------------------------------------------------------------------
-                    ' Add ScriptingCode
-                    '----------------------------------------------------------------------------------------------------
-                    '
-                    If ScriptingEntryPoint <> "" Then
-                        '
-                        ' Get Modules
-                        '
-                        SQL = "select c.code from ccScriptingModules c left join ccAddonScriptingModuleRules r on r.ScriptingModuleID=c.id where r.Addonid=" & addonId & " order by c.sortorder"
-                        CSRules = cpCore.db.cs_openCsSql_rev("default", SQL)
-                        Do While cpCore.db.cs_ok(CSRules)
-                            CodeFilename = cpCore.db.cs_get(CSRules, "code")
-                            If CodeFilename <> "" Then
-                                ScriptingCode = ScriptingCode & vbCrLf & cpCore.cdnFiles.readFile(CodeFilename)
-                            End If
-                            Call cpCore.db.cs_goNext(CSRules)
-                        Loop
-                        Call cpCore.db.cs_Close(CSRules)
-                    End If
+                    ''
+                    ''----------------------------------------------------------------------------------------------------
+                    '' add shared styles
+                    ''----------------------------------------------------------------------------------------------------
+                    ''
+                    'Dim addonIdKey As String
+                    'addonIdKey = addonId.ToString
+                    'Ptr = cpCore.addonStyleRulesIndex.getFirstPtr(addonIdKey)
+                    'Do While Ptr >= 0
+                    '    styleId = genericController.EncodeInteger(cpCore.addonStyleRulesIndex.getValue(Ptr))
+                    '    Call cpCore.html.addSharedStyleID2(styleId, AddonName)
+                    '    Ptr = cpCore.addonStyleRulesIndex.getNextPtr()
+                    'Loop
+                    ''
+                    ''----------------------------------------------------------------------------------------------------
+                    '' Add ScriptingCode
+                    ''----------------------------------------------------------------------------------------------------
+                    ''
+                    'If ScriptingEntryPoint <> "" Then
+                    '    '
+                    '    ' Get Modules
+                    '    '
+                    '    SQL = "select c.code from ccScriptingModules c left join ccAddonScriptingModuleRules r on r.ScriptingModuleID=c.id where r.Addonid=" & addonId & " order by c.sortorder"
+                    '    CSRules = cpCore.db.cs_openCsSql_rev("default", SQL)
+                    '    Do While cpCore.db.cs_ok(CSRules)
+                    '        CodeFilename = cpCore.db.cs_get(CSRules, "code")
+                    '        If CodeFilename <> "" Then
+                    '            ScriptingCode = ScriptingCode & vbCrLf & cpCore.cdnFiles.readFile(CodeFilename)
+                    '        End If
+                    '        Call cpCore.db.cs_goNext(CSRules)
+                    '    Loop
+                    '    Call cpCore.db.cs_Close(CSRules)
+                    'End If
                     '
                     '----------------------------------------------------------------------------------------------------
                     ' Add the common addon options to the AddonOptionConstructor
@@ -504,7 +474,7 @@ Namespace Contensive.Core.Controllers
                             AddonOptionConstructor = AddonOptionConstructor_ForBlockText
                             TextContent = ""
                             DefaultStylesFilename = ""
-                            CustomStylesFilename = ""
+                            ' CustomStylesFilename = ""
                             helpCopy = ""
                             helpLink = ""
                             JSOnLoad = ""
@@ -523,7 +493,7 @@ Namespace Contensive.Core.Controllers
                             If Not cpCore.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
                                 HTMLContent = BlockTextStartMarker
                             End If
-                            'If isMainOk Then
+                            'If true Then
                             '    '
                             '    ' web-only
                             '    '
@@ -545,7 +515,7 @@ Namespace Contensive.Core.Controllers
                             AddonOptionConstructor = AddonOptionConstructor_ForBlockTextEnd
                             TextContent = ""
                             DefaultStylesFilename = ""
-                            CustomStylesFilename = ""
+                            'CustomStylesFilename = ""
                             helpCopy = ""
                             helpLink = ""
                             JSOnLoad = ""
@@ -615,7 +585,7 @@ Namespace Contensive.Core.Controllers
                         ' Enable Edit Wrapper for Page Content edit mode
                         '-----------------------------------------------------------------
                         '
-                        If isMainOk Then
+                        If True Then
                             IncludeEditWrapper =
                                 (Not AddonBlockEditTools) _
                                 And (Context <> CPUtilsBaseClass.addonContext.ContextEditor) _
@@ -833,12 +803,12 @@ Namespace Contensive.Core.Controllers
                                 ' js,styles and other features are NOT added to the host page, they go to the remotemethod page
                                 '-----------------------------------------------------------------
                                 '
-                                'todo isMainOk is a check for iis driven page - move to iisController
-                                If isMainOk Then
+                                'todo true is a check for iis driven page - move to iisController
+                                If True Then
                                     '
                                     ' web-only
                                     '
-                                    Link = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
+                                    Link = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
                                     If genericController.vbInstr(1, Link, "?") = 0 Then
                                         Link = Link & "?"
                                     Else
@@ -867,7 +837,7 @@ Namespace Contensive.Core.Controllers
                                 '   DLL processing, they have to be handled
                                 '-----------------------------------------------------------------
                                 '
-                                If isMainOk Then
+                                If True Then
                                     AsAjaxID = "asajax" & GetRandomInteger()
                                     QS = "" _
                                         & RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(AddonNameOrGuid_Local) _
@@ -920,15 +890,15 @@ Namespace Contensive.Core.Controllers
                                         '
                                         ' add javascript and styles if it has not run already
                                         '
-                                        Call cpCore.html.main_AddOnLoadJavascript2(JSOnLoad, AddedByName)
-                                        Call cpCore.html.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
-                                        Call cpCore.html.main_AddHeadScriptLink(JSFilename, AddedByName)
+                                        Call cpCore.html.addOnLoadJavascript(JSOnLoad, AddedByName)
+                                        Call cpCore.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
+                                        Call cpCore.html.addJavaScriptLinkHead(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.html.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), AddonName & " default")
                                         End If
-                                        If CustomStylesFilename <> "" Then
-                                            Call cpCore.html.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
-                                        End If
+                                        'If CustomStylesFilename <> "" Then
+                                        '    Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
+                                        'End If
                                     End If
                                 End If
                             Else
@@ -942,7 +912,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
                                     '
-                                    If isMainOk Then
+                                    If True Then
                                         Call cpCore.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
                                         Call cpCore.doc.addRefreshQueryString("optionstring", WorkingOptionString)
                                     End If
@@ -951,7 +921,7 @@ Namespace Contensive.Core.Controllers
                                     ' Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
                                     ' restore form values
                                     '
-                                    If isMainOk Then
+                                    If True Then
                                         QS = cpCore.docProperties.getText("Hostform")
                                         If QS <> "" Then
                                             Call cpCore.docProperties.addQueryString(QS)
@@ -987,7 +957,7 @@ Namespace Contensive.Core.Controllers
                                         MetaKeywordList = ""
                                         OtherHeadTags = ""
                                         DefaultStylesFilename = ""
-                                        CustomStylesFilename = ""
+                                        '  CustomStylesFilename = ""
                                     End If
                                 End If
                                 '
@@ -1089,7 +1059,7 @@ Namespace Contensive.Core.Controllers
                                             '
                                             ' Put up an admin hint
                                             '
-                                            If (Not isMainOk) Or (Context = CPUtilsBaseClass.addonContext.ContextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                            If (Not True) Or (Context = CPUtilsBaseClass.addonContext.ContextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
                                                 '
                                                 ' Block all output even on error
                                                 '
@@ -1141,14 +1111,14 @@ Namespace Contensive.Core.Controllers
                                     If RemoteAssetLink <> "" Then
                                         WorkingLink = RemoteAssetLink
                                         If genericController.vbInstr(1, WorkingLink, "://") = 0 Then
-                                            If isMainOk Then
+                                            If True Then
                                                 '
                                                 ' use request object to build link
                                                 '
                                                 If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & WorkingLink
+                                                    WorkingLink = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & WorkingLink
                                                 Else
-                                                    WorkingLink = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.webServer.webServerIO_requestVirtualFilePath & WorkingLink
+                                                    WorkingLink = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & cpCore.webServer.requestVirtualFilePath & WorkingLink
                                                 End If
                                             Else
                                                 '
@@ -1183,10 +1153,10 @@ Namespace Contensive.Core.Controllers
                                 '   FormXML
                                 '-----------------------------------------------------------------------------------------------------
                                 '
-                                If isMainOk And (FormXML <> "") Then
+                                If True And (FormXML <> "") Then
                                     FormContent = getFormContent(Nothing, FormXML, ExitAddonWithBlankResponse)
                                     If ExitAddonWithBlankResponse Then
-                                        Exit Function
+                                        Return String.Empty
                                     End If
                                 End If
                                 '
@@ -1197,7 +1167,7 @@ Namespace Contensive.Core.Controllers
                                 '#If traceExecuteAddon Then
                                 'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") z"
                                 '#End If
-                                If isMainOk And (Link <> "") Then
+                                If True And (Link <> "") Then
                                     If WorkingOptionString <> "" Then
                                         If genericController.vbInstr(1, Link, "?") = 0 Then
                                             Link = Link & "?" & WorkingOptionString
@@ -1206,7 +1176,7 @@ Namespace Contensive.Core.Controllers
                                         End If
                                     End If
                                     Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
-                                    Link = EncodeAppRootPath(Link, cpCore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
+                                    Link = EncodeAppRootPath(Link, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
                                     ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
                                 End If
                                 '
@@ -1219,21 +1189,21 @@ Namespace Contensive.Core.Controllers
                                 '#If traceExecuteAddon Then
                                 'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") aa"
                                 '#End If
-                                If isMainOk Then
+                                If True Then
                                     Call cpCore.html.main_AddPagetitle2(PageTitle, AddedByName)
                                     Call cpCore.html.main_addMetaDescription2(MetaDescription, AddedByName)
                                     Call cpCore.html.main_addMetaKeywordList2(MetaKeywordList, AddedByName)
                                     Call cpCore.html.main_AddHeadTag2(OtherHeadTags, AddedByName)
                                     If Not blockJavascriptAndCss Then
-                                        Call cpCore.html.main_AddOnLoadJavascript2(JSOnLoad, AddedByName)
-                                        Call cpCore.html.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
-                                        Call cpCore.html.main_AddHeadScriptLink(JSFilename, AddedByName)
+                                        Call cpCore.html.addOnLoadJavascript(JSOnLoad, AddedByName)
+                                        Call cpCore.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
+                                        Call cpCore.html.addJavaScriptLinkHead(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.html.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), AddonName & " default")
                                         End If
-                                        If CustomStylesFilename <> "" Then
-                                            Call cpCore.html.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
-                                        End If
+                                        'If CustomStylesFilename <> "" Then
+                                        '    Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
+                                        'End If
                                     End If
                                 End If
                                 '
@@ -1249,7 +1219,7 @@ Namespace Contensive.Core.Controllers
                                 '#If traceExecuteAddon Then
                                 'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ab"
                                 '#End If
-                                Dim layoutErrors As String
+                                Dim layoutErrors As String = String.Empty
                                 If (Context = CPUtilsBaseClass.addonContext.ContextEditor) Then
                                     '
                                     ' editor -- no encoding and no contentcommands
@@ -1276,7 +1246,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' csv_EncodeContent everything
                                     '
-                                    returnVal = cpCore.html.html_encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
+                                    returnVal = cpCore.html.encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
                                 End If
                                 ''
                                 '' +++++ 9/8/2011, 4.1.482
@@ -1310,7 +1280,7 @@ Namespace Contensive.Core.Controllers
                                     '    '
                                     '    ' Put up an admin hint
                                     '    '
-                                    '    If (Not isMainOk) Or (Context = CPUtilsBaseClass.addonContext.contextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethod) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                    '    If (Not true) Or (Context = CPUtilsBaseClass.addonContext.contextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethod) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
                                     '        '
                                     '        ' Block all output even on error
                                     '        '
@@ -1349,7 +1319,7 @@ Namespace Contensive.Core.Controllers
                             '#If traceExecuteAddon Then
                             'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ae"
                             '#End If
-                            If isMainOk Then
+                            If True Then
                                 If (InFrame And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                     '
                                     ' Return IFrame content
@@ -1419,7 +1389,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' Add Comment wrapper - to help debugging except email, remote methods and admin (empty is used to detect no result)
                                     '
-                                    If isMainOk And (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (Context <> CPUtilsBaseClass.addonContext.ContextEmail) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) And (Context <> CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                    If True And (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (Context <> CPUtilsBaseClass.addonContext.ContextEmail) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) And (Context <> CPUtilsBaseClass.addonContext.ContextSimple) Then
                                         If cpCore.visitProperty.getBoolean("AllowDebugging") Then
                                             AddonCommentName = genericController.vbReplace(AddonName, "-->", "..>")
                                             If IsInline Then
@@ -1469,43 +1439,28 @@ Namespace Contensive.Core.Controllers
         ''' <param name="return_ExitAddonBlankWithResponse"></param>
         ''' <returns></returns>
         Private Function getFormContent(ByVal nothingObject As Object, ByVal FormXML As String, ByRef return_ExitAddonBlankWithResponse As Boolean) As String
-            Dim result As String
+            Dim result As String = ""
             Try
                 '
-                Const LoginMode_None = 1
-                Const LoginMode_AutoRecognize = 2
-                Const LoginMode_AutoLogin = 3
-                '
-                Dim PageSize As Integer
+                'Const LoginMode_None = 1
+                'Const LoginMode_AutoRecognize = 2
+                'Const LoginMode_AutoLogin = 3
                 Dim FieldCount As Integer
                 Dim RowMax As Integer
                 Dim ColumnMax As Integer
-                'Dim RecordField As Field
                 Dim SQLPageSize As Integer
-                'dim dt as datatable
                 Dim ErrorNumber As Integer
                 Dim ErrorDescription As String
-                Dim something As Object(,)
+                Dim something As Object(,) = {}
                 Dim RecordID As Integer
-                'Dim XMLTools As New xmlToolsclass(me)
                 Dim fieldfilename As String
-                'Dim fs As New fileSystemClass
                 Dim FieldDataSource As String
                 Dim FieldSQL As String
-                Dim LoginMode As Integer
-                Dim Help As String
                 Dim Content As New stringBuilderLegacyController
                 Dim Copy As String
                 Dim Button As String
-                Dim PageNotFoundPageID As String
                 Dim Adminui As New adminUIController(cpCore)
-                Dim ButtonList As String
-                Dim AllowLinkAlias As Boolean
-                Dim LinkForwardAutoInsert As Boolean
-                Dim SectionLandingLink As String
-                Dim LandingPageID As String
-                Dim AllowAutoRecognize As Boolean
-                Dim AllowMobileTemplates As Boolean
+                Dim ButtonList As String = String.Empty
                 Dim Filename As String
                 Dim NonEncodedLink As String
                 Dim EncodedLink As String
@@ -1517,14 +1472,12 @@ Namespace Contensive.Core.Controllers
                 Dim TabCnt As Integer
                 Dim TabCell As stringBuilderLegacyController
                 Dim loadOK As Boolean = True
-                Dim FieldValue As String
+                Dim FieldValue As String = String.Empty
                 Dim FieldDescription As String
                 Dim FieldDefaultValue As String
                 Dim IsFound As Boolean
-                Dim Name As String
-                Dim Description As String
-                Dim LoopPtr As Integer
-                Dim XMLFile As String
+                Dim Name As String = String.Empty
+                Dim Description As String = String.Empty
                 Dim Doc As New XmlDocument
                 Dim TabNode As XmlNode
                 Dim SettingNode As XmlNode
@@ -1544,7 +1497,7 @@ Namespace Contensive.Core.Controllers
                     ' Cancel just exits with no content
                     '
                     return_ExitAddonBlankWithResponse = True
-                    Exit Function
+                    Return String.Empty
                 ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Not Admin Error
@@ -1729,7 +1682,7 @@ Namespace Contensive.Core.Controllers
                                     ' Exit on OK or cancel
                                     '
                                     return_ExitAddonBlankWithResponse = True
-                                    Exit Function
+                                    Return String.Empty
                                 End If
                                 '
                                 ' ----- Display Form
@@ -1987,10 +1940,10 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             ' Run the SQL
                                                             '
-                                                            Dim rs As DataTable
+                                                            Dim dt As DataTable = Nothing
                                                             If FieldSQL <> "" Then
                                                                 Try
-                                                                    rs = cpCore.db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
+                                                                    dt = cpCore.db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
                                                                     'RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
 
                                                                 Catch ex As Exception
@@ -2000,87 +1953,88 @@ Namespace Contensive.Core.Controllers
                                                                     loadOK = False
                                                                 End Try
                                                             End If
-                                                            If FieldSQL = "" Then
-                                                                '
-                                                                ' ----- Error
-                                                                '
-                                                                Copy = "No Result"
-                                                            ElseIf ErrorNumber <> 0 Then
-                                                                '
-                                                                ' ----- Error
-                                                                '
-                                                                Copy = "Error: " & Err.Description
-                                                            ElseIf (Not isDataTableOk(rs)) Then
-                                                                '
-                                                                ' ----- no result
-                                                                '
-                                                                Copy = "No Results"
-                                                            ElseIf (rs.Rows.Count = 0) Then
-                                                                '
-                                                                ' ----- no result
-                                                                '
-                                                                Copy = "No Results"
-                                                            Else
-                                                                '
-                                                                ' ----- print results
-                                                                '
-                                                                If rs.Rows.Count > 0 Then
-                                                                    If rs.Rows.Count = 1 And rs.Columns.Count = 1 Then
-                                                                        Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(something(0, 0)), , , , , True)
-                                                                    Else
-                                                                        For Each dr As DataRow In rs.Rows
-                                                                            '
-                                                                            ' Build headers
-                                                                            '
-                                                                            FieldCount = dr.ItemArray.Count
-                                                                            Copy = Copy & (cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;"">")
-                                                                            Copy = Copy & (cr & vbTab & "<tr>")
-                                                                            For Each dc As DataColumn In dr.ItemArray
-                                                                                Copy = Copy & (cr & vbTab & vbTab & "<td class=""ccadminsmall"" style=""border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;"">" & dr(dc).ToString & "</td>")
-                                                                            Next
-                                                                            Copy = Copy & (cr & vbTab & "</tr>")
-                                                                            '
-                                                                            ' Build output table
-                                                                            '
-                                                                            Dim RowStart As String
-                                                                            Dim RowEnd As String
-                                                                            Dim ColumnStart As String
-                                                                            Dim ColumnEnd As String
-                                                                            RowStart = cr & vbTab & "<tr>"
-                                                                            RowEnd = cr & vbTab & "</tr>"
-                                                                            ColumnStart = cr & vbTab & vbTab & "<td class=""ccadminnormal"" style=""border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px"">"
-                                                                            ColumnEnd = "</td>"
-                                                                            Dim RowPointer As Integer
-                                                                            For RowPointer = 0 To RowMax
-                                                                                Copy = Copy & (RowStart)
-                                                                                Dim ColumnPointer As Integer
-                                                                                For ColumnPointer = 0 To ColumnMax
-                                                                                    Dim CellData As Object
-                                                                                    CellData = something(ColumnPointer, RowPointer)
-                                                                                    If IsNull(CellData) Then
-                                                                                        Copy = Copy & (ColumnStart & "[null]" & ColumnEnd)
-                                                                                    ElseIf IsNothing(CellData) Then
-                                                                                        Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
-                                                                                    ElseIf IsArray(CellData) Then
-                                                                                        Copy = Copy & ColumnStart & "[array]"
-                                                                                        'Dim Cnt As Integer
-                                                                                        'Cnt = UBound(CellData)
-                                                                                        'Dim Ptr As Integer
-                                                                                        'For Ptr = 0 To Cnt - 1
-                                                                                        '    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData(Ptr) & "]")
-                                                                                        'Next
-                                                                                        'Copy = Copy & (ColumnEnd)
-                                                                                    ElseIf genericController.encodeText(CellData) = "" Then
-                                                                                        Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
-                                                                                    Else
-                                                                                        Copy = Copy & (ColumnStart & genericController.encodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
-                                                                                    End If
+                                                            If (dt IsNot Nothing) Then
+                                                                If FieldSQL = "" Then
+                                                                    '
+                                                                    ' ----- Error
+                                                                    '
+                                                                    Copy = "No Result"
+                                                                ElseIf ErrorNumber <> 0 Then
+                                                                    '
+                                                                    ' ----- Error
+                                                                    '
+                                                                    Copy = "Error: " & Err.Description
+                                                                ElseIf (Not isDataTableOk(dt)) Then
+                                                                    '
+                                                                    ' ----- no result
+                                                                    '
+                                                                    Copy = "No Results"
+                                                                ElseIf (dt.Rows.Count = 0) Then
+                                                                    '
+                                                                    ' ----- no result
+                                                                    '
+                                                                    Copy = "No Results"
+                                                                Else
+                                                                    '
+                                                                    ' ----- print results
+                                                                    '
+                                                                    If dt.Rows.Count > 0 Then
+                                                                        If dt.Rows.Count = 1 And dt.Columns.Count = 1 Then
+                                                                            Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(something(0, 0)), , , , , True)
+                                                                        Else
+                                                                            For Each dr As DataRow In dt.Rows
+                                                                                '
+                                                                                ' Build headers
+                                                                                '
+                                                                                FieldCount = dr.ItemArray.Count
+                                                                                Copy = Copy & (cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;"">")
+                                                                                Copy = Copy & (cr & vbTab & "<tr>")
+                                                                                For Each dc As DataColumn In dr.ItemArray
+                                                                                    Copy = Copy & (cr & vbTab & vbTab & "<td class=""ccadminsmall"" style=""border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;"">" & dr(dc).ToString & "</td>")
                                                                                 Next
-                                                                                Copy = Copy & (RowEnd)
+                                                                                Copy = Copy & (cr & vbTab & "</tr>")
+                                                                                '
+                                                                                ' Build output table
+                                                                                '
+                                                                                Dim RowStart As String
+                                                                                Dim RowEnd As String
+                                                                                Dim ColumnStart As String
+                                                                                Dim ColumnEnd As String
+                                                                                RowStart = cr & vbTab & "<tr>"
+                                                                                RowEnd = cr & vbTab & "</tr>"
+                                                                                ColumnStart = cr & vbTab & vbTab & "<td class=""ccadminnormal"" style=""border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px"">"
+                                                                                ColumnEnd = "</td>"
+                                                                                Dim RowPointer As Integer
+                                                                                For RowPointer = 0 To RowMax
+                                                                                    Copy = Copy & (RowStart)
+                                                                                    Dim ColumnPointer As Integer
+                                                                                    For ColumnPointer = 0 To ColumnMax
+                                                                                        Dim CellData As Object
+                                                                                        CellData = something(ColumnPointer, RowPointer)
+                                                                                        If IsNull(CellData) Then
+                                                                                            Copy = Copy & (ColumnStart & "[null]" & ColumnEnd)
+                                                                                        ElseIf IsNothing(CellData) Then
+                                                                                            Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
+                                                                                        ElseIf IsArray(CellData) Then
+                                                                                            Copy = Copy & ColumnStart & "[array]"
+                                                                                            'Dim Cnt As Integer
+                                                                                            'Cnt = UBound(CellData)
+                                                                                            'Dim Ptr As Integer
+                                                                                            'For Ptr = 0 To Cnt - 1
+                                                                                            '    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData(Ptr) & "]")
+                                                                                            'Next
+                                                                                            'Copy = Copy & (ColumnEnd)
+                                                                                        ElseIf genericController.encodeText(CellData) = "" Then
+                                                                                            Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
+                                                                                        Else
+                                                                                            Copy = Copy & (ColumnStart & genericController.encodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
+                                                                                        End If
+                                                                                    Next
+                                                                                    Copy = Copy & (RowEnd)
+                                                                                Next
+                                                                                Copy = Copy & (cr & "</table>")
                                                                             Next
-                                                                            Copy = Copy & (cr & "</table>")
-
-                                                                        Next
+                                                                        End If
                                                                     End If
                                                                 End If
                                                             End If
@@ -2132,7 +2086,6 @@ Namespace Contensive.Core.Controllers
         Private Function getFormContent_decodeSelector(ByVal nothingObject As Object, ByVal SitePropertyName As String, ByVal SitePropertyValue As String, ByVal selector As String) As String
             Dim result As String = ""
             Try
-                '
                 Dim ExpandedSelector As String = ""
                 Dim ignore As String = ""
                 Dim OptionCaption As String
@@ -2141,35 +2094,11 @@ Namespace Contensive.Core.Controllers
                 Dim OptionPtr As Integer
                 Dim OptionCnt As Integer
                 Dim OptionValues() As String
-                Dim OptionSuffix As String
+                Dim OptionSuffix As String = String.Empty
                 Dim LCaseOptionDefault As String
                 Dim Pos As Integer
-                Dim Checked As Boolean
-                Dim ParentID As Integer
-                Dim ParentCID As Integer
-                Dim Criteria As String
-                Dim RootCID As Integer
-                Dim SQL As String
-                Dim TableID As Integer
-                Dim TableName As Integer
-                Dim ChildCID As Integer
-                Dim CIDList As String
-                Dim TableName2 As String
-                Dim RecordContentName As String
-                Dim HasParentID As Boolean
-                Dim CS As Integer
-                ' converted array to dictionary - Dim FieldPointer As Integer
-                Dim CSPointer As Integer
-                Dim RecordID As Integer
                 Dim FastString As stringBuilderLegacyController
-                Dim FieldValueInteger As Integer
-                Dim FieldRequired As Boolean
-                Dim FieldHelp As String
-                Dim AuthoringStatusMessage As String
-                Dim Delimiter As String
-                Dim Copy As String
-                '
-                Dim FieldName As String
+                Dim Copy As String = String.Empty
                 '
                 FastString = New stringBuilderLegacyController
                 '
@@ -2294,9 +2223,9 @@ Namespace Contensive.Core.Controllers
             Try
                 Dim Lines() As String
                 Dim sc As New MSScriptControl.ScriptControl
-                Dim Args() As String
+                Dim Args As String() = {}
                 Dim Pos As Integer
-                Dim EntryPointArgs As String
+                Dim EntryPointArgs As String = String.Empty
                 Dim EntryPointName As String
                 Dim Ptr As Integer
                 Dim ReplaceName As String
@@ -2731,104 +2660,43 @@ Namespace Contensive.Core.Controllers
         '====================================================================================================================
         '
         Public Function executeAddonAsProcess(ByVal AddonIDGuidOrName As String, Optional ByVal OptionString As String = "") As String
-            On Error GoTo ErrorTrap 'Const Tn = "ExecuteAddonAsProcess" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim StatusOK As Boolean
-            Dim ErrNumber As Integer
-            Dim ErrSource As String
-            Dim ErrDescription As String
-            Dim TestName As String
-            Dim TestValue As String
-            Dim PairPtr As Integer
-            Dim LCaseTestName As String
-            Dim ScriptingTimeout As Integer
-            Dim ACInstanceID As String
-            Dim AddonOptionConstructor As String
-            Dim AddonOptionExpandedConstructor As String
-            Dim OptionString_ForObjectCall As String
-            Dim CollectionGuid As String
-            Dim IgnoreErrorMessage As String
-            Dim DefaultWrapperID As Integer
-            Dim WrapperID As Integer
-            Dim OptionPair() As String
-            Dim OptionsForCPVars() As NameValuePrivateType
-            Dim OptionPtr As Integer
-            Dim Options() As String
-            Dim CodeFilename As String
-            Dim CSRules As Integer
-            Dim SQL As String
-            Dim ScriptingLanguage As String
-            Dim scriptinglanguageid As Integer
-            Dim ScriptingEntryPoint As String
-            Dim HTMLContent As String
-            Dim AddonGuid As String
-            Dim OptionCnt As Integer
-            Dim OptionsForCPVars_Cnt As Integer
-
-            Dim Ptr As Integer
-            Dim hint As String
-            Dim Criteria As String
-            Dim CS As Integer
-            Dim AddonName As String
-            Dim ProgramID As String
-            Dim ArgumentList As String
-            Dim ScriptingCode As String
-            Dim DotNetClassFullName As String
-            Dim WorkingAddonOptionString As String
-            Dim cmdQueryString As String
-            'Dim runAtServer As runAtServerClass
-            Dim addonId As Integer
-            'Dim AddonGuidOrName As String
-            Dim ProcessStartTick As Integer
-            Dim ReplaceCnt As Integer
-            Dim ReplaceNames() As String
-            Dim ReplaceValues() As String
-            Dim SQLName As String
-            Dim addonPtr As Integer
-            ' Dim taskScheduler As New taskSchedulerServiceClass()
-            '
-            'hint = "csv_executeAddonAsProcess, enter"
-            '
-            ProcessStartTick = GetTickCount
-            addonPtr = cpCore.addonLegacyCache.getPtr(AddonIDGuidOrName)
-            If addonPtr >= 0 Then
-                addonId = genericController.EncodeInteger(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).id)
-                AddonName = genericController.encodeText(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).name)
-                'hint = hint & ",020 addonname=[" & AddonName & "] addonid=[" & addonId & "]"
-            End If
-            '
-            '-----------------------------------------------------------------
-            '   Add to background process queue
-            '-----------------------------------------------------------------
-            '
-            'hint = hint & ",030"
-            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-            '
-            ' runAtServer = New runAtServerClass(Me)
-            ' must nva encode because that is what the server-execute command expects
-            cmdQueryString = "" _
+            Dim result As String = ""
+            Try
+                Dim AddonName As String = String.Empty
+                Dim cmdQueryString As String
+                Dim addonId As Integer
+                Dim ProcessStartTick As Integer
+                Dim addonPtr As Integer
+                '
+                ProcessStartTick = GetTickCount
+                addonPtr = cpCore.addonLegacyCache.getPtr(AddonIDGuidOrName)
+                If addonPtr >= 0 Then
+                    addonId = genericController.EncodeInteger(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).id)
+                    AddonName = genericController.encodeText(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).name)
+                End If
+                '
+                '-----------------------------------------------------------------
+                '   Add to background process queue
+                '-----------------------------------------------------------------
+                '
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+                '
+                cmdQueryString = "" _
                     & "appname=" & encodeNvaArgument(EncodeRequestVariable(cpCore.serverConfig.appConfig.name)) _
                     & "&AddonID=" & CStr(addonId) _
                     & "&OptionString=" & encodeNvaArgument(EncodeRequestVariable(OptionString))
-            'hint = hint & ",035"
-            Dim taskScheduler As New taskSchedulerController()
-            Dim cmdDetail As New cmdDetailClass
-            cmdDetail.addonId = addonId
-            cmdDetail.addonName = AddonName
-            cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(cpCore, cmdQueryString)
-            Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
-            'Call runAtServer.executeCmd("RunProcess", cmdQueryString)
-            '
-            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-            '
-            Exit Function
-ErrorTrap:
-            ErrNumber = Err.Number
-            ErrSource = Err.Source
-            ErrDescription = Err.Description
-            Call Err.Clear()
-            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
+                Dim taskScheduler As New taskSchedulerController()
+                Dim cmdDetail As New cmdDetailClass
+                cmdDetail.addonId = addonId
+                cmdDetail.addonName = AddonName
+                cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(cpCore, cmdQueryString)
+                Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
+                '
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '=============================================================================================================
@@ -2864,12 +2732,12 @@ ErrorTrap:
         ' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
         '====================================================================================================
         '
-        Public Function execute_legacy3(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal WrapperID As Integer = 0, Optional ByVal nothingObject As Object = Nothing) As String
+        Public Function execute_legacy3(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal WrapperID As Integer = 0) As String
             Dim AddonStatusOK As Boolean
             If genericController.vbIsNumeric(AddonIDGuidOrName) Then
-                execute_legacy3 = execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
+                Return execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, Nothing)
             Else
-                execute_legacy3 = execute_legacy2(0, AddonIDGuidOrName, Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
+                Return execute_legacy2(0, AddonIDGuidOrName, Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, Nothing)
             End If
         End Function
         '
@@ -2932,9 +2800,9 @@ ErrorTrap:
             Dim FormInput As String
             Dim OptionPtr As Integer
             Dim QueryString As String
-            Dim LocalCode As String
-            Dim CopyHeader As String
-            Dim CopyContent As String
+            Dim LocalCode As String = String.Empty
+            Dim CopyHeader As String = String.Empty
+            Dim CopyContent As String = String.Empty
             Dim BubbleJS As String
             Dim OptionSplit() As String
             Dim OptionName As String
@@ -3166,7 +3034,7 @@ ErrorTrap:
                     cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addOnLoadJavascript("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                 End If
@@ -3182,44 +3050,29 @@ ErrorTrap:
         '===============================================================================================================================================
         '
         Public Function getAddonStylesBubble(ByVal addonId As Integer, ByRef return_DialogList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetAddonStylesBubble")
-            '
-            Dim DefaultStylesheet As String
-            Dim StyleSheet As String
-            Dim OptionDefault As String
-            Dim OptionSuffix As String
-            Dim OptionCnt As Integer
-            Dim OptionValue_AddonEncoded As String
-            Dim OptionValue As String
-            Dim OptionCaption As String
-            Dim LCaseOptionDefault As String
-            Dim OptionValues() As String
-            Dim FormInput As String
-            Dim OptionPtr As Integer
-            Dim QueryString As String
-            Dim LocalCode As String
-            Dim CopyHeader As String
-            Dim CopyContent As String
-            Dim BubbleJS As String
-            Dim OptionSplit() As String
-            Dim OptionName As String
-            Dim OptionSelector As String
-            Dim Ptr As Integer
-            Dim Pos As Integer
-            Dim CS As Integer
-            Dim AddonName As String
-            '
-            If cpCore.authContext.isAuthenticated() And True Then
-                If cpCore.authContext.isEditingAnything() Then
-                    CS = cpCore.db.csOpenRecord(cnAddons, addonId)
-                    If cpCore.db.cs_ok(CS) Then
-                        AddonName = cpCore.db.cs_getText(CS, "name")
-                        StyleSheet = cpCore.db.cs_get(CS, "CustomStylesFilename")
-                        DefaultStylesheet = cpCore.db.cs_get(CS, "StylesFilename")
-                    End If
-                    Call cpCore.db.cs_Close(CS)
-                    '
-                    CopyHeader = CopyHeader _
+            Dim result As String = String.Empty
+            Try
+                Dim DefaultStylesheet As String = String.Empty
+                Dim StyleSheet As String = String.Empty
+                Dim QueryString As String
+                Dim LocalCode As String = String.Empty
+                Dim CopyHeader As String = String.Empty
+                Dim CopyContent As String
+                Dim BubbleJS As String
+                Dim CS As Integer
+                Dim AddonName As String = String.Empty
+                '
+                If cpCore.authContext.isAuthenticated() And True Then
+                    If cpCore.authContext.isEditingAnything() Then
+                        CS = cpCore.db.csOpenRecord(cnAddons, addonId)
+                        If cpCore.db.cs_ok(CS) Then
+                            AddonName = cpCore.db.cs_getText(CS, "name")
+                            StyleSheet = cpCore.db.cs_get(CS, "CustomStylesFilename")
+                            DefaultStylesheet = cpCore.db.cs_get(CS, "StylesFilename")
+                        End If
+                        Call cpCore.db.cs_Close(CS)
+                        '
+                        CopyHeader = CopyHeader _
                         & "<div class=""ccHeaderCon"">" _
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
                         & "<tr>" _
@@ -3228,64 +3081,64 @@ ErrorTrap:
                         & "</tr>" _
                         & "</table>" _
                         & "</div>"
-                    CopyContent = "" _
+                        CopyContent = "" _
                         & "" _
                         & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
                         & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>" _
                         & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b>" & cpCore.html.html_GetFormInputTextExpandable2("CustomStyles", StyleSheet, 10, "400px") & "</td></tr>"
-                    'CopyContent = "" _
-                    '    & cpcore.main_GetUploadFormStart() _
-                    '    & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
-                    '    & "<tr><td><div style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</div></td></tr>" _
-                    '    & "<tr><td><div style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b></div>" & cpcore.main_GetFormInputTextExpandable2( "CustomStyles", StyleSheet, 10, "400px") & "</td></tr>"
-                    If DefaultStylesheet = "" Then
-                        CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
-                    Else
-                        CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>" & cpCore.html.html_GetFormInputTextExpandable2("DefaultStyles", DefaultStylesheet, 10, "400px", , , True) & "</td></tr>"
-                    End If
-                    CopyContent = "" _
+                        'CopyContent = "" _
+                        '    & cpcore.main_GetUploadFormStart() _
+                        '    & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
+                        '    & "<tr><td><div style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</div></td></tr>" _
+                        '    & "<tr><td><div style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b></div>" & cpcore.main_GetFormInputTextExpandable2( "CustomStyles", StyleSheet, 10, "400px") & "</td></tr>"
+                        If DefaultStylesheet = "" Then
+                            CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
+                        Else
+                            CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>" & cpCore.html.html_GetFormInputTextExpandable2("DefaultStyles", DefaultStylesheet, 10, "400px", , , True) & "</td></tr>"
+                        End If
+                        CopyContent = "" _
                         & CopyContent _
                         & "</tr>" _
                         & "</table>" _
                         & cpCore.html.html_GetFormInputHidden("Type", FormTypeAddonStyleEditor) _
                         & cpCore.html.html_GetFormInputHidden("AddonID", addonId) _
                         & ""
-                    '
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.doc.helpCodeCount & "',this);return false;"""
-                    QueryString = cpCore.doc.refreshQueryString
-                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
-                    Dim Dialog As String
+                        '
+                        BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.doc.helpCodeCount & "',this);return false;"""
+                        QueryString = cpCore.doc.refreshQueryString
+                        QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
+                        'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
+                        Dim Dialog As String = String.Empty
 
-                    Dialog = Dialog _
-                        & "<div class=""ccCon helpDialogCon"">" _
-                        & cpCore.html.html_GetUploadFormStart() _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.doc.helpCodeCount & """ style=""display:none;visibility:hidden;"">" _
-                        & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
-                        & "<tr><td class=""ccButtonCon"">" & cpCore.html.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
-                        & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
-                        & "</table>" _
-                        & "</form>" _
-                        & "</div>"
-                    return_DialogList = return_DialogList & Dialog
-                    getAddonStylesBubble = "" _
-                        & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & ">" _
-                        & GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " & AddonName & " Stylesheets", "Edit " & AddonName & " Stylesheets", "", True, "") _
-                        & "</a>"
-                    If cpCore.doc.helpCodeCount >= cpCore.doc.helpCodeSize Then
-                        cpCore.doc.helpCodeSize = cpCore.doc.helpCodeSize + 10
-                        ReDim Preserve cpCore.doc.helpCodes(cpCore.doc.helpCodeSize)
-                        ReDim Preserve cpCore.doc.helpCaptions(cpCore.doc.helpCodeSize)
+                        Dialog = Dialog _
+                            & "<div class=""ccCon helpDialogCon"">" _
+                            & cpCore.html.html_GetUploadFormStart() _
+                            & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.doc.helpCodeCount & """ style=""display:none;visibility:hidden;"">" _
+                            & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
+                            & "<tr><td class=""ccButtonCon"">" & cpCore.html.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
+                            & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
+                            & "</table>" _
+                            & "</form>" _
+                            & "</div>"
+                        return_DialogList = return_DialogList & Dialog
+                        result = "" _
+                            & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & ">" _
+                            & GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " & AddonName & " Stylesheets", "Edit " & AddonName & " Stylesheets", "", True, "") _
+                            & "</a>"
+                        If cpCore.doc.helpCodeCount >= cpCore.doc.helpCodeSize Then
+                            cpCore.doc.helpCodeSize = cpCore.doc.helpCodeSize + 10
+                            ReDim Preserve cpCore.doc.helpCodes(cpCore.doc.helpCodeSize)
+                            ReDim Preserve cpCore.doc.helpCaptions(cpCore.doc.helpCodeSize)
+                        End If
+                        cpCore.doc.helpCodes(cpCore.doc.helpCodeCount) = LocalCode
+                        cpCore.doc.helpCaptions(cpCore.doc.helpCodeCount) = AddonName
+                        cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     End If
-                    cpCore.doc.helpCodes(cpCore.doc.helpCodeCount) = LocalCode
-                    cpCore.doc.helpCaptions(cpCore.doc.helpCodeCount) = AddonName
-                    cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                 End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("addon_execute_GetAddonStylesBubble")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '===============================================================================================================================================
@@ -3296,18 +3149,18 @@ ErrorTrap:
         Public Function getHelpBubble(ByVal addonId As Integer, ByVal helpCopy As String, ByVal CollectionID As Integer, ByRef return_DialogList As String) As String
             Dim result As String = ""
             Dim QueryString As String
-            Dim LocalCode As String
+            Dim LocalCode As String = String.Empty
             Dim CopyContent As String
             Dim BubbleJS As String
-            Dim AddonName As String
+            Dim AddonName As String = String.Empty
             Dim StyleSN As Integer
             Dim InnerCopy As String
-            Dim CollectionCopy As String
+            Dim CollectionCopy As String = String.Empty
             '
             If cpCore.authContext.isAuthenticated() Then
                 If cpCore.authContext.isEditingAnything() Then
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
-                    'cpCore.html.html_HelpViewerButtonID = "HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount
+                    'cpCore.html.html_HelpViewerButtonID = "HelpBubble" & doccontroller.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy
                     If InnerCopy = "" Then
                         InnerCopy = "<p style=""text-align:center"">No help is available for this add-on.</p>"
@@ -3363,7 +3216,7 @@ ErrorTrap:
                     cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addOnLoadJavascript("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                     result = "" _
@@ -3395,8 +3248,8 @@ ErrorTrap:
             Dim FormInput As String
             Dim OptionPtr As Integer
             Dim QueryString As String
-            Dim LocalCode As String
-            Dim CopyHeader As String
+            Dim LocalCode As String = String.Empty
+            Dim CopyHeader As String = String.Empty
             Dim CopyContent As String
             Dim BubbleJS As String
             Dim OptionSplit() As String
@@ -3405,7 +3258,7 @@ ErrorTrap:
             Dim Ptr As Integer
             Dim Pos As Integer
             Dim CS As Integer
-            Dim AddonName As String
+            Dim AddonName As String = String.Empty
             Dim StyleSN As Integer
             Dim HTMLViewerBubbleID As String
             '
@@ -3453,7 +3306,7 @@ ErrorTrap:
                     'SiteStylesBubbleCache = "x"
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addOnLoadJavascript("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                     getHTMLViewerBubble = "" _
@@ -3471,685 +3324,646 @@ ErrorTrap:
         '
         '
         Private Function getFormContent(ByVal FormXML As String, ByRef return_ExitRequest As Boolean) As String
-            ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetFormContent")
-            '
-            Const LoginMode_None = 1
-            Const LoginMode_AutoRecognize = 2
-            Const LoginMode_AutoLogin = 3
-            '
-            Dim PageSize As Integer
-            Dim FieldCount As Integer
-            Dim RowMax As Integer
-            Dim ColumnMax As Integer
-            'Dim RecordField As Field
-            Dim SQLPageSize As Integer
-            'dim dt as datatable
-            Dim ErrorNumber As Integer
-            Dim ErrorDescription As String
-            Dim dataArray As String(,)
-            Dim RecordID As Integer
-            'Dim XMLTools As New xmlToolsclass(me)
-            Dim fieldfilename As String
-            'Dim fs As New fileSystemClass
-            Dim FieldDataSource As String
-            Dim FieldSQL As String
-            Dim LoginMode As Integer
-            Dim Help As String
-            Dim Content As New stringBuilderLegacyController
-            Dim Copy As String
-            Dim Button As String
-            Dim PageNotFoundPageID As String
-            Dim Adminui As New adminUIController(cpCore)
-            Dim ButtonList As String
-            Dim AllowLinkAlias As Boolean
-            'Dim AllowExternalLinksInChildList As Boolean
-            Dim LinkForwardAutoInsert As Boolean
-            Dim SectionLandingLink As String
-            'Dim app.siteProperty_ServerPageDefault As String
-            Dim LandingPageID As String
-            Dim AllowAutoRecognize As Boolean
-            Dim AllowMobileTemplates As Boolean
-            '
-            '
-            '
-            Dim Filename As String
-            Dim NonEncodedLink As String
-            Dim EncodedLink As String
-            Dim VirtualFilePath As String
-            Dim Option_String As String
-            Dim TabName As String
-            Dim TabDescription As String
-            Dim TabHeading As String
-            Dim TabCnt As Integer
-            Dim TabCell As stringBuilderLegacyController
-            Dim FieldValue As String
-            Dim FieldDescription As String
-            Dim FieldDefaultValue As String
-            Dim IsFound As Boolean
-            Dim Name As String
-            Dim Description As String
-            Dim LoopPtr As Integer
-            Dim XMLFile As String
-            Dim Doc As New XmlDocument
-            Dim TabNode As XmlNode
-            Dim SettingNode As XmlNode
-            Dim CS As Integer
-            Dim FieldName As String
-            Dim FieldCaption As String
-            Dim FieldAddon As String
-            Dim FieldReadOnly As Boolean
-            Dim FieldHTML As Boolean
-            Dim fieldType As String
-            Dim FieldSelector As String
-            Dim DefaultFilename As String
-            '
-            Button = cpCore.docProperties.getText(RequestNameButton)
-            If Button = ButtonCancel Then
+            Dim result As String = ""
+            Try
+                Dim FieldCount As Integer
+                Dim RowMax As Integer
+                Dim ColumnMax As Integer
+                Dim SQLPageSize As Integer
+                Dim ErrorNumber As Integer
+                Dim ErrorDescription As String
+                Dim dataArray As String(,)
+                Dim RecordID As Integer
+                Dim fieldfilename As String
+                Dim FieldDataSource As String
+                Dim FieldSQL As String
+                Dim Content As New stringBuilderLegacyController
+                Dim Copy As String
+                Dim Button As String
+                Dim Adminui As New adminUIController(cpCore)
+                Dim ButtonList As String = String.Empty
+                Dim Filename As String
+                Dim NonEncodedLink As String
+                Dim EncodedLink As String
+                Dim VirtualFilePath As String
+                Dim Option_String As String
+                Dim TabName As String
+                Dim TabDescription As String
+                Dim TabHeading As String
+                Dim TabCnt As Integer
+                Dim TabCell As stringBuilderLegacyController
+                Dim FieldValue As String = String.Empty
+                Dim FieldDescription As String
+                Dim FieldDefaultValue As String
+                Dim IsFound As Boolean
+                Dim Name As String = String.Empty
+                Dim Description As String = String.Empty
+                Dim Doc As New XmlDocument
+                Dim TabNode As XmlNode
+                Dim SettingNode As XmlNode
+                Dim CS As Integer
+                Dim FieldName As String
+                Dim FieldCaption As String
+                Dim FieldAddon As String
+                Dim FieldReadOnly As Boolean
+                Dim FieldHTML As Boolean
+                Dim fieldType As String
+                Dim FieldSelector As String
+                Dim DefaultFilename As String
                 '
-                ' Cancel just exits with no content
-                '
-                return_ExitRequest = True
-                Exit Function
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
-                '
-                ' Not Admin Error
-                '
-                ButtonList = ButtonCancel
-                Content.Add(Adminui.GetFormBodyAdminOnly())
-            Else
-                If True Then
-                    Dim loadOK As Boolean
-                    loadOK = True
-                    Try
+                Button = cpCore.docProperties.getText(RequestNameButton)
+                If Button = ButtonCancel Then
+                    '
+                    ' Cancel just exits with no content
+                    '
+                    return_ExitRequest = True
+                    Return String.Empty
+                ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                    '
+                    ' Not Admin Error
+                    '
+                    ButtonList = ButtonCancel
+                    Content.Add(Adminui.GetFormBodyAdminOnly())
+                Else
+                    If True Then
+                        Dim loadOK As Boolean
+                        loadOK = True
+                        Try
 
-                        Doc.LoadXml(FormXML)
-                    Catch ex As Exception
-                        ' error
-                        '
-                        ButtonList = ButtonCancel
-                        Content.Add("<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">There was a problem with the Setting Page you requested.</div>")
-                        loadOK = False
-                    End Try
-                    '        CS = cpcore.main_OpenCSContentRecord("Setting Pages", SettingPageID)
-                    '        If Not app.csv_IsCSOK(CS) Then
-                    '            '
-                    '            ' Setting Page was not found
-                    '            '
-                    '            ButtonList = ButtonCancel
-                    '            Content.Add( "<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">The Setting Page you requested could not be found.</div>"
-                    '        Else
-                    '            XMLFile = app.cs_get(CS, "xmlfile")
-                    '            Doc = New XmlDocument
-                    'Doc.loadXML (XMLFile)
-                    If loadOK Then
-                    Else
-                        '
-                        ' data is OK
-                        '
-                        If genericController.vbLCase(Doc.DocumentElement.Name) <> "form" Then
-                            '
-                            ' error - Need a way to reach the user that submitted the file
+                            Doc.LoadXml(FormXML)
+                        Catch ex As Exception
+                            ' error
                             '
                             ButtonList = ButtonCancel
                             Content.Add("<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">There was a problem with the Setting Page you requested.</div>")
+                            loadOK = False
+                        End Try
+                        '        CS = cpcore.main_OpenCSContentRecord("Setting Pages", SettingPageID)
+                        '        If Not app.csv_IsCSOK(CS) Then
+                        '            '
+                        '            ' Setting Page was not found
+                        '            '
+                        '            ButtonList = ButtonCancel
+                        '            Content.Add( "<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">The Setting Page you requested could not be found.</div>"
+                        '        Else
+                        '            XMLFile = app.cs_get(CS, "xmlfile")
+                        '            Doc = New XmlDocument
+                        'Doc.loadXML (XMLFile)
+                        If loadOK Then
                         Else
                             '
-                            ' ----- Process Requests
+                            ' data is OK
                             '
-                            If (Button = ButtonSave) Or (Button = ButtonOK) Then
+                            If genericController.vbLCase(Doc.DocumentElement.Name) <> "form" Then
+                                '
+                                ' error - Need a way to reach the user that submitted the file
+                                '
+                                ButtonList = ButtonCancel
+                                Content.Add("<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">There was a problem with the Setting Page you requested.</div>")
+                            Else
+                                '
+                                ' ----- Process Requests
+                                '
+                                If (Button = ButtonSave) Or (Button = ButtonOK) Then
+                                    With Doc.DocumentElement
+                                        For Each SettingNode In .ChildNodes
+                                            Select Case genericController.vbLCase(SettingNode.Name)
+                                                Case "tab"
+                                                    For Each TabNode In SettingNode.ChildNodes
+                                                        Select Case genericController.vbLCase(TabNode.Name)
+                                                            Case "siteproperty"
+                                                                '
+                                                                FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                                FieldValue = cpCore.docProperties.getText(FieldName)
+                                                                fieldType = main_GetXMLAttribute(IsFound, TabNode, "type", "")
+                                                                Select Case genericController.vbLCase(fieldType)
+                                                                    Case "integer"
+                                                                        '
+                                                                        If FieldValue <> "" Then
+                                                                            FieldValue = genericController.EncodeInteger(FieldValue).ToString
+                                                                        End If
+                                                                        Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
+                                                                    Case "boolean"
+                                                                        '
+                                                                        If FieldValue <> "" Then
+                                                                            FieldValue = genericController.EncodeBoolean(FieldValue).ToString
+                                                                        End If
+                                                                        Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
+                                                                    Case "float"
+                                                                        '
+                                                                        If FieldValue <> "" Then
+                                                                            FieldValue = EncodeNumber(FieldValue).ToString
+                                                                        End If
+                                                                        Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
+                                                                    Case "date"
+                                                                        '
+                                                                        If FieldValue <> "" Then
+                                                                            FieldValue = genericController.EncodeDate(FieldValue).ToString
+                                                                        End If
+                                                                        Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
+                                                                    Case "file", "imagefile"
+                                                                        '
+                                                                        If cpCore.docProperties.getBoolean(FieldName & ".DeleteFlag") Then
+                                                                            Call cpCore.siteProperties.setProperty(FieldName, "")
+                                                                        End If
+                                                                        If FieldValue <> "" Then
+                                                                            Filename = FieldValue
+                                                                            VirtualFilePath = "Settings/" & FieldName & "/"
+                                                                            cpCore.cdnFiles.saveUpload(FieldName, VirtualFilePath, Filename)
+                                                                            Call cpCore.siteProperties.setProperty(FieldName, VirtualFilePath & "/" & Filename)
+                                                                        End If
+                                                                    Case "textfile"
+                                                                        '
+                                                                        DefaultFilename = "Settings/" & FieldName & ".txt"
+                                                                        Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename)
+                                                                        If Filename = "" Then
+                                                                            Filename = DefaultFilename
+                                                                            Call cpCore.siteProperties.setProperty(FieldName, DefaultFilename)
+                                                                        End If
+                                                                        Call cpCore.appRootFiles.saveFile(Filename, FieldValue)
+                                                                    Case "cssfile"
+                                                                        '
+                                                                        DefaultFilename = "Settings/" & FieldName & ".css"
+                                                                        Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename)
+                                                                        If Filename = "" Then
+                                                                            Filename = DefaultFilename
+                                                                            Call cpCore.siteProperties.setProperty(FieldName, DefaultFilename)
+                                                                        End If
+                                                                        Call cpCore.appRootFiles.saveFile(Filename, FieldValue)
+                                                                    Case "xmlfile"
+                                                                        '
+                                                                        DefaultFilename = "Settings/" & FieldName & ".xml"
+                                                                        Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename)
+                                                                        If Filename = "" Then
+                                                                            Filename = DefaultFilename
+                                                                            Call cpCore.siteProperties.setProperty(FieldName, DefaultFilename)
+                                                                        End If
+                                                                        Call cpCore.appRootFiles.saveFile(Filename, FieldValue)
+                                                                    Case "currency"
+                                                                        '
+                                                                        If FieldValue <> "" Then
+                                                                            FieldValue = EncodeNumber(FieldValue).ToString
+                                                                            FieldValue = FormatCurrency(FieldValue)
+                                                                        End If
+                                                                        Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
+                                                                    Case "link"
+                                                                        Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
+                                                                    Case Else
+                                                                        Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
+                                                                End Select
+                                                            Case "copycontent"
+                                                                '
+                                                                ' A Copy Content block
+                                                                '
+                                                                FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                                If Not FieldReadOnly Then
+                                                                    FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                                    FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", "false"))
+                                                                    If FieldHTML Then
+                                                                        '
+                                                                        ' treat html as active content for now.
+                                                                        '
+                                                                        FieldValue = cpCore.docProperties.getRenderedActiveContent(FieldName)
+                                                                    Else
+                                                                        FieldValue = cpCore.docProperties.getText(FieldName)
+                                                                    End If
+
+                                                                    CS = cpCore.db.cs_open("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
+                                                                    If Not cpCore.db.cs_ok(CS) Then
+                                                                        Call cpCore.db.cs_Close(CS)
+                                                                        CS = cpCore.db.cs_insertRecord("Copy Content")
+                                                                    End If
+                                                                    If cpCore.db.cs_ok(CS) Then
+                                                                        Call cpCore.db.cs_set(CS, "name", FieldName)
+                                                                        '
+                                                                        ' Set copy
+                                                                        '
+                                                                        Call cpCore.db.cs_set(CS, "copy", FieldValue)
+                                                                        '
+                                                                        ' delete duplicates
+                                                                        '
+                                                                        Call cpCore.db.cs_goNext(CS)
+                                                                        Do While cpCore.db.cs_ok(CS)
+                                                                            Call cpCore.db.cs_deleteRecord(CS)
+                                                                            Call cpCore.db.cs_goNext(CS)
+                                                                        Loop
+                                                                    End If
+                                                                    Call cpCore.db.cs_Close(CS)
+                                                                End If
+
+                                                            Case "filecontent"
+                                                                '
+                                                                ' A File Content block
+                                                                '
+                                                                FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                                If Not FieldReadOnly Then
+                                                                    FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                                    fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
+                                                                    FieldValue = cpCore.docProperties.getText(FieldName)
+                                                                    Call cpCore.appRootFiles.saveFile(fieldfilename, FieldValue)
+                                                                End If
+                                                            Case "dbquery"
+                                                                '
+                                                                ' dbquery has no results to process
+                                                                '
+                                                        End Select
+                                                    Next
+                                                Case Else
+                                            End Select
+                                        Next
+                                    End With
+                                End If
+                                If (Button = ButtonOK) Then
+                                    '
+                                    ' Exit on OK or cancel
+                                    '
+                                    return_ExitRequest = True
+                                    Return String.Empty
+                                End If
+                                '
+                                ' ----- Display Form
+                                '
+                                Content.Add(Adminui.EditTableOpen)
+                                Name = main_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
                                 With Doc.DocumentElement
                                     For Each SettingNode In .ChildNodes
                                         Select Case genericController.vbLCase(SettingNode.Name)
+                                            Case "description"
+                                                Description = SettingNode.InnerText
                                             Case "tab"
+                                                TabCnt = TabCnt + 1
+                                                TabName = main_GetXMLAttribute(IsFound, SettingNode, "name", "")
+                                                TabDescription = main_GetXMLAttribute(IsFound, SettingNode, "description", "")
+                                                TabHeading = main_GetXMLAttribute(IsFound, SettingNode, "heading", "")
+                                                TabCell = New stringBuilderLegacyController
                                                 For Each TabNode In SettingNode.ChildNodes
                                                     Select Case genericController.vbLCase(TabNode.Name)
+                                                        Case "heading"
+                                                            '
+                                                            ' Heading
+                                                            '
+                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                            Call TabCell.Add(Adminui.GetEditSubheadRow(FieldCaption))
                                                         Case "siteproperty"
                                                             '
+                                                            ' Site property
+                                                            '
                                                             FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                            FieldValue = cpCore.docProperties.getText(FieldName)
-                                                            fieldType = main_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            Select Case genericController.vbLCase(fieldType)
-                                                                Case "integer"
+                                                            If FieldName <> "" Then
+                                                                FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                                If FieldCaption = "" Then
+                                                                    FieldCaption = FieldName
+                                                                End If
+                                                                FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
+                                                                fieldType = main_GetXMLAttribute(IsFound, TabNode, "type", "")
+                                                                FieldSelector = main_GetXMLAttribute(IsFound, TabNode, "selector", "")
+                                                                FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
+                                                                FieldAddon = main_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
+                                                                FieldDefaultValue = TabNode.InnerText
+                                                                FieldValue = cpCore.siteProperties.getText(FieldName, FieldDefaultValue)
+                                                                '                                                    If FieldReadOnly Then
+                                                                '                                                        '
+                                                                '                                                        ' Read only = no editor
+                                                                '                                                        '
+                                                                '                                                        Copy = FieldValue & cpcore.main_GetFormInputHidden( FieldName, FieldValue)
+                                                                '
+                                                                '                                                    ElseIf FieldAddon <> "" Then
+                                                                If FieldAddon <> "" Then
                                                                     '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = genericController.EncodeInteger(FieldValue).ToString
-                                                                    End If
-                                                                    Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "boolean"
+                                                                    ' Use Editor Addon
                                                                     '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = genericController.EncodeBoolean(FieldValue).ToString
-                                                                    End If
-                                                                    Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "float"
+                                                                    Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
+                                                                    Copy = execute_legacy5(0, FieldAddon, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
+                                                                ElseIf FieldSelector <> "" Then
                                                                     '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString
-                                                                    End If
-                                                                    Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "date"
+                                                                    ' Use Selector
                                                                     '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = genericController.EncodeDate(FieldValue).ToString
-                                                                    End If
-                                                                    Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "file", "imagefile"
+                                                                    Copy = getFormContent_decodeSelector(FieldName, FieldValue, FieldSelector)
+                                                                Else
                                                                     '
-                                                                    If cpCore.docProperties.getBoolean(FieldName & ".DeleteFlag") Then
-                                                                        Call cpCore.siteProperties.setProperty(FieldName, "")
-                                                                    End If
-                                                                    If FieldValue <> "" Then
-                                                                        Filename = FieldValue
-                                                                        VirtualFilePath = "Settings/" & FieldName & "/"
-                                                                        cpCore.cdnFiles.saveUpload(FieldName, VirtualFilePath, Filename)
-                                                                        Call cpCore.siteProperties.setProperty(FieldName, VirtualFilePath & "/" & Filename)
-                                                                    End If
-                                                                Case "textfile"
+                                                                    ' Use default editor for each field type
                                                                     '
-                                                                    DefaultFilename = "Settings/" & FieldName & ".txt"
-                                                                    Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename)
-                                                                    If Filename = "" Then
-                                                                        Filename = DefaultFilename
-                                                                        Call cpCore.siteProperties.setProperty(FieldName, DefaultFilename)
-                                                                    End If
-                                                                    Call cpCore.appRootFiles.saveFile(Filename, FieldValue)
-                                                                Case "cssfile"
-                                                                    '
-                                                                    DefaultFilename = "Settings/" & FieldName & ".css"
-                                                                    Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename)
-                                                                    If Filename = "" Then
-                                                                        Filename = DefaultFilename
-                                                                        Call cpCore.siteProperties.setProperty(FieldName, DefaultFilename)
-                                                                    End If
-                                                                    Call cpCore.appRootFiles.saveFile(Filename, FieldValue)
-                                                                Case "xmlfile"
-                                                                    '
-                                                                    DefaultFilename = "Settings/" & FieldName & ".xml"
-                                                                    Filename = cpCore.siteProperties.getText(FieldName, DefaultFilename)
-                                                                    If Filename = "" Then
-                                                                        Filename = DefaultFilename
-                                                                        Call cpCore.siteProperties.setProperty(FieldName, DefaultFilename)
-                                                                    End If
-                                                                    Call cpCore.appRootFiles.saveFile(Filename, FieldValue)
-                                                                Case "currency"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString
-                                                                        FieldValue = FormatCurrency(FieldValue)
-                                                                    End If
-                                                                    Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "link"
-                                                                    Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case Else
-                                                                    Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
-                                                            End Select
+                                                                    Select Case genericController.vbLCase(fieldType)
+                                                                        Case "integer"
+                                                                            '
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            End If
+                                                                        Case "boolean"
+                                                                            If FieldReadOnly Then
+                                                                                Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
+                                                                                Copy = genericController.vbReplace(Copy, ">", " disabled>")
+                                                                                Copy = Copy & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
+                                                                            End If
+                                                                        Case "float"
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            End If
+                                                                        Case "date"
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                Copy = cpCore.html.html_GetFormInputDate(FieldName, FieldValue)
+                                                                            End If
+                                                                        Case "file", "imagefile"
+                                                                            '
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                If FieldValue = "" Then
+                                                                                    Copy = cpCore.html.html_GetFormInputFile(FieldName)
+                                                                                Else
+                                                                                    NonEncodedLink = cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, FieldValue)
+                                                                                    EncodedLink = EncodeURL(NonEncodedLink)
+                                                                                    Dim FieldValuefilename As String = ""
+                                                                                    Dim FieldValuePath As String = ""
+                                                                                    cpCore.privateFiles.splitPathFilename(FieldValue, FieldValuePath, FieldValuefilename)
+                                                                                    Copy = "" _
+                                                                                    & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & FieldValuefilename & "]</A>" _
+                                                                                    & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html.html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
+                                                                                    & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.html.html_GetFormInputFile(FieldName)
+                                                                                End If
+                                                                            End If
+                                                                        'Call s.Add("&nbsp;</span></nobr></td>")
+                                                                        Case "currency"
+                                                                            '
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                If FieldValue <> "" Then
+                                                                                    FieldValue = FormatCurrency(FieldValue)
+                                                                                End If
+                                                                                Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            End If
+                                                                        Case "textfile"
+                                                                            '
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                FieldValue = cpCore.cdnFiles.readFile(FieldValue)
+                                                                                If FieldHTML Then
+                                                                                    Copy = cpCore.html.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                Else
+                                                                                    Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
+                                                                                End If
+                                                                            End If
+                                                                        Case "cssfile"
+                                                                            '
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
+                                                                            End If
+                                                                        Case "xmlfile"
+                                                                            '
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
+                                                                            End If
+                                                                        Case "link"
+                                                                            '
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            End If
+                                                                        Case Else
+                                                                            '
+                                                                            ' text
+                                                                            '
+                                                                            If FieldReadOnly Then
+                                                                                Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Else
+                                                                                If FieldHTML Then
+                                                                                    Copy = cpCore.html.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                Else
+                                                                                    Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
+                                                                                End If
+                                                                            End If
+                                                                    End Select
+                                                                End If
+                                                                Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
+                                                            End If
                                                         Case "copycontent"
                                                             '
-                                                            ' A Copy Content block
+                                                            ' Content Copy field
                                                             '
-                                                            FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            If Not FieldReadOnly Then
-                                                                FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", "false"))
-                                                                If FieldHTML Then
-                                                                    '
-                                                                    ' treat html as active content for now.
-                                                                    '
-                                                                    FieldValue = cpCore.docProperties.getRenderedActiveContent(FieldName)
-                                                                Else
-                                                                    FieldValue = cpCore.docProperties.getText(FieldName)
+                                                            FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                            If FieldName <> "" Then
+                                                                FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                                If FieldCaption = "" Then
+                                                                    FieldCaption = FieldName
                                                                 End If
-
-                                                                CS = cpCore.db.cs_open("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
+                                                                FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
+                                                                FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
+                                                                '
+                                                                CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "Copy")
                                                                 If Not cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_Close(CS)
                                                                     CS = cpCore.db.cs_insertRecord("Copy Content")
+                                                                    If cpCore.db.cs_ok(CS) Then
+                                                                        RecordID = cpCore.db.cs_getInteger(CS, "ID")
+                                                                        Call cpCore.db.cs_set(CS, "name", FieldName)
+                                                                        Call cpCore.db.cs_set(CS, "copy", genericController.encodeText(TabNode.InnerText))
+                                                                        Call cpCore.db.cs_save2(CS)
+                                                                        Call cpCore.workflow.publishEdit("Copy Content", RecordID)
+                                                                    End If
                                                                 End If
                                                                 If cpCore.db.cs_ok(CS) Then
-                                                                    Call cpCore.db.cs_set(CS, "name", FieldName)
-                                                                    '
-                                                                    ' Set copy
-                                                                    '
-                                                                    Call cpCore.db.cs_set(CS, "copy", FieldValue)
-                                                                    '
-                                                                    ' delete duplicates
-                                                                    '
-                                                                    Call cpCore.db.cs_goNext(CS)
-                                                                    Do While cpCore.db.cs_ok(CS)
-                                                                        Call cpCore.db.cs_deleteRecord(CS)
-                                                                        Call cpCore.db.cs_goNext(CS)
-                                                                    Loop
+                                                                    FieldValue = cpCore.db.cs_getText(CS, "copy")
                                                                 End If
-                                                                Call cpCore.db.cs_Close(CS)
+                                                                If FieldReadOnly Then
+                                                                    '
+                                                                    ' Read only
+                                                                    '
+                                                                    Copy = FieldValue
+                                                                ElseIf FieldHTML Then
+                                                                    '
+                                                                    ' HTML
+                                                                    '
+                                                                    Copy = cpCore.html.html_GetFormInputHTML3(FieldName, FieldValue)
+                                                                    'Copy = cpcore.main_GetFormInputActiveContent( FieldName, FieldValue)
+                                                                Else
+                                                                    '
+                                                                    ' Text edit
+                                                                    '
+                                                                    Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue)
+                                                                End If
+                                                                Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
                                                             End If
-
                                                         Case "filecontent"
                                                             '
-                                                            ' A File Content block
+                                                            ' Content from a flat file
                                                             '
+                                                            FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                            fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
                                                             FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            If Not FieldReadOnly Then
-                                                                FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                                FieldValue = cpCore.docProperties.getText(FieldName)
-                                                                Call cpCore.appRootFiles.saveFile(fieldfilename, FieldValue)
+                                                            FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
+                                                            FieldDefaultValue = TabNode.InnerText
+                                                            Copy = ""
+                                                            If fieldfilename <> "" Then
+                                                                If cpCore.appRootFiles.fileExists(fieldfilename) Then
+                                                                    Copy = FieldDefaultValue
+                                                                Else
+                                                                    Copy = cpCore.cdnFiles.readFile(fieldfilename)
+                                                                End If
+                                                                If Not FieldReadOnly Then
+                                                                    Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, Copy, 10)
+                                                                End If
                                                             End If
-                                                        Case "dbquery"
+                                                            Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
+                                                        Case "dbquery", "querydb", "query", "db"
                                                             '
-                                                            ' dbquery has no results to process
+                                                            ' Display the output of a query
                                                             '
+                                                            Copy = ""
+                                                            FieldDataSource = main_GetXMLAttribute(IsFound, TabNode, "DataSourceName", "")
+                                                            FieldSQL = TabNode.InnerText
+                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                            FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
+                                                            SQLPageSize = genericController.EncodeInteger(main_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
+                                                            If SQLPageSize = 0 Then
+                                                                SQLPageSize = 100
+                                                            End If
+                                                            '
+                                                            ' Run the SQL
+                                                            '
+                                                            Dim dt As DataTable = Nothing
+
+                                                            If FieldSQL <> "" Then
+                                                                Try
+                                                                    dt = cpCore.db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
+                                                                Catch ex As Exception
+                                                                    ErrorDescription = ex.ToString
+                                                                    loadOK = False
+                                                                End Try
+                                                            End If
+                                                            If (dt IsNot Nothing) Then
+                                                                If FieldSQL = "" Then
+                                                                    '
+                                                                    ' ----- Error
+                                                                    '
+                                                                    Copy = "No Result"
+                                                                ElseIf ErrorNumber <> 0 Then
+                                                                    '
+                                                                    ' ----- Error
+                                                                    '
+                                                                    Copy = "Error: " & Err.Description
+                                                                ElseIf (dt.Rows.Count <= 0) Then
+                                                                    '
+                                                                    ' ----- no result
+                                                                    '
+                                                                    Copy = "No Results"
+                                                                Else
+                                                                    '
+                                                                    ' ----- print results
+                                                                    '
+                                                                    'PageSize = RS.PageSize
+                                                                    '
+                                                                    ' --- Create the Fields for the new table
+                                                                    '
+                                                                    '
+                                                                    'Dim dtOk As Boolean = True
+                                                                    dataArray = cpCore.db.convertDataTabletoArray(dt)
+                                                                    '
+                                                                    RowMax = UBound(dataArray, 2)
+                                                                    ColumnMax = UBound(dataArray, 1)
+                                                                    If RowMax = 0 And ColumnMax = 0 Then
+                                                                        '
+                                                                        ' Single result, display with no table
+                                                                        '
+                                                                        Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(dataArray(0, 0)), , , , , True)
+                                                                    Else
+                                                                        '
+                                                                        ' Build headers
+                                                                        '
+                                                                        FieldCount = dt.Columns.Count
+                                                                        Copy = Copy & (cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;"">")
+                                                                        Copy = Copy & (cr2 & "<tr>")
+                                                                        For Each dc As DataColumn In dt.Columns
+                                                                            Copy = Copy & (cr2 & vbTab & "<td class=""ccadminsmall"" style=""border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;"">" & dc.ColumnName & "</td>")
+                                                                        Next
+                                                                        Copy = Copy & (cr2 & "</tr>")
+                                                                        '
+                                                                        ' Build output table
+                                                                        '
+                                                                        Dim RowStart As String
+                                                                        Dim RowEnd As String
+                                                                        Dim ColumnStart As String
+                                                                        Dim ColumnEnd As String
+                                                                        RowStart = cr2 & "<tr>"
+                                                                        RowEnd = cr2 & "</tr>"
+                                                                        ColumnStart = cr2 & vbTab & "<td class=""ccadminnormal"" style=""border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px"">"
+                                                                        ColumnEnd = "</td>"
+                                                                        Dim RowPointer As Integer
+                                                                        For RowPointer = 0 To RowMax
+                                                                            Copy = Copy & (RowStart)
+                                                                            Dim ColumnPointer As Integer
+                                                                            For ColumnPointer = 0 To ColumnMax
+                                                                                Dim CellData As Object
+                                                                                CellData = dataArray(ColumnPointer, RowPointer)
+                                                                                If IsNull(CellData) Then
+                                                                                    Copy = Copy & (ColumnStart & "[null]" & ColumnEnd)
+                                                                                ElseIf IsNothing(CellData) Then
+                                                                                    Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
+                                                                                ElseIf IsArray(CellData) Then
+                                                                                    Copy = Copy & ColumnStart & "[array]"
+                                                                                ElseIf genericController.encodeText(CellData) = "" Then
+                                                                                    Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
+                                                                                Else
+                                                                                    Copy = Copy & (ColumnStart & genericController.encodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
+                                                                                End If
+                                                                            Next
+                                                                            Copy = Copy & (RowEnd)
+                                                                        Next
+                                                                        Copy = Copy & (cr & "</table>")
+                                                                    End If
+                                                                End If
+                                                            End If
+                                                            Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
                                                     End Select
                                                 Next
+                                                Copy = Adminui.GetEditPanel(True, TabHeading, TabDescription, Adminui.EditTableOpen & TabCell.Text & Adminui.EditTableClose)
+                                                If Copy <> "" Then
+                                                    Call cpCore.html.main_AddLiveTabEntry(Replace(TabName, " ", "&nbsp;"), Copy, "ccAdminTab")
+                                                End If
+                                                'Content.Add( cpcore.main_GetForm_Edit_AddTab(TabName, Copy, True))
+                                                TabCell = Nothing
                                             Case Else
                                         End Select
                                     Next
                                 End With
-                            End If
-                            If (Button = ButtonOK) Then
                                 '
-                                ' Exit on OK or cancel
+                                ' Buttons
                                 '
-                                return_ExitRequest = True
-                                Exit Function
-                            End If
-                            '
-                            ' ----- Display Form
-                            '
-                            Content.Add(Adminui.EditTableOpen)
-                            Name = main_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
-                            With Doc.DocumentElement
-                                For Each SettingNode In .ChildNodes
-                                    Select Case genericController.vbLCase(SettingNode.Name)
-                                        Case "description"
-                                            Description = SettingNode.InnerText
-                                        Case "tab"
-                                            TabCnt = TabCnt + 1
-                                            TabName = main_GetXMLAttribute(IsFound, SettingNode, "name", "")
-                                            TabDescription = main_GetXMLAttribute(IsFound, SettingNode, "description", "")
-                                            TabHeading = main_GetXMLAttribute(IsFound, SettingNode, "heading", "")
-                                            TabCell = New stringBuilderLegacyController
-                                            For Each TabNode In SettingNode.ChildNodes
-                                                Select Case genericController.vbLCase(TabNode.Name)
-                                                    Case "heading"
-                                                        '
-                                                        ' Heading
-                                                        '
-                                                        FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                        Call TabCell.Add(Adminui.GetEditSubheadRow(FieldCaption))
-                                                    Case "siteproperty"
-                                                        '
-                                                        ' Site property
-                                                        '
-                                                        FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                        If FieldName <> "" Then
-                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            If FieldCaption = "" Then
-                                                                FieldCaption = FieldName
-                                                            End If
-                                                            FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
-                                                            fieldType = main_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            FieldSelector = main_GetXMLAttribute(IsFound, TabNode, "selector", "")
-                                                            FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            FieldAddon = main_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
-                                                            FieldDefaultValue = TabNode.InnerText
-                                                            FieldValue = cpCore.siteProperties.getText(FieldName, FieldDefaultValue)
-                                                            '                                                    If FieldReadOnly Then
-                                                            '                                                        '
-                                                            '                                                        ' Read only = no editor
-                                                            '                                                        '
-                                                            '                                                        Copy = FieldValue & cpcore.main_GetFormInputHidden( FieldName, FieldValue)
-                                                            '
-                                                            '                                                    ElseIf FieldAddon <> "" Then
-                                                            If FieldAddon <> "" Then
-                                                                '
-                                                                ' Use Editor Addon
-                                                                '
-                                                                Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
-                                                                Copy = execute_legacy5(0, FieldAddon, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
-                                                            ElseIf FieldSelector <> "" Then
-                                                                '
-                                                                ' Use Selector
-                                                                '
-                                                                Copy = getFormContent_decodeSelector(FieldName, FieldValue, FieldSelector)
-                                                            Else
-                                                                '
-                                                                ' Use default editor for each field type
-                                                                '
-                                                                Select Case genericController.vbLCase(fieldType)
-                                                                    Case "integer"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "boolean"
-                                                                        If FieldReadOnly Then
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
-                                                                            Copy = genericController.vbReplace(Copy, ">", " disabled>")
-                                                                            Copy = Copy & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
-                                                                        End If
-                                                                    Case "float"
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "date"
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = cpCore.html.html_GetFormInputDate(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "file", "imagefile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            If FieldValue = "" Then
-                                                                                Copy = cpCore.html.html_GetFormInputFile(FieldName)
-                                                                            Else
-                                                                                NonEncodedLink = cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, FieldValue)
-                                                                                EncodedLink = EncodeURL(NonEncodedLink)
-                                                                                Dim FieldValuefilename As String = ""
-                                                                                Dim FieldValuePath As String = ""
-                                                                                cpCore.privateFiles.splitPathFilename(FieldValue, FieldValuePath, FieldValuefilename)
-                                                                                Copy = "" _
-                                                                                    & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & FieldValuefilename & "]</A>" _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html.html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.html.html_GetFormInputFile(FieldName)
-                                                                            End If
-                                                                        End If
-                                                                        'Call s.Add("&nbsp;</span></nobr></td>")
-                                                                    Case "currency"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            If FieldValue <> "" Then
-                                                                                FieldValue = FormatCurrency(FieldValue)
-                                                                            End If
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "textfile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            FieldValue = cpCore.cdnFiles.readFile(FieldValue)
-                                                                            If FieldHTML Then
-                                                                                Copy = cpCore.html.html_GetFormInputHTML(FieldName, FieldValue)
-                                                                            Else
-                                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
-                                                                            End If
-                                                                        End If
-                                                                    Case "cssfile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
-                                                                        End If
-                                                                    Case "xmlfile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
-                                                                        End If
-                                                                    Case "link"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case Else
-                                                                        '
-                                                                        ' text
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            If FieldHTML Then
-                                                                                Copy = cpCore.html.html_GetFormInputHTML(FieldName, FieldValue)
-                                                                            Else
-                                                                                Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
-                                                                            End If
-                                                                        End If
-                                                                End Select
-                                                            End If
-                                                            Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                        End If
-                                                    Case "copycontent"
-                                                        '
-                                                        ' Content Copy field
-                                                        '
-                                                        FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                        If FieldName <> "" Then
-                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            If FieldCaption = "" Then
-                                                                FieldCaption = FieldName
-                                                            End If
-                                                            FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
-                                                            '
-                                                            CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "Copy")
-                                                            If Not cpCore.db.cs_ok(CS) Then
-                                                                Call cpCore.db.cs_Close(CS)
-                                                                CS = cpCore.db.cs_insertRecord("Copy Content")
-                                                                If cpCore.db.cs_ok(CS) Then
-                                                                    RecordID = cpCore.db.cs_getInteger(CS, "ID")
-                                                                    Call cpCore.db.cs_set(CS, "name", FieldName)
-                                                                    Call cpCore.db.cs_set(CS, "copy", genericController.encodeText(TabNode.InnerText))
-                                                                    Call cpCore.db.cs_save2(CS)
-                                                                    Call cpCore.workflow.publishEdit("Copy Content", RecordID)
-                                                                End If
-                                                            End If
-                                                            If cpCore.db.cs_ok(CS) Then
-                                                                FieldValue = cpCore.db.cs_getText(CS, "copy")
-                                                            End If
-                                                            If FieldReadOnly Then
-                                                                '
-                                                                ' Read only
-                                                                '
-                                                                Copy = FieldValue
-                                                            ElseIf FieldHTML Then
-                                                                '
-                                                                ' HTML
-                                                                '
-                                                                Copy = cpCore.html.html_GetFormInputHTML3(FieldName, FieldValue)
-                                                                'Copy = cpcore.main_GetFormInputActiveContent( FieldName, FieldValue)
-                                                            Else
-                                                                '
-                                                                ' Text edit
-                                                                '
-                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue)
-                                                            End If
-                                                            Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                        End If
-                                                    Case "filecontent"
-                                                        '
-                                                        ' Content from a flat file
-                                                        '
-                                                        FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                        FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                        fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                        FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                        FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                        FieldDefaultValue = TabNode.InnerText
-                                                        Copy = ""
-                                                        If fieldfilename <> "" Then
-                                                            If cpCore.appRootFiles.fileExists(fieldfilename) Then
-                                                                Copy = FieldDefaultValue
-                                                            Else
-                                                                Copy = cpCore.cdnFiles.readFile(fieldfilename)
-                                                            End If
-                                                            If Not FieldReadOnly Then
-                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, Copy, 10)
-                                                            End If
-                                                        End If
-                                                        Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                    Case "dbquery", "querydb", "query", "db"
-                                                        '
-                                                        ' Display the output of a query
-                                                        '
-                                                        Copy = ""
-                                                        FieldDataSource = main_GetXMLAttribute(IsFound, TabNode, "DataSourceName", "")
-                                                        FieldSQL = TabNode.InnerText
-                                                        FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                        FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                        SQLPageSize = genericController.EncodeInteger(main_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
-                                                        If SQLPageSize = 0 Then
-                                                            SQLPageSize = 100
-                                                        End If
-                                                        '
-                                                        ' Run the SQL
-                                                        '
-                                                        Dim dt As DataTable
-
-                                                        If FieldSQL <> "" Then
-                                                            Try
-                                                                dt = cpCore.db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
-                                                            Catch ex As Exception
-                                                                ErrorDescription = ex.ToString
-                                                                loadOK = False
-                                                            End Try
-                                                        End If
-                                                        If FieldSQL = "" Then
-                                                            '
-                                                            ' ----- Error
-                                                            '
-                                                            Copy = "No Result"
-                                                        ElseIf ErrorNumber <> 0 Then
-                                                            '
-                                                            ' ----- Error
-                                                            '
-                                                            Copy = "Error: " & Err.Description
-                                                        ElseIf (dt.Rows.Count <= 0) Then
-                                                            '
-                                                            ' ----- no result
-                                                            '
-                                                            Copy = "No Results"
-                                                        Else
-                                                            '
-                                                            ' ----- print results
-                                                            '
-                                                            'PageSize = RS.PageSize
-                                                            '
-                                                            ' --- Create the Fields for the new table
-                                                            '
-                                                            '
-                                                            'Dim dtOk As Boolean = True
-                                                            dataArray = cpCore.db.convertDataTabletoArray(dt)
-                                                            '
-                                                            RowMax = UBound(dataArray, 2)
-                                                            ColumnMax = UBound(dataArray, 1)
-                                                            If RowMax = 0 And ColumnMax = 0 Then
-                                                                '
-                                                                ' Single result, display with no table
-                                                                '
-                                                                Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(dataArray(0, 0)), , , , , True)
-                                                            Else
-                                                                '
-                                                                ' Build headers
-                                                                '
-                                                                FieldCount = dt.Columns.Count
-                                                                Copy = Copy & (cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;"">")
-                                                                Copy = Copy & (cr2 & "<tr>")
-                                                                For Each dc As DataColumn In dt.Columns
-                                                                    Copy = Copy & (cr2 & vbTab & "<td class=""ccadminsmall"" style=""border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;"">" & dc.ColumnName & "</td>")
-                                                                    'Copy = Copy & ("<td class=""ccHeaderCon ccAdminSmall"" style=""color:white"">" & RecordField.Name & "</td>")
-                                                                Next
-                                                                Copy = Copy & (cr2 & "</tr>")
-                                                                '
-                                                                ' Build output table
-                                                                '
-                                                                Dim RowStart As String
-                                                                Dim RowEnd As String
-                                                                Dim ColumnStart As String
-                                                                Dim ColumnEnd As String
-                                                                RowStart = cr2 & "<tr>"
-                                                                RowEnd = cr2 & "</tr>"
-                                                                ColumnStart = cr2 & vbTab & "<td class=""ccadminnormal"" style=""border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px"">"
-                                                                ColumnEnd = "</td>"
-                                                                Dim RowPointer As Integer
-                                                                For RowPointer = 0 To RowMax
-                                                                    Copy = Copy & (RowStart)
-                                                                    Dim ColumnPointer As Integer
-                                                                    For ColumnPointer = 0 To ColumnMax
-                                                                        Dim CellData As Object
-                                                                        CellData = dataArray(ColumnPointer, RowPointer)
-                                                                        If IsNull(CellData) Then
-                                                                            Copy = Copy & (ColumnStart & "[null]" & ColumnEnd)
-                                                                        ElseIf IsNothing(CellData) Then
-                                                                            Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
-                                                                        ElseIf IsArray(CellData) Then
-                                                                            Copy = Copy & ColumnStart & "[array]"
-                                                                            'Dim Cnt As Integer
-                                                                            'Cnt = UBound(CellData)
-                                                                            'Dim Ptr As Integer
-                                                                            'For Ptr = 0 To Cnt - 1
-                                                                            '    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData(Ptr) & "]")
-                                                                            'Next
-                                                                            'Copy = Copy & (ColumnEnd)
-                                                                        ElseIf genericController.encodeText(CellData) = "" Then
-                                                                            Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
-                                                                        Else
-                                                                            Copy = Copy & (ColumnStart & genericController.encodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
-                                                                        End If
-                                                                    Next
-                                                                    Copy = Copy & (RowEnd)
-                                                                Next
-                                                                Copy = Copy & (cr & "</table>")
-                                                            End If
-                                                        End If
-                                                        Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                End Select
-                                            Next
-                                            Copy = Adminui.GetEditPanel(True, TabHeading, TabDescription, Adminui.EditTableOpen & TabCell.Text & Adminui.EditTableClose)
-                                            If Copy <> "" Then
-                                                Call cpCore.html.main_AddLiveTabEntry(Replace(TabName, " ", "&nbsp;"), Copy, "ccAdminTab")
-                                            End If
-                                            'Content.Add( cpcore.main_GetForm_Edit_AddTab(TabName, Copy, True))
-                                            TabCell = Nothing
-                                        Case Else
-                                    End Select
-                                Next
-                            End With
-                            '
-                            ' Buttons
-                            '
-                            ButtonList = ButtonCancel & "," & ButtonSave & "," & ButtonOK
-                            '
-                            ' Close Tables
-                            '
-                            'Content.Add( cpcore.main_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormMobileBrowserControl))
-                            '
-                            '
-                            '
-                            If TabCnt > 0 Then
-                                Content.Add(cpCore.html.main_GetLiveTabs())
+                                ButtonList = ButtonCancel & "," & ButtonSave & "," & ButtonOK
+                                '
+                                ' Close Tables
+                                '
+                                If TabCnt > 0 Then
+                                    Content.Add(cpCore.html.main_GetLiveTabs())
+                                End If
                             End If
                         End If
                     End If
                 End If
-            End If
-            '
-            getFormContent = Adminui.GetBody(Name, ButtonList, "", True, True, Description, "", 0, Content.Text)
-            Content = Nothing
-            '
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError10(Err.Number, Err.Source, Err.Description, "addon_execute_GetFormContent", True, False)
+                '
+                getFormContent = Adminui.GetBody(Name, ButtonList, "", True, True, Description, "", 0, Content.Text)
+                Content = Nothing
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '========================================================================
@@ -4159,15 +3973,15 @@ ErrorTrap:
         Private Function getFormContent_decodeSelector(SitePropertyName As String, SitePropertyValue As String, selector As String) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("AdminClass.addon_execute_GetFormContent_decodeSelector")
             '
-            Dim ExpandedSelector As String
-            Dim ignore As String
+            Dim ExpandedSelector As String = String.Empty
+            Dim ignore As String = String.Empty
             Dim OptionCaption As String
             Dim OptionValue As String
             Dim OptionValue_AddonEncoded As String
             Dim OptionPtr As Integer
             Dim OptionCnt As Integer
             Dim OptionValues() As String
-            Dim OptionSuffix As String
+            Dim OptionSuffix As String = String.Empty
             Dim LCaseOptionDefault As String
             Dim Pos As Integer
             Dim Checked As Boolean
@@ -4193,7 +4007,7 @@ ErrorTrap:
             Dim FieldHelp As String
             Dim AuthoringStatusMessage As String
             Dim Delimiter As String
-            Dim Copy As String
+            Dim Copy As String = String.Empty
             Dim Adminui As New adminUIController(cpCore)
             '
             Dim FieldName As String
@@ -4324,7 +4138,6 @@ ErrorTrap:
                 '
                 Dim SavePtr As Integer
                 Dim InstanceTypes() As String
-                Dim InstanceType As String
                 Dim ConstructorTypes() As String
                 Dim ConstructorType As String
                 Dim ConstructorValue As String
@@ -4339,10 +4152,10 @@ ErrorTrap:
                 Dim InstanceName As String
                 Dim InstanceValue As String
                 '
-                Dim ConstructorNameValues() As String
-                Dim ConstructorNames() As String
-                Dim ConstructorSelectors() As String
-                Dim ConstructorValues() As String
+                Dim ConstructorNameValues As String() = {}
+                Dim ConstructorNames As String() = {}
+                Dim ConstructorSelectors As String() = {}
+                Dim ConstructorValues As String() = {}
                 '
                 Dim IPtr As Integer
                 Dim ConstructorCnt As Integer
@@ -4541,23 +4354,23 @@ ErrorTrap:
                 If WrapperSourceForComment <> "" Then
                     SourceComment = SourceComment & " for " & WrapperSourceForComment
                 End If
-                Call cpCore.html.main_AddOnLoadJavascript2(cpCore.db.cs_getText(CS, "javascriptonload"), SourceComment)
-                Call cpCore.html.main_AddEndOfBodyJavascript2(cpCore.db.cs_getText(CS, "javascriptbodyend"), SourceComment)
+                Call cpCore.html.addOnLoadJavascript(cpCore.db.cs_getText(CS, "javascriptonload"), SourceComment)
+                Call cpCore.html.addBodyJavascriptCode(cpCore.db.cs_getText(CS, "javascriptbodyend"), SourceComment)
                 Call cpCore.html.main_AddHeadTag2(cpCore.db.cs_getText(CS, "OtherHeadTags"), SourceComment)
                 '
                 JSFilename = cpCore.db.cs_getText(CS, "jsfilename")
                 If JSFilename <> "" Then
-                    JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
-                    Call cpCore.html.main_AddHeadScriptLink(JSFilename, SourceComment)
+                    JSFilename = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
+                    Call cpCore.html.addJavaScriptLinkHead(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.cs_getText(CS, "stylesfilename")
                 If Copy <> "" Then
                     If genericController.vbInstr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
-                        Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
+                        Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
                     End If
-                    Call cpCore.html.main_AddStylesheetLink2(Copy, SourceComment)
+                    Call cpCore.html.addStyleLink(Copy, SourceComment)
                 End If
                 '
                 If Wrapper <> "" Then
@@ -4621,29 +4434,35 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
-            '
-            Dim NodeAttribute As XmlAttribute
-            Dim ResultNode As XmlNode
-            Dim UcaseName As String
-            '
-            Found = False
-            ResultNode = Node.Attributes.GetNamedItem(Name)
-            If (ResultNode Is Nothing) Then
-                UcaseName = genericController.vbUCase(Name)
-                For Each NodeAttribute In Node.Attributes
-                    If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
-                        main_GetXMLAttribute = NodeAttribute.Value
-                        Found = True
-                        Exit For
-                    End If
-                Next
-            Else
-                main_GetXMLAttribute = ResultNode.Value
-                Found = True
-            End If
-            If Not Found Then
-                main_GetXMLAttribute = DefaultIfNotFound
-            End If
+            Dim result As String = String.Empty
+            Try
+                '
+                Dim NodeAttribute As XmlAttribute
+                Dim ResultNode As XmlNode
+                Dim UcaseName As String
+                '
+                Found = False
+                ResultNode = Node.Attributes.GetNamedItem(Name)
+                If (ResultNode Is Nothing) Then
+                    UcaseName = genericController.vbUCase(Name)
+                    For Each NodeAttribute In Node.Attributes
+                        If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
+                            result = NodeAttribute.Value
+                            Found = True
+                            Exit For
+                        End If
+                    Next
+                Else
+                    result = ResultNode.Value
+                    Found = True
+                End If
+                If Not Found Then
+                    result = DefaultIfNotFound
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '

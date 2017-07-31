@@ -71,6 +71,9 @@ Namespace Contensive.Addons
                 End If
                 logController.appendLog(cpCore, SaveContent, "admin", cpCore.serverConfig.appConfig.name & "-request-")
                 '
+                ' -- refactor, move this to the addon
+                cpCore.html.addStyleLink("/adminSite/styles.css", "AdminSite")
+                '
                 ' main_Get Content
                 '
                 cpCore.db.sqlCommandTimeout = 300
@@ -225,7 +228,7 @@ Namespace Contensive.Addons
             ContentWatchLoaded = False
             editRecord.Loaded = False
             UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
-            Call cpCore.html.main_AddOnLoadJavascript2("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
+            Call cpCore.html.addOnLoadJavascript("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
             '
             '-------------------------------------------------------------------------------
             ' check for member login, if logged in and no admin, lock out
@@ -241,7 +244,8 @@ leak200:
                 '
                 ' --- must be authenticated to continue
                 '
-                Stream.Add(cpCore.html.getLoginPage(False))
+                Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                Stream.Add(loginAddon.getLoginPage(False))
             ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
                 '
                 ' --- member must have proper access to continue
@@ -546,7 +550,7 @@ leak200:
                 '
                 If includeFancyBox Then
                     Call cpCore.addon.execute_legacy4(jQueryFancyBoxGuid)
-                    Call cpCore.html.main_AddHeadJavascript("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});")
+                    Call cpCore.html.addHeadJavascriptCode("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});", "")
                 End If
                 '
                 ' Pickup user errors
@@ -2209,12 +2213,7 @@ ErrorTrap:
         '
         Private Sub LoadEditResponse(adminContent As cdefModel, editRecord As editRecordClass)
             Try
-                '
-                ' converted array to dictionary - Dim FieldPointer As Integer
-                Dim FieldCount As Integer
-                Dim DataSourceName As String
                 Dim PageNotFoundPageID As Integer
-                'Dim LandingPageID As Integer
                 Dim FormFieldListToBeLoaded As String
                 Dim FormEmptyFieldList As String
                 '
@@ -2336,38 +2335,28 @@ ErrorTrap:
         '
         Private Sub LoadEditResponseByPointer(adminContent As cdefModel, editRecord As editRecordClass, field As CDefFieldModel, DataSourceName As String, ByRef FormFieldListToBeLoaded As String, FormEmptyFieldList As String)
             Try
+                Const LoopPtrMax = 100
                 Dim blockDuplicateUsername As Boolean
                 Dim blockDuplicateEmail As Boolean
                 Dim lcaseCopy As String
                 Dim HasImg As Boolean
                 Dim HasInput As Boolean
                 Dim HasAC As Boolean
-                Dim HasText As Boolean
-                'Dim ResponseText As String
                 Dim EditorPixelHeight As Integer
                 Dim EditorRowHeight As Integer
                 Dim HTMLDecode As htmlToTextControllers
                 Dim Copy As String
-                'Dim ResponseValueVariant As Object
                 Dim FieldName As String
                 Dim ResponseFieldValueIsOKToSave As Boolean
                 Dim SQLUnique As String
                 Dim CSPointer As Integer
                 Dim ResponseFieldIsEmpty As Boolean
                 Dim ResponseFieldValueText As String
-                Dim Filename As String
-                'Dim innovaEditor As New innovaEditorAddonClassFPO
                 Dim HTML As New htmlParserController(cpCore)
-                Dim ElementPointer As Integer
-                Dim Result As String
-                Dim Word As String
-                Dim WordList As String
-                'Dim Speller As New kmaSpellCheck2.SpellingClass
                 Dim TabCopy As String = ""
                 Dim ParentID As Integer
                 Dim UsedIDs As String
                 Dim LoopPtr As Integer
-                Const LoopPtrMax = 100
                 Dim CS As Integer
                 Dim InLoadedFieldList As Boolean
                 Dim InEmptyFieldList As Boolean
@@ -3647,7 +3636,7 @@ ErrorTrap:
                             Filename = cpCore.db.cs_get(CS, .nameLc)
                             If Filename <> "" Then
                                 Copy = cpCore.cdnFiles.readFile(Filename)
-                                Copy = cpCore.html.html_encodeContent10(Copy, cpCore.authContext.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything())
+                                Copy = cpCore.html.encodeContent10(Copy, cpCore.authContext.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything())
                                 Stream.Add(Copy)
                             End If
                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany
@@ -3722,9 +3711,7 @@ ErrorTrap:
                 Dim Active As Boolean
                 Dim Name As String
                 Dim WFMessage As String = ""
-                Dim IgnoreInteger As Integer
                 Dim IgnoreString As String = ""
-                Dim IgnoreBoolean As Boolean
                 Dim styleList As String
                 Dim styleOptionList As String = ""
                 Dim fieldEditorList As String
@@ -3736,7 +3723,6 @@ ErrorTrap:
                 Dim TableID As Integer
                 Dim LastSendTestDate As Date
                 Dim AllowEmailSendWithoutTest As Boolean
-                'Dim fieldEditorOptions() As fieldEditorType
                 Dim fieldEditorOptions As New Dictionary(Of String, Integer)
                 Dim Ptr As Integer
                 Dim fieldEditorOptionCnt As Integer
@@ -3752,13 +3738,7 @@ ErrorTrap:
                 Dim IsEmailTable As Boolean
                 Dim IsLandingPageTemp As Boolean
                 Dim Pos As Integer
-                'Dim LandingPageID As Integer
-                Dim PCC As String(,)
-                Dim TestPageID As Integer
-                Dim EditRecordRootPageID As Integer
-                Dim PCCPtr As Integer
                 Dim IsLandingPageParent As Boolean
-                Dim LoopPtr As Integer
                 Dim IsLandingSection As Boolean
                 Dim CreatedCopy As String
                 Dim ModifiedCopy As String
@@ -3869,7 +3849,7 @@ ErrorTrap:
                 '
                 EditReferer = cpCore.docProperties.getText(RequestNameEditReferer)
                 If EditReferer = "" Then
-                    EditReferer = cpCore.webServer.webServerIO_requestReferer
+                    EditReferer = cpCore.webServer.requestReferer
                     If EditReferer <> "" Then
                         '
                         ' special case - if you are coming from the advanced search, go back to the list page
@@ -4198,7 +4178,7 @@ ErrorTrap:
                 ' ----- editor strings needed - needs to be on-demand
                 '
                 editorAddonListJSON = cpCore.html.main_GetEditorAddonListJSON(ContentType)
-                styleList = cpCore.html.main_GetStyleSheet2(ContentType, TemplateIDForStyles, emailIdForStyles)
+                styleList = "" ' cpCore.html.main_GetStyleSheet2(ContentType, TemplateIDForStyles, emailIdForStyles)
                 '
                 ' ----- Create edit page
                 '
@@ -5221,7 +5201,7 @@ ErrorTrap:
                 Dim Pos As Integer
                 Dim editorAddonID As Integer
                 Dim editorReadOnly As Boolean
-                Dim addonOptionString As String
+                Dim addonOptionString As String = String.Empty
                 Dim AllowHelpIcon As Boolean
                 Dim fieldId As Integer
                 Dim FieldHelpFound As Boolean
@@ -6675,8 +6655,8 @@ ErrorTrap:
                         HTMLFieldString = "" _
                             & "<SCRIPT type=text/javascript>" _
                             & vbCrLf & "var ccProto=(('https:'==document.location.protocol) ? 'https://' : 'http://');" _
-                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServer.webServerIO_requestDomain & "/ccLib/ClientSide/Core.js' type='text/javascript'%3E%3C/script%3E""));" _
-                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServer.webServerIO_requestDomain & "/" & genericController.EncodeURL(editRecord.nameLc) & "?requestjsform=1' type='text/javascript'%3E%3C/script%3E""));" _
+                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServer.requestDomain & "/ccLib/ClientSide/Core.js' type='text/javascript'%3E%3C/script%3E""));" _
+                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServer.requestDomain & "/" & genericController.EncodeURL(editRecord.nameLc) & "?requestjsform=1' type='text/javascript'%3E%3C/script%3E""));" _
                             & vbCrLf & "</SCRIPT>"
                         '<SCRIPT type=text/javascript>
                         'var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -7206,7 +7186,7 @@ ErrorTrap:
                     & vbCrLf & "<div style=""padding:20px;height:450px"">" _
                     & vbCrLf & "<div><a href=http://www.Contensive.com target=_blank><img style=""border:1px solid #000;"" src=""/ccLib/images/ContensiveAdminLogo.GIF"" border=0 ></A></div>" _
                     & vbCrLf & "<div><strong>Contensive/" & cpCore.codeVersion & "</strong></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.webServer.webServerIO_requestDomain & "</div></div>" _
+                    & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.webServer.requestDomain & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.authContext.user.Name & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Quick Reports</div><div style=""float:left;""><a Href=""?" & RequestNameAdminForm & "=" & AdminFormQuickStats & """>Real-Time Activity</A></div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.id & """>Run Dashboard</A></div></div>" _
@@ -8125,7 +8105,7 @@ ErrorTrap:
             FastString = New stringBuilderLegacyController
             Call FastString.Add("<tr>")
             Call FastString.Add("<td valign=""top"" align=""right"">" & SpanClassAdminSmall & "Groups</td>")
-            Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal & cpCore.html.main_GetFormInputCheckList("PathRules", "Paths", editRecord.id, "Groups", "Path Rules", "PathID", "GroupID", , "Caption") & "</span></td>")
+            Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal & cpCore.html.getINputChecList2("PathRules", "Paths", editRecord.id, "Groups", "Path Rules", "PathID", "GroupID", , "Caption") & "</span></td>")
             Call FastString.Add("</tr>")
             'Call FastString.Add(adminui.EditTableClose)
             GetForm_Edit_PathRules = Adminui.GetEditPanel((Not allowAdminTabs), "Path Permissions", "Groups that have access to this path", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
@@ -8155,7 +8135,7 @@ ErrorTrap:
             Dim ReportLink As String
             Dim Adminui As New adminUIController(cpCore)
             '
-            GroupList = cpCore.html.main_GetFormInputCheckList("PageContentBlockRules", adminContent.Name, editRecord.id, "Groups", "Page Content Block Rules", "RecordID", "GroupID", , "Caption", False)
+            GroupList = cpCore.html.getINputChecList2("PageContentBlockRules", adminContent.Name, editRecord.id, "Groups", "Page Content Block Rules", "RecordID", "GroupID", , "Caption", False)
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
@@ -8203,7 +8183,7 @@ ErrorTrap:
             Dim ReportLink As String
             Dim Adminui As New adminUIController(cpCore)
             '
-            GroupList = cpCore.html.main_GetFormInputCheckList("LibraryFolderRules", adminContent.Name, editRecord.id, "Groups", "Library Folder Rules", "FolderID", "GroupID", , "Caption")
+            GroupList = cpCore.html.getINputChecList2("LibraryFolderRules", adminContent.Name, editRecord.id, "Groups", "Library Folder Rules", "FolderID", "GroupID", , "Caption")
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
@@ -9721,8 +9701,8 @@ ErrorTrap:
             '        & "}" _
             '        & ""
             '
-            Call cpCore.html.main_AddHeadScriptCode("var docLoaded=false", "Form loader")
-            Call cpCore.html.main_AddOnLoadJavascript2("docLoaded=true;", "Form loader")
+            Call cpCore.html.addHeadJavascriptCode("var docLoaded=false", "Form loader")
+            Call cpCore.html.addOnLoadJavascript("docLoaded=true;", "Form loader")
             s = cpCore.html.html_GetUploadFormStart()
             s = genericController.vbReplace(s, ">", " onSubmit=""cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');"">")
             s = genericController.vbReplace(s, ">", " autocomplete=""off"">")
@@ -10005,28 +9985,28 @@ ErrorTrap:
                             '
                             EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString, 1, 99, vbTextCompare)
                             Call cpCore.privateFiles.deleteFile(EditorStyleRulesFilename)
-                        Case "CCSHAREDSTYLES"
-                            '
-                            ' save and clear editorstylerules for any template
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call LoadContentTrackingDataBase(adminContent, editRecord)
-                            Call LoadContentTrackingResponse(adminContent, editRecord)
-                            'Call LoadAndSaveCalendarEvents
-                            Call LoadAndSaveMetaContent()
-                            'call SaveTopicRules
-                            Call SaveContentTracking(adminContent, editRecord)
-                            '
-                            EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
-                            Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
-                            '
-                            CS = cpCore.db.cs_openCsSql_rev("default", "select id from cctemplates")
-                            Do While cpCore.db.cs_ok(CS)
-                                EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.db.cs_get(CS, "ID"), 1, 99, vbTextCompare)
-                                Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
-                                Call cpCore.db.cs_goNext(CS)
-                            Loop
-                            Call cpCore.db.cs_Close(CS)
+                            'Case "CCSHAREDSTYLES"
+                            '    '
+                            '    ' save and clear editorstylerules for any template
+                            '    '
+                            '    Call SaveEditRecord(adminContent, editRecord)
+                            '    Call LoadContentTrackingDataBase(adminContent, editRecord)
+                            '    Call LoadContentTrackingResponse(adminContent, editRecord)
+                            '    'Call LoadAndSaveCalendarEvents
+                            '    Call LoadAndSaveMetaContent()
+                            '    'call SaveTopicRules
+                            '    Call SaveContentTracking(adminContent, editRecord)
+                            '    '
+                            '    EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
+                            '    Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
+                            '    '
+                            '    CS = cpCore.db.cs_openCsSql_rev("default", "select id from cctemplates")
+                            '    Do While cpCore.db.cs_ok(CS)
+                            '        EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.db.cs_get(CS, "ID"), 1, 99, vbTextCompare)
+                            '        Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
+                            '        Call cpCore.db.cs_goNext(CS)
+                            '    Loop
+                            '    Call cpCore.db.cs_Close(CS)
 
 
                         Case Else
@@ -10968,71 +10948,72 @@ ErrorTrap:
         '========================================================================
         '
         Private Function admin_GetForm_StyleEditor() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_StyleEditor")
-            '
-            Dim Content As New stringBuilderLegacyController
-            Dim Button As String
-            Dim Copy As String
-            Dim ButtonList As String = ""
-            Dim Adminui As New adminUIController(cpCore)
-            Dim Caption As String
-            Dim Description As String
-            'Dim StyleSN as integer
-            Dim AllowCSSReset As Boolean
-            '
-            Button = cpCore.docProperties.getText(RequestNameButton)
-            If Button = ButtonCancel Then
-                '
-                '
-                '
-                Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "StyleEditor, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
-                '
-                '
-                '
-                ButtonList = ButtonCancel
-                Content.Add(Adminui.GetFormBodyAdminOnly())
-            Else
-                'StyleSN = genericController.EncodeInteger(cpCore.main_GetSiteProperty2("StylesheetSerialNumber", false ))
-                AllowCSSReset = False
-                If True Then ' 4.1.101" Then
-                    AllowCSSReset = (cpCore.siteProperties.getBoolean("Allow CSS Reset", False))
-                End If
-                '
-                Copy = cpCore.html.html_GetFormInputTextExpandable("StyleEditor", cpCore.cdnFiles.readFile(DynamicStylesFilename), 20)
-                Copy = genericController.vbReplace(Copy, " cols=""100""", " style=""width:100%;""", 1, 99, vbTextCompare)
-                Copy = "" _
-                    & "<div style=""padding:10px;"">" & cpCore.html.html_GetFormInputCheckBox2(RequestNameAllowCSSReset, AllowCSSReset) & "&nbsp;Include Contensive reset styles</div>" _
-                    & "<div style=""padding:10px;"">" & Copy & "</div>"
+            Return "<div><p>Site Styles are not longer supported. Instead add your styles to addons and add them with template dependencies.</p></div>"
+            '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_StyleEditor")
+            '            '
+            '            Dim Content As New stringBuilderLegacyController
+            '            Dim Button As String
+            '            Dim Copy As String
+            '            Dim ButtonList As String = ""
+            '            Dim Adminui As New adminUIController(cpCore)
+            '            Dim Caption As String
+            '            Dim Description As String
+            '            'Dim StyleSN as integer
+            '            Dim AllowCSSReset As Boolean
+            '            '
+            '            Button = cpCore.docProperties.getText(RequestNameButton)
+            '            If Button = ButtonCancel Then
+            '                '
+            '                '
+            '                '
+            '                Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "StyleEditor, Cancel Button Pressed", False)
+            '            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            '                '
+            '                '
+            '                '
+            '                ButtonList = ButtonCancel
+            '                Content.Add(Adminui.GetFormBodyAdminOnly())
+            '            Else
+            '                'StyleSN = genericController.EncodeInteger(cpCore.main_GetSiteProperty2("StylesheetSerialNumber", false ))
+            '                AllowCSSReset = False
+            '                If True Then ' 4.1.101" Then
+            '                    AllowCSSReset = (cpCore.siteProperties.getBoolean("Allow CSS Reset", False))
+            '                End If
+            '                '
+            '                Copy = cpCore.html.html_GetFormInputTextExpandable("StyleEditor", cpCore.cdnFiles.readFile(DynamicStylesFilename), 20)
+            '                Copy = genericController.vbReplace(Copy, " cols=""100""", " style=""width:100%;""", 1, 99, vbTextCompare)
+            '                Copy = "" _
+            '                    & "<div style=""padding:10px;"">" & cpCore.html.html_GetFormInputCheckBox2(RequestNameAllowCSSReset, AllowCSSReset) & "&nbsp;Include Contensive reset styles</div>" _
+            '                    & "<div style=""padding:10px;"">" & Copy & "</div>"
 
-                '& "<div style=""padding:10px;"">" & cpCore.main_GetFormInputCheckBox2(RequestNameInlineStyles, (StyleSN = 0)) & "&nbsp;Force site styles inline</div>"
+            '                '& "<div style=""padding:10px;"">" & cpCore.main_GetFormInputCheckBox2(RequestNameInlineStyles, (StyleSN = 0)) & "&nbsp;Force site styles inline</div>"
 
-                Content.Add(Copy)
-                ButtonList = ButtonCancel & "," & ButtonRefresh & "," & ButtonSave & "," & ButtonOK
-                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormStyleEditor))
-            End If
-            '
-            Description = "" _
-                & "<p>This tool is used to edit the site styles. When a public page is rendered, the head tag includes styles in this order:" _
-                & "<ol>" _
-                & "<li>Contensive reset styles (optional)</li>" _
-                & "<li>Contensive styles</li>" _
-                & "<li>These site styles (optionally inline)</li>" _
-                & "<li>Shared styles from the template in use</li>" _
-                & "<li>Exclusive styles from the template in use</li>" _
-                & "<li>Add-on styles, first the default styles, then any custom styles included.</li>" _
-                & "</ul>" _
-                & ""
-            admin_GetForm_StyleEditor = Adminui.GetBody("Site Styles", ButtonList, "", True, True, Description, "", 0, Content.Text)
-            '
-            Call cpCore.html.main_AddPagetitle("Style Editor")
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("GetForm_StyleEditor")
-            '
+            '                Content.Add(Copy)
+            '                ButtonList = ButtonCancel & "," & ButtonRefresh & "," & ButtonSave & "," & ButtonOK
+            '                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormStyleEditor))
+            '            End If
+            '            '
+            '            Description = "" _
+            '                & "<p>This tool is used to edit the site styles. When a public page is rendered, the head tag includes styles in this order:" _
+            '                & "<ol>" _
+            '                & "<li>Contensive reset styles (optional)</li>" _
+            '                & "<li>Contensive styles</li>" _
+            '                & "<li>These site styles (optionally inline)</li>" _
+            '                & "<li>Shared styles from the template in use</li>" _
+            '                & "<li>Exclusive styles from the template in use</li>" _
+            '                & "<li>Add-on styles, first the default styles, then any custom styles included.</li>" _
+            '                & "</ul>" _
+            '                & ""
+            '            admin_GetForm_StyleEditor = Adminui.GetBody("Site Styles", ButtonList, "", True, True, Description, "", 0, Content.Text)
+            '            '
+            '            Call cpCore.html.main_AddPagetitle("Style Editor")
+            '            Exit Function
+            '            '
+            '            ' ----- Error Trap
+            '            '
+            'ErrorTrap:
+            '            Call handleLegacyClassError3("GetForm_StyleEditor")
+            '            '
         End Function
         '
         '
@@ -14446,9 +14427,9 @@ ErrorTrap:
                                     End If
                                 End With
                                 Call SaveIndexConfig(IndexConfig)
-                                Exit Function
+                                Return String.Empty
                             Case ButtonCancel
-                                Exit Function
+                                Return String.Empty
                         End Select
                     End If
                     IndexConfig = LoadIndexConfig(adminContent)
@@ -17857,14 +17838,8 @@ ErrorTrap:
         '==========================================================================================================================================
         '
         Public Shared Function main_GetFormInputStyles(cpCore As coreClass, ByVal TagName As String, ByVal StyleCopy As String, Optional ByVal HtmlId As String = "", Optional ByVal HtmlClass As String = "") As String
-            '
-            Dim FieldRows As String
-            Dim FieldOptionRow As String
-            Dim Copy As String
-            '
-            Copy = genericController.encodeHTML(StyleCopy)
-            main_GetFormInputStyles = cpCore.html.html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
+            Dim Copy As String = genericController.encodeHTML(StyleCopy)
+            Return cpCore.html.html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
         End Function
-
     End Class
 End Namespace

@@ -230,7 +230,7 @@ Namespace Contensive.Core.Controllers
                                     End If
                                     .IsForm = False
                                     .IsFile = False
-                                    cpCore.webServer.webServerIO_ReadStreamJSForm = cpCore.webServer.webServerIO_ReadStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
+                                    cpCore.webServer.readStreamJSForm = cpCore.webServer.readStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
                                     cpCore.docProperties.setProperty(key, docProperty)
                                 End If
                             End If

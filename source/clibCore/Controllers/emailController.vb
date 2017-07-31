@@ -194,25 +194,25 @@ Namespace Contensive.Core.Controllers
             End Try
             Return returnStatus
         End Function
-        '
-        '
-        '
-        Public Function getStyles(ByVal EmailID As Integer) As String
-            On Error GoTo ErrorTrap 'Const Tn = "getEmailStyles": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            getStyles = cpcore.html.html_getStyleSheet2(csv_contentTypeEnum.contentTypeEmail, 0, genericController.EncodeInteger(EmailID))
-            If getStyles <> "" Then
-                getStyles = "" _
-                    & vbCrLf & StyleSheetStart _
-                    & vbCrLf & getStyles _
-                    & vbCrLf & StyleSheetEnd
-            End If
-            '
-            '
-            Exit Function
-ErrorTrap:
-            cpCore.handleException(New Exception("Unexpected exception"))
-        End Function
+        '        '
+        '        '
+        '        '
+        '        Public Function getStyles(ByVal EmailID As Integer) As String
+        '            On Error GoTo ErrorTrap 'Const Tn = "getEmailStyles": 'Dim th as integer: th = profileLogMethodEnter(Tn)
+        '            '
+        '            getStyles = cpcore.html.html_getStyleSheet2(csv_contentTypeEnum.contentTypeEmail, 0, genericController.EncodeInteger(EmailID))
+        '            If getStyles <> "" Then
+        '                getStyles = "" _
+        '                    & vbCrLf & StyleSheetStart _
+        '                    & vbCrLf & getStyles _
+        '                    & vbCrLf & StyleSheetEnd
+        '            End If
+        '            '
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            cpCore.handleException(New Exception("Unexpected exception"))
+        '        End Function
         '  
         '========================================================================
         ''' <summary>
@@ -233,8 +233,6 @@ ErrorTrap:
             Try
                 Dim CS As Integer
                 Dim ToAddress As String
-                'Dim MethodName As String
-                Dim rootUrl As String
                 Dim layoutError As String = ""
                 Dim subjectEncoded As String
                 Dim bodyEncoded As String
@@ -260,18 +258,18 @@ ErrorTrap:
                         ' encode subject
                         '
                         subjectEncoded = cpcore.html.html_executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
-                        subjectEncoded = cpcore.html.html_encodeContent10(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        subjectEncoded = cpcore.html.encodeContent10(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode Body
                         '
                         bodyEncoded = cpcore.html.html_executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
-                        bodyEncoded = cpcore.html.html_encodeContent10(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        bodyEncoded = cpcore.html.encodeContent10(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode template
                         '
                         If (templateEncoded <> "") Then
                             templateEncoded = cpcore.html.html_executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
-                            templateEncoded = cpcore.html.html_encodeContent10(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                            templateEncoded = cpcore.html.encodeContent10(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
                                 bodyEncoded = genericController.vbReplace(templateEncoded, fpoContentBox, bodyEncoded)
@@ -351,10 +349,10 @@ ErrorTrap:
             Dim EmailFrom As String
             Dim EmailSubjectSource As String
             Dim EmailBodySource As String
-            Dim ConfirmBody As String
+            Dim ConfirmBody As String = String.Empty
             Dim EmailAllowLinkEID As Boolean
             Dim EmailToConfirmationMemberID As Integer
-            Dim EmailStatusMessage As String
+            Dim EmailStatusMessage As String = String.Empty
             Dim EMailToMemberID As Integer
             Dim EmailSubject As String
             Dim ClickFlagQuery As String
@@ -364,7 +362,7 @@ ErrorTrap:
             Dim SelectList As String
             Dim EMailTemplateID As Integer
             Dim EmailTemplate As String
-            Dim EmailTemplateSource As String
+            Dim EmailTemplateSource As String = String.Empty
             Dim CS As Integer
             Dim isValid As Boolean
             '
@@ -388,7 +386,7 @@ ErrorTrap:
                 Call cpcore.db.cs_set(CSEmail, "FromAddress", cpcore.siteProperties.getText("EmailAdmin", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0)))
                 'Call app.csv_SetCS(CSEmail, "caption", EmailName)
                 Call cpcore.db.cs_Close(CSEmail)
-                Call Err.Raise(ignoreInteger, "dll", "No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent.")
+                cpcore.handleException(New ApplicationException("No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent."))
             Else
                 '
                 ' --- collect values needed for send
@@ -420,8 +418,8 @@ ErrorTrap:
                 '
                 ' add styles to the template
                 '
-                emailstyles = getStyles(EmailRecordID)
-                EmailTemplateSource = emailstyles & EmailTemplateSource
+                'emailstyles = getStyles(EmailRecordID)
+                'EmailTemplateSource = emailstyles & EmailTemplateSource
                 '
                 ' Spam Footer
                 '
@@ -580,22 +578,19 @@ ErrorTrap:
         ''' <param name="ConfirmationMemberID"></param>
         Public Sub sendConfirmationTest(ByVal EmailID As Integer, ByVal ConfirmationMemberID As Integer)
             Try
-                Dim ConfirmFooter As String
+                Dim ConfirmFooter As String = String.Empty
                 Dim TotalCnt As Integer
                 Dim BlankCnt As Integer
                 Dim DupCnt As Integer
-                Dim DupList As String
+                Dim DupList As String = String.Empty
                 Dim BadCnt As Integer
-                Dim BadList As String
-
+                Dim BadList As String = String.Empty
                 Dim EmailLen As Integer
-                Dim Pos As Integer
-
                 Dim LastEmail As String
                 Dim Emailtext As String
-                Dim LastDupEmail As String
+                Dim LastDupEmail As String = String.Empty
                 Dim EmailLine As String
-                Dim TotalList As String
+                Dim TotalList As String = String.Empty
                 Dim EMailName As String
                 Dim EmailMemberID As Integer
                 Dim Posat As Integer
@@ -606,12 +601,10 @@ ErrorTrap:
                 Dim EmailTemplate As String
                 Dim EMailTemplateID As Integer
                 Dim CSTemplate As Integer
-                Dim SpamFooter As String
                 Dim CSPeople As Integer
                 Dim SQL As String
                 Dim EmailStatus As String
-                Dim emailstyles As String
-                Dim layoutError As String
+                ' Dim emailstyles As String
                 '
                 CS = cpcore.db.csOpenRecord("email", EmailID)
                 If Not cpcore.db.cs_ok(CS) Then
@@ -634,8 +627,8 @@ ErrorTrap:
                     '
                     ' styles
                     '
-                    emailstyles = getStyles(EmailID)
-                    EmailBody = emailstyles & EmailBody
+                    'emailstyles = getStyles(EmailID)
+                    'EmailBody = emailstyles & EmailBody
                     '
                     ' spam footer
                     '
@@ -644,7 +637,7 @@ ErrorTrap:
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & requestAppRootPath & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML(cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & requestAppRootPath & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
@@ -752,59 +745,44 @@ ErrorTrap:
         '========================================================================
         '
         Public Sub sendForm(ByVal SendTo As String, ByVal SendFrom As String, ByVal SendSubject As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SendFormEmail")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim Message As String
-            Dim subject As String
-            Dim Result As String
-            Dim RequestFormElementVariant As Object
-            Dim MethodName As String
-            Dim iSendTo As String
-            Dim iSendFrom As String
-            Dim iSendSubject As String
-            Dim Pointer As Integer
-            '
-            iSendTo = genericController.encodeText(SendTo)
-            iSendFrom = genericController.encodeText(SendFrom)
-            iSendSubject = genericController.encodeText(SendSubject)
-            '
-            MethodName = "main_SendFormEmail"
-            '
-            If ((InStr(iSendTo, "@") = 0)) Then
-                iSendTo = cpcore.siteProperties.getText("TrapEmail")
-                iSendSubject = "EmailForm with bad Sendto address"
-                Message = "Subject: " & iSendSubject
+            Try
+                Dim Message As String = String.Empty
+                Dim iSendTo As String
+                Dim iSendFrom As String
+                Dim iSendSubject As String
+                '
+                iSendTo = genericController.encodeText(SendTo)
+                iSendFrom = genericController.encodeText(SendFrom)
+                iSendSubject = genericController.encodeText(SendSubject)
+                '
+                If ((InStr(iSendTo, "@") = 0)) Then
+                    iSendTo = cpcore.siteProperties.getText("TrapEmail")
+                    iSendSubject = "EmailForm with bad Sendto address"
+                    Message = "Subject: " & iSendSubject
+                    Message = Message & vbCrLf
+                End If
+                Message = Message & "The form was submitted " & cpcore.app_startTime & vbCrLf
                 Message = Message & vbCrLf
-            End If
-            Message = Message & "The form was submitted " & cpcore.app_startTime & vbCrLf
-            Message = Message & vbCrLf
-            Message = Message & "All text fields are included, completed or not." & vbCrLf
-            Message = Message & "Only those checkboxes that are checked are included." & vbCrLf
-            Message = Message & "Entries are not in the order they appeared on the form." & vbCrLf
-            Message = Message & vbCrLf
-            For Each key As String In cpcore.docProperties.getKeyList
-                With cpcore.docProperties.getProperty(key)
-                    If .IsForm Then
-                        If genericController.vbUCase(.Value) = "ON" Then
-                            Message = Message & .Name & ": Yes" & vbCrLf & vbCrLf
-                        Else
-                            Message = Message & .Name & ": " & .Value & vbCrLf & vbCrLf
+                Message = Message & "All text fields are included, completed or not." & vbCrLf
+                Message = Message & "Only those checkboxes that are checked are included." & vbCrLf
+                Message = Message & "Entries are not in the order they appeared on the form." & vbCrLf
+                Message = Message & vbCrLf
+                For Each key As String In cpcore.docProperties.getKeyList
+                    With cpcore.docProperties.getProperty(key)
+                        If .IsForm Then
+                            If genericController.vbUCase(.Value) = "ON" Then
+                                Message = Message & .Name & ": Yes" & vbCrLf & vbCrLf
+                            Else
+                                Message = Message & .Name & ": " & .Value & vbCrLf & vbCrLf
+                            End If
                         End If
-                    End If
-                End With
-            Next
-            '
-            Call send_Legacy(iSendTo, iSendFrom, iSendSubject, Message, , False, False)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
-            '
+                    End With
+                Next
+                '
+                Call send_Legacy(iSendTo, iSendFrom, iSendSubject, Message, , False, False)
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
         End Sub
         '
         '
@@ -816,7 +794,7 @@ ErrorTrap:
             '
             Dim rootUrl As String
             Dim MethodName As String
-            Dim Groups() As String
+            Dim Groups As String() = {}
             Dim GroupCount As Integer
             Dim GroupPointer As Integer
             Dim iiGroupList As String
@@ -844,7 +822,7 @@ ErrorTrap:
             '
             ' Fix links for HTML send - must do it now before encodehtml so eid links will attach
             '
-            rootUrl = "http://" & cpcore.webServer.webServerIO_requestDomain & requestAppRootPath
+            rootUrl = "http://" & cpcore.webServer.requestDomain & requestAppRootPath
             iBodySource = genericController.ConvertLinksToAbsolute(iBodySource, rootUrl)
             '
             ' Build the list of groups
@@ -917,21 +895,6 @@ ErrorTrap:
             End If
             Exit Sub
         End Sub
-
-        '
-        '   2.1 compatibility
-        '
-        Public Function getPasswordRecoveryForm() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00278")
-            '
-            'If Not (true) Then Exit Function
-            '
-            getPasswordRecoveryForm = cpcore.html.getSendPasswordForm()
-            '
-            Exit Function
-ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormSendPassword")
-        End Function
         '
         '=============================================================================
         ' Send the Member his username and password
@@ -1027,15 +990,15 @@ ErrorTrap:
                         End If
                         If cpcore.db.cs_ok(CS) Then
                             'hint = "160"
-                            FromAddress = cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.webServerIO_requestDomain)
-                            subject = "Password Request at " & cpcore.webServer.webServerIO_requestDomain
+                            FromAddress = cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.requestDomain)
+                            subject = "Password Request at " & cpcore.webServer.requestDomain
                             Message = ""
                             Do While cpcore.db.cs_ok(CS)
                                 'hint = "170"
                                 updateUser = False
                                 If Message = "" Then
                                     'hint = "180"
-                                    Message = "This email was sent in reply to a request at " & cpcore.webServer.webServerIO_requestDomain & " for the username and password associated with this email address. "
+                                    Message = "This email was sent in reply to a request at " & cpcore.webServer.requestDomain & " for the username and password associated with this email address. "
                                     Message = Message & "If this request was made by you, please return to the login screen and use the following:" & vbCrLf
                                     Message = Message & vbCrLf
                                 Else

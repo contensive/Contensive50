@@ -106,9 +106,7 @@ Namespace Contensive.Core
                 Dim Description As String
                 Dim ButtonList As String = ""
                 Dim CollectionFilename As String
-                Dim CollectionFilePathPage As String
                 Dim CDef_Node As XmlNode
-                'Dim Doc As New XmlDocument
                 Dim CollectionNode As XmlNode
                 Dim status As String = ""
                 Dim AllowInstallFromFolder As Boolean
@@ -886,34 +884,32 @@ Namespace Contensive.Core
         '
         '
         Private Sub GetForm_SafeModeAddonManager_DeleteNavigatorBranch(ByVal EntryName As String, ByVal EntryParentID As Integer)
-            On Error GoTo ErrorTrap
-            '
-            Dim CS As Integer
-            Dim EntryID As Integer
-            '
-            If EntryParentID = 0 Then
-                CS = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
-            Else
-                CS = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.encodeSQLNumber(EntryParentID) & ")")
-            End If
-            If cpCore.db.cs_ok(CS) Then
-                EntryID = cpCore.db.cs_getInteger(CS, "ID")
-            End If
-            Call cpCore.db.cs_Close(CS)
-            '
-            If EntryID <> 0 Then
-                CS = cpCore.db.cs_open(cnNavigatorEntries, "(parentID=" & cpCore.db.encodeSQLNumber(EntryID) & ")")
-                Do While cpCore.db.cs_ok(CS)
-                    Call GetForm_SafeModeAddonManager_DeleteNavigatorBranch(cpCore.db.cs_getText(CS, "name"), EntryID)
-                    Call cpCore.db.cs_goNext(CS)
-                Loop
+            Try
+                Dim CS As Integer
+                Dim EntryID As Integer
+                '
+                If EntryParentID = 0 Then
+                    CS = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
+                Else
+                    CS = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.encodeSQLNumber(EntryParentID) & ")")
+                End If
+                If cpCore.db.cs_ok(CS) Then
+                    EntryID = cpCore.db.cs_getInteger(CS, "ID")
+                End If
                 Call cpCore.db.cs_Close(CS)
-                Call cpCore.db.deleteContentRecord(cnNavigatorEntries, EntryID)
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Call HandleClassTrapError("GetForm_SafeModeAddonManager_DeleteNavigatorBranch")
+                '
+                If EntryID <> 0 Then
+                    CS = cpCore.db.cs_open(cnNavigatorEntries, "(parentID=" & cpCore.db.encodeSQLNumber(EntryID) & ")")
+                    Do While cpCore.db.cs_ok(CS)
+                        Call GetForm_SafeModeAddonManager_DeleteNavigatorBranch(cpCore.db.cs_getText(CS, "name"), EntryID)
+                        Call cpCore.db.cs_goNext(CS)
+                    Loop
+                    Call cpCore.db.cs_Close(CS)
+                    Call cpCore.db.deleteContentRecord(cnNavigatorEntries, EntryID)
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
         '========================================================================

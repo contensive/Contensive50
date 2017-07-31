@@ -67,6 +67,7 @@ Namespace Contensive.Core
             End Get
         End Property
 
+        <Obsolete("This is no longer supported. Add a overriding style in another stylesheet instead of modifying", True)>
         Public Overrides ReadOnly Property BlockDefaultStyles() As String
             Get
                 Return ""

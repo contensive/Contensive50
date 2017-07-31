@@ -194,7 +194,7 @@ Namespace Contensive.Core
                 If False Then
                     Return DomainPrimary
                 Else
-                    Return cpCore.webServer.webServerIO_requestDomain
+                    Return cpCore.webServer.requestDomain
                 End If
             End Get
         End Property
@@ -241,7 +241,7 @@ Namespace Contensive.Core
             If False Then
                 Return Link
             Else
-                Return genericController.EncodeAppRootPath(genericController.encodeText(Link), cpCore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
+                Return genericController.EncodeAppRootPath(genericController.encodeText(Link), cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
             End If
         End Function
 

@@ -51,55 +51,37 @@ Namespace Contensive.Core.Controllers
         ' Test if a key exists in the form collection
         '
         Public Function FieldExists(ByVal Key As String) As Boolean
-            On Error GoTo ErrorTrap
-            '
-            Dim ItemPointer As Integer
-            Dim UcaseKey As String
-            Dim ErrMessage As String
-            '
-            FieldExists = False
-            If (ItemCount > 0) And Not IsNull(Key) Then
-                UcaseKey = genericController.vbUCase(Key)
-                For ItemPointer = 0 To ItemCount - 1
-                    If ItemNames(ItemPointer) = UcaseKey Then
-                        FieldExists = True
-                        Exit For
-                    End If
-                Next
-            End If
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyClassError("FieldExists", Err.Number, Err.Source, Err.Description)
+            Dim result As Boolean = False
+            Try
+                Dim ItemPointer As Integer
+                Dim UcaseKey As String
+                '
+                FieldExists = False
+                If (ItemCount > 0) And Not IsNull(Key) Then
+                    UcaseKey = genericController.vbUCase(Key)
+                    For ItemPointer = 0 To ItemCount - 1
+                        If ItemNames(ItemPointer) = UcaseKey Then
+                            FieldExists = True
+                            Exit For
+                        End If
+                    Next
+                End If
+            Catch ex As Exception
+                Throw
+            End Try
         End Function
 
 
         Public Function Key(ByVal Index As Integer) As String
-            On Error GoTo ErrorTrap
-            '
-            If Index < ItemCount Then
-                Key = ItemNames(Index)
-            End If
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyClassError("FieldExists", Err.Number, Err.Source, Err.Description)
+            Dim result As String = ""
+            Try
+                If Index < ItemCount Then
+                    Key = ItemNames(Index)
+                End If
+            Catch ex As Exception
+                Throw
+            End Try
+            Return result
         End Function
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors in this class
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <param name="ErrNumber"></param>
-        ''' <param name="ErrSource"></param>
-        ''' <param name="ErrDescription"></param>
-        ''' <remarks></remarks>
-        Private Sub handleLegacyClassError(ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String)
-            '
-            On Error GoTo 0
-            Call Err.Raise(ErrNumber, ErrSource, "App.EXEName" & ".Upload." & MethodName & " encountered and error: " & ErrDescription)
-            '
-        End Sub
     End Class
 End Namespace

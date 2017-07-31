@@ -97,7 +97,7 @@ Namespace Contensive.Core
 
         Public Overrides Function EncodeContentForWeb(ByVal Source As String, Optional ByVal ContextContentName As String = "", Optional ByVal ContextRecordID As Integer = 0, Optional ByVal WrapperID As Integer = 0) As String
             If True Then
-                EncodeContentForWeb = CP.core.html.html_encodeContentForWeb(Source, ContextContentName, ContextRecordID, "", WrapperID)
+                EncodeContentForWeb = CP.core.html.encodeContentForWeb(Source, ContextContentName, ContextRecordID, "", WrapperID)
             Else
                 EncodeContentForWeb = ""
             End If
@@ -240,13 +240,13 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String) As String
-            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), 0, Nothing)
+            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), 0)
         End Function
         '
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal WrapperId As Integer) As String
-            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), WrapperId, Nothing)
+            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), WrapperId)
         End Function
         '
         '
@@ -443,7 +443,7 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function EncodeHtmlForWysiwygEditor(Source As String) As String
-            Return CP.core.html.html_encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
+            Return CP.core.html.encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
             'Return CP.core.encodeContent9(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", 1)
         End Function
         '
