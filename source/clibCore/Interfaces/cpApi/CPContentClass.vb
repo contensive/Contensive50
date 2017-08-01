@@ -134,7 +134,12 @@ Namespace Contensive.Core
         End Function
         '
         '====================================================================================================
-        '
+        ''' <summary>
+        ''' returns the matching record name if a match is found, otherwise blank. Does NOT validate the record.
+        ''' </summary>
+        ''' <param name="ContentName"></param>
+        ''' <param name="RecordID"></param>
+        ''' <returns></returns>
         Public Overrides Function GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
             Return cpCore.db.getRecordName(ContentName, RecordID)
         End Function
