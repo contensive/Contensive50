@@ -899,7 +899,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="filePath"></param>
         ''' <param name="returnFilename"></param>
         ''' <returns></returns>
-        Public Function saveUpload(ByVal htmlTagName As String, ByVal path As String, ByRef returnFilename As String) As Boolean
+        Public Function upload(ByVal htmlTagName As String, ByVal path As String, ByRef returnFilename As String) As Boolean
             Dim success As Boolean = False
             Try
                 returnFilename = String.Empty

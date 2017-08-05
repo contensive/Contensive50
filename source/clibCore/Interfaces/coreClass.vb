@@ -575,7 +575,6 @@ Namespace Contensive.Core
                     Dim pairName As String
                     Dim pairValue As String
                     Dim addonRoute As String = ""
-                    Dim routeTest As String
                     Dim normalRoute As String
                     Dim adminRoute As String = serverConfig.appConfig.adminRoute.ToLower
                     Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)

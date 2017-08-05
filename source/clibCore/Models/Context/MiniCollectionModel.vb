@@ -21,6 +21,7 @@ Namespace Contensive.Core.Models.Entity
         '
         ' Content Definitions (some data in CDef, some in the CDef extension)
         '
+        Public name As String
         Public isBaseCollection As Boolean                     ' true only for the one collection created from the base file. This property does not transfer during addSrcToDst
         Public CDef As New Dictionary(Of String, cdefModel)
         Public SQLIndexCnt As Integer

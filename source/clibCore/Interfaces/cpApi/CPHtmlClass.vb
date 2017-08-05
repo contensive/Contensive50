@@ -249,7 +249,7 @@ Namespace Contensive.Core
         <Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")>
         Public Overrides Sub ProcessInputFile(ByVal HtmlName As String, Optional ByVal VirtualFilePath As String = "") 'Inherits BaseClasses.CPHtmlBaseClass.ProcessInputFile
             Dim ignoreFilename As String = ""
-            Call cpCore.cdnFiles.saveUpload(HtmlName, VirtualFilePath, ignoreFilename)
+            Call cpCore.cdnFiles.upload(HtmlName, VirtualFilePath, ignoreFilename)
         End Sub
         ''
         ''====================================================================================================

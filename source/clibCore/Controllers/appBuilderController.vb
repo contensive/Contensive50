@@ -290,6 +290,7 @@ Namespace Contensive.Core.Controllers
                 Dim dt As DataTable
                 Dim Copy As String
                 Dim MethodName As String = "Upgrade2"
+                Dim nonCriticalErrorList As New List(Of String)
                 '
                 '---------------------------------------------------------------------
                 ' ----- verify upgrade is not already in progress
@@ -325,7 +326,7 @@ Namespace Contensive.Core.Controllers
                     ' Update the Db Content from CDef Files
                     '
                     Call appendBuildLog(cpcore, "UpgradeCDef...")
-                    Call addonInstall.installBaseCollection(isNewBuild)
+                    Call addonInstall.installBaseCollection(isNewBuild, nonCriticalErrorList)
                     '
                     '---------------------------------------------------------------------
                     ' ----- Convert Database fields for new Db
@@ -543,7 +544,7 @@ Namespace Contensive.Core.Controllers
                             ErrorMessage = ""
                             'RegisterList = ""
                             Call appendBuildLog(cpcore, "Upgrading All Local Collections to new server build.")
-                            UpgradeOK = addonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, "", IISResetRequired, isNewBuild)
+                            UpgradeOK = addonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, "", IISResetRequired, isNewBuild, nonCriticalErrorList)
                             If ErrorMessage <> "" Then
                                 throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             ElseIf Not UpgradeOK Then
@@ -672,7 +673,7 @@ Namespace Contensive.Core.Controllers
                                                             ErrorMessage = ""
                                                             If Not localCollectionFound Then
                                                                 Call appendBuildLog(cpcore, "...site collection [" & Collectionname & "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.")
-                                                                addonInstallOk = addonInstall.installCollectionFromRemoteRepo(CollectionGuid, ErrorMessage, "", isNewBuild)
+                                                                addonInstallOk = addonInstall.installCollectionFromRemoteRepo(CollectionGuid, ErrorMessage, "", isNewBuild, nonCriticalErrorList)
                                                                 If Not addonInstallOk Then
                                                                     '
                                                                     ' this may be OK so log, but do not call it an error
@@ -682,7 +683,7 @@ Namespace Contensive.Core.Controllers
                                                             Else
                                                                 If upgradeCollection Then
                                                                     Call appendBuildLog(cpcore, "...upgrading collection")
-                                                                    Call addonInstall.installCollectionFromLocalRepo(CollectionGuid, cpcore.codeVersion, ErrorMessage, "", isNewBuild)
+                                                                    Call addonInstall.installCollectionFromLocalRepo(CollectionGuid, cpcore.codeVersion, ErrorMessage, "", isNewBuild, nonCriticalErrorList)
                                                                 End If
                                                             End If
                                                         End If

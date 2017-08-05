@@ -327,7 +327,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================================================
         '
-        Public Function installCollectionFromRemoteRepo(ByVal CollectionGuid As String, ByRef return_ErrorMessage As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean) As Boolean
+        Public Function installCollectionFromRemoteRepo(ByVal CollectionGuid As String, ByRef return_ErrorMessage As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String)) As Boolean
             Dim UpgradeOK As Boolean = True
             Try
                 '
@@ -370,7 +370,7 @@ Namespace Contensive.Core
                 ' Upgrade the server from the collection files
                 '
                 If UpgradeOK Then
-                    UpgradeOK = installCollectionFromLocalRepo(CollectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild)
+                    UpgradeOK = installCollectionFromLocalRepo(CollectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, nonCriticalErrorList)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -383,7 +383,7 @@ Namespace Contensive.Core
         '
         ' Upgrades all collections, registers and resets the server if needed
         '
-        Public Function UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ByRef return_ErrorMessage As String, ByRef return_RegisterList As String, ByRef return_IISResetRequired As Boolean, IsNewBuild As Boolean) As Boolean
+        Public Function UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ByRef return_ErrorMessage As String, ByRef return_RegisterList As String, ByRef return_IISResetRequired As Boolean, IsNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String)) As Boolean
             Dim returnOk As Boolean = True
             Try
                 Dim localCollectionUpToDate As Boolean
@@ -643,7 +643,7 @@ Namespace Contensive.Core
                                                                                                 ' Upgrade the apps from the collection files, do not install on any apps
                                                                                                 '
                                                                                                 If returnOk Then
-                                                                                                    returnOk = installCollectionFromLocalRepo(LibGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild)
+                                                                                                    returnOk = installCollectionFromLocalRepo(LibGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild, nonCriticalErrorList)
                                                                                                     If allowLogging Then logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), UpgradeAllAppsFromLocalCollection returned " & returnOk)
                                                                                                 End If
                                                                                                 '
@@ -986,13 +986,14 @@ Namespace Contensive.Core
                                                             If ChildCollectionGUID = "" Then
                                                                 ChildCollectionGUID = CDefSection.InnerText
                                                             End If
+                                                            Dim statusMsg As String = "Installing collection [" & ChildCollectionName & ", " & ChildCollectionGUID & "] referenced from collection [" & Collectionname & "]"
                                                             Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" & ChildCollectionName & "], childCollectionGuid [" & ChildCollectionGUID & "]")
                                                             If genericController.vbInstr(1, CollectionVersionPath, ChildCollectionGUID, vbTextCompare) = 0 Then
                                                                 If ChildCollectionGUID = "" Then
                                                                     '
                                                                     ' -- Needs a GUID to install
                                                                     result = False
-                                                                    return_ErrorMessage = "The installation can not continue because an imported collection [" & ChildCollectionName & "] could not be downloaded because it does not include a valid GUID."
+                                                                    return_ErrorMessage = statusMsg & "The installation can not continue because an imported collection could not be downloaded because it does not include a valid GUID."
                                                                     Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, return message [" & return_ErrorMessage & "]")
                                                                 ElseIf GetCollectionPath(ChildCollectionGUID) = "" Then
                                                                     Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], not found so needs to be installed")
@@ -1005,11 +1006,12 @@ Namespace Contensive.Core
                                                                     '
                                                                     StatusOK = DownloadCollectionFiles(ChildWorkingPath, ChildCollectionGUID, ChildCollectionLastChangeDate, return_ErrorMessage)
                                                                     If Not StatusOK Then
-                                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
+
+                                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & statusMsg & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
                                                                         If return_ErrorMessage = "" Then
-                                                                            return_ErrorMessage = "The installation can not continue because there was an unknown error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]."
+                                                                            return_ErrorMessage = statusMsg & "The installation can not continue because there was an unknown error while downloading the necessary collection file, [" & ChildCollectionGUID & "]."
                                                                         Else
-                                                                            return_ErrorMessage = "The installation can not continue because there was an error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
+                                                                            return_ErrorMessage = statusMsg & "The installation can not continue because there was an error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
                                                                         End If
                                                                     Else
                                                                         Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned OK")
@@ -1019,11 +1021,11 @@ Namespace Contensive.Core
                                                                         Dim ChildCollectionGUIDList As New List(Of String)
                                                                         StatusOK = BuildLocalCollectionReposFromFolder(ChildWorkingPath, ChildCollectionLastChangeDate, ChildCollectionGUIDList, return_ErrorMessage, allowLogging)
                                                                         If Not StatusOK Then
-                                                                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
+                                                                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & statusMsg & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
                                                                             If return_ErrorMessage = "" Then
-                                                                                return_ErrorMessage = "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]."
+                                                                                return_ErrorMessage = statusMsg & "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]."
                                                                             Else
-                                                                                return_ErrorMessage = "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
+                                                                                return_ErrorMessage = statusMsg & "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
                                                                             End If
                                                                         End If
                                                                     End If
@@ -1113,17 +1115,12 @@ Namespace Contensive.Core
         '   ImportFromCollectionsGuidList - If this collection is from an import, this is the guid of the import.
         '=========================================================================================================================
         '
-        Public Function installCollectionFromLocalRepo(ByVal CollectionGuid As String, ByVal ignore_BuildVersion As String, ByRef return_ErrorMessage As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean) As Boolean
+        Public Function installCollectionFromLocalRepo(ByVal CollectionGuid As String, ByVal ignore_BuildVersion As String, ByRef return_ErrorMessage As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String)) As Boolean
             Dim result As Boolean = False
             Try
                 '
-                Dim NodeName As String
-                Dim nodeGuid As String
-                Dim sharedStyleId As Integer
                 Dim fieldLookupId As Integer
                 Dim ChildCollectionID As Integer
-                Dim ScriptingGuid As String
-                Dim ScriptingName As String
                 Dim ResourceType As String
                 Dim ResourcePath As String
                 Dim SrcPath As String
@@ -1172,7 +1169,6 @@ Namespace Contensive.Core
                 Dim FieldName As String
                 Dim FieldValue As String = String.Empty
                 Dim CS As Integer
-                Dim Criteria As String
                 Dim DstFilePath As String
                 Dim AOName As String = String.Empty
                 Dim IsFound As Boolean
@@ -1410,7 +1406,7 @@ Namespace Contensive.Core
                                                                         Else
                                                                             Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, import collection found, name [" & ChildCollectionName & "], guid [" & ChildCollectionGUID & "]")
                                                                             If True Then
-                                                                                Call installCollectionFromRemoteRepo(ChildCollectionGUID, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild)
+                                                                                Call installCollectionFromRemoteRepo(ChildCollectionGUID, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, nonCriticalErrorList)
                                                                             Else
                                                                                 If ChildCollectionGUID = "" Then
                                                                                     status = "The importcollection node [" & ChildCollectionName & "] can not be upgraded because it does not include a valid guid."
@@ -1430,7 +1426,7 @@ Namespace Contensive.Core
                                                                                         ' It is installed in the local collections, update just this site
                                                                                         '
                                                                                         'Call AppendClassLogFile(cmc.appEnvironment.name, "UpgradeAppFromLocalCollection", "processing importcollection node [" & ChildCollectionName & "] of collection [" & Collectionname & "], GUID [" & CollectionGuid & "]. The collection is installed locally, so only this site will be updated.")
-                                                                                        UpgradeOK = UpgradeOK And installCollectionFromLocalRepo(ChildCollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild)
+                                                                                        UpgradeOK = UpgradeOK And installCollectionFromLocalRepo(ChildCollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild, nonCriticalErrorList)
                                                                                         'UpgradeOK = UpgradeOK And UpgradeAppFromLocalCollection(cmc, Upgrade, Parent_NavID, Return_IISResetRequired, ChildCollectionGUID, cpCore.app.dataBuildVersion, Return_ErrorMessage, Return_RegisterList, ImportFromCollectionsGuidList & "," & CollectionGuid)
                                                                                     Else
                                                                                         '
@@ -1652,7 +1648,7 @@ Namespace Contensive.Core
                                                                         CollectionWrapper = "<" & CollectionFileRootNode & ">" & CollectionWrapper & "</" & CollectionFileRootNode & ">"
                                                                         'saveLogFolder = builder.classLogFolder
                                                                         'builder.classLogFolder = "AddonInstall"
-                                                                        Call installCollectionFromLocalRepo_BuildDbFromXmlData(CollectionWrapper, IsNewBuild, isBaseCollection)
+                                                                        Call installCollectionFromLocalRepo_BuildDbFromXmlData(CollectionWrapper, IsNewBuild, isBaseCollection, nonCriticalErrorList)
                                                                         'builder.classLogFolder = saveLogFolder
                                                                         '
                                                                         ' Process nodes to save Collection data
@@ -2445,7 +2441,7 @@ Namespace Contensive.Core
         ' Installs Addons in a source folder
         '======================================================================================================
         '
-        Public Function InstallCollectionsFromPrivateFolder(ByVal privateFolder As String, ByRef return_ErrorMessage As String, ByRef return_CollectionGUIDList As List(Of String), IsNewBuild As Boolean) As Boolean
+        Public Function InstallCollectionsFromPrivateFolder(ByVal privateFolder As String, ByRef return_ErrorMessage As String, ByRef return_CollectionGUIDList As List(Of String), IsNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String)) As Boolean
             Dim returnSuccess As Boolean = False
             Try
                 Dim CollectionLastChangeDate As Date
@@ -2459,7 +2455,7 @@ Namespace Contensive.Core
                     Call appendInstallLog("", "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
                 Else
                     For Each collectionGuid As String In return_CollectionGUIDList
-                        If Not installCollectionFromLocalRepo(collectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild) Then
+                        If Not installCollectionFromLocalRepo(collectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild, nonCriticalErrorList) Then
                             Call appendInstallLog("", "InstallCollectionFilesFromPrivateFolder", "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
                             Exit For
                         End If
@@ -2479,7 +2475,7 @@ Namespace Contensive.Core
         ' Installs Addons in a source file
         '======================================================================================================
         '
-        Public Function InstallCollectionsFromPrivateFile(ByVal pathFilename As String, ByRef return_ErrorMessage As String, ByRef return_CollectionGUID As String, IsNewBuild As Boolean) As Boolean
+        Public Function InstallCollectionsFromPrivateFile(ByVal pathFilename As String, ByRef return_ErrorMessage As String, ByRef return_CollectionGUID As String, IsNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String)) As Boolean
             Dim returnSuccess As Boolean = False
             Try
                 Dim CollectionLastChangeDate As Date
@@ -2492,7 +2488,7 @@ Namespace Contensive.Core
                     '
                     Call appendInstallLog("", "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
                 Else
-                    returnSuccess = installCollectionFromLocalRepo(return_CollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild)
+                    returnSuccess = installCollectionFromLocalRepo(return_CollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild, nonCriticalErrorList)
                     If Not returnSuccess Then
                         '
                         ' Upgrade all apps failed
@@ -2653,8 +2649,6 @@ Namespace Contensive.Core
         Private Sub InstallCollectionFromLocalRepo_addonNode_Phase1(ByVal AddonNode As XmlNode, ByVal AddonGuidFieldName As String, ByVal ignore_BuildVersion As String, ByVal CollectionID As Integer, ByRef return_UpgradeOK As Boolean, ByRef return_ErrorMessage As String)
             Try
                 '
-                Dim sharedStyleId As Integer
-                Dim nodeNameOrGuid As String
                 Dim fieldTypeID As Integer
                 Dim fieldType As String
                 Dim test As String
@@ -3863,7 +3857,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Public Sub installBaseCollection(isNewBuild As Boolean)
+        Public Sub installBaseCollection(isNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String))
             Try
                 Dim tmpFolderPath As String = "tmp" & genericController.GetRandomInteger().ToString & "\"
                 Dim ignoreString As String = ""
@@ -3880,7 +3874,7 @@ Namespace Contensive.Core
                     Dim CollectionNew As New miniCollectionModel
                     Dim baseCollectionXml As String = cpCore.programFiles.readFile("aoBase5.xml")
                     Call installCollection_LoadXmlToMiniCollection(baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
-                    Call installCollection_BuildDbFromMiniCollection(CollectionNew, cpCore.siteProperties.dataBuildVersion, isNewBuild)
+                    Call installCollection_BuildDbFromMiniCollection(CollectionNew, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
                 End If
                 '
                 ' now treat as a regular collection and install - to pickup everything else 
@@ -3888,7 +3882,7 @@ Namespace Contensive.Core
                 cpCore.privateFiles.createPath(tmpFolderPath)
                 cpCore.programFiles.copyFile("aoBase5.xml", tmpFolderPath & "aoBase5.xml", cpCore.privateFiles)
                 Dim ignoreList As New List(Of String)
-                If Not InstallCollectionsFromPrivateFolder(tmpFolderPath, returnErrorMessage, ignoreList, isNewBuild) Then
+                If Not InstallCollectionsFromPrivateFolder(tmpFolderPath, returnErrorMessage, ignoreList, isNewBuild, nonCriticalErrorList) Then
                     Throw New ApplicationException(returnErrorMessage)
                 End If
                 cpCore.privateFiles.DeleteFileFolder(tmpFolderPath)
@@ -3926,7 +3920,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Public Sub installCollectionFromLocalRepo_BuildDbFromXmlData(ByVal XMLText As String, isNewBuild As Boolean, isBaseCollection As Boolean)
+        Public Sub installCollectionFromLocalRepo_BuildDbFromXmlData(ByVal XMLText As String, isNewBuild As Boolean, isBaseCollection As Boolean, ByRef nonCriticalErrorList As List(Of String))
             Try
                 '
                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "installCollectionFromLocalRepo_BuildDbFromXmlData", "Application: " & cpCore.serverConfig.appConfig.name)
@@ -3936,7 +3930,7 @@ Namespace Contensive.Core
                 Dim miniCollectionWorking As miniCollectionModel = installCollection_GetApplicationMiniCollection(isNewBuild)
                 Call installCollection_LoadXmlToMiniCollection(XMLText, miniCollectionToAdd, isBaseCollection, False, isNewBuild, miniCollectionWorking)
                 Call installCollection_AddMiniCollectionSrcToDst(miniCollectionWorking, miniCollectionToAdd, True)
-                Call installCollection_BuildDbFromMiniCollection(miniCollectionWorking, cpCore.siteProperties.dataBuildVersion, isNewBuild)
+                Call installCollection_BuildDbFromMiniCollection(miniCollectionWorking, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -4036,6 +4030,7 @@ Namespace Contensive.Core
                             Else
                                 'Call AppendClassLogFile(cpcore.app.config.name,"UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & cpcore.app.appEnvironment.name & ", Collection: " & Collectionname)
                             End If
+                            returnCollection.name = Collectionname
                             ''
                             '' Load possible DefaultSortMethods
                             ''
@@ -4168,7 +4163,7 @@ Namespace Contensive.Core
                                                             DefaultCDefField = New CDefFieldModel()
                                                         End If
                                                         '
-                                                        If Not returnCollection.CDef(ContentName.ToLower).fields.ContainsKey(FieldName) Then
+                                                        If Not returnCollection.CDef(ContentName.ToLower).fields.ContainsKey(FieldName.ToLower()) Then
                                                             returnCollection.CDef(ContentName.ToLower).fields.Add(FieldName.ToLower, New CDefFieldModel)
                                                         End If
                                                         With returnCollection.CDef(ContentName.ToLower).fields(FieldName.ToLower)
@@ -4521,7 +4516,7 @@ Namespace Contensive.Core
         ''' <param name="Collection"></param>
         ''' <param name="return_IISResetRequired"></param>
         ''' <param name="BuildVersion"></param>
-        Private Sub installCollection_BuildDbFromMiniCollection(ByVal Collection As miniCollectionModel, ByVal BuildVersion As String, isNewBuild As Boolean)
+        Private Sub installCollection_BuildDbFromMiniCollection(ByVal Collection As miniCollectionModel, ByVal BuildVersion As String, isNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String))
             Try
                 '
                 Dim FieldHelpID As Integer
@@ -4841,15 +4836,15 @@ Namespace Contensive.Core
                                     '
                                     ' This collection is installed locally, install from local collections
                                     '
-                                    Call installCollectionFromLocalRepo(Guid, cpCore.codeVersion, errorMessage, "", isNewBuild)
+                                    Call installCollectionFromLocalRepo(Guid, cpCore.codeVersion, errorMessage, "", isNewBuild, nonCriticalErrorList)
                                 Else
                                     '
                                     ' This is a new collection, install to the server and force it on this site
                                     '
                                     Dim addonInstallOk As Boolean
-                                    addonInstallOk = installCollectionFromRemoteRepo(Guid, errorMessage, "", isNewBuild)
+                                    addonInstallOk = installCollectionFromRemoteRepo(Guid, errorMessage, "", isNewBuild, nonCriticalErrorList)
                                     If Not addonInstallOk Then
-                                        Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                        Throw (New ApplicationException("Failure to install addon collection from remote repository. Collection [" & Guid & "] was referenced in collection [" & Collection.name & "]")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                                     End If
 
                                 End If

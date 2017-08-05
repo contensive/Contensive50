@@ -423,7 +423,7 @@ Namespace Contensive.Core
                             Call cpcore.db.cs_set(CSPointer, FieldName, Path)
                             Path = genericController.vbReplace(Path, "\", "/")
                             Path = genericController.vbReplace(Path, "/" & Filename, "")
-                            Call cpcore.appRootFiles.saveUpload(LocalRequestName, Path, Filename)
+                            Call cpcore.appRootFiles.upload(LocalRequestName, Path, Filename)
                         End If
                     Case Else
                         '

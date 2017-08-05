@@ -212,7 +212,6 @@ Namespace Contensive.Core.Controllers
                 Dim errorMessageForAdmin As String = String.Empty
                 Dim CollectionGuid As String = String.Empty
                 Dim DotNetClassFullName As String = String.Empty
-                Dim CodeFilename As String
                 Dim ScriptingEntryPoint As String = String.Empty
                 Dim scriptinglanguageid As Integer
                 Dim ScriptingLanguage As String = String.Empty
@@ -248,8 +247,6 @@ Namespace Contensive.Core.Controllers
                 Dim OptionString_ForObjectCall As String = String.Empty
                 Dim Pos As Integer
                 Dim Ptr As Integer
-                Dim SQL As String
-                Dim CSRules As Integer
                 Dim HelpIcon As String = String.Empty
                 Dim InstanceSettingsEditIcon As String
                 Dim OptionPair As String() = {}
@@ -1573,7 +1570,7 @@ Namespace Contensive.Core.Controllers
                                                                         If FieldValue <> "" Then
                                                                             Filename = FieldValue
                                                                             VirtualFilePath = "Settings/" & FieldName & "/"
-                                                                            cpCore.cdnFiles.saveUpload(FieldName, VirtualFilePath, Filename)
+                                                                            cpCore.cdnFiles.upload(FieldName, VirtualFilePath, Filename)
                                                                             Call cpCore.siteProperties.setProperty(FieldName, VirtualFilePath & Filename)
                                                                         End If
                                                                     Case "textfile"
@@ -3469,7 +3466,7 @@ ErrorTrap:
                                                                         If FieldValue <> "" Then
                                                                             Filename = FieldValue
                                                                             VirtualFilePath = "Settings/" & FieldName & "/"
-                                                                            cpCore.cdnFiles.saveUpload(FieldName, VirtualFilePath, Filename)
+                                                                            cpCore.cdnFiles.upload(FieldName, VirtualFilePath, Filename)
                                                                             Call cpCore.siteProperties.setProperty(FieldName, VirtualFilePath & "/" & Filename)
                                                                         End If
                                                                     Case "textfile"

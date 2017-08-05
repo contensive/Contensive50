@@ -382,7 +382,7 @@ Namespace Contensive.Core
             Dim taskId As Integer = 0
             Dim ignoreUserMessage As String = ""
             Dim ignoreGuid As String = ""
-            Call CP.core.addon.addonInstall.InstallCollectionsFromPrivateFile(privateFile, ignoreUserMessage, ignoreGuid, False)
+            Call CP.core.addon.addonInstall.InstallCollectionsFromPrivateFile(privateFile, ignoreUserMessage, ignoreGuid, False, New List(Of String))
             Return taskId
         End Function
         '
@@ -397,7 +397,7 @@ Namespace Contensive.Core
             Dim taskId As Integer = 0
             Dim ignoreUserMessage As String = ""
             Dim ignoreList As New List(Of String)
-            Call CP.core.addon.addonInstall.InstallCollectionsFromPrivateFolder(privateFolder, ignoreUserMessage, ignoreList, False)
+            Call CP.core.addon.addonInstall.InstallCollectionsFromPrivateFolder(privateFolder, ignoreUserMessage, ignoreList, False, New List(Of String))
             Return taskId
         End Function
         '
@@ -421,7 +421,7 @@ Namespace Contensive.Core
         Public Overrides Function installCollectionFromLibrary(collectionGuid As String) As Integer
             Dim taskId As Integer = 0
             Dim ignoreUserMessage As String = ""
-            Call CP.core.addon.addonInstall.installCollectionFromRemoteRepo(collectionGuid, ignoreUserMessage, "", False)
+            Call CP.core.addon.addonInstall.installCollectionFromRemoteRepo(collectionGuid, ignoreUserMessage, "", False, New List(Of String))
             Return taskId
         End Function
         '

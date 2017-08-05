@@ -78,6 +78,7 @@ Namespace Contensive.Core
             Dim DataSourceType As Integer
             Dim AddonInstall As addonInstallClass
             Dim cp As CPClass
+            Dim nonCriticalErrorList As New List(Of String)
             '
             ' put token in a config file
             '
@@ -200,7 +201,7 @@ Namespace Contensive.Core
                                 Dim ignoreRefactorText As String = ""
                                 Dim ignoreRefactorBoolean As Boolean = False
                                 AddonInstall = New addonInstallClass(cp.core)
-                                If Not AddonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, ignoreRefactorText, ignoreRefactorBoolean, False) Then
+                                If Not AddonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, ignoreRefactorText, ignoreRefactorBoolean, False, nonCriticalErrorList) Then
                                     If ErrorMessage = "" Then
                                         ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status."
                                     End If
@@ -209,7 +210,7 @@ Namespace Contensive.Core
                                 '
                                 ' Verify core installation
                                 '
-                                Call AddonInstall.installCollectionFromRemoteRepo(CoreCollectionGuid, ErrorMessage, "", False)
+                                Call AddonInstall.installCollectionFromRemoteRepo(CoreCollectionGuid, ErrorMessage, "", False, nonCriticalErrorList)
                                 '
                                 DomainNamePrimary = cp.core.serverConfig.appConfig.domainList(0)
                                 Pos = genericController.vbInstr(1, DomainNamePrimary, ",")

@@ -56,16 +56,20 @@ Public Class configurationClass
             Dim defaultPage As String = cp.Site.GetText("serverpagedefault", "default.aspx")
             Dim physicalFile As String = "~/" & defaultPage
             Dim adminRoute As String = cp.core.serverConfig.appConfig.adminRoute
+            Dim routesAdded As New List(Of String)
             If (Not String.IsNullOrEmpty(adminRoute)) Then
                 '
                 ' -- register admin route
                 Try
-                    adminRoute.Replace("\", "/")
+                    adminRoute = adminRoute.Replace("\", "/")
                     If (adminRoute.Substring(0, 1) = "/"c) Then
                         adminRoute = adminRoute.Substring(1)
                     End If
-                    appendLog(cp, "RegisterRoutes, admin route, serverConfig.appConfig.adminRoute [" & adminRoute & "]")
-                    routes.MapPageRoute("Admin Route", adminRoute, physicalFile)
+                    If (Not routesAdded.Contains(adminRoute)) Then
+                        appendLog(cp, "RegisterRoutes, admin route, serverConfig.appConfig.adminRoute [" & adminRoute & "]")
+                        routes.MapPageRoute("Admin Route", adminRoute, physicalFile)
+                        routesAdded.Add(adminRoute)
+                    End If
                 Catch ex As Exception
                     cp.Site.ErrorReport(ex, "Exception while adding admin route")
                 End Try
@@ -78,9 +82,13 @@ Public Class configurationClass
                 ' -- register each remote method
                 Try
                     Dim routeName As String = remoteMethod.Name
-                    Dim routeUrl As String = remoteMethod.Name
-                    appendLog(cp, "RegisterRoutes, remoteMethods, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
-                    routes.MapPageRoute(routeName, routeUrl, physicalFile)
+                    Dim routeUrl As String = remoteMethod.name
+                    ' routes.
+                    If (Not routesAdded.Contains(routeName)) Then
+                        appendLog(cp, "RegisterRoutes, remoteMethods, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
+                        routes.MapPageRoute(routeName, routeUrl, physicalFile)
+                        routesAdded.Add(adminRoute)
+                    End If
                 Catch ex As Exception
                     cp.Site.ErrorReport(ex, "Exception while adding remote method routes")
                 End Try

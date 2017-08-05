@@ -115,6 +115,7 @@ Namespace Contensive.Core
                 Dim privateFilesInstallPath As String
                 Dim Adminui As New adminUIController(cpCore)
                 Dim addonInstall As New addonInstallClass(cpCore)
+                Dim nonCriticalErrorList As New List(Of String)
                 '
                 ' BuildVersion = cpcore.app.dataBuildVersion
                 Dim dataBuildVersion As String = cpCore.siteProperties.dataBuildVersion
@@ -456,7 +457,7 @@ Namespace Contensive.Core
                             '---------------------------------------------------------------------------------------------
                             '
                             If cpCore.authContext.isAuthenticatedDeveloper(cpCore) And cpCore.docProperties.getBoolean("InstallCore") Then
-                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo("{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ErrorMessage, "", False)
+                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo("{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ErrorMessage, "", False, nonCriticalErrorList)
                             End If
                             '
                             '---------------------------------------------------------------------------------------------
@@ -465,14 +466,14 @@ Namespace Contensive.Core
                             '
                             Dim uploadedCollectionPathFilenames As New List(Of String)
                             CollectionFilename = ""
-                            If (cpCore.privateFiles.saveUpload("MetaFile", InstallFolder, CollectionFilename)) Then
+                            If (cpCore.privateFiles.upload("MetaFile", InstallFolder, CollectionFilename)) Then
                                 status &= "<br>Uploaded collection file [" & CollectionFilename & "]"
                                 uploadedCollectionPathFilenames.Add(InstallFolder & CollectionFilename)
                                 AllowInstallFromFolder = True
                             End If
                             '
                             For Ptr = 0 To cpCore.docProperties.getInteger("UploadCount") - 1
-                                If (cpCore.privateFiles.saveUpload("Upload" & Ptr, InstallFolder, CollectionFilename)) Then
+                                If (cpCore.privateFiles.upload("Upload" & Ptr, InstallFolder, CollectionFilename)) Then
                                     status &= "<br>Uploaded collection file [" & CollectionFilename & "]"
                                     uploadedCollectionPathFilenames.Add(InstallFolder & CollectionFilename)
                                     AllowInstallFromFolder = True
@@ -490,7 +491,7 @@ Namespace Contensive.Core
                             Cnt = UBound(LibGuids) + 1
                             For Ptr = 0 To Cnt - 1
                                 RegisterList = ""
-                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo(LibGuids(Ptr), ErrorMessage, "", False)
+                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo(LibGuids(Ptr), ErrorMessage, "", False, nonCriticalErrorList)
                                 If Not UpgradeOK Then
                                     '
                                     ' block the reset because we will loose the error message
@@ -515,7 +516,7 @@ Namespace Contensive.Core
                         If AllowInstallFromFolder Then
                             'InstallFolder = cpcore.asv.config.physicalFilePath & InstallFolderName & "\"
                             If cpCore.privateFiles.pathExists(privateFilesInstallPath) Then
-                                UpgradeOK = addonInstall.InstallCollectionsFromPrivateFolder(privateFilesInstallPath, ErrorMessage, InstalledCollectionGuidList, False)
+                                UpgradeOK = addonInstall.InstallCollectionsFromPrivateFolder(privateFilesInstallPath, ErrorMessage, InstalledCollectionGuidList, False, nonCriticalErrorList)
                                 If Not UpgradeOK Then
                                     If ErrorMessage = "" Then
                                         errorController.error_AddUserError(cpCore, "The Add-on Collection did not install correctly, but no detailed error message was given.")
@@ -868,6 +869,13 @@ Namespace Contensive.Core
                     Description = "<div>Use the add-on manager to add and remove Add-ons from your Contensive installation.</div>"
                     If Not DbUpToDate Then
                         Description = Description & "<div style=""Margin-left:50px"">The Add-on Manager is disabled because this site's Database needs to be upgraded.</div>"
+                    End If
+                    If nonCriticalErrorList.Count > 0 Then
+                        status &= "<ul>"
+                        For Each item As String In nonCriticalErrorList
+                            status &= "<li>" & item & "</li>"
+                        Next
+                        status &= "</ul>"
                     End If
                     If status <> "" Then
                         Description = Description & "<div style=""Margin-left:50px"">" & status & "</div>"

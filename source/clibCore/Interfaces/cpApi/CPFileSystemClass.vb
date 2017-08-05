@@ -126,13 +126,13 @@ Namespace Contensive.Core
         '==========================================================================================
         '
         Public Overrides Function saveUpload(htmlformName As String, ByRef returnFilename As String) As Boolean
-            Return fileSystem.saveUpload(htmlformName, "\upload", returnFilename)
+            Return fileSystem.upload(htmlformName, "\upload", returnFilename)
         End Function
         '
         '==========================================================================================
         '
         Public Overrides Function saveUpload(htmlformName As String, folderpath As String, ByRef returnFilename As String) As Boolean
-            Return fileSystem.saveUpload(htmlformName, folderpath, returnFilename)
+            Return fileSystem.upload(htmlformName, folderpath, returnFilename)
         End Function
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.

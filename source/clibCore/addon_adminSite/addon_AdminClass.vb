@@ -3343,7 +3343,7 @@ ErrorTrap:
                                             Dim unixPathFilename As String = cpCore.db.cs_getFilename(CSEditRecord, FieldName, Filename, adminContent.Name)
                                             Dim dosPathFilename As String = genericController.convertToDosSlash(unixPathFilename)
                                             Dim dosPath As String = genericController.getPath(dosPathFilename)
-                                            cpCore.cdnFiles.saveUpload(FieldName, dosPath, Filename)
+                                            cpCore.cdnFiles.upload(FieldName, dosPath, Filename)
                                             Call cpCore.db.cs_set(CSEditRecord, FieldName, unixPathFilename)
                                             RecordChanged = True
                                             FieldChanged = True
