@@ -85,11 +85,12 @@ Namespace Contensive.Addons
                 Call cpCore.html.main_SetMetaContent(0, 0)
                 Call cpCore.html.main_AddPagetitle2("Login", "loginPage")
                 head = cpCore.html.getHtmlDocHead(False)
-                If cpCore.doc.template.BodyTag <> "" Then
-                    bodyTag = cpCore.doc.template.BodyTag
-                Else
-                    bodyTag = TemplateDefaultBodyTag
-                End If
+                bodyTag = TemplateDefaultBodyTag
+                'If cpCore.doc.template.BodyTag <> "" Then
+                '    bodyTag = cpCore.doc.template.BodyTag
+                'Else
+                '    bodyTag = TemplateDefaultBodyTag
+                'End If
                 returnREsult = cpCore.html.assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw

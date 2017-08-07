@@ -152,8 +152,9 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
+        <Obsolete("Deprecated, template link is not supported", True)>
         Public Overrides Function GetTemplateLink(ByVal TemplateID As Integer) As String
-            Return cpCore.doc.getTemplateLink(TemplateID)
+            Return "" ' cpCore.doc.getTemplateLink(TemplateID)
         End Function
         '
         '====================================================================================================

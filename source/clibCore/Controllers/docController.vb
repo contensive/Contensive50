@@ -1020,13 +1020,13 @@ Namespace Contensive.Core.Controllers
                     'End If
                     '
                     ' -- add template and page details to document
-                    Call cpCore.html.addOnLoadJavascript(template.JSOnLoad, "template")
-                    Call cpCore.html.addHeadJavascriptCode(template.JSHead, "template")
-                    Call cpCore.html.addBodyJavascriptCode(template.JSEndBody, "template")
-                    Call cpCore.html.main_AddHeadTag2(template.OtherHeadTags, "template")
-                    If template.StylesFilename <> "" Then
-                        cpCore.doc.metaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, template.StylesFilename) & """ >"
-                    End If
+                    'Call cpCore.html.addOnLoadJavascript(template.JSOnLoad, "template")
+                    'Call cpCore.html.addHeadJavascriptCode(template.JSHead, "template")
+                    'Call cpCore.html.addBodyJavascriptCode(template.JSEndBody, "template")
+                    'Call cpCore.html.main_AddHeadTag2(template.OtherHeadTags, "template")
+                    'If template.StylesFilename <> "" Then
+                    '    cpCore.doc.metaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, template.StylesFilename) & """ >"
+                    'End If
                     ''
                     '' -- add shared styles
                     'Dim sqlCriteria As String = "(templateId=" & template.ID & ")"
@@ -1095,11 +1095,12 @@ Namespace Contensive.Core.Controllers
                         ' Build Body Tag
                         '
                         htmlDocHead = cpCore.html.getHtmlDocHead(False)
-                        If template.BodyTag <> "" Then
-                            bodyTag = template.BodyTag
-                        Else
-                            bodyTag = TemplateDefaultBodyTag
-                        End If
+                        bodyTag = TemplateDefaultBodyTag
+                        'If template.BodyTag <> "" Then
+                        '    bodyTag = template.BodyTag
+                        'Else
+                        '    bodyTag = TemplateDefaultBodyTag
+                        'End If
                         '
                         ' Add tools panel to body
                         '
@@ -3546,19 +3547,19 @@ Namespace Contensive.Core.Controllers
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("IsContentBlocked")
         End Function
-        '
-        '====================================================================================================
-        '   main_GetTemplateLink
-        '       Added to externals (aoDynamicMenu) can main_Get hard template links
-        '====================================================================================================
-        '
-        Public Function getTemplateLink(templateId As Integer) As String
-            Dim template As pageTemplateModel = pageTemplateModel.create(cpcore, templateId, New List(Of String))
-            If template IsNot Nothing Then
-                Return template.Link
-            End If
-            Return ""
-        End Function
+        ''
+        ''====================================================================================================
+        ''   main_GetTemplateLink
+        ''       Added to externals (aoDynamicMenu) can main_Get hard template links
+        ''====================================================================================================
+        ''
+        'Public Function getTemplateLink(templateId As Integer) As String
+        '    Dim template As pageTemplateModel = pageTemplateModel.create(cpcore, templateId, New List(Of String))
+        '    If template IsNot Nothing Then
+        '        Return template.Link
+        '    End If
+        '    Return ""
+        'End Function
         '
         '========================================================================
         ' main_DeleteChildRecords
@@ -4188,7 +4189,7 @@ ErrorTrap:
             Else
                 defaultPathPage = "/" & main_guessDefaultPage()
             End If
-            templateLinkIncludesProtocol = (InStr(1, template.Link, "://") <> 0)
+            templateLinkIncludesProtocol = False ' (InStr(1, template.Link, "://") <> 0)
             '
             ' calc linkQS (cleared in come cases later)
             '
@@ -4199,7 +4200,9 @@ ErrorTrap:
             '
             ' calculate depends on the template provided
             '
-            If template.Link = "" Then
+            If True Then
+                'End If
+                'If template.Link = "" Then
                 '
                 ' ----- templateLink is blank
                 '
@@ -4268,7 +4271,7 @@ ErrorTrap:
                 '
                 ' ----- Short TemplateLink
                 '
-                linkPathPage = template.Link
+                linkPathPage = "" ' template.Link
                 '
                 ' domain (fake for now)
                 '
@@ -4290,7 +4293,7 @@ ErrorTrap:
                 '
                 ' ----- Long TemplateLink
                 '
-                linkLong = template.Link
+                linkLong = "" ' template.Link
             End If
             '
             ' assemble
@@ -4756,7 +4759,7 @@ ErrorTrap:
                         If templateId <> 0 Then
                             Dim template As pageTemplateModel = pageTemplateModel.create(cpcore, templateId, New List(Of String))
                             If (template IsNot Nothing) Then
-                                resultLink = template.Link
+                                resultLink = "" ' template.Link
                             End If
                         End If
                         If String.IsNullOrEmpty(resultLink) Then

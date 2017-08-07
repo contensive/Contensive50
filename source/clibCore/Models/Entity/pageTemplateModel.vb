@@ -18,33 +18,33 @@ Namespace Contensive.Core.Models.Entity
         Private Const primaryContentDataSource As String = "default"
         '
         ' -- instance properties
-        Public ID As Integer
-        Public Active As Boolean
-        Public BodyHTML As String
-        Public BodyTag As String
-        Public ccGuid As String
-        Public ContentCategoryID As Integer
-        Public ContentControlID As Integer
-        Public CreatedBy As Integer
-        Public CreateKey As Integer
-        Public DateAdded As Date
-        Public EditArchive As Boolean
-        Public EditBlank As Boolean
-        Public EditSourceID As Integer
-        Public IsSecure As Boolean
-        Public JSEndBody As String
-        Public JSFilename As String
-        Public JSHead As String
-        Public JSOnLoad As String
-        Public Link As String
-        Public MobileBodyHTML As String
-        Public ModifiedBy As Integer
-        Public ModifiedDate As Date
-        Public Name As String
-        Public OtherHeadTags As String
-        Public SortOrder As String
-        Public Source As String
-        Public StylesFilename As String
+        Public Property ID As Integer
+        Public Property Active As Boolean
+        Public Property BodyHTML As String
+        ' Public Property BodyTag As String
+        Public Property ccGuid As String
+        Public Property ContentCategoryID As Integer
+        Public Property ContentControlID As Integer
+        Public Property CreatedBy As Integer
+        Public Property CreateKey As Integer
+        Public Property DateAdded As Date
+        Public Property EditArchive As Boolean
+        Public Property EditBlank As Boolean
+        Public Property EditSourceID As Integer
+        Public Property IsSecure As Boolean
+        ' Public Property JSEndBody As String
+        ' Public Property JSFilename As String
+        ' Public Property JSHead As String
+        ' Public Property JSOnLoad As String
+        ' Public Property Link As String
+        ' Public Property MobileBodyHTML As String
+        Public Property ModifiedBy As Integer
+        Public Property ModifiedDate As Date
+        Public Property Name As String
+        ' Public Property OtherHeadTags As String
+        Public Property SortOrder As String
+        ' Public Property Source As String
+        ' Public Property StylesFilename As String
         '
         '====================================================================================================
         ''' <summary>
@@ -198,7 +198,7 @@ Namespace Contensive.Core.Models.Entity
                         .ID = cs.getInteger("ID")
                         .Active = cs.getBoolean("Active")
                         .BodyHTML = cs.getText("BodyHTML")
-                        .BodyTag = cs.getText("BodyTag")
+                        ' .BodyTag = cs.getText("BodyTag")
                         .ccGuid = cs.getText("ccGuid")
                         .ContentCategoryID = cs.getInteger("ContentCategoryID")
                         .ContentControlID = cs.getInteger("ContentControlID")
@@ -209,19 +209,19 @@ Namespace Contensive.Core.Models.Entity
                         .EditBlank = cs.getBoolean("EditBlank")
                         .EditSourceID = cs.getInteger("EditSourceID")
                         .IsSecure = cs.getBoolean("IsSecure")
-                        .JSEndBody = cs.getText("JSEndBody")
-                        .JSFilename = cs.getText("JSFilename")
-                        .JSHead = cs.getText("JSHead")
-                        .JSOnLoad = cs.getText("JSOnLoad")
-                        .Link = cs.getText("Link")
-                        .MobileBodyHTML = cs.getText("MobileBodyHTML")
+                        ' .JSEndBody = cs.getText("JSEndBody")
+                        ' .JSFilename = cs.getText("JSFilename")
+                        ' .JSHead = cs.getText("JSHead")
+                        ' .JSOnLoad = cs.getText("JSOnLoad")
+                        ' .Link = cs.getText("Link")
+                        ' .MobileBodyHTML = cs.getText("MobileBodyHTML")
                         .ModifiedBy = cs.getInteger("ModifiedBy")
                         .ModifiedDate = cs.getDate("ModifiedDate")
                         .Name = cs.getText("Name")
-                        .OtherHeadTags = cs.getText("OtherHeadTags")
+                        ' .OtherHeadTags = cs.getText("OtherHeadTags")
                         .SortOrder = cs.getText("SortOrder")
-                        .Source = cs.getText("Source")
-                        .StylesFilename = cs.getText("StylesFilename")
+                        ' .Source = cs.getText("Source")
+                        ' .StylesFilename = cs.getText("StylesFilename")
                     End With
                     If (result IsNot Nothing) Then
                         '
@@ -275,7 +275,7 @@ Namespace Contensive.Core.Models.Entity
                     id = cs.getInteger("id")
                     cs.setField("Active", Active.ToString())
                     cs.setField("BodyHTML", BodyHTML)
-                    cs.setField("BodyTag", BodyTag)
+                    ' cs.setField("BodyTag", BodyTag)
                     cs.setField("ccGuid", ccGuid)
                     cs.setField("ContentCategoryID", ContentCategoryID.ToString())
                     cs.setField("ContentControlID", ContentControlID.ToString())
@@ -286,19 +286,19 @@ Namespace Contensive.Core.Models.Entity
                     cs.setField("EditBlank", EditBlank.ToString())
                     cs.setField("EditSourceID", EditSourceID.ToString())
                     cs.setField("IsSecure", IsSecure.ToString())
-                    cs.setField("JSEndBody", JSEndBody)
-                    cs.setField("JSFilename", JSFilename)
-                    cs.setField("JSHead", JSHead)
-                    cs.setField("JSOnLoad", JSOnLoad)
-                    cs.setField("Link", Link)
-                    cs.setField("MobileBodyHTML", MobileBodyHTML)
+                    ' cs.setField("JSEndBody", JSEndBody)
+                    ' cs.setField("JSFilename", JSFilename)
+                    ' cs.setField("JSHead", JSHead)
+                    ' cs.setField("JSOnLoad", JSOnLoad)
+                    ' cs.setField("Link", Link)
+                    ' cs.setField("MobileBodyHTML", MobileBodyHTML)
                     cs.setField("ModifiedBy", ModifiedBy.ToString())
                     cs.setField("ModifiedDate", ModifiedDate.ToString())
                     cs.setField("Name", Name)
-                    cs.setField("OtherHeadTags", OtherHeadTags)
+                    ' cs.setField("OtherHeadTags", OtherHeadTags)
                     cs.setField("SortOrder", SortOrder)
-                    cs.setField("Source", Source)
-                    cs.setField("StylesFilename", StylesFilename)
+                    ' cs.setField("Source", Source)
+                    ' cs.setField("StylesFilename", StylesFilename)
                     If (String.IsNullOrEmpty(ccGuid)) Then ccGuid = Controllers.genericController.getGUID()
                 End If
                 Call cs.Close()
@@ -483,7 +483,7 @@ Namespace Contensive.Core.Models.Entity
                     With CDef
                         instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
                         instance.BodyHTML = genericController.encodeText(.fields("BodyHTML").defaultValue)
-                        instance.BodyTag = genericController.encodeText(.fields("BodyTag").defaultValue)
+                        ' instance.BodyTag = genericController.encodeText(.fields("BodyTag").defaultValue)
                         instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
                         instance.ContentCategoryID = genericController.EncodeInteger(.fields("ContentCategoryID").defaultValue)
                         instance.ContentControlID = CDef.Id
@@ -494,19 +494,19 @@ Namespace Contensive.Core.Models.Entity
                         instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
                         instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
                         instance.IsSecure = genericController.EncodeBoolean(.fields("IsSecure").defaultValue)
-                        instance.JSEndBody = genericController.encodeText(.fields("JSEndBody").defaultValue)
-                        instance.JSFilename = genericController.encodeText(.fields("JSFilename").defaultValue)
-                        instance.JSHead = genericController.encodeText(.fields("JSHead").defaultValue)
-                        instance.JSOnLoad = genericController.encodeText(.fields("JSOnLoad").defaultValue)
-                        instance.Link = genericController.encodeText(.fields("Link").defaultValue)
-                        instance.MobileBodyHTML = genericController.encodeText(.fields("MobileBodyHTML").defaultValue)
+                        ' instance.JSEndBody = genericController.encodeText(.fields("JSEndBody").defaultValue)
+                        ' instance.JSFilename = genericController.encodeText(.fields("JSFilename").defaultValue)
+                        ' instance.JSHead = genericController.encodeText(.fields("JSHead").defaultValue)
+                        ' instance.JSOnLoad = genericController.encodeText(.fields("JSOnLoad").defaultValue)
+                        ' instance.Link = genericController.encodeText(.fields("Link").defaultValue)
+                        ' instance.MobileBodyHTML = genericController.encodeText(.fields("MobileBodyHTML").defaultValue)
                         instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)
                         instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").defaultValue)
                         instance.Name = genericController.encodeText(.fields("Name").defaultValue)
-                        instance.OtherHeadTags = genericController.encodeText(.fields("OtherHeadTags").defaultValue)
+                        ' instance.OtherHeadTags = genericController.encodeText(.fields("OtherHeadTags").defaultValue)
                         instance.SortOrder = genericController.encodeText(.fields("SortOrder").defaultValue)
-                        instance.Source = genericController.encodeText(.fields("Source").defaultValue)
-                        instance.StylesFilename = genericController.encodeText(.fields("StylesFilename").defaultValue)
+                        ' instance.Source = genericController.encodeText(.fields("Source").defaultValue)
+                        ' instance.StylesFilename = genericController.encodeText(.fields("StylesFilename").defaultValue)
                     End With
                 End If
             Catch ex As Exception
