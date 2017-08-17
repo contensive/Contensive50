@@ -279,12 +279,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_484F4748F21247EAA6B5DA7A7FE97389"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4961B7D565BB213C6E57937676D4BE95"
         "OwnerKey" = "8:_7C42C4E97C1C4ACB9FF53D9C14978257"
         "MsmSig" = "8:_UNDEFINED"
@@ -561,18 +555,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_AB02E4BF29A94F977726692C4666B22D"
-        "OwnerKey" = "8:_9DDD8602CA8F00D1E125C2C9F725F850"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_AB02E4BF29A94F977726692C4666B22D"
-        "OwnerKey" = "8:_7C42C4E97C1C4ACB9FF53D9C14978257"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_ACAD7748171B6FECF04EAF15C5AF4E39"
         "OwnerKey" = "8:_7C42C4E97C1C4ACB9FF53D9C14978257"
         "MsmSig" = "8:_UNDEFINED"
@@ -623,24 +605,6 @@
         {
         "MsmKey" = "8:_B7C0F0928C6F40FE32D937701F3A8E24"
         "OwnerKey" = "8:_DD85BE7E0F61C6FE8B3755606C0C8BD3"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_BC8316DFEF27D36D2FD04C93A565BE90"
-        "OwnerKey" = "8:_9DDD8602CA8F00D1E125C2C9F725F850"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_BC8316DFEF27D36D2FD04C93A565BE90"
-        "OwnerKey" = "8:_E23B71C8F8B24DC095846B1AE1ED81EC"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_BC8316DFEF27D36D2FD04C93A565BE90"
-        "OwnerKey" = "8:_2174422A3C884AE18410FE91CDFA67C4"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -705,12 +669,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_EA4458F357A74FD8A132AF6A22859E01"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_EAD1083E7D76BE6F0302FEAA472CCB26"
         "OwnerKey" = "8:_7C42C4E97C1C4ACB9FF53D9C14978257"
         "MsmSig" = "8:_UNDEFINED"
@@ -747,6 +705,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_F1CA0CE1EAB2F7DDE59B844663E3C3FB"
+        "OwnerKey" = "8:_7AF9EBAAE96C1C435AFB76DE4E734FB1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F1CA0CE1EAB2F7DDE59B844663E3C3FB"
+        "OwnerKey" = "8:_E58C08CD989747F293E0209C8C82A0A6"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_F45139C4D24A1C1AB2A1572AB8482B28"
         "OwnerKey" = "8:_7C42C4E97C1C4ACB9FF53D9C14978257"
         "MsmSig" = "8:_UNDEFINED"
@@ -779,12 +749,6 @@
         {
         "MsmKey" = "8:_F7AC77965C2F059B863C2B3407FBCC24"
         "OwnerKey" = "8:_2174422A3C884AE18410FE91CDFA67C4"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F9DCA3F461084371AB476B2DCD77C083"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1313,12 +1277,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_637D873E7F8DFEA68C9925DD84F810E3"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_BC8316DFEF27D36D2FD04C93A565BE90"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -2474,26 +2432,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_484F4748F21247EAA6B5DA7A7FE97389"
-            {
-            "SourcePath" = "8:..\\..\\installFolderResources\\WaitPageOpen.htm"
-            "TargetName" = "8:WaitPageOpen.htm"
-            "Tag" = "8:"
-            "Folder" = "8:_8EEE80F20C0A4198A10A504281DA2B32"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4961B7D565BB213C6E57937676D4BE95"
             {
             "AssemblyRegister" = "3:1"
@@ -3386,7 +3324,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:clibCore, Version=5.0.6403.33446, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:clibCore, Version=5.0.6435.28702, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_9DDD8602CA8F00D1E125C2C9F725F850"
@@ -3502,26 +3440,6 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AB02E4BF29A94F977726692C4666B22D"
-            {
-            "SourcePath" = "8:clibCore.tlb"
-            "TargetName" = "8:clibCore.tlb"
-            "Tag" = "8:"
-            "Folder" = "8:_EE56B290185E4E4FBB0DBE92BA269622"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:2"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
@@ -3757,37 +3675,6 @@
                     }
                 }
             "SourcePath" = "8:System.Runtime.InteropServices.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_EE56B290185E4E4FBB0DBE92BA269622"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BC8316DFEF27D36D2FD04C93A565BE90"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:HttpMultipartParser, Version=2.2.3.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_BC8316DFEF27D36D2FD04C93A565BE90"
-                    {
-                    "Name" = "8:HttpMultipartParser.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:HttpMultipartParser.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_EE56B290185E4E4FBB0DBE92BA269622"
@@ -4053,26 +3940,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EA4458F357A74FD8A132AF6A22859E01"
-            {
-            "SourcePath" = "8:..\\..\\installFolderResources\\WaitPageClose.htm"
-            "TargetName" = "8:WaitPageClose.htm"
-            "Tag" = "8:"
-            "Folder" = "8:_8EEE80F20C0A4198A10A504281DA2B32"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_EAD1083E7D76BE6F0302FEAA472CCB26"
             {
             "AssemblyRegister" = "3:1"
@@ -4228,6 +4095,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F1CA0CE1EAB2F7DDE59B844663E3C3FB"
+            {
+            "SourcePath" = "8:processor.tlb"
+            "TargetName" = "8:processor.tlb"
+            "Tag" = "8:"
+            "Folder" = "8:_EE56B290185E4E4FBB0DBE92BA269622"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:2"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F45139C4D24A1C1AB2A1572AB8482B28"
             {
             "AssemblyRegister" = "3:1"
@@ -4319,26 +4206,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F9DCA3F461084371AB476B2DCD77C083"
-            {
-            "SourcePath" = "8:..\\..\\installFolderResources\\WaitForIISReset.htm"
-            "TargetName" = "8:WaitForIISReset.htm"
-            "Tag" = "8:"
-            "Folder" = "8:_8EEE80F20C0A4198A10A504281DA2B32"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }
