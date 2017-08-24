@@ -1205,12 +1205,17 @@ Namespace Contensive.Core
                             '
                             ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
                             '
-                            'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", authcontext.user.userid, visit.visitAuthenticated)
-                            '
-                            ' until then, run it as an internal class
-                            '
-                            Dim admin As New Contensive.Addons.addon_AdminSiteClass()
-                            returnResult = admin.execute(cp_forAddonExecutionOnly).ToString()
+                            If True Then
+                                returnResult = addon.execute_legacy4(adminSiteAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
+                            Else
+                                '
+                                ' until then, run it as an internal class
+                                '
+                                returnResult = addon.execute_legacy4(basestlylesAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
+                                Dim admin As New Contensive.Addons.addon_AdminSiteClass()
+                                returnResult = admin.execute(cp_forAddonExecutionOnly).ToString()
+                            End If
+                            'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", authContext.user.userid, visit.visitAuthenticated)
                         Else
                             '--------------------------------------------------------------------------
                             ' default routing addon takes what is left

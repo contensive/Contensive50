@@ -19,7 +19,7 @@ Public Class Global_asax
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Try
             Trace.WriteLine(getAppDescription("Application_Start"))
-            Using cp As New Contensive.Core.CPClass(ConfigurationManager.AppSettings("ContensiveAppName"))
+            Using cp As New Contensive.Core.CPClass(DefaultSite.configurationClass.getAppName())
                 DefaultSite.configurationClass.appendLog(cp, getAppDescription("Application_Start"))
                 If (cp.appOk) Then
                     DefaultSite.configurationClass.RegisterRoutes(cp, RouteTable.Routes)

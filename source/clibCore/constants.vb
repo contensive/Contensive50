@@ -44,6 +44,7 @@ Namespace Contensive.Core
         ' -- navigator entries
         Public Const guidManageAddon As String = "{DBA354AB-5D3E-4882-8718-CF23CAAB7927}"
         ' -- addons
+        Public Const basestlylesAddonGuid As String = "{0dd7df28-4924-4881-a1d8-421824f5c2d1}"
         Public Const adminSiteAddonGuid As String = "{c2de2acf-ca39-4668-b417-aa491e7d8460}"
         Public Const DashboardAddonGuid = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}"
         Public Const PersonalizationGuid = "{C82CB8A6-D7B9-4288-97FF-934080F5FC9C}"

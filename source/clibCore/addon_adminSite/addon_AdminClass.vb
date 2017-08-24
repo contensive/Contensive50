@@ -72,7 +72,7 @@ Namespace Contensive.Addons
                 logController.appendLog(cpCore, SaveContent, "admin", cpCore.serverConfig.appConfig.name & "-request-")
                 '
                 ' -- refactor, move this to the addon
-                cpCore.html.addStyleLink("/adminSite/styles.css", "AdminSite")
+                'cpCore.html.addStyleLink("/adminSite/styles.css", "AdminSite")
                 '
                 ' main_Get Content
                 '

@@ -17,7 +17,7 @@
         Else
             '
             ' -- initialize with contensive c:\programdata\contensive\serverConfig.json setup during installation
-            Using cp As New Contensive.Core.CPClass(ConfigurationManager.AppSettings("ContensiveAppName"), HttpContext.Current)
+            Using cp As New Contensive.Core.CPClass(DefaultSite.configurationClass.getAppName(), HttpContext.Current)
                 Response.Write(cp.executeRoute())
                 DefaultSite.configurationClass.appendLog(cp, "page_load, jsonConfig Load, completed, (" & sw.ElapsedMilliseconds.ToString() & " ms)")
             End Using

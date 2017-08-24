@@ -9,6 +9,18 @@ Imports System.Web.Routing
 Imports System.IO
 
 Public Class configurationClass
+    '
+    ''' <summary>
+    ''' determine the Contensive application name from the webconfig or iis sitename
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function getAppName() As String
+        Dim appName As String = ConfigurationManager.AppSettings("ContensiveAppName")
+        If (String.IsNullOrEmpty(appName)) Then
+            appName = System.Web.Hosting.HostingEnvironment.ApplicationHost.GetSiteName()
+        End If
+        Return appName
+    End Function
     Public Shared Function getServerConfig() As Contensive.Core.Models.Entity.serverConfigModel
         Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel = Nothing
         Try
@@ -17,10 +29,7 @@ Public Class configurationClass
             '
             serverConfig.allowTaskRunnerService = False
             serverConfig.allowTaskSchedulerService = False
-            serverConfig.appConfig.name = ConfigurationManager.AppSettings("ContensiveAppName")
-            'If (String.IsNullOrEmpty(serverConfig.appConfig.name)) Then
-            '    serverConfig.appConfig.name = System.Web.Hosting.HostingEnvironment.ApplicationHost.GetSiteName()
-            'End If
+            serverConfig.appConfig.name = getAppName()
             serverConfig.appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")
             serverConfig.appConfig.appRootFilesPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")
             serverConfig.appConfig.cdnFilesNetprefix = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
@@ -81,7 +90,7 @@ Public Class configurationClass
                 '
                 ' -- register each remote method
                 Try
-                    Dim routeName As String = remoteMethod.Name
+                    Dim routeName As String = remoteMethod.name
                     Dim routeUrl As String = remoteMethod.name
                     ' routes.
                     If (Not routesAdded.Contains(routeName)) Then

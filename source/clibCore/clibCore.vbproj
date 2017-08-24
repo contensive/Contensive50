@@ -431,6 +431,7 @@
     <Compile Include="Models\Entity\TemplateDomainRuleModel.vb" />
     <Compile Include="Models\Entity\pageContentModel.vb" />
     <Compile Include="Models\Entity\NavigatorEntryModel.vb" />
+    <Compile Include="Models\Entity\addonContentFieldTypeRulesModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />
