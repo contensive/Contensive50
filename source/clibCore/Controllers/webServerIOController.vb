@@ -439,7 +439,7 @@ Namespace Contensive.Core.Controllers
                         ' Add JSProcessForm to form
                         '
                         blockClosePageCopyright = True
-                        outStreamDevice = docController.htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
+                        outStreamDevice = htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
                         Call setResponseContentType("application/javascript") ' refactor -- this should be setContentType
                         '
                         ' Add the cpcore.main_ServerReferrer QS to the cpcore.doc.main_InStreamArray()

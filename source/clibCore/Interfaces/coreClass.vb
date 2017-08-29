@@ -760,7 +760,7 @@ Namespace Contensive.Core
                             '
                             webServer.blockClosePageCopyright = True
                             html_BlockClosePageLink = True
-                            If (webServer.outStreamDevice = docController.htmlDoc_OutStreamJavaScript) Then
+                            If (webServer.outStreamDevice = htmlDoc_OutStreamJavaScript) Then
                                 If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
                                     Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
                                     returnResult = FormSplit(0)
@@ -1106,20 +1106,17 @@ Namespace Contensive.Core
                                         '
                                         If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
                                             Dim addonId As Integer
-                                            Dim contentName As String = ""
-                                            Dim nothingObject As Object = Nothing
-                                            Dim cs As Integer
                                             addonId = docProperties.getInteger("AddonID")
-                                            cs = db.csOpenRecord(cnAddons, addonId)
-                                            If db.cs_ok(cs) Then
-                                                Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
-                                            End If
-                                            Call db.cs_Close(cs)
-                                            '
-                                            ' Clear Caches
-                                            '
-                                            If contentName <> "" Then
-                                                Call cache.invalidateContent(contentName)
+                                            If (addonId > 0) Then
+                                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(Me, addonId)
+                                                If (addon.StylesFilename <> docProperties.getText("CustomStyles")) Then
+                                                    addon.StylesFilename = docProperties.getText("CustomStyles")
+                                                    addon.save(Me)
+                                                    '
+                                                    ' Clear Caches
+                                                    '
+                                                    Call cache.invalidateContent(addonModel.contentName)
+                                                End If
                                             End If
                                         End If
                                     Case FormTypeAddonSettingsEditor
@@ -1226,7 +1223,7 @@ Namespace Contensive.Core
                             '
                             'debugLog("executeRoute, route is Default Route AddonId")
                             '
-                            Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
+                            Dim defaultAddonId As Integer = siteProperties.getinteger(spDefaultRouteAddonId)
                             If (defaultAddonId = 0) Then
                                 '
                                 ' -- no default route set, assume html hit
@@ -1656,7 +1653,7 @@ Namespace Contensive.Core
                             & siteProperties.docTypeDeclaration() _
                             & "<html>" _
                             & cr & "<head>" _
-                            & genericController.htmlIndent(html.getHtmlDocHead(False)) _
+                            & genericController.htmlIndent(doc.getHtmlDocHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
                             & genericController.htmlIndent(html.main_GetPanelHeader("Contensive Resource Library")) _
@@ -1694,7 +1691,7 @@ Namespace Contensive.Core
                             & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & genericController.htmlIndent(html.getHtmlDocHead(False)) _
+                            & genericController.htmlIndent(doc.getHtmlDocHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
                             & html.main_GetPanelHeader("Contensive Resource Library") _
@@ -1756,7 +1753,7 @@ Namespace Contensive.Core
                             & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & genericController.htmlIndent(html.getHtmlDocHead(False)) _
+                            & genericController.htmlIndent(doc.getHtmlDocHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
                             & genericController.htmlIndent(html.main_GetPanelHeader("Contensive Site Explorer")) _
@@ -1862,7 +1859,7 @@ Namespace Contensive.Core
                         Copy = Copy & "<p align=""center""><CENTER>"
                         If Not authContext.isAuthenticated() Then
                             Dim loginAddon As New Addons.addon_loginClass(Me)
-                            Copy = Copy & loginAddon.getLoginPanel()
+                            Copy = Copy & loginAddon.getLoginForm()
                         ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
                             'Copy = Copy & main_GetToolsPanel
                         Else

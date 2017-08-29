@@ -184,6 +184,24 @@ Namespace Contensive.Core.Controllers
             Return result
         End Function
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' Execute an addon because it is a dependency of another addon/page/template
+        ''' </summary>
+        ''' <param name="addonId"></param>
+        ''' <param name="context"></param>
+        ''' <returns></returns>
+        Public Function executeDependency(ByVal addonId As Integer, context As CPUtilsBaseClass.addonContext, HostContentName As String, hostRecordId As Integer, hostFieldName As String, acInstanceId As String, defaultWrapperId As Integer, ByRef return_addonStatusOk As Boolean, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
+            Dim result As String = String.Empty
+            Try
+                Dim optionString As String = ""
+                result = execute(addonId, "", "", context, HostContentName, hostRecordId, hostFieldName, acInstanceId, True, defaultWrapperId, "", return_addonStatusOk, Nothing, "," & addonId, Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
+        End Function
+        '
         'todo convert to addon model, and pass new model to subroutines to enhandle error reporting
         '
         '====================================================================================================
@@ -1016,7 +1034,7 @@ Namespace Contensive.Core.Controllers
                                     If addonIncludeRules.Count > 0 Then
                                         For Each addonRule As Models.Entity.addonIncludeRuleModel In addonIncludeRules
                                             If addonRule.IncludedAddonID > 0 Then
-                                                IncludeContent = IncludeContent & execute(addonRule.IncludedAddonID, "", "", CPUtilsBaseClass.addonContext.ContextAdmin, HostContentName, HostRecordID, HostFieldName, ACInstanceID, True, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, AddonStatusOK, Nothing, ignore_addonCallingItselfIdList & "," & addonId, Nothing, ignore_AddonsRunOnThisPageIdList, personalizationPeopleId, personalizationIsAuthenticated)
+                                                IncludeContent = IncludeContent & executeDependency(addonRule.IncludedAddonID, CPUtilsBaseClass.addonContext.ContextAdmin, HostContentName, HostRecordID, HostFieldName, ACInstanceID, DefaultWrapperID, AddonStatusOK, personalizationPeopleId, personalizationIsAuthenticated)
                                             End If
                                         Next
                                     End If
@@ -1328,7 +1346,7 @@ Namespace Contensive.Core.Controllers
                                         & cpCore.siteProperties.docTypeDeclaration() _
                                         & vbCrLf & "<html>" _
                                         & cr & "<head>" _
-                                        & vbCrLf & htmlIndent(cpCore.html.getHtmlDocHead(False)) _
+                                        & vbCrLf & htmlIndent(cpCore.doc.getHtmlDocHead(False)) _
                                         & cr & "</head>" _
                                         & cr & TemplateDefaultBodyTag _
                                         & cr & "</body>" _
@@ -3049,50 +3067,37 @@ ErrorTrap:
         Public Function getAddonStylesBubble(ByVal addonId As Integer, ByRef return_DialogList As String) As String
             Dim result As String = String.Empty
             Try
-                Dim DefaultStylesheet As String = String.Empty
-                Dim StyleSheet As String = String.Empty
+                'Dim DefaultStylesheet As String = String.Empty
+                'Dim StyleSheet As String = String.Empty
                 Dim QueryString As String
                 Dim LocalCode As String = String.Empty
                 Dim CopyHeader As String = String.Empty
                 Dim CopyContent As String
                 Dim BubbleJS As String
-                Dim CS As Integer
-                Dim AddonName As String = String.Empty
+                'Dim AddonName As String = String.Empty
                 '
                 If cpCore.authContext.isAuthenticated() And True Then
                     If cpCore.authContext.isEditingAnything() Then
-                        CS = cpCore.db.csOpenRecord(cnAddons, addonId)
-                        If cpCore.db.cs_ok(CS) Then
-                            AddonName = cpCore.db.cs_getText(CS, "name")
-                            StyleSheet = cpCore.db.cs_get(CS, "CustomStylesFilename")
-                            DefaultStylesheet = cpCore.db.cs_get(CS, "StylesFilename")
-                        End If
-                        Call cpCore.db.cs_Close(CS)
-                        '
+                        Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpCore, addonId)
                         CopyHeader = CopyHeader _
-                        & "<div class=""ccHeaderCon"">" _
-                        & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
-                        & "<tr>" _
-                        & "<td align=left class=""bbLeft"">Stylesheet for " & AddonName & "</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.doc.helpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
-                        & "</tr>" _
-                        & "</table>" _
-                        & "</div>"
+                            & "<div class=""ccHeaderCon"">" _
+                            & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
+                            & "<tr>" _
+                            & "<td align=left class=""bbLeft"">Stylesheet for " & addon.name & "</td>" _
+                            & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.doc.helpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
+                            & "</tr>" _
+                            & "</table>" _
+                            & "</div>"
                         CopyContent = "" _
-                        & "" _
-                        & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
-                        & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>" _
-                        & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b>" & cpCore.html.html_GetFormInputTextExpandable2("CustomStyles", StyleSheet, 10, "400px") & "</td></tr>"
-                        'CopyContent = "" _
-                        '    & cpcore.main_GetUploadFormStart() _
-                        '    & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
-                        '    & "<tr><td><div style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</div></td></tr>" _
-                        '    & "<tr><td><div style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b></div>" & cpcore.main_GetFormInputTextExpandable2( "CustomStyles", StyleSheet, 10, "400px") & "</td></tr>"
-                        If DefaultStylesheet = "" Then
-                            CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
-                        Else
-                            CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>" & cpCore.html.html_GetFormInputTextExpandable2("DefaultStyles", DefaultStylesheet, 10, "400px", , , True) & "</td></tr>"
-                        End If
+                            & "" _
+                            & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
+                            & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>" _
+                            & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b>" & cpCore.html.html_GetFormInputTextExpandable2("CustomStyles", addon.StylesFilename, 10, "400px") & "</td></tr>"
+                        'If DefaultStylesheet = "" Then
+                        '    CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
+                        'Else
+                        '    CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>" & cpCore.html.html_GetFormInputTextExpandable2("DefaultStyles", DefaultStylesheet, 10, "400px", , , True) & "</td></tr>"
+                        'End If
                         CopyContent = "" _
                         & CopyContent _
                         & "</tr>" _
@@ -3120,7 +3125,7 @@ ErrorTrap:
                         return_DialogList = return_DialogList & Dialog
                         result = "" _
                             & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & ">" _
-                            & GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " & AddonName & " Stylesheets", "Edit " & AddonName & " Stylesheets", "", True, "") _
+                            & GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " & addon.name & " Stylesheets", "Edit " & addon.name & " Stylesheets", "", True, "") _
                             & "</a>"
                         If cpCore.doc.helpCodeCount >= cpCore.doc.helpCodeSize Then
                             cpCore.doc.helpCodeSize = cpCore.doc.helpCodeSize + 10
@@ -3128,7 +3133,7 @@ ErrorTrap:
                             ReDim Preserve cpCore.doc.helpCaptions(cpCore.doc.helpCodeSize)
                         End If
                         cpCore.doc.helpCodes(cpCore.doc.helpCodeCount) = LocalCode
-                        cpCore.doc.helpCaptions(cpCore.doc.helpCodeCount) = AddonName
+                        cpCore.doc.helpCaptions(cpCore.doc.helpCodeCount) = addon.name
                         cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     End If
                 End If

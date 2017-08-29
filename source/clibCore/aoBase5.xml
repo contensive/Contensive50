@@ -1,387 +1,5 @@
 
 <Collection name="Base5" guid="{7C6601A7-9D52-40A3-9570-774D0D43D758}" system="1">
-	<Addon name="Admin Site" guid="{c2de2acf-ca39-4668-b417-aa491e7d8460}" type="Add-on">
-		<Copy></Copy>
-		<CopyText></CopyText>
-		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass><![CDATA[Contensive.Addons.addon_AdminSiteClass]]></DotNetClass>
-		<ArgumentList></ArgumentList>
-		<AsAjax>No</AsAjax>
-		<Filter>No</Filter>
-		<Help></Help>
-		<HelpLink></HelpLink>
-		<Icon Link="" width="0" height="0" sprites="0" />
-		<InIframe>No</InIframe>
-		<BlockEditTools>No</BlockEditTools>
-		<FormXML></FormXML>
-		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-		<IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
-		<IsInline>No</IsInline>
-		<JavascriptOnLoad></JavascriptOnLoad>
-		<JavascriptInHead></JavascriptInHead>
-		<JavascriptBodyEnd></JavascriptBodyEnd>
-		<MetaDescription></MetaDescription>
-		<OtherHeadTags></OtherHeadTags>
-		<Content>No</Content>
-		<Template>No</Template>
-		<Email>No</Email>
-		<Admin>No</Admin>
-		<OnPageEndEvent>No</OnPageEndEvent>
-		<OnPageStartEvent>No</OnPageStartEvent>
-		<OnBodyStart>No</OnBodyStart>
-		<OnBodyEnd>No</OnBodyEnd>
-		<RemoteMethod>No</RemoteMethod>
-		<ProcessRunOnce>No</ProcessRunOnce>
-		<ProcessInterval>0</ProcessInterval>
-		<PageTitle></PageTitle>
-		<RemoteAssetLink></RemoteAssetLink>
-		<Styles></Styles>
-		<Scripting Language="" EntryPoint="" Timeout="5000"/>
-	</Addon>
-	<Addon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}" type="Add-on">
-		<Copy></Copy>
-		<CopyText></CopyText>
-		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass></DotNetClass>
-		<ArgumentList></ArgumentList>
-		<AsAjax>No</AsAjax>
-		<Filter>No</Filter>
-		<Help></Help>
-		<HelpLink></HelpLink>
-		<Icon Link="" width="0" height="0" sprites="0" />
-		<InIframe>No</InIframe>
-		<BlockEditTools>No</BlockEditTools>
-		<FormXML></FormXML>
-		<IsInline>No</IsInline>
-		<JavascriptOnLoad></JavascriptOnLoad>
-		<JavascriptInHead></JavascriptInHead>
-		<JavascriptBodyEnd></JavascriptBodyEnd>
-		<MetaDescription></MetaDescription>
-		<OtherHeadTags></OtherHeadTags>
-		<Content>No</Content>
-		<Template>No</Template>
-		<Email>No</Email>
-		<Admin>No</Admin>
-		<OnPageEndEvent>No</OnPageEndEvent>
-		<OnPageStartEvent>No</OnPageStartEvent>
-		<OnBodyStart>No</OnBodyStart>
-		<OnBodyEnd>No</OnBodyEnd>
-		<RemoteMethod>No</RemoteMethod>
-		<ProcessRunOnce>No</ProcessRunOnce>
-		<ProcessInterval>0</ProcessInterval>
-		<PageTitle></PageTitle>
-		<RemoteAssetLink></RemoteAssetLink>
-		<Styles><![CDATA[body {overflow:auto;}
-/*
-Body Class Selectors 
-*/
-.ccBodyWeb{}
-.ccBodyPrint{}
-.ccBodyEmail{}
-.ccBodyAdmin {margin:0;padding:0;COLOR:black;BACKGROUND-COLOR:#C3D9FF;FONT-WEIGHT:normal}
-/*
-Contensive Container Resets 
-*/
-.ccCon div,.ccCon p,.ccCon td,.ccCon ul,.ccCon li {color:#222;font-size:11px;font-family:verdana,arial,sans-serif;line-height:1.2;}
-.ccCon p {margin:1.12em 0;}
-.ccCon li {margin:0.3em 0;}
-.ccCon ul {list-style:disc outside;margin:0;padding-left:20px}
-.ccCon ol {list-style:decimal inside;margin:0;padding-left:20px}
-.ccCon td {vertical-align:top;line-height:1.2;}
-.ccCon h1,.ccCon H2,.ccCon H3,.ccCon H4,.ccCon H5,.ccCon H6 {MARGIN-TOP:15PX;MARGIN-BOTTOM:10PX;PADDING:0PX;FONT-WEIGHT:bold;FONT-FAMILY:verdana,arial,sans-serif;}
-.ccCon h2 {FONT-SIZE:17px;}
-.ccCon h2 {FONT-SIZE:14px;}
-.ccCon h3 {FONT-SIZE:13px;}
-.ccCon h4 {FONT-SIZE:12px;}
-.ccCon h5,.ccCon h6 {FONT-SIZE:12px;}
-/*
-Contensive Admin 
-*/
-#desktop { color:#222;Background-color:#C3D9FF}
-.ccCon .ccHeaderCon {width:100%;COLOR:white;BACKGROUND-COLOR:#1F70BD;clear:both;vertical-align:middle;}
-.ccCon .ccHeaderCon .cchLeft {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;}
-.ccCon .ccHeaderCon .cchRight {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;}
-.ccCon .ccHeaderCon .cchSingle {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;vertical-align:middle;}
-.ccCon .ccHeaderCon .cchClosed {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px}
-.ccCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
-.ccCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
-/**/
-.ccCon .ccToolsCon {margin:0;padding:0;Background-color:white;border-right:1px solid black;min-height:400px;}
-.ccCon .ccToolsCon .ccHeaderCon {COLOR:white;BACKGROUND-COLOR:#1F70BD;}
-.ccCon .ccToolsCon .ccHeaderCon .closed {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;}
-.ccCon .ccToolsCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left}
-.ccCon .ccToolsCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right}
-.ccCon .ccToolsCon .ccContentCon {width:100%;margin:0;Background-color:white;min-height:400px;}
-.ccCon .ccToolsCon .ccContentCon .opened {width:100%;margin:0;Background-color:white;min-height:400px;padding-top:10px;padding-bottom:20px;}
-.ccCon .ccToolsCon .ccContentCon .closed {width:100%;margin:0;Background-color:white;min-height:400px;}
-/**/
-.ccCon .ccContentCon {margin:0;padding:0;Background-color:#C3D9FF;width:100%;}
-.ccCon .ccControlsCon {color:black;background-color:#fff8d0;padding:5px ! important;border-top:1px solid #808080;border-left:1px solid #808080;border-bottom:1px solid #f8f8f8;border-right:1px solid #f8f8f8;}
-.ccCon .ccControlsCon .left {text-align:right;}
-.ccCon .ccControlsCon .right {text-align:right;}
-.ccCon .ccEditCaptionCon {color:black;white-space:nowrap;text-align:right;font-size:9px;vertical-align:top;padding-top:4px;}
-.ccCon .ccEditCaptionCon {padding-top:5px;}
-.ccCon .ccEditCaptionCon .textexpandable {padding-top:25px;}
-.ccCon .ccEditCaptionCon .htmleditor {padding-top:100px;}
-.ccCon .ccEditFieldCon {padding:5px;border-top:1px solid #fffdf1;border-bottom:1px solid #dad4b2;color:black;background-color:#fff8d0;text-align:left;font-weight:normal;font-size:9px;vertical-align:baseline;}
-.ccCon .ccEditFieldCon .ccEditorCon {}
-.ccCon .ccEditFieldCon .ccEditorCon .checkBox {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .text {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .select {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .file {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .date {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .number {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .password {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .styles {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .link {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorCon .resourceLink {border: 1px solid #ccc;padding:4px;}
-.ccCon .ccEditFieldCon .ccEditorHelpCon {color:#888;font-size:9px;padding:10px;width:80%;}
-.ccCon .ccEditFieldCon .ccEditorHelpCon .opened {display:none;}
-.ccCon .ccEditFieldCon .ccEditorHelpCon .opened .header {font-weight:bold;padding-top:5px;color:#444;}
-.ccCon .ccEditFieldCon .ccEditorHelpCon .opened .body {color:#444;}
-.ccCon .ccHelpCon {width:95%;padding:10px;margin:10px;border: 2px solid #808080;background-color:white}
-.ccCon .ccHelpCon .title {font-size:120%;color:black;FONT-WEIGHT:bold;}
-.ccCon .ccHelpCon .byline {font-size:90%;color:#606060;padding-top:5px;padding-bottom:1px;}
-.ccCon .ccHelpCon .body {font-size:100%;color:#404040;padding-top:5px;border-top:1px solid #808080}
-.ccCon .ccAdminEditHeading {padding:6px;COLOR:black;FONT-WEIGHT:bold;FONT-SIZE:14px;}
-.ccCon .ccAdminEditSubHeader {margin-left:20px;border-bottom:1px solid black;padding:6px;COLOR:black;FONT-WEIGHT:bold;FONT-SIZE:13px;}
-.ccCon .ccAdminEditDescription {COLOR:black;padding:10px;FONT-SIZE:11px;FONT-WEIGHT:normal;}
-.ccCon .ccAdminEditBody {BACKGROUND-COLOR:#E8EEF7;padding:5px;}
-.ccCon .ccAdminEditCaption {COLOR:black;WHITE-SPACE:nowrap;TEXT-ALIGN:right;FONT-WEIGHT:normal;FONT-SIZE:9px;}
-.ccCon .ccAdminEditField {border-top:1px solid #FFFDF1;border-bottom:1px solid #DAD4B2;COLOR:black;Background-color:#fff8d0;TEXT-ALIGN:left;FONT-WEIGHT:normal;FONT-SIZE:9px;vertical-align:baseline;}
-.ccCon .ccAdminListCaption {padding:4px;background-color:#669ACC;COLOR:white;FONT-WEIGHT:normal;FONT-SIZE:11px;border-right:1px solid white;border-bottom:1px solid black;border-top:0px solid white;Text-Decoration:none ! important;}
-.ccCon A.ccAdminListCaption {Display:block;COLOR:white;Text-Decoration:none;border:0px;padding:0px;}
-.ccCon A.ccAdminListCaption:Hover {Text-Decoration:none;}
-.ccCon A.ccAdminListCaption:Visited {Text-Decoration:none;}
-.ccCon .ccAdminListRowEven {BACKGROUND-COLOR:#E8EEF7;padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
-.ccCon .ccAdminListRowOdd {BACKGROUND-COLOR:#ffffff;padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
-.ccCon .ccAdminTab {background-color:#669ACC;color:white;white-space:nowrap;}
-.ccCon A.ccAdminTabLink {color:white;TEXT-DECORATION:none;}
-.ccCon A.ccAdminTabLink:visited {color:white;TEXT-DECORATION:none;}
-.ccCon A.ccAdminTabLink:hover {color:white;TEXT-DECORATION:none;}
-.ccCon .ccAdminTabHit {background-color:white;color:black;white-space:nowrap;}
-.ccCon A.ccAdminTabHitLink {color:black;TEXT-DECORATION:none;}
-.ccCon A.ccAdminTabHitLink:visited {color:black;TEXT-DECORATION:none;}
-.ccCon A.ccAdminTabHitLink:hover {color:black;TEXT-DECORATION:none;}
-.ccCon .ccAdminTabEnd {width:100%;border-bottom:1px solid black;} 
-.ccCon .ccAdminTabEdge {background-color:black;} 
-.ccCon .ccAdminTabBodyCollectionWrap{}
-.ccCon .ccAdminTabBodyWrapShow { display:block;}
-.ccCon .ccAdminTabBodyWrapHide { display:none;}
-.ccCon .ccAdminTabBodyWrap{}
-.ccCon .ccAdminTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;}
-.ccCon .ccAdminTabHitSpacer { width: 5px; }
-.ccCon .ccAdminTabHitFiller { width: 100%; }
-.ccCon A.ccAdminButton {COLOR:#000000;BACKGROUND-COLOR:#e0e0e0;}
-.ccCon A.ccAdminButton:hover {COLOR:#000000;BACKGROUND-COLOR:#ffffff;TEXT-DECORATION:none}
-.ccCon .ccAdminNormal {FONT-WEIGHT:normal;FONT-SIZE:11px;COLOR:#000000;TEXT-DECORATION:none}
-.ccCon .ccAdminSmall {FONT-WEIGHT:normal;FONT-SIZE:9px;COLOR:#000000;TEXT-DECORATION:none}
-.ccCon A.ccAdminNormal {COLOR:blue;TEXT-DECORATION:underline}
-.ccCon A.ccAdminSmall {COLOR:blue;TEXT-DECORATION:underline}
-.ccCon A.ccAdminSmall:hover {COLOR:blue;TEXT-DECORATION:underline}
-.ccCon A.ccAdminSmall:visited {COLOR:blue;TEXT-DECORATION:underline}
-.ccCon A.ccAdminLink {COLOR:blue;TEXT-DECORATION:underline}
-.ccCon A.ccAdminLink:hover {COLOR:blue;TEXT-DECORATION:underline}
-.ccCon A.ccAdminLink:visited{COLOR:blue;TEXT-DECORATION:underline}
-.ccCon .ccAdvSearchText {width:250px}
-.ccCon .ccEditorPreferenceCon {width:400px;height:400px;padding:20px;border: 1px solid #ccc;}
-.ccCon .ccEditorPreferenceCon h1 {}
-.ccCon .ccEditorPreferenceCon p {}
-.ccCon .ccEditorPreferenceCon  .radioCon {padding:0 0 0 10px}
-.ccCon .ccEditorPreferenceCon .buttonCon {padding:20px 0 20px 0}
-/*
-styles used publicly by Contensive 
-*/
-.ccButtonCon {COLOR:black;Background-color:#567694;Padding:5px ! important;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
-div.ccJumpCon {Background-color:#579;Padding:2px;margin:0;}
-.ccJumpCon ul {vertical-align:middle;text-align:right;white-space:nowrap;COLOR:#fff;Padding:5px;margin:0;}
-.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;Padding:5px ! important;color:#ccc;Background-Color:#68a;border-left:1px solid #579;}
-.ccJumpCon ul li:hover {color:#fff;}
-.ccJumpCon ul li.caption {Background-Color:transparent;color:#ccc;border:0;cursor:default;}
-.ccJumpCon ul li.delim {Background-Color:transparent;color:#ccc;border:0;cursor:default;}
-.ccJumpCon ul li.hit {cursor:default;Background-Color:#468;color:#fff;border:1px solid #fff;}
-.ccBubbleCon {position:absolute; border: 2px solid #1F70BD;margin:0;padding:0;Background-color:#C3D9FF;z-index:1;}
-.ccBubbleCon .ccHeaderCon {position:static;width:100%;COLOR:white;BACKGROUND-COLOR:#1F70BD;}
-.ccBubbleCon .ccHeaderCon .bbLeft {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;white-space:nowrap;width:99%}
-.ccBubbleCon .ccHeaderCon .bbRight {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:23px}
-.ccBubbleCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
-.ccBubbleCon .ccContentCon {margin:0;padding:10px;Background-color:#C3D9FF;vertical-align:middle;}
-.ccBubbleCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
-.ccBubbleCon .ccContentCon td.bbLeft {text-align:right;white-space:nowrap;}
-.ccBubbleCon .ccContentCon td.bbRight {text-align:left;}
-.ccDialogCon {margin:0;padding:0;Background-color:#C3D9FF;}
-.ccDialogCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
-.ccDialogCon .ccContentCon {margin:0;padding:10px;Background-color:#C3D9FF;vertical-align:middle;}
-.ccDialogCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
-.ccDialogCon .ccContentCon td.left {text-align:right;white-space:nowrap;}
-.ccDialogCon .ccContentCon td.right {text-align:left;}
-.ccAddonFrameCon {width:100%;border:0;overflow:auto;}
-.ccAddonAjaxCon {}
-.ccAddonEditCaption {white-space:nowrap;clear:left;padding:2px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;line-height:1.2;}
-.ccAddonEditTools {clear:left;padding:0px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;line-height:1.2;}
-.ccHelpIcon a {cursor:help}
-ul.ccChildList {text-align:left}
-ul.ccChildList li.ccListItem {text-align:left}
-ul.ccChildList li.ccListItem a {}
-ul.ccChildList li.ccListItem a:hover {}
-ul.ccChildList li.ccListItem a:visited {}
-ul.ccChildListInactive {text-align:left;border-top:1px solid #444;}
-ul.ccChildListInactive li.ccListItem {text-align:left}
-ul.ccChildListInactive li.ccListItem a {}
-ul.ccChildListInactive li.ccListItem a:hover {}
-ul.ccChildListInactive li.ccListItem a:visited {}
-.ccImgA {width:18px;height:18px;border:0;vertical-align:middle;}
-.ccCategoryListCon {}
-.ccCategoryListCon .caption {padding-top:5px;}
-.ccCategoryListCon .caption a {}
-.ccCategoryListCon UL {margin:0;padding:0;padding-left:20px;}
-.ccCategoryListCon ul li {margin:0;padding:0;padding-left:2px;padding-top:5px;}
-.ccFilterHead {font-size:12px;margin-top:10px;font-weight:bold;color:black}
-.ccFilterSubHead {font-size:10px;margin-top:10px;color:black}
-.ccFilterList {font-size:10px;color:black;}
-A.ccFilterLink {text-decoration:none ! important;color:black ! important;}
-.ccFilterIndent {margin-left:10px;}
-ul.ccFilterList {list-style:none;margin:0;padding:0;}
-ul.ccFilterList li {margin:0;padding:0;padding-left:10px;}
-ul.ccFilterList li a {text-decoration:none ! important;color:black ! important;}
-.ccRecordLinkCon { position: absolute; z-index: 999; }
-.ccListItem .ccRecordLinkCon { position: static; }
-.ccRecordLinkCon a.ccRecordEditLink { }
-.ccRecordLinkCon a.ccRecordCutLink { }
-.ccEditWrapper {border:1px dashed #808080;}
-.ccEditWrapperCaption {FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;line-height:1.2;text-align:left;border-bottom:1px solid #808080;padding:4px;color:black;background-color:#4c4;}
-.ccEditWrapperContent{padding:4px;}
-.ccDisabledReason {color:gray;}
-.ccEditorTextROCon {padding:20px;background-color:#fff;border:1px solid #aaa;}
-.ccAdminMsg {padding:10px;margin:10px;background-color:white;border:1px solid #888}
-.ccAdminButtonBar {COLOR:black;Background-color:#567694;Padding:5px}
-.ccCon  div.ccAdminTitleBar {COLOR:black;Background-color:transparent;FONT-WEIGHT:bold;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;Padding:10px}
-.ccAdminInfoBar {COLOR:black;Background-color:#E8EEF7;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;Padding:10px;Margin:10px;Margin-Top:0px;}
-.ccAuthoringLink {FONT-WEIGHT:normal;FONT-SIZE:9px;COLOR:#ffffff;FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#89ab22;TEXT-DECORATION:none}
-.ccNavLink {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;margin-top:3px;}
-.ccNavLinkEmpty {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;}
-.ccNavLinkChild {margin-left:19px;}
-.ccHeadline {FONT-WEIGHT:bold;FONT-SIZE:14px;FONT-FAMILY:verdana,arial,sans-serif;}
-.ccList {}
-.ccWatchList {}
-.ccListCopy {}
-.ccSmall {FONT-SIZE:9px;FONT-FAMILY:verdana,arial,sans-serif;}
-.ccNormal {FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;}
-.ccLarge {FONT-SIZE:14px;FONT-FAMILY:verdana,arial,sans-serif;}
-.ccSurveyHeadline {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;FONT-WEIGHT:bold;FONT-SIZE:14px;FONT-FAMILY:verdana,arial,sans-serif}
-.ccSurveyQuestion {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif}
-.ccSurveyCopy {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif}
-.ccError {FONT-WEIGHT:bold;FONT-SIZE:11px;COLOR:#c02020;FONT-FAMILY:verdana,arial,sans-serif}
-.ccPanel3D{BACKGROUND-COLOR:#e0e0e0;Border-Top:1px solid #f8f8f8;Border-Left:1px solid #f8f8f8;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
-.ccPanel3DReverse{BACKGROUND-COLOR:#e0e0e0;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
-.ccPanel3DInput{BACKGROUND-COLOR:#f0f0f0;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
-.ccPanel {BACKGROUND-COLOR:#e0e0e0}
-.ccPanelHilite {BACKGROUND-COLOR:#f8f8f8}
-.ccPanelShadow {BACKGROUND-COLOR:#808080}
-.ccPanelInput {BACKGROUND-COLOR:#f0f0f0;}
-.ccPanelBackground {BACKGROUND-COLOR:#f0f0f0}
-.ccPanelButtons {BACKGROUND-COLOR:#a0a0a0}
-.ccPanelDark {BACKGROUND-COLOR:#d0d0d0}
-.ccPanelHeader {FONT-SIZE:11px;COLOR:#ffffff;FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#0320b0}
-.ccPanelHeaderHilite {FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#8080ff}
-.ccPanelHeaderShadow {FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#000000}
-.ccPanelReverse {BACKGROUND-COLOR:#0320c0}
-.ccPanelIndexRow {BACKGROUND-COLOR:#d6dfed}
-.ccPanelRowEven {BACKGROUND-COLOR:#f0f0f0}
-.ccPanelRowOdd {BACKGROUND-COLOR:#ffffff}
-.ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:0px;PADDING-LEFT:0px;PADDING-BOTTOM:4px;PADDING-TOP:4px;white-space:nowrap;}
-A.ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:6px;PADDING-LEFT:6px;PADDING-BOTTOM:4px;PADDING-TOP:4px;FONT-WEIGHT:normal;FONT-SIZE:11px;Z-INDEX:100;COLOR:black;FONT-STYLE:normal;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;white-space:nowrap;}
-A.ccFlyoutButton:hover {TEXT-DECORATION:none;color:white;Background-color:#669ACC;}
-A.ccFlyoutButton:visited {TEXT-DECORATION:none;}
-A.ccFlyoutButtonDown {TEXT-DECORATION:none;color:white;Background-color:#669ACC;}
-A.ccFlyoutButtonDown:hover {TEXT-DECORATION:none;}
-A.ccFlyoutButtonDown:visited {TEXT-DECORATION:none;}
-.ccFlyoutDelimiter {color:#808080;padding:0px;margin:0px;}
-.ccFlyoutPanel {BORDER:white 1px solid;Z-INDEX:101;VISIBILITY:hidden;POSITION:absolute;BACKGROUND-COLOR:#e0e0e0;TEXT-DECORATION:none;}
-A.ccFlyoutPanelButton {DISPLAY:block;BORDER-BOTTOM:#f0f0f0 1px solid;PADDING:4px;PADDING-LEFT:10px;PADDING-RIGHT:10px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-STYLE:normal;FONT-FAMILY:verdana,arial,sans-serif;WHITE-SPACE:nowrap;TEXT-DECORATION:none;COLOR:black;}
-A.ccFlyoutPanelButton:hover {TEXT-DECORATION:none;COLOR:white;BACKGROUND-COLOR:#669ACC;}
-A.ccFlyoutPanelButton:visited {TEXT-DECORATION:none;}
-A.ccFlyoutPanelButtonDown {TEXT-DECORATION:none;COLOR:white;BACKGROUND-COLOR:#669ACC;}
-.ccReport {padding:20px;Background-Color:white;Border-bottom:1px solid black;Border-left:1px solid black;Border-right:1px solid black;} 
-.ccReportRowTop {padding:4px;Background-Color:white;} 
-.ccReportRowOdd {padding:4px;Border-top:1px solid black;Background-Color:#F0F0F0;} 
-.ccReportRowEven {padding:4px;Border-top:1px solid black;Background-Color:white;} 
-.ccTab {background-color:#1F70BD;color:white;}
-A.ccTabLink:Link {color:white;TEXT-DECORATION:none;}
-A.ccTabLink:visited {color:white;TEXT-DECORATION:none;}
-A.ccTabLink:hover {color:white;TEXT-DECORATION:none;}
-.ccTabHit {background-color:white;color:black;}
-A.ccTabHitLink:link {color:black;TEXT-DECORATION:none;}
-A.ccTabHitLink:visited {color:black;TEXT-DECORATION:none;}
-A.ccTabHitLink:hover {color:black;TEXT-DECORATION:none;}
-.ccTabEnd {width:100%;border-bottom:1px solid black;} 
-.ccTabEdge {background-color:black;} 
-.ccTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;border-bottom:1px solid black;margin:0px;}
-.ccTabHitSpacer { width: 5px; }
-.ccTabHitFiller { width: 100%; }
-.ccLiveTab {background-color:#A0A0A0;color:white;}
-A.ccLiveTabLink {color:white;TEXT-DECORATION:none;}
-A.ccLiveTabLink:visited {color:white;TEXT-DECORATION:none;}
-A.ccLiveTabLink:hover {color:white;TEXT-DECORATION:none;}
-.ccLiveTabHit {background-color:white;color:black;}
-A.ccLiveTabHitLink {color:black;TEXT-DECORATION:none;}
-A.ccLiveTabHitLink:visited {color:black;TEXT-DECORATION:none;}
-A.ccLiveTabHitLink:hover {color:black;TEXT-DECORATION:none;}
-.ccLiveTabEnd {width:100%;border-bottom:1px solid black;} 
-.ccLiveTabEdge {background-color:black;} 
-.ccLiveTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;}
-.ccLiveTabHitSpacer { width: 5px; }
-.ccLiveTabHitFiller { width: 100%; }
-.ccLiveTabBodyCollectionWrap { position:relative;background-color:white;}
-.ccWizardHeader{COLOR:white;BACKGROUND-COLOR:#1F70BD;Padding:5px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;Border-Top:1px solid #1330c0;Border-Left:1px solid #1330c0;Border-Bottom:1px solid #0210a0;Border-right:1px solid #0210a0;}
-.ccWizardPanel{COLOR:black;BACKGROUND-COLOR:#E8EEF7;Border-Top:1px solid #ffffff;Border-Left:1px solid #ffffff;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
-.ccTextArea {width:100%;overflow:auto;}
-.ccTextArea textarea {padding:0;margin:0;border:none}
-.ccTextAreaOpened {position:absolute;top:24px;left:0px;;width:100%;overflow:auto;}
-.ccTextAreaHead {COLOR:white;BACKGROUND-COLOR:#669ACC;padding:5px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif}
-div.ccTextAreaHead A:link {COLOR:white;TEXT-DECORATION:none;}
-div.ccTextAreaHead A:visited {COLOR:white;TEXT-DECORATION:none;}
-div.ccTextAreaHead A:hover {COLOR:white;TEXT-DECORATION:none;}
-.ccTextAreaHeadOpened {position:absolute;top:0px;left:0px;height:24px;width:100%;background-color:#669ACC;margin:0px;padding:5px;border-bottom:2px solid #d0d0d0;}
-div.ccTextAreaHeadOpened A:link {COLOR:white;TEXT-DECORATION:none;}
-div.ccTextAreaHeadOpened A:visited {COLOR:white;TEXT-DECORATION:none;}
-div.ccTextAreaHeadOpened A:hover {COLOR:white;TEXT-DECORATION:none;}
-div.ccTestPointMessageCon { margin:10px;border:1px solid #444;padding:20px;background-color:#eee;}
-/*
-for hints created with getAdminHintWrapper
-*/
-.ccEditWrapper {border:1px dashed #808080;}
-.ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}
-.ccEditWrapperContent{padding:4px;}
-.ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}
-.ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}
-/*
-help dialog for addon options, etc.
-*/
-.helpDialogCon {/* blows advanced edit page out - width:420px; */}
-/*
-Container for the login panel when the section is blocked
-*/
-.ccLoginPageCon 
-{
-	width: 400px;
-	margin: 100px auto 0 auto;
-}
-/*
-Container for the default login form
-*/
-.ccLoginFormCon
-{
-	width: 350px;
-	margin: 0 auto;
-}
-/*
-Exception list
-*/
-ul.ccExceptionList { padding: 10px 20px;margin:0;background-color:red;list-style-type: none;}
-li.ccExceptionListRow { padding:0;margin: 10px auto;}]]></Styles>
-		<Scripting Language="" EntryPoint="" Timeout="5000"/>
-	</Addon>
   <CDef Name="Data Sources" ActiveOnly="1" AdminOnly="1" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccDataSources" ContentDataSourceName="DEFAULT" ContentTableName="ccDataSources" DefaultSortMethod="By Name" DeveloperOnly="1" DropDownFieldList="NAME" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowMetaContent="0" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites=""  guid="{50EC1B7B-B671-4F40-8DBE-BD74D1E54D7D}">
 		<Field Name="Name" active="1" AdminOnly="0" Authorable="1" Caption="Name" DeveloperOnly="0" EditSortPriority="110" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="30" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="Active" active="1" AdminOnly="0" Authorable="1" Caption="Active" DeveloperOnly="0" EditSortPriority="200" FieldType="Boolean" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="1" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
@@ -774,7 +392,6 @@ li.ccExceptionListRow { padding:0;margin: 10px auto;}]]></Styles>
 		<Field Name="BirthdayDay" active="True" AdminOnly="False" Authorable="True" Caption="Birthday Day" DeveloperOnly="False" EditSortPriority="1500" FieldType="Integer" HTMLContent="0" IndexColumn="99" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Personalize" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
 		<Field Name="BirthdayMonth" active="True" AdminOnly="False" Authorable="True" Caption="Birthday Month" DeveloperOnly="False" EditSortPriority="1510" FieldType="Lookup" HTMLContent="0" IndexColumn="99" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Personalize" Scramble="False" LookupList="January,February,March,April,May,June,July,August,September,October,November,December" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
 		<Field Name="BirthdayYear" active="True" AdminOnly="False" Authorable="True" Caption="Birthday Year" DeveloperOnly="False" EditSortPriority="1520" FieldType="Integer" HTMLContent="0" IndexColumn="99" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Personalize" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
-		<Field Name="StyleFilename" active="True" AdminOnly="False" Authorable="True" Caption="Member Styles" DeveloperOnly="False" EditSortPriority="3000" FieldType="CSSFile" HTMLContent="0" IndexColumn="99" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Personalize" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
 		<Field Name="Topics" active="True" AdminOnly="False" Authorable="True" Caption="Topics" DeveloperOnly="False" EditSortPriority="1000" FieldType="ManyToMany" HTMLContent="0" IndexColumn="99" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Topics" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="MemberID" ManyToManyRuleSecondaryField="TopicID" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="Topics" ManyToManyRuleContent="Member Topic Rules" ></Field>
 		<Field Name="BillAddress2" active="True" AdminOnly="False" Authorable="True" Caption="Address Line 2" DeveloperOnly="False" EditSortPriority="1225" FieldType="Text" HTMLContent="0" IndexColumn="99" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Billing" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
 		<Field Name="ShipAddress2" active="True" AdminOnly="False" Authorable="True" Caption="Address Line 2" DeveloperOnly="False" EditSortPriority="1295" FieldType="Text" HTMLContent="0" IndexColumn="99" IndexSortDirection="" IndexSortOrder="0" IndexWidth="0" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="0" EditTab="Shipping" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="False" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
@@ -888,7 +505,7 @@ li.ccExceptionListRow { padding:0;margin: 10px auto;}]]></Styles>
 		<Field Name="LinkAlias" active="1" AdminOnly="0" Authorable="0" Caption="Link Alias" DeveloperOnly="0" EditSortPriority="4000" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="1" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="1" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<!-- Topics Tab -->
 		<Field Name="Topics" active="1" AdminOnly="0" Authorable="1" Caption="Topics" DeveloperOnly="0" EditSortPriority="1000" FieldType="ManyToMany" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Topics" Scramble="0" LookupList="" ManyToManyContent="Topics" ManyToManyRuleContent="Page Content Topic Rules" ManyToManyRulePrimaryField="PageID" ManyToManyRuleSecondaryField="TopicID" />
-		<Field Name="includedaddons" active="True" AdminOnly="False" Authorable="True" Caption="Required Add-ons" DeveloperOnly="False" EditSortPriority="1000" FieldType="ManyToMany" HTMLContent="False" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="" EditTab="Dependencies" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="addonId" ManyToManyRuleSecondaryField="pageId" IsModified="True" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="Add-ons" ManyToManyRuleContent="Add-on Page Rules" ></Field>
+		<Field Name="includedaddons" active="True" AdminOnly="False" Authorable="True" Caption="Required Add-ons" DeveloperOnly="False" EditSortPriority="1000" FieldType="ManyToMany" HTMLContent="False" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="" EditTab="Dependencies" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="pageId" ManyToManyRuleSecondaryField="addonId" IsModified="True" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="Add-ons" ManyToManyRuleContent="Add-on Page Rules" ></Field>
 	</CDef>
 	<CDef Name="Page Content Block Rules" ActiveOnly="1" AdminOnly="0" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccPageContentBlockRules" ContentDataSourceName="DEFAULT" ContentTableName="ccPageContentBlockRules" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="GROUPID RECORDID" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowMetaContent="0" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{78B28231-9C0B-4753-B69B-F586EE44DA9F}">
 		<Field Name="GroupID" active="1" AdminOnly="0" Authorable="1" Caption="Group" DeveloperOnly="0" EditSortPriority="1000" FieldType="Lookup" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="50" LookupContent="Groups" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
@@ -1408,7 +1025,7 @@ li.ccExceptionListRow { padding:0;margin: 10px auto;}]]></Styles>
 		<Field Name="Name" active="1" AdminOnly="0" Authorable="1" Caption="Name" DeveloperOnly="0" EditSortPriority="100" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="50" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="1" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="BodyHTML" active="1" AdminOnly="0" Authorable="1" Caption="Body" DeveloperOnly="0" EditSortPriority="1100" FieldType="HTML" HTMLContent="1" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="IsSecure" active="1" AdminOnly="0" Authorable="1" Caption="Requires Secure SSL Connection" DeveloperOnly="0" EditSortPriority="1120" FieldType="Boolean" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="1" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-   		<Field Name="includedaddons" active="True" AdminOnly="False" Authorable="True" Caption="Required Add-ons" DeveloperOnly="False" EditSortPriority="1000" FieldType="ManyToMany" HTMLContent="False" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="" EditTab="Dependencies" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="addonId" ManyToManyRuleSecondaryField="templateId" IsModified="True" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="Add-ons" ManyToManyRuleContent="Add-on Template Rules" ></Field>
+   	<Field Name="includedaddons" active="True" AdminOnly="False" Authorable="True" Caption="Required Add-ons" DeveloperOnly="False" EditSortPriority="1000" FieldType="ManyToMany" HTMLContent="False" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="" EditTab="Dependencies" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="templateId" ManyToManyRuleSecondaryField="addonId" IsModified="True" IsBaseField="False" LookupContent="" RedirectContent="" ManyToManyContent="Add-ons" ManyToManyRuleContent="Add-on Template Rules" ></Field>
 		<Field Name="Source" active="1" AdminOnly="0" Authorable="0" Caption="Body Source File" DeveloperOnly="0" EditSortPriority="1050" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="1" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="Domains" active="1" AdminOnly="0" Authorable="1" Caption="Domains Required By This Template" DeveloperOnly="0" EditSortPriority="1000" FieldType="ManyToMany" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="1" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Domains" Scramble="0" LookupList="" ManyToManyContent="Domains" ManyToManyRuleContent="Template Domain Rules" ManyToManyRulePrimaryField="templateId" ManyToManyRuleSecondaryField="domainId" />
 <!--
@@ -1429,30 +1046,7 @@ li.ccExceptionListRow { padding:0;margin: 10px auto;}]]></Styles>
 		<Field Name="templateId" active="1" AdminOnly="0" Authorable="1" Caption="Template" DeveloperOnly="0" EditSortPriority="1000" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Page Templates" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="domainId" active="1" AdminOnly="0" Authorable="1" Caption="Domain" DeveloperOnly="0" EditSortPriority="1100" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Domains" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 	</CDef>
-    <!--
-	<CDef Name="Shared Styles Template Rules" Active="1" AdminOnly="0" AllowAdd="1"  AllowContentChildTool="0" NavIconType="Content" AllowContentTracking="0" AllowDelete="1" AllowMetaContent="0" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="ccSharedStylesTemplateRules" ContentDataSourceName="Default" ContentTableName="ccSharedStylesTemplateRules" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="Name" EditorGroupName="" Parent="" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{37317AE7-E58D-4F87-B96F-72BC704396B0}">
-		<Field Name="TemplateID" active="1" AdminOnly="0" Authorable="1" Caption="Template" DeveloperOnly="0" EditSortPriority="1000" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Page Templates" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="StyleID" active="1" AdminOnly="0" Authorable="1" Caption="Style" DeveloperOnly="0" EditSortPriority="1100" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Shared Styles" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-	</CDef>
-  -->
-	<CDef Name="Site Sections" ActiveOnly="1" AdminOnly="0" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccSections" ContentDataSourceName="DEFAULT" ContentTableName="ccSections" DefaultSortMethod="By Alpha Sort Order Then Oldest First" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowMetaContent="0" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{C77591FA-D203-45F5-BBF7-71787D6CF8C0}">
-		<Field Name="Name" active="1" AdminOnly="0" Authorable="1" Caption="Name" DeveloperOnly="0" EditSortPriority="100" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="100" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="1" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="SortOrder" active="1" AdminOnly="0" Authorable="1" Caption="Alpha Sort Order" DeveloperOnly="0" EditSortPriority="200" FieldType="Text" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="zzzz" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="Active" active="1" AdminOnly="0" Authorable="1" Caption="Active" DeveloperOnly="0" EditSortPriority="300" FieldType="Boolean" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="1" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="Caption" active="1" AdminOnly="0" Authorable="1" Caption="Caption" DeveloperOnly="0" EditSortPriority="1000" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="1" IndexWidth="20" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Features" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="TemplateID" active="1" AdminOnly="0" Authorable="1" Caption="Default Template" DeveloperOnly="0" EditSortPriority="1100" FieldType="Lookup" HTMLContent="0" IndexColumn="1" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="50" LookupContent="Page Templates" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Features" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="RootPageID" active="1" AdminOnly="0" Authorable="1" Caption="Root Page" DeveloperOnly="0" EditSortPriority="1150" FieldType="Lookup" HTMLContent="0" IndexColumn="2" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="Page Content" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="1" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Features" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="ContentID" active="1" AdminOnly="0" Authorable="1" Caption="Default Content" DeveloperOnly="1" EditSortPriority="1200" FieldType="Lookup" HTMLContent="0" IndexColumn="2" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="30" LookupContent="Content" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Features" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="MenuImageFilename" active="1" AdminOnly="0" Authorable="1" Caption="Menu Image" DeveloperOnly="0" EditSortPriority="1300" FieldType="Image" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Features" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="MenuImageOverFilename" active="1" AdminOnly="0" Authorable="1" Caption="Menu Image Rollover" DeveloperOnly="0" EditSortPriority="1301" FieldType="Image" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Features" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="HideMenu" active="1" AdminOnly="0" Authorable="1" Caption="Hidden from Menus" DeveloperOnly="0" EditSortPriority="1310" FieldType="Boolean" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="0" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Features" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="BlockSection" active="1" AdminOnly="0" Authorable="1" Caption="Blocked from Users" DeveloperOnly="0" EditSortPriority="1320" FieldType="Boolean" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="0" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Features" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="JSOnLoad" active="1" AdminOnly="0" Authorable="1" Caption="onLoad Event" DeveloperOnly="0" EditSortPriority="2000" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Javascript" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="JSHead" active="1" AdminOnly="0" Authorable="1" Caption="In Head (Legacy/Developer only)" DeveloperOnly="1" EditSortPriority="2100" FieldType="LongText" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Javascript" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="JSFilename" active="1" AdminOnly="0" Authorable="1" Caption="In Head" DeveloperOnly="0" EditSortPriority="2100" FieldType="JavascriptFile" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Javascript" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-		<Field Name="JSEndBody" active="1" AdminOnly="0" Authorable="1" Caption="Before End of Body" DeveloperOnly="0" EditSortPriority="2200" FieldType="LongText" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Javascript" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
-	</CDef>
-	<CDef Name="Meta Content" ActiveOnly="1" AdminOnly="0" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccMetaContent" ContentDataSourceName="DEFAULT" ContentTableName="ccMetaContent" DefaultSortMethod="By Alpha Sort Order Field" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowMetaContent="0" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{42FC4D0C-4099-47E0-8FC3-48F476B6BAC6}">
+  <CDef Name="Meta Content" ActiveOnly="1" AdminOnly="0" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccMetaContent" ContentDataSourceName="DEFAULT" ContentTableName="ccMetaContent" DefaultSortMethod="By Alpha Sort Order Field" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowMetaContent="0" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{42FC4D0C-4099-47E0-8FC3-48F476B6BAC6}">
 		<Field Name="Name" active="1" AdminOnly="0" Authorable="1" Caption="Meta Title" DeveloperOnly="0" EditSortPriority="100" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="100" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="MetaDescription" active="1" AdminOnly="0" Authorable="1" Caption="Meta Description" DeveloperOnly="0" EditSortPriority="1000" FieldType="LongText" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="MetaKeywordList" active="1" AdminOnly="0" Authorable="1" Caption="Meta Keyword List" DeveloperOnly="0" EditSortPriority="1005" FieldType="LongText" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
@@ -1679,17 +1273,11 @@ li.ccExceptionListRow { padding:0;margin: 10px auto;}]]></Styles>
 	<NavigatorEntry Name="Email Templates" NameSpace="Manage Email" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Email Templates" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{43812ECE-C41A-4E2B-B9FB-B11EC4495E54}" />
 	<NavigatorEntry Name="Email Log" NameSpace="Manage Email" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Email Log" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{788EE1A9-3445-493A-A1AE-E945293CAAB1}" />
 	<NavigatorEntry Name="Pages" NameSpace="Manage Content" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Page Content" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{984609DD-2FD8-4DBC-90BC-971A4FCD98C8}" />
-	<NavigatorEntry Name="Sections" NameSpace="Manage Content" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Site Sections" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{28A152A1-05A2-47CF-820A-C8A84F7077C4}" />
 	<NavigatorEntry Name="Templates" NameSpace="Manage Design" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Page Templates" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{36F47E8E-8DC9-4561-AB61-40B82F7E0A40}" />
 	<NavigatorEntry Name="Menus" NameSpace="Manage Design" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Dynamic Menus" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{013E089D-87DE-476A-8E23-581DB78AF2C3}" />
 	<NavigatorEntry name="Wrappers" namespace="manage design" navicontitle="" navicontype="content" linkpage="" contentname="wrappers" adminonly="0" developeronly="0" newwindow="0" active="1" AddonName="" guid="{131E0319-D516-4AB2-BBDA-D7EA63A8AD9E}" />
 	<NavigatorEntry Name="Styles" NameSpace="Manage Design" NavIconTitle="" NavIconType="Folder" LinkPage="" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{C34DF96F-7DEC-4CC7-9979-50BC3069F858}" />
-  <!--
-	<NavigatorEntry Name="Shared Styles" NameSpace="Manage Design.Styles" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Shared Styles" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{605C39C7-FCEA-458F-826E-8539916DF504}" />
-	<NavigatorEntry Name="Site Styles" NameSpace="Manage Design.Styles" NavIconTitle="" NavIconType="Content" LinkPage="?af=27" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{7C8E1706-8A81-4005-B421-96EBF8827906}" />
-  --> 
 	<NavigatorEntry Name="Content Watch Lists" NameSpace="Settings" NavIconTitle="" NavIconType="content" LinkPage="" ContentName="Content Watch Lists" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{F1305C23-4379-4F1B-8556-99DF07396A2D}" />
-	<!-- <NavigatorEntry Name="Email Wizard" NameSpace="Manage Email" NavIconTitle="" NavIconType="Tool" LinkPage="?af=34" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{422EF377-ED6C-448C-859D-92AFA8848C67}" /> -->
 	<NavigatorEntry Name="Remote Queries" NameSpace="Settings.Advanced" NavIconTitle="" NavIconType="Advanced" LinkPage="" ContentName="Remote Queries" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{7E37952E-040C-4A0B-B811-E55A11AC22A4}" />
 	<NavigatorEntry Name="Navigator Entries" NameSpace="Settings.Advanced" NavIconTitle="" NavIconType="Advanced" LinkPage="" ContentName="Navigator Entries" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{D12D88F1-8E27-4B9F-8E26-27657D01F9AC}" />
 	<NavigatorEntry Name="Link Alias" NameSpace="Settings.Advanced" NavIconTitle="" NavIconType="Advanced" LinkPage="" ContentName="Link Aliases" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{03B8B95F-DF59-4E9C-AA53-AD28124AFEA5}" />

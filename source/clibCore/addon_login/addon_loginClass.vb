@@ -44,14 +44,16 @@ Namespace Contensive.Addons
         End Function
         '
         '========================================================================
-        '   Print the login form in an intercept page
-        '========================================================================
-        '
+        ''' <summary>
+        ''' A complete html page with the login form in the middle
+        ''' </summary>
+        ''' <param name="forceDefaultLogin"></param>
+        ''' <returns></returns>
         Public Function getLoginPage(forceDefaultLogin As Boolean) As String
             Dim returnREsult As String = ""
             Try
                 Dim Body As String
-                Dim head As String
+                'Dim head As String
                 Dim bodyTag As String
                 '
                 ' ----- Default Login
@@ -84,14 +86,8 @@ Namespace Contensive.Addons
                 '
                 Call cpCore.html.main_SetMetaContent(0, 0)
                 Call cpCore.html.main_AddPagetitle2("Login", "loginPage")
-                head = cpCore.html.getHtmlDocHead(False)
                 bodyTag = TemplateDefaultBodyTag
-                'If cpCore.doc.template.BodyTag <> "" Then
-                '    bodyTag = cpCore.doc.template.BodyTag
-                'Else
-                '    bodyTag = TemplateDefaultBodyTag
-                'End If
-                returnREsult = cpCore.html.assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
+                returnREsult = cpCore.html.getHtmlDoc(Body, bodyTag, True, True, False, True)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -239,17 +235,9 @@ Namespace Contensive.Addons
             Return returnHtml
         End Function
         '
-        '========================================================================
-        '   same as main_GetLoginForm
-        '========================================================================
-        '
-        Public Function getLoginPanel() As String
-            Return getLoginForm()
-        End Function
-        '
         '=============================================================================
         ''' <summary>
-        ''' 
+        ''' A login form that can be added to any page. This is just form with no surrounding border, etc. 
         ''' </summary>
         ''' <returns></returns>
         Public Function getLoginForm() As String

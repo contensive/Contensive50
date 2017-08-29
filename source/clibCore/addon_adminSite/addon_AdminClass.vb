@@ -36,22 +36,14 @@ Namespace Contensive.Addons
                 Me.cp = DirectCast(cp, CPClass)
                 cpCore = Me.cp.core
                 '
-                Dim AdminContent As String
-                Dim SaveContent As String
-                Dim BinaryHeader() As Byte
-                Dim BinaryHeaderString As String
-                Dim rightNow As Date = DateTime.Now
-                '
-                ' log request
-                '
-                SaveContent = "" _
-                    & Now() _
-                    & vbCrLf & "member.name:" & cpCore.authContext.user.Name _
-                    & vbCrLf & "member.id:" & cpCore.authContext.user.id _
-                    & vbCrLf & "visit.id:" & cpCore.authContext.visit.id _
-                    & vbCrLf & "url:" & cpCore.webServer.requestUrl _
-                    & vbCrLf & "url source:" & cpCore.webServer.requestUrlSource
-                SaveContent &= "" _
+                ' -- log request
+                Dim SaveContent As String = "" _
+                        & Now() _
+                        & vbCrLf & "member.name:" & cpCore.authContext.user.Name _
+                        & vbCrLf & "member.id:" & cpCore.authContext.user.id _
+                        & vbCrLf & "visit.id:" & cpCore.authContext.visit.id _
+                        & vbCrLf & "url:" & cpCore.webServer.requestUrl _
+                        & vbCrLf & "url source:" & cpCore.webServer.requestUrlSource _
                         & vbCrLf & "----------" _
                         & vbCrLf & "form post:"
                 For Each key As String In cpCore.docProperties.getKeyList()
@@ -61,65 +53,88 @@ Namespace Contensive.Addons
                     End If
                 Next
                 If Not IsNothing(cpCore.webServer.requestFormBinaryHeader) Then
-                    BinaryHeader = cpCore.webServer.requestFormBinaryHeader
-                    BinaryHeaderString = genericController.kmaByteArrayToString(BinaryHeader)
+                    Dim BinaryHeader() As Byte = cpCore.webServer.requestFormBinaryHeader
+                    Dim BinaryHeaderString As String = genericController.kmaByteArrayToString(BinaryHeader)
                     SaveContent &= "" _
-                        & vbCrLf & "----------" _
-                        & vbCrLf & "binary header:" _
-                        & vbCrLf & BinaryHeaderString _
-                        & vbCrLf
+                            & vbCrLf & "----------" _
+                            & vbCrLf & "binary header:" _
+                            & vbCrLf & BinaryHeaderString _
+                            & vbCrLf
                 End If
                 logController.appendLog(cpCore, SaveContent, "admin", cpCore.serverConfig.appConfig.name & "-request-")
                 '
-                ' -- refactor, move this to the addon
-                'cpCore.html.addStyleLink("/adminSite/styles.css", "AdminSite")
-                '
-                ' main_Get Content
-                '
-                cpCore.db.sqlCommandTimeout = 300
-                Call cpCore.html.main_SetMetaContent(0, 0)
-                '
-                AdminContent = execute_getContent("")
-                If Not cpCore.continueProcessing Then
+                Dim adminBody As String = ""
+                If Not cpCore.authContext.isAuthenticated Then
                     '
-                    ' stream closed, don't both
+                    ' --- must be authenticated to continue. Force a local login
                     '
-                    'ElseIf (cpCore.main_ClosePageCounter > 0) Then
-                    '    '
-                    '    ' admin page may have called getLoginPage, which includes getEndOfBody
-                    '    '
-                    '    'PageOpen = cpCore.admin_GetPageStart2()
-                    '    '
-                    '    returnHtml = "" _
-                    '    & cpCore.htmlDoc.getBeforeBodyHtml() _
-                    '    & AdminContent _
-                    '    & cpCore.htmlDoc.getAfterBodyHtml() _
-                    '    & ""
+                    Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                    adminBody = "" _
+                        & cr & "<p class=""ccAdminNormal"">You are attempting to enter an access controlled area. Continue only if you have authority to enter this area. Information about your visit will be recorded for security purposes.</p>" _
+                        & loginAddon.getLoginForm() _
+                        & ""
+                    '
+                    adminBody = "" _
+                        & cpCore.html.main_GetPanel(adminBody, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) _
+                        & cr & "<p>&nbsp;</p>" _
+                        & cr & "<p>&nbsp;</p>" _
+                        & cr & "<p style=""text-align:center""><a href=""http://www.Contensive.com"" target=""_blank""><img src=""/ccLib/images/ccLibLogin.GIF"" width=""80"" height=""33"" border=""0"" alt=""Contensive Content Control"" ></A></p>" _
+                        & cr & "<p style=""text-align:center"" class=""ccAdminSmall"">The content on this web site is managed and delivered by the Contensive Site Management Server. If you do not have member access, please use your back button to return to the public area.</p>" _
+                        & ""
+                    '
+                    ' --- create an outer table to hold the form
+                    adminBody = "" _
+                        & cr & "<div class=""ccCon"" style=""width:400px;margin:100px auto 0 auto;"">" _
+                        & htmlIndent(cpCore.html.main_GetPanelHeader("Login")) _
+                        & htmlIndent(adminBody) _
+                        & "</div>"
+                    '
+                    Call cpCore.html.main_SetMetaContent(0, 0)
+                    Call cpCore.html.main_AddPagetitle2("Login", "adminSite")
+                ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
+                    '
+                    ' --- member must have proper access to continue
+                    '
+                    adminBody = "" _
+                        & "<p>" & SpanClassAdminNormal _
+                        & "You are attempting to enter an area which your account does not have access." _
+                        & cr & "<ul class=""ccList"">" _
+                        & cr & "<li class=""ccListItem"">To return to the public web site, use your back button, or <a href=""" & requestAppRootPath & """>Click Here</A>." _
+                        & cr & "<li class=""ccListItem"">To login under a different account, <a href=""" & cpCore.serverConfig.appConfig.adminRoute & "?method=logout"" rel=""nofollow"">Click Here</A>" _
+                        & cr & "<li class=""ccListItem"">To have your account access changed to include this area, please contact the <a href=""mailto:" & cpCore.siteProperties.getText("EmailAdmin") & """>system administrator</A>. " _
+                        & cr & "</ul>" _
+                        & "</span></p>"
+                    adminBody = "" _
+                        & cpCore.html.main_GetPanelHeader("Unauthorized Access") _
+                        & cpCore.html.main_GetPanel(adminBody, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15)
+                    adminBody = "" _
+                        & cr & "<div style=""display:table;margin:100px auto auto auto;"">" _
+                        & genericController.htmlIndent(adminBody) _
+                        & cr & "</div>"
+                    '
+                    Call cpCore.html.main_SetMetaContent(0, 0)
+                    Call cpCore.html.main_AddPagetitle2("Unauthorized Access", "adminSite")
                 Else
                     '
-                    ' normal
+                    ' get admin content
                     '
-                    returnHtml = cpCore.html.getHtmlDoc(cpCore, AdminContent, True, True, False, True)
-                    'returnHtml = "" _
-                    '    & cpCore.htmlDoc.getHtmlDoc_beforeBodyHtml() _
-                    '    & AdminContent _
-                    '    & cpCore.htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, True) _
-                    '    & cpCore.htmlDoc.getHtmlDoc_afterBodyHtml() _
-                    '    & ""
+                    adminBody = getAdminBody()
                 End If
+                returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False, True)
                 '
                 ' Log response
                 '
                 SaveContent &= "" _
-                    & Now() _
-                    & vbCrLf & "member.name:" & cpCore.authContext.user.Name _
-                    & vbCrLf & "member.id:" & cpCore.authContext.user.id _
-                    & vbCrLf & "visit.id:" & cpCore.authContext.visit.id _
-                    & vbCrLf & "url:" & cpCore.webServer.requestUrl _
-                    & vbCrLf & "url source:" & cpCore.webServer.requestUrlSource _
-                    & vbCrLf & "----------" _
-                    & vbCrLf & "response:" _
-                    & vbCrLf & returnHtml
+                        & Now() _
+                        & vbCrLf & "member.name:" & cpCore.authContext.user.Name _
+                        & vbCrLf & "member.id:" & cpCore.authContext.user.id _
+                        & vbCrLf & "visit.id:" & cpCore.authContext.visit.id _
+                        & vbCrLf & "url:" & cpCore.webServer.requestUrl _
+                        & vbCrLf & "url source:" & cpCore.webServer.requestUrlSource _
+                        & vbCrLf & "----------" _
+                        & vbCrLf & "response:" _
+                        & vbCrLf & returnHtml
+                Dim rightNow As Date = DateTime.Now
                 Call logController.appendLog(cpCore, SaveContent, "admin", rightNow.Year & rightNow.Month.ToString("00") & rightNow.Day.ToString("00") & rightNow.Hour.ToString("00") & rightNow.Minute.ToString("00") & rightNow.Second.ToString("00"))
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
@@ -149,451 +164,380 @@ Namespace Contensive.Addons
             cpCore = Me.cp.core
             ClassInitialized = False
         End Sub
-        ''
-        ''=============================================================================
-        ''   main_Get the Admin Page (form with the HTML trimmings)
-        ''=============================================================================
-        ''
-        'Private Function addonToBe_admin(Optional ByVal Content As String = "") As String
-        '    Dim returnHtml As String = ""
-        '    Try
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        '    Return returnHtml
-        'End Function
         '
         '========================================================================
-        '   initialization and print page
-        '       GetForm_ can not read in any Request because
-        '       it can not be used withing the upload response page.
-        '========================================================================
         '
-        Private Function execute_getContent(ContentArgFromCaller As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm")
-            '
-            Dim AddonMan As addon_AddonMngrSafeClass
-            Dim DefaultWrapperID As Integer
-            Dim HelpIcon As String
-            Dim SettingsIcon As String
-            Dim s As String
-            Dim AddonHelpCopy As String
-            Dim AddonHelpLink As String
-            Dim AddonSettingsIcon As String
-            Dim AddonEditLink As String
-            Dim AddonHelpIcon As String
-            Dim InstanceOptionString As String
-            Dim HelpLevel As Integer
-            Dim AddonDateAdded As Date
-            Dim AddonLastUpdated As Date
-            Dim HelpAddonID As Integer
-            Dim HelpCollectionID As Integer
-            Dim CurrentLink As String
-            Dim Args() As String
-            Dim Ptr As Integer
-            Dim AdminNavOpen As Boolean
-            Dim AdminNavHead As String
-            Dim AdminNavContent As String
-            Dim AdminNavJS As String
-            Dim OpenNodeList As String
-            Dim NavHeader As String
-            Dim EditReferer As String
-            Dim ContentCell As String
-            Dim ao As Object
-            Dim Obj As Object
-            Dim SQL As String
-            Dim CS As Integer
-            Dim Panel As String
-            Dim Copy As String
-            Dim Stream As New stringBuilderLegacyController
-            Dim AdminURL As String
-            'Dim MenuEntryContentName As String
-            Dim addonId As Integer
-            Dim AddonGuid As String
-            Dim addonOptionString As String
-            Dim AddonName As String = ""
-            Dim UseContentWatchLink As Boolean
-            'Dim ResponseFormID As String
-            Dim returnStatus As Boolean
-            Dim editRecord As New editRecordClass
-            Dim AdminContent As New cdefModel
-            '
-            '-------------------------------------------------------------------------------
-            ' Setup defaults
-            '-------------------------------------------------------------------------------
-            '
-            ButtonObjectCount = 0
-            ImagePreloadCount = 0
-            JavaScriptString = ""
-            ContentWatchLoaded = False
-            editRecord.Loaded = False
-            UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
-            Call cpCore.html.addOnLoadJavascript("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
-            '
-            '-------------------------------------------------------------------------------
-            ' check for member login, if logged in and no admin, lock out
-            ' Do CheckMember here because we need to know who is there to create proper blocked menu
-            '-------------------------------------------------------------------------------
-            '
-leak200:
-            If Not cpCore.continueProcessing Then
-                '
-                ' ----- no stream anyway, do nothing
-                '
-            ElseIf Not cpCore.authContext.isAuthenticated Then
-                '
-                ' --- must be authenticated to continue
-                '
-                Dim loginAddon As New Addons.addon_loginClass(cpCore)
-                Stream.Add(loginAddon.getLoginPage(False))
-            ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
-                '
-                ' --- member must have proper access to continue
-                '
-                s = "" _
-                    & "<p>" & SpanClassAdminNormal _
-                    & "You are attempting to enter an area which your account does not have access." _
-                    & cr & "<ul class=""ccList"">" _
-                    & cr & "<li class=""ccListItem"">To return to the public web site, use your back button, or <a href=""" & requestAppRootPath & """>Click Here</A>." _
-                    & cr & "<li class=""ccListItem"">To login under a different account, <a href=""" & cpCore.serverConfig.appConfig.adminRoute & "?method=logout"" rel=""nofollow"">Click Here</A>" _
-                    & cr & "<li class=""ccListItem"">To have your account access changed to include this area, please contact the <a href=""mailto:" & cpCore.siteProperties.getText("EmailAdmin") & """>system administrator</A>. " _
-                    & cr & "</ul>" _
-                    & "</span></p>" _
-                    & ""
-                s = "" _
-                    & cpCore.html.main_GetPanelHeader("Unauthorized Access") _
-                    & cpCore.html.main_GetPanel(s, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) _
-                    & ""
-                Call Stream.Add("" _
-                    & cr & "<div style=""display:table;margin:100px auto auto auto;"">" _
-                    & genericController.htmlIndent(s) _
-                    & cr & "</div>" _
-                    & "")
-            Else
+        Private Function getAdminBody(Optional ContentArgFromCaller As String = "") As String
+            Dim result As String = ""
+            Try
+                Dim DefaultWrapperID As Integer
+                Dim s As String
+                Dim AddonHelpCopy As String
+                Dim InstanceOptionString As String
+                Dim HelpLevel As Integer
+                Dim HelpAddonID As Integer
+                Dim HelpCollectionID As Integer
+                Dim CurrentLink As String
+                Dim EditReferer As String
+                Dim ContentCell As String
+                Dim CS As Integer
+                Dim Stream As New stringBuilderLegacyController
+                Dim addonId As Integer
+                Dim AddonGuid As String
+                Dim AddonName As String = ""
+                Dim UseContentWatchLink As Boolean
+                Dim editRecord As New editRecordClass
+                Dim AdminContent As New cdefModel
                 '
                 '-------------------------------------------------------------------------------
-                ' Get Requests
-                '   initialize adminContent and editRecord objects 
+                ' Setup defaults
                 '-------------------------------------------------------------------------------
                 '
-                Call GetForm_LoadControl(AdminContent, editRecord)
-                addonId = cpCore.docProperties.getInteger("addonid")
-                AddonGuid = cpCore.docProperties.getText("addonguid")
-                ''
-                ''-------------------------------------------------------------------------------
-                ''
-                ''-------------------------------------------------------------------------------
-                ''
-                'If AdminContent.fields.Count > 0 Then
-                '    ReDim EditRecordValuesObject(AdminContent.fields.Count)
-                '    ReDim EditRecordDbValues(AdminContent.fields.Count)
-                'End If
+                cpCore.db.sqlCommandTimeout = 300
+                ButtonObjectCount = 0
+                ImagePreloadCount = 0
+                JavaScriptString = ""
+                ContentWatchLoaded = False
+                editRecord.Loaded = False
+                UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
+                Call cpCore.html.addOnLoadJavascript("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
+                Call cpCore.html.main_SetMetaContent(0, 0)
                 '
                 '-------------------------------------------------------------------------------
-                ' Process SourceForm/Button into Action/Form, and process
+                ' check for member login, if logged in and no admin, lock out
+                ' Do CheckMember here because we need to know who is there to create proper blocked menu
                 '-------------------------------------------------------------------------------
                 '
-                If cpCore.docProperties.getText("Button") = ButtonCancelAll Then
-                    AdminForm = AdminFormRoot
+                If Not cpCore.continueProcessing Then
+                    '
+                    ' ----- no stream anyway, do nothing
+                    '
+                    'ElseIf Not cpCore.authContext.isAuthenticated Then
+                    '    '
+                    '    ' --- must be authenticated to continue
+                    '    '
+                    '    Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                    '    Stream.Add(loginAddon.getLoginForm())
                 Else
-                    Call ProcessForms(AdminContent, editRecord)
-                    Call ProcessActions(AdminContent, editRecord, UseContentWatchLink)
-                End If
-                '
-                '-------------------------------------------------------------------------------
-                ' Normalize values to be needed
-                '-------------------------------------------------------------------------------
-                '
-                If editRecord.id <> 0 Then
-                    Call cpCore.workflow.ClearEditLock(AdminContent.Name, editRecord.id)
-                End If
-                '
-                If (AdminForm < 1) Then
                     '
-                    ' No form was set, use default form
+                    '-------------------------------------------------------------------------------
+                    ' Get Requests
+                    '   initialize adminContent and editRecord objects 
+                    '-------------------------------------------------------------------------------
                     '
-                    If AdminContent.Id <= 0 Then
+                    Call GetForm_LoadControl(AdminContent, editRecord)
+                    addonId = cpCore.docProperties.getInteger("addonid")
+                    AddonGuid = cpCore.docProperties.getText("addonguid")
+                    ''
+                    ''-------------------------------------------------------------------------------
+                    ''
+                    ''-------------------------------------------------------------------------------
+                    ''
+                    'If AdminContent.fields.Count > 0 Then
+                    '    ReDim EditRecordValuesObject(AdminContent.fields.Count)
+                    '    ReDim EditRecordDbValues(AdminContent.fields.Count)
+                    'End If
+                    '
+                    '-------------------------------------------------------------------------------
+                    ' Process SourceForm/Button into Action/Form, and process
+                    '-------------------------------------------------------------------------------
+                    '
+                    If cpCore.docProperties.getText("Button") = ButtonCancelAll Then
                         AdminForm = AdminFormRoot
                     Else
-                        AdminForm = AdminFormIndex
+                        Call ProcessForms(AdminContent, editRecord)
+                        Call ProcessActions(AdminContent, editRecord, UseContentWatchLink)
                     End If
-                End If
-                '
-                If AdminForm = AdminFormLegacyAddonManager Then
                     '
-                    ' patch out any old links to the legacy addon manager
+                    '-------------------------------------------------------------------------------
+                    ' Normalize values to be needed
+                    '-------------------------------------------------------------------------------
                     '
-                    AdminForm = 0
-                    AddonGuid = AddonManagerGuid
-                End If
-                '
-                '-------------------------------------------------------------------------------
-                ' Edit form but not valid record case
-                ' Put this here so we can display the error without being stuck displaying the edit form
-                ' Putting the error on the edit form is confusing because there are fields to fill in
-                '-------------------------------------------------------------------------------
-                '
-                If (AdminSourceForm = AdminFormEdit) Then
-                    If (Not (cpCore.debug_iUserError <> "")) And cpCore.html.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete) Or (AdminButton = ButtonPublish) Or (AdminButton = ButtonPublishApprove) Or (AdminButton = ButtonAbortEdit) Or (AdminButton = ButtonPublishSubmit)) Then
-                        EditReferer = cpCore.docProperties.getText("EditReferer")
-                        CurrentLink = genericController.modifyLinkQuery(cpCore.webServer.requestUrl, "editreferer", "", False)
-                        CurrentLink = genericController.vbLCase(CurrentLink)
+                    If editRecord.id <> 0 Then
+                        Call cpCore.workflow.ClearEditLock(AdminContent.Name, editRecord.id)
+                    End If
+                    '
+                    If (AdminForm < 1) Then
                         '
-                        ' check if this editreferer includes cid=thisone and id=thisone -- if so, go to index form for this cid
+                        ' No form was set, use default form
                         '
-                        If (EditReferer <> "") And (LCase(EditReferer) <> CurrentLink) Then
-                            '
-                            ' return to the page it came from
-                            '
-                            Call cpCore.webServer.redirect(EditReferer, "Admin Edit page returning to the EditReferer setting", False)
-                            Exit Function
+                        If AdminContent.Id <= 0 Then
+                            AdminForm = AdminFormRoot
                         Else
-                            '
-                            ' return to the index page for this content
-                            '
                             AdminForm = AdminFormIndex
                         End If
                     End If
-                    If BlockEditForm Then
-                        AdminForm = AdminFormIndex
+                    '
+                    If AdminForm = AdminFormLegacyAddonManager Then
+                        '
+                        ' patch out any old links to the legacy addon manager
+                        '
+                        AdminForm = 0
+                        AddonGuid = AddonManagerGuid
                     End If
-                End If
-                HelpLevel = cpCore.docProperties.getInteger("helplevel")
-                HelpAddonID = cpCore.docProperties.getInteger("helpaddonid")
-                HelpCollectionID = cpCore.docProperties.getInteger("helpcollectionid")
-                If HelpCollectionID = 0 Then
-                    HelpCollectionID = cpCore.visitProperty.getInteger("RunOnce HelpCollectionID")
-                    If HelpCollectionID <> 0 Then
-                        Call cpCore.visitProperty.setProperty("RunOnce HelpCollectionID", "")
-                    End If
-                End If
-                '
-                '-------------------------------------------------------------------------------
-                ' build refresh string
-                '-------------------------------------------------------------------------------
-                '
-                If AdminContent.Id <> 0 Then Call cpCore.doc.addRefreshQueryString("cid", genericController.encodeText(AdminContent.Id))
-                If editRecord.id <> 0 Then Call cpCore.doc.addRefreshQueryString("id", genericController.encodeText(editRecord.id))
-                If TitleExtension <> "" Then Call cpCore.doc.addRefreshQueryString(RequestNameTitleExtension, cpCore.html.main_EncodeRequestVariable(TitleExtension))
-                If RecordTop <> 0 Then Call cpCore.doc.addRefreshQueryString("rt", genericController.encodeText(RecordTop))
-                If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.doc.addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage))
-                If AdminForm <> 0 Then Call cpCore.doc.addRefreshQueryString(RequestNameAdminForm, genericController.encodeText(AdminForm))
-                If MenuDepth <> 0 Then Call cpCore.doc.addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(MenuDepth))
-                '
-                ' normalize guid
-                '
-                If AddonGuid <> "" Then
-                    If (Len(AddonGuid) = 38) And (Left(AddonGuid, 1) = "{") And (Right(AddonGuid, 1) = "}") Then
-                        '
-                        ' Good to go
-                        '
-                    ElseIf (Len(AddonGuid) = 36) Then
-                        '
-                        ' might be valid with the brackets, add them
-                        '
-                        AddonGuid = "{" & AddonGuid & "}"
-                    ElseIf (Len(AddonGuid) = 32) Then
-                        '
-                        ' might be valid with the brackets and the dashes, add them
-                        '
-                        AddonGuid = "{" & Mid(AddonGuid, 1, 8) & "-" & Mid(AddonGuid, 9, 4) & "-" & Mid(AddonGuid, 13, 4) & "-" & Mid(AddonGuid, 17, 4) & "-" & Mid(AddonGuid, 21) & "}"
-                    Else
-                        '
-                        ' not valid
-                        '
-                        AddonGuid = ""
-                    End If
-                End If
-                '
-                '-------------------------------------------------------------------------------
-                ' Create the content
-                '-------------------------------------------------------------------------------
-                '
-                ContentCell = ""
-                If ContentArgFromCaller <> "" Then
                     '
-                    ' Use content passed in as an argument
+                    '-------------------------------------------------------------------------------
+                    ' Edit form but not valid record case
+                    ' Put this here so we can display the error without being stuck displaying the edit form
+                    ' Putting the error on the edit form is confusing because there are fields to fill in
+                    '-------------------------------------------------------------------------------
                     '
-                    ContentCell = ContentArgFromCaller
-                ElseIf (HelpAddonID <> 0) Then
-                    '
-                    ' display Addon Help
-                    '
-                    Call cpCore.doc.addRefreshQueryString("helpaddonid", HelpAddonID.ToString)
-                    ContentCell = GetAddonHelp(HelpAddonID, "")
-                ElseIf (HelpCollectionID <> 0) Then
-                    '
-                    ' display Collection Help
-                    '
-                    Call cpCore.doc.addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString)
-                    ContentCell = GetCollectionHelp(HelpCollectionID, "")
-                ElseIf (AdminForm <> 0) Then
-                    '
-                    ' No content so far, try the forms
-                    '
-                    Select Case Int(AdminForm)
-                        Case AdminFormBuilderCollection
-                            ContentCell = GetForm_BuildCollection()
-                        Case AdminFormSecurityControl
-                            AddonGuid = AddonGuidPreferences
-                            '    ContentCell = GetForm_SecurityControl()
-                        Case AdminFormMetaKeywordTool
-                            ContentCell = GetForm_MetaKeywordTool()
-                        Case AdminFormMobileBrowserControl, AdminFormPageControl, AdminFormEmailControl
-                            ContentCell = cpCore.addon.execute_legacy4(AddonGuidPreferences, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
-                        Case AdminFormClearCache
-                            ContentCell = GetForm_ClearCache()
-                        Case AdminFormEDGControl
-                            ContentCell = (GetForm_StaticPublishControl())
-                        Case AdminFormSpiderControl
-                            ContentCell = cpCore.addon.execute_legacy4("Content Spider Control", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
-                        Case AdminFormResourceLibrary
-                            ContentCell = cpCore.html.main_GetResourceLibrary2("", False, "", "", True)
-                        Case AdminFormQuickStats
-                            ContentCell = (GetForm_QuickStats())
-                        Case AdminFormIndex
-                            ContentCell = (GetForm_Index(AdminContent, editRecord, (LCase(AdminContent.ContentTableName) = "ccemail")))
-                        Case AdminFormEdit
-                            ContentCell = GetForm_Edit(AdminContent, editRecord)
-                        Case AdminFormClose
-                            Stream.Add("<Script Language=""JavaScript"" type=""text/javascript""> window.close(); </Script>")
-                        Case AdminFormPublishing
-                            ContentCell = (GetForm_Publish())
-                        Case AdminFormContentChildTool
-                            ContentCell = (GetContentChildTool())
-                        Case AdminformPageContentMap
-                            ContentCell = (GetForm_PageContentMap())
-                        Case AdminformHousekeepingControl
-                            ContentCell = (GetForm_HouseKeepingControl())
-                        Case AdminFormTools, 100 To 199
-                            Dim Tools As New coreToolsClass(cpCore)
-                            ContentCell = Tools.GetForm()
-                        Case AdminFormStyleEditor
-                            ContentCell = (admin_GetForm_StyleEditor())
-                        Case AdminFormDownloads
-                            ContentCell = (GetForm_Downloads())
-                        Case AdminformRSSControl
-                            Call cpCore.webServer.redirect("?cid=" & cpCore.metaData.getContentId("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
-                        Case AdminFormImportWizard
-                            ContentCell = cpCore.addon.execute_legacy4(ImportWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
-                        Case AdminFormCustomReports
-                            ContentCell = GetForm_CustomReports()
-                        Case AdminFormFormWizard
-                            ContentCell = cpCore.addon.execute_legacy4(FormWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
-                        Case AdminFormLegacyAddonManager
-                            ContentCell = GetAddonManager()
-                        Case AdminFormEditorConfig
-                            ContentCell = GetForm_EditConfig()
-                        Case Else
-                            ContentCell = "<p>The form requested is not supported</p>"
-                    End Select
-                ElseIf ((addonId <> 0) Or (AddonGuid <> "") Or (AddonName <> "")) Then
-                    '
-                    ' execute an addon
-                    '
-                    If (AddonGuid = AddonManagerGuid) Or (LCase(AddonName) = "add-on manager") Or (LCase(AddonName) = "addon manager") Then
-                        '
-                        ' Special case, call the routine that provides a backup
-                        '
-                        Call cpCore.doc.addRefreshQueryString("addonguid", AddonManagerGuid)
-                        ContentCell = GetAddonManager()
-                    Else
-                        If addonId <> 0 Then
-                            Call cpCore.doc.addRefreshQueryString("addonid", CStr(addonId))
-                            CS = cpCore.db.csOpenRecord(cnAddons, addonId)
-                            If Not cpCore.db.cs_ok(CS) Then
-                                Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its id " & addonId)
-                            End If
-                        ElseIf AddonGuid <> "" Then
-                            Call cpCore.doc.addRefreshQueryString("addonguid", AddonGuid)
-                            '$$$$$ cache this
-                            If True Then ' 3.4.060" Then
-                                CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(AddonGuid))
+                    If (AdminSourceForm = AdminFormEdit) Then
+                        If (Not (cpCore.debug_iUserError <> "")) And cpCore.html.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete) Or (AdminButton = ButtonPublish) Or (AdminButton = ButtonPublishApprove) Or (AdminButton = ButtonAbortEdit) Or (AdminButton = ButtonPublishSubmit)) Then
+                            EditReferer = cpCore.docProperties.getText("EditReferer")
+                            CurrentLink = genericController.modifyLinkQuery(cpCore.webServer.requestUrl, "editreferer", "", False)
+                            CurrentLink = genericController.vbLCase(CurrentLink)
+                            '
+                            ' check if this editreferer includes cid=thisone and id=thisone -- if so, go to index form for this cid
+                            '
+                            If (EditReferer <> "") And (LCase(EditReferer) <> CurrentLink) Then
+                                '
+                                ' return to the page it came from
+                                '
+                                Call cpCore.webServer.redirect(EditReferer, "Admin Edit page returning to the EditReferer setting", False)
+                                Return ""
                             Else
-                                CS = cpCore.db.cs_open(cnAddons, "aoguid=" & cpCore.db.encodeSQLText(AddonGuid))
-                            End If
-                            If Not cpCore.db.cs_ok(CS) Then
-                                Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its guid " & AddonGuid)
-                            End If
-                        ElseIf AddonName <> "" Then
-                            Call cpCore.doc.addRefreshQueryString("addonname", AddonName)
-                            CS = cpCore.db.cs_open(cnAddons, "name=" & cpCore.db.encodeSQLText(AddonName))
-                            If Not cpCore.db.cs_ok(CS) Then
-                                Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its name " & AddonName)
+                                '
+                                ' return to the index page for this content
+                                '
+                                AdminForm = AdminFormIndex
                             End If
                         End If
-                        If cpCore.db.cs_ok(CS) Then
-                            addonId = cpCore.db.cs_getInteger(CS, "ID")
-                            AddonName = cpCore.db.cs_getText(CS, "name")
-                            AddonHelpCopy = cpCore.db.cs_getText(CS, "help")
-                            Call cpCore.doc.addRefreshQueryString(RequestNameRunAddon, addonId.ToString)
+                        If BlockEditForm Then
+                            AdminForm = AdminFormIndex
                         End If
-                        Call cpCore.db.cs_Close(CS)
-                        InstanceOptionString = cpCore.userProperty.getText("Addon [" & AddonName & "] Options", "")
-                        ' default wrapper does not apply to admin
-                        DefaultWrapperID = -1
-                        'DefaultWrapperID = cpCore.main_GetSiteProperty2("DefaultWrapperID", "0")
-                        ContentCell = cpCore.addon.execute_legacy1(addonId, "", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, AddonName, "-2", DefaultWrapperID)
-                        ' no must allow for an add-on to return blank to return to root
-                        'If ContentCell = "" Then
-                        '    ContentCell = "<div class=""ccAdminMsg"">The Add-on you requested did not return a valid response.</div>"
-                        'End If
                     End If
-                Else
+                    HelpLevel = cpCore.docProperties.getInteger("helplevel")
+                    HelpAddonID = cpCore.docProperties.getInteger("helpaddonid")
+                    HelpCollectionID = cpCore.docProperties.getInteger("helpcollectionid")
+                    If HelpCollectionID = 0 Then
+                        HelpCollectionID = cpCore.visitProperty.getInteger("RunOnce HelpCollectionID")
+                        If HelpCollectionID <> 0 Then
+                            Call cpCore.visitProperty.setProperty("RunOnce HelpCollectionID", "")
+                        End If
+                    End If
                     '
-                    ' nothing so far, display desktop
+                    '-------------------------------------------------------------------------------
+                    ' build refresh string
+                    '-------------------------------------------------------------------------------
                     '
-                    ContentCell = GetForm_Root()
-                End If
-                '
-                ' include fancybox if it was needed
-                '
-                If includeFancyBox Then
-                    Call cpCore.addon.execute_legacy4(jQueryFancyBoxGuid)
-                    Call cpCore.html.addHeadJavascriptCode("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});", "")
-                End If
-                '
-                ' Pickup user errors
-                '
-                If (cpCore.debug_iUserError <> "") Then
-                    ContentCell = "<div class=""ccAdminMsg"">" & errorController.error_GetUserError(cpCore) & "</div>" & ContentCell
-                End If
-                ''
-                '' If blank, must be an addon with a setting form that returned blank, do the dashboard again
-                ''
-                'If ContentCell = "" Then
-                '    '
-                '    ' must use the root as a default - bc forms and add-ons may return blank, meaning return to root
-                '    ' throw errors only if there is a user error
-                '    '
-                '    ContentCell = GetForm_Root()
-                '    'ContentCell = "<div class=""ccAdminMsg"">The form you requested did not return a valid response.</div>"
-                'End If
-                '
-                If cpCore.doc.isPrintVersion Then
+                    If AdminContent.Id <> 0 Then Call cpCore.doc.addRefreshQueryString("cid", genericController.encodeText(AdminContent.Id))
+                    If editRecord.id <> 0 Then Call cpCore.doc.addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                    If TitleExtension <> "" Then Call cpCore.doc.addRefreshQueryString(RequestNameTitleExtension, cpCore.html.main_EncodeRequestVariable(TitleExtension))
+                    If RecordTop <> 0 Then Call cpCore.doc.addRefreshQueryString("rt", genericController.encodeText(RecordTop))
+                    If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.doc.addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage))
+                    If AdminForm <> 0 Then Call cpCore.doc.addRefreshQueryString(RequestNameAdminForm, genericController.encodeText(AdminForm))
+                    If MenuDepth <> 0 Then Call cpCore.doc.addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(MenuDepth))
                     '
-                    ' For print version, just add content
+                    ' normalize guid
                     '
-                    Call Stream.Add(ContentCell)
-                Else
-                    Call Stream.Add(cr & GetForm_Top())
-                    Call Stream.Add(genericController.htmlIndent(ContentCell))
-                    Call Stream.Add(cr & AdminFormBottom)
+                    If AddonGuid <> "" Then
+                        If (Len(AddonGuid) = 38) And (Left(AddonGuid, 1) = "{") And (Right(AddonGuid, 1) = "}") Then
+                            '
+                            ' Good to go
+                            '
+                        ElseIf (Len(AddonGuid) = 36) Then
+                            '
+                            ' might be valid with the brackets, add them
+                            '
+                            AddonGuid = "{" & AddonGuid & "}"
+                        ElseIf (Len(AddonGuid) = 32) Then
+                            '
+                            ' might be valid with the brackets and the dashes, add them
+                            '
+                            AddonGuid = "{" & Mid(AddonGuid, 1, 8) & "-" & Mid(AddonGuid, 9, 4) & "-" & Mid(AddonGuid, 13, 4) & "-" & Mid(AddonGuid, 17, 4) & "-" & Mid(AddonGuid, 21) & "}"
+                        Else
+                            '
+                            ' not valid
+                            '
+                            AddonGuid = ""
+                        End If
+                    End If
+                    '
+                    '-------------------------------------------------------------------------------
+                    ' Create the content
+                    '-------------------------------------------------------------------------------
+                    '
+                    ContentCell = ""
+                    If ContentArgFromCaller <> "" Then
+                        '
+                        ' Use content passed in as an argument
+                        '
+                        ContentCell = ContentArgFromCaller
+                    ElseIf (HelpAddonID <> 0) Then
+                        '
+                        ' display Addon Help
+                        '
+                        Call cpCore.doc.addRefreshQueryString("helpaddonid", HelpAddonID.ToString)
+                        ContentCell = GetAddonHelp(HelpAddonID, "")
+                    ElseIf (HelpCollectionID <> 0) Then
+                        '
+                        ' display Collection Help
+                        '
+                        Call cpCore.doc.addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString)
+                        ContentCell = GetCollectionHelp(HelpCollectionID, "")
+                    ElseIf (AdminForm <> 0) Then
+                        '
+                        ' No content so far, try the forms
+                        '
+                        Select Case Int(AdminForm)
+                            Case AdminFormBuilderCollection
+                                ContentCell = GetForm_BuildCollection()
+                            Case AdminFormSecurityControl
+                                AddonGuid = AddonGuidPreferences
+                            '    ContentCell = GetForm_SecurityControl()
+                            Case AdminFormMetaKeywordTool
+                                ContentCell = GetForm_MetaKeywordTool()
+                            Case AdminFormMobileBrowserControl, AdminFormPageControl, AdminFormEmailControl
+                                ContentCell = cpCore.addon.execute_legacy4(AddonGuidPreferences, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                            Case AdminFormClearCache
+                                ContentCell = GetForm_ClearCache()
+                            Case AdminFormEDGControl
+                                ContentCell = (GetForm_StaticPublishControl())
+                            Case AdminFormSpiderControl
+                                ContentCell = cpCore.addon.execute_legacy4("Content Spider Control", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                            Case AdminFormResourceLibrary
+                                ContentCell = cpCore.html.main_GetResourceLibrary2("", False, "", "", True)
+                            Case AdminFormQuickStats
+                                ContentCell = (GetForm_QuickStats())
+                            Case AdminFormIndex
+                                ContentCell = (GetForm_Index(AdminContent, editRecord, (LCase(AdminContent.ContentTableName) = "ccemail")))
+                            Case AdminFormEdit
+                                ContentCell = GetForm_Edit(AdminContent, editRecord)
+                            Case AdminFormClose
+                                Stream.Add("<Script Language=""JavaScript"" type=""text/javascript""> window.close(); </Script>")
+                            Case AdminFormPublishing
+                                ContentCell = (GetForm_Publish())
+                            Case AdminFormContentChildTool
+                                ContentCell = (GetContentChildTool())
+                            Case AdminformPageContentMap
+                                ContentCell = (GetForm_PageContentMap())
+                            Case AdminformHousekeepingControl
+                                ContentCell = (GetForm_HouseKeepingControl())
+                            Case AdminFormTools, 100 To 199
+                                Dim Tools As New coreToolsClass(cpCore)
+                                ContentCell = Tools.GetForm()
+                            Case AdminFormStyleEditor
+                                ContentCell = (admin_GetForm_StyleEditor())
+                            Case AdminFormDownloads
+                                ContentCell = (GetForm_Downloads())
+                            Case AdminformRSSControl
+                                Call cpCore.webServer.redirect("?cid=" & cpCore.metaData.getContentId("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
+                            Case AdminFormImportWizard
+                                ContentCell = cpCore.addon.execute_legacy4(ImportWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                            Case AdminFormCustomReports
+                                ContentCell = GetForm_CustomReports()
+                            Case AdminFormFormWizard
+                                ContentCell = cpCore.addon.execute_legacy4(FormWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                            Case AdminFormLegacyAddonManager
+                                ContentCell = GetAddonManager()
+                            Case AdminFormEditorConfig
+                                ContentCell = GetForm_EditConfig()
+                            Case Else
+                                ContentCell = "<p>The form requested is not supported</p>"
+                        End Select
+                    ElseIf ((addonId <> 0) Or (AddonGuid <> "") Or (AddonName <> "")) Then
+                        '
+                        ' execute an addon
+                        '
+                        If (AddonGuid = AddonManagerGuid) Or (LCase(AddonName) = "add-on manager") Or (LCase(AddonName) = "addon manager") Then
+                            '
+                            ' Special case, call the routine that provides a backup
+                            '
+                            Call cpCore.doc.addRefreshQueryString("addonguid", AddonManagerGuid)
+                            ContentCell = GetAddonManager()
+                        Else
+                            If addonId <> 0 Then
+                                Call cpCore.doc.addRefreshQueryString("addonid", CStr(addonId))
+                                CS = cpCore.db.csOpenRecord(cnAddons, addonId)
+                                If Not cpCore.db.cs_ok(CS) Then
+                                    Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its id " & addonId)
+                                End If
+                            ElseIf AddonGuid <> "" Then
+                                Call cpCore.doc.addRefreshQueryString("addonguid", AddonGuid)
+                                '$$$$$ cache this
+                                If True Then ' 3.4.060" Then
+                                    CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(AddonGuid))
+                                Else
+                                    CS = cpCore.db.cs_open(cnAddons, "aoguid=" & cpCore.db.encodeSQLText(AddonGuid))
+                                End If
+                                If Not cpCore.db.cs_ok(CS) Then
+                                    Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its guid " & AddonGuid)
+                                End If
+                            ElseIf AddonName <> "" Then
+                                Call cpCore.doc.addRefreshQueryString("addonname", AddonName)
+                                CS = cpCore.db.cs_open(cnAddons, "name=" & cpCore.db.encodeSQLText(AddonName))
+                                If Not cpCore.db.cs_ok(CS) Then
+                                    Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its name " & AddonName)
+                                End If
+                            End If
+                            If cpCore.db.cs_ok(CS) Then
+                                addonId = cpCore.db.cs_getInteger(CS, "ID")
+                                AddonName = cpCore.db.cs_getText(CS, "name")
+                                AddonHelpCopy = cpCore.db.cs_getText(CS, "help")
+                                Call cpCore.doc.addRefreshQueryString(RequestNameRunAddon, addonId.ToString)
+                            End If
+                            Call cpCore.db.cs_Close(CS)
+                            InstanceOptionString = cpCore.userProperty.getText("Addon [" & AddonName & "] Options", "")
+                            ' default wrapper does not apply to admin
+                            DefaultWrapperID = -1
+                            'DefaultWrapperID = cpCore.main_GetSiteProperty2("DefaultWrapperID", "0")
+                            ContentCell = cpCore.addon.execute_legacy1(addonId, "", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, AddonName, "-2", DefaultWrapperID)
+                            ' no must allow for an add-on to return blank to return to root
+                            'If ContentCell = "" Then
+                            '    ContentCell = "<div class=""ccAdminMsg"">The Add-on you requested did not return a valid response.</div>"
+                            'End If
+                        End If
+                    Else
+                        '
+                        ' nothing so far, display desktop
+                        '
+                        ContentCell = GetForm_Root()
+                    End If
+                    '
+                    ' include fancybox if it was needed
+                    '
+                    If includeFancyBox Then
+                        Call cpCore.addon.execute_legacy4(jQueryFancyBoxGuid)
+                        Call cpCore.html.addHeadJavascriptCode("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});", "")
+                    End If
+                    '
+                    ' Pickup user errors
+                    '
+                    If (cpCore.debug_iUserError <> "") Then
+                        ContentCell = "<div class=""ccAdminMsg"">" & errorController.error_GetUserError(cpCore) & "</div>" & ContentCell
+                    End If
+                    ''
+                    '' If blank, must be an addon with a setting form that returned blank, do the dashboard again
+                    ''
+                    'If ContentCell = "" Then
+                    '    '
+                    '    ' must use the root as a default - bc forms and add-ons may return blank, meaning return to root
+                    '    ' throw errors only if there is a user error
+                    '    '
+                    '    ContentCell = GetForm_Root()
+                    '    'ContentCell = "<div class=""ccAdminMsg"">The form you requested did not return a valid response.</div>"
+                    'End If
+                    '
+                    If cpCore.doc.isPrintVersion Then
+                        '
+                        ' For print version, just add content
+                        '
+                        Call Stream.Add(ContentCell)
+                    Else
+                        Call Stream.Add(cr & GetForm_Top())
+                        Call Stream.Add(genericController.htmlIndent(ContentCell))
+                        Call Stream.Add(cr & AdminFormBottom)
+                    End If
+                    Call Stream.Add(cr & "<script language=""javascript1.2"" type=""text/javascript"">" & JavaScriptString)
+                    Call Stream.Add(cr & "ButtonObjectCount = " & ButtonObjectCount & ";")
+                    Call Stream.Add(cr & "</script>")
                 End If
-                Call Stream.Add(cr & "<script language=""javascript1.2"" type=""text/javascript"">" & JavaScriptString)
-                Call Stream.Add(cr & "ButtonObjectCount = " & ButtonObjectCount & ";")
-                Call Stream.Add(cr & "</script>")
-            End If
-            execute_getContent = errorController.getDocExceptionHtmlList(cpCore) & Stream.Text
-            Exit Function
-ErrorTrap:
-            '
-            ' Handle this routine as a public interface so log errors and resume
-            '   if you exit here, the page doesnt finish properly
-            '
-            Call handleLegacyClassError2("GetForm")
-            '    GetForm = "<p style=""margin:auto auto auto auto"">There was problem with this page. Please use your back button to return to your page, and report this to the site administrator.</p>"
-            Resume Next
+                result = errorController.getDocExceptionHtmlList(cpCore) & Stream.Text
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '========================================================================
@@ -3730,7 +3674,7 @@ ErrorTrap:
                 Dim IsTemplateTable As Boolean
                 Dim TemplateIDForStyles As Integer
                 Dim emailIdForStyles As Integer
-                Dim RootPageSectionID As Integer
+                ' Dim RootPageSectionID As Integer
                 Dim AllowajaxTabs As Boolean
                 Dim XMLTools As New xmlController(cpCore)
                 Dim IsPageContentTable As Boolean
@@ -3911,15 +3855,15 @@ ErrorTrap:
                             '    End If
                             'End If
                             IsRootPage = IsPageContentTable And (editRecord.parentID = 0)
-                            If IsRootPage Then
-                                '$$$$$ cache
-                                CS = cpCore.db.cs_open("Site Sections", "RootPageID=" & editRecord.id, , , , , , "ID")
-                                IsRootPage = cpCore.db.cs_ok(CS)
-                                If IsRootPage Then
-                                    RootPageSectionID = cpCore.db.cs_getInteger(CS, "ID")
-                                End If
-                                Call cpCore.db.cs_Close(CS)
-                            End If
+                            'If IsRootPage Then
+                            '    '$$$$$ cache
+                            '    CS = cpCore.db.cs_open("Site Sections", "RootPageID=" & editRecord.id, , , , , , "ID")
+                            '    IsRootPage = cpCore.db.cs_ok(CS)
+                            '    If IsRootPage Then
+                            '        RootPageSectionID = cpCore.db.cs_getInteger(CS, "ID")
+                            '    End If
+                            '    Call cpCore.db.cs_Close(CS)
+                            'End If
                         End If
                     End If
                 End If
@@ -3954,7 +3898,7 @@ ErrorTrap:
                 ElseIf IsLandingPageParent Then
                     CustomDescription = "<div>This page is a parent of the default Landing Page for this website. It should not be deleted. You can not mark this record inactive, or use the Publish Date, Expire Date or Archive Date features.</div>"
                 ElseIf IsRootPage Then
-                    CustomDescription = "<div>This page is a Root Page. A Root Page is the primary page of a section. If you delete or inactivate this page, the section will create a new blank page in its place. If you need to hide or delete a section, <a href=""?af=4&cid=" & cpCore.metaData.getContentId("site sections") & "&id=" & RootPageSectionID & """>edit</a> the section record. You can not use the Publish Date, Expire Date or Archive Date features on this page.</div>"
+                    CustomDescription = "<div>This page is a Root Page. A Root Page is the primary page of a section. If you delete or inactivate this page, the section will create a new blank page in its place.</div>"
                 End If
                 '
                 ' ----- Determine TemplateIDForStyles
@@ -8213,182 +8157,6 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyClassError3("GetForm_Edit_LibraryFolderRules")
         End Function
-        '        '
-        '        '========================================================================
-        '        '
-        '        '========================================================================
-        '        '
-        '        Private Function GetForm_Edit_SectionDynamicMenuRules(adminContent As cdefModel, editRecord As editRecordClass) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SectionDynamicMenuRules")
-        '            '
-        '            Dim f As New stringBuilderLegacyController
-        '            Dim DynamicMenuList As String
-        '            Dim DynamicMenuSplit() As String
-        '            Dim Ptr As Integer
-        '            Dim IDPtr As Integer
-        '            Dim IDEndPtr As Integer
-        '            Dim DynamicMenuID As Integer
-        '            Dim ReportLink As String
-        '            Dim WCPtr As Integer
-        '            Dim Adminui As New adminUIController(cpCore)
-        '            Dim ForcedMenuID As Integer
-        '            '
-        '            ' Determine the forced Menu ID (in the URL as MenuID=99)
-        '            '
-        '            If WherePairCount > 0 Then
-        '                For WCPtr = 0 To WherePairCount - 1
-        '                    If genericController.vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
-        '                        ForcedMenuID = genericController.EncodeInteger(WherePair(1, WCPtr))
-        '                        Exit For
-        '                    End If
-        '                Next
-        '            End If
-        '            '
-        '            ' If ForceMenuID=0 then force the default menu
-        '            '
-        '            ' this is causing more problems then it solves
-        '            '
-        '            '    If ForcedMenuID = 0 Then
-        '            '        ForcedMenuID = cpcore.htmldoc.main_GetRecordID_Internal("Dynamic Menus", "Default")
-        '            '    End If
-        '            'Call cpCore.main_VerifyDynamicMenu("Default")
-        '            DynamicMenuList = cpCore.htmlDoc.main_GetFormInputCheckList("SectionDynamicMenuRules", "Site Sections", editRecord.id, "Dynamic Menus", "Dynamic Menu Section Rules", "SectionID", "DynamicMenuID", , , False)
-        '            DynamicMenuSplit = Split(DynamicMenuList, "<br >", , vbTextCompare)
-        '            For Ptr = 0 To UBound(DynamicMenuSplit)
-        '                DynamicMenuID = -1
-        '                IDPtr = genericController.vbInstr(1, DynamicMenuSplit(Ptr), "value=", vbTextCompare)
-        '                If IDPtr > 0 Then
-        '                    IDEndPtr = genericController.vbInstr(IDPtr, DynamicMenuSplit(Ptr), ">")
-        '                    If IDEndPtr > 0 Then
-        '                        DynamicMenuID = genericController.EncodeInteger(Mid(DynamicMenuSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
-        '                    End If
-        '                End If
-        '                If ForcedMenuID = DynamicMenuID Then
-        '                    DynamicMenuSplit(Ptr) = genericController.vbReplace(DynamicMenuSplit(Ptr), "type=checkbox ", "type=checkbox checked ", 1, 99, vbTextCompare)
-        '                End If
-        '                'If WherePairCount > 0 Then
-        '                '    For WCPtr = 0 To WherePairCount - 1
-        '                '        If genericController.vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
-        '                '            If WherePair(1, WCPtr) = CStr(DynamicMenuID) Then
-        '                '                DynamicMenuSplit(Ptr) = genericController.vbReplace(DynamicMenuSplit(Ptr), "<input ", "<input checked ", 1, 1, vbTextCompare)
-        '                '            End If
-        '                '            Exit For
-        '                '        End If
-        '                '    Next
-        '                'End If
-        '                'If DynamicMenuID > 0 Then
-        '                '    ReportLink = "<a href=""?" & RequestNameAdminForm & "=12&rid=35&recordid=" & DynamicMenuID & """ target=_blank>DynamicMenu&nbsp;Report</a>"
-        '                'Else
-        '                ReportLink = "&nbsp;"
-        '                'End If
-        '                f.Add("<tr>" _
-        '                    & "<td>&nbsp;</td>" _
-        '                    & "<td class=""ccAdminEditField"" align=left>" & SpanClassAdminNormal & DynamicMenuSplit(Ptr) & "</span></td>" _
-        '                    & "<td class=""ccAdminEditField"" align=center>" & ReportLink & "</td>" _
-        '                    & "</tr>")
-        '            Next
-        '            GetForm_Edit_SectionDynamicMenuRules = Adminui.GetEditPanel((Not allowAdminTabs), "Dynamic Sections", "Select Dynamic Menus that include this Site Section", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
-        '            EditSectionPanelCount = EditSectionPanelCount + 1
-        '            Exit Function
-        '            '
-        'ErrorTrap:
-        '            Call handleLegacyClassError3("GetForm_Edit_SectionDynamicMenuRules")
-        '        End Function
-        '        '
-        '        '========================================================================
-        '        '
-        '        '========================================================================
-        '        '
-        '        Private Function GetForm_Edit_DynamicMenuSectionRules(adminContent As cdefModel, editRecord As editRecordClass) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_DynamicMenuSectionRules")
-        '            '
-        '            Dim f As New stringBuilderLegacyController
-        '            Dim SectionList As String
-        '            Dim SectionSplit() As String
-        '            Dim Ptr As Integer
-        '            Dim IDPtr As Integer
-        '            Dim IDEndPtr As Integer
-        '            Dim SectionID As Integer
-        '            Dim ReportLink As String
-        '            Dim Adminui As New adminUIController(cpCore)
-        '            '
-        '            'Call cpCore.main_VerifyDynamicMenu("Default")
-        '            SectionList = cpCore.htmlDoc.main_GetFormInputCheckList("DynamicMenuSectionRules", "Dynamic Menus", editRecord.id, "Site Sections", "Dynamic Menu Section Rules", "DynamicMenuID", "SectionID", , , False)
-        '            SectionSplit = Split(SectionList, "<br >", , vbTextCompare)
-        '            For Ptr = 0 To UBound(SectionSplit)
-        '                SectionID = 0
-        '                IDPtr = genericController.vbInstr(1, SectionSplit(Ptr), "value=", vbTextCompare)
-        '                If IDPtr > 0 Then
-        '                    IDEndPtr = genericController.vbInstr(IDPtr, SectionSplit(Ptr), ">")
-        '                    If IDEndPtr > 0 Then
-        '                        SectionID = genericController.EncodeInteger(Mid(SectionSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
-        '                    End If
-        '                End If
-        '                'If SectionID > 0 Then
-        '                '    ReportLink = "<a href=""?" & RequestNameAdminForm & "=12&rid=35&recordid=" & SectionID & """ target=_blank>DynamicMenu&nbsp;Report</a>"
-        '                'Else
-        '                ReportLink = "&nbsp;"
-        '                'End If
-        '                f.Add("<tr>" _
-        '                    & "<td>&nbsp;</td>" _
-        '                    & "<td class=""ccAdminEditField"" align=left>" & SpanClassAdminNormal & SectionSplit(Ptr) & "</span></td>" _
-        '                    & "<td class=""ccAdminEditField"" align=center>" & ReportLink & "</td>" _
-        '                    & "</tr>")
-        '            Next
-        '            GetForm_Edit_DynamicMenuSectionRules = Adminui.GetEditPanel((Not allowAdminTabs), "Site Sections", "Select Site Sections to be included in this Dynamic Menu.", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
-        '            EditSectionPanelCount = EditSectionPanelCount + 1
-        '            Exit Function
-        '            '
-        'ErrorTrap:
-        '            Call handleLegacyClassError3("GetForm_Edit_DynamicMenuSectionRules")
-        '        End Function
-        '        '
-        '        '========================================================================
-        '        '   Print the path Rules section of the path edit form
-        '        '========================================================================
-        '        '
-        '        Private Function GetForm_Edit_SectionBlockRules(adminContent As cdefModel, editRecord As editRecordClass) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SectionBlockRules")
-        '            '
-        '            Dim f As New stringBuilderLegacyController
-        '            Dim GroupList As String
-        '            Dim GroupSplit() As String
-        '            Dim Ptr As Integer
-        '            Dim IDPtr As Integer
-        '            Dim IDEndPtr As Integer
-        '            Dim GroupID As Integer
-        '            Dim ReportLink As String
-        '            Dim Adminui As New adminUIController(cpCore)
-        '            '
-        '            GroupList = cpCore.htmlDoc.main_GetFormInputCheckList("SectionBlockRules", adminContent.Name, editRecord.id, "Groups", "Section Block Rules", "SectionID", "GroupID", , "Caption", False)
-        '            GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
-        '            For Ptr = 0 To UBound(GroupSplit)
-        '                GroupID = 0
-        '                IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
-        '                If IDPtr > 0 Then
-        '                    IDEndPtr = genericController.vbInstr(IDPtr, GroupSplit(Ptr), ">")
-        '                    If IDEndPtr > 0 Then
-        '                        GroupID = genericController.EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
-        '                    End If
-        '                End If
-        '                If GroupID > 0 Then
-        '                    ReportLink = "[<a href=""?" & RequestNameAdminForm & "=12&rid=35&recordid=" & GroupID & """ target=_blank>Group&nbsp;Report</a>]"
-        '                Else
-        '                    ReportLink = "&nbsp;"
-        '                End If
-        '                f.Add("<tr>" _
-        '                    & "<td>&nbsp;</td>" _
-        '                    & "<td class=""ccAdminEditField"" align=left>" & SpanClassAdminNormal & GroupSplit(Ptr) & "</span></td>" _
-        '                    & "<td class=""ccAdminEditField"" align=center>" & ReportLink & "</td>" _
-        '                    & "</tr>")
-        '            Next
-        '            GetForm_Edit_SectionBlockRules = Adminui.GetEditPanel((Not allowAdminTabs), "Group Permissions", "If this section is marked 'Blocked from Users' on the details tab, select groups that have access to this section and its navigation", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
-        '            EditSectionPanelCount = EditSectionPanelCount + 1
-        '            Exit Function
-        '            '
-        'ErrorTrap:
-        '            Call handleLegacyClassError3("GetForm_Edit_SectionBlockRules")
-        '        End Function
         '
         '========================================================================
         ' Print the Group Rules section for Content Edit form
@@ -9898,32 +9666,6 @@ ErrorTrap:
                             Call SaveLinkAlias(adminContent, editRecord)
                             'Call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
-                        'Case "CCSECTIONS"
-                        '    '
-                        '    '
-                        '    '
-                        '    Call SaveEditRecord(adminContent, editRecord)
-                        '    Call LoadContentTrackingDataBase(adminContent, editRecord)
-                        '    Call LoadContentTrackingResponse(adminContent, editRecord)
-                        '    'Call LoadAndSaveCalendarEvents
-                        '    Call LoadAndSaveMetaContent()
-                        '    Call cpCore.main_ProcessCheckList("SectionBlockRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Section Block Rules", "SectionID", "GroupID")
-                        '    Call cpCore.main_ProcessCheckList("SectionDynamicMenuRules", adminContent.Name, genericController.encodeText(editRecord.id), "Dynamic Menus", "Dynamic Menu Section Rules", "SectionID", "DynamicMenuID")
-                        '    'call SaveTopicRules
-                        '    Call SaveContentTracking(adminContent, editRecord)
-                        'Case "CCDYNAMICMENUS"
-                        '    '
-                        '    '
-                        '    '
-                        '    Call SaveEditRecord(adminContent, editRecord)
-                        '    Call cpCore.main_ProcessCheckList("DynamicMenuSectionRules", adminContent.Name, genericController.encodeText(editRecord.id), "Site Sections", "Dynamic Menu Section Rules", "DynamicMenuID", "SectionID")
-                        '    'call SaveTopicRules
-                        '    Call SaveContentTracking(adminContent, editRecord)
-                        '    '
-                        '    ' Verify the stylesheetPrefix exists in the Dynamic Styles
-                        '    '
-                        '    'Call VerifyDynamicMenuStyleSheet(EditRecord.ID)
-                        '    'Call cpCore.main_VerifyDynamicMenu("Default")
                         Case "CCLIBRARYFOLDERS"
                             '
                             '

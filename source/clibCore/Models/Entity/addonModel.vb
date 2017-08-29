@@ -233,5 +233,25 @@ Namespace Contensive.Core.Models.Entity
             End Try
             Return result
         End Function
+        '
+        Public Shared Function createList_pageDependencies(cpCore As coreClass, pageId As Integer) As List(Of addonModel)
+            Dim result As New List(Of addonModel)
+            Try
+                result = createList(cpCore, "(id in (select addonId from ccAddonPageRules where (pageId=" & pageId & ")))")
+            Catch ex As Exception
+                cpCore.handleException(ex) : Throw
+            End Try
+            Return result
+        End Function
+        '
+        Public Shared Function createList_templateDependencies(cpCore As coreClass, templateId As Integer) As List(Of addonModel)
+            Dim result As New List(Of addonModel)
+            Try
+                result = createList(cpCore, "(id in (select addonId from ccAddonTemplateRules where (templateId=" & templateId & ")))")
+            Catch ex As Exception
+                cpCore.handleException(ex) : Throw
+            End Try
+            Return result
+        End Function
     End Class
 End Namespace

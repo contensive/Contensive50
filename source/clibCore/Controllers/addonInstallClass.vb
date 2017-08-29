@@ -360,8 +360,13 @@ Namespace Contensive.Core
                     Call cpCore.privateFiles.createPath(workingPath)
                     '
                     UpgradeOK = DownloadCollectionFiles(workingPath, CollectionGuid, CollectionLastChangeDate, return_ErrorMessage)
-                    If UpgradeOK Then
+                    If Not UpgradeOK Then
+                        UpgradeOK = UpgradeOK
+                    Else
                         UpgradeOK = BuildLocalCollectionReposFromFolder(workingPath, CollectionLastChangeDate, collectionGuidList, return_ErrorMessage, False)
+                        If Not UpgradeOK Then
+                            UpgradeOK = UpgradeOK
+                        End If
                     End If
                     '
                     Call cpCore.privateFiles.DeleteFileFolder(workingPath)
@@ -371,6 +376,9 @@ Namespace Contensive.Core
                 '
                 If UpgradeOK Then
                     UpgradeOK = installCollectionFromLocalRepo(CollectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, nonCriticalErrorList)
+                    If Not UpgradeOK Then
+                        UpgradeOK = UpgradeOK
+                    End If
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -1427,6 +1435,9 @@ Namespace Contensive.Core
                                                                                         '
                                                                                         'Call AppendClassLogFile(cmc.appEnvironment.name, "UpgradeAppFromLocalCollection", "processing importcollection node [" & ChildCollectionName & "] of collection [" & Collectionname & "], GUID [" & CollectionGuid & "]. The collection is installed locally, so only this site will be updated.")
                                                                                         UpgradeOK = UpgradeOK And installCollectionFromLocalRepo(ChildCollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild, nonCriticalErrorList)
+                                                                                        If Not UpgradeOK Then
+                                                                                            UpgradeOK = UpgradeOK
+                                                                                        End If
                                                                                         'UpgradeOK = UpgradeOK And UpgradeAppFromLocalCollection(cmc, Upgrade, Parent_NavID, Return_IISResetRequired, ChildCollectionGUID, cpCore.app.dataBuildVersion, Return_ErrorMessage, Return_RegisterList, ImportFromCollectionsGuidList & "," & CollectionGuid)
                                                                                     Else
                                                                                         '
@@ -2089,12 +2100,18 @@ Namespace Contensive.Core
                                                                                 '   (include add-on node must be done after all add-ons are installed)
                                                                                 '
                                                                                 Call InstallCollectionFromLocalRepo_addonNode_Phase1(CDefSection, AddonGuidFieldName, cpCore.siteProperties.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
+                                                                                If Not UpgradeOK Then
+                                                                                    UpgradeOK = UpgradeOK
+                                                                                End If
                                                                             Case "interfaces"
                                                                                 '
                                                                                 ' Legacy Interface Node
                                                                                 '
                                                                                 For Each CDefInterfaces In CDefSection.ChildNodes
                                                                                     Call InstallCollectionFromLocalRepo_addonNode_Phase1(CDefInterfaces, AddonGuidFieldName, cpCore.siteProperties.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
+                                                                                    If Not UpgradeOK Then
+                                                                                        UpgradeOK = UpgradeOK
+                                                                                    End If
                                                                                 Next
                                                                             Case "otherxml", "importcollection", "sqlindex", "style", "styles", "stylesheet", "adminmenu", "menuentry", "navigatorentry"
                                                                                 '
@@ -2129,12 +2146,18 @@ Namespace Contensive.Core
                                                                                 '   (include add-on node must be done after all add-ons are installed)
                                                                                 '
                                                                                 Call InstallCollectionFromLocalRepo_addonNode_Phase2(CDefSection, AddonGuidFieldName, cpCore.siteProperties.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
+                                                                                If Not UpgradeOK Then
+                                                                                    UpgradeOK = UpgradeOK
+                                                                                End If
                                                                             Case "interfaces"
                                                                                 '
                                                                                 ' Legacy Interface Node
                                                                                 '
                                                                                 For Each CDefInterfaces In CDefSection.ChildNodes
                                                                                     Call InstallCollectionFromLocalRepo_addonNode_Phase2(CDefInterfaces, AddonGuidFieldName, cpCore.siteProperties.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
+                                                                                    If Not UpgradeOK Then
+                                                                                        UpgradeOK = UpgradeOK
+                                                                                    End If
                                                                                 Next
                                                                         End Select
                                                                     Next
@@ -5225,9 +5248,9 @@ Namespace Contensive.Core
                     srcCollectionCdef = srcKeyValuePair.Value
 
                     SrcContentName = srcCollectionCdef.Name
-                    If genericController.vbLCase(SrcContentName) = "site sections" Then
-                        SrcContentName = SrcContentName
-                    End If
+                    'If genericController.vbLCase(SrcContentName) = "site sections" Then
+                    '    SrcContentName = SrcContentName
+                    'End If
                     DebugSrcFound = False
                     If genericController.vbInstr(1, SrcContentName, cnNavigatorEntries, vbTextCompare) <> 0 Then
                         DebugSrcFound = True

@@ -812,7 +812,7 @@ ErrorTrap:
                 Dim AllowPopupTraps As Boolean
                 Dim Ptr As Integer
                 Dim JSCodeAsString As String
-                Dim Copy As String
+                'Dim Copy As String
                 Dim JS As String
                 Dim autoPrintText As String
                 Dim RenderTimeString As String = Format((GetTickCount - cpCore.app_startTickCount) / 1000, "0.000")
@@ -978,15 +978,15 @@ ErrorTrap:
                 '        Next
                 '    End If
                 'End If
-                '
-                ' ----- Add Member Stylesheet if left over
-                '
-                If cpCore.authContext.user.StyleFilename <> "" Then
-                    Copy = cpCore.cdnFiles.readFile(cpCore.authContext.user.StyleFilename)
-                    headTags = headTags & cr & "<style type=""text/css"">" & Copy & "</style>"
-                    'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('<style type=""text/css"">" & Copy & "</style>');"
-                    cpCore.authContext.user.StyleFilename = ""
-                End If
+                ''
+                '' ----- Add Member Stylesheet if left over
+                ''
+                'If cpCore.authContext.user.StyleFilename <> "" Then
+                '    Copy = cpCore.cdnFiles.readFile(cpCore.authContext.user.StyleFilename)
+                '    headTags = headTags & cr & "<style type=""text/css"">" & Copy & "</style>"
+                '    'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('<style type=""text/css"">" & Copy & "</style>');"
+                '    cpCore.authContext.user.StyleFilename = ""
+                'End If
                 '
                 ' ----- Add any left over head tags
                 '
@@ -1009,14 +1009,14 @@ ErrorTrap:
                 '
                 ' ----- If javascript stream, output it all now
                 '
-                If (cpCore.webServer.outStreamDevice = docController.htmlDoc_OutStreamJavaScript) Then
+                If (cpCore.webServer.outStreamDevice = htmlDoc_OutStreamJavaScript) Then
                     '
                     ' This is a js output stream from a <script src=url></script>
                     ' process everything into a var=msg;document.write(var)
                     ' any js from the page should be added to this group
                     '
                     Call writeAltBuffer(s)
-                    cpCore.webServer.outStreamDevice = docController.htmlDoc_OutStreamStandard
+                    cpCore.webServer.outStreamDevice = htmlDoc_OutStreamStandard
                     s = webServerIO_JavaStream_Text
                     If JS <> "" Then
                         s = s & vbCrLf & JS
@@ -1866,7 +1866,7 @@ ErrorTrap:
             '
             If cpCore.continueProcessing Then
                 Select Case cpCore.webServer.outStreamDevice
-                    Case docController.htmlDoc_OutStreamJavaScript
+                    Case htmlDoc_OutStreamJavaScript
                         Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
                     Case Else
 
@@ -1890,7 +1890,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00375")
             '
             If cpCore.doc.javascriptStreamCount >= cpCore.doc.javascriptStreamSize Then
-                cpCore.doc.javascriptStreamSize = cpCore.doc.javascriptStreamSize + docController.htmlDoc_JavaStreamChunk
+                cpCore.doc.javascriptStreamSize = cpCore.doc.javascriptStreamSize + htmlDoc_JavaStreamChunk
                 ReDim Preserve cpCore.doc.javascriptStreamHolder(cpCore.doc.javascriptStreamSize)
             End If
             cpCore.doc.javascriptStreamHolder(cpCore.doc.javascriptStreamCount) = NewString
@@ -4033,7 +4033,7 @@ ErrorTrap:
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
                                                 ElseIf EncodeCachableTags Then
                                                     If moreInfoPeopleId <> 0 Then
-                                                        Copy = cpCore.doc.getMoreInfoHtml(cpCore, moreInfoPeopleId)
+                                                        Copy = pageContentController.getMoreInfoHtml(cpCore, moreInfoPeopleId)
                                                     End If
                                                 End If
                                             Case ACTypeFeedback
@@ -7721,7 +7721,7 @@ ErrorTrap:
                     '
                     'hint = hint & ",600, Handle webclient features"
                     If genericController.vbInstr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
-                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, cpCore.doc.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
+                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, pageContentController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
                     End If
                     '
                     ' if call from webpage, push addon js and css out to cpCoreClass
@@ -8438,202 +8438,6 @@ ErrorTrap:
             Exit Function
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetComboTabs")
-        End Function
-
-
-        ' main_Get the Head innerHTML for any page
-        '
-        Public Function getHtmlDocHead(ByVal main_IsAdminSite As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetHTMLInternalHead")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim Parts() As String
-            Dim FileList As String
-            Dim Files() As String
-            Dim Ptr As Integer
-            Dim Pos As Integer
-            Dim BaseHref As String
-            Dim StyleTag As String
-            Dim IDList As String
-            Dim Cnt As Integer
-            Dim StyleSheetLink As String
-            Dim SQL As String
-            Dim CS As Integer
-            Dim OtherHeadTags As String = String.Empty
-            Dim Copy As String
-            Dim VirtualFilename As String
-            Dim Ext As String
-            '
-            getHtmlDocHead = cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
-            '
-            ' stylesheets first -- for performance
-            ' put stylesheets inline without processing
-            '
-            'If cpCore.siteProperties.getBoolean("Allow CSS Reset") Then
-            '    '
-            '    ' reset styles
-            '    '
-            '    getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
-            'End If
-            'getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""/ccLib/Styles/" & defaultStyleFilename & """>"
-            'If Not main_IsAdminSite Then
-            '    '
-            '    ' site styles
-            '    '
-            '    getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & genericController.getCdnFileLink(cpCore, "templates/styles.css") & """ >"
-            'End If
-            ''
-            '' Template shared styles
-            ''
-            '' !!!!! dont know why this was blocked. Running add-ons with shared styles need this in the admin site.
-            'FileList = main_GetSharedStyleFileList(cpCore, cpCore.doc.metaContent_SharedStyleIDList, main_IsAdminSite)
-            'cpCore.doc.metaContent_SharedStyleIDList = ""
-            'If FileList <> "" Then
-            '    Files = Split(FileList, vbCrLf)
-            '    For Ptr = 0 To UBound(Files)
-            '        If Files(Ptr) <> "" Then
-            '            Parts = Split(Files(Ptr) & "<<", "<")
-            '            If Parts(1) <> "" Then
-            '                getHtmlDocHead = getHtmlDocHead & cr & genericController.decodeHtml(Parts(1))
-            '            End If
-            '            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Parts(0)) & """ >"
-            '            If Parts(2) <> "" Then
-            '                getHtmlDocHead = getHtmlDocHead & cr & genericController.decodeHtml(Parts(2))
-            '            End If
-            '            'End If
-            '        End If
-            '    Next
-            'End If
-            '
-            ' Template exclusive styles
-            '
-            If cpCore.doc.metaContent_TemplateStyleSheetTag <> "" Then
-                getHtmlDocHead = getHtmlDocHead & cpCore.doc.metaContent_TemplateStyleSheetTag
-            End If
-            '
-            ' Page Styles
-            '
-            If cpCore.doc.metaContent_StyleSheetTags <> "" Then
-                getHtmlDocHead = getHtmlDocHead & cpCore.doc.metaContent_StyleSheetTags
-                cpCore.doc.metaContent_StyleSheetTags = ""
-            End If
-            '
-            ' Member Styles
-            '
-            If cpCore.authContext.user.StyleFilename <> "" Then
-                Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, cpCore.authContext.user.StyleFilename), "member style")
-                cpCore.authContext.user.StyleFilename = ""
-            End If
-            '
-            ' meta content
-            '
-            Copy = cpCore.doc.metaContent_Title
-            If Copy <> "" Then
-                getHtmlDocHead = getHtmlDocHead & cr & "<title>" & Copy & "</title>"
-            End If
-            '
-            Copy = cpCore.doc.metaContent_KeyWordList
-            If Copy <> "" Then
-                getHtmlDocHead = getHtmlDocHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
-            End If
-            '
-            Copy = cpCore.doc.metaContent_Description
-            If Copy <> "" Then
-                getHtmlDocHead = getHtmlDocHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
-            End If
-            '
-            ' favicon
-            '
-            VirtualFilename = cpCore.siteProperties.getText("faviconfilename")
-            If VirtualFilename <> "" Then
-                Pos = InStrRev(VirtualFilename, ".")
-                If Pos > 0 Then
-                    Ext = genericController.vbLCase(Mid(VirtualFilename, Pos))
-                    Select Case Ext
-                        Case ".ico"
-                            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
-                        Case ".png"
-                            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
-                        Case ".gif"
-                            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
-                        Case ".jpg"
-                            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
-                    End Select
-                End If
-            End If
-            '
-            ' misc caching, etc
-            '
-            Dim encoding As String
-            encoding = genericController.encodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
-            getHtmlDocHead = getHtmlDocHead _
-                & OtherHeadTags _
-                & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
-                & cr & "<meta http-equiv=""content-language"" content=""en-us"" >" _
-                & cr & "<meta http-equiv=""cache-control"" content=""no-cache"" >" _
-                & cr & "<meta http-equiv=""expires"" content=""-1"" >" _
-                & cr & "<meta http-equiv=""pragma"" content=""no-cache"" >" _
-                & cr & "<meta name=""generator"" content=""Contensive"" >"
-            '& CR & "<meta http-equiv=""cache-control"" content=""no-store"" >"
-            '
-            ' no-follow
-            '
-            If cpCore.webServer.response_NoFollow Then
-                getHtmlDocHead = getHtmlDocHead _
-                    & cr & "<meta name=""robots"" content=""nofollow"" >" _
-                    & cr & "<meta name=""mssmarttagspreventparsing"" content=""true"" >"
-            End If
-            '
-            ' Base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
-            '
-            BaseHref = cpCore.webServer.serverFormActionURL
-            If main_IsAdminSite Then
-                '
-                ' no base in admin site
-                '
-            ElseIf BaseHref <> "" Then
-                If cpCore.doc.refreshQueryString <> "" Then
-                    BaseHref = BaseHref & "?" & cpCore.doc.refreshQueryString
-                End If
-                getHtmlDocHead = getHtmlDocHead & cr & "<base href=""" & BaseHref & """ >"
-            End If
-            '
-            ' Head Javascript -- (should be) last for performance
-            '
-            getHtmlDocHead = getHtmlDocHead _
-                & cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & "/ccLib/ClientSide/Core.js""></script>" _
-                & ""
-            If cpCore.doc.headScripts.Count > 0 Then
-                For Ptr = 0 To cpCore.doc.headScripts.Count - 1
-                    With cpCore.doc.headScripts(Ptr)
-                        If (.addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                            getHtmlDocHead = getHtmlDocHead & cr & "<!-- from " & .addedByMessage & " -->"
-                        End If
-                        If Not .IsLink Then
-                            getHtmlDocHead = getHtmlDocHead & cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
-                        Else
-                            getHtmlDocHead = getHtmlDocHead & cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
-                        End If
-                    End With
-                Next
-                cpCore.doc.headScripts = {}
-            End If
-            '
-            ' other head tags - always last
-            '
-            OtherHeadTags = cpCore.doc.metaContent_OtherHeadTags
-            If OtherHeadTags <> "" Then
-                If Left(OtherHeadTags, 2) <> vbCrLf Then
-                    OtherHeadTags = vbCrLf & OtherHeadTags
-                End If
-                getHtmlDocHead = getHtmlDocHead & genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetHTMLInternalHead")
         End Function
         ''
         ''================================================================================================================
@@ -10226,41 +10030,44 @@ ErrorTrap:
         End Function
         '
         '====================================================================================================
-        Public Function getHtmlDoc(cpcore As coreClass, htmlBody As String, Optional allowLogin As Boolean = True, Optional allowTools As Boolean = True, Optional blockNonContentExtras As Boolean = False, Optional isAdminSite As Boolean = True) As String
+        Public Function getHtmlDoc(htmlBody As String, htmlBodyTag As String, Optional allowLogin As Boolean = True, Optional allowTools As Boolean = True, Optional blockNonContentExtras As Boolean = False, Optional isAdminSite As Boolean = True) As String
             Dim result As String = ""
             Try
+                Dim htmlBeforeEndOfBody As String = getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools, blockNonContentExtras, isAdminSite, True)
+                Dim htmlHead As String = cpCore.doc.getHtmlDocHead(isAdminSite)
+
                 result = "" _
-                    & cpcore.siteProperties.docTypeDeclarationAdmin _
+                    & cpCore.siteProperties.docTypeDeclarationAdmin _
                     & vbCrLf & "<html>" _
                     & vbCrLf & "<head>" _
-                    & getHtmlDocHead(True) _
+                    & htmlHead _
                     & vbCrLf & "</head>" _
-                    & vbCrLf & "<body class=""ccBodyAdmin ccCon"">" _
+                    & vbCrLf & htmlBodyTag _
                     & htmlBody _
-                    & getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools, blockNonContentExtras, isAdminSite) _
+                    & htmlBeforeEndOfBody _
                     & vbCrLf & "</body>" _
                     & vbCrLf & "</html>" _
                     & ""
             Catch ex As Exception
-                cpcore.handleException(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function
-        '
-        ' assemble all the html parts
-        '
-        Public Function assembleHtmlDoc(ByVal docType As String, ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
-            Return "" _
-                & docType _
-                & cr & "<html>" _
-                & cr2 & "<head>" _
-                & genericController.htmlIndent(head) _
-                & cr2 & "</head>" _
-                & cr2 & bodyTag _
-                & genericController.htmlIndent(Body) _
-                & cr2 & "</body>" _
-                & cr & "</html>"
-        End Function
+        ''
+        '' assemble all the html parts
+        ''
+        'Public Function assembleHtmlDoc(ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
+        '    Return "" _
+        '        & cpCore.siteProperties.docTypeDeclarationAdmin _
+        '        & cr & "<html>" _
+        '        & cr2 & "<head>" _
+        '        & genericController.htmlIndent(head) _
+        '        & cr2 & "</head>" _
+        '        & cr2 & bodyTag _
+        '        & genericController.htmlIndent(Body) _
+        '        & cr2 & "</body>" _
+        '        & cr & "</html>"
+        'End Function
         ''
         ''========================================================================
         '' ----- Starts an HTML page (for an admin page -- not a public page)

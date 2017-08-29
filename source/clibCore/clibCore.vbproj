@@ -409,6 +409,7 @@
     <Compile Include="Controllers\errorController.vb" />
     <Compile Include="Controllers\debugController.vb" />
     <Compile Include="Controllers\htmlReflowController.vb" />
+    <Compile Include="Controllers\pageContentController.vb" />
     <Compile Include="Controllers\_blankStaticController.vb" />
     <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />
@@ -421,6 +422,7 @@
     <Compile Include="Models\Context\stylesheetContextModel.vb" />
     <Compile Include="Models\Context\_blankModel.vb" />
     <Compile Include="Models\Entity\addonModel.vb" />
+    <Compile Include="Models\Entity\addonTemplateRules.vb" />
     <Compile Include="Models\Entity\sortMethodModel.vb" />
     <Compile Include="Models\Entity\libraryFilesModel.vb" />
     <Compile Include="Models\Entity\libraryFileLogModel.vb" />
@@ -432,6 +434,7 @@
     <Compile Include="Models\Entity\pageContentModel.vb" />
     <Compile Include="Models\Entity\NavigatorEntryModel.vb" />
     <Compile Include="Models\Entity\addonContentFieldTypeRulesModel.vb" />
+    <Compile Include="Models\Entity\addonPageRules.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />
@@ -504,7 +507,6 @@
     <Compile Include="Models\Entity\serverConfigModel.vb" />
     <Compile Include="Models\Entity\xdataSourceModel.vb" />
     <Compile Include="Models\Entity\visitorModel.vb" />
-    <Compile Include="Models\Entity\siteSectionModel.vb" />
     <Compile Include="Models\Entity\visitModel.vb" />
     <Compile Include="Models\Entity\personModel.vb" />
     <Compile Include="Models\Entity\LanguageModel.vb" />

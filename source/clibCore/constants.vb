@@ -67,6 +67,7 @@ Namespace Contensive.Core
         Public Const DefaultLandingSectionGuid = "{D882ED77-DB8F-4183-B12C-F83BD616E2E1}"
         Public Const DefaultTemplateGuid = "{47BE95E4-5D21-42CC-9193-A343241E2513}"
         Public Const DefaultDynamicMenuGuid = "{E8D575B9-54AE-4BF9-93B7-C7E7FE6F2DB3}"
+        Public Const pageManagerAddonGuid = "{3a01572e-0f08-4feb-b189-18371752a3c3}"
         '
         Public Const fpoContentBox = "{1571E62A-972A-4BFF-A161-5F6075720791}"
         '
@@ -1081,6 +1082,7 @@ Namespace Contensive.Core
         Public Const siteproperty_serverPageDefault_defaultValue = "default.aspx"
         Public Const spAllowPageWithoutSectionDisplay As String = "Allow Page Without Section Display"
         Public Const spAllowPageWithoutSectionDisplay_default As Boolean = True
+        Public Const spDefaultRouteAddonId As String = "Default Route AddonId"
         '
         '=======================================================================
         '   content replacements
@@ -1865,6 +1867,62 @@ Namespace Contensive.Core
         Public Const PageNotAvailable_Msg = "This page is not currently available. <br>" _
                             & "Please use your back button to return to the previous page. <br>"
         Public Const NewPage_Msg = ""
+        '
+        Public Const htmlDoc_JavaStreamChunk = 100
+        Public Const htmlDoc_OutStreamStandard = 0
+        Public Const htmlDoc_OutStreamJavaScript = 1
+        Public Const main_BakeHeadDelimiter = "#####MultilineFlag#####"
+        Public Const navStruc_Descriptor = 1           ' Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page
+        Public Const navStruc_Descriptor_CurrentPage = 2
+        Public Const navStruc_Descriptor_ChildPage = 3
+        Public Const navStruc_TemplateId = 7
+        Public Const blockMessageDefault = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
+        Public Const main_BlockSourceDefaultMessage = 0
+        Public Const main_BlockSourceCustomMessage = 1
+        Public Const main_BlockSourceLogin = 2
+        Public Const main_BlockSourceRegistration = 3
+        Public Const main_FieldDelimiter = " , "
+        Public Const main_LineDelimiter = " ,, "
+        Public Const main_IPosType = 0
+        Public Const main_IPosCaption = 1
+        Public Const main_IPosRequired = 2
+        Public Const main_IPosMax = 2       ' value checked for the line before decoding
+        Public Const main_IPosPeopleField = 3
+        Public Const main_IPosGroupName = 3
+        '
+        Public Structure main_FormPagetype_InstType
+            Dim Type As Integer
+            Dim Caption As String
+            Dim REquired As Boolean
+            Dim PeopleField As String
+            Dim GroupName As String
+        End Structure
+        '
+        Public Structure main_FormPagetype
+            Dim PreRepeat As String
+            Dim PostRepeat As String
+            Dim RepeatCell As String
+            Dim AddGroupNameList As String
+            Dim AuthenticateOnFormProcess As Boolean
+            Dim Inst() As main_FormPagetype_InstType
+        End Structure
+        '
+        ' Cache the input selects (admin uses the same ones over and over)
+        '
+        Public Structure main_InputSelectCacheType
+            Dim SelectRaw As String
+            Dim ContentName As String
+            Dim Criteria As String
+            Dim CurrentValue As String
+        End Structure
+        '
+        ' block of js code that goes into a script tag
+        '
+        Public Structure main_HeadScriptType
+            Dim IsLink As Boolean
+            Dim Text As String
+            Dim addedByMessage As String
+        End Structure
 
     End Module
     Public Module taskQueueCommandEnumModule

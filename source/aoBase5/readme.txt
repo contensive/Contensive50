@@ -1,5 +1,6 @@
 
-The aoBase5.xml (not zipped) collection holds only the database metadata required to begin the system, and a reference to aoCore5 collection, but builds out the system
+The aoBase5.xml (not zipped) collection holds only the database metadata required to begin the system, and a reference to aoCore5 collection, 
+but builds out the system
 
 This file is stored in the \source\clibCore folder and is part of the core project
 

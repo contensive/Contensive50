@@ -440,6 +440,14 @@ Namespace Contensive.Core.Controllers
                         Copy = cpcore.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->")
                         Copy = cpcore.siteProperties.getText("TrapEmail", "")
                         Copy = cpcore.siteProperties.getText("TrapErrors", "0")
+                        Dim defaultRouteAddonId As Integer = cpcore.siteProperties.getinteger(spDefaultRouteAddonId, 0)
+                        Dim defaultRouteAddon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, defaultRouteAddonId)
+                        If (defaultRouteAddon Is Nothing) Then
+                            defaultRouteAddon = Models.Entity.addonModel.create(cpcore, pageManagerAddonGuid)
+                            If (defaultRouteAddon IsNot Nothing) Then
+                                cpcore.siteProperties.setProperty(spDefaultRouteAddonId, defaultRouteAddon.id)
+                            End If
+                        End If
                     End If
                     '
                     '---------------------------------------------------------------------
@@ -481,13 +489,6 @@ Namespace Contensive.Core.Controllers
                                 landingPage.ccGuid = DefaultLandingPageGuid
                             End If
                             '
-                            ' -- landing section
-                            Dim landingSection As Models.Entity.siteSectionModel = siteSectionModel.create(cpcore, DefaultLandingSectionGuid, New List(Of String))
-                            If (landingSection Is Nothing) Then
-                                landingSection = siteSectionModel.add(cpcore, New List(Of String))
-                                landingSection.ccGuid = DefaultLandingSectionGuid
-                            End If
-                            '
                             ' -- default template
                             Dim defaultTemplate As Models.Entity.pageTemplateModel = pageTemplateModel.createByName(cpcore, "Default", New List(Of String))
                             If (defaultTemplate Is Nothing) Then
@@ -505,11 +506,6 @@ Namespace Contensive.Core.Controllers
                             landingPage.TemplateID = defaultTemplate.ID
                             landingPage.Copyfilename.copy = constants.defaultLandingPageHtml
                             landingPage.save(cpcore)
-                            '
-                            landingSection.Caption = "Default Section"
-                            landingSection.RootPageID = landingPage.ID
-                            landingSection.TemplateID = defaultTemplate.ID
-                            landingSection.saveObject(cpcore)
                             '
                             defaultTemplate.BodyHTML = constants.defaultTemplateHtml
                             defaultTemplate.save(cpcore)

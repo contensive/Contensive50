@@ -83,7 +83,7 @@ Namespace Contensive.Core.Models.Entity
         Public ShipZip As String
         Public SortOrder As String
         Public State As String
-        Public StyleFilename As String
+        'Public StyleFilename As String
         Public ThumbnailFilename As String
         Public Title As String
         Public Username As String
@@ -247,7 +247,7 @@ Namespace Contensive.Core.Models.Entity
                         .ShipZip = cs.getText("ShipZip")
                         .SortOrder = cs.getText("SortOrder")
                         .State = cs.getText("State")
-                        .StyleFilename = cs.getText("StyleFilename")
+                        '.StyleFilename = cs.getText("StyleFilename")
                         .ThumbnailFilename = cs.getText("ThumbnailFilename")
                         .Title = cs.getText("Title")
                         .Username = cs.getText("Username")
@@ -367,7 +367,7 @@ Namespace Contensive.Core.Models.Entity
                     cs.SetField("ShipZip", ShipZip)
                     cs.SetField("SortOrder", SortOrder)
                     cs.SetField("State", State)
-                    cs.SetField("StyleFilename", StyleFilename)
+                    'cs.SetField("StyleFilename", StyleFilename)
                     cs.SetField("ThumbnailFilename", ThumbnailFilename)
                     cs.SetField("Title", Title)
                     cs.SetField("Username", Username)

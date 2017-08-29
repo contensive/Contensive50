@@ -640,6 +640,7 @@
     <None Include="My Project\PublishProfiles\c-pf-kma-c5-resources-iisDefaultSite.pubxml" />
     <None Include="My Project\PublishProfiles\deployToLocalAppPatternsAspnet.pubxml" />
     <None Include="My Project\PublishProfiles\DevDefaultApp.pubxml" />
+    <None Include="My Project\PublishProfiles\localTestSite.pubxml" />
     <None Include="My Project\PublishProfiles\StagingDefaultApp.pubxml" />
     <None Include="My Project\PublishProfiles\WebDeploymentPackage.pubxml" />
     <None Include="My Project\Settings.settings">
