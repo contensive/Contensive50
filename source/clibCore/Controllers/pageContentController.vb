@@ -52,6 +52,9 @@ Namespace Contensive.Core.Controllers
                 '
                 If cpCore.continueProcessing Then
                     '
+                    ' -- load requested page/template
+                    cpCore.doc.loadPage(cpCore.docProperties.getInteger(rnPageId), cpCore.webServer.requestDomain)
+                    '
                     ' -- execute template dependancies
                     Dim templateAddonList As List(Of Models.Entity.addonModel) = addonModel.createList_templateDependencies(cpCore, cpCore.doc.page.id)
                     For Each addon As addonModel In templateAddonList

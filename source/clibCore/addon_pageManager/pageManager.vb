@@ -24,7 +24,6 @@ Namespace Contensive.Addons.PageManager
             Try
                 Dim processor As CPClass = DirectCast(cp, CPClass)
                 Dim cpCore As coreClass = processor.core
-                cpCore.doc.initDoc(cpCore.docProperties.getInteger(rnPageId), cpCore.webServer.requestDomain)
                 htmlDoc = pageContentController.getHtmlContentPage(cpCore)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

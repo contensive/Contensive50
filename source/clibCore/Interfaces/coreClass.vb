@@ -84,6 +84,9 @@ Namespace Contensive.Core
         'Public Property stylesheetCache As csv_stylesheetCacheType()
         'Public Property stylesheetCacheCnt As Integer
         Public Property pageAddonCnt As Integer = 0
+        '
+        ' -- assemblies found with load failures, this list keeps them from being loaded twice
+        Public assemblySkipList As New List(Of String)
         ''
         ''===================================================================================================
         'Public ReadOnly Property addonStyleRulesIndex() As keyPtrIndexController

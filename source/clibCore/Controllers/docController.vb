@@ -168,7 +168,7 @@ Namespace Contensive.Core.Controllers
             'End If
         End Sub
         '
-        Public Sub initDoc(pageId As Integer, Optional domainName As String = "")
+        Public Sub loadPage(pageId As Integer, Optional domainName As String = "")
             Try
                 '
                 ' -- setup domain
@@ -244,8 +244,6 @@ Namespace Contensive.Core.Controllers
                             template.save(cpcore)
                         End If
                     End If
-                    '
-                    ' -- run addon dependancies for template and page ???
                 End If
             Catch ex As Exception
 
