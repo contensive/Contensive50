@@ -1514,6 +1514,8 @@ Namespace Contensive.Core
         Public Const ALLOWLEGACYAPI As Boolean = False
         Public Const ALLOWPROFILING As Boolean = False
         '
+        Public Const cacheNameAssemblySkipList As String = "cacheNameAssemblySkipList"
+        '
         ' put content definitions here
         '
         '

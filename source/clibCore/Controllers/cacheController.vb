@@ -260,26 +260,26 @@ Namespace Contensive.Core.Controllers
                                         End If
                                     End If
                                 Next
-                                If Not cacheMiss Then
-                                    If (TypeOf cacheWrapper.data Is Newtonsoft.Json.Linq.JObject) Then
-                                        '
-                                        ' -- newtonsoft types
-                                        Dim data As Newtonsoft.Json.Linq.JObject = DirectCast(cacheWrapper.data, Newtonsoft.Json.Linq.JObject)
-                                        returnObject = data.ToObject(Of objectClass)()
-                                    ElseIf (TypeOf cacheWrapper.data Is Newtonsoft.Json.Linq.JArray) Then
-                                        '
-                                        ' -- newtonsoft types
-                                        Dim data As Newtonsoft.Json.Linq.JArray = DirectCast(cacheWrapper.data, Newtonsoft.Json.Linq.JArray)
-                                        returnObject = data.ToObject(Of objectClass)()
-                                    ElseIf (TypeOf cacheWrapper.data Is String) And (TypeOf returnObject IsNot String) Then
-                                        '
-                                        ' -- if cache data was left as a string (might be empty), and return object is not string, there was an error
-                                        returnObject = Nothing
-                                    Else
-                                        '
-                                        ' -- all worked
-                                        returnObject = DirectCast(cacheWrapper.data, objectClass)
-                                    End If
+                            End If
+                            If Not cacheMiss Then
+                                If (TypeOf cacheWrapper.data Is Newtonsoft.Json.Linq.JObject) Then
+                                    '
+                                    ' -- newtonsoft types
+                                    Dim data As Newtonsoft.Json.Linq.JObject = DirectCast(cacheWrapper.data, Newtonsoft.Json.Linq.JObject)
+                                    returnObject = data.ToObject(Of objectClass)()
+                                ElseIf (TypeOf cacheWrapper.data Is Newtonsoft.Json.Linq.JArray) Then
+                                    '
+                                    ' -- newtonsoft types
+                                    Dim data As Newtonsoft.Json.Linq.JArray = DirectCast(cacheWrapper.data, Newtonsoft.Json.Linq.JArray)
+                                    returnObject = data.ToObject(Of objectClass)()
+                                ElseIf (TypeOf cacheWrapper.data Is String) And (TypeOf returnObject IsNot String) Then
+                                    '
+                                    ' -- if cache data was left as a string (might be empty), and return object is not string, there was an error
+                                    returnObject = Nothing
+                                Else
+                                    '
+                                    ' -- all worked
+                                    returnObject = DirectCast(cacheWrapper.data, objectClass)
                                 End If
                             End If
                         End If
@@ -712,7 +712,7 @@ Namespace Contensive.Core.Controllers
         '
         '====================================================================================================
         ''' <summary>
-        ''' produce a standard format cachename for this model
+        ''' create a cache name for an entity model (based on the Db)
         ''' </summary>
         ''' <param name="tableName"></param>
         ''' <param name="fieldName"></param>
@@ -724,6 +724,17 @@ Namespace Contensive.Core.Controllers
         '
         Public Shared Function getDbRecordCacheName(tableName As String, field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
             Return (tableName & "-" & field1Name & "." & field1Value & "-" & field2Name & "." & field2Value).ToLower().Replace(" ", "_")
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' create a cache name for an object composed of data not from a signel record
+        ''' </summary>
+        ''' <param name="objectName"></param>
+        ''' <param name="uniqueObjectIdentifier"></param>
+        ''' <returns></returns>
+        Public Shared Function getComplexObjectCacheName(objectName As String, uniqueObjectIdentifier As String) As String
+            Return ("complexobject-" & objectName & "-" & uniqueObjectIdentifier).ToLower().Replace(" ", "_")
         End Function
         '
         '====================================================================================================

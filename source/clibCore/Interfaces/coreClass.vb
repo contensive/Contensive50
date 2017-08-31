@@ -85,19 +85,26 @@ Namespace Contensive.Core
         'Public Property stylesheetCacheCnt As Integer
         Public Property pageAddonCnt As Integer = 0
         '
-        ' -- assemblies found with load failures, this list keeps them from being loaded twice
-        Public assemblySkipList As New List(Of String)
-        ''
-        ''===================================================================================================
-        'Public ReadOnly Property addonStyleRulesIndex() As keyPtrIndexController
-        '    Get
-        '        If (_cache_addonStyleRules Is Nothing) Then
-        '            _cache_addonStyleRules = New keyPtrIndexController(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
-        '        End If
-        '        Return _cache_addonStyleRules
-        '    End Get
-        'End Property
-        'Private _cache_addonStyleRules As keyPtrIndexController = Nothing
+        '===================================================================================================
+        ''' <summary>
+        ''' list of DLLs in the addon assembly path that are not adds. As they are discovered, they are added to this list
+        ''' and not loaded in the future. The me.dispose compares the list count to the loaded count and caches if different.
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property assemblySkipList As List(Of String)
+            Get
+                If (_assemblySkipList Is Nothing) Then
+                    _assemblySkipList = cache.getObject(Of List(Of String))(cacheNameAssemblySkipList)
+                    If (_assemblySkipList Is Nothing) Then
+                        _assemblySkipList = New List(Of String)
+                    End If
+                    _assemblySkipList_CountWhenLoaded = _assemblySkipList.Count()
+                End If
+                Return _assemblySkipList
+            End Get
+        End Property
+        Private _assemblySkipList As List(Of String)
+        Private _assemblySkipList_CountWhenLoaded As Integer
         '
         '===================================================================================================
         Public ReadOnly Property dataSourceDictionary() As Dictionary(Of String, Models.Entity.dataSourceModel)
@@ -2160,6 +2167,13 @@ Namespace Contensive.Core
                     '
                     blockExceptionReporting = True
                     continueProcessing = False
+                    '
+                    ' -- save addoncache
+                    If (_assemblySkipList IsNot Nothing) Then
+                        If (_assemblySkipList.Count > _assemblySkipList_CountWhenLoaded) Then
+                            cache.setObject(cacheNameAssemblySkipList, _assemblySkipList)
+                        End If
+                    End If
                     '
                     ' content server object is valid
                     '

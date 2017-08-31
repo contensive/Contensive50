@@ -133,7 +133,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' load cache version
                     '
-                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName("cccontent", "id", contentId.ToString)
+                    Dim cacheName As String = Controllers.cacheController.getComplexObjectCacheName("cdef", contentId.ToString)
                     Dim dependantCacheNameList As New List(Of String)
                     If (Not forceDbLoad) Then
                         Try
