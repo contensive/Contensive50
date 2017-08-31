@@ -10033,8 +10033,8 @@ ErrorTrap:
         Public Function getHtmlDoc(htmlBody As String, htmlBodyTag As String, Optional allowLogin As Boolean = True, Optional allowTools As Boolean = True, Optional blockNonContentExtras As Boolean = False, Optional isAdminSite As Boolean = True) As String
             Dim result As String = ""
             Try
+                Dim htmlHead As String = cpCore.doc.getHtmlHead(isAdminSite)
                 Dim htmlBeforeEndOfBody As String = getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools, blockNonContentExtras, isAdminSite)
-                Dim htmlHead As String = cpCore.doc.getHtmlDocHead(isAdminSite)
 
                 result = "" _
                     & cpCore.siteProperties.docTypeDeclarationAdmin _

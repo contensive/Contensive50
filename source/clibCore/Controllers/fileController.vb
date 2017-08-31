@@ -81,11 +81,11 @@ Namespace Contensive.Core.Controllers
         '   changes / to \, and makes sure there is one and only one at the joint
         '
         Public Function joinPath(ByVal path As String, ByVal pathFilename As String) As String
-            Dim returnPath As String = path & pathFilename
+            Dim returnPath As String = IO.Path.Combine(path, pathFilename)
             Try
                 path = normalizePath(path)
                 pathFilename = normalizePathFilename(pathFilename)
-                returnPath = IO.Path.Combine(path & pathFilename)
+                returnPath = IO.Path.Combine(path, pathFilename)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -206,9 +206,6 @@ Namespace Contensive.Core.Controllers
                 If Not isValidPathFilename(pathFilename) Then
                     Throw New ArgumentException("PathFilename argument is not valid [" & pathFilename & "]")
                 Else
-                    'Dim localPathFilename As String
-                    'localPathFilename = rootLocalPath & PathFilename
-                    '
                     splitPathFilename(pathFilename, path, filename)
                     If Not pathExists(path) Then
                         Call createPath(path)
@@ -299,8 +296,6 @@ Namespace Contensive.Core.Controllers
                 Dim Position As Integer
                 Dim WorkingPath As String
                 '
-                'MethodName = "CreateFileFolder( " & WorkingPath & " )"
-                '
                 If (String.IsNullOrEmpty(physicalFolderPath)) Then
                     Throw New ArgumentException("CreateLocalFileFolder called with blank path.")
                 Else
@@ -352,8 +347,6 @@ Namespace Contensive.Core.Controllers
                     ' not an error because the pathfile already does not exist
                     '
                 Else
-                    'Dim localPathFilename As String
-                    'localPathFilename = rootLocalPath & PathFilename
                     If fileExists(PathFilename) Then
                         Call File.Delete(convertToAbsPath(PathFilename))
                     End If
@@ -374,20 +367,7 @@ Namespace Contensive.Core.Controllers
         '
         Public Sub DeleteFileFolder(ByVal PathName As String)
             Try
-                'Dim FolderObject As Folder
-                'Dim ErrorDescription As String
-                'Dim MethodName As String
-                'Dim FolderDescription As String
-                'Dim DetailArray As Object
-                'Dim SubFolders As String
-                'Dim ArrayPointer As Integer
-                'Dim FileDetails As Object
-                'Dim WorkingPath As String
-                '
-                'MethodName = "DeleteFolder( " & PathName & " )"
-                '
                 If (PathName <> "") Then
-                    'WorkingPath = PathName
                     Dim localPath As String
                     localPath = joinPath(rootLocalPath, PathName)
                     If Right(localPath, 1) = "\" Then
@@ -440,8 +420,8 @@ Namespace Contensive.Core.Controllers
                             If Not dstFileSystem.pathExists(dstPath) Then
                                 Call dstFileSystem.createPath(dstPath)
                             End If
-                            srcFullPathFilename = rootLocalPath & srcPathFilename
-                            DstFullPathFilename = dstFileSystem.rootLocalPath & dstPathFilename
+                            srcFullPathFilename = Path.Combine(rootLocalPath, srcPathFilename)
+                            DstFullPathFilename = Path.Combine(dstFileSystem.rootLocalPath, dstPathFilename)
                             If dstFileSystem.fileExists(dstPathFilename) Then
                                 dstFileSystem.deleteFile(dstPathFilename)
                             End If
@@ -466,7 +446,7 @@ Namespace Contensive.Core.Controllers
                 Else
                     If pathExists(FolderPath) Then
                         Dim localPath As String
-                        localPath = rootLocalPath & FolderPath
+                        localPath = convertToAbsPath(FolderPath)
                         Dim di As New IO.DirectoryInfo(localPath)
                         returnFileInfoList = di.GetFiles()
                     End If
@@ -513,7 +493,7 @@ Namespace Contensive.Core.Controllers
                     If Not pathExists(FolderPath) Then
                         returnFolders = {}
                     Else
-                        Dim localPath As String = rootLocalPath & FolderPath
+                        Dim localPath As String = convertToAbsPath(FolderPath)
                         Dim di As New DirectoryInfo(localPath)
                         returnFolders = di.GetDirectories()
                     End If
@@ -593,7 +573,7 @@ Namespace Contensive.Core.Controllers
                                 ' not an error, to minimize file use, empty files are not created, so missing files are just empty
                                 '
                             Else
-                                File.Move(srcFullPathFilename, sourceFullPath & DestinationFilename)
+                                File.Move(srcFullPathFilename, Path.Combine(sourceFullPath, DestinationFilename))
                             End If
                         End If
                     End If
@@ -683,7 +663,7 @@ Namespace Contensive.Core.Controllers
                     If dstFileSystem Is Nothing Then
                         dstFileSystem = Me
                     End If
-                    Call copyLocalFileFolder(rootLocalPath & srcPath, dstFileSystem.rootLocalPath & dstPath)
+                    Call copyLocalFileFolder(Path.Combine(rootLocalPath, srcPath), Path.Combine(dstFileSystem.rootLocalPath, dstPath))
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -796,7 +776,7 @@ Namespace Contensive.Core.Controllers
                 Dim archiveFilename As String = "" '
                 '
                 splitPathFilename(archivePathFilename, archivepath, archiveFilename)
-                fastZip.CreateZip(rootLocalPath & archivePathFilename, rootLocalPath & addPathFilename, recurse, fileFilter)
+                fastZip.CreateZip(convertToAbsPath(archivePathFilename), convertToAbsPath(addPathFilename), recurse, fileFilter)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try

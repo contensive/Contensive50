@@ -20,15 +20,16 @@ Namespace Contensive.Addons.PageManager
         ''' <param name="cp"></param>
         ''' <returns></returns>
         Public Overrides Function execute(cp As Contensive.BaseClasses.CPBaseClass) As Object
-            Dim htmlDoc As String = ""
+            Dim returnHtml As String = ""
             Try
                 Dim processor As CPClass = DirectCast(cp, CPClass)
                 Dim cpCore As coreClass = processor.core
-                htmlDoc = pageContentController.getHtmlContentPage(cpCore)
+                Dim htmlBody As String = cpCore.doc.docBuffer & pageContentController.getHtmlBody(cpCore)
+                returnHtml = cpCore.html.getHtmlDoc(htmlBody, TemplateDefaultBodyTag, True, True, False, False)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try
-            Return htmlDoc
+            Return returnHtml
         End Function
     End Class
 End Namespace

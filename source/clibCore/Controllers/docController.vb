@@ -2564,7 +2564,7 @@ ErrorTrap:
 
         ' main_Get the Head innerHTML for any page
         '
-        Public Function getHtmlDocHead(ByVal main_IsAdminSite As Boolean) As String
+        Public Function getHtmlHead(ByVal main_IsAdminSite As Boolean) As String
             Dim result As String = ""
             Try
                 Dim Ptr As Integer

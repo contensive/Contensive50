@@ -973,7 +973,8 @@ Namespace Contensive.Core
                                 webServer.blockClosePageCopyright = True
                                 html_BlockClosePageLink = True
                                 'Call AppendLog("call main_getEndOfBody, from main_initf")
-                                returnResult = returnResult & html.getHtmlDoc_beforeEndOfBodyHtml(False, False, True, False)
+                                ' -- removed, not sure what it did but this should just be part of getHtmlDoc() 
+                                'returnResult = returnResult & html.getHtmlDoc_beforeEndOfBodyHtml(False, False, True, False)
                                 Call html.writeAltBuffer(returnResult)
                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
                                 Return doc.docBuffer
@@ -1658,25 +1659,37 @@ Namespace Contensive.Core
                             Call html.main_SetMetaContent(0, 0)
                             Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Resource Library")
                             Copy = html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
-                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2b")
-                            Copy = "" _
-                            & siteProperties.docTypeDeclaration() _
-                            & "<html>" _
-                            & cr & "<head>" _
-                            & genericController.htmlIndent(doc.getHtmlDocHead(False)) _
-                            & cr & "</head>" _
-                            & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & genericController.htmlIndent(html.main_GetPanelHeader("Contensive Resource Library")) _
-                            & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
-                            & cr2 & "<div style=""border-top:1px solid white;border-bottom:1px solid black;height:2px""><img alt=""spacer"" src=""/ccLib/images/spacer.gif"" width=1 height=1></div>" _
-                            & genericController.htmlIndent(Copy) _
-                            & cr & "</td></tr>" _
-                            & cr & "<tr><td>" _
-                            & genericController.htmlIndent(html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)) _
-                            & cr & "</td></tr></table>" _
-                            & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
-                            & cr & "</body>" _
-                            & "</html>"
+                            Dim htmlBody As String = "" _
+                                & genericController.htmlIndent(html.main_GetPanelHeader("Contensive Resource Library")) _
+                                & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
+                                & cr2 & "<div style=""border-top:1px solid white;border-bottom:1px solid black;height:2px""><img alt=""spacer"" src=""/ccLib/images/spacer.gif"" width=1 height=1></div>" _
+                                & genericController.htmlIndent(Copy) _
+                                & cr & "</td></tr>" _
+                                & cr & "<tr><td>" _
+                                & genericController.htmlIndent(html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)) _
+                                & cr & "</td></tr></table>" _
+                                & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
+                                & ""
+                            Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
+                            Copy = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
+                            'Copy = "" _
+                            '& siteProperties.docTypeDeclaration() _
+                            '& "<html>" _
+                            '& cr & "<head>" _
+                            '& genericController.htmlIndent(doc.getHtmlDocHead(False)) _
+                            '& cr & "</head>" _
+                            '& cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
+                            '& genericController.htmlIndent(html.main_GetPanelHeader("Contensive Resource Library")) _
+                            '& cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
+                            '& cr2 & "<div style=""border-top:1px solid white;border-bottom:1px solid black;height:2px""><img alt=""spacer"" src=""/ccLib/images/spacer.gif"" width=1 height=1></div>" _
+                            '& genericController.htmlIndent(Copy) _
+                            '& cr & "</td></tr>" _
+                            '& cr & "<tr><td>" _
+                            '& genericController.htmlIndent(html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)) _
+                            '& cr & "</td></tr></table>" _
+                            '& cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
+                            '& cr & "</body>" _
+                            '& "</html>"
                             Call html.writeAltBuffer(Copy)
                             result = True
                             'Call main_GetEndOfBody(False, False)
@@ -1701,7 +1714,7 @@ Namespace Contensive.Core
                             & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & genericController.htmlIndent(doc.getHtmlDocHead(False)) _
+                            & genericController.htmlIndent(doc.getHtmlHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
                             & html.main_GetPanelHeader("Contensive Resource Library") _
@@ -1763,7 +1776,7 @@ Namespace Contensive.Core
                             & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & genericController.htmlIndent(doc.getHtmlDocHead(False)) _
+                            & genericController.htmlIndent(doc.getHtmlHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
                             & genericController.htmlIndent(html.main_GetPanelHeader("Contensive Site Explorer")) _
@@ -1861,35 +1874,36 @@ Namespace Contensive.Core
                     '        Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
                     '    End If
                     '    result = True
-                    Case HardCodedPageGetJSLogin
-                        '
-                        ' ----- Create a Javascript login page
-                        '
-                        webServer.blockClosePageCopyright = True
-                        Copy = Copy & "<p align=""center""><CENTER>"
-                        If Not authContext.isAuthenticated() Then
-                            Dim loginAddon As New Addons.addon_loginClass(Me)
-                            Copy = Copy & loginAddon.getLoginForm()
-                        ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
-                            'Copy = Copy & main_GetToolsPanel
-                        Else
-                            Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.serverFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
-                        End If
-                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
-                        Copy = Copy & html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False)
-                        Copy = Copy & "</CENTER></p>"
-                        Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
-                        Copy = genericController.vbReplace(Copy, vbCr, "")
-                        Copy = genericController.vbReplace(Copy, vbLf, "")
-                        'Copy = "<b>login Page</b>"
-                        '
-                        ' Write the page to the stream, with a javascript wrapper
-                        '
-                        MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                        Call webServer.setResponseContentType("text/plain")
-                        Call html.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
-                        Call html.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
-                        result = True
+                    ' -- deprecate
+                    'Case HardCodedPageGetJSLogin
+                    '    '
+                    '    ' ----- Create a Javascript login page
+                    '    '
+                    '    webServer.blockClosePageCopyright = True
+                    '    Copy = Copy & "<p align=""center""><CENTER>"
+                    '    If Not authContext.isAuthenticated() Then
+                    '        Dim loginAddon As New Addons.addon_loginClass(Me)
+                    '        Copy = Copy & loginAddon.getLoginForm()
+                    '    ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
+                    '        'Copy = Copy & main_GetToolsPanel
+                    '    Else
+                    '        Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.serverFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
+                    '    End If
+                    '    'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
+                    '    Copy = Copy & html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False)
+                    '    Copy = Copy & "</CENTER></p>"
+                    '    Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
+                    '    Copy = genericController.vbReplace(Copy, vbCr, "")
+                    '    Copy = genericController.vbReplace(Copy, vbLf, "")
+                    '    'Copy = "<b>login Page</b>"
+                    '    '
+                    '    ' Write the page to the stream, with a javascript wrapper
+                    '    '
+                    '    MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
+                    '    Call webServer.setResponseContentType("text/plain")
+                    '    Call html.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
+                    '    Call html.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
+                    '    result = True
                     Case HardCodedPageRedirect
                         '
                         ' ----- Redirect with RC and RI

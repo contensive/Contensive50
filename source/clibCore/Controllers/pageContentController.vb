@@ -21,14 +21,12 @@ Namespace Contensive.Core.Controllers
         '   This code is based on the GoMethod site script
         '========================================================================
         '
-        Public Shared Function getHtmlContentPage(cpCore As coreClass) As String
+        Public Shared Function getHtmlBody(cpCore As coreClass) As String
             Dim returnHtml As String = ""
             Try
                 Dim downloadId As Integer
                 Dim Pos As Integer
                 Dim htmlDocBody As String
-                Dim htmlDocHead As String
-                Dim bodyTag As String
                 Dim Clip As String
                 Dim ClipParentRecordID As Integer
                 Dim ClipParentContentID As Integer
@@ -566,22 +564,23 @@ Namespace Contensive.Core.Controllers
                                     Call cpCore.html.main_SetMetaContent(0, 0)
                                     Call cpCore.html.addOnLoadJavascript("document.body.style.overflow='scroll'", "Anonymous User Block")
                                     Dim Copy As String = cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
-                                    ' -- already encoded
-                                    'Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
-                                    Copy = "" _
-                                            & cpCore.siteProperties.docTypeDeclaration() _
-                                            & vbCrLf & "<html>" _
-                                            & cr & "<head>" _
-                                            & genericController.htmlIndent(cpCore.doc.getHtmlDocHead(False)) _
-                                            & cr & "</head>" _
-                                            & cr & TemplateDefaultBodyTag _
-                                            & genericController.htmlIndent(Copy) _
-                                            & cr2 & "<div>" _
-                                            & cr3 & cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False) _
-                                            & cr2 & "</div>" _
-                                            & cr & "</body>" _
-                                            & vbCrLf & "</html>"
-                                    '& "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
+                                    Copy = cpCore.html.getHtmlDoc(Copy, TemplateDefaultBodyTag, True, True, False, False)
+                                    '' -- already encoded
+                                    ''Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
+                                    'Copy = "" _
+                                    '        & cpCore.siteProperties.docTypeDeclaration() _
+                                    '        & vbCrLf & "<html>" _
+                                    '        & cr & "<head>" _
+                                    '        & genericController.htmlIndent(cpCore.doc.getHtmlDocHead(False)) _
+                                    '        & cr & "</head>" _
+                                    '        & cr & TemplateDefaultBodyTag _
+                                    '        & genericController.htmlIndent(Copy) _
+                                    '        & cr2 & "<div>" _
+                                    '        & cr3 & cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False) _
+                                    '        & cr2 & "</div>" _
+                                    '        & cr & "</body>" _
+                                    '        & vbCrLf & "</html>"
+                                    ''& "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                                     Call cpCore.html.writeAltBuffer(Copy)
                                     cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                     Return cpCore.doc.docBuffer
@@ -590,29 +589,7 @@ Namespace Contensive.Core.Controllers
                     End If
                     '
                     ' -- build document
-                    htmlDocBody = getHtmlDocBody(cpCore)
-                    'bodyAddonId = genericController.EncodeInteger(cpCore.siteProperties.getText("Html Body AddonId", "0"))
-                    'If bodyAddonId <> 0 Then
-                    '    htmlBody = cpCore.addon.execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
-                    'Else
-                    '    htmlBody = getDocBody(cpCore)
-                    'End If
-                    '
-                    ' -- add template and page details to document
-                    'Call cpCore.html.addOnLoadJavascript(template.JSOnLoad, "template")
-                    'Call cpCore.html.addHeadJavascriptCode(template.JSHead, "template")
-                    'Call cpCore.html.addBodyJavascriptCode(template.JSEndBody, "template")
-                    'Call cpCore.html.main_AddHeadTag2(template.OtherHeadTags, "template")
-                    'If cpCore.doc.template.StylesFilename <> "" Then
-                    '    cpCore.doc.metaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, cpCore.doc.template.StylesFilename) & """ >"
-                    'End If
-                    ''
-                    '' -- add shared styles
-                    'Dim sqlCriteria As String = "(templateId=" & cpCore.doc.template.ID & ")"
-                    'Dim styleList As List(Of Models.Entity.SharedStylesTemplateRuleModel) = Models.Entity.SharedStylesTemplateRuleModel.createList(cpCore, sqlCriteria, "sortOrder,id")
-                    'For Each rule As SharedStylesTemplateRuleModel In styleList
-                    '    Call cpCore.html.addSharedStyleID2(rule.StyleID, "template")
-                    'Next
+                    htmlDocBody = getHtmlBodyTemplate(cpCore)
                     '
                     ' -- check secure certificate required
                     Dim SecureLink_Template_Required As Boolean = cpCore.doc.template.IsSecure
@@ -669,27 +646,28 @@ Namespace Contensive.Core.Controllers
                             Return ""
                         End If
                     End If
-                    If cpCore.continueProcessing Then
-                        '
-                        ' Build Body Tag
-                        '
-                        htmlDocHead = cpCore.doc.getHtmlDocHead(False)
-                        bodyTag = TemplateDefaultBodyTag
-                        'If cpCore.doc.template.BodyTag <> "" Then
-                        '    bodyTag = cpCore.doc.template.BodyTag
-                        'Else
-                        '    bodyTag = TemplateDefaultBodyTag
-                        'End If
-                        '
-                        ' Add tools panel to body
-                        '
-                        htmlDocBody = htmlDocBody & cr & "<div>" & genericController.htmlIndent(cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False)) & cr & "</div>"
-                        '
-                        ' build doc
-                        '
-                        returnHtml = cpCore.html.getHtmlDoc(cpCore.doc.docBuffer & htmlDocBody, bodyTag, True, True, False, False)
-                        'returnHtml = cpCore.html.assembleHtmlDoc(htmlDocHead, bodyTag, cpCore.doc.docBuffer & htmlDocBody)
-                    End If
+                    returnHtml = htmlDocBody
+                    'If cpCore.continueProcessing Then
+                    '    '
+                    '    ' Build Body Tag
+                    '    '
+                    '    htmlDocHead = cpCore.doc.getHtmlDocHead(False)
+                    '    bodyTag = TemplateDefaultBodyTag
+                    '    'If cpCore.doc.template.BodyTag <> "" Then
+                    '    '    bodyTag = cpCore.doc.template.BodyTag
+                    '    'Else
+                    '    '    bodyTag = TemplateDefaultBodyTag
+                    '    'End If
+                    '    '
+                    '    ' Add tools panel to body
+                    '    '
+                    '    htmlDocBody = htmlDocBody & cr & "<div>" & genericController.htmlIndent(cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False)) & cr & "</div>"
+                    '    '
+                    '    ' build doc
+                    '    '
+                    '    returnHtml = cpCore.html.getHtmlDoc(cpCore.doc.docBuffer & htmlDocBody, bodyTag, True, True, False, False)
+                    '    'returnHtml = cpCore.html.assembleHtmlDoc(htmlDocHead, bodyTag, cpCore.doc.docBuffer & htmlDocBody)
+                    'End If
                 End If
                 '
                 ' all other routes should be handled here.
@@ -1541,11 +1519,11 @@ ErrorTrap:
                         '
                         ' -- Process Trigger Conditions
                         ConditionID = cpCore.doc.page.TriggerConditionID
-                    ConditionGroupID = cpCore.doc.page.TriggerConditionGroupID
-                    main_AddGroupID = cpCore.doc.page.TriggerAddGroupID
-                    RemoveGroupID = cpCore.doc.page.TriggerRemoveGroupID
-                    SystemEMailID = cpCore.doc.page.TriggerSendSystemEmailID
-                    Select Case ConditionID
+                        ConditionGroupID = cpCore.doc.page.TriggerConditionGroupID
+                        main_AddGroupID = cpCore.doc.page.TriggerAddGroupID
+                        RemoveGroupID = cpCore.doc.page.TriggerRemoveGroupID
+                        SystemEMailID = cpCore.doc.page.TriggerSendSystemEmailID
+                        Select Case ConditionID
                             Case 1
                                 '
                                 ' Always
@@ -2148,7 +2126,7 @@ ErrorTrap:
         '   This code is based on the GoMethod site script
         '========================================================================
         '
-        Public Shared Function getHtmlDocBody(cpCore As coreClass) As String
+        Public Shared Function getHtmlBodyTemplate(cpCore As coreClass) As String
             Dim returnBody As String = ""
             Try
                 Dim AddonReturn As String
@@ -2194,7 +2172,7 @@ ErrorTrap:
                 ' ----- main_Get Content (Already Encoded)
                 '
                 blockSiteWithLogin = False
-                PageContent = getHtmlDocBodyContent(cpCore, True, True, False, blockSiteWithLogin)
+                PageContent = getHtmlBodyTemplateContent(cpCore, True, True, False, blockSiteWithLogin)
                 If blockSiteWithLogin Then
                     '
                     ' section blocked, just return the login box in the page content
@@ -2297,7 +2275,7 @@ ErrorTrap:
         '           else - (IsSectionRootPageIDMode) SectionRecord has a RootPageID field
         '=============================================================================
         '
-        Public Shared Function getHtmlDocBodyContent(cpCore As coreClass, AllowChildPageList As Boolean, AllowReturnLink As Boolean, AllowEditWrapper As Boolean, ByRef return_blockSiteWithLogin As Boolean) As String
+        Public Shared Function getHtmlBodyTemplateContent(cpCore As coreClass, AllowChildPageList As Boolean, AllowReturnLink As Boolean, AllowEditWrapper As Boolean, ByRef return_blockSiteWithLogin As Boolean) As String
             Dim returnHtml As String = ""
             Try
                 Dim allowPageWithoutSectionDislay As Boolean
