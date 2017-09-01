@@ -501,7 +501,7 @@ Namespace Contensive.Core.Controllers
                                         Content = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
                                         Call cpCore.appRootFiles.saveFile(Filename, Content)
                                     End If
-                                    Content = Content & cpCore.addonLegacyCache.addonCache.robotsTxt
+                                    Content = Content & cpCore.addonCache.robotsTxt
                                     Call cpCore.webServer.setResponseContentType("text/plain")
                                     Call cpCore.html.writeAltBuffer(Content)
                                     cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
@@ -1621,17 +1621,8 @@ ErrorTrap:
                     '
                     ' ----- OnPageEndEvent
                     cpCore.doc.bodyContent = returnHtml
-                    AddOnCnt = UBound(cpCore.addonLegacyCache.addonCache.onPageEndPtrs) + 1
-                    For addonPtr = 0 To AddOnCnt - 1
-                        addonCachePtr = cpCore.addonLegacyCache.addonCache.onPageEndPtrs(addonPtr)
-                        If addonCachePtr > -1 Then
-                            addonId = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).id
-                            If addonId > 0 Then
-                                AddonName = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).name
-                                AddonContent = cpCore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                                cpCore.doc.bodyContent = cpCore.doc.bodyContent & AddonContent
-                            End If
-                        End If
+                    For Each addon As addonModel In cpCore.addonCache.getOnPageEndAddonList
+                        cpCore.doc.bodyContent &= cpCore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                     Next
                     returnHtml = cpCore.doc.bodyContent
                     '
@@ -2145,27 +2136,16 @@ ErrorTrap:
                 Dim addonId As Integer
                 Dim AddonName As String
                 '
-                Call cpCore.addonLegacyCache.load()
                 returnBody = ""
                 '
                 ' ----- OnBodyStart add-ons
                 '
                 FilterStatusOK = False
-                Cnt = UBound(cpCore.addonLegacyCache.addonCache.onBodyStartPtrs) + 1
-                For Ptr = 0 To Cnt - 1
-                    addonCachePtr = cpCore.addonLegacyCache.addonCache.onBodyStartPtrs(Ptr)
-                    If addonCachePtr > -1 Then
-                        addonId = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).id
-                        'hint = hint & ",addonId=" & addonId
-                        If addonId > 0 Then
-                            AddonName = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).name
-                            'hint = hint & ",AddonName=" & AddonName
-                            returnBody = returnBody & cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
-                            If Not FilterStatusOK Then
-                                Throw New ApplicationException("Unexpected exception")
-                                Exit For
-                            End If
-                        End If
+                For Each addon As addonModel In cpCore.addonCache.getOnBodyStartAddonList
+                    returnBody &= cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                    If Not FilterStatusOK Then
+                        Throw New ApplicationException("Unexpected exception")
+                        Exit For
                     End If
                 Next
                 '
@@ -2233,29 +2213,38 @@ ErrorTrap:
                     '
                     ' ----- OnBodyEnd add-ons
                     '
-                    'hint = hint & ",onBodyEnd"
-                    FilterStatusOK = False
-                    Cnt = UBound(cpCore.addonLegacyCache.addonCache.onBodyEndPtrs) + 1
-                    'hint = hint & ",cnt=" & Cnt
-                    For Ptr = 0 To Cnt - 1
-                        addonCachePtr = cpCore.addonLegacyCache.addonCache.onBodyEndPtrs(Ptr)
-                        'hint = hint & ",ptr=" & Ptr & ",addonCachePtr=" & addonCachePtr
-                        If addonCachePtr > -1 Then
-                            addonId = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).id
-                            'hint = hint & ",addonId=" & addonId
-                            If addonId > 0 Then
-                                AddonName = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).name
-                                'hint = hint & ",AddonName=" & AddonName
-                                cpCore.doc.docBodyFilter = returnBody
-                                AddonReturn = cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
-                                returnBody = cpCore.doc.docBodyFilter & AddonReturn
-                                If Not FilterStatusOK Then
-                                    Throw New ApplicationException("Unexpected exception")
-                                    Exit For
-                                End If
-                            End If
+                    For Each addon In cpCore.addonCache.getOnBodyEndAddonList()
+                        cpCore.doc.docBodyFilter = returnBody
+                        AddonReturn = cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                        returnBody = cpCore.doc.docBodyFilter & AddonReturn
+                        If Not FilterStatusOK Then
+                            Throw New ApplicationException("Unexpected exception")
+                            Exit For
                         End If
                     Next
+                    ''hint = hint & ",onBodyEnd"
+                    'FilterStatusOK = False
+                    'Cnt = UBound(cpCore.addonIdDict.addonCache.onBodyEndPtrs) + 1
+                    ''hint = hint & ",cnt=" & Cnt
+                    'For Ptr = 0 To Cnt - 1
+                    '    addonCachePtr = cpCore.addonIdDict.addonCache.onBodyEndPtrs(Ptr)
+                    '    'hint = hint & ",ptr=" & Ptr & ",addonCachePtr=" & addonCachePtr
+                    '    If addonCachePtr > -1 Then
+                    '        addonId = cpCore.addonIdDict.addonCache.addonList(addonCachePtr.ToString).id
+                    '        'hint = hint & ",addonId=" & addonId
+                    '        If addonId > 0 Then
+                    '            AddonName = cpCore.addonIdDict.addonCache.addonList(addonCachePtr.ToString).name
+                    '            'hint = hint & ",AddonName=" & AddonName
+                    '            cpCore.doc.docBodyFilter = returnBody
+                    '            AddonReturn = cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                    '            returnBody = cpCore.doc.docBodyFilter & AddonReturn
+                    '            If Not FilterStatusOK Then
+                    '                Throw New ApplicationException("Unexpected exception")
+                    '                Exit For
+                    '            End If
+                    '        End If
+                    '    End If
+                    'Next
                     '
                     ' Make it pretty for those who care
                     '

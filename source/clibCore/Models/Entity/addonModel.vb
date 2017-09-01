@@ -58,7 +58,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property IsInline As Boolean
         Public Property JavaScriptBodyEnd As String
         Public Property JavaScriptOnLoad As String
-        Public Property JSFilename As String
+        Public Property JSFilename As fieldTypeTextFile
         Public Property Link As String
         Public Property MetaDescription As String
         Public Property MetaKeywordList As String
@@ -86,7 +86,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property ScriptingLanguageID As Integer
         Public Property ScriptingTimeout As String
         'Public Property SortOrder As String
-        Public Property StylesFilename As String
+        Public Property StylesFilename As fieldTypeTextFile
         Public Property Template As Boolean        '
         '====================================================================================================
         Public Overloads Shared Function add(cpCore As coreClass) As addonModel
@@ -253,5 +253,92 @@ Namespace Contensive.Core.Models.Entity
             End Try
             Return result
         End Function
+        '
+        Public Class addonCacheClass
+            Private dictIdAddon As New Dictionary(Of Integer, addonModel)
+            Private dictGuidId As New Dictionary(Of String, Integer)
+            Private dictNameId As New Dictionary(Of String, Integer)
+            '
+            Private onBodyEndIdList As New List(Of Integer)
+            Private onBodyStartIdList As New List(Of Integer)
+            Private onNewVisitIdList As New List(Of Integer)
+            Private OnPageEndIdList As New List(Of Integer)
+            Private OnPageStartIdList As New List(Of Integer)
+            Public robotsTxt As String = ""
+            '
+            Public Sub add(addon As addonModel)
+                If (Not dictIdAddon.ContainsKey(addon.id)) Then
+                    If (Not dictGuidId.ContainsKey(addon.ccguid)) Then
+                        If (Not dictNameId.ContainsKey(addon.name)) Then
+                            dictIdAddon.Add(addon.id, addon)
+                            dictGuidId.Add(addon.ccguid, addon.id)
+                            dictNameId.Add(addon.name, addon.id)
+                        End If
+                    End If
+                End If
+                If (addon.OnBodyEnd) And (Not onBodyEndIdList.Contains(addon.id)) Then
+                    onBodyEndIdList.Add(addon.id)
+                End If
+                If (addon.OnBodyStart) And (Not onBodyStartIdList.Contains(addon.id)) Then
+                    onBodyStartIdList.Add(addon.id)
+                End If
+                If (addon.OnNewVisitEvent) And (Not onNewVisitIdList.Contains(addon.id)) Then
+                    onNewVisitIdList.Add(addon.id)
+                End If
+                If (addon.OnPageEndEvent) And (Not OnPageEndIdList.Contains(addon.id)) Then
+                    OnPageEndIdList.Add(addon.id)
+                End If
+                If (addon.OnPageStartEvent) And (Not OnPageStartIdList.Contains(addon.id)) Then
+                    OnPageStartIdList.Add(addon.id)
+                End If
+                robotsTxt &= vbCrLf & addon.RobotsTxt
+            End Sub
+            Public Function getAddonByGuid(guid As String) As addonModel
+                If (Me.dictGuidId.ContainsKey(guid)) Then
+                    Return getAddonById(Me.dictGuidId.Item(guid))
+                End If
+                Return Nothing
+            End Function
+            Public Function getAddonByName(name As String) As addonModel
+                If (Me.dictNameId.ContainsKey(name)) Then
+                    Return getAddonById(Me.dictNameId.Item(name))
+                End If
+                Return Nothing
+            End Function
+            Public Function getAddonById(addonId As Integer) As addonModel
+                If (Me.dictIdAddon.ContainsKey(addonId)) Then
+                    Return Me.dictIdAddon.Item(addonId)
+                End If
+                Return Nothing
+            End Function
+            '
+            Private Function getAddonList(addonIdList As List(Of Integer)) As List(Of addonModel)
+                Dim result As New List(Of addonModel)
+                For Each addonId As Integer In addonIdList
+                    result.Add(getAddonById(addonId))
+                Next
+                Return result
+            End Function
+            '
+            Public Function getOnBodyEndAddonList() As List(Of addonModel)
+                Return getAddonList(onBodyEndIdList)
+            End Function
+            '
+            Public Function getOnBodyStartAddonList() As List(Of addonModel)
+                Return getAddonList(onBodyStartIdList)
+            End Function
+            '
+            Public Function getOnNewVisitAddonList() As List(Of addonModel)
+                Return getAddonList(onNewVisitIdList)
+            End Function
+            '
+            Public Function getOnPageEndAddonList() As List(Of addonModel)
+                Return getAddonList(OnPageEndIdList)
+            End Function
+            '
+            Public Function getOnPageStartAddonList() As List(Of addonModel)
+                Return getAddonList(OnPageStartIdList)
+            End Function
+        End Class
     End Class
 End Namespace

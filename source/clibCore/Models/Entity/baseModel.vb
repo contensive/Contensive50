@@ -332,56 +332,59 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
         Private Shared Function loadRecord(Of T As baseModel)(cpCore As coreClass, cs As csController, ByRef callersCacheNameList As List(Of String)) As T
-            Dim instance As T = Nothing
+            Dim modelInstance As T = Nothing
             Try
                 If cs.ok() Then
                     Dim instanceType As Type = GetType(T)
                     Dim tableName As String = derivedContentTableName(instanceType)
-                    instance = DirectCast(Activator.CreateInstance(instanceType), T)
-                    For Each instanceProperty As PropertyInfo In instance.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
-                        Select Case instanceProperty.Name.ToLower()
+                    modelInstance = DirectCast(Activator.CreateInstance(instanceType), T)
+                    For Each modelProperty As PropertyInfo In modelInstance.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
+                        Select Case modelProperty.Name.ToLower()
                             Case "specialcasefield"
                             Case Else
-                                Select Case instanceProperty.PropertyType.Name
+                                Select Case modelProperty.PropertyType.Name
                                     Case "Int32"
-                                        instanceProperty.SetValue(instance, cs.getInteger(instanceProperty.Name), Nothing)
+                                        modelProperty.SetValue(modelInstance, cs.getInteger(modelProperty.Name), Nothing)
                                     Case "Boolean"
-                                        instanceProperty.SetValue(instance, cs.getBoolean(instanceProperty.Name), Nothing)
+                                        modelProperty.SetValue(modelInstance, cs.getBoolean(modelProperty.Name), Nothing)
                                     Case "DateTime"
-                                        instanceProperty.SetValue(instance, cs.getDate(instanceProperty.Name), Nothing)
+                                        modelProperty.SetValue(modelInstance, cs.getDate(modelProperty.Name), Nothing)
                                     Case "Double"
-                                        instanceProperty.SetValue(instance, cs.getNumber(instanceProperty.Name), Nothing)
+                                        modelProperty.SetValue(modelInstance, cs.getNumber(modelProperty.Name), Nothing)
                                     Case "String"
-                                        instanceProperty.SetValue(instance, cs.getText(instanceProperty.Name), Nothing)
+                                        modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), Nothing)
                                     Case "fieldTypeTextFile"
-                                        Dim copy As String = cs.getTextFile(instanceProperty.Name)
-                                        ' copy = cs.getTextFile(instanceProperty.Name)
-                                        'Dim filename As String = cs.getText(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
-                                        Dim propertyInstance As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(instance), fieldTypeTextFile)
-                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
-                                        'If (Not String.IsNullOrEmpty(filename)) Then
-                                        '    copy = cpCore.privateFiles.readFile(filename)
-                                        '    If (String.IsNullOrEmpty(copy)) Then
-                                        '        cpCore.programDataFiles.deleteFile(filename)
-                                        '        cs.setField(instanceProperty.Name, "")
-                                        '    End If
-                                        'End If
-                                        copyProperty.SetValue(propertyInstance, copy)
+                                        Dim instanceTextFile As New fieldTypeTextFile
+                                        instanceTextFile.copy = cs.getTextFile(modelProperty.Name)
+                                        instanceTextFile.filename = cs.getFilename(modelProperty.Name)
+                                        modelProperty.SetValue(modelInstance, instanceTextFile)
+
+                                        ''Dim instanceTextFile As fieldTypeTextFile = DirectCast(modelPropertyInstance.GetValue(modelInstance), fieldTypeTextFile)
+
+
+                                        ''
+                                        'Dim filename As String = cs.getText(modelPropertyInstance.Name)
+                                        'Dim filenameProperty As PropertyInfo = modelPropertyInstance.PropertyType.GetProperty("filename")
+                                        'filenameProperty.SetValue(modelPropertyInstance, filename, Nothing)
+                                        ''
+                                        'Dim copy As String = cs.getTextFile(modelPropertyInstance.Name)
+                                        'Dim copyProperty As PropertyInfo = modelPropertyInstance.PropertyType.GetProperty("copy")
+                                        'copyProperty.SetValue(modelPropertyInstance, copy, Nothing)
                                     Case Else
-                                        instanceProperty.SetValue(instance, cs.getText(instanceProperty.Name), Nothing)
+                                        modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), Nothing)
                                 End Select
                         End Select
                     Next
-                    If (instance IsNot Nothing) Then
+                    If (modelInstance IsNot Nothing) Then
                         '
                         ' -- set primary cache to the object created
                         ' -- set secondary caches to the primary cache
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim baseInstance As baseModel = TryCast(instance, baseModel)
+                        Dim baseInstance As baseModel = TryCast(modelInstance, baseModel)
                         If (baseInstance IsNot Nothing) Then
                             Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(tableName, "id", baseInstance.id.ToString())
                             callersCacheNameList.Add(cacheName0)
-                            cpCore.cache.setObject(cacheName0, instance)
+                            cpCore.cache.setObject(cacheName0, modelInstance)
                             '
                             Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(tableName, "ccguid", baseInstance.ccguid)
                             callersCacheNameList.Add(cacheName1)
@@ -393,7 +396,7 @@ Namespace Contensive.Core.Models.Entity
                 cpCore.handleException(ex)
                 Throw
             End Try
-            Return instance
+            Return modelInstance
         End Function
         '
         '====================================================================================================
@@ -461,9 +464,9 @@ Namespace Contensive.Core.Models.Entity
                                         Double.TryParse(instanceProperty.GetValue(Me, Nothing).ToString(), value)
                                         cs.setField(instanceProperty.Name, value)
                                     Case "fieldTypeTextFile"
-                                        Dim propertyInstance As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeTextFile)
+                                        Dim textFileProperty As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeTextFile)
                                         Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
-                                        Dim copy As String = DirectCast(copyProperty.GetValue(propertyInstance), String)
+                                        Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         If (String.IsNullOrEmpty(copy)) Then
                                             '
                                             ' -- empty copy

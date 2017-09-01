@@ -6120,12 +6120,11 @@ ErrorTrap:
         Public Sub processAddonSettingsEditor()
             '
             Dim constructor As String
-            Dim FoundAddon As Boolean
             Dim ParseOK As Boolean
             Dim PosNameStart As Integer
             Dim PosNameEnd As Integer
             Dim AddonName As String
-            Dim CSAddon As Integer
+            'Dim CSAddon As Integer
             Dim OptionPtr As Integer
             Dim ArgValueAddonEncoded As String
             Dim OptionCnt As Integer
@@ -6157,16 +6156,16 @@ ErrorTrap:
             RecordID = cpCore.docProperties.getInteger("RecordID")
             FieldName = cpCore.docProperties.getText("FieldName")
             ACInstanceID = cpCore.docProperties.getText("ACInstanceID")
+            Dim FoundAddon As Boolean = False
             If (ACInstanceID = PageChildListInstanceID) Then
                 '
                 ' ----- Page Content Child List Add-on
                 '
-                If (RecordID <> 0) And (True) Then
-                    CSAddon = cpCore.db.csOpenRecord(cnAddons, cpCore.siteProperties.childListAddonID)
-                    FoundAddon = False
-                    If cpCore.db.cs_ok(CSAddon) Then
+                If (RecordID <> 0) Then
+                    Dim addon As addonModel = cpCore.addonCache.getAddonById(cpCore.siteProperties.childListAddonID)
+                    If (addon IsNot Nothing) Then
                         FoundAddon = True
-                        AddonOptionConstructor = cpCore.db.cs_getText(CSAddon, "ArgumentList")
+                        AddonOptionConstructor = addon.ArgumentList
                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
@@ -6174,7 +6173,7 @@ ErrorTrap:
                             If AddonOptionConstructor <> "" Then
                                 AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                             End If
-                            If cpCore.db.cs_getBoolean(CSAddon, "IsInline") Then
+                            If addon.IsInline Then
                                 AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                             Else
                                 AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -6210,9 +6209,8 @@ ErrorTrap:
                         If addonOption_String <> "" Then
                             addonOption_String = Mid(addonOption_String, 2)
                         End If
+
                     End If
-                    Call cpCore.db.cs_Close(CSAddon)
-                    ' ????? need to test
                     Call cpCore.db.executeSql("update ccpagecontent set ChildListInstanceOptions=" & cpCore.db.encodeSQLText(addonOption_String) & " where id=" & RecordID)
                     needToClearCache = True
                     'CS = main_OpenCSContentRecord("page content", RecordID)
@@ -6227,42 +6225,23 @@ ErrorTrap:
                 ' ----- Admin Addon, ACInstanceID=-2, FieldName=AddonName
                 '
                 AddonName = FieldName
-                '????? test this
                 FoundAddon = False
-                addonPtr = cpCore.addonLegacyCache.getPtr(AddonName)
-                If addonPtr >= 0 Then
+                Dim addon As addonModel = cpCore.addonCache.getAddonByName(AddonName)
+                If (addon IsNot Nothing) Then
                     FoundAddon = True
-                    AddonOptionConstructor = cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).ArgumentList
+                    AddonOptionConstructor = addon.ArgumentList
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                     If AddonOptionConstructor <> "" Then
                         AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                     End If
-                    If genericController.EncodeBoolean(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).isInline) Then
+                    If genericController.EncodeBoolean(addon.IsInline) Then
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                     Else
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
                     End If
                 End If
-                '        CSAddon = app.csOpen(cnAddons, "name=" & encodeSQLText(AddonName))
-                '        FoundAddon = False
-                '        If app.csv_IsCSOK(CSAddon) Then
-                '            FoundAddon = True
-                '            AddonOptionConstructor = cpcore.db.cs_getText(CSAddon, "ArgumentList")
-                '            AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                '            AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                '            AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
-                '            If AddonOptionConstructor <> "" Then
-                '                AddonOptionConstructor = AddonOptionConstructor & vbCrLf
-                '            End If
-                '            If cpcore.db.cs_getBoolean(CSAddon, "IsInline") Then
-                '                AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
-                '            Else
-                '                AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
-                '            End If
-                '        End If
-                '        Call app.closeCS(CSAddon)
                 If Not FoundAddon Then
                     '
                     ' Hardcoded Addons
@@ -6373,26 +6352,24 @@ ErrorTrap:
                                     AddonName = Mid(Copy, PosNameStart, PosNameEnd - PosNameStart)
                                     '????? test this
                                     FoundAddon = False
-                                    addonPtr = cpCore.addonLegacyCache.getPtr(AddonName)
-                                    If addonPtr >= 0 Then
+                                    Dim embeddedAddon As addonModel = cpCore.addonCache.getAddonByName(AddonName)
+                                    If (embeddedAddon IsNot Nothing) Then
                                         FoundAddon = True
-                                        AddonOptionConstructor = genericController.encodeText(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).ArgumentList)
+                                        AddonOptionConstructor = genericController.encodeText(embeddedAddon.ArgumentList)
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                                         If AddonOptionConstructor <> "" Then
                                             AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                                         End If
-                                        If genericController.EncodeBoolean(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).isInline) Then
+                                        If genericController.EncodeBoolean(embeddedAddon.IsInline) Then
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                                         Else
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
                                         End If
-                                    End If
-                                    If Not FoundAddon Then
+                                    Else
                                         '
-                                        ' Hardcoded Addons
-                                        '
+                                        ' -- Hardcoded Addons
                                         Select Case genericController.vbLCase(AddonName)
                                             Case "block text"
                                                 FoundAddon = True

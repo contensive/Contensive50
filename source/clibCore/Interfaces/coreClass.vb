@@ -376,15 +376,33 @@ Namespace Contensive.Core
         Private _cdnFiles As fileController = Nothing
         '
         '===================================================================================================
-        Public ReadOnly Property addonLegacyCache() As Models.Entity.addonLegacyModel
+        Public ReadOnly Property addonCache As addonModel.addonCacheClass
             Get
                 If (_addonCache Is Nothing) Then
-                    _addonCache = New Models.Entity.addonLegacyModel(Me)
+                    _addonCache = cache.getObject(Of addonModel.addonCacheClass)("addonCache")
+                    If (_addonCache Is Nothing) Then
+                        _addonCache = New addonModel.addonCacheClass
+                        For Each addon As addonModel In addonModel.createList(Me, "")
+                            _addonCache.add(addon)
+                        Next
+                        Call cache.setObject("addonCache", _addonCache)
+                    End If
                 End If
                 Return _addonCache
             End Get
         End Property
-        Private _addonCache As Models.Entity.addonLegacyModel = Nothing
+        Private _addonCache As addonModel.addonCacheClass = Nothing
+        ''
+        ''===================================================================================================
+        'Public ReadOnly Property addonLegacyCache() As Models.Entity.addonLegacyModel
+        '    Get
+        '        If (_addonCache Is Nothing) Then
+        '            _addonCache = New Models.Entity.addonLegacyModel(Me)
+        '        End If
+        '        Return _addonCache
+        '    End Get
+        'End Property
+        'Private _addonCache As Models.Entity.addonLegacyModel = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -629,30 +647,28 @@ Namespace Contensive.Core
                         '------------------------------------------------------------------------------------------
                         '
                         ' if route is a remote method, use it
-                        Dim addonPtr As Integer = addonLegacyCache.getPtr(normalRoute)
-                        If (addonPtr >= 0) Then
-                            addonRoute = normalRoute
-                        Else
+                        Dim addon As addonModel
+                        addonRoute = normalRoute
+                        addon = addonCache.getAddonByName(addonRoute)
+                        If (addon Is Nothing) Then
                             '
                             ' -- try testRoute2
-                            Dim testRoute2 As String = normalRoute & "/"
-                            addonPtr = addonLegacyCache.getPtr(testRoute2)
-                            If (addonPtr >= 0) Then
-                                addonRoute = testRoute2
-                            Else
+                            addonRoute = normalRoute & "/"
+                            addon = addonCache.getAddonByName(addonRoute)
+                            If (addon Is Nothing) Then
                                 '
                                 ' -- try testRoute3
-                                Dim testRoute3 As String = normalRoute.Substring(1)
-                                addonPtr = addonLegacyCache.getPtr(testRoute3)
-                                If (addonPtr >= 0) Then
-                                    addonRoute = testRoute3
-                                Else
+                                addonRoute = normalRoute.Substring(1)
+                                addon = addonCache.getAddonByName(addonRoute)
+                                If (addon Is Nothing) Then
                                     '
                                     ' -- try testRoute4
-                                    Dim testRoute4 As String = testRoute3 & "/"
-                                    addonPtr = addonLegacyCache.getPtr(testRoute4)
-                                    If (addonPtr >= 0) Then
-                                        addonRoute = testRoute4
+                                    addonRoute &= "/"
+                                    addon = addonCache.getAddonByName(addonRoute)
+                                    If (addon Is Nothing) Then
+                                        '
+                                        ' -- not found
+                                        addonRoute = ""
                                     End If
                                 End If
                             End If
@@ -763,7 +779,7 @@ Namespace Contensive.Core
                                 '
                                 ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
                                 '
-                                returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.id, authContext.isAuthenticated)
+                                returnResult = Me.addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.id, authContext.isAuthenticated)
                             End If
                             '
                             ' deliver styles, javascript and other head tags as javascript appends
@@ -1119,10 +1135,10 @@ Namespace Contensive.Core
                                             Dim addonId As Integer
                                             addonId = docProperties.getInteger("AddonID")
                                             If (addonId > 0) Then
-                                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(Me, addonId)
-                                                If (addon.StylesFilename <> docProperties.getText("CustomStyles")) Then
-                                                    addon.StylesFilename = docProperties.getText("CustomStyles")
-                                                    addon.save(Me)
+                                                Dim styleAddon As Models.Entity.addonModel = Models.Entity.addonModel.create(Me, addonId)
+                                                If (styleAddon.StylesFilename.copy <> docProperties.getText("CustomStyles")) Then
+                                                    styleAddon.StylesFilename.copy = docProperties.getText("CustomStyles")
+                                                    styleAddon.save(Me)
                                                     '
                                                     ' Clear Caches
                                                     '
@@ -1214,12 +1230,12 @@ Namespace Contensive.Core
                             ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
                             '
                             If True Then
-                                returnResult = addon.execute_legacy4(adminSiteAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
+                                returnResult = Me.addon.execute_legacy4(adminSiteAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
                             Else
                                 '
                                 ' until then, run it as an internal class
                                 '
-                                returnResult = addon.execute_legacy4(basestlylesAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
+                                returnResult = Me.addon.execute_legacy4(basestlylesAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
                                 Dim admin As New Contensive.Addons.addon_AdminSiteClass()
                                 returnResult = admin.execute(cp_forAddonExecutionOnly).ToString()
                             End If
@@ -1241,7 +1257,7 @@ Namespace Contensive.Core
                                 returnResult = "<p>This site is not configured for website traffic. Please set the default route.</p>"
                             Else
                                 Dim addonStatusOk As Boolean = False
-                                returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.id, authContext.visit.VisitAuthenticated)
+                                returnResult = Me.addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.id, authContext.visit.VisitAuthenticated)
                                 If (Not addonStatusOk) Then
                                     '
                                     ' -- there was an error in the default route addon
@@ -2240,10 +2256,6 @@ Namespace Contensive.Core
                     End If
                     '
                     ' ----- dispose objects created here
-                    '
-                    If Not (_addonCache Is Nothing) Then
-                        _addonCache = Nothing
-                    End If
                     '
                     If Not (_addon Is Nothing) Then
                         Call _addon.Dispose()
