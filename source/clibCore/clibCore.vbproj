@@ -414,7 +414,6 @@
     <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />
     <Compile Include="Controllers\genericController.vb" />
-    <Compile Include="Models\addonLegacyModel.vb" />
     <Compile Include="Controllers\addonController.vb" />
     <Compile Include="Controllers\cacheController.vb" />
     <Compile Include="Controllers\docPropertyController.vb" />
@@ -513,7 +512,6 @@
     <Compile Include="Models\Entity\groupModel.vb" />
     <Compile Include="Models\Entity\dataSourceModel.vb" />
     <Compile Include="Models\Entity\sitePropertyModel.vb" />
-    <Compile Include="Models\Entity\_oldaddonModel.vb" />
     <Compile Include="Models\Entity\contentModel.vb" />
     <Compile Include="Models\Context\miniCollectionModel.vb" />
     <Compile Include="Models\Entity\domainModel.vb" />

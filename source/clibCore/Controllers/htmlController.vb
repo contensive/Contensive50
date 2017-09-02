@@ -6080,34 +6080,34 @@ ErrorTrap:
                             ' ----- developer Only parts
                             '
                             Call cpCore.visitProperty.setProperty("AllowDebugging", genericController.encodeText(cpCore.docProperties.getBoolean("AllowDebugging")))
-                            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
-                                '
-                                ' ----- Create Path Block record, if requested
-                                '
-                                CreatePathBlock = cpCore.docProperties.getBoolean("CreatePathBlock")
-                                CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPath))
-                                PathID = 0
-                                If cpCore.db.cs_ok(CS) Then
-                                    PathID = cpCore.db.cs_getInteger(CS, "id")
-                                End If
-                                Call cpCore.db.cs_Close(CS)
-                                If (PathID = 0) And (CreatePathBlock) Then
-                                    '
-                                    ' path is not blocked, but we want it blocked
-                                    '
-                                    CS = cpCore.db.cs_insertRecord("Paths")
-                                    If cpCore.db.cs_ok(CS) Then
-                                        Call cpCore.db.cs_set(CS, "name", cpCore.webServer.requestPath)
-                                        Call cpCore.db.cs_set(CS, "active", 1)
-                                    End If
-                                    Call cpCore.db.cs_Close(CS)
-                                ElseIf (PathID <> 0) And (Not CreatePathBlock) Then
-                                    '
-                                    ' path is blocked, but we do not want it blocked
-                                    '
-                                    Call cpCore.db.deleteContentRecord("Paths", PathID)
-                                End If
-                            End If
+                            'If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                            '    '
+                            '    ' ----- Create Path Block record, if requested
+                            '    '
+                            '    CreatePathBlock = cpCore.docProperties.getBoolean("CreatePathBlock")
+                            '    CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPath))
+                            '    PathID = 0
+                            '    If cpCore.db.cs_ok(CS) Then
+                            '        PathID = cpCore.db.cs_getInteger(CS, "id")
+                            '    End If
+                            '    Call cpCore.db.cs_Close(CS)
+                            '    If (PathID = 0) And (CreatePathBlock) Then
+                            '        '
+                            '        ' path is not blocked, but we want it blocked
+                            '        '
+                            '        CS = cpCore.db.cs_insertRecord("Paths")
+                            '        If cpCore.db.cs_ok(CS) Then
+                            '            Call cpCore.db.cs_set(CS, "name", cpCore.webServer.requestPath)
+                            '            Call cpCore.db.cs_set(CS, "active", 1)
+                            '        End If
+                            '        Call cpCore.db.cs_Close(CS)
+                            '    ElseIf (PathID <> 0) And (Not CreatePathBlock) Then
+                            '        '
+                            '        ' path is blocked, but we do not want it blocked
+                            '        '
+                            '        Call cpCore.db.deleteContentRecord("Paths", PathID)
+                            '    End If
+                            'End If
                     End Select
                 End If
             End If
@@ -9751,40 +9751,40 @@ ErrorTrap:
                             & cr & "<div class=""ccAdminSmall"">" _
                             & cr2 & "<LABEL for=""" & TagID & """>" & Tag & "&nbsp;Debug</LABEL>" & helpLink _
                             & cr & "</div>"
-                            '
-                            ' Create Path Block Row
-                            '
-                            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
-                                TagID = "CreatePathBlock"
-                                If cpCore.siteProperties.allowPathBlocking Then
-                                    '
-                                    ' Path blocking allowed
-                                    '
-                                    'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
-                                    CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPath), , , , , , "ID")
-                                    If cpCore.db.cs_ok(CS) Then
-                                        PathID = (cpCore.db.cs_getInteger(CS, "ID"))
-                                    End If
-                                    Call cpCore.db.cs_Close(CS)
-                                    If PathID <> 0 Then
-                                        '
-                                        ' Path is blocked
-                                        '
-                                        Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
-                                    Else
-                                        '
-                                        ' Path is not blocked
-                                        '
-                                        Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [" & cpCore.webServer.requestPath & "]</LABEL>"
-                                    End If
-                                    helpLink = ""
-                                    'helpLink = main_GetHelpLink(10, "Enable Debugging", "Debugging is a developer only debugging tool. With Debugging enabled, ccLib.TestPoints(...) will print, ErrorTrapping will be displayed, redirections are blocked, and more.")
-                                    OptionsPanel = OptionsPanel _
-                                    & cr & "<div class=""ccAdminSmall"">" _
-                                    & cr2 & "<LABEL for=""" & TagID & """>" & Tag & "</LABEL>" & helpLink _
-                                    & cr & "</div>"
-                                End If
-                            End If
+                            ''
+                            '' Create Path Block Row
+                            ''
+                            'If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                            '    TagID = "CreatePathBlock"
+                            '    If cpCore.siteProperties.allowPathBlocking Then
+                            '        '
+                            '        ' Path blocking allowed
+                            '        '
+                            '        'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
+                            '        CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPath), , , , , , "ID")
+                            '        If cpCore.db.cs_ok(CS) Then
+                            '            PathID = (cpCore.db.cs_getInteger(CS, "ID"))
+                            '        End If
+                            '        Call cpCore.db.cs_Close(CS)
+                            '        If PathID <> 0 Then
+                            '            '
+                            '            ' Path is blocked
+                            '            '
+                            '            Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                            '        Else
+                            '            '
+                            '            ' Path is not blocked
+                            '            '
+                            '            Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [" & cpCore.webServer.requestPath & "]</LABEL>"
+                            '        End If
+                            '        helpLink = ""
+                            '        'helpLink = main_GetHelpLink(10, "Enable Debugging", "Debugging is a developer only debugging tool. With Debugging enabled, ccLib.TestPoints(...) will print, ErrorTrapping will be displayed, redirections are blocked, and more.")
+                            '        OptionsPanel = OptionsPanel _
+                            '        & cr & "<div class=""ccAdminSmall"">" _
+                            '        & cr2 & "<LABEL for=""" & TagID & """>" & Tag & "</LABEL>" & helpLink _
+                            '        & cr & "</div>"
+                            '    End If
+                            'End If
                             '
                             ' Buttons
                             '

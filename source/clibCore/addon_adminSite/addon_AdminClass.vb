@@ -2400,6 +2400,29 @@ ErrorTrap:
                                     editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
                                     ResponseFieldIsEmpty = False
                                 End If
+                            Case "ACTIVE"
+                                '
+                                '
+                                '
+                                InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & FieldName & ",", vbTextCompare) <> 0)
+                                InResponse = cpCore.docProperties.containsKey(FieldName)
+                                If AllowAdminFieldCheck() Then
+                                    If (Not InResponse) And (Not InEmptyFieldList) Then
+                                        Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
+                                        Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                        Exit Sub
+                                    End If
+                                End If
+                                '
+                                Dim responseValue As Boolean = cpCore.docProperties.getBoolean(FieldName)
+
+                                If Not responseValue.Equals(EncodeBoolean(editRecord.fieldsLc(.nameLc).value)) Then
+                                    '
+                                    ' new value
+                                    '
+                                    editRecord.fieldsLc(.nameLc).value = responseValue
+                                    ResponseFieldIsEmpty = False
+                                End If
                             Case "CCGUID"
                                 '
                                 '
@@ -3222,14 +3245,11 @@ ErrorTrap:
                                     End If
                                 Case "ACTIVE"
                                     Dim saveValue As Boolean = genericController.EncodeBoolean(fieldValueObject)
-                                    If (Not saveValue) Then
-                                        '
-                                        ' ----- record is being saved inactive, delete contentwatch and contentwatchlistrules
-                                        '
-                                        ContentWatchListIDCount = 0
-                                        ContentWatchLink = ""
+                                    If cpCore.db.cs_getBoolean(CSEditRecord, FieldName) <> saveValue Then
+                                        FieldChanged = True
+                                        RecordChanged = True
+                                        Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
                                     End If
-                                        '
                                 Case "DATEEXPIRES"
                                     '
                                     ' ----- make sure content watch expires before content expires
@@ -4149,31 +4169,6 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
                                 Call Stream.Add(cpCore.html.menu_GetComboTabs())
-                            End If
-                            Call Stream.Add(EditSectionButtonBar)
-                        End If
-                    '
-                    Case "CCPATHS"
-                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
-                            '
-                            ' Must be admin
-                            '
-                            Call Stream.Add(GetForm_Error(
-                            "This edit form requires Member Administration access." _
-                            , "This edit form requires Member Administration access."
-                            ))
-                        Else
-                            EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                            EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
-                            Call Stream.Add(EditSectionButtonBar)
-                            Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                            Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
-                            Call Stream.Add(GetForm_Edit_AddTab("Path Rules", GetForm_Edit_PathRules(adminContent, editRecord), allowAdminTabs))
-                            'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
-                            Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
-                            If allowAdminTabs Then
-                                Call Stream.Add(cpCore.html.menu_GetComboTabs())
-                                'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
                         End If
@@ -6511,14 +6506,14 @@ ErrorTrap:
                 End If
                 '
                 Dim Checked As Boolean
-                '
-                ' ----- Authoring status
-                '
-                FieldHelp = "In immediate authoring mode, the live site is changed when each record is saved. In Workflow authoring mode, there are several steps to publishing a change. This field displays the current stage of this record."
-                FieldRequired = False
-                AuthoringStatusMessage = cpCore.authContext.main_GetAuthoringStatusMessage(cpCore, AdminContentWorkflowAuthoring, editRecord.EditLock, editRecord.EditLockMemberName, editRecord.EditLockExpires, editRecord.ApproveLock, editRecord.ApprovedName, editRecord.SubmitLock, editRecord.SubmittedName, editRecord.IsDeleted, editRecord.IsInserted, editRecord.IsModified, editRecord.LockModifiedName)
-                Call FastString.Add(Adminui.GetEditRow(AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
-                'Call FastString.Add(AdminUI.GetEditRow( AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
+                ''
+                '' ----- Authoring status
+                ''
+                'FieldHelp = "In immediate authoring mode, the live site is changed when each record is saved. In Workflow authoring mode, there are several steps to publishing a change. This field displays the current stage of this record."
+                'FieldRequired = False
+                'AuthoringStatusMessage = cpCore.authContext.main_GetAuthoringStatusMessage(cpCore, AdminContentWorkflowAuthoring, editRecord.EditLock, editRecord.EditLockMemberName, editRecord.EditLockExpires, editRecord.ApproveLock, editRecord.ApprovedName, editRecord.SubmitLock, editRecord.SubmittedName, editRecord.IsDeleted, editRecord.IsInserted, editRecord.IsModified, editRecord.LockModifiedName)
+                'Call FastString.Add(Adminui.GetEditRow(AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
+                ''Call FastString.Add(AdminUI.GetEditRow( AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
                 '
                 ' ----- RecordID
                 '
@@ -6530,6 +6525,11 @@ ErrorTrap:
                 End If
                 HTMLFieldString = cpCore.html.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
                 Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Record Number", FieldHelp, True, False, ""))
+                '
+                ' -- Active
+                Copy = "When unchecked, add-ons can ignore this record as if it was temporarily deleted."
+                HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("active", editRecord.active)
+                Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Active", Copy, False, False, ""))
                 '
                 ' ----- If Page Content , check if this is the default PageNotFound page
                 '
@@ -8035,32 +8035,32 @@ ErrorTrap:
             FastString = Nothing
             Call handleLegacyClassError3("GetForm_Edit_MemberReports")
         End Function
-        '
-        '========================================================================
-        '   Print the path Rules section of the path edit form
-        '========================================================================
-        '
-        Private Function GetForm_Edit_PathRules(adminContent As cdefModel, editRecord As editRecordClass) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_PathRules")
-            '
-            Dim FastString As stringBuilderLegacyController
-            Dim Adminui As New adminUIController(cpCore)
-            '
-            FastString = New stringBuilderLegacyController
-            Call FastString.Add("<tr>")
-            Call FastString.Add("<td valign=""top"" align=""right"">" & SpanClassAdminSmall & "Groups</td>")
-            Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal & cpCore.html.getINputChecList2("PathRules", "Paths", editRecord.id, "Groups", "Path Rules", "PathID", "GroupID", , "Caption") & "</span></td>")
-            Call FastString.Add("</tr>")
-            'Call FastString.Add(adminui.EditTableClose)
-            GetForm_Edit_PathRules = Adminui.GetEditPanel((Not allowAdminTabs), "Path Permissions", "Groups that have access to this path", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
-            EditSectionPanelCount = EditSectionPanelCount + 1
-            FastString = Nothing
-            Exit Function
-            '
-ErrorTrap:
-            FastString = Nothing
-            Call handleLegacyClassError3("GetForm_Edit_PathRules")
-        End Function
+        '        '
+        '        '========================================================================
+        '        '   Print the path Rules section of the path edit form
+        '        '========================================================================
+        '        '
+        '        Private Function GetForm_Edit_PathRules(adminContent As cdefModel, editRecord As editRecordClass) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_PathRules")
+        '            '
+        '            Dim FastString As stringBuilderLegacyController
+        '            Dim Adminui As New adminUIController(cpCore)
+        '            '
+        '            FastString = New stringBuilderLegacyController
+        '            Call FastString.Add("<tr>")
+        '            Call FastString.Add("<td valign=""top"" align=""right"">" & SpanClassAdminSmall & "Groups</td>")
+        '            Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal & cpCore.html.getINputChecList2("PathRules", "Paths", editRecord.id, "Groups", "Path Rules", "PathID", "GroupID", , "Caption") & "</span></td>")
+        '            Call FastString.Add("</tr>")
+        '            'Call FastString.Add(adminui.EditTableClose)
+        '            GetForm_Edit_PathRules = Adminui.GetEditPanel((Not allowAdminTabs), "Path Permissions", "Groups that have access to this path", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
+        '            EditSectionPanelCount = EditSectionPanelCount + 1
+        '            FastString = Nothing
+        '            Exit Function
+        '            '
+        'ErrorTrap:
+        '            FastString = Nothing
+        '            Call handleLegacyClassError3("GetForm_Edit_PathRules")
+        '        End Function
         '
         '========================================================================
         '   Print the path Rules section of the path edit form
@@ -9516,7 +9516,7 @@ ErrorTrap:
                 '
             Else
                 Select Case genericController.vbUCase(Name)
-                    Case "ID", "CONTENTCONTROLID", "CREATEDBY", "DATEADDED", "MODIFIEDBY", "MODIFIEDDATE", "CREATEKEY", "EDITSOURCEID", "EDITBLANK", "EDITARCHIVE", "CONTENTCATEGORYID", "CCGUID"
+                    Case "ACTIVE", "ID", "CONTENTCONTROLID", "CREATEDBY", "DATEADDED", "MODIFIEDBY", "MODIFIEDDATE", "CREATEKEY", "EDITSOURCEID", "EDITBLANK", "EDITARCHIVE", "CONTENTCATEGORYID", "CCGUID"
                         '
                         ' ----- control fields are not editable user fields
                         '
@@ -9632,12 +9632,6 @@ ErrorTrap:
                             Call SaveEditRecord(adminContent, editRecord)
                             Call SaveMemberRules(editRecord.id)
                             'Call SaveTopicRules
-                        Case "CCPATHS"
-                            '
-                            '
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call cpCore.html.main_ProcessCheckList("PathRules", "Paths", genericController.encodeText(editRecord.id), "Groups", "Path Rules", "PathID", "GroupID")
                         Case "CCEMAIL"
                             '
                             '

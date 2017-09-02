@@ -3138,7 +3138,7 @@ Namespace Contensive.Core
                     ''
                     '' Addon is now fully installed
                     '' Go through all collection files on this site and see if there are
-                    '' any dependancies on this add-on that need to be attached
+                    '' any Dependencies on this add-on that need to be attached
                     '' src args are those for the addon that includes the current addon
                     ''   - if this addon is the target of another add-on's  "includeaddon" node
                     ''

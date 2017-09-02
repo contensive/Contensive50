@@ -53,14 +53,14 @@ Namespace Contensive.Core.Controllers
                     ' -- load requested page/template
                     cpCore.doc.loadPage(cpCore.docProperties.getInteger(rnPageId), cpCore.webServer.requestDomain)
                     '
-                    ' -- execute template dependancies
+                    ' -- execute template Dependencies
                     Dim templateAddonList As List(Of Models.Entity.addonModel) = addonModel.createList_templateDependencies(cpCore, cpCore.doc.page.id)
                     For Each addon As addonModel In templateAddonList
                         Dim AddonStatusOK As Boolean = True
                         returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.authContext.user.id, cpCore.authContext.visit.VisitAuthenticated)
                     Next
                     '
-                    ' -- execute page dependancies
+                    ' -- execute page Dependencies
                     Dim pageAddonList As List(Of Models.Entity.addonModel) = addonModel.createList_pageDependencies(cpCore, cpCore.doc.page.id)
                     For Each addon As addonModel In pageAddonList
                         Dim AddonStatusOK As Boolean = True

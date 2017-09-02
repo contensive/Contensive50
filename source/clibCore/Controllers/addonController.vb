@@ -209,9 +209,6 @@ Namespace Contensive.Core.Controllers
         Public Function execute(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
             Dim returnVal As String = ""
             Try
-                ' Dim AddonName As String = "unknown"
-                Dim inlineScriptContent As String = String.Empty
-                Dim inlineScript As String = String.Empty
                 Dim blockJavascriptAndCss As Boolean
                 Dim JSOnLoad As String = String.Empty
                 Dim JSBodyEnd As String = String.Empty
@@ -409,7 +406,6 @@ Namespace Contensive.Core.Controllers
                         ScriptingCode = addon.ScriptingCode
                         AddonBlockEditTools = genericController.EncodeBoolean(addon.BlockEditTools)
                         ScriptingTimeout = genericController.EncodeInteger(addon.ScriptingTimeout)
-                        inlineScript = addon.inlineScript
                         helpCopy = addon.Help
                         helpLink = addon.HelpLink
                         JSOnLoad = addon.JavaScriptOnLoad
@@ -973,15 +969,6 @@ Namespace Contensive.Core.Controllers
                                     ''hint = ""
                                     '
                                     '-----------------------------------------------------------------------------------------------------
-                                    '   Script Include
-                                    '       Adds a comment with a script include file
-                                    '-----------------------------------------------------------------------------------------------------
-                                    '
-                                    If (True) And (inlineScript <> "") Then
-                                        inlineScriptContent = "<!-- inlineScript(" & cpCore.docGuid & ")[" & genericController.encodeHTML(inlineScript) & "] -->"
-                                    End If
-                                    '
-                                    '-----------------------------------------------------------------------------------------------------
                                     '   RemoteAssetLink
                                     '-----------------------------------------------------------------------------------------------------
                                     '
@@ -1103,7 +1090,7 @@ Namespace Contensive.Core.Controllers
                                         ' editor -- no encoding and no contentcommands
                                         '
                                         returnVal = TextContent & addon.Copy
-                                        returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
+                                        returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent
                                         '
                                         ' csv_EncodeContent everything
                                         '
@@ -1120,17 +1107,12 @@ Namespace Contensive.Core.Controllers
                                         '
                                         ' add in the rest
                                         '
-                                        returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
+                                        returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent
                                         '
                                         ' csv_EncodeContent everything
                                         '
                                         returnVal = cpCore.html.encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
                                     End If
-                                    ''
-                                    '' +++++ 9/8/2011, 4.1.482
-                                    ''
-                                    's = TextContent & HTMLContent & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
-                                    's = genericController.vbReplace(s, "{%", "{<!---->%")
                                     '
                                     '-----------------------------------------------------------------
                                     ' check for xml contensive process instruction
@@ -2386,7 +2368,7 @@ Namespace Contensive.Core.Controllers
                             testFileIsValidAddonAssembly = True
                             Try
                                 '
-                                ' ##### consider using refectiononlyload first, then if it is right, do the loadfrom - so dependancies are not loaded.
+                                ' ##### consider using refectiononlyload first, then if it is right, do the loadfrom - so Dependencies are not loaded.
                                 '
                                 testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname)
                                 testAssemblyName = testAssembly.FullName

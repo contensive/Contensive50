@@ -4185,9 +4185,6 @@ Namespace Contensive.Core.Controllers
                             '
                             Call deleteContentRecords("Page Content Block Rules", "RecordID=" & RecordID)
                             Call deleteContentRecords("Page Content Topic Rules", "PageID=" & RecordID)
-                        Case "CCPATHS"
-                            '
-                            Call deleteContentRecords("Path Rules", "PathID=" & RecordID)
                         Case "CCSURVEYQUESTIONS"
                             '
                             Call deleteContentRecords("Survey Results", "QuestionID=" & RecordID)

@@ -54,7 +54,6 @@ Namespace Contensive.Core.Models.Entity
         Public Property IconSprites As Integer
         Public Property IconWidth As Integer
         Public Property InFrame As Boolean
-        Public Property inlineScript As String
         Public Property IsInline As Boolean
         Public Property JavaScriptBodyEnd As String
         Public Property JavaScriptOnLoad As String

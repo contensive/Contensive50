@@ -141,7 +141,7 @@ Namespace Contensive.Core
         '   dtdam       DefaultAddMenu
         '   dtblank     DefaultCreateBlankRecord
         '
-        'Dependancies:
+        'Dependencies:
         '   LibCommon2.asp
         '   LibAdmin3.asp
         '   site field definitions

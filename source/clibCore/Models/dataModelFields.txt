@@ -5899,7 +5899,6 @@ public IconHeight as Integer
 public IconSprites as Integer
 public IconWidth as Integer
 public InFrame as Boolean
-public inlineScript as String
 public IsInline as Boolean
 public JavaScriptBodyEnd as String
 public JavaScriptOnLoad as String
@@ -5964,7 +5963,6 @@ public Template as Boolean
 .IconSprites = cs.getInteger("IconSprites")
 .IconWidth = cs.getInteger("IconWidth")
 .InFrame = cs.getBoolean("InFrame")
-.inlineScript = cs.getText("inlineScript")
 .IsInline = cs.getBoolean("IsInline")
 .JavaScriptBodyEnd = cs.getText("JavaScriptBodyEnd")
 .JavaScriptOnLoad = cs.getText("JavaScriptOnLoad")
@@ -6028,7 +6026,6 @@ cs.SetField("IconHeight", IconHeight.ToString())
 cs.SetField("IconSprites", IconSprites.ToString())
 cs.SetField("IconWidth", IconWidth.ToString())
 cs.SetField("InFrame", InFrame.ToString())
-cs.SetField("inlineScript", inlineScript)
 cs.SetField("IsInline", IsInline.ToString())
 cs.SetField("JavaScriptBodyEnd", JavaScriptBodyEnd)
 cs.SetField("JavaScriptOnLoad", JavaScriptOnLoad)
@@ -6090,10 +6087,9 @@ instance.Help = genericController.EncodeText(.fields("Help").defaultValue)
 instance.HelpLink = genericController.EncodeText(.fields("HelpLink").defaultValue)
 instance.IconFilename = genericController.EncodeText(.fields("IconFilename").defaultValue)
 instance.IconHeight = genericController.EncodeInteger(.fields("IconHeight").defaultValue)
-instance.IconSprites = genericController.EncodeInteger(.fields("IconSprites").defaultValue)
+instance.IconSprites = genericController.EncodeInteger(.fields("IconSprites").defaultValue) 
 instance.IconWidth = genericController.EncodeInteger(.fields("IconWidth").defaultValue)
 instance.InFrame = genericController.EncodeBoolean(.fields("InFrame").defaultValue)
-instance.inlineScript = genericController.EncodeText(.fields("inlineScript").defaultValue)
 instance.IsInline = genericController.EncodeBoolean(.fields("IsInline").defaultValue)
 instance.JavaScriptBodyEnd = genericController.EncodeText(.fields("JavaScriptBodyEnd").defaultValue)
 instance.JavaScriptOnLoad = genericController.EncodeText(.fields("JavaScriptOnLoad").defaultValue)
