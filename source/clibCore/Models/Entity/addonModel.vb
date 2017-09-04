@@ -270,8 +270,8 @@ Namespace Contensive.Core.Models.Entity
                     If (Not dictGuidId.ContainsKey(addon.ccguid)) Then
                         If (Not dictNameId.ContainsKey(addon.name)) Then
                             dictIdAddon.Add(addon.id, addon)
-                            dictGuidId.Add(addon.ccguid, addon.id)
-                            dictNameId.Add(addon.name, addon.id)
+                            dictGuidId.Add(addon.ccguid.ToLower(), addon.id)
+                            dictNameId.Add(addon.name.ToLower(), addon.id)
                         End If
                     End If
                 End If
@@ -293,14 +293,14 @@ Namespace Contensive.Core.Models.Entity
                 robotsTxt &= vbCrLf & addon.RobotsTxt
             End Sub
             Public Function getAddonByGuid(guid As String) As addonModel
-                If (Me.dictGuidId.ContainsKey(guid)) Then
-                    Return getAddonById(Me.dictGuidId.Item(guid))
+                If (Me.dictGuidId.ContainsKey(guid.ToLower())) Then
+                    Return getAddonById(Me.dictGuidId.Item(guid.ToLower()))
                 End If
                 Return Nothing
             End Function
             Public Function getAddonByName(name As String) As addonModel
-                If (Me.dictNameId.ContainsKey(name)) Then
-                    Return getAddonById(Me.dictNameId.Item(name))
+                If (Me.dictNameId.ContainsKey(name.ToLower())) Then
+                    Return getAddonById(Me.dictNameId.Item(name.ToLower()))
                 End If
                 Return Nothing
             End Function

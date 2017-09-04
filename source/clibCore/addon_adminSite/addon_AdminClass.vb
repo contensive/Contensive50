@@ -925,7 +925,7 @@ ErrorTrap:
                             '
                             ' Mark the record reviewed without making any changes
                             '
-                            Call cpCore.db.markRecordReviewed(adminContent.Name, editRecord.id)
+                            Call cpCore.doc.markRecordReviewed(adminContent.Name, editRecord.id)
                         Case AdminActionWorkflowPublishSelected
                             '
                             ' Publish everything selected
@@ -936,7 +936,7 @@ ErrorTrap:
                                     RecordID = cpCore.docProperties.getInteger("RowID" & RowPtr)
                                     ContentName = cpCore.docProperties.getText("RowContentName" & RowPtr)
                                     Call cpCore.workflow.publishEdit(ContentName, RecordID)
-                                    Call cpCore.db.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
+                                    Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
                                     Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
                                     Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & cpCore.metaData.getContentId(ContentName))
                                 End If
@@ -952,7 +952,7 @@ ErrorTrap:
                                 ContentName = cpCore.metaData.getContentNameByID(ContentID)
                                 If ContentName <> "" Then
                                     Call cpCore.workflow.publishEdit(ContentName, RecordID)
-                                    Call cpCore.db.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
+                                    Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
                                     Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
                                 End If
                                 cpCore.db.cs_goNext(CS)
@@ -1011,7 +1011,7 @@ ErrorTrap:
                                 Dim IsDeleted As Boolean
                                 IsDeleted = Not cpCore.db.cs_ok(CS)
                                 Call cpCore.db.cs_Close(CS)
-                                Call cpCore.db.main_ProcessSpecialCaseAfterSave(IsDeleted, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                                Call cpCore.doc.processAfterSave(IsDeleted, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
                             Else
                                 AdminForm = AdminSourceForm
@@ -1021,7 +1021,7 @@ ErrorTrap:
                             ' --- copy live record over edit record
                             '
                             Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.authContext.user.id)
-                            Call cpCore.db.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                            Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                             If MenuDepth > 0 Then
                                 '
                                 ' opened as a child, close the window
@@ -1051,7 +1051,7 @@ ErrorTrap:
                                         End If
                                     End If
                                     Call cpCore.db.cs_deleteRecord(CSEditRecord)
-                                    Call cpCore.db.main_ProcessSpecialCaseAfterSave(True, editRecord.contentControlId_Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                                    Call cpCore.doc.processAfterSave(True, editRecord.contentControlId_Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                     Call cpCore.cache.invalidateContent(editRecord.contentControlId_Name)
                                 End If
                                 Call cpCore.db.cs_Close(CSEditRecord)
@@ -1111,7 +1111,7 @@ ErrorTrap:
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.db.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                             End If
                             AdminAction = AdminActionNop ' convert so action can be used in as a refresh
@@ -1127,7 +1127,7 @@ ErrorTrap:
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.db.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 editRecord.id = 0
                                 editRecord.Loaded = False
@@ -1150,7 +1150,7 @@ ErrorTrap:
                                     Call LoadEditResponse(adminContent, editRecord)
                                     Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                     If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                        Call cpCore.db.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                                        Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                     End If
                                     Call ProcessActionDuplicate(adminContent, editRecord)
                                 End If
@@ -1170,7 +1170,7 @@ ErrorTrap:
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.db.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 If Not (cpCore.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Group Email")) Then
@@ -1231,7 +1231,7 @@ ErrorTrap:
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.db.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 If Not (cpCore.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
@@ -1262,7 +1262,7 @@ ErrorTrap:
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.db.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 '
                                 If Not (cpCore.debug_iUserError <> "") Then
@@ -1299,7 +1299,7 @@ ErrorTrap:
                                                 '
                                                 ContentName = cpCore.metaData.getContentNameByID(cpCore.db.cs_getInteger(CSEditRecord, "ContentControlID"))
                                                 Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
-                                                Call cpCore.db.main_ProcessSpecialCaseAfterSave(True, ContentName, RecordID, "", 0, UseContentWatchLink)
+                                                Call cpCore.doc.processAfterSave(True, ContentName, RecordID, "", 0, UseContentWatchLink)
                                             End If
                                             '
                                             ' Page Content special cases
@@ -5590,7 +5590,8 @@ ErrorTrap:
                                             MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                                             MTMRuleField0 = .ManyToManyRulePrimaryField
                                             MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                            EditorString &= (cpCore.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , True, MTMContent1))
+                                            EditorString &= cpCore.html.getInputCheckList("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1)
+                                            'EditorString &= (cpCore.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , True, MTMContent1))
                                             EditorString &= WhyReadOnlyMsg
                                             '
                                         Case FieldTypeIdCurrency
@@ -5846,7 +5847,8 @@ ErrorTrap:
                                             MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                                             MTMRuleField0 = .ManyToManyRulePrimaryField
                                             MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                            EditorString &= (cpCore.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, FieldValueText))
+                                            EditorString &= cpCore.html.getInputCheckList("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, False, FieldValueText)
+                                            'EditorString &= (cpCore.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, FieldValueText))
                                         Case FieldTypeIdDate
                                             '
                                             ' ----- Date
@@ -7586,7 +7588,8 @@ ErrorTrap:
                 '
                 Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Shared Meta Keywords</td>")
                 Call FastString.Add("<td class=""ccAdminEditField"" colspan=""2"">")
-                Call FastString.Add(cpCore.html.getInputCheckListCategories("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField, "Meta Keywords"))
+                Call FastString.Add(cpCore.html.getInputCheckList("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField))
+                'Call FastString.Add(cpCore.html.getInputCheckListCategories("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField, "Meta Keywords"))
                 Call FastString.Add("</td></tr>")
                 '
                 ' Other Head Tags
@@ -7639,7 +7642,8 @@ ErrorTrap:
             Dim Adminui As New adminUIController(cpCore)
             Dim s As String
             '
-            s = cpCore.html.getInputCheckListCategories("EmailGroups", "Group Email", editRecord.id, "Groups", "Email Groups", "EmailID", "GroupID", , "Caption", readOnlyField, "Groups")
+            s = cpCore.html.getInputCheckList("EmailGroups", "Group Email", editRecord.id, "Groups", "Email Groups", "EmailID", "GroupID", , "Caption")
+            's = cpCore.html.getInputCheckListCategories("EmailGroups", "Group Email", editRecord.id, "Groups", "Email Groups", "EmailID", "GroupID", , "Caption", readOnlyField, "Groups")
             s = "<tr>" _
                 & "<td class=""ccAdminEditCaption"">Groups</td>" _
                 & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & s & "</span></td>" _
@@ -7719,7 +7723,8 @@ ErrorTrap:
             '
             Dim s As String
             '
-            s = cpCore.html.getInputCheckListCategories("EmailTopics", "Group Email", editRecord.id, "Topics", "Email Topics", "EmailID", "TopicID", , "Name", readOnlyField, "Topics")
+            s = cpCore.html.getInputCheckList("EmailTopics", "Group Email", editRecord.id, "Topics", "Email Topics", "EmailID", "TopicID", , "Name")
+            's = cpCore.html.getInputCheckListCategories("EmailTopics", "Group Email", editRecord.id, "Topics", "Email Topics", "EmailID", "TopicID", , "Name", readOnlyField, "Topics")
             s = "<tr>" _
                 & "<td class=""ccAdminEditCaption"">Topics</td>" _
                 & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & s & "</span></td>" _

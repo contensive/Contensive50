@@ -2121,8 +2121,8 @@ ErrorTrap:
             Dim returnBody As String = ""
             Try
                 Dim AddonReturn As String
-                Dim Ptr As Integer
-                Dim Cnt As Integer
+                'Dim Ptr As Integer
+                'Dim Cnt As Integer
                 Dim layoutError As String = String.Empty
                 Dim FilterStatusOK As Boolean
                 Dim Result As New stringBuilderLegacyController
@@ -2132,9 +2132,9 @@ ErrorTrap:
                 Dim LocalTemplateName As String
                 Dim LocalTemplateBody As String
                 Dim blockSiteWithLogin As Boolean
-                Dim addonCachePtr As Integer
-                Dim addonId As Integer
-                Dim AddonName As String
+                'Dim addonCachePtr As Integer
+                'Dim addonId As Integer
+                'Dim AddonName As String
                 '
                 returnBody = ""
                 '
@@ -2215,7 +2215,7 @@ ErrorTrap:
                     '
                     For Each addon In cpCore.addonCache.getOnBodyEndAddonList()
                         cpCore.doc.docBodyFilter = returnBody
-                        AddonReturn = cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                        AddonReturn = cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                         returnBody = cpCore.doc.docBodyFilter & AddonReturn
                         If Not FilterStatusOK Then
                             Throw New ApplicationException("Unexpected exception")

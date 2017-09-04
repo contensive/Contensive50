@@ -703,6 +703,7 @@ Namespace Contensive.Core.Controllers
                     ' ----- Explain, put up a link and exit without continuing
                     '---------------------------------------------------------------------
                     '
+                    cpcore.cache.invalidateAll()
                     appendBuildLog(cpcore, "Upgrade Complete")
                     cpcore.upgradeInProgress = False
                 End If

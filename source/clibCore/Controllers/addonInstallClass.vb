@@ -2120,12 +2120,12 @@ Namespace Contensive.Core
                                                                                 If genericController.vbLCase(CDefSection.OuterXml) <> "<otherxml></otherxml>" Then
                                                                                     OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
                                                                                 End If
-                                                                            Case Else
-                                                                                '
-                                                                                ' Unknown node in collection file
-                                                                                '
-                                                                                OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
-                                                                                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromtLocalCollection", "Addon Collection for [" & Collectionname & "] contained an unknown node [" & CDefSection.Name & "]. This node will be ignored.")
+                                                                                'Case Else
+                                                                                '    '
+                                                                                '    ' Unknown node in collection file
+                                                                                '    '
+                                                                                '    OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
+                                                                                '    Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromtLocalCollection", "Addon Collection for [" & Collectionname & "] contained an unknown node [" & CDefSection.Name & "]. This node will be ignored.")
                                                                         End Select
                                                                     Next
                                                                     '

@@ -367,9 +367,10 @@ Namespace Contensive.Core.Controllers
                     FoundAddon = True
                     If Not String.IsNullOrEmpty(addon.ObjectProgramID) Then
                         '
-                        ' addons with activeX components are deprecated
-                        '
-                        Throw New ApplicationException("This add-on [#" & addon.id & ", " & addon.name & "] is no longer supported because it contains an active-X component.")
+                        ' -- addons with activeX components are deprecated
+
+                        Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                        Throw New ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " & addonDescription & ".")
                     Else
                         addonId = addon.id
                         Link = addon.Link
@@ -904,9 +905,10 @@ Namespace Contensive.Core.Controllers
                                         If (ScriptingCode <> "") Then
                                             'hint = "Processing Addon [" & AddonName & "], calling script component."
                                             Try
-                                                ScriptContent = executeScript(ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & addon.name & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
+                                                ScriptContent = executeScript(addon, ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & addon.name & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
                                             Catch ex As Exception
-                                                Throw New ApplicationException("There was an error executing the script component of Add-on [" & addon.name & "], AddonOptionString [" & WorkingOptionString & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
+                                                Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                                                Throw New ApplicationException("There was an error executing the script component of Add-on " & addonDescription & ", AddonOptionString [" & WorkingOptionString & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
                                             End Try
                                         End If
                                         '
@@ -929,7 +931,8 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 ' log the error
                                                 '
-                                                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError8("Error during cmc.csv_ExecuteAssembly [" & errorMessageForAdmin & "]", "cpCoreClass.addon_execute_internal", True)
+                                                Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                                                Throw New ApplicationException("Unexpected exception in addon " & addonDescription)
                                                 '
                                                 ' Put up an admin hint
                                                 '
@@ -1125,7 +1128,8 @@ Namespace Contensive.Core.Controllers
                                     '#End If
                                     Pos = genericController.vbInstr(1, returnVal, "<?contensive", vbTextCompare)
                                     If Pos > 0 Then
-                                        Throw New ApplicationException("xml structured commands are no longer supported")
+                                        Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                                        Throw New ApplicationException("xml structured commands are no longer supported, addon" & addonDescription)
                                         ''
                                         ''output is xml structured data
                                         '' pass the data in as an argument to the structured data processor
@@ -2079,7 +2083,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="ReplaceValues"></param>
         ''' <returns></returns>
         ''' <remarks>long run, use either csscript.net, or use .net tools to build compile/run funtion</remarks>
-        Private Function executeScript(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByRef return_errorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
+        Private Function executeScript(ByRef addon As Models.Entity.addonModel, ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByRef return_errorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
             Dim returnText As String = ""
             Try
                 Dim Lines() As String
@@ -2200,6 +2204,8 @@ Namespace Contensive.Core.Controllers
                             Else
                                 return_errorMessage &= ", no scripting error"
                             End If
+                            Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                            return_errorMessage &= ", " & addonDescription
                             Throw New ApplicationException(return_errorMessage, ex)
                         End Try
                         If String.IsNullOrEmpty(return_errorMessage) Then
@@ -2240,7 +2246,8 @@ Namespace Contensive.Core.Controllers
                                     End Select
                                 End If
                             Catch ex As Exception
-                                return_errorMessage = "Error executing script [" & ScriptName & "]"
+                                Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                                return_errorMessage = "Error executing script [" & ScriptName & "], " & addonDescription
                                 If sc.Error.Number <> 0 Then
                                     With sc.Error
                                         return_errorMessage = return_errorMessage & ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
@@ -4468,6 +4475,17 @@ ErrorTrap:
                 Next
             End If
             Return result
+        End Function
+        '
+        Private Function getAddonDescription(cpcore As coreClass, addon As Models.Entity.addonModel) As String
+            Dim collection As Models.Entity.AddonCollectionModel = Models.Entity.AddonCollectionModel.create(cpcore, addon.CollectionID)
+            Dim addonDescription As String = "[#" & addon.id.ToString() & ", " & addon.name & "], collection [" & collection.name & "]"
+            If (collection Is Nothing) Then
+                addonDescription &= ", no collection set"
+            Else
+                addonDescription &= ", collection [" & collection.name & "]"
+            End If
+            Return addonDescription
         End Function
 
         '====================================================================================================

@@ -123,31 +123,47 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Shared Function getFieldTypeDefaultEditorAddonIdList(cpCore As coreClass) As String
-            '
-            Dim editorAddonIds() As String
-            Dim SQL As String
-            Dim RS As DataTable
-            Dim fieldTypeID As Integer
-            '
-            Dim docFieldEditorList As String = ""
-            '
-            ' load default editors into editors() - these are the editors used when there is no editorPreference
-            '   editors(fieldtypeid) = addonid
-            '
-            ReDim editorAddonIds(FieldTypeIdMax)
-            SQL = "select t.id,t.editorAddonId" _
+            Dim result As String = ""
+            Try
+                Dim editorAddonIds() As String
+                Dim RS As DataTable
+                Dim fieldTypeID As Integer
+                '
+                ' load default editors into editors() - these are the editors used when there is no editorPreference
+                '   editors(fieldtypeid) = addonid
+                ReDim editorAddonIds(FieldTypeIdMax)
+                Dim SQL As String = "" _
+                    & " select" _
+                    & " t.id as contentfieldtypeid" _
+                    & " ,t.editorAddonId" _
                     & " from ccFieldTypes t" _
                     & " left join ccaggregatefunctions a on a.id=t.editorAddonId" _
                     & " where (t.active<>0)and(a.active<>0) order by t.id"
-            RS = cpCore.db.executeSql(SQL)
-            For Each dr As DataRow In RS.Rows
-                fieldTypeID = genericController.EncodeInteger(dr("id"))
-                If (fieldTypeID <= FieldTypeIdMax) Then
-                    editorAddonIds(fieldTypeID) = genericController.encodeText(dr("editorAddonId"))
-                End If
-            Next
-            docFieldEditorList = Join(editorAddonIds, ",")
-            getFieldTypeDefaultEditorAddonIdList = docFieldEditorList
+                RS = cpCore.db.executeSql(SQL)
+                For Each dr As DataRow In RS.Rows
+                    fieldTypeID = genericController.EncodeInteger(dr("contentfieldtypeid"))
+                    If (fieldTypeID <= FieldTypeIdMax) Then
+                        editorAddonIds(fieldTypeID) = genericController.encodeText(dr("editorAddonId"))
+                    End If
+                Next
+                '
+                ' -- set any editors not specifically requested in fieldtype
+                SQL = "select contentfieldtypeid, max(addonId) as editorAddonId from ccAddonContentFieldTypeRules group by contentfieldtypeid"
+                RS = cpCore.db.executeSql(SQL)
+                For Each dr As DataRow In RS.Rows
+                    fieldTypeID = genericController.EncodeInteger(dr("contentfieldtypeid"))
+                    If (fieldTypeID <= FieldTypeIdMax) Then
+                        If (editorAddonIds(fieldTypeID) = "") Then
+                            editorAddonIds(fieldTypeID) = genericController.encodeText(dr("editorAddonId"))
+                        End If
+
+                    End If
+                Next
+                result = Join(editorAddonIds, ",")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '====================================================================================================

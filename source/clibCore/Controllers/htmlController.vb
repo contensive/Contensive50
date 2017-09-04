@@ -3166,7 +3166,8 @@ ErrorTrap:
                             MTMRuleField0 = .ManyToManyRulePrimaryField
                             MTMRuleField1 = .ManyToManyRuleSecondaryField
                         End With
-                        result = getInputCheckListCategories(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, HtmlValue)
+                        result = getInputCheckList(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False)
+                        'result = getInputCheckListCategories(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, HtmlValue)
                     Case FieldTypeIdMemberSelect
                         '
                         '

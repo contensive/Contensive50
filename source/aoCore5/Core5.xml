@@ -608,7 +608,6 @@ End Function]]></Code>
 	<ImportCollection name="Logout Link">{1D8AC775-0C19-4310-B375-A2561B7BED12}</ImportCollection>
 	<ImportCollection name="Login">{030DBBCD-8817-4889-8F50-E5DAE4CA7DD1}</ImportCollection>
 	<ImportCollection name="Whats Related">{9E0D6124-0C6B-45A9-A310-2D434A4AA7D6}</ImportCollection>
-	<ImportCollection name="Printer Version Icon">{E4E87F53-6A03-488B-8B25-E84BD77E65B1}</ImportCollection>
 	<ImportCollection name="Child Page Sorting">{BDD2CFBD-CB53-40B7-A246-ED0D234F17EA}</ImportCollection>
 	<ImportCollection name="Content Box">{6A681E1F-ABCC-4E28-AAB4-79264DA18B91}</ImportCollection>
 	<Resource name="pageManager.js" type="www" path="/pageManager" />
