@@ -549,8 +549,8 @@ Namespace Contensive.Core.Controllers
                                     '
                                     'Call AppendLog("main_init(), 3410 - exit for login block")
                                     '
-                                    Call cpCore.html.main_SetMetaContent(0, 0)
-                                    Dim login As New Addons.addon_loginClass(cpCore)
+                                    Call cpCore.doc.setMetaContent(0, 0)
+                                    Dim login As New Addons.loginPageClass(cpCore)
                                     Call cpCore.html.writeAltBuffer(login.getLoginPage(False))
                                     cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                     Return cpCore.doc.docBuffer
@@ -561,7 +561,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     'Call AppendLog("main_init(), 3420 - exit for custom content block")
                                     '
-                                    Call cpCore.html.main_SetMetaContent(0, 0)
+                                    Call cpCore.doc.setMetaContent(0, 0)
                                     Call cpCore.html.addOnLoadJavascript("document.body.style.overflow='scroll'", "Anonymous User Block")
                                     Dim Copy As String = cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
                                     Copy = cpCore.html.getHtmlDoc(Copy, TemplateDefaultBodyTag, True, True, False, False)
@@ -1207,7 +1207,7 @@ ErrorTrap:
                 Dim pageViewings As Integer
                 Dim layoutError As String = ""
                 '
-                Call cpCore.html.main_AddHeadTag2("<meta name=""contentId"" content=""" & cpCore.doc.page.id & """ >", "page content")
+                Call cpCore.html.doc_AddHeadTag2("<meta name=""contentId"" content=""" & cpCore.doc.page.id & """ >", "page content")
                 '
                 returnHtml = getContentBox_content(cpCore, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, ignoreme, UseContentWatchLink, allowPageWithoutSectionDisplay)
                 '
@@ -1337,7 +1337,7 @@ ErrorTrap:
                                     BlockCopy = "" _
                                         & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                         & ""
-                                    Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                                    Dim loginAddon As New Addons.loginPageClass(cpCore)
                                     BlockForm = loginAddon.getLoginForm()
                                 Else
                                     '
@@ -1346,7 +1346,7 @@ ErrorTrap:
                                     BlockCopy = "" _
                                         & "<p>This content has limited access. You were recognized as ""<b>" & cpCore.authContext.user.Name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
                                         & ""
-                                    Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                                    Dim loginAddon As New Addons.loginPageClass(cpCore)
                                     BlockForm = loginAddon.getLoginForm()
                                 End If
                             Else
@@ -1357,7 +1357,7 @@ ErrorTrap:
                                     & "<p>You are currently logged in as ""<b>" & cpCore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
                                     & ""
-                                Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                                Dim loginAddon As New Addons.loginPageClass(cpCore)
                                 BlockForm = loginAddon.getLoginForm()
                             End If
                             returnHtml = "" _
@@ -1376,7 +1376,7 @@ ErrorTrap:
                                 '
                                 ' login subform form
                                 '
-                                Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                                Dim loginAddon As New Addons.loginPageClass(cpCore)
                                 BlockForm = loginAddon.getLoginForm()
                                 BlockCopy = "" _
                                     & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
@@ -1605,7 +1605,10 @@ ErrorTrap:
                     ' Set the Meta Content flag
                     '---------------------------------------------------------------------------------
                     '
-                    Call cpCore.html.main_SetMetaContent(cpCore.doc.page.ContentControlID, cpCore.doc.page.id)
+                    Call cpCore.html.doc_AddPagetitle2(genericController.encodeHTML(cpCore.doc.page.pageTitle), "page content")
+                    Call cpCore.html.doc_addMetaDescription2(genericController.encodeHTML(cpCore.doc.page.metaDescription), "page content")
+                    Call cpCore.html.doc_AddHeadTag2(cpCore.doc.page.OtherHeadTags, "page content")
+                    Call cpCore.html.doc_addMetaKeywordList2(cpCore.doc.page.MetaKeywordList, "page content")
                     '
                     '---------------------------------------------------------------------------------
                     ' ----- OnPageStartEvent
@@ -1636,7 +1639,7 @@ ErrorTrap:
                 '
                 ' add contentid and sectionid
                 '
-                Call cpCore.html.main_AddHeadTag2("<meta name=""contentId"" content=""" & cpCore.doc.page.id & """ >", "page content")
+                Call cpCore.html.doc_AddHeadTag2("<meta name=""contentId"" content=""" & cpCore.doc.page.id & """ >", "page content")
                 '
                 ' Display Admin Warnings with Edits for record errors
                 '

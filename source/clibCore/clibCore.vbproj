@@ -396,7 +396,7 @@
   <ItemGroup>
     <Compile Include="addon_emailProcess\processEmailClass.vb" />
     <Compile Include="addon_housekeeping\houseKeepClass.vb" />
-    <Compile Include="addon_login\addon_loginClass.vb" />
+    <Compile Include="addon_login\loginPageClass.vb" />
     <Compile Include="addon_pageManager\childPageResortClass.vb" />
     <Compile Include="addon_pageManager\pageManager.vb" />
     <Compile Include="constants.vb" />

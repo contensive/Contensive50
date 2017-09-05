@@ -757,10 +757,10 @@ Namespace Contensive.Core.Controllers
                                         ' Long Term Fix
                                         '   Convert js, style, and meta tag system to use .createElement during remote method processing
                                         '
-                                        Call cpCore.html.main_AddPagetitle2(PageTitle, AddedByName)
-                                        Call cpCore.html.main_addMetaDescription2(MetaDescription, AddedByName)
-                                        Call cpCore.html.main_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                                        Call cpCore.html.main_AddHeadTag2(OtherHeadTags, AddedByName)
+                                        Call cpCore.html.doc_AddPagetitle2(PageTitle, AddedByName)
+                                        Call cpCore.html.doc_addMetaDescription2(MetaDescription, AddedByName)
+                                        Call cpCore.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
+                                        Call cpCore.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
                                         If Not blockJavascriptAndCss Then
                                             '
                                             ' add javascript and styles if it has not run already
@@ -1058,10 +1058,10 @@ Namespace Contensive.Core.Controllers
                                     'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") aa"
                                     '#End If
                                     If True Then
-                                        Call cpCore.html.main_AddPagetitle2(PageTitle, AddedByName)
-                                        Call cpCore.html.main_addMetaDescription2(MetaDescription, AddedByName)
-                                        Call cpCore.html.main_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                                        Call cpCore.html.main_AddHeadTag2(OtherHeadTags, AddedByName)
+                                        Call cpCore.html.doc_AddPagetitle2(PageTitle, AddedByName)
+                                        Call cpCore.html.doc_addMetaDescription2(MetaDescription, AddedByName)
+                                        Call cpCore.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
+                                        Call cpCore.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
                                         If Not blockJavascriptAndCss Then
                                             Call cpCore.html.addOnLoadJavascript(JSOnLoad, AddedByName)
                                             Call cpCore.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
@@ -1190,7 +1190,7 @@ Namespace Contensive.Core.Controllers
                                         '   Framed in content, during the remote method call
                                         '   add in the rest of the html page
                                         '
-                                        Call cpCore.html.main_SetMetaContent(0, 0)
+                                        Call cpCore.doc.setMetaContent(0, 0)
                                         returnVal = "" _
                                         & cpCore.siteProperties.docTypeDeclaration() _
                                         & vbCrLf & "<html>" _
@@ -4220,7 +4220,7 @@ ErrorTrap:
                 End If
                 Call cpCore.html.addOnLoadJavascript(cpCore.db.cs_getText(CS, "javascriptonload"), SourceComment)
                 Call cpCore.html.addBodyJavascriptCode(cpCore.db.cs_getText(CS, "javascriptbodyend"), SourceComment)
-                Call cpCore.html.main_AddHeadTag2(cpCore.db.cs_getText(CS, "OtherHeadTags"), SourceComment)
+                Call cpCore.html.doc_AddHeadTag2(cpCore.db.cs_getText(CS, "OtherHeadTags"), SourceComment)
                 '
                 JSFilename = cpCore.db.cs_getText(CS, "jsfilename")
                 If JSFilename <> "" Then

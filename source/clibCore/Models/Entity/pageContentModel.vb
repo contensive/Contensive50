@@ -56,6 +56,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property EditBlank As Boolean
         Public Property EditSourceID As Integer
         Public Property Headline As String
+        Public Property imageFilename As String
         Public Property IsSecure As Boolean
         Public Property JSEndBody As String
         Public Property JSFilename As String
@@ -63,7 +64,11 @@ Namespace Contensive.Core.Models.Entity
         Public Property JSOnLoad As String
         Public Property LinkAlias As String
         Public Property MenuHeadline As String
+        Public Property metaDescription As String
+        Public Property MetaKeywordList As String
+        Public Property OtherHeadTags As String
         Public Property PageLink As String
+        Public Property pageTitle As String
         Public Property ParentID As Integer
         Public Property ParentListName As String
         Public Property PubDate As Date

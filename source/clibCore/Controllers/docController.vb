@@ -2989,5 +2989,73 @@ ErrorTrap:
                 cpcore.handleException(ex)
             End Try
         End Sub
+        '
+        '=============================================================================
+        '   Sets the MetaContent subsystem so the next call to main_GetLastMeta... returns the correct value
+        '       And neither takes much time
+        '=============================================================================
+        '
+        Public Sub setMetaContent(ByVal ContentID As Integer, ByVal RecordID As Integer)
+            Dim KeywordList As String = String.Empty
+            Dim CS As Integer
+            Dim Criteria As String
+            Dim SQL As String
+            Dim FieldList As String
+            Dim iContentID As Integer
+            Dim iRecordID As Integer
+            Dim MetaContentID As Integer
+            '
+            iContentID = genericController.EncodeInteger(ContentID)
+            iRecordID = genericController.EncodeInteger(RecordID)
+            If (iContentID <> 0) And (iRecordID <> 0) Then
+                '
+                ' main_Get ID, Description, Title
+                '
+                Criteria = "(ContentID=" & iContentID & ")and(RecordID=" & iRecordID & ")"
+                If False Then '.3.550" Then
+                    FieldList = "ID,Name,MetaDescription,'' as OtherHeadTags,'' as MetaKeywordList"
+                ElseIf False Then '.3.930" Then
+                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,'' as MetaKeywordList"
+                Else
+                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList"
+                End If
+                CS = cpcore.db.cs_open("Meta Content", Criteria, , , , ,, FieldList)
+                If cpcore.db.cs_ok(CS) Then
+                    MetaContentID = cpcore.db.cs_getInteger(CS, "ID")
+                    Call cpcore.html.doc_AddPagetitle2(genericController.encodeHTML(cpcore.db.cs_getText(CS, "Name")), "page content")
+                    Call cpcore.html.doc_addMetaDescription2(genericController.encodeHTML(cpcore.db.cs_getText(CS, "MetaDescription")), "page content")
+                    Call cpcore.html.doc_AddHeadTag2(cpcore.db.cs_getText(CS, "OtherHeadTags"), "page content")
+                    If True Then
+                        KeywordList = genericController.vbReplace(cpcore.db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
+                    End If
+                    'main_MetaContent_Title = encodeHTML(app.csv_cs_getText(CS, "Name"))
+                    'htmldoc.main_MetaContent_Description = encodeHTML(app.csv_cs_getText(CS, "MetaDescription"))
+                    'main_MetaContent_OtherHeadTags = app.csv_cs_getText(CS, "OtherHeadTags")
+                End If
+                Call cpcore.db.cs_Close(CS)
+                '
+                ' main_Get Keyword List
+                '
+                SQL = "select ccMetaKeywords.Name" _
+                    & " From ccMetaKeywords" _
+                    & " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID" _
+                    & " Where ccMetaKeywordRules.MetaContentID=" & MetaContentID
+                CS = cpcore.db.cs_openSql(SQL)
+                Do While cpcore.db.cs_ok(CS)
+                    KeywordList = KeywordList & "," & cpcore.db.cs_getText(CS, "Name")
+                    Call cpcore.db.cs_goNext(CS)
+                Loop
+                If KeywordList <> "" Then
+                    If Left(KeywordList, 1) = "," Then
+                        KeywordList = Mid(KeywordList, 2)
+                    End If
+                    'KeyWordList = Mid(KeyWordList, 2)
+                    KeywordList = genericController.encodeHTML(KeywordList)
+                    Call cpcore.html.doc_addMetaKeywordList2(KeywordList, "page content")
+                End If
+                Call cpcore.db.cs_Close(CS)
+            End If
+        End Sub
+
     End Class
 End Namespace

@@ -6050,7 +6050,7 @@ ErrorTrap:
                             '
                             ' Login - This can only come from the Horizonal Tool Bar
                             '
-                            Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                            Dim loginAddon As New Addons.loginPageClass(cpCore)
                             Call loginAddon.processFormLoginDefault()
                         Case ButtonApply
                             '
@@ -6058,7 +6058,7 @@ ErrorTrap:
                             '
                             username = cpCore.docProperties.getText("username")
                             If username <> "" Then
-                                Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                                Dim loginAddon As New Addons.loginPageClass(cpCore)
                                 Call loginAddon.processFormLoginDefault()
                             End If
                             '
@@ -7156,17 +7156,17 @@ ErrorTrap:
         '=========================================================================================================
         '
         Public Sub main_AddPagetitle(PageTitle As String)
-            Call main_AddPagetitle2(PageTitle, "")
+            Call doc_AddPagetitle2(PageTitle, "")
         End Sub
         '
         '
         '
-        Public Sub main_AddPagetitle2(PageTitle As String, addedByMessage As String)
+        Public Sub doc_AddPagetitle2(PageTitle As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
             If PageTitle <> "" And genericController.vbInstr(1, cpCore.doc.metaContent_Title, PageTitle, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    Call main_AddHeadTag2("<!-- title from " & addedByMessage & " -->", "")
+                    Call doc_AddHeadTag2("<!-- title from " & addedByMessage & " -->", "")
                 End If
                 If cpCore.doc.metaContent_Title <> "" Then
                     cpCore.doc.metaContent_Title = cpCore.doc.metaContent_Title & ", "
@@ -7185,17 +7185,17 @@ ErrorTrap:
         '=========================================================================================================
         '
         Public Sub main_addMetaDescription(MetaDescription As String)
-            Call main_addMetaDescription2(MetaDescription, "")
+            Call doc_addMetaDescription2(MetaDescription, "")
         End Sub
         '
         '
         '
-        Public Sub main_addMetaDescription2(MetaDescription As String, addedByMessage As String)
+        Public Sub doc_addMetaDescription2(MetaDescription As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
             If MetaDescription <> "" And genericController.vbInstr(1, cpCore.doc.metaContent_Description, MetaDescription, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    Call main_AddHeadTag2("<!-- meta description from " & addedByMessage & " -->", "")
+                    Call doc_AddHeadTag2("<!-- meta description from " & addedByMessage & " -->", "")
                 End If
                 If cpCore.doc.metaContent_Description <> "" Then
                     cpCore.doc.metaContent_Description = cpCore.doc.metaContent_Description & ", "
@@ -7233,7 +7233,7 @@ ErrorTrap:
             '
             If genericController.vbInstr(1, cpCore.doc.metaContent_SharedStyleIDList & ",", "," & styleId & ",") = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    Call main_AddHeadTag2("<!-- shared style " & styleId & " from " & addedByMessage & " -->", "")
+                    Call doc_AddHeadTag2("<!-- shared style " & styleId & " from " & addedByMessage & " -->", "")
                 End If
                 cpCore.doc.metaContent_SharedStyleIDList = cpCore.doc.metaContent_SharedStyleIDList & "," & styleId
             End If
@@ -7248,17 +7248,17 @@ ErrorTrap:
         '=========================================================================================================
         '
         Public Sub main_addMetaKeywordList(MetaKeywordList As String)
-            Call main_addMetaKeywordList2(MetaKeywordList, "")
+            Call doc_addMetaKeywordList2(MetaKeywordList, "")
         End Sub
         '
         '
         '
-        Public Sub main_addMetaKeywordList2(MetaKeywordList As String, addedByMessage As String)
+        Public Sub doc_addMetaKeywordList2(MetaKeywordList As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
             If MetaKeywordList <> "" And genericController.vbInstr(1, cpCore.doc.metaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    Call main_AddHeadTag2("<!-- meta keyword list from " & addedByMessage & " -->", "")
+                    Call doc_AddHeadTag2("<!-- meta keyword list from " & addedByMessage & " -->", "")
                 End If
                 If cpCore.doc.metaContent_KeyWordList <> "" Then
                     cpCore.doc.metaContent_KeyWordList = cpCore.doc.metaContent_KeyWordList & ", "
@@ -7276,12 +7276,12 @@ ErrorTrap:
         '=========================================================================================================
         '
         Public Sub addHeadTag(HeadTag As String)
-            Call main_AddHeadTag2(HeadTag, "")
+            Call doc_AddHeadTag2(HeadTag, "")
         End Sub
         '
         '
         '
-        Public Sub main_AddHeadTag2(HeadTag As String, addedByMessage As String)
+        Public Sub doc_AddHeadTag2(HeadTag As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
             If HeadTag <> "" And genericController.vbInstr(1, cpCore.doc.metaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
@@ -7302,13 +7302,13 @@ ErrorTrap:
         '
         '
         Public Sub main_addMeta(metaName As String, metaContent As String, addedByMessage As String)
-            Call main_AddHeadTag2("<meta name=""" & encodeHTML(metaName) & """ content=""" & encodeHTML(metaContent) & """>", addedByMessage)
+            Call doc_AddHeadTag2("<meta name=""" & encodeHTML(metaName) & """ content=""" & encodeHTML(metaContent) & """>", addedByMessage)
         End Sub
         '
         '
         '
         Public Sub main_addMetaProperty(metaProperty As String, metaContent As String, addedByMessage As String)
-            Call main_AddHeadTag2("<meta property=""" & encodeHTML(metaProperty) & """ content=""" & encodeHTML(metaContent) & """>", addedByMessage)
+            Call doc_AddHeadTag2("<meta property=""" & encodeHTML(metaProperty) & """ content=""" & encodeHTML(metaContent) & """>", addedByMessage)
         End Sub
         '
         Friend ReadOnly Property main_ReturnAfterEdit() As Boolean
@@ -7709,7 +7709,7 @@ ErrorTrap:
                         '
                         ' headtags generated from csv_EncodeContent
                         '
-                        Call main_AddHeadTag2(Copy, "embedded content")
+                        Call doc_AddHeadTag2(Copy, "embedded content")
                     End If
                     '
                     ' If any javascript or styles were added during encode, pick them up now
@@ -8560,73 +8560,6 @@ ErrorTrap:
         '    End If
         '    Return result
         'End Function
-        '
-        '=============================================================================
-        '   Sets the MetaContent subsystem so the next call to main_GetLastMeta... returns the correct value
-        '       And neither takes much time
-        '=============================================================================
-        '
-        Public Sub main_SetMetaContent(ByVal ContentID As Integer, ByVal RecordID As Integer)
-            Dim KeywordList As String = String.Empty
-            Dim CS As Integer
-            Dim Criteria As String
-            Dim SQL As String
-            Dim FieldList As String
-            Dim iContentID As Integer
-            Dim iRecordID As Integer
-            Dim MetaContentID As Integer
-            '
-            iContentID = genericController.EncodeInteger(ContentID)
-            iRecordID = genericController.EncodeInteger(RecordID)
-            If (iContentID <> 0) And (iRecordID <> 0) Then
-                '
-                ' main_Get ID, Description, Title
-                '
-                Criteria = "(ContentID=" & iContentID & ")and(RecordID=" & iRecordID & ")"
-                If False Then '.3.550" Then
-                    FieldList = "ID,Name,MetaDescription,'' as OtherHeadTags,'' as MetaKeywordList"
-                ElseIf False Then '.3.930" Then
-                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,'' as MetaKeywordList"
-                Else
-                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList"
-                End If
-                CS = cpCore.db.cs_open("Meta Content", Criteria, , , , ,, FieldList)
-                If cpCore.db.cs_ok(CS) Then
-                    MetaContentID = cpCore.db.cs_getInteger(CS, "ID")
-                    Call cpCore.html.main_AddPagetitle2(genericController.encodeHTML(cpCore.db.cs_getText(CS, "Name")), "page content")
-                    Call cpCore.html.main_addMetaDescription2(genericController.encodeHTML(cpCore.db.cs_getText(CS, "MetaDescription")), "page content")
-                    Call cpCore.html.main_AddHeadTag2(cpCore.db.cs_getText(CS, "OtherHeadTags"), "page content")
-                    If True Then
-                        KeywordList = genericController.vbReplace(cpCore.db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
-                    End If
-                    'main_MetaContent_Title = encodeHTML(app.csv_cs_getText(CS, "Name"))
-                    'htmldoc.main_MetaContent_Description = encodeHTML(app.csv_cs_getText(CS, "MetaDescription"))
-                    'main_MetaContent_OtherHeadTags = app.csv_cs_getText(CS, "OtherHeadTags")
-                End If
-                Call cpCore.db.cs_Close(CS)
-                '
-                ' main_Get Keyword List
-                '
-                SQL = "select ccMetaKeywords.Name" _
-                    & " From ccMetaKeywords" _
-                    & " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID" _
-                    & " Where ccMetaKeywordRules.MetaContentID=" & MetaContentID
-                CS = cpCore.db.cs_openSql(SQL)
-                Do While cpCore.db.cs_ok(CS)
-                    KeywordList = KeywordList & "," & cpCore.db.cs_getText(CS, "Name")
-                    Call cpCore.db.cs_goNext(CS)
-                Loop
-                If KeywordList <> "" Then
-                    If Left(KeywordList, 1) = "," Then
-                        KeywordList = Mid(KeywordList, 2)
-                    End If
-                    'KeyWordList = Mid(KeyWordList, 2)
-                    KeywordList = genericController.encodeHTML(KeywordList)
-                    Call cpCore.html.main_addMetaKeywordList2(KeywordList, "page content")
-                End If
-                Call cpCore.db.cs_Close(CS)
-            End If
-        End Sub
 
         '
         '

@@ -1099,7 +1099,7 @@ Namespace Contensive.Core
                                 '
                                 ' set the meta content flag to show it is not needed for the head tag
                                 '
-                                Call html.main_SetMetaContent(0, 0)
+                                Call doc.setMetaContent(0, 0)
                                 Select Case formType
                                     Case FormTypeSiteStyleEditor
                                         If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
@@ -1160,19 +1160,19 @@ Namespace Contensive.Core
                                         '
                                         '
                                         '
-                                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                                        Dim loginAddon As New Addons.loginPageClass(Me)
                                         Call loginAddon.processFormJoin()
                                     Case FormTypeSendPassword
                                         '
                                         '
                                         '
-                                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                                        Dim loginAddon As New Addons.loginPageClass(Me)
                                         Call loginAddon.processFormSendPassword()
                                     Case FormTypeLogin, "l09H58a195"
                                         '
                                         '
                                         '
-                                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                                        Dim loginAddon As New Addons.loginPageClass(Me)
                                         Call loginAddon.processFormLoginDefault()
                                     Case FormTypeToolsPanel
                                         '
@@ -1672,7 +1672,7 @@ Namespace Contensive.Core
                             Call doc.addRefreshQueryString("EditorObjectName", EditorObjectName)
                             Call html.addJavaScriptLinkHead("/ccLib/ClientSide/dialogs.js", "Resource Library")
                             'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
-                            Call html.main_SetMetaContent(0, 0)
+                            Call doc.setMetaContent(0, 0)
                             Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Resource Library")
                             Copy = html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                             Dim htmlBody As String = "" _
@@ -1714,7 +1714,7 @@ Namespace Contensive.Core
                             '
                             Call doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
                             Call html.addJavaScriptLinkHead("/ccLib/ClientSide/dialogs.js", "Resource Library")
-                            Call html.main_SetMetaContent(0, 0)
+                            Call doc.setMetaContent(0, 0)
                             Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Resource Library")
                             Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                             Dim htmlBody As String = "" _
@@ -1731,7 +1731,7 @@ Namespace Contensive.Core
                     Case HardCodedPageLoginDefault
                         '
                         doc.refreshQueryString = webServer.requestQueryString
-                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                        Dim loginAddon As New Addons.loginPageClass(Me)
                         Call html.writeAltBuffer(loginAddon.getLoginPage(True))
                         result = True
                     Case HardCodedPageLogin, HardCodedPageLogoutLogin
@@ -1744,7 +1744,7 @@ Namespace Contensive.Core
                             Call authContext.logout(Me)
                         End If
                         doc.refreshQueryString = webServer.requestQueryString
-                        Dim loginAddon As New Addons.addon_loginClass(Me)
+                        Dim loginAddon As New Addons.loginPageClass(Me)
                         Call html.writeAltBuffer(loginAddon.getLoginPage(False))
                         result = True
                     Case HardCodedPageLogout
@@ -1765,7 +1765,7 @@ Namespace Contensive.Core
                             '
                             Call doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
                             Call html.main_AddPagetitle("Site Explorer")
-                            Call html.main_SetMetaContent(0, 0)
+                            Call doc.setMetaContent(0, 0)
                             Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
                             Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Site Explorer")
                             Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"

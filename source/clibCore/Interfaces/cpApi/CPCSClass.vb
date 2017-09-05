@@ -109,7 +109,7 @@ Namespace Contensive.Core
                 CSPointer = cpCore.db.cs_open(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
                 success = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.Open")
+                Call cpCore.handleException(ex, "Unexpected error in cs.Open") : Throw
             End Try
             Return success
         End Function

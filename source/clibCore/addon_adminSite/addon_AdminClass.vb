@@ -68,7 +68,7 @@ Namespace Contensive.Addons
                     '
                     ' --- must be authenticated to continue. Force a local login
                     '
-                    Dim loginAddon As New Addons.addon_loginClass(cpCore)
+                    Dim loginAddon As New Addons.loginPageClass(cpCore)
                     adminBody = "" _
                         & cr & "<p class=""ccAdminNormal"">You are attempting to enter an access controlled area. Continue only if you have authority to enter this area. Information about your visit will be recorded for security purposes.</p>" _
                         & loginAddon.getLoginForm() _
@@ -89,8 +89,8 @@ Namespace Contensive.Addons
                         & htmlIndent(adminBody) _
                         & "</div>"
                     '
-                    Call cpCore.html.main_SetMetaContent(0, 0)
-                    Call cpCore.html.main_AddPagetitle2("Login", "adminSite")
+                    Call cpCore.doc.setMetaContent(0, 0)
+                    Call cpCore.html.doc_AddPagetitle2("Login", "adminSite")
                 ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
                     '
                     ' --- member must have proper access to continue
@@ -112,8 +112,8 @@ Namespace Contensive.Addons
                         & genericController.htmlIndent(adminBody) _
                         & cr & "</div>"
                     '
-                    Call cpCore.html.main_SetMetaContent(0, 0)
-                    Call cpCore.html.main_AddPagetitle2("Unauthorized Access", "adminSite")
+                    Call cpCore.doc.setMetaContent(0, 0)
+                    Call cpCore.html.doc_AddPagetitle2("Unauthorized Access", "adminSite")
                 Else
                     '
                     ' get admin content
@@ -201,7 +201,7 @@ Namespace Contensive.Addons
                 editRecord.Loaded = False
                 UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
                 Call cpCore.html.addOnLoadJavascript("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
-                Call cpCore.html.main_SetMetaContent(0, 0)
+                Call cpCore.doc.setMetaContent(0, 0)
                 '
                 '-------------------------------------------------------------------------------
                 ' check for member login, if logged in and no admin, lock out
@@ -2928,73 +2928,73 @@ ErrorTrap:
             Call handleLegacyClassError3("LoadContentTrackingResponse")
             '
         End Sub
-        '
-        '========================================================================
-        '   Load and Save
-        '       From both response and database
-        '
-        '   This needs to be updated:
-        '       - Divide into LoadCalendarEvents / SaveCalendarEvents
-        '       - Put LoadCalendarEvents in LoadResponse/LoadDatabase
-        '       - Put SaveCalendarEvents with SaveEditRecord
-        '       - this is so a usererror will preserve form responses
-        '       - Dont delete all and recreate / just update records
-        '========================================================================
-        '
-        Private Sub LoadAndSaveMetaContent()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadAndSaveMetaContent")
-            '
-            Dim CS As Integer
-            Dim MetaContentID As Integer
-            Dim MetaKeywordList As String
-            '
-            MetaContentID = cpCore.docProperties.getInteger("MetaContent.MetaContentID")
-            If (MetaContentID <> 0) Then
-                '
-                ' ----- Load from Response
-                '
-                CS = cpCore.db.csOpenRecord("Meta Content", MetaContentID)
-                If cpCore.db.cs_ok(CS) Then
-                    Call cpCore.db.cs_set(CS, "Name", cpCore.docProperties.getText("MetaContent.PageTitle"))
-                    Call cpCore.db.cs_set(CS, "MetaDescription", cpCore.docProperties.getText("MetaContent.MetaDescription"))
-                    If True Then ' 3.3.930" Then
-                        Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
-                        MetaKeywordList = cpCore.docProperties.getText("MetaContent.MetaKeywordList")
-                        MetaKeywordList = genericController.vbReplace(MetaKeywordList, ",", vbCrLf)
-                        Do While genericController.vbInstr(1, MetaKeywordList, vbCrLf & " ") <> 0
-                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, vbCrLf & " ", vbCrLf)
-                        Loop
-                        Do While genericController.vbInstr(1, MetaKeywordList, " " & vbCrLf) <> 0
-                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, " " & vbCrLf, vbCrLf)
-                        Loop
-                        Do While genericController.vbInstr(1, MetaKeywordList, vbCrLf & vbCrLf) <> 0
-                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, vbCrLf & vbCrLf, vbCrLf)
-                        Loop
-                        Do While (MetaKeywordList <> "") And (Right(MetaKeywordList, 2) = vbCrLf)
-                            MetaKeywordList = Left(MetaKeywordList, Len(MetaKeywordList) - 2)
-                        Loop
-                        Call cpCore.db.cs_set(CS, "MetaKeywordList", MetaKeywordList)
-                    ElseIf cpCore.db.cs_isFieldSupported(CS, "OtherHeadTags") Then
-                        Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
-                    End If
-                    Call cpCore.html.main_ProcessCheckList("MetaContent.KeywordList", "Meta Content", genericController.encodeText(MetaContentID), "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID")
-                End If
-                Call cpCore.db.cs_Close(CS)
-                '
-                ' Clear any bakes involving this content
-                '
-                Call cpCore.cache.invalidateContent("Meta Content")
-                Call cpCore.cache.invalidateContent("Meta Keyword Rules")
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("LoadAndSaveMetaContent")
-            '
-        End Sub
+        '        '
+        '        '========================================================================
+        '        '   Load and Save
+        '        '       From both response and database
+        '        '
+        '        '   This needs to be updated:
+        '        '       - Divide into LoadCalendarEvents / SaveCalendarEvents
+        '        '       - Put LoadCalendarEvents in LoadResponse/LoadDatabase
+        '        '       - Put SaveCalendarEvents with SaveEditRecord
+        '        '       - this is so a usererror will preserve form responses
+        '        '       - Dont delete all and recreate / just update records
+        '        '========================================================================
+        '        '
+        '        Private Sub LoadAndSaveMetaContent()
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadAndSaveMetaContent")
+        '            '
+        '            Dim CS As Integer
+        '            Dim MetaContentID As Integer
+        '            Dim MetaKeywordList As String
+        '            '
+        '            MetaContentID = cpCore.docProperties.getInteger("MetaContent.MetaContentID")
+        '            If (MetaContentID <> 0) Then
+        '                '
+        '                ' ----- Load from Response
+        '                '
+        '                CS = cpCore.db.csOpenRecord("Meta Content", MetaContentID)
+        '                If cpCore.db.cs_ok(CS) Then
+        '                    Call cpCore.db.cs_set(CS, "Name", cpCore.docProperties.getText("MetaContent.PageTitle"))
+        '                    Call cpCore.db.cs_set(CS, "MetaDescription", cpCore.docProperties.getText("MetaContent.MetaDescription"))
+        '                    If True Then ' 3.3.930" Then
+        '                        Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
+        '                        MetaKeywordList = cpCore.docProperties.getText("MetaContent.MetaKeywordList")
+        '                        MetaKeywordList = genericController.vbReplace(MetaKeywordList, ",", vbCrLf)
+        '                        Do While genericController.vbInstr(1, MetaKeywordList, vbCrLf & " ") <> 0
+        '                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, vbCrLf & " ", vbCrLf)
+        '                        Loop
+        '                        Do While genericController.vbInstr(1, MetaKeywordList, " " & vbCrLf) <> 0
+        '                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, " " & vbCrLf, vbCrLf)
+        '                        Loop
+        '                        Do While genericController.vbInstr(1, MetaKeywordList, vbCrLf & vbCrLf) <> 0
+        '                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, vbCrLf & vbCrLf, vbCrLf)
+        '                        Loop
+        '                        Do While (MetaKeywordList <> "") And (Right(MetaKeywordList, 2) = vbCrLf)
+        '                            MetaKeywordList = Left(MetaKeywordList, Len(MetaKeywordList) - 2)
+        '                        Loop
+        '                        Call cpCore.db.cs_set(CS, "MetaKeywordList", MetaKeywordList)
+        '                    ElseIf cpCore.db.cs_isFieldSupported(CS, "OtherHeadTags") Then
+        '                        Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
+        '                    End If
+        '                    Call cpCore.html.main_ProcessCheckList("MetaContent.KeywordList", "Meta Content", genericController.encodeText(MetaContentID), "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID")
+        '                End If
+        '                Call cpCore.db.cs_Close(CS)
+        '                '
+        '                ' Clear any bakes involving this content
+        '                '
+        '                Call cpCore.cache.invalidateContent("Meta Content")
+        '                Call cpCore.cache.invalidateContent("Meta Keyword Rules")
+        '            End If
+        '            '
+        '            Exit Sub
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyClassError3("LoadAndSaveMetaContent")
+        '            '
+        '        End Sub
         '
         '========================================================================
         '   Save Link Alias field if it supported, and is non-authoring
@@ -4372,7 +4372,7 @@ ErrorTrap:
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingPage Or IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
-                        Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
+                        'Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Link Aliases", GetForm_Edit_LinkAliases(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                         'Call Stream.Add(GetForm_Edit_AddTab("Topics", GetForm_Edit_TopicRules, AllowAdminTabs))
                         'Call Stream.Add(GetForm_Edit_AddTab("RSS/Podcasts", GetForm_Edit_RSSFeeds(EditRecord.ContentName, EditRecord.ContentID, EditRecord.ID, cpCore.main_GetPageLink(EditRecord.ID)), AllowAdminTabs))
@@ -4442,7 +4442,7 @@ ErrorTrap:
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                         Call Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_ContentGroupRules(adminContent, editRecord), allowAdminTabs))
-                        Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
+                        'Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                         'Call Stream.Add(GetForm_Edit_AddTab("Topics", GetForm_Edit_TopicRules, AllowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContent, editRecord), allowAdminTabs))
                         'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
@@ -4497,7 +4497,7 @@ ErrorTrap:
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
-                        Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
+                        'Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
@@ -7507,119 +7507,119 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyClassError3("GetForm_Edit_LinkAliases")
         End Function
-        '
-        '========================================================================
-        '   Print the Topic Rules section of any edit form
-        '========================================================================
-        '
-        Private Function GetForm_Edit_MetaContent(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_MetaContent")
-            '
-            Dim s As String
-            Dim SQL As String
-            Dim FastString As New stringBuilderLegacyController
-            Dim Checked As Boolean
-            Dim TableID As Integer
-            Dim MetaContentID As Integer
-            Dim CS As Integer
-            Dim PageTitle As String = ""
-            Dim MetaDescription As String = ""
-            Dim MetaKeywordList As String = ""
-            Dim OtherHeadTags As String = ""
-            Dim Adminui As New adminUIController(cpCore)
-            '
-            If adminContent.AllowMetaContent Then
-                CS = cpCore.db.cs_open("Meta Content", "(ContentID=" & editRecord.contentControlId & ")and(RecordID=" & editRecord.id & ")")
-                If Not cpCore.db.cs_ok(CS) Then
-                    CS = cpCore.db.cs_insertRecord("Meta Content")
-                    Call cpCore.db.cs_set(CS, "ContentID", editRecord.contentControlId)
-                    Call cpCore.db.cs_set(CS, "RecordID", editRecord.id)
-                    Call cpCore.db.cs_save2(CS)
-                End If
-                If cpCore.db.cs_ok(CS) Then
-                    MetaContentID = cpCore.db.cs_getInteger(CS, "ID")
-                    PageTitle = cpCore.db.cs_get(CS, "Name")
-                    MetaDescription = cpCore.db.cs_get(CS, "MetaDescription")
-                    If True Then ' 3.3.930" Then
-                        MetaKeywordList = cpCore.db.cs_get(CS, "MetaKeywordList")
-                        OtherHeadTags = cpCore.db.cs_get(CS, "OtherHeadTags")
-                    ElseIf cpCore.db.cs_isFieldSupported(CS, "OtherHeadTags") Then
-                        OtherHeadTags = cpCore.db.cs_get(CS, "OtherHeadTags")
-                    End If
-                End If
-                Call cpCore.db.cs_Close(CS)
-                '
-                'Call FastString.Add(cpCore.main_GetFormInputHidden("MetaContent.MetaContentID", MetaContentID))
-                '
-                ' Page Title
-                '
-                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Page Title</td>")
-                Call FastString.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
-                If readOnlyField Then
-                    Call FastString.Add(PageTitle)
-                Else
-                    Call FastString.Add(cpCore.html.html_GetFormInputText2("MetaContent.PageTitle", PageTitle))
-                End If
-                Call FastString.Add("</span></td></tr>")
-                '
-                ' Meta Description
-                '
-                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Meta Description</td>")
-                Call FastString.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
-                If readOnlyField Then
-                    Call FastString.Add(MetaDescription)
-                Else
-                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.MetaDescription", MetaDescription, 10))
-                End If
-                Call FastString.Add("</span></td></tr>")
-                '
-                ' Meta Keyword List
-                '
-                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Meta Keyword List</td>")
-                Call FastString.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
-                If readOnlyField Then
-                    Call FastString.Add(MetaKeywordList)
-                Else
-                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.MetaKeywordList", MetaKeywordList, 10))
-                End If
-                Call FastString.Add("</span></td></tr>")
-                '
-                ' Meta Keywords, Shared
-                '
-                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Shared Meta Keywords</td>")
-                Call FastString.Add("<td class=""ccAdminEditField"" colspan=""2"">")
-                Call FastString.Add(cpCore.html.getInputCheckList("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField))
-                'Call FastString.Add(cpCore.html.getInputCheckListCategories("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField, "Meta Keywords"))
-                Call FastString.Add("</td></tr>")
-                '
-                ' Other Head Tags
-                '
-                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Other Head Tags</td>")
-                Call FastString.Add("<td class=""ccAdminEditField"" colspan=""2"">" & SpanClassAdminNormal)
-                If readOnlyField Then
-                    Call FastString.Add(OtherHeadTags)
-                Else
-                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.OtherHeadTags", OtherHeadTags, 10))
-                End If
-                Call FastString.Add("</span></td></tr>")
-                '
-                s = "" _
-                    & Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose _
-                    & cpCore.html.html_GetFormInputHidden("MetaContent.MetaContentID", MetaContentID) _
-                    & ""
-                '
-                GetForm_Edit_MetaContent = Adminui.GetEditPanel((Not allowAdminTabs), "Meta Content", "Meta Tags available for pages using this content", s)
-                EditSectionPanelCount = EditSectionPanelCount + 1
-                '
-                FastString = Nothing
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            FastString = Nothing
-            Call handleLegacyClassError3("GetForm_Edit_MetaContent")
-        End Function
+        '        '
+        '        '========================================================================
+        '        '   Print the Topic Rules section of any edit form
+        '        '========================================================================
+        '        '
+        '        Private Function GetForm_Edit_MetaContent(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_MetaContent")
+        '            '
+        '            Dim s As String
+        '            Dim SQL As String
+        '            Dim FastString As New stringBuilderLegacyController
+        '            Dim Checked As Boolean
+        '            Dim TableID As Integer
+        '            Dim MetaContentID As Integer
+        '            Dim CS As Integer
+        '            Dim PageTitle As String = ""
+        '            Dim MetaDescription As String = ""
+        '            Dim MetaKeywordList As String = ""
+        '            Dim OtherHeadTags As String = ""
+        '            Dim Adminui As New adminUIController(cpCore)
+        '            '
+        '            If adminContent.AllowMetaContent Then
+        '                CS = cpCore.db.cs_open("Meta Content", "(ContentID=" & editRecord.contentControlId & ")and(RecordID=" & editRecord.id & ")")
+        '                If Not cpCore.db.cs_ok(CS) Then
+        '                    CS = cpCore.db.cs_insertRecord("Meta Content")
+        '                    Call cpCore.db.cs_set(CS, "ContentID", editRecord.contentControlId)
+        '                    Call cpCore.db.cs_set(CS, "RecordID", editRecord.id)
+        '                    Call cpCore.db.cs_save2(CS)
+        '                End If
+        '                If cpCore.db.cs_ok(CS) Then
+        '                    MetaContentID = cpCore.db.cs_getInteger(CS, "ID")
+        '                    PageTitle = cpCore.db.cs_get(CS, "Name")
+        '                    MetaDescription = cpCore.db.cs_get(CS, "MetaDescription")
+        '                    If True Then ' 3.3.930" Then
+        '                        MetaKeywordList = cpCore.db.cs_get(CS, "MetaKeywordList")
+        '                        OtherHeadTags = cpCore.db.cs_get(CS, "OtherHeadTags")
+        '                    ElseIf cpCore.db.cs_isFieldSupported(CS, "OtherHeadTags") Then
+        '                        OtherHeadTags = cpCore.db.cs_get(CS, "OtherHeadTags")
+        '                    End If
+        '                End If
+        '                Call cpCore.db.cs_Close(CS)
+        '                '
+        '                'Call FastString.Add(cpCore.main_GetFormInputHidden("MetaContent.MetaContentID", MetaContentID))
+        '                '
+        '                ' Page Title
+        '                '
+        '                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Page Title</td>")
+        '                Call FastString.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
+        '                If readOnlyField Then
+        '                    Call FastString.Add(PageTitle)
+        '                Else
+        '                    Call FastString.Add(cpCore.html.html_GetFormInputText2("MetaContent.PageTitle", PageTitle))
+        '                End If
+        '                Call FastString.Add("</span></td></tr>")
+        '                '
+        '                ' Meta Description
+        '                '
+        '                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Meta Description</td>")
+        '                Call FastString.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
+        '                If readOnlyField Then
+        '                    Call FastString.Add(MetaDescription)
+        '                Else
+        '                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.MetaDescription", MetaDescription, 10))
+        '                End If
+        '                Call FastString.Add("</span></td></tr>")
+        '                '
+        '                ' Meta Keyword List
+        '                '
+        '                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Meta Keyword List</td>")
+        '                Call FastString.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
+        '                If readOnlyField Then
+        '                    Call FastString.Add(MetaKeywordList)
+        '                Else
+        '                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.MetaKeywordList", MetaKeywordList, 10))
+        '                End If
+        '                Call FastString.Add("</span></td></tr>")
+        '                '
+        '                ' Meta Keywords, Shared
+        '                '
+        '                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Shared Meta Keywords</td>")
+        '                Call FastString.Add("<td class=""ccAdminEditField"" colspan=""2"">")
+        '                Call FastString.Add(cpCore.html.getInputCheckList("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField))
+        '                'Call FastString.Add(cpCore.html.getInputCheckListCategories("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField, "Meta Keywords"))
+        '                Call FastString.Add("</td></tr>")
+        '                '
+        '                ' Other Head Tags
+        '                '
+        '                Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Other Head Tags</td>")
+        '                Call FastString.Add("<td class=""ccAdminEditField"" colspan=""2"">" & SpanClassAdminNormal)
+        '                If readOnlyField Then
+        '                    Call FastString.Add(OtherHeadTags)
+        '                Else
+        '                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.OtherHeadTags", OtherHeadTags, 10))
+        '                End If
+        '                Call FastString.Add("</span></td></tr>")
+        '                '
+        '                s = "" _
+        '                    & Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose _
+        '                    & cpCore.html.html_GetFormInputHidden("MetaContent.MetaContentID", MetaContentID) _
+        '                    & ""
+        '                '
+        '                GetForm_Edit_MetaContent = Adminui.GetEditPanel((Not allowAdminTabs), "Meta Content", "Meta Tags available for pages using this content", s)
+        '                EditSectionPanelCount = EditSectionPanelCount + 1
+        '                '
+        '                FastString = Nothing
+        '            End If
+        '            '
+        '            Exit Function
+        '            '
+        'ErrorTrap:
+        '            FastString = Nothing
+        '            Call handleLegacyClassError3("GetForm_Edit_MetaContent")
+        '        End Function
         '
         '========================================================================
         ' Print the Email form Group associations
@@ -9661,7 +9661,7 @@ ErrorTrap:
                             Call SaveEditRecord(adminContent, editRecord)
                             Call LoadContentTrackingDataBase(adminContent, editRecord)
                             Call LoadContentTrackingResponse(adminContent, editRecord)
-                            Call LoadAndSaveMetaContent()
+                            'Call LoadAndSaveMetaContent()
                             Call SaveLinkAlias(adminContent, editRecord)
                             'Call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
@@ -9673,7 +9673,7 @@ ErrorTrap:
                             Call LoadContentTrackingDataBase(adminContent, editRecord)
                             Call LoadContentTrackingResponse(adminContent, editRecord)
                             'Call LoadAndSaveCalendarEvents
-                            Call LoadAndSaveMetaContent()
+                            'Call LoadAndSaveMetaContent()
                             Call cpCore.html.main_ProcessCheckList("LibraryFolderRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID")
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
@@ -9708,7 +9708,7 @@ ErrorTrap:
                             Call LoadContentTrackingResponse(adminContent, editRecord)
                             Call LoadAndSaveContentGroupRules(editRecord.id)
                             'Call LoadAndSaveCalendarEvents
-                            Call LoadAndSaveMetaContent()
+                            'Call LoadAndSaveMetaContent()
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                             'Dim EditorStyleRulesFilename As String
@@ -9720,7 +9720,7 @@ ErrorTrap:
                             Call LoadContentTrackingDataBase(adminContent, editRecord)
                             Call LoadContentTrackingResponse(adminContent, editRecord)
                             'Call LoadAndSaveCalendarEvents
-                            Call LoadAndSaveMetaContent()
+                            'Call LoadAndSaveMetaContent()
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                             '
@@ -9758,7 +9758,7 @@ ErrorTrap:
                             Call LoadContentTrackingDataBase(adminContent, editRecord)
                             Call LoadContentTrackingResponse(adminContent, editRecord)
                             'Call LoadAndSaveCalendarEvents
-                            Call LoadAndSaveMetaContent()
+                            'Call LoadAndSaveMetaContent()
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                     End Select

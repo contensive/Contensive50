@@ -11,7 +11,7 @@ Imports Contensive.Core.Models.Entity
 '
 Namespace Contensive.Addons
     '
-    Public Class addon_loginClass
+    Public Class loginPageClass
         Inherits Contensive.BaseClasses.AddonBaseClass
         '
         '====================================================================================================
@@ -19,7 +19,7 @@ Namespace Contensive.Addons
         '   sets cp from argument For use In calls To other objects, Then cpCore because cp cannot be used since that would be a circular depenancy
         '====================================================================================================
         '
-        Private cp As CPClass                   ' local cp set in constructor
+        'Private cp As CPClass                   ' local cp set in constructor
         Private cpCore As coreClass           ' cpCore -- short term, this is the migration solution from a built-in tool, to an addon
         '
         ' -- tmp solution
@@ -36,7 +36,9 @@ Namespace Contensive.Addons
         Public Overrides Function execute(cp As Contensive.BaseClasses.CPBaseClass) As Object
             Dim returnHtml As String = ""
             Try
-                '
+                Dim processor As CPClass = DirectCast(cp, CPClass)
+                Dim cpCore As coreClass = processor.core
+                returnHtml = getLoginPage(False)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try
@@ -84,8 +86,8 @@ Namespace Contensive.Addons
                     & htmlIndent(Body) _
                     & "</div>"
                 '
-                Call cpCore.html.main_SetMetaContent(0, 0)
-                Call cpCore.html.main_AddPagetitle2("Login", "loginPage")
+                Call cpCore.doc.setMetaContent(0, 0)
+                Call cpCore.html.doc_AddPagetitle2("Login", "loginPage")
                 bodyTag = TemplateDefaultBodyTag
                 returnREsult = cpCore.html.getHtmlDoc(Body, bodyTag, True, True, False, True)
             Catch ex As Exception
