@@ -221,7 +221,7 @@ Namespace Contensive.Core.Controllers
                                 .EditorGroupName = genericController.encodeText(row.Item(18))
                                 .AllowContentTracking = genericController.EncodeBoolean(row.Item(19))
                                 .AllowTopicRules = genericController.EncodeBoolean(row.Item(20))
-                                .AllowMetaContent = genericController.EncodeBoolean(row.Item(21))
+                                ' .AllowMetaContent = genericController.EncodeBoolean(row.Item(21))
                                 '
                                 .ActiveOnly = True
                                 .AliasID = "ID"
@@ -1442,19 +1442,17 @@ ErrorTrap:
         '       called from upgrade and DeveloperTools
         '========================================================================
         '
-        Public Function createContent(ByVal Active As Boolean, datasource As dataSourceModel, ByVal TableName As String, ByVal contentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "", Optional clearMetaCache As Boolean = False) As Integer
+        Public Function createContent(ByVal Active As Boolean, datasource As dataSourceModel, ByVal TableName As String, ByVal contentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal ignore1 As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "", Optional clearMetaCache As Boolean = False) As Integer
             Dim returnContentId As Integer = 0
             Try
                 '
                 Dim ContentIsBaseContent As Boolean
                 Dim NewGuid As String
-                Dim SupportsGuid As Boolean
                 Dim LcContentGuid As String
                 Dim SQL As String
                 Dim parentId As Integer
                 Dim dt As DataTable
                 Dim TableID As Integer
-                'Dim DataSourceID As Integer
                 Dim iDefaultSortMethod As String
                 Dim DefaultSortMethodID As Integer
                 Dim CDefFound As Boolean
@@ -1625,29 +1623,23 @@ ErrorTrap:
                             Call sqlList.add("AllowContentTracking", cpCore.db.encodeSQLBoolean(AllowContentTracking))
                             Call sqlList.add("AllowTopicRules", cpCore.db.encodeSQLBoolean(AllowTopicRules))
                             Call sqlList.add("AllowContentChildTool", cpCore.db.encodeSQLBoolean(AllowContentChildTool))
-                            Call sqlList.add("AllowMetaContent", cpCore.db.encodeSQLBoolean(AllowMetaContent))
+                            'Call sqlList.add("AllowMetaContent", cpCore.db.encodeSQLBoolean(ignore1))
                             Call sqlList.add("IconLink", cpCore.db.encodeSQLText(encodeEmptyText(IconLink, "")))
                             Call sqlList.add("IconHeight", cpCore.db.encodeSQLNumber(IconHeight))
                             Call sqlList.add("IconWidth", cpCore.db.encodeSQLNumber(IconWidth))
                             Call sqlList.add("IconSprites", cpCore.db.encodeSQLNumber(IconSprites))
                             Call sqlList.add("installedByCollectionid", cpCore.db.encodeSQLNumber(InstalledByCollectionID))
-                            If SupportsGuid Then
-                                If (LcContentGuid = "") And (NewGuid <> "") Then
-                                    '
-                                    ' hard one - only update guid if the tables supports it, and it the new guid is not blank
-                                    ' if the new guid does no match te old guid
-                                    '
-                                    Call sqlList.add("ccGuid", cpCore.db.encodeSQLText(NewGuid))
-                                ElseIf (NewGuid <> "") And (LcContentGuid <> genericController.vbLCase(NewGuid)) Then
-                                    '
-                                    ' new guid does not match current guid
-                                    '
-                                    'cpCore.AppendLog("upgrading cdef [" & ContentName & "], the guid was not updated because the current guid [" & LcContentGuid & "] is not empty, and it did not match the new guid [" & genericController.vbLCase(NewGuid) & "]")
-                                    'Call AppendLog2(cpCore,appEnvironment.name, "upgrading cdef [" & ContentName & "], the guid was not updated because the current guid [" & LcContentGuid & "] is not empty, and it did not match the new guid [" & genericController.vbLCase(NewGuid) & "]", "dll", "cpCoreClass", "csv_CreateContent3", 0, "", "", False, True, "", "", "")
-                                End If
-                            End If
-                            If returnContentId = 54 Then
-                                returnContentId = returnContentId
+                            If (LcContentGuid = "") And (NewGuid <> "") Then
+                                '
+                                ' hard one - only update guid if the tables supports it, and it the new guid is not blank
+                                ' if the new guid does no match te old guid
+                                '
+                                Call sqlList.add("ccGuid", cpCore.db.encodeSQLText(NewGuid))
+                            ElseIf (NewGuid <> "") And (LcContentGuid <> genericController.vbLCase(NewGuid)) Then
+                                '
+                                ' installing content definition with matching name, but different guid -- this is an error that needs to be fixed
+                                '
+                                cpCore.handleException(New ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" & contentName & "], newGuid [" & NewGuid & "], installedGuid [" & LcContentGuid & "] "))
                             End If
                             Call cpCore.db.updateTableRecord("Default", "ccContent", "ID=" & returnContentId, sqlList)
                             '

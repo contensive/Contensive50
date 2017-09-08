@@ -435,6 +435,7 @@
     <Compile Include="Models\Entity\addonContentFieldTypeRulesModel.vb" />
     <Compile Include="Models\Entity\addonPageRules.vb" />
     <Compile Include="Models\Entity\AddonCollectionModel.vb" />
+    <Compile Include="Models\Entity\contentModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />
@@ -513,7 +514,7 @@
     <Compile Include="Models\Entity\groupModel.vb" />
     <Compile Include="Models\Entity\dataSourceModel.vb" />
     <Compile Include="Models\Entity\sitePropertyModel.vb" />
-    <Compile Include="Models\Entity\contentModel.vb" />
+    <Compile Include="Models\Entity\contentModelx.vb" />
     <Compile Include="Models\Context\miniCollectionModel.vb" />
     <Compile Include="Models\Entity\domainModel.vb" />
     <Compile Include="Models\Entity\pageTemplateModel.vb" />

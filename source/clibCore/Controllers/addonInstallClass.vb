@@ -4128,7 +4128,7 @@ Namespace Contensive.Core
                                                     .AllowContentChildTool = GetXMLAttributeBoolean(Found, CDef_Node, "AllowContentChildTool", DefaultCDef.AllowContentChildTool)
                                                     .AllowContentTracking = GetXMLAttributeBoolean(Found, CDef_Node, "AllowContentTracking", DefaultCDef.AllowContentTracking)
                                                     .AllowDelete = GetXMLAttributeBoolean(Found, CDef_Node, "AllowDelete", DefaultCDef.AllowDelete)
-                                                    .AllowMetaContent = GetXMLAttributeBoolean(Found, CDef_Node, "AllowMetaContent", DefaultCDef.AllowMetaContent)
+                                                    '.AllowMetaContent = GetXMLAttributeBoolean(Found, CDef_Node, "AllowMetaContent", DefaultCDef.AllowMetaContent)
                                                     .AllowTopicRules = GetXMLAttributeBoolean(Found, CDef_Node, "AllowTopicRules", DefaultCDef.AllowTopicRules)
                                                     .AllowWorkflowAuthoring = GetXMLAttributeBoolean(Found, CDef_Node, "AllowWorkflowAuthoring", DefaultCDef.AllowWorkflowAuthoring)
                                                     .AuthoringDataSourceName = GetXMLAttribute(Found, CDef_Node, "AuthoringDataSourceName", DefaultCDef.AuthoringDataSourceName)
@@ -4564,7 +4564,6 @@ Namespace Contensive.Core
                 Dim ContentName As String
                 Dim NodeCount As Integer
                 Dim TableName As String
-                Dim UsedTables As String
                 Dim RequireReload As Boolean
                 Dim Found As Boolean
                 ' Dim builder As New coreBuilderClass(cpCore)
@@ -4588,57 +4587,55 @@ Namespace Contensive.Core
                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 1: create SQL tables in default datasource")
                 '----------------------------------------------------------------------------------------------------------------------
                 '
-                UsedTables = ""
                 With Collection
-                    For Each keypairvalue In .CDef
-                        Dim workingCdef As cdefModel = keypairvalue.Value
-                        ContentName = workingCdef.Name
-                        With workingCdef
-                            If .dataChanged Then
-                                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating sql table [" & .ContentTableName & "], datasource [" & .ContentDataSourceName & "]")
-                                If genericController.vbLCase(.ContentDataSourceName) = "default" Or .ContentDataSourceName = "" Then
-                                    TableName = .ContentTableName
-                                    If genericController.vbInstr(1, "," & UsedTables & ",", "," & TableName & ",", vbTextCompare) <> 0 Then
-                                        TableName = TableName
-                                    Else
-                                        UsedTables = UsedTables & "," & TableName
-                                        Call cpCore.db.createSQLTable(.ContentDataSourceName, TableName)
+                    If True Then
+                        Dim UsedTables As String = ""
+                        For Each keypairvalue In .CDef
+                            Dim workingCdef As cdefModel = keypairvalue.Value
+                            ContentName = workingCdef.Name
+                            With workingCdef
+                                If .dataChanged Then
+                                    Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating sql table [" & .ContentTableName & "], datasource [" & .ContentDataSourceName & "]")
+                                    If genericController.vbLCase(.ContentDataSourceName) = "default" Or .ContentDataSourceName = "" Then
+                                        TableName = .ContentTableName
+                                        If genericController.vbInstr(1, "," & UsedTables & ",", "," & TableName & ",", vbTextCompare) <> 0 Then
+                                            TableName = TableName
+                                        Else
+                                            UsedTables = UsedTables & "," & TableName
+                                            Call cpCore.db.createSQLTable(.ContentDataSourceName, TableName)
+                                        End If
                                     End If
                                 End If
-                            End If
-                        End With
-                    Next
-                    cpCore.metaData.clear()
-                    cpCore.cache.invalidateAll()
+                            End With
+                        Next
+                        cpCore.metaData.clear()
+                        cpCore.cache.invalidateAll()
+                    End If
                     '
                     '----------------------------------------------------------------------------------------------------------------------
                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 2: Verify all CDef names in ccContent so GetContentID calls will succeed")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     NodeCount = 0
-                    UsedTables = ""
-                    SQL = "SELECT Name from ccContent where (active<>0)"
-                    rs = cpCore.db.executeSql(SQL)
+                    Dim installedContentList As New List(Of String)
+                    rs = cpCore.db.executeSql("SELECT Name from ccContent where (active<>0)")
                     If isDataTableOk(rs) Then
-                        UsedTables = convertDataTableColumntoItemList(rs)
+                        installedContentList = New List(Of String)(convertDataTableColumntoItemList(rs))
                     End If
                     rs.Dispose()
                     '
                     For Each keypairvalue In .CDef
-                        Dim workingCdef As cdefModel = keypairvalue.Value
-                        ContentName = workingCdef.Name
-                        If workingCdef.dataChanged Then
-                            With workingCdef
+                        With keypairvalue.Value
+                            If .dataChanged Then
                                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef name [" & .Name & "]")
-                                ContentName = .Name
-                                If genericController.vbInstr(1, "," & UsedTables & ",", "," & ContentName & ",", vbTextCompare) = 0 Then
-                                    SQL = "Insert into ccContent (name,active,createkey)values(" & cpCore.db.encodeSQLText(ContentName) & ",1,0);"
+                                If (Not installedContentList.Contains(.Name.ToLower())) Then
+                                    SQL = "Insert into ccContent (name,ccguid,active,createkey)values(" & cpCore.db.encodeSQLText(.Name) & "," & cpCore.db.encodeSQLText(.guid) & ",1,0);"
                                     Call cpCore.db.executeSql(SQL)
-                                    UsedTables = UsedTables & "," & ContentName
+                                    installedContentList.Add(.Name.ToLower())
                                     RequireReload = True
                                 End If
-                            End With
-                        End If
+                            End If
+                        End With
                     Next
                     cpCore.metaData.clear()
                     cpCore.cache.invalidateAll()
@@ -4657,17 +4654,10 @@ Namespace Contensive.Core
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     For Each keypairvalue In .CDef
-                        Dim workingCdef As cdefModel = keypairvalue.Value
-                        ContentName = workingCdef.Name
-                        With workingCdef
-                            ContentName = genericController.vbLCase(.Name)
-                            If ContentName = "content" Then
+                        With keypairvalue.Value
+                            If .Name.ToLower() = "content" Then
                                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
-                                '
-                                ' stop the errors here, so a bad field does not block the upgrade
-                                '
-                                'On Error Resume Next
-                                Call installCollection_BuildDbFromCollection_AddCDefToDb(workingCdef, BuildVersion)
+                                Call installCollection_BuildDbFromCollection_AddCDefToDb(keypairvalue.Value, BuildVersion)
                                 RequireReload = True
                                 Exit For
                             End If
@@ -4682,24 +4672,15 @@ Namespace Contensive.Core
                     '
                     RequireReload = False
                     For Each keypairvalue In .CDef
-                        Dim workingCdef As cdefModel = keypairvalue.Value
-                        ContentName = workingCdef.Name
-                        If workingCdef.dataChanged Or workingCdef.includesAFieldChange Then
-                            With workingCdef
-                                If ContentName.ToLower() = "people" Then
-                                    ContentName = ContentName
-                                End If
-                                If genericController.vbLCase(ContentName) <> "content" Then
+                        With keypairvalue.Value
+                            If .dataChanged Or .includesAFieldChange Then
+                                If (.Name.ToLower() <> "content") Then
                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
-                                    '
-                                    ' stop the errors here, so a bad field does not block the upgrade
-                                    '
-                                    'On Error Resume Next
-                                    Call installCollection_BuildDbFromCollection_AddCDefToDb(workingCdef, cpCore.siteProperties.dataBuildVersion)
+                                    Call installCollection_BuildDbFromCollection_AddCDefToDb(keypairvalue.Value, BuildVersion)
                                     RequireReload = True
                                 End If
-                            End With
-                        End If
+                            End If
+                        End With
                     Next
                     cpCore.metaData.clear()
                     cpCore.cache.invalidateAll()
@@ -5061,7 +5042,7 @@ Namespace Contensive.Core
                                     , .AllowContentTracking _
                                     , .AllowTopicRules _
                                     , .AllowContentChildTool _
-                                    , .AllowMetaContent _
+                                    , False _
                                     , .IconLink _
                                     , .IconWidth _
                                     , .IconHeight _
@@ -5297,8 +5278,8 @@ Namespace Contensive.Core
                                 If Not okToUpdateDstFromSrc Then n = "AllowDelete"
                                 okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.AllowDelete <> srcCollectionCdef.AllowDelete)
                                 '
-                                If Not okToUpdateDstFromSrc Then n = "AllowMetaContent"
-                                okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.AllowMetaContent <> srcCollectionCdef.AllowMetaContent)
+                                'If Not okToUpdateDstFromSrc Then n = "AllowMetaContent"
+                                'okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.AllowMetaContent <> srcCollectionCdef.AllowMetaContent)
                                 '
                                 If Not okToUpdateDstFromSrc Then n = "AllowTopicRules"
                                 okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.AllowTopicRules <> srcCollectionCdef.AllowTopicRules)
@@ -5407,7 +5388,7 @@ Namespace Contensive.Core
                             .AllowContentChildTool = srcCollectionCdef.AllowContentChildTool
                             .AllowContentTracking = srcCollectionCdef.AllowContentTracking
                             .AllowDelete = srcCollectionCdef.AllowDelete
-                            .AllowMetaContent = srcCollectionCdef.AllowMetaContent
+                            '.AllowMetaContent = srcCollectionCdef.AllowMetaContent
                             .AllowTopicRules = srcCollectionCdef.AllowTopicRules
                             .AllowWorkflowAuthoring = srcCollectionCdef.AllowWorkflowAuthoring
                             .AuthoringDataSourceName = srcCollectionCdef.AuthoringDataSourceName

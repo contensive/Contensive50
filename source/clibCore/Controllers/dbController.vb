@@ -2137,10 +2137,9 @@ Namespace Contensive.Core.Controllers
         ''' <param name="OriginalFilename"></param>
         ''' <param name="ContentName"></param>
         ''' <returns></returns>
-        Public Function cs_getFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "") As String
+        Public Function cs_getFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "", Optional fieldTypeId As Integer = 0) As String
             Dim returnFilename As String = ""
             Try
-                Dim fieldTypeId As Integer
                 Dim TableName As String
                 Dim RecordID As Integer
                 Dim fieldNameUpper As String
@@ -2219,14 +2218,26 @@ Namespace Contensive.Core.Controllers
                             '
                             ' ----- Create filename
                             '
-                            If ContentName = "" Then
-                                If OriginalFilename = "" Then
-                                    fieldTypeId = FieldTypeIdText
+                            If fieldTypeId = 0 Then
+                                If ContentName = "" Then
+                                    If OriginalFilename = "" Then
+                                        fieldTypeId = FieldTypeIdText
+                                    Else
+                                        fieldTypeId = FieldTypeIdFile
+                                    End If
+                                ElseIf (.Updateable) Then
+                                    '
+                                    ' -- get from cdef
+                                    fieldTypeId = .CDef.fields(FieldName.ToLower()).fieldTypeId
                                 Else
-                                    fieldTypeId = FieldTypeIdFile
+                                    '
+                                    ' -- else assume text
+                                    If OriginalFilename = "" Then
+                                        fieldTypeId = FieldTypeIdText
+                                    Else
+                                        fieldTypeId = FieldTypeIdFile
+                                    End If
                                 End If
-                            Else
-                                fieldTypeId = .CDef.fields(FieldName.ToLower()).fieldTypeId
                             End If
                             returnFilename = genericController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
                             ' 20160607 - no, if you call the cs_set, it stack-overflows. this is a get, so do not save it here.
@@ -2288,10 +2299,6 @@ Namespace Contensive.Core.Controllers
         '
         Public Sub SetCSTextFile(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal Copy As String, ByVal ContentName As String)
             Try
-                Dim Filename As String
-                Dim OldFilename As String
-                Dim OldCopy As String
-                '
                 If Not cs_ok(CSPointer) Then
                     Throw New ArgumentException("dataset is not valid")
                 ElseIf String.IsNullOrEmpty(FieldName) Then
@@ -2303,8 +2310,8 @@ Namespace Contensive.Core.Controllers
                         If Not .Updateable Then
                             Throw New ApplicationException("Attempting To update an unupdateable data set")
                         Else
-                            OldFilename = cs_getText(CSPointer, FieldName)
-                            Filename = cs_getFilename(CSPointer, FieldName, "", ContentName)
+                            Dim OldFilename As String = cs_getText(CSPointer, FieldName)
+                            Dim Filename As String = cs_getFilename(CSPointer, FieldName, "", ContentName, FieldTypeIdFileTextPrivate)
                             If OldFilename <> Filename Then
                                 '
                                 ' Filename changed, mark record changed
@@ -2312,7 +2319,7 @@ Namespace Contensive.Core.Controllers
                                 Call cpCore.privateFiles.saveFile(Filename, Copy)
                                 Call cs_set(CSPointer, FieldName, Filename)
                             Else
-                                OldCopy = cpCore.cdnFiles.readFile(Filename)
+                                Dim OldCopy As String = cpCore.cdnFiles.readFile(Filename)
                                 If OldCopy <> Copy Then
                                     '
                                     ' copy changed, mark record changed
@@ -2838,16 +2845,17 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' ----- fields to copy
                                 '
-                                Select Case cs_getFieldTypeId(CSSource, FieldName)
+                                Dim sourceFieldTypeId As Integer = cs_getFieldTypeId(CSSource, FieldName)
+                                Select Case sourceFieldTypeId
                                     Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                     Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                         '
                                         ' ----- cdn file
                                         '
-                                        SourceFilename = cs_getFilename(CSSource, FieldName, "")
+                                        SourceFilename = cs_getFilename(CSSource, FieldName, "", contentSetStore(CSDestination).CDef.Name, sourceFieldTypeId)
                                         'SourceFilename = (csv_cs_getText(CSSource, FieldName))
                                         If (SourceFilename <> "") Then
-                                            DestFilename = cs_getFilename(CSDestination, FieldName, "")
+                                            DestFilename = cs_getFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId)
                                             'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                             Call cs_set(CSDestination, FieldName, DestFilename)
                                             Call cpCore.cdnFiles.copyFile(SourceFilename, DestFilename)
@@ -2856,10 +2864,10 @@ Namespace Contensive.Core.Controllers
                                         '
                                         ' ----- private file
                                         '
-                                        SourceFilename = cs_getFilename(CSSource, FieldName, "")
+                                        SourceFilename = cs_getFilename(CSSource, FieldName, "", DestContentName, sourceFieldTypeId)
                                         'SourceFilename = (csv_cs_getText(CSSource, FieldName))
                                         If (SourceFilename <> "") Then
-                                            DestFilename = cs_getFilename(CSDestination, FieldName, "")
+                                            DestFilename = cs_getFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId)
                                             'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                             Call cs_set(CSDestination, FieldName, DestFilename)
                                             Call cpCore.privateFiles.copyFile(SourceFilename, DestFilename)
@@ -3175,7 +3183,7 @@ Namespace Contensive.Core.Controllers
                                                     End If
                                                 Else
                                                     If fileNameNoExt = "" Then
-                                                        fileNameNoExt = cs_getFilename(CSPointer, FieldName, "", ContentName)
+                                                        fileNameNoExt = cs_getFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId)
                                                     End If
                                                     Call cpCore.privateFiles.saveFile(fileNameNoExt, FieldValue)
                                                     'Call publicFiles.SaveFile(fileNameNoExt, FieldValue)
@@ -3205,7 +3213,7 @@ Namespace Contensive.Core.Controllers
                                                     End If
                                                 Else
                                                     If PathFilename = "" Then
-                                                        PathFilename = cs_getFilename(CSPointer, FieldNameLc, "", ContentName)
+                                                        PathFilename = cs_getFilename(CSPointer, FieldNameLc, "", ContentName, field.fieldTypeId)
                                                     End If
                                                     If Left(PathFilename, 1) = "/" Then
                                                         '
@@ -4435,7 +4443,7 @@ Namespace Contensive.Core.Controllers
                         End If
                 End Select
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected exception")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected exception")
             End Try
             Return returnFieldTypeName
         End Function

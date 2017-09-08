@@ -237,10 +237,10 @@ Namespace Contensive.Core
         End Function
         '
         '====================================================================================================
-        Public Function getFilename(ByVal FieldName As String, Optional ByVal OriginalFilename As String = "", Optional ByVal ContentName As String = "") As String
+        Public Function getFilename(ByVal FieldName As String, Optional ByVal OriginalFilename As String = "", Optional ByVal ContentName As String = "", Optional fieldTypeId As Integer = 0) As String
             Dim result As String = String.Empty
             Try
-                result = cpCore.db.cs_getFilename(csPtr, FieldName, OriginalFilename, ContentName)
+                result = cpCore.db.cs_getFilename(csPtr, FieldName, OriginalFilename, ContentName, fieldTypeId)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -419,7 +419,7 @@ Namespace Contensive.Core
                         '
                         Filename = cpcore.docProperties.getText(LocalRequestName)
                         If Filename <> "" Then
-                            Path = cpcore.db.cs_getFilename(CSPointer, FieldName, Filename)
+                            Path = cpcore.db.cs_getFilename(CSPointer, FieldName, Filename,, cpcore.db.cs_getFieldTypeId(CSPointer, FieldName))
                             Call cpcore.db.cs_set(CSPointer, FieldName, Path)
                             Path = genericController.vbReplace(Path, "\", "/")
                             Path = genericController.vbReplace(Path, "/" & Filename, "")

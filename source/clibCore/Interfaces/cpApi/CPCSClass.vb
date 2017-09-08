@@ -74,7 +74,7 @@ Namespace Contensive.Core
                 CSPointer = cpCore.db.cs_insertRecord(ContentName, OpeningMemberID)
                 success = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.insert")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.insert")
             End Try
             Return success
         End Function
@@ -91,7 +91,7 @@ Namespace Contensive.Core
                 CSPointer = cpCore.db.cs_open(ContentName, "id=" & recordId, , ActiveOnly, , , , SelectFieldList, 1, 1)
                 success = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.OpenRecord")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenRecord")
             End Try
             Return success
         End Function
@@ -109,7 +109,7 @@ Namespace Contensive.Core
                 CSPointer = cpCore.db.cs_open(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
                 success = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.Open") : Throw
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Open") : Throw
             End Try
             Return success
         End Function
@@ -126,7 +126,7 @@ Namespace Contensive.Core
                 CSPointer = cpCore.db.cs_openGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
                 success = OK()
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.OpenGroupUsers")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenGroupUsers")
             End Try
             Return success
         End Function
@@ -145,7 +145,7 @@ Namespace Contensive.Core
                 CSPointer = cpCore.db.cs_openGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
                 success = OK()
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.OpenGroupUsers")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenGroupUsers")
             End Try
             Return success
         End Function
@@ -171,7 +171,7 @@ Namespace Contensive.Core
                 CSPointer = cpCore.db.cs_openCsSql_rev("default", sql)
                 success = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.OpenSQL")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenSQL")
             End Try
             Return success
         End Function
@@ -196,7 +196,7 @@ Namespace Contensive.Core
                 End If
                 success = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.OpenSQL")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenSQL")
             End Try
             Return success
         End Function
@@ -221,7 +221,7 @@ Namespace Contensive.Core
                 End If
                 success = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.OpenSQL")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenSQL")
             End Try
             Return success
         End Function
@@ -234,7 +234,7 @@ Namespace Contensive.Core
                     CSPointer = -1
                 End If
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.Close")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Close")
             End Try
         End Sub
 
@@ -250,7 +250,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.db.cs_deleteRecord(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.Delete")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Delete")
             End Try
         End Sub
 
@@ -260,7 +260,7 @@ Namespace Contensive.Core
             Try
                 result = cpCore.db.cs_isFieldSupported(CSPointer, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.FieldOK")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.FieldOK")
             End Try
             Return result
         End Function
@@ -269,7 +269,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.db.cs_goFirst(CSPointer, False)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.Delete")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Delete")
             End Try
         End Sub
         '
@@ -284,7 +284,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetAddLink")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetAddLink")
                 result = String.Empty
             End Try
             Return result
@@ -298,7 +298,7 @@ Namespace Contensive.Core
             Try
                 result = cpCore.db.cs_getBoolean(CSPointer, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetBoolean")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetBoolean")
             End Try
             Return result
         End Function
@@ -311,7 +311,7 @@ Namespace Contensive.Core
             Try
                 result = cpCore.db.cs_getDate(CSPointer, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetDate")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetDate")
             End Try
             Return result
         End Function
@@ -324,7 +324,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetEditLink")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetEditLink")
                 result = String.Empty
             End Try
             Return result
@@ -342,7 +342,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetFilename")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetFilename")
                 result = String.Empty
             End Try
             Return result
@@ -356,7 +356,7 @@ Namespace Contensive.Core
             Try
                 result = cpCore.db.cs_getInteger(CSPointer, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetInteger")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetInteger")
             End Try
             Return result
         End Function
@@ -369,7 +369,7 @@ Namespace Contensive.Core
             Try
                 result = cpCore.db.cs_getNumber(CSPointer, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetNumber")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetNumber")
             End Try
             Return result
         End Function
@@ -382,7 +382,7 @@ Namespace Contensive.Core
             Try
                 result = cpCore.db.cs_getRowCount(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetRowCount")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetRowCount")
             End Try
             Return result
         End Function
@@ -399,7 +399,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetSQL")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetSQL")
                 result = String.Empty
             End Try
             Return result
@@ -417,7 +417,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetText")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetText")
                 result = String.Empty
             End Try
             Return result
@@ -441,7 +441,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GetTextFile")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetTextFile")
             End Try
             Return result
         End Function
@@ -452,7 +452,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.db.cs_goNext(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.GoNext")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GoNext")
             End Try
         End Sub
         '
@@ -464,7 +464,7 @@ Namespace Contensive.Core
                 Call cpCore.db.cs_goNext(CSPointer)
                 result = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.NextOK")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.NextOK")
             End Try
             Return result
         End Function
@@ -477,7 +477,7 @@ Namespace Contensive.Core
             Try
                 result = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.OK")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OK")
             End Try
             Return result
         End Function
@@ -488,7 +488,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.db.cs_save2(CSPointer)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.Save")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Save")
             End Try
         End Sub
         '
@@ -498,7 +498,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.db.cs_set(CSPointer, FieldName, FieldValue)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.SetField")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetField")
             End Try
         End Sub
         '
@@ -508,7 +508,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.db.cs_set(CSPointer, FieldName, FieldValue)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.SetField")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetField")
             End Try
         End Sub
 
@@ -516,7 +516,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.db.SetCSTextFile(CSPointer, FieldName, Copy, ContentName)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.SetFile")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetFile")
             End Try
         End Sub
 
@@ -525,7 +525,7 @@ Namespace Contensive.Core
             Try
                 Call csController.cs_setFormInput(cpCore, CSPointer, FieldName, RequestName)
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in cs.SetFormInput")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetFormInput")
             End Try
         End Sub
         Private Sub appendDebugLog(ByVal copy As String)

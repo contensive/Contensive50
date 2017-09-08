@@ -1,3 +1,7 @@
+
+Option Explicit On
+Option Strict On
+
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 Imports Contensive.Core.Models.Entity
@@ -109,7 +113,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function GetEditLink(ByVal ContentName As String, ByVal RecordID As String, ByVal AllowCut As Boolean, ByVal RecordName As String, ByVal IsEditing As Boolean) As String
             If True Then
-                Return cpCore.html.main_GetRecordEditLink2(ContentName, RecordID, AllowCut, RecordName, IsEditing)
+                Return cpCore.html.main_GetRecordEditLink2(ContentName, genericController.EncodeInteger(RecordID), AllowCut, RecordName, IsEditing)
             Else
                 Return ""
             End If
@@ -165,14 +169,14 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Function IsLocked(ByVal ContentName As String, ByVal RecordID As String) As Boolean 'Inherits CPContentBaseClass.IsLocked
-            Return cpCore.workflow.isRecordLocked(ContentName, RecordID, 0)
+        Public Overrides Function IsLocked(ByVal ContentName As String, ByVal RecordID As String) As Boolean
+            Return cpCore.workflow.isRecordLocked(ContentName, genericController.EncodeInteger(RecordID), 0)
         End Function
         '
         '====================================================================================================
         '
-        Public Overrides Function IsChildContent(ByVal ChildContentID As String, ByVal ParentContentID As String) As Boolean 'Inherits CPContentBaseClass.IsChildContent
-            Return cpCore.metaData.isWithinContent(ChildContentID, ParentContentID)
+        Public Overrides Function IsChildContent(ByVal ChildContentID As String, ByVal ParentContentID As String) As Boolean
+            Return cpCore.metaData.isWithinContent(genericController.EncodeInteger(ChildContentID), genericController.EncodeInteger(ParentContentID))
         End Function
         '
         '====================================================================================================
@@ -220,7 +224,7 @@ Namespace Contensive.Core
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in getLayout")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in getLayout")
             End Try
             Return result
         End Function
@@ -237,7 +241,7 @@ Namespace Contensive.Core
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in AddRecord")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in AddRecord")
             End Try
             Return recordId
         End Function
@@ -257,7 +261,7 @@ Namespace Contensive.Core
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in AddRecord")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in AddRecord")
             End Try
             Return recordId
         End Function
@@ -292,7 +296,7 @@ Namespace Contensive.Core
             field.indexColumn = 0
             field.indexSortDirection = 0
             field.indexSortOrder = 0
-            field.indexWidth = 0
+            field.indexWidth = ""
             field.installedByCollectionGuid = ""
             field.isBaseField = False
             field.lookupContentID = 0
@@ -311,7 +315,7 @@ Namespace Contensive.Core
             field.ReadOnly = False
             field.RedirectContentID = 0
             field.RedirectContentName(cpCore) = ""
-            field.RedirectID = 0
+            field.RedirectID = ""
             field.RedirectPath = ""
             field.Required = False
             field.Scramble = False
@@ -384,7 +388,7 @@ Namespace Contensive.Core
                     & " align=""absmiddle""" _
                     & "></a>"
             Catch ex As Exception
-                Call cpCore.handleException(ex, "Unexpected error in GetListLink")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected error in GetListLink")
             End Try
             Return returnHtml
         End Function

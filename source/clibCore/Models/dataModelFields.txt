@@ -252,7 +252,6 @@ public AllowAdd as Boolean
 public AllowContentChildTool as Boolean
 public AllowContentTracking as Boolean
 public AllowDelete as Boolean
-public AllowMetaContent as Boolean
 public AllowTopicRules as Boolean
 public AllowWorkflowAuthoring as Boolean
 public AuthoringTableID as Integer
@@ -289,7 +288,6 @@ public SortOrder as String
 .AllowContentChildTool = cs.getBoolean("AllowContentChildTool")
 .AllowContentTracking = cs.getBoolean("AllowContentTracking")
 .AllowDelete = cs.getBoolean("AllowDelete")
-.AllowMetaContent = cs.getBoolean("AllowMetaContent")
 .AllowTopicRules = cs.getBoolean("AllowTopicRules")
 .AllowWorkflowAuthoring = cs.getBoolean("AllowWorkflowAuthoring")
 .AuthoringTableID = cs.getInteger("AuthoringTableID")
@@ -325,7 +323,6 @@ cs.SetField("AllowAdd", AllowAdd.ToString())
 cs.SetField("AllowContentChildTool", AllowContentChildTool.ToString())
 cs.SetField("AllowContentTracking", AllowContentTracking.ToString())
 cs.SetField("AllowDelete", AllowDelete.ToString())
-cs.SetField("AllowMetaContent", AllowMetaContent.ToString())
 cs.SetField("AllowTopicRules", AllowTopicRules.ToString())
 cs.SetField("AllowWorkflowAuthoring", AllowWorkflowAuthoring.ToString())
 cs.SetField("AuthoringTableID", AuthoringTableID.ToString())
@@ -362,7 +359,6 @@ instance.AllowAdd = genericController.EncodeBoolean(.fields("AllowAdd").defaultV
 instance.AllowContentChildTool = genericController.EncodeBoolean(.fields("AllowContentChildTool").defaultValue)
 instance.AllowContentTracking = genericController.EncodeBoolean(.fields("AllowContentTracking").defaultValue)
 instance.AllowDelete = genericController.EncodeBoolean(.fields("AllowDelete").defaultValue)
-instance.AllowMetaContent = genericController.EncodeBoolean(.fields("AllowMetaContent").defaultValue)
 instance.AllowTopicRules = genericController.EncodeBoolean(.fields("AllowTopicRules").defaultValue)
 instance.AllowWorkflowAuthoring = genericController.EncodeBoolean(.fields("AllowWorkflowAuthoring").defaultValue)
 instance.AuthoringTableID = genericController.EncodeInteger(.fields("AuthoringTableID").defaultValue)

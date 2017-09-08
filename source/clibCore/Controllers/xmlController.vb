@@ -53,7 +53,7 @@ Namespace Contensive.Core.Controllers
             '
             Const ContentSelectList = "" _
                 & " id,name,active,adminonly,allowadd" _
-                & ",allowcalendarevents,allowcontentchildtool,allowcontenttracking,allowdelete,allowmetacontent" _
+                & ",allowcalendarevents,allowcontentchildtool,allowcontenttracking,allowdelete,0 as allowmetacontent" _
                 & ",allowtopicrules,AllowWorkflowAuthoring,AuthoringTableID" _
                 & ",ContentTableID,DefaultSortMethodID,DeveloperOnly,DropDownFieldList" _
                 & ",EditorGroupID,ParentID,ccGuid,IsBaseContent" _
@@ -291,7 +291,7 @@ Namespace Contensive.Core.Controllers
                         sb.Append(" AllowContentChildTool=""" & GetRSXMLAttribute(appName, dr, "AllowContentChildTool") & """")
                         sb.Append(" AllowContentTracking=""" & GetRSXMLAttribute(appName, dr, "AllowContentTracking") & """")
                         sb.Append(" AllowDelete=""" & GetRSXMLAttribute(appName, dr, "AllowDelete") & """")
-                        sb.Append(" AllowMetaContent=""" & GetRSXMLAttribute(appName, dr, "AllowMetaContent") & """")
+                        'sb.Append(" AllowMetaContent=""" & GetRSXMLAttribute(appName, dr, "AllowMetaContent") & """")
                         sb.Append(" AllowTopicRules=""" & GetRSXMLAttribute(appName, dr, "AllowTopicRules") & """")
                         sb.Append(" AllowWorkflowAuthoring=""" & GetRSXMLAttribute(appName, dr, "AllowWorkflowAuthoring") & """")
                         '

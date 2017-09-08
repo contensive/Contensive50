@@ -1,4 +1,7 @@
 ﻿
+Option Strict On
+Option Explicit On
+
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses

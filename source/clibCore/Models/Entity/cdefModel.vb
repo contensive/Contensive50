@@ -47,7 +47,7 @@ Namespace Contensive.Core.Models.Entity
         Public AllowTopicRules As Boolean          ' For admin edit page
         Public AllowContentTracking As Boolean     ' For admin edit page
         Public AllowCalendarEvents As Boolean      ' For admin edit page
-        Public AllowMetaContent As Boolean         ' For admin edit page - Adds the Meta Content Section
+        'Public AllowMetaContent As Boolean         ' For admin edit page - Adds the Meta Content Section
         '
         Public dataChanged As Boolean
         Public includesAFieldChange As Boolean                     ' if any fields().changed, this is set true to

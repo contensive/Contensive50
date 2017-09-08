@@ -369,7 +369,7 @@ Namespace Contensive.Core.Controllers
                             prop.IsFile = True
                             prop.IsForm = True
                             prop.tempfilename = instanceId & "-" & filePtr.ToString() & ".bin"
-                            file.SaveAs(IO.Path.Combine(cpCore.tempFiles.rootLocalPath, prop.tempfilename))
+                            file.SaveAs(cpCore.tempFiles.joinPath(cpCore.tempFiles.rootLocalPath, prop.tempfilename))
                             cpCore.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename)
                             prop.FileSize = CInt(file.ContentLength)
                             cpCore.docProperties.setProperty(formName, prop)

@@ -72,28 +72,20 @@ Namespace Contensive.Core.Models.Entity
         '-- field types
         '
         Public Class fieldTypeTextFile
-
             Public Property filename As String
             Public Property copy As String
-            '    Get
-            '        If (_copy Is Nothing) Then
-            '            _copy = ""
-            '            If (filename IsNot Nothing) Then
-            '                _copy = cpCore.privateFiles.readFile(filename)
-            '                _copyUpdate = False
-            '            End If
-            '        End If
-            '        Return _copy
-            '    End Get
-            '    Set(value As String)
-            '        If (Not _copy.Equals(value)) Then
-            '            _copy = value
-            '            _copyUpdate = True
-            '        End If
-            '    End Set
-            'End Property
-            'Private _copy As String = Nothing
-            'Private _copyUpdate As Boolean = False
+        End Class
+        Public Class fieldTypeJavascriptFile
+            Public Property filename As String
+            Public Property copy As String
+        End Class
+        Public Class fieldTypeCSSFile
+            Public Property filename As String
+            Public Property copy As String
+        End Class
+        Public Class fieldTypHTMLFile
+            Public Property filename As String
+            Public Property copy As String
         End Class
         '
         '====================================================================================================
@@ -336,7 +328,9 @@ Namespace Contensive.Core.Models.Entity
             Try
                 If cs.ok() Then
                     Dim instanceType As Type = GetType(T)
+                    Dim contentName As String = derivedContentName(instanceType)
                     Dim tableName As String = derivedContentTableName(instanceType)
+                    Dim recordId As Integer = cs.getInteger("id")
                     modelInstance = DirectCast(Activator.CreateInstance(instanceType), T)
                     For Each modelProperty As PropertyInfo In modelInstance.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
                         Select Case modelProperty.Name.ToLower()
@@ -354,22 +348,33 @@ Namespace Contensive.Core.Models.Entity
                                     Case "String"
                                         modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), Nothing)
                                     Case "fieldTypeTextFile"
-                                        Dim instanceTextFile As New fieldTypeTextFile
-                                        instanceTextFile.copy = cs.getTextFile(modelProperty.Name)
-                                        instanceTextFile.filename = cs.getFilename(modelProperty.Name)
-                                        modelProperty.SetValue(modelInstance, instanceTextFile)
-
-                                        ''Dim instanceTextFile As fieldTypeTextFile = DirectCast(modelPropertyInstance.GetValue(modelInstance), fieldTypeTextFile)
-
-
-                                        ''
-                                        'Dim filename As String = cs.getText(modelPropertyInstance.Name)
-                                        'Dim filenameProperty As PropertyInfo = modelPropertyInstance.PropertyType.GetProperty("filename")
-                                        'filenameProperty.SetValue(modelPropertyInstance, filename, Nothing)
-                                        ''
-                                        'Dim copy As String = cs.getTextFile(modelPropertyInstance.Name)
-                                        'Dim copyProperty As PropertyInfo = modelPropertyInstance.PropertyType.GetProperty("copy")
-                                        'copyProperty.SetValue(modelPropertyInstance, copy, Nothing)
+                                        Dim instanceFileType As New fieldTypeTextFile
+                                        instanceFileType.copy = cs.getTextFile(modelProperty.Name)
+                                        instanceFileType.filename = cs.getText(modelProperty.Name)
+                                        'If (String.IsNullOrEmpty(instanceFileType.filename)) Then
+                                        '    instanceFileType.filename = genericController.getVirtualRecordPathFilename(tableName, modelProperty.Name.ToLower(), recordId, "", FieldTypeIdFileTextPrivate)
+                                        'End If
+                                        modelProperty.SetValue(modelInstance, instanceFileType)
+                                    Case "fieldTypeJavascriptFile"
+                                        Dim instanceFileType As New fieldTypeJavascriptFile
+                                        instanceFileType.copy = cs.getTextFile(modelProperty.Name)
+                                        instanceFileType.filename = cs.getText(modelProperty.Name)
+                                        'If (String.IsNullOrEmpty(instanceFileType.filename)) Then
+                                        '    instanceFileType.filename = genericController.getVirtualRecordPathFilename(tableName, modelProperty.Name.ToLower(), recordId, "", FieldTypeIdFileJavascript)
+                                        'End If
+                                        modelProperty.SetValue(modelInstance, instanceFileType)
+                                    Case "fieldTypeCSSFile"
+                                        Dim instanceFileType As New fieldTypeCSSFile
+                                        instanceFileType.filename = cs.getText(modelProperty.Name)
+                                        instanceFileType.copy = cs.getTextFile(modelProperty.Name)
+                                        'instanceFileType.filename = genericController.getVirtualRecordPathFilename(tableName, modelProperty.Name.ToLower(), recordId, "", FieldTypeIdFileCSS)
+                                        modelProperty.SetValue(modelInstance, instanceFileType)
+                                    Case "fieldTypeHTMLFile"
+                                        Dim instanceFileType As New fieldTypHTMLFile
+                                        instanceFileType.copy = cs.getTextFile(modelProperty.Name)
+                                        instanceFileType.filename = cs.getText(modelProperty.Name)
+                                        'instanceFileType.filename = genericController.getVirtualRecordPathFilename(tableName, modelProperty.Name.ToLower(), recordId, "", FieldTypeIdFileHTMLPrivate)
+                                        modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case Else
                                         modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), Nothing)
                                 End Select
@@ -434,6 +439,7 @@ Namespace Contensive.Core.Models.Entity
                             Throw New ApplicationException("Unable to insert record in content [" & contentName & "]")
                         End If
                     End If
+                    Dim recordId As Integer = cs.getInteger("id")
                     For Each instanceProperty As PropertyInfo In Me.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
                         Select Case instanceProperty.Name.ToLower()
                             Case "id"
@@ -466,10 +472,30 @@ Namespace Contensive.Core.Models.Entity
                                     Case "fieldTypeTextFile"
                                         Dim textFileProperty As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeTextFile)
                                         Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        Dim filename As String = cs.getText(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
                                         Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         If (String.IsNullOrEmpty(copy)) Then
                                             '
-                                            ' -- empty copy
+                                            ' -- empty content
+                                            If (Not String.IsNullOrEmpty(filename)) Then
+                                                cs.setField(instanceProperty.Name, "")
+                                                cpCore.privateFiles.deleteFile(filename)
+                                            End If
+                                        Else
+                                            '
+                                            ' -- save content
+                                            If (String.IsNullOrEmpty(filename)) Then
+                                                filename = genericController.getVirtualRecordPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, "", FieldTypeIdFileTextPrivate)
+                                            End If
+                                            cs.setFile(instanceProperty.Name, copy, contentName)
+                                        End If
+                                    Case "fieldTypeJavascriptFile"
+                                        Dim textFileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeJavascriptFile)
+                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
+                                        If (String.IsNullOrEmpty(copy)) Then
+                                            '
+                                            ' -- empty content
                                             Dim filename As String = cs.getText(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
                                             If (Not String.IsNullOrEmpty(filename)) Then
                                                 cs.setField(instanceProperty.Name, "")
@@ -477,7 +503,41 @@ Namespace Contensive.Core.Models.Entity
                                             End If
                                         Else
                                             '
-                                            ' -- save copy
+                                            ' -- save content
+                                            cs.setFile(instanceProperty.Name, copy, contentName)
+                                        End If
+                                    Case "fieldTypeCSSFile"
+                                        Dim textFileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeCSSFile)
+                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
+                                        If (String.IsNullOrEmpty(copy)) Then
+                                            '
+                                            ' -- empty content
+                                            Dim filename As String = cs.getText(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+                                            If (Not String.IsNullOrEmpty(filename)) Then
+                                                cs.setField(instanceProperty.Name, "")
+                                                cpCore.privateFiles.deleteFile(filename)
+                                            End If
+                                        Else
+                                            '
+                                            ' -- save content
+                                            cs.setFile(instanceProperty.Name, copy, contentName)
+                                        End If
+                                    Case "fieldTypeHTMLFile"
+                                        Dim textFileProperty As fieldTypHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypHTMLFile)
+                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
+                                        If (String.IsNullOrEmpty(copy)) Then
+                                            '
+                                            ' -- empty content
+                                            Dim filename As String = cs.getText(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+                                            If (Not String.IsNullOrEmpty(filename)) Then
+                                                cs.setField(instanceProperty.Name, "")
+                                                cpCore.privateFiles.deleteFile(filename)
+                                            End If
+                                        Else
+                                            '
+                                            ' -- save content
                                             cs.setFile(instanceProperty.Name, copy, contentName)
                                         End If
                                     Case Else
@@ -599,10 +659,13 @@ Namespace Contensive.Core.Models.Entity
                     cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     Dim cs As New csController(cpCore)
-                    Dim ignoreCacheNames As New List(Of String)
-                    Dim instanceType As Type = GetType(T)
-                    Dim contentName As String = derivedContentName(instanceType)
-                    If (cs.open(contentName, sqlCriteria, sqlOrderBy)) Then
+                    Dim sql As String = getSelectSql(Of T)(Nothing, sqlCriteria, sqlOrderBy)
+                    'Dim ignoreCacheNames As New List(Of String)
+                    'Dim instanceType As Type = GetType(T)
+                    'Dim contentName As String = derivedContentName(instanceType)
+                    If (cs.openSQL(sql)) Then
+                        'End If
+                        'If (cs.open(contentName, sqlCriteria, sqlOrderBy)) Then
                         Dim instance As T
                         Do
                             instance = loadRecord(Of T)(cpCore, cs, callersCacheNameList)
@@ -808,6 +871,27 @@ Namespace Contensive.Core.Models.Entity
             Dim tableName As String = derivedContentTableName(instanceType)
             Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(tableName, fieldName, fieldValue)
             Return cpCore.cache.getObject(Of T)(cacheName)
+        End Function
+        '
+        Private Shared Function getSelectSql(Of T As baseModel)(Optional fieldList As List(Of String) = Nothing, Optional criteria As String = "", Optional orderBy As String = "") As String
+            Dim result As String = ""
+            Dim instanceType As Type = GetType(T)
+            Dim tableName As String = derivedContentTableName(instanceType)
+            If (fieldList Is Nothing) Then
+                fieldList = New List(Of String)
+                Dim modelInstance As T = DirectCast(Activator.CreateInstance(instanceType), T)
+                For Each modelProperty As PropertyInfo In modelInstance.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
+                    fieldList.Add(modelProperty.Name)
+                Next
+            End If
+            result = "select " & String.Join(",", fieldList.ToArray()) & " from " & tableName & " where (active>0)"
+            If (Not String.IsNullOrEmpty(criteria)) Then
+                result &= "and(" & criteria & ")"
+            End If
+            If (Not String.IsNullOrEmpty(orderBy)) Then
+                result &= " order by " & orderBy
+            End If
+            Return result
         End Function
     End Class
 End Namespace

@@ -1,3 +1,7 @@
+
+Option Explicit On
+Option Strict On
+
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 Imports ADODB
@@ -195,7 +199,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("deprecated. Use ExecuteSql_GetRecordSet() or ExecuteSql_GetDataTable()", False)>
         Public Overrides Function ExecuteSQL(ByVal SQL As String, Optional ByVal DataSourcename As String = "Default", Optional ByVal Retries As String = "0", Optional ByVal PageSize As String = "10", Optional ByVal PageNumber As String = "1") As Object
-            Return cp.core.db.executeSql_getRecordSet(SQL, DataSourcename, PageNumber * PageSize, PageSize)
+            Return cp.core.db.executeSql_getRecordSet(SQL, DataSourcename, Controllers.genericController.EncodeInteger(PageNumber) * Controllers.genericController.EncodeInteger(PageSize), Controllers.genericController.EncodeInteger(PageSize))
         End Function
         '
         '====================================================================================================

@@ -2162,7 +2162,7 @@ Namespace Contensive.Core.Controllers
                     Call cpCore.db.createSQLTableField("Default", "ccContent", "AllowContentTracking", FieldTypeIdBoolean)
                     Call cpCore.db.createSQLTableField("Default", "ccContent", "AllowTopicRules", FieldTypeIdBoolean)
                     Call cpCore.db.createSQLTableField("Default", "ccContent", "AllowContentChildTool", FieldTypeIdBoolean)
-                    Call cpCore.db.createSQLTableField("Default", "ccContent", "AllowMetaContent", FieldTypeIdBoolean)
+                    'Call cpCore.db.createSQLTableField("Default", "ccContent", "AllowMetaContent", FieldTypeIdBoolean)
                     Call cpCore.db.createSQLTableField("Default", "ccContent", "IconLink", FieldTypeIdLink)
                     Call cpCore.db.createSQLTableField("Default", "ccContent", "IconHeight", FieldTypeIdInteger)
                     Call cpCore.db.createSQLTableField("Default", "ccContent", "IconWidth", FieldTypeIdInteger)

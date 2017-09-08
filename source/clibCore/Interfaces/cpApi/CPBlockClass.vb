@@ -37,10 +37,10 @@ Namespace Contensive.Core
                 Try
                     htmlDoc = New Controllers.htmlController(cpCore)
                 Catch ex As Exception
-                    cpCore.handleException(ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.")
+                    cpCore.handleException(ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.") : Throw
                 End Try
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error creating cp.block Object")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error creating cp.block Object")
             End Try
         End Sub
         '
@@ -90,7 +90,7 @@ Namespace Contensive.Core
             Try
                 accum = htmlString
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.Load")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.Load")
             End Try
         End Sub
         '
@@ -100,7 +100,7 @@ Namespace Contensive.Core
             Try
                 accum &= htmlString
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.Append")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.Append")
             End Try
         End Sub
         '
@@ -110,7 +110,7 @@ Namespace Contensive.Core
             Try
                 accum = ""
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.Clear")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.Clear")
             End Try
         End Sub
         '
@@ -122,7 +122,7 @@ Namespace Contensive.Core
                 'tp("getHtml,accum=" & accum)
                 s = accum
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.GetHtml")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.GetHtml")
             End Try
             Return s
         End Function
@@ -137,7 +137,7 @@ Namespace Contensive.Core
                     s = htmlDoc.getInnerHTML(cpCore, a, findSelector)
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.GetInner")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.GetInner")
             End Try
             Return s
         End Function
@@ -152,7 +152,7 @@ Namespace Contensive.Core
                     s = htmlDoc.getOuterHTML(cpCore, a, findSelector)
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.GetOuter")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.GetOuter")
             End Try
             Return s
         End Function
@@ -173,7 +173,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.ImportFile")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.ImportFile")
             End Try
         End Sub
         '
@@ -191,7 +191,7 @@ Namespace Contensive.Core
                     Call cs.Close()
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.OpenCopy")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.OpenCopy")
             End Try
         End Sub
         '
@@ -204,7 +204,7 @@ Namespace Contensive.Core
                     accum = cp.wwwFiles.read(wwwFileName)
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.OpenFile")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.OpenFile")
             End Try
         End Sub
         '
@@ -222,7 +222,7 @@ Namespace Contensive.Core
                     Call cs.Close()
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.OpenLayout")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.OpenLayout")
             End Try
         End Sub
         '
@@ -232,7 +232,7 @@ Namespace Contensive.Core
             Try
                 accum = htmlString & accum
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.Prepend")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.Prepend")
             End Try
         End Sub
         '
@@ -242,7 +242,7 @@ Namespace Contensive.Core
             Try
                 accum = htmlDoc.insertInnerHTML(cpCore, accum, findSelector, htmlString)
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.SetInner")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.SetInner")
             End Try
         End Sub
         '
@@ -252,7 +252,7 @@ Namespace Contensive.Core
             Try
                 accum = htmlDoc.insertOuterHTML(cpCore, accum, findSelector, htmlString)
             Catch ex As Exception
-                cpCore.handleException(ex, "Unexpected Error in block.SetOuter")
+                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.SetOuter")
             End Try
         End Sub
     End Class

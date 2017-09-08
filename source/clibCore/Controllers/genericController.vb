@@ -4568,10 +4568,26 @@ ErrorTrap:
         End Function
         '
         '====================================================================================================
-        ' convert a dtaTable to a comma delimited list of column 0
-        '====================================================================================================
+        ''' <summary>
+        ''' convert a dtaTable to list of string 
+        ''' </summary>
+        ''' <param name="dt"></param>
+        ''' <returns></returns>
+        Public Shared Function convertDataTableColumntoItemList(dt As DataTable) As List(Of String)
+            Dim returnString As New List(Of String)
+            For Each dr As DataRow In dt.Rows
+                returnString.Add(dr.Item(0).ToString.ToLower())
+            Next
+            Return returnString
+        End Function
         '
-        Public Shared Function convertDataTableColumntoItemList(dt As DataTable) As String
+        '====================================================================================================
+        ''' <summary>
+        ''' convert a dtaTable to a comma delimited list of column 0
+        ''' </summary>
+        ''' <param name="dt"></param>
+        ''' <returns></returns>
+        Public Shared Function convertDataTableColumntoItemCommaList(dt As DataTable) As String
             Dim returnString As String = ""
             For Each dr As DataRow In dt.Rows
                 returnString &= "," & dr.Item(0).ToString

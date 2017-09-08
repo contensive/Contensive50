@@ -81,11 +81,13 @@ Namespace Contensive.Core.Controllers
         '   changes / to \, and makes sure there is one and only one at the joint
         '
         Public Function joinPath(ByVal path As String, ByVal pathFilename As String) As String
-            Dim returnPath As String = IO.Path.Combine(path, pathFilename)
+            Dim returnPath As String = ""
             Try
-                path = normalizePath(path)
+                returnPath = normalizePath(path)
                 pathFilename = normalizePathFilename(pathFilename)
-                returnPath = IO.Path.Combine(path, pathFilename)
+                If (pathFilename <> "\") Then
+                    returnPath = IO.Path.Combine(returnPath, pathFilename)
+                End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -420,8 +422,8 @@ Namespace Contensive.Core.Controllers
                             If Not dstFileSystem.pathExists(dstPath) Then
                                 Call dstFileSystem.createPath(dstPath)
                             End If
-                            srcFullPathFilename = Path.Combine(rootLocalPath, srcPathFilename)
-                            DstFullPathFilename = Path.Combine(dstFileSystem.rootLocalPath, dstPathFilename)
+                            srcFullPathFilename = joinPath(rootLocalPath, srcPathFilename)
+                            DstFullPathFilename = joinPath(dstFileSystem.rootLocalPath, dstPathFilename)
                             If dstFileSystem.fileExists(dstPathFilename) Then
                                 dstFileSystem.deleteFile(dstPathFilename)
                             End If
@@ -573,7 +575,7 @@ Namespace Contensive.Core.Controllers
                                 ' not an error, to minimize file use, empty files are not created, so missing files are just empty
                                 '
                             Else
-                                File.Move(srcFullPathFilename, Path.Combine(sourceFullPath, DestinationFilename))
+                                File.Move(srcFullPathFilename, joinPath(sourceFullPath, DestinationFilename))
                             End If
                         End If
                     End If
@@ -631,7 +633,7 @@ Namespace Contensive.Core.Controllers
                     ' copy each file into destination
                     '
                     For Each srcFile As FileInfo In srcDirectoryInfo.GetFiles()
-                        srcFile.CopyTo(Path.Combine(dstDiretoryInfo.ToString, srcFile.Name), True)
+                        srcFile.CopyTo(joinPath(dstDiretoryInfo.ToString, srcFile.Name), True)
                     Next
                     '
                     ' recurse through folders
@@ -663,7 +665,7 @@ Namespace Contensive.Core.Controllers
                     If dstFileSystem Is Nothing Then
                         dstFileSystem = Me
                     End If
-                    Call copyLocalFileFolder(Path.Combine(rootLocalPath, srcPath), Path.Combine(dstFileSystem.rootLocalPath, dstPath))
+                    Call copyLocalFileFolder(joinPath(rootLocalPath, srcPath), joinPath(dstFileSystem.rootLocalPath, dstPath))
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
