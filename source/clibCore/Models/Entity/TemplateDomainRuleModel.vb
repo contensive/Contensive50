@@ -16,7 +16,7 @@ Namespace Contensive.Core.Models.Entity
         '====================================================================================================
         '-- const
         Public Const contentName As String = "Template Domain Rules"
-        Public Const contentTableName As String = "ccTemplateDomainRules"
+        Public Const contentTableName As String = "ccDomainTemplateRules"
         Private Shadows Const contentDataSource As String = "default"
         '
         '====================================================================================================

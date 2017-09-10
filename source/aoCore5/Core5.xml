@@ -722,6 +722,8 @@ End Function]]></Code>
 	<ImportCollection name="Whats Related">{9E0D6124-0C6B-45A9-A310-2D434A4AA7D6}</ImportCollection>
 	<ImportCollection name="Child Page Sorting">{BDD2CFBD-CB53-40B7-A246-ED0D234F17EA}</ImportCollection>
 	<ImportCollection name="Content Box">{6A681E1F-ABCC-4E28-AAB4-79264DA18B91}</ImportCollection>
+	<ImportCollection name="Redactor Html Editor">{E87AFAFF-2503-44DE-A343-EFF8C64B652D}</ImportCollection>
+	<ImportCollection name="Tool Panel">{374E2B8C-B29D-470B-BD1B-41CAA5BCEDCB}</ImportCollection>
 	<Resource name="pageManager.js" type="www" path="/pageManager" />
 	<Resource name="pageManager.css" type="www" path="/pageManager" />
 </Collection>

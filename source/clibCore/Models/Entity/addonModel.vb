@@ -267,11 +267,15 @@ Namespace Contensive.Core.Models.Entity
             '
             Public Sub add(addon As addonModel)
                 If (Not dictIdAddon.ContainsKey(addon.id)) Then
-                    If (Not dictGuidId.ContainsKey(addon.ccguid)) Then
-                        If (Not dictNameId.ContainsKey(addon.name)) Then
-                            dictIdAddon.Add(addon.id, addon)
-                            dictGuidId.Add(addon.ccguid.ToLower(), addon.id)
-                            dictNameId.Add(addon.name.ToLower(), addon.id)
+                    If (Not dictGuidId.ContainsKey(addon.ccguid.ToLower())) Then
+                        If (Not dictNameId.ContainsKey(addon.name.ToLower())) Then
+                            Try
+                                dictIdAddon.Add(addon.id, addon)
+                                dictGuidId.Add(addon.ccguid.ToLower(), addon.id)
+                                dictNameId.Add(addon.name.ToLower(), addon.id)
+                            Catch ex As Exception
+                                ' - this cannot fail or the system will not load.
+                            End Try
                         End If
                     End If
                 End If

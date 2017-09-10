@@ -83,7 +83,7 @@ Namespace Contensive.Core.Models.Entity
             Public Property filename As String
             Public Property copy As String
         End Class
-        Public Class fieldTypHTMLFile
+        Public Class fieldTypeHTMLFile
             Public Property filename As String
             Public Property copy As String
         End Class
@@ -370,7 +370,7 @@ Namespace Contensive.Core.Models.Entity
                                         'instanceFileType.filename = genericController.getVirtualRecordPathFilename(tableName, modelProperty.Name.ToLower(), recordId, "", FieldTypeIdFileCSS)
                                         modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case "fieldTypeHTMLFile"
-                                        Dim instanceFileType As New fieldTypHTMLFile
+                                        Dim instanceFileType As New fieldTypeHTMLFile
                                         instanceFileType.copy = cs.getTextFile(modelProperty.Name)
                                         instanceFileType.filename = cs.getText(modelProperty.Name)
                                         'instanceFileType.filename = genericController.getVirtualRecordPathFilename(tableName, modelProperty.Name.ToLower(), recordId, "", FieldTypeIdFileHTMLPrivate)
@@ -524,7 +524,7 @@ Namespace Contensive.Core.Models.Entity
                                             cs.setFile(instanceProperty.Name, copy, contentName)
                                         End If
                                     Case "fieldTypeHTMLFile"
-                                        Dim textFileProperty As fieldTypHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypHTMLFile)
+                                        Dim textFileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeHTMLFile)
                                         Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
                                         Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         If (String.IsNullOrEmpty(copy)) Then

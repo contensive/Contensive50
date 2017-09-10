@@ -47,7 +47,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property Clicks As Integer
         Public Property ContactMemberID As Integer
         Public Property ContentPadding As Integer
-        Public Property Copyfilename As New fieldTypHTMLFile
+        Public Property Copyfilename As New fieldTypeHTMLFile
         Public Property CustomBlockMessage As String
         Public Property DateArchive As Date
         Public Property DateExpires As Date

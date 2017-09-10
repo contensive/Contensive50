@@ -1001,7 +1001,7 @@ Namespace Contensive.Core
                                                                     '
                                                                     ' -- Needs a GUID to install
                                                                     result = False
-                                                                    return_ErrorMessage = statusMsg & "The installation can not continue because an imported collection could not be downloaded because it does not include a valid GUID."
+                                                                    return_ErrorMessage = statusMsg & ". The installation can not continue because an imported collection could not be downloaded because it does not include a valid GUID."
                                                                     Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, return message [" & return_ErrorMessage & "]")
                                                                 ElseIf GetCollectionPath(ChildCollectionGUID) = "" Then
                                                                     Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], not found so needs to be installed")
@@ -1017,9 +1017,9 @@ Namespace Contensive.Core
 
                                                                         Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & statusMsg & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
                                                                         If return_ErrorMessage = "" Then
-                                                                            return_ErrorMessage = statusMsg & "The installation can not continue because there was an unknown error while downloading the necessary collection file, [" & ChildCollectionGUID & "]."
+                                                                            return_ErrorMessage = statusMsg & ". The installation can not continue because there was an unknown error while downloading the necessary collection file, [" & ChildCollectionGUID & "]."
                                                                         Else
-                                                                            return_ErrorMessage = statusMsg & "The installation can not continue because there was an error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
+                                                                            return_ErrorMessage = statusMsg & ". The installation can not continue because there was an error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
                                                                         End If
                                                                     Else
                                                                         Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned OK")
@@ -1031,9 +1031,9 @@ Namespace Contensive.Core
                                                                         If Not StatusOK Then
                                                                             Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & statusMsg & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
                                                                             If return_ErrorMessage = "" Then
-                                                                                return_ErrorMessage = statusMsg & "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]."
+                                                                                return_ErrorMessage = statusMsg & ". The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]."
                                                                             Else
-                                                                                return_ErrorMessage = statusMsg & "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
+                                                                                return_ErrorMessage = statusMsg & ". The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
                                                                             End If
                                                                         End If
                                                                     End If
@@ -1384,7 +1384,7 @@ Namespace Contensive.Core
                                                                                 If genericController.vbLCase(Right(Filename, 4)) = ".zip" Then
                                                                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
                                                                                     'Call appendInstallLog(cpCore.serverconfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
-                                                                                    Call cpCore.privateFiles.UnzipFile(DstFilePath & Filename)
+                                                                                    Call cpCore.appRootFiles.UnzipFile(DstFilePath & Filename)
                                                                                 End If
                                                                             Case "file", "content"
                                                                                 ContentFileList = ContentFileList & vbCrLf & DstFilePath & Filename
