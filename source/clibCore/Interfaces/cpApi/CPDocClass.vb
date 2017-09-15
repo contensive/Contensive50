@@ -174,7 +174,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property startTime() As Date
             Get
                 If True Then
-                    Return cpCore.app_startTime
+                    Return cpCore.profileStartTime
                 Else
                     Return New Date()
                 End If

@@ -210,7 +210,7 @@ ErrorTrap:
             Dim s As String
             '
             If RightSideMessage = "" Then
-                RightSideMessage = FormatDateTime(cpCore.app_startTime)
+                RightSideMessage = FormatDateTime(cpCore.profileStartTime)
             End If
             '
             If isInStr(1, HeaderMessage & RightSideMessage, vbCrLf) Then

@@ -75,7 +75,7 @@ Namespace Contensive.Core.Controllers
                     Dim AllowCookieTest As Boolean
                     AllowCookieTest = cpCore.siteProperties.allowVisitTracking And (cpCore.authContext.visit.PageVisits = 1)
                     If AllowCookieTest Then
-                        Call cpCore.html.addOnLoadJavascript("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.authContext.visit.id, cpCore.app_startTime) & "')};", "Cookie Test")
+                        Call cpCore.html.addOnLoadJavascript("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.authContext.visit.id, cpCore.profileStartTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -510,7 +510,7 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
                                 '
-                                If (cpCore.app_errorCount = 0) And cpCore.siteProperties.getBoolean("LinkForwardAutoInsert") And (Not IsInLinkForwardTable) Then
+                                If (cpCore.errorCount = 0) And cpCore.siteProperties.getBoolean("LinkForwardAutoInsert") And (Not IsInLinkForwardTable) Then
                                     '
                                     ' Add a new Link Forward entry
                                     '
@@ -1156,7 +1156,7 @@ Namespace Contensive.Core.Controllers
             & errorController.error_GetUserError(cpcore) _
             & cpcore.html.html_GetUploadFormStart() _
             & cpcore.html.html_GetFormInputHidden("ContensiveFormPageID", FormPageID) _
-            & cpcore.html.html_GetFormInputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpcore.app_startTime)) _
+            & cpcore.html.html_GetFormInputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpcore.profileStartTime)) _
             & f.PreRepeat _
             & RepeatBody _
             & f.PostRepeat _
@@ -1180,17 +1180,10 @@ ErrorTrap:
         Public Shared Function getContentBox(cpCore As coreClass, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, ignoreme As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
             Dim returnHtml As String = ""
             Try
-                Dim AddonName As String
-                Dim addonCachePtr As Integer
-                Dim addonPtr As Integer
-                Dim AddOnCnt As Integer
-                Dim addonId As Integer
                 Dim AddonContent As String
                 Dim DateModified As Date
                 Dim PageRecordID As Integer
                 Dim PageName As String
-                'Dim RootPageContentCID As Integer
-                'Dim iRootPageContentName As String
                 Dim CS As Integer
                 Dim SQL As String
                 Dim ContentBlocked As Boolean
@@ -1258,7 +1251,7 @@ ErrorTrap:
                             & " AND ((ccPageContentBlockRules.Active)<>0)" _
                             & " AND ((ccgroups.Active)<>0)" _
                             & " AND ((ccMemberRules.Active)<>0)" _
-                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & "));"
+                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "));"
                         CS = cpCore.db.cs_openSql(SQL)
                         BlockedRecordIDList = "," & BlockedRecordIDList
                         Do While cpCore.db.cs_ok(CS)
@@ -1281,7 +1274,7 @@ ErrorTrap:
                                 & " AND ((ccGroupRules.Active)<>0)" _
                                 & " AND ((ManagementGroups.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.Active)<>0)" _
-                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & ")" _
+                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & ")" _
                                 & " AND ((ManagementMemberRules.MemberID)=" & cpCore.authContext.user.id & " ));"
                             CS = cpCore.db.cs_openSql(SQL)
                             Do While cpCore.db.cs_ok(CS)

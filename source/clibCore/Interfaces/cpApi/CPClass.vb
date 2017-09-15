@@ -23,8 +23,8 @@ Namespace Contensive.Core
         Public Const EventsId As String = "4FADD1C2-6A89-4A8E-ADD0-9850D3EB6DBC"
 #End Region
         '
-        Public core As Contensive.Core.coreClass
-        Private MyAddonID As Integer
+        Public Property core As Contensive.Core.coreClass
+        Private Property MyAddonID As Integer
         '
         '=========================================================================================================
         ''' <summary>
@@ -78,7 +78,7 @@ Namespace Contensive.Core
             core = New coreClass(Me, appName, httpContext)
         End Sub
         '
-        '
+        '=========================================================================================================
         '
         Public ReadOnly Property status As Models.Entity.serverConfigModel.appStatusEnum
             Get
@@ -86,7 +86,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '=========================================================================================================
         '
         Public ReadOnly Property statusMessage As String
             Get
@@ -113,7 +113,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '=========================================================================================================
         '
         Public ReadOnly Property appOk As Boolean
             Get
@@ -136,10 +136,11 @@ Namespace Contensive.Core
             Try
                 result = core.executeRoute(route)
             Catch ex As Exception
-                Site.ErrorReport(ex, "Unexpected error in cp.executeRoute()")
+                Site.ErrorReport(ex)
             End Try
             Return result
         End Function
+        '
         '====================================================================================================
         ''' <summary>
         ''' executes an addon with the name or guid provided, in the context specified.
@@ -152,10 +153,11 @@ Namespace Contensive.Core
             Try
                 result = core.addon.execute_legacy4(addonNameOrGuid, core.docProperties.getLegacyOptionStringFromVar(), addonContext, Nothing)
             Catch ex As Exception
-                Site.ErrorReport(ex, "Unexpected error in cp.executeRoute()")
+                Site.ErrorReport(ex)
             End Try
             Return result
         End Function
+        '
         '====================================================================================================
         ''' <summary>
         ''' executes an addon with the id provided, in the context specified.
@@ -167,44 +169,40 @@ Namespace Contensive.Core
             Dim result As String = ""
             Try
                 If Response.isOpen Then
-                    'If Response.isOpen Then
-                    '    result = core.addon.addon_execute_legacy4(addonId.ToString(), core.getLegacyOptionStringFromVar(), addonContext, Nothing)
-                    'End If
-                    result = core.addon.execute(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.authContext.user.id, core.authContext.visit.visitAuthenticated)
+                    result = core.addon.execute(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.authContext.user.id, core.authContext.visit.VisitAuthenticated)
                 End If
                 '
             Catch ex As Exception
-                Site.ErrorReport(ex, "Unexpected error in cp.executeRoute()")
+                Site.ErrorReport(ex)
             End Try
             Return result
         End Function
         '
-        '
+        '=========================================================================================================
         '
         Public Sub AddVar(ByVal OptionName As String, ByVal OptionValue As String)
             Try
                 If OptionName <> "" Then
-                    'Call appendDebugLog("addVar, calling doc.var to save [" & OptionName & "] as [" & OptionValue & "]")
                     Me.Doc.Var(OptionName) = OptionValue
                 End If
             Catch ex As Exception
-                Site.ErrorReport(ex, "Unexpected error in AddVar()")
+                Site.ErrorReport(ex)
             End Try
         End Sub
         '
-        '
+        '=========================================================================================================
         '
         Public Overrides Function BlockNew() As CPBlockBaseClass
             BlockNew = New CPBlockClass(Me)
         End Function
         '
-        '
+        '=========================================================================================================
         '
         Public Overrides Function CSNew() As CPCSBaseClass
             CSNew = New CPCSClass(Me)
         End Function
         '
-        '
+        '=========================================================================================================
         '
         Public Overrides ReadOnly Property Version() As String
             Get
@@ -212,9 +210,9 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        ' Implement Cp.UserError
+        '=========================================================================================================
         '
-        Public Overrides ReadOnly Property UserError() As CPUserErrorBaseClass 'Inherits BaseClasses.CPBaseClass.UserError
+        Public Overrides ReadOnly Property UserError() As CPUserErrorBaseClass
             Get
                 If _userErrorObj Is Nothing Then
                     _userErrorObj = New CPUserErrorClass(core)
@@ -224,9 +222,9 @@ Namespace Contensive.Core
         End Property
         Private _userErrorObj As CPUserErrorClass
         '
-        ' Implement Cp.Visitor
+        '=========================================================================================================
         '
-        Public Overrides ReadOnly Property User() As CPUserBaseClass 'Inherits BaseClasses.CPBaseClass.User
+        Public Overrides ReadOnly Property User() As CPUserBaseClass
             Get
                 If _userObj Is Nothing Then
                     _userObj = New CPUserClass(core, Me)
@@ -236,17 +234,9 @@ Namespace Contensive.Core
         End Property
         Private _userObj As CPUserClass
         '
-        ' append to logfile
+        '=========================================================================================================
         '
-        Private Sub appendDebugLog(ByVal copy As String)
-            Console.WriteLine("CPClass-" & copy)
-            'My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp, " & copy & vbCrLf, True)
-            ' 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
-        End Sub
-        '
-        ' Implement Cp.Addon
-        '
-        Public Overrides ReadOnly Property Addon() As CPAddonBaseClass 'Inherits BaseClasses.CPBaseClass.Addon
+        Public Overrides ReadOnly Property Addon() As CPAddonBaseClass
             Get
                 If _addonObj Is Nothing Then
                     _addonObj = New CPAddonClass(Me)
@@ -255,6 +245,8 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _addonObj As CPAddonClass
+        '
+        '=========================================================================================================
         '
         Public Overrides ReadOnly Property cdnFiles() As CPFileSystemBaseClass
             Get
@@ -266,9 +258,9 @@ Namespace Contensive.Core
         End Property
         Private _cdnFiles As CPFileSystemClass
         '
-        ' Implement Cp.Cache
+        '=========================================================================================================
         '
-        Public Overrides ReadOnly Property Cache() As CPCacheBaseClass 'Inherits BaseClasses.CPBaseClass.Cache
+        Public Overrides ReadOnly Property Cache() As CPCacheBaseClass
             Get
                 If _cacheObj Is Nothing Then
                     _cacheObj = New CPCacheClass(Me)
@@ -278,9 +270,9 @@ Namespace Contensive.Core
         End Property
         Private _cacheObj As CPCacheClass
         '
-        ' Implement Cp.Content
+        '=========================================================================================================
         '
-        Public Overrides ReadOnly Property Content() As CPContentBaseClass 'Inherits BaseClasses.CPBaseClass.Content
+        Public Overrides ReadOnly Property Content() As CPContentBaseClass
             Get
                 If _contentObj Is Nothing Then
                     _contentObj = New CPContentClass(Me)
@@ -290,7 +282,7 @@ Namespace Contensive.Core
         End Property
         Private _contentObj As CPContentClass
         '
-        ' Implement Cp.Context
+        '=========================================================================================================
         '
         Public ReadOnly Property Context() As CPContextClass
             Get
@@ -302,9 +294,9 @@ Namespace Contensive.Core
         End Property
         Private _contextObj As CPContextClass
         '
-        ' Implement Cp.Db
+        '=========================================================================================================
         '
-        Public Overrides ReadOnly Property Db() As CPDbBaseClass 'Inherits BaseClasses.CPBaseClass.Db
+        Public Overrides ReadOnly Property Db() As CPDbBaseClass
             Get
                 If _dbObj Is Nothing Then
                     _dbObj = New CPDbClass(Me)
@@ -314,9 +306,9 @@ Namespace Contensive.Core
         End Property
         Private _dbObj As CPDbClass
         '
-        ' CP.Doc
+        '=========================================================================================================
         '
-        Public Overrides ReadOnly Property Doc() As CPDocBaseClass  'Inherits BaseClasses.CPBaseClass.Doc
+        Public Overrides ReadOnly Property Doc() As CPDocBaseClass
             Get
                 If _docObj Is Nothing Then
                     _docObj = New CPDocClass(Me)
@@ -326,9 +318,9 @@ Namespace Contensive.Core
         End Property
         Private _docObj As CPDocClass
         '
-        ' Implement Cp.Email
+        '====================================================================================================
         '
-        Public Overrides ReadOnly Property Email() As CPEmailBaseClass 'Inherits BaseClasses.CPBaseClass.Email
+        Public Overrides ReadOnly Property Email() As CPEmailBaseClass
             Get
                 If _emailObj Is Nothing Then
                     _emailObj = New CPEmailClass(core)
@@ -337,7 +329,9 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _emailObj As CPEmailClass
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property File() As CPFileBaseClass
             Get
                 If _fileObj Is Nothing Then
@@ -348,9 +342,9 @@ Namespace Contensive.Core
         End Property
         Private _fileObj As CPFileClass
         '
-        ' Implement Cp.Group
+        '====================================================================================================
         '
-        Public Overrides ReadOnly Property Group() As CPGroupBaseClass 'Inherits BaseClasses.CPBaseClass.Group
+        Public Overrides ReadOnly Property Group() As CPGroupBaseClass
             Get
                 If _groupObj Is Nothing Then
                     _groupObj = New CPGroupClass(Me)
@@ -360,9 +354,9 @@ Namespace Contensive.Core
         End Property
         Private _groupObj As CPGroupClass
         '
-        ' Implement Cp.Html
+        '====================================================================================================
         '
-        Public Overrides ReadOnly Property Html() As CPHtmlBaseClass 'Inherits BaseClasses.CPBaseClass.Html
+        Public Overrides ReadOnly Property Html() As CPHtmlBaseClass
             Get
                 If _htmlObj Is Nothing Then
                     _htmlObj = New CPHtmlClass(Me)
@@ -370,9 +364,11 @@ Namespace Contensive.Core
                 Return _htmlObj
             End Get
         End Property
-        '
         Private _htmlObj As CPHtmlClass
-        Public Overrides ReadOnly Property MyAddon() As CPAddonBaseClass 'Inherits BaseClasses.CPBaseClass.MyAddon
+        '
+        '====================================================================================================
+        '
+        Public Overrides ReadOnly Property MyAddon() As CPAddonBaseClass
             Get
                 If _myAddonObj Is Nothing Then
                     _myAddonObj = New CPAddonClass(Me)
@@ -382,6 +378,8 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _myAddonObj As CPAddonClass
+        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property privateFiles() As CPFileSystemBaseClass
             Get
@@ -393,9 +391,9 @@ Namespace Contensive.Core
         End Property
         Private _privateFiles As CPFileSystemClass
         '
-        ' Implement Cp.Request
+        '====================================================================================================
         '
-        Public Overrides ReadOnly Property Request() As CPRequestBaseClass 'Inherits BaseClasses.CPBaseClass.Request
+        Public Overrides ReadOnly Property Request() As CPRequestBaseClass
             Get
                 If _requestObj Is Nothing Then
                     _requestObj = New CPRequestClass(core)
@@ -405,9 +403,9 @@ Namespace Contensive.Core
         End Property
         Private _requestObj As CPRequestClass
         '
-        ' Implement Cp.Response
+        '====================================================================================================
         '
-        Public Overrides ReadOnly Property Response() As CPResponseBaseClass 'Inherits BaseClasses.CPBaseClass.Response
+        Public Overrides ReadOnly Property Response() As CPResponseBaseClass
             Get
                 If _responseObj Is Nothing Then
                     _responseObj = New CPResponseClass(core)
@@ -417,9 +415,9 @@ Namespace Contensive.Core
         End Property
         Private _responseObj As CPResponseClass
         '
-        ' CP.Site
+        '====================================================================================================
         '
-        Public Overrides ReadOnly Property Site() As CPSiteBaseClass 'Inherits BaseClasses.CPBaseClass.Site
+        Public Overrides ReadOnly Property Site() As CPSiteBaseClass
             Get
                 If _siteObj Is Nothing Then
                     _siteObj = New CPSiteClass(core, Me)
@@ -429,9 +427,9 @@ Namespace Contensive.Core
         End Property
         Private _siteObj As CPSiteClass
         '
-        ' Implement Cp.Utils
+        '====================================================================================================
         '
-        Public Overrides ReadOnly Property Utils() As CPUtilsBaseClass 'Inherits BaseClasses.CPBaseClass.Utils
+        Public Overrides ReadOnly Property Utils() As CPUtilsBaseClass
             Get
                 If _utilsObj Is Nothing Then
                     _utilsObj = New CPUtilsClass(Me)
@@ -441,9 +439,9 @@ Namespace Contensive.Core
         End Property
         Private _utilsObj As CPUtilsClass
         '
-        ' Implement Cp.Visit
+        '====================================================================================================
         '
-        Public Overrides ReadOnly Property Visit() As CPVisitBaseClass 'Inherits BaseClasses.CPBaseClass.Visit
+        Public Overrides ReadOnly Property Visit() As CPVisitBaseClass
             Get
                 If _visitObj Is Nothing Then
                     _visitObj = New CPVisitClass(core, Me)
@@ -453,9 +451,9 @@ Namespace Contensive.Core
         End Property
         Private _visitObj As CPVisitClass
         '
-        ' Implement Cp.Visitor
+        '====================================================================================================
         '
-        Public Overrides ReadOnly Property Visitor() As CPVisitorBaseClass 'Inherits BaseClasses.CPBaseClass.Visitor
+        Public Overrides ReadOnly Property Visitor() As CPVisitorBaseClass
             Get
                 If _visitorObj Is Nothing Then
                     _visitorObj = New CPVisitorClass(core, Me)
@@ -464,6 +462,8 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _visitorObj As CPVisitorClass
+        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property wwwFiles() As CPFileSystemBaseClass
             Get

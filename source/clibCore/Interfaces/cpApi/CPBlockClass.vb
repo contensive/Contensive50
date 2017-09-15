@@ -20,14 +20,17 @@ Namespace Contensive.Core
         Public Const EventsId As String = "5911548D-7637-4021-BD08-C7676F3E12C6"
 #End Region
         '
-        Private cpCore As Contensive.Core.coreClass
-        Private cp As CPClass
-        Private accum As String
-        Private htmlDoc As Controllers.htmlController
-        Protected disposed As Boolean = False
+        Private Property cpCore As Contensive.Core.coreClass
+        Private Property cp As CPClass
+        Private Property accum As String
+        Private Property htmlDoc As Controllers.htmlController
+        Protected Property disposed As Boolean = False
         '
-        ' Constructor - Initialize the Main and Csv objects
-        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Constructor - Initialize the Main and Csv objects
+        ''' </summary>
+        ''' <param name="cpParent"></param>
         Public Sub New(ByRef cpParent As CPClass)
             MyBase.New()
             Try
@@ -40,12 +43,176 @@ Namespace Contensive.Core
                     cpCore.handleException(ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.") : Throw
                 End Try
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error creating cp.block Object")
+                Call cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
-        ' dispose
+        '====================================================================================================
         '
+        Public Overrides Sub Load(ByVal htmlString As String)
+            Try
+                accum = htmlString
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Overrides Sub Append(ByVal htmlString As String)
+            Try
+                accum &= htmlString
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Overrides Sub Clear()
+            Try
+                accum = ""
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Overrides Function GetHtml() As String
+            Return accum
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Overrides Function GetInner(ByVal findSelector As String) As String
+            Dim s As String = ""
+            Try
+                Dim a As String = accum
+                If findSelector <> "" Then
+                    s = htmlDoc.getInnerHTML(cpCore, a, findSelector)
+                End If
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+            Return s
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Overrides Function GetOuter(ByVal findSelector As String) As String
+            Dim s As String = ""
+            Try
+                Dim a As String = accum
+                If findSelector <> "" Then
+                    s = htmlDoc.getOuterHTML(cpCore, a, findSelector)
+                End If
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+            Return s
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Overrides Sub ImportFile(ByVal wwwFileName As String)
+            Dim headTags As String = ""
+            Try
+                If wwwFileName <> "" Then
+                    accum = cp.wwwFiles.read(wwwFileName)
+                    If accum <> "" Then
+                        headTags = Controllers.htmlController.getTagInnerHTML(accum, "head", False)
+                        If headTags <> "" Then
+                            Call cpCore.doc.addHeadTags(headTags)
+                        End If
+                        accum = Controllers.htmlController.getTagInnerHTML(accum, "body", False)
+                    End If
+                End If
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Overrides Sub OpenCopy(ByVal copyRecordNameOrGuid As String)
+            Dim cs As CPCSClass = cp.CSNew
+            Try
+                accum = ""
+                If copyRecordNameOrGuid <> "" Then
+                    Call cs.Open("copy content", "(name=" & cp.Db.EncodeSQLText(copyRecordNameOrGuid) & ")or(ccGuid=" & cp.Db.EncodeSQLText(copyRecordNameOrGuid) & ")", "id", , "copy")
+                    If cs.OK Then
+                        accum = cs.GetText("copy")
+                    End If
+                    Call cs.Close()
+                End If
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Overrides Sub OpenFile(ByVal wwwFileName As String)
+            Try
+                accum = ""
+                If (Not String.IsNullOrEmpty(wwwFileName)) Then
+                    accum = cp.wwwFiles.read(wwwFileName)
+                End If
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Overrides Sub OpenLayout(ByVal layoutRecordNameOrGuid As String)
+            Try
+                Dim cs As CPCSClass = cp.CSNew
+                accum = ""
+                If layoutRecordNameOrGuid <> "" Then
+                    Call cs.Open("layouts", "(name=" & cp.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")or(ccGuid=" & cp.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")", "id", , "layout")
+                    If cs.OK Then
+                        accum = cs.GetText("layout")
+                    End If
+                    Call cs.Close()
+                End If
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Overrides Sub Prepend(ByVal htmlString As String)
+            Try
+                accum = htmlString & accum
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Overrides Sub SetInner(ByVal findSelector As String, ByVal htmlString As String)
+            Try
+                accum = htmlDoc.insertInnerHTML(cpCore, accum, findSelector, htmlString)
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Overrides Sub SetOuter(ByVal findSelector As String, ByVal htmlString As String)
+            Try
+                accum = htmlDoc.insertOuterHTML(cpCore, accum, findSelector, htmlString)
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
             If Not Me.disposed Then
                 If disposing Then
@@ -78,182 +245,5 @@ Namespace Contensive.Core
         End Sub
 #End Region
         '
-        ' testpoint
-        '
-        Private Sub tp(ByVal msg As String)
-            'My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.block, " & msg & vbCrLf, True)
-        End Sub
-        '
-        '
-        '
-        Public Overrides Sub Load(ByVal htmlString As String)
-            Try
-                accum = htmlString
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.Load")
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Overrides Sub Append(ByVal htmlString As String)
-            Try
-                accum &= htmlString
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.Append")
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Overrides Sub Clear()
-            Try
-                accum = ""
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.Clear")
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Overrides Function GetHtml() As String
-            Dim s As String = ""
-            Try
-                'tp("getHtml,accum=" & accum)
-                s = accum
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.GetHtml")
-            End Try
-            Return s
-        End Function
-        '
-        '
-        '
-        Public Overrides Function GetInner(ByVal findSelector As String) As String
-            Dim s As String = ""
-            Try
-                Dim a As String = accum
-                If findSelector <> "" Then
-                    s = htmlDoc.getInnerHTML(cpCore, a, findSelector)
-                End If
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.GetInner")
-            End Try
-            Return s
-        End Function
-        '
-        '
-        '
-        Public Overrides Function GetOuter(ByVal findSelector As String) As String
-            Dim s As String = ""
-            Try
-                Dim a As String = accum
-                If findSelector <> "" Then
-                    s = htmlDoc.getOuterHTML(cpCore, a, findSelector)
-                End If
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.GetOuter")
-            End Try
-            Return s
-        End Function
-        '
-        '
-        '
-        Public Overrides Sub ImportFile(ByVal wwwFileName As String)
-            Dim headTags As String = ""
-            Try
-                If wwwFileName <> "" Then
-                    accum = cp.wwwFiles.read(wwwFileName)
-                    If accum <> "" Then
-                        headTags = Controllers.htmlController.getTagInnerHTML(accum, "head", False)
-                        If headTags <> "" Then
-                            Call cpCore.doc.addHeadTags(headTags)
-                        End If
-                        accum = Controllers.htmlController.getTagInnerHTML(accum, "body", False)
-                    End If
-                End If
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.ImportFile")
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Overrides Sub OpenCopy(ByVal copyRecordNameOrGuid As String)
-            Dim cs As CPCSClass = cp.CSNew
-            Try
-                accum = ""
-                If copyRecordNameOrGuid <> "" Then
-                    Call cs.Open("copy content", "(name=" & cp.Db.EncodeSQLText(copyRecordNameOrGuid) & ")or(ccGuid=" & cp.Db.EncodeSQLText(copyRecordNameOrGuid) & ")", "id", , "copy")
-                    If cs.OK Then
-                        accum = cs.GetText("copy")
-                    End If
-                    Call cs.Close()
-                End If
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.OpenCopy")
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Overrides Sub OpenFile(ByVal wwwFileName As String)
-            Try
-                accum = ""
-                If (Not String.IsNullOrEmpty(wwwFileName)) Then
-                    accum = cp.wwwFiles.read(wwwFileName)
-                End If
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.OpenFile")
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Overrides Sub OpenLayout(ByVal layoutRecordNameOrGuid As String)
-            Try
-                Dim cs As CPCSClass = cp.CSNew
-                accum = ""
-                If layoutRecordNameOrGuid <> "" Then
-                    Call cs.Open("layouts", "(name=" & cp.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")or(ccGuid=" & cp.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")", "id", , "layout")
-                    If cs.OK Then
-                        accum = cs.GetText("layout")
-                    End If
-                    Call cs.Close()
-                End If
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.OpenLayout")
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Overrides Sub Prepend(ByVal htmlString As String)
-            Try
-                accum = htmlString & accum
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.Prepend")
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Overrides Sub SetInner(ByVal findSelector As String, ByVal htmlString As String)
-            Try
-                accum = htmlDoc.insertInnerHTML(cpCore, accum, findSelector, htmlString)
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.SetInner")
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Overrides Sub SetOuter(ByVal findSelector As String, ByVal htmlString As String)
-            Try
-                accum = htmlDoc.insertOuterHTML(cpCore, accum, findSelector, htmlString)
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected Error in block.SetOuter")
-            End Try
-        End Sub
     End Class
 End Namespace

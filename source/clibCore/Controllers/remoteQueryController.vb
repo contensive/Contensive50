@@ -33,7 +33,7 @@ Namespace Contensive.Core.Controllers
                 Call cpCore.db.cs_set(CS, "datasourceid", DataSourceID)
                 Call cpCore.db.cs_set(CS, "sqlquery", SQL)
                 Call cpCore.db.cs_set(CS, "maxRows", maxRows)
-                Call cpCore.db.cs_set(CS, "dateexpires", cpCore.db.encodeSQLDate(cpCore.app_startTime.AddDays(1)))
+                Call cpCore.db.cs_set(CS, "dateexpires", cpCore.db.encodeSQLDate(cpCore.profileStartTime.AddDays(1)))
                 Call cpCore.db.cs_set(CS, "QueryTypeID", QueryTypeSQL)
                 Call cpCore.db.cs_set(CS, "VisitId", cpCore.authContext.visit.id)
             End If

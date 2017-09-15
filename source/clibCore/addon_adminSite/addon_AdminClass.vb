@@ -171,7 +171,6 @@ Namespace Contensive.Addons
             Dim result As String = ""
             Try
                 Dim DefaultWrapperID As Integer
-                Dim s As String
                 Dim AddonHelpCopy As String
                 Dim InstanceOptionString As String
                 Dim HelpLevel As Integer
@@ -1187,7 +1186,7 @@ ErrorTrap:
                                             Call cpCore.db.cs_set(CS, "submitted", True)
                                             Call cpCore.db.cs_set(CS, "ConditionID", 0)
                                             If cpCore.db.cs_getDate(CS, "ScheduleDate") = Date.MinValue Then
-                                                Call cpCore.db.cs_set(CS, "ScheduleDate", cpCore.app_startTime)
+                                                Call cpCore.db.cs_set(CS, "ScheduleDate", cpCore.profileStartTime)
                                             End If
                                         End If
                                         Call cpCore.db.cs_Close(CS)
@@ -1245,7 +1244,7 @@ ErrorTrap:
                                         Else
                                             Call cpCore.db.cs_set(CS, "submitted", True)
                                             If cpCore.db.cs_getDate(CS, "ScheduleDate") = Date.MinValue Then
-                                                Call cpCore.db.cs_set(CS, "ScheduleDate", cpCore.app_startTime)
+                                                Call cpCore.db.cs_set(CS, "ScheduleDate", cpCore.profileStartTime)
                                             End If
                                         End If
                                         Call cpCore.db.cs_Close(CS)
@@ -1273,8 +1272,8 @@ ErrorTrap:
                                         Call cpCore.email.sendConfirmationTest(editRecord.id, EmailToConfirmationMemberID)
                                         '
                                         If editRecord.fieldsLc.ContainsKey("lastsendtestdate") Then
-                                            editRecord.fieldsLc.Item("lastsendtestdate").value = cpCore.app_startTime
-                                            Call cpCore.db.executeSql("update ccemail Set lastsendtestdate=" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & " where id=" & editRecord.id)
+                                            editRecord.fieldsLc.Item("lastsendtestdate").value = cpCore.profileStartTime
+                                            Call cpCore.db.executeSql("update ccemail Set lastsendtestdate=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & " where id=" & editRecord.id)
                                         End If
                                     End If
                                 End If
@@ -1346,7 +1345,7 @@ ErrorTrap:
             '
 ErrorTrap:
             Call handleLegacyClassError2("ProcessActions")
-            Call errorController.error_AddUserError(cpCore, "There was an unknown error processing this page at " & cpCore.app_startTime & ". Please try again, Or report this error To the site administrator.")
+            Call errorController.error_AddUserError(cpCore, "There was an unknown error processing this page at " & cpCore.profileStartTime & ". Please try again, Or report this error To the site administrator.")
         End Sub
         '
         '========================================================================
@@ -6663,7 +6662,7 @@ ErrorTrap:
                     ElseIf editRecord.id = 0 Then
                         HTMLFieldString = "(available after save)"
                     Else
-                        EID = genericController.encodeText(cpCore.security.encodeToken(editRecord.id, cpCore.app_startTime))
+                        EID = genericController.encodeText(cpCore.security.encodeToken(editRecord.id, cpCore.profileStartTime))
                         If (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Then
                             HTMLFieldString = EID
                             'HTMLFieldString = EID _
@@ -7194,14 +7193,14 @@ ErrorTrap:
             '
             ' ----- All Visits Today
             '
-            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE ((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.app_startTime.Date) & ");"
+            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE ((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date) & ");"
             CS = cpCore.db.cs_openSql(SQL)
             If cpCore.db.cs_ok(CS) Then
                 VisitCount = cpCore.db.cs_getInteger(CS, "VisitCount")
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "All Visits</span></td>")
-                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.profileStartTime & "&DateTo=" & cpCore.profileStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7209,14 +7208,14 @@ ErrorTrap:
             '
             ' ----- Non-Bot Visits Today
             '
-            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.app_startTime.Date) & ");"
+            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date) & ");"
             CS = cpCore.db.cs_openSql(SQL)
             If cpCore.db.cs_ok(CS) Then
                 VisitCount = cpCore.db.cs_getInteger(CS, "VisitCount")
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Non-bot Visits</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.profileStartTime.ToShortDateString & "&DateTo=" & cpCore.profileStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7224,14 +7223,14 @@ ErrorTrap:
             '
             ' ----- Visits Today by new visitors
             '
-            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and(ccVisits.StartTime>" & cpCore.db.encodeSQLDate(cpCore.app_startTime.Date) & ")AND(ccVisits.VisitorNew<>0);"
+            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and(ccVisits.StartTime>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date) & ")AND(ccVisits.VisitorNew<>0);"
             CS = cpCore.db.cs_openSql(SQL)
             If cpCore.db.cs_ok(CS) Then
                 VisitCount = cpCore.db.cs_getInteger(CS, "VisitCount")
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Visits by New Visitors</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.profileStartTime.ToShortDateString & "&DateTo=" & cpCore.profileStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7246,7 +7245,7 @@ ErrorTrap:
                 Stream.Add("<h2>Current Visits</h2>")
                 SQL = "SELECT ccVisits.HTTP_REFERER as referer,ccVisits.remote_addr as Remote_Addr, ccVisits.LastVisitTime as LastVisitTime, ccVisits.PageVisits as PageVisits, ccMembers.Name as MemberName, ccVisits.ID as VisitID, ccMembers.ID as MemberID" _
                     & " FROM ccVisits LEFT JOIN ccMembers ON ccVisits.MemberID = ccMembers.ID" _
-                    & " WHERE (((ccVisits.LastVisitTime)>" & cpCore.db.encodeSQLDate(cpCore.app_startTime.AddHours(-1)) & "))" _
+                    & " WHERE (((ccVisits.LastVisitTime)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.AddHours(-1)) & "))" _
                     & " ORDER BY ccVisits.LastVisitTime DESC;"
                 CS = cpCore.db.cs_openSql(SQL)
                 If cpCore.db.cs_ok(CS) Then
@@ -8027,8 +8026,8 @@ ErrorTrap:
             Call FastString.Add("<td valign=""top"" align=""right"">&nbsp;</td>")
             Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal)
             Call FastString.Add("<ul class=""ccList"">")
-            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&MemberID=" & editRecord.id & "&DateTo=" & Int(cpCore.app_startTime.ToOADate) & "&DateFrom=" & Int(cpCore.app_startTime.ToOADate) - 365 & """>All visits from this person</A></LI>")
-            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=13&MemberID=" & editRecord.id & "&DateTo=" & Int(CDbl(cpCore.app_startTime.ToOADate)) & "&DateFrom=" & Int(CDbl(cpCore.app_startTime.ToOADate) - 365) & """>All orders from this person</A></LI>")
+            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&MemberID=" & editRecord.id & "&DateTo=" & Int(cpCore.profileStartTime.ToOADate) & "&DateFrom=" & Int(cpCore.profileStartTime.ToOADate) - 365 & """>All visits from this person</A></LI>")
+            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=13&MemberID=" & editRecord.id & "&DateTo=" & Int(CDbl(cpCore.profileStartTime.ToOADate)) & "&DateFrom=" & Int(CDbl(cpCore.profileStartTime.ToOADate) - 365) & """>All orders from this person</A></LI>")
             Call FastString.Add("</ul>")
             Call FastString.Add("</span></td></tr>")
             GetForm_Edit_MemberReports = Adminui.GetEditPanel((Not allowAdminTabs), "Contensive Reporting", "", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
@@ -8838,7 +8837,7 @@ ErrorTrap:
                 ' create the with-menu version
                 '
                 LeftSide = cpCore.siteProperties.getText("AdminHeaderHTML", "Contensive Administration Site")
-                RightSide = cpCore.app_startTime & "&nbsp;"
+                RightSide = cpCore.profileStartTime & "&nbsp;"
                 '
                 ' AdminTabs
                 '
@@ -9778,7 +9777,7 @@ ErrorTrap:
             '
 ErrorTrap:
             Call handleLegacyClassError2("ProcessActionSave")
-            Call errorController.error_AddUserError(cpCore, "There was an unknown error saving the record at " & cpCore.app_startTime & ". Please try again, or report this error to the site administrator.")
+            Call errorController.error_AddUserError(cpCore, "There was an unknown error saving the record at " & cpCore.profileStartTime & ". Please try again, or report this error to the site administrator.")
             '
         End Sub
         '
@@ -10582,7 +10581,7 @@ ErrorTrap:
                     DateValue = cpCore.db.cs_getDate(CSServers, "DateAdded")
                     If DateValue <> Date.MinValue Then
                         Copy = genericController.encodeText(DateValue)
-                        AgeInDays = genericController.encodeText(Int(cpCore.app_startTime - DateValue))
+                        AgeInDays = genericController.encodeText(Int(cpCore.profileStartTime - DateValue))
                     End If
                 End If
                 Call cpCore.db.cs_Close(CSServers)
@@ -11115,10 +11114,10 @@ ErrorTrap:
                                                 Call cpCore.db.cs_set(CSDst, "Name", cpCore.db.cs_getText(CSSrc, "name"))
                                                 Call cpCore.db.cs_set(CSDst, SQLFieldName, cpCore.db.cs_getText(CSSrc, SQLFieldName))
                                                 If genericController.vbLCase(cpCore.db.cs_getText(CSSrc, "command")) = "xml" Then
-                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".xml")
+                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".xml")
                                                     Call cpCore.db.cs_set(CSDst, "Command", "BUILDXML")
                                                 Else
-                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".csv")
+                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv")
                                                     Call cpCore.db.cs_set(CSDst, "Command", "BUILDCSV")
                                                 End If
                                             End If
@@ -11142,7 +11141,7 @@ ErrorTrap:
                                     TableName = cpCore.metaData.getContentTablename(ContentName)
                                     Criteria = cpCore.metaData.content_getContentControlCriteria(ContentName)
                                     Name = "CSV Download, " & ContentName
-                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
+                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
                                     Call cpCore.db.cs_set(CS, "Name", Name)
                                     Call cpCore.db.cs_set(CS, "Filename", Filename)
                                     Call cpCore.db.cs_set(CS, "Command", "BUILDCSV")
@@ -11159,7 +11158,7 @@ ErrorTrap:
                                     TableName = cpCore.metaData.getContentTablename(ContentName)
                                     Criteria = cpCore.metaData.content_getContentControlCriteria(ContentName)
                                     Name = "XML Download, " & ContentName
-                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".xml"
+                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".xml"
                                     Call cpCore.db.cs_set(CS, "Name", Name)
                                     Call cpCore.db.cs_set(CS, "Filename", Filename)
                                     Call cpCore.db.cs_set(CS, "Command", "BUILDXML")
@@ -11799,7 +11798,7 @@ ErrorTrap:
                                         CS = cpCore.db.cs_insertRecord("Tasks")
                                         If cpCore.db.cs_ok(CS) Then
                                             RecordName = "CSV Download, Custom Report [" & Name & "]"
-                                            Filename = "CustomReport_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
+                                            Filename = "CustomReport_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
                                             Call cpCore.db.cs_set(CS, "Name", RecordName)
                                             Call cpCore.db.cs_set(CS, "Filename", Filename)
                                             If Format = "XML" Then
@@ -16803,19 +16802,19 @@ ErrorTrap:
                 ' Where Clause: edited today
                 '
                 If IndexConfig.LastEditedToday Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.app_startTime.Date) & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date) & ")"
                 End If
                 '
                 ' Where Clause: edited past week
                 '
                 If IndexConfig.LastEditedPast7Days Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.app_startTime.Date.AddDays(-7)) & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date.AddDays(-7)) & ")"
                 End If
                 '
                 ' Where Clause: edited past month
                 '
                 If IndexConfig.LastEditedPast30Days Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.app_startTime.Date.AddDays(-30)) & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date.AddDays(-30)) & ")"
                 End If
                 '
                 ' Where Clause: Workflow

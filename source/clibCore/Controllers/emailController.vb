@@ -761,7 +761,7 @@ ErrorTrap:
                     Message = "Subject: " & iSendSubject
                     Message = Message & vbCrLf
                 End If
-                Message = Message & "The form was submitted " & cpcore.app_startTime & vbCrLf
+                Message = Message & "The form was submitted " & cpcore.profileStartTime & vbCrLf
                 Message = Message & vbCrLf
                 Message = Message & "All text fields are included, completed or not." & vbCrLf
                 Message = Message & "Only those checkboxes that are checked are included." & vbCrLf
@@ -848,7 +848,7 @@ ErrorTrap:
                 '
                 SQL = "SELECT DISTINCT ccMembers.ID" _
                     & " FROM (ccMembers LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID) LEFT JOIN ccgroups ON ccMemberRules.GroupID = ccgroups.ID" _
-                    & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & ")) AND ("
+                    & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpcore.db.encodeSQLDate(cpcore.profileStartTime) & ")) AND ("
                 For GroupPointer = 0 To GroupCount - 1
                     If GroupPointer = 0 Then
                         SQL &= "(ccgroups.Name=" & cpcore.db.encodeSQLText(Groups(GroupPointer)) & ")"

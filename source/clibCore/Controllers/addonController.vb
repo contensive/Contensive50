@@ -254,7 +254,6 @@ Namespace Contensive.Core.Controllers
                 Dim IncludeEditWrapper As Boolean
                 Dim AddedByName As String = String.Empty
                 Dim AddonCommentName As String
-                Dim GroupIDList As String
                 Dim AddonOptionConstructor As String = String.Empty
                 Dim AddonOptionExpandedConstructor As String = String.Empty
                 Dim OptionString_ForObjectCall As String = String.Empty

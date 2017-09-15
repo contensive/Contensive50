@@ -47,26 +47,32 @@ Namespace Contensive.Core
         End Sub
         Protected disposed As Boolean = False
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property Admin() As Boolean
             Get
                 Return False
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property ArgumentList() As String
             Get
                 Return ""
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property AsAjax() As Boolean
             Get
                 Return False
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         <Obsolete("This is no longer supported. Add a overriding style in another stylesheet instead of modifying", True)>
         Public Overrides ReadOnly Property BlockDefaultStyles() As String
             Get
@@ -74,319 +80,413 @@ Namespace Contensive.Core
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property ccGuid() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property CollectionID() As Integer
             Get
                 Return 0
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property Content() As Boolean
             Get
                 Return False
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property Copy() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property CopyText() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property CustomStyles() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property DefaultStyles() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property Description() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property DotNetClass() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property FormXML() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property Help() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property HelpLink() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IconFilename() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IconHeight() As Integer
             Get
                 Return 0
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IconSprites() As Integer
             Get
                 Return 0
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IconWidth() As Integer
             Get
                 Return 0
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property ID() As Integer
             Get
                 Return 0
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property InFrame() As Boolean
             Get
 
                 Return False
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsInline() As Boolean
             Get
                 Return False
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property JavaScriptBodyEnd() As String
             Get
 
                 Return ""
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property JavascriptInHead() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property JavaScriptOnLoad() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property Link() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property MetaDescription() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property MetaKeywordList() As String
             Get
 
                 Return ""
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property Name() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property NavIconType() As String
             Get
                 Return ""
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property ObjectProgramID() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property OnBodyEnd() As Boolean
             Get
                 Return False
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property OnBodyStart() As Boolean
             Get
                 Return False
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property OnContentEnd() As Boolean
             Get
                 Return False
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property OnContentStart() As Boolean
             Get
                 Return False
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function Open(ByVal AddonId As Integer) As Boolean
             Return False
 
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function Open(ByVal AddonNameOrGuid As String) As Boolean
 
             Return False
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property OtherHeadTags() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property PageTitle() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property ProcessInterval() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property ProcessNextRun() As Date
             Get
                 Return #12:00:00 AM#
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property ProcessRunOnce() As Boolean
             Get
                 Return False
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property RemoteAssetLink() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property RemoteMethod() As Boolean
             Get
                 Return False
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property RobotsTxt() As String
             Get
                 Return ""
 
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property ScriptCode() As String
             Get
 
                 Return ""
             End Get
         End Property
-
-        Public Overrides ReadOnly Property ScriptEntryPoint() As String 'Inherits BaseClasses.CPAddonBaseClass.ScriptEntryPoint
+        '
+        '====================================================================================================
+        '
+        Public Overrides ReadOnly Property ScriptEntryPoint() As String
             Get
 
                 Return ""
             End Get
         End Property
-
-        Public Overrides ReadOnly Property ScriptLanguage() As String 'Inherits BaseClasses.CPAddonBaseClass.ScriptLanguage
+        '
+        '====================================================================================================
+        '
+        Public Overrides ReadOnly Property ScriptLanguage() As String
             Get
                 Return ""
 
             End Get
         End Property
-
-        Public Overrides ReadOnly Property SharedStyles() As String 'Inherits BaseClasses.CPAddonBaseClass.SharedStyles
+        '
+        '====================================================================================================
+        '
+        Public Overrides ReadOnly Property SharedStyles() As String
             Get
                 Return ""
 
             End Get
         End Property
-
-        Public Overrides ReadOnly Property Template() As Boolean 'Inherits BaseClasses.CPAddonBaseClass.Template
+        '
+        '====================================================================================================
+        '
+        Public Overrides ReadOnly Property Template() As Boolean
             Get
                 Return False
             End Get
@@ -411,21 +511,22 @@ Namespace Contensive.Core
             Return returnOk
         End Function
         '
+        '====================================================================================================
+        '
         Public Overrides Function installCollectionFromLibrary(collectionGuid As String, ByRef returnUserError As String) As Boolean
             Return False
         End Function
         '
-        ' append to logfile
+        '====================================================================================================
         '
         Private Sub appendDebugLog(ByVal copy As String)
-            'My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.addon, " & copy & vbCrLf, True)
-            ' 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
+            '
         End Sub
         '
-        ' testpoint
+        '====================================================================================================
         '
         Private Sub tp(ByVal msg As String)
-            'Call appendDebugLog(msg)
+            '
         End Sub
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.

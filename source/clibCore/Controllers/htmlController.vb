@@ -815,18 +815,18 @@ ErrorTrap:
                 'Dim Copy As String
                 Dim JS As String
                 Dim autoPrintText As String
-                Dim RenderTimeString As String = Format((GetTickCount - cpCore.app_startTickCount) / 1000, "0.000")
+                Dim RenderTimeString As String = Format((GetTickCount - cpCore.profileStartTickCount) / 1000, "0.000")
                 '
                 ' ----- Developer debug counters
                 '
-                cpCore.main_ClosePageCounter = cpCore.main_ClosePageCounter + 1
+                cpCore.closePageCounter = cpCore.closePageCounter + 1
                 If cpCore.webServer.initCounter = 0 Then
                     cpCore.handleException(New Exception("Page was not initialized properly. Init(...) call may be missing."))
                 End If
                 If cpCore.webServer.initCounter > 1 Then
                     cpCore.handleException(New Exception("Page was not initialized properly. Init(...) was called multiple times."))
                 End If
-                If cpCore.main_ClosePageCounter > 1 Then
+                If cpCore.closePageCounter > 1 Then
                     cpCore.handleException(New Exception("Page was not closed properly. main_GetEndOfBody was called multiple times."))
                 End If
                 '
@@ -875,7 +875,7 @@ ErrorTrap:
                     s = s & vbCrLf & vbTab & "<!--" & vbCrLf & vbCrLf & vbTab & "Contensive Framework/" & cpCore.codeVersion & ", copyright 1999-2012 Contensive, www.Contensive.com, " & RenderTimeString & vbCrLf & vbCrLf & vbTab & "-->"
                 End If
                 '
-                If Not cpCore.html_BlockClosePageLink Then
+                If Not cpCore.blockClosePageLink Then
                     s = s & vbCrLf & vbTab & "<a href=""http://www.contensive.com""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" border=""0""></a>"
                 End If
                 '
@@ -884,13 +884,13 @@ ErrorTrap:
                 If (Not BlockNonContentExtras) And cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
                     AllowPopupTraps = cpCore.siteProperties.getBoolean("AllowPopupTraps", True)
                     If AllowPopupTraps Then
-                        If cpCore.html_PageErrorWithoutCsv Then
-                            cpCore.main_TrapLogMessage = "" _
+                        If cpCore.pageErrorWithoutCsv Then
+                            cpCore.trapLogMessage = "" _
                                     & "<div style=""padding: 20px;"">" _
-                                    & genericController.vbReplace(cpCore.main_TrapLogMessage, vbCrLf, "<br>") _
+                                    & genericController.vbReplace(cpCore.trapLogMessage, vbCrLf, "<br>") _
                                     & "</div>"
                             '  s = s & main_GetPopupMessage(main_TrapLogMessage, 600, 400, True, True)
-                        ElseIf (cpCore.app_errorCount > 0) Then
+                        ElseIf (cpCore.errorCount > 0) Then
                             '  s = s & main_GetPopupMessage(main_TrapLogMessage, "", "", "yes")
                         End If
                     End If
@@ -902,8 +902,8 @@ ErrorTrap:
                     If cpCore.doc.htmlForEndOfBody <> "" Then
                         s = s & cpCore.doc.htmlForEndOfBody
                     End If
-                    If cpCore.main_testPointMessage <> "" Then
-                        s = s & "<div class=""ccTestPointMessageCon"">" & cpCore.main_testPointMessage & "</div>"
+                    If cpCore.testPointMessage <> "" Then
+                        s = s & "<div class=""ccTestPointMessageCon"">" & cpCore.testPointMessage & "</div>"
                     End If
                 End If
                 '
@@ -6026,92 +6026,62 @@ ErrorTrap:
         '========================================================================
         '
         Public Sub processFormToolsPanel()
-            Dim CS As Integer
-            Dim MethodName As String
-            Dim CreatePathBlock As Boolean
-            Dim Button As String
-            Dim PathID As Integer
-            Dim username As String
-            '
-            MethodName = "main_ProcessFormToolsPanel()"
-            '
-            ' ----- Read in and save the Member profile values from the tools panel
-            '
-            If (cpCore.authContext.user.id > 0) Then
-                If Not (cpCore.debug_iUserError <> "") Then
-                    Button = cpCore.docProperties.getText("mb")
-                    Select Case Button
-                        Case ButtonLogout
-                            '
-                            ' Logout - This can only come from the Horizonal Tool Bar
-                            '
-                            Call cpCore.authContext.logout(cpCore)
-                        Case ButtonLogin
-                            '
-                            ' Login - This can only come from the Horizonal Tool Bar
-                            '
-                            Dim loginAddon As New Addons.loginPageClass(cpCore)
-                            Call loginAddon.processFormLoginDefault()
-                        Case ButtonApply
-                            '
-                            ' Apply
-                            '
-                            username = cpCore.docProperties.getText("username")
-                            If username <> "" Then
+            Try
+                Dim Button As String
+                Dim username As String
+                '
+                ' ----- Read in and save the Member profile values from the tools panel
+                '
+                If (cpCore.authContext.user.id > 0) Then
+                    If Not (cpCore.debug_iUserError <> "") Then
+                        Button = cpCore.docProperties.getText("mb")
+                        Select Case Button
+                            Case ButtonLogout
+                                '
+                                ' Logout - This can only come from the Horizonal Tool Bar
+                                '
+                                Call cpCore.authContext.logout(cpCore)
+                            Case ButtonLogin
+                                '
+                                ' Login - This can only come from the Horizonal Tool Bar
+                                '
                                 Dim loginAddon As New Addons.loginPageClass(cpCore)
                                 Call loginAddon.processFormLoginDefault()
-                            End If
-                            '
-                            ' ----- AllowAdminLinks
-                            '
-                            Call cpCore.visitProperty.setProperty("AllowEditing", genericController.encodeText(cpCore.docProperties.getBoolean("AllowEditing")))
-                            '
-                            ' ----- Quick Editor
-                            '
-                            Call cpCore.visitProperty.setProperty("AllowQuickEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowQuickEditor")))
-                            '
-                            ' ----- Advanced Editor
-                            '
-                            Call cpCore.visitProperty.setProperty("AllowAdvancedEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowAdvancedEditor")))
-                            '
-                            ' ----- Allow Workflow authoring Render Mode - Visit Property
-                            '
-                            Call cpCore.visitProperty.setProperty("AllowWorkflowRendering", genericController.encodeText(cpCore.docProperties.getBoolean("AllowWorkflowRendering")))
-                            '
-                            ' ----- developer Only parts
-                            '
-                            Call cpCore.visitProperty.setProperty("AllowDebugging", genericController.encodeText(cpCore.docProperties.getBoolean("AllowDebugging")))
-                            'If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
-                            '    '
-                            '    ' ----- Create Path Block record, if requested
-                            '    '
-                            '    CreatePathBlock = cpCore.docProperties.getBoolean("CreatePathBlock")
-                            '    CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPath))
-                            '    PathID = 0
-                            '    If cpCore.db.cs_ok(CS) Then
-                            '        PathID = cpCore.db.cs_getInteger(CS, "id")
-                            '    End If
-                            '    Call cpCore.db.cs_Close(CS)
-                            '    If (PathID = 0) And (CreatePathBlock) Then
-                            '        '
-                            '        ' path is not blocked, but we want it blocked
-                            '        '
-                            '        CS = cpCore.db.cs_insertRecord("Paths")
-                            '        If cpCore.db.cs_ok(CS) Then
-                            '            Call cpCore.db.cs_set(CS, "name", cpCore.webServer.requestPath)
-                            '            Call cpCore.db.cs_set(CS, "active", 1)
-                            '        End If
-                            '        Call cpCore.db.cs_Close(CS)
-                            '    ElseIf (PathID <> 0) And (Not CreatePathBlock) Then
-                            '        '
-                            '        ' path is blocked, but we do not want it blocked
-                            '        '
-                            '        Call cpCore.db.deleteContentRecord("Paths", PathID)
-                            '    End If
-                            'End If
-                    End Select
+                            Case ButtonApply
+                                '
+                                ' Apply
+                                '
+                                username = cpCore.docProperties.getText("username")
+                                If username <> "" Then
+                                    Dim loginAddon As New Addons.loginPageClass(cpCore)
+                                    Call loginAddon.processFormLoginDefault()
+                                End If
+                                '
+                                ' ----- AllowAdminLinks
+                                '
+                                Call cpCore.visitProperty.setProperty("AllowEditing", genericController.encodeText(cpCore.docProperties.getBoolean("AllowEditing")))
+                                '
+                                ' ----- Quick Editor
+                                '
+                                Call cpCore.visitProperty.setProperty("AllowQuickEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowQuickEditor")))
+                                '
+                                ' ----- Advanced Editor
+                                '
+                                Call cpCore.visitProperty.setProperty("AllowAdvancedEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowAdvancedEditor")))
+                                '
+                                ' ----- Allow Workflow authoring Render Mode - Visit Property
+                                '
+                                Call cpCore.visitProperty.setProperty("AllowWorkflowRendering", genericController.encodeText(cpCore.docProperties.getBoolean("AllowWorkflowRendering")))
+                                '
+                                ' ----- developer Only parts
+                                '
+                                Call cpCore.visitProperty.setProperty("AllowDebugging", genericController.encodeText(cpCore.docProperties.getBoolean("AllowDebugging")))
+                        End Select
+                    End If
                 End If
-            End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
         '========================================================================
@@ -6149,7 +6119,6 @@ ErrorTrap:
             Dim PosStart As Integer
             Dim PosIDStart As Integer
             Dim PosIDEnd As Integer
-            Dim addonPtr As Integer
             '
             MethodName = "main_ProcessAddonSettingsEditor()"
             '
@@ -9186,7 +9155,7 @@ ErrorTrap:
                             & " AND(ccContent.active<>0)" _
                             & " AND(ccGroupRules.active<>0)" _
                             & " AND(ccMemberRules.active<>0)" _
-                            & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & "))" _
+                            & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "))" _
                             & " AND(ccgroups.active<>0)" _
                             & " AND(ccMembers.active<>0)" _
                             & " AND(ccMembers.ID=" & cpCore.authContext.user.id & ")" _
@@ -9204,7 +9173,7 @@ ErrorTrap:
                             MemberRulesAllow = False
                             If MemberRulesDateExpires = Date.MinValue Then
                                 MemberRulesAllow = True
-                            ElseIf (MemberRulesDateExpires > cpCore.app_startTime) Then
+                            ElseIf (MemberRulesDateExpires > cpCore.profileStartTime) Then
                                 MemberRulesAllow = True
                             End If
                         Else
@@ -9416,7 +9385,7 @@ ErrorTrap:
             'If Not (true) Then Exit Function
             '
             iHeaderMessage = genericController.encodeText(HeaderMessage)
-            iRightSideMessage = genericController.encodeEmptyText(RightSideMessage, FormatDateTime(cpCore.app_startTime))
+            iRightSideMessage = genericController.encodeEmptyText(RightSideMessage, FormatDateTime(cpCore.profileStartTime))
             main_GetPanelHeader = Adminui.GetHeader(iHeaderMessage, iRightSideMessage)
         End Function
 
@@ -9550,8 +9519,6 @@ ErrorTrap:
                 Dim AdvancedEditTagID As String
                 Dim WorkflowTagID As String
                 Dim Tag As String
-                Dim PathID As Integer
-                Dim CS As Integer
                 Dim MethodName As String
                 Dim TagID As String
                 Dim ToolsPanel As stringBuilderLegacyController
@@ -9576,7 +9543,7 @@ ErrorTrap:
                     LinkPanel = New stringBuilderLegacyController
                     LinkPanel.Add(SpanClassAdminSmall)
                     LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
-                    LinkPanel.Add(FormatDateTime(cpCore.app_startTime) & " | ")
+                    LinkPanel.Add(FormatDateTime(cpCore.profileStartTime) & " | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("http://" & cpCore.webServer.requestDomain) & """>Public Home</A> | ")
@@ -9823,7 +9790,7 @@ ErrorTrap:
                         LinkPanel.Add(SpanClassAdminSmall)
                         'LinkPanel.Add( "WebClient " & main_WebClientVersion & " | "
                         LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
-                        LinkPanel.Add(FormatDateTime(cpCore.app_startTime) & " | ")
+                        LinkPanel.Add(FormatDateTime(cpCore.profileStartTime) & " | ")
                         LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("http://" & cpCore.webServer.requestDomain) & """>Public Home</A> | ")
@@ -9875,7 +9842,7 @@ ErrorTrap:
                                 Copy = Copy & cr & "<br>" & genericController.encodeHTML(docProperty.NameValue)
                             End If
                         Next
-                        DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((GetTickCount - cpCore.app_startTickCount) / 1000, "0.000") & " sec")
+                        DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((GetTickCount - cpCore.profileStartTickCount) / 1000, "0.000") & " sec")
                         If True Then
                             VisitHrs = CInt(cpCore.authContext.visit.TimeToLastHit / 3600)
                             VisitMin = CInt(cpCore.authContext.visit.TimeToLastHit / 60) - (60 * VisitHrs)

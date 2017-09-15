@@ -2,13 +2,9 @@
 Option Strict On
 Option Explicit On
 
-Imports System.Xml
 Imports System.Reflection
-Imports HttpMultipartParser
 Imports Contensive.BaseClasses
 Imports Contensive.Core.Controllers
-Imports Contensive.Core.Controllers.genericController
-Imports Contensive.Core.Models
 Imports Contensive.Core.Models.Context
 Imports Contensive.Core.Models.Entity
 '
@@ -26,63 +22,29 @@ Namespace Contensive.Core
         ' -- objects passed by constructor - do not dispose
         ' -- yes, cp is needed to pass int addon execution and script execution - but DO NOT call if from anything else
         ' -- no, cpCore should never call up to cp. cp is the api that calls core.
-        Friend cp_forAddonExecutionOnly As CPClass                                   ' constructor -- top-level cp
-        '
-        ' -- shared globals
-        '
-        Public serverConfig As Models.Entity.serverConfigModel
-        '
-        ' -- application storage
-        '
-        Friend errList As List(Of String)                                   ' exceptions collected during document construction
-        Friend userErrorList As List(Of String)                           ' user messages
-        '
-        ' -- state, authentication, authorization
-        ' -- these are set id=0 at construction, then initialize if authentication used
-        '
-        Public authContext As authContextModel
-        '
-        ' -- Debugging
-        '
-        Private appStopWatch As Stopwatch = Stopwatch.StartNew()
-        Public Property app_startTime As Date                                        ' set in constructor
-        Public Property app_startTickCount As Integer = 0
-        Public Property debug_allowDebugLog As Boolean = False                       ' turn on in script -- use to write /debug.log in content files for whatever is needed
-        Public Property blockExceptionReporting As Boolean = False                   ' used so error reporting can not call itself
-        Public Property app_errorCount As Integer = 0
+        Friend Property cp_forAddonExecutionOnly As CPClass                                   ' constructor -- top-level cp
+        Public Property serverConfig As Models.Entity.serverConfigModel
+        Friend Property errList As List(Of String)                                   ' exceptions collected during document construction
+        Public Property errorCount As Integer = 0
+        Friend Property userErrorList As List(Of String)                           ' user messages
         Public Property debug_iUserError As String = ""                              ' User Error String
-        Public Property html_PageErrorWithoutCsv As Boolean = False                  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
-        Public Property main_TrapLogMessage As String = ""                           ' The content of the current traplog (keep for popups if no Csv)
-        Public Property main_ClosePageCounter As Integer = 0
-        Public Property html_BlockClosePageLink As Boolean = False                   ' if true,block the href to contensive
-        Public Property main_testPointMessage As String = ""                         '
+        Public Property trapLogMessage As String = ""                           ' The content of the current traplog (keep for popups if no Csv)
+        Public Property testPointMessage As String = ""                         '
         Public Property testPointPrinting As Boolean = False                         ' if true, send main_TestPoint messages to the stream
+        Public Property authContext As authContextModel
+        Private Property appStopWatch As Stopwatch = Stopwatch.StartNew()
+        Public Property profileStartTime As Date                                        ' set in constructor
+        Public Property profileStartTickCount As Integer = 0
+        Public Property allowDebugLog As Boolean = False                       ' turn on in script -- use to write /debug.log in content files for whatever is needed
+        Public Property blockExceptionReporting As Boolean = False                   ' used so error reporting can not call itself
+        Public Property pageErrorWithoutCsv As Boolean = False                  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
+        Public Property closePageCounter As Integer = 0
+        Public Property blockClosePageLink As Boolean = False                   ' if true,block the href to contensive
         Public Property continueProcessing As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
-        'Public Const cache_linkAlias_cacheName = "cache_linkAlias"
-        'Public Property cache_linkAlias As String(,)
-        'Public Property cache_linkAliasCnt As Integer = 0
-        'Public Property cache_linkAlias_NameIndex As keyPtrController
-        'Public Property cache_linkAlias_PageIdQSSIndex As keyPtrController
-        '
-        '========================================================================================================================
-        '   Internal cache (for content used to run the system)
-        '
         Public Property upgradeInProgress() As Boolean
-        Private Property main_PleaseWaitStarted As Boolean = False
-        '
-        '------------------------------------------------------------------------
-        ' ----- Debugging
-        '
         Public Property docGuid As String                        ' Random number (semi) unique to this hit
         Friend Property addonsRunOnThisPageIdList As New List(Of Integer)
         Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
-        'Public Structure csv_stylesheetCacheType
-        '    Dim templateId As Integer
-        '    Dim EmailID As Integer
-        '    Dim StyleSheet As String
-        'End Structure
-        'Public Property stylesheetCache As csv_stylesheetCacheType()
-        'Public Property stylesheetCacheCnt As Integer
         Public Property pageAddonCnt As Integer = 0
         '
         '===================================================================================================
@@ -392,17 +354,6 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _addonCache As addonModel.addonCacheClass = Nothing
-        ''
-        ''===================================================================================================
-        'Public ReadOnly Property addonLegacyCache() As Models.Entity.addonLegacyModel
-        '    Get
-        '        If (_addonCache Is Nothing) Then
-        '            _addonCache = New Models.Entity.addonLegacyModel(Me)
-        '        End If
-        '        Return _addonCache
-        '    End Get
-        'End Property
-        'Private _addonCache As Models.Entity.addonLegacyModel = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -594,25 +545,14 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <returns>The doc created by the default addon. (html, json, etc)</returns>
         Public Function executeRoute(Optional route As String = "") As String
-            Dim returnResult As String = ""
+            Dim result As String = ""
             Try
                 If (serverConfig.appConfig IsNot Nothing) Then
                     '
-                    ' -- if app is not configured, cannot execute route
-                    Dim pairs() As String
-                    Dim pairName As String
-                    Dim pairValue As String
-                    Dim addonRoute As String = ""
-                    Dim normalRoute As String
-                    Dim adminRoute As String = serverConfig.appConfig.adminRoute.ToLower
-                    Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
-                    Dim AjaxFastFunction As String = docProperties.getText(RequestNameAjaxFastFunction)
-                    Dim RemoteMethodFromQueryString As String = docProperties.getText(RequestNameRemoteMethodAddon)
-                    '
-                    'debugLog("executeRoute, enter")
-                    '
                     ' determine route from either url or querystring 
                     '
+                    Dim normalRoute As String = webServer.requestPathPage.ToLower
+                    Dim RemoteMethodFromQueryString As String = docProperties.getText(RequestNameRemoteMethodAddon)
                     If (Not String.IsNullOrEmpty(route)) Then
                         '
                         ' route privided as argument
@@ -623,17 +563,11 @@ Namespace Contensive.Core
                         ' route comes from a remoteMethod=route querystring argument
                         '
                         normalRoute = "/" & RemoteMethodFromQueryString.ToLower()
-                    Else
-                        '
-                        ' routine comes from the url
-                        '
-                        normalRoute = webServer.requestPathPage.ToLower
                     End If
                     '
                     ' normalize route to /path/page or /path
                     '
                     normalRoute = genericController.normalizeRoute(normalRoute)
-                    addonRoute = ""
                     '
                     ' call with no addon route returns admin site
                     '
@@ -647,9 +581,8 @@ Namespace Contensive.Core
                         '------------------------------------------------------------------------------------------
                         '
                         ' if route is a remote method, use it
-                        Dim addon As addonModel
-                        addonRoute = normalRoute
-                        addon = addonCache.getAddonByName(addonRoute)
+                        Dim addonRoute As String = normalRoute
+                        Dim addon As addonModel = addonCache.getAddonByName(addonRoute)
                         If (addon Is Nothing) Then
                             '
                             ' -- try testRoute2
@@ -756,10 +689,10 @@ Namespace Contensive.Core
                                     ' convert Querystring encoding to (internal) NVA
                                     '
                                     If webServer.requestQueryString <> "" Then
-                                        pairs = Split(webServer.requestQueryString, "&")
+                                        Dim pairs() As String = Split(webServer.requestQueryString, "&")
                                         For addonPtr = 0 To UBound(pairs)
-                                            pairName = pairs(addonPtr)
-                                            pairValue = ""
+                                            Dim pairName As String = pairs(addonPtr)
+                                            Dim pairValue As String = ""
                                             pos = genericController.vbInstr(1, pairName, "=")
                                             If pos > 0 Then
                                                 pairValue = genericController.DecodeResponseVariable(Mid(pairName, pos + 1))
@@ -779,31 +712,31 @@ Namespace Contensive.Core
                                 '
                                 ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
                                 '
-                                returnResult = Me.addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.id, authContext.isAuthenticated)
+                                result = Me.addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.id, authContext.isAuthenticated)
                             End If
                             '
                             ' deliver styles, javascript and other head tags as javascript appends
                             '
                             webServer.blockClosePageCopyright = True
-                            html_BlockClosePageLink = True
+                            blockClosePageLink = True
                             If (webServer.outStreamDevice = htmlDoc_OutStreamJavaScript) Then
-                                If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
-                                    Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
-                                    returnResult = FormSplit(0)
+                                If genericController.vbInstr(1, result, "<form ", vbTextCompare) <> 0 Then
+                                    Dim FormSplit As String() = Split(result, "<form ", , vbTextCompare)
+                                    result = FormSplit(0)
                                     For addonPtr = 1 To UBound(FormSplit)
                                         Dim FormEndPos As Integer = genericController.vbInstr(1, FormSplit(addonPtr), ">")
                                         Dim FormInner As String = Mid(FormSplit(addonPtr), 1, FormEndPos)
                                         Dim FormSuffix As String = Mid(FormSplit(addonPtr), FormEndPos + 1)
                                         FormInner = genericController.vbReplace(FormInner, "method=""post""", "method=""main_Get""", 1, 99, vbTextCompare)
                                         FormInner = genericController.vbReplace(FormInner, "method=post", "method=""main_Get""", 1, 99, vbTextCompare)
-                                        returnResult = returnResult & "<form " & FormInner & FormSuffix
+                                        result = result & "<form " & FormInner & FormSuffix
                                     Next
                                 End If
                                 '
-                                Call html.writeAltBuffer(returnResult)
-                                returnResult = ""
+                                Call html.writeAltBuffer(result)
+                                result = ""
                             End If
-                            Return returnResult
+                            Return result
                         End If
                         If True Then
                             '
@@ -813,8 +746,9 @@ Namespace Contensive.Core
                             '   AJAX late functions (slower then the early functions, but they include visit state, etc.
                             '------------------------------------------------------------------------------------------
                             '
+                            Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
                             If AjaxFunction <> "" Then
-                                returnResult = ""
+                                result = ""
                                 Select Case AjaxFunction
                                     Case ajaxGetFieldEditorPreferenceForm
                                         '
@@ -859,7 +793,7 @@ Namespace Contensive.Core
                                             For Each rsDr As DataRow In dt.Rows
                                                 Dim addonId As Integer = genericController.EncodeInteger(rsDr("addonid"))
                                                 If (addonId <> 0) And (addonId <> addonDefaultEditorId) Then
-                                                    returnResult = returnResult _
+                                                    result = result _
                                                     & vbCrLf & vbTab & "<div class=""radioCon"">" & html.html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & genericController.encodeText(rsDr("addonName")) & "</div>" _
                                                     & ""
                                                 End If
@@ -877,11 +811,11 @@ Namespace Contensive.Core
                                         & "document.getElementById('adminEditForm').submit();" _
                                         & ""
 
-                                        returnResult = "" _
+                                        result = "" _
                                         & vbCrLf & vbTab & "<h1>Editor Preference</h1>" _
                                         & vbCrLf & vbTab & "<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>" _
                                         & vbCrLf & vbTab & "<div class=""radioCon"">" & html.html_GetFormInputRadioBox("setEditorPreference" & fieldId, "0", "0") & "&nbsp;Use Default Editor" & addonDefaultEditorName & "</div>" _
-                                        & vbCrLf & vbTab & returnResult _
+                                        & vbCrLf & vbTab & result _
                                         & vbCrLf & vbTab & "<div class=""buttonCon"">" _
                                         & vbCrLf & vbTab & "<button type=""button"" onclick=""" & OnClick & """>Select</button>" _
                                         & vbCrLf & vbTab & "</div>" _
@@ -901,7 +835,7 @@ Namespace Contensive.Core
                                         If db.cs_ok(CS) Then
                                             addonArgumentList = db.cs_getText(CS, "argumentlist")
                                             addonIsInline = db.cs_getBoolean(CS, "IsInline")
-                                            returnResult = addonController.main_GetDefaultAddonOption_String(Me, addonArgumentList, AddonGuid, addonIsInline)
+                                            result = addonController.main_GetDefaultAddonOption_String(Me, addonArgumentList, AddonGuid, addonIsInline)
                                         End If
                                         Call db.cs_Close(CS)
                                     Case AjaxSetVisitProperty
@@ -921,9 +855,9 @@ Namespace Contensive.Core
                                             End If
                                             Call visitProperty.setProperty(PropertyName, PropertyValue)
                                         Next
-                                        returnResult = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                        returnResult = html.main_encodeHTML(returnResult)
-                                        Call html.writeAltBuffer(returnResult)
+                                        result = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
+                                        result = html.main_encodeHTML(result)
+                                        Call html.writeAltBuffer(result)
                                     Case AjaxGetVisitProperty
                                         '
                                         ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
@@ -948,9 +882,9 @@ Namespace Contensive.Core
                                             End If
                                             gd.row(0).Cell(Ptr).v = visitProperty.getText(PropertyName, PropertyValue)
                                         Next
-                                        returnResult = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                        returnResult = html.main_encodeHTML(returnResult)
-                                        Call html.writeAltBuffer(returnResult)
+                                        result = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
+                                        result = html.main_encodeHTML(result)
+                                        Call html.writeAltBuffer(result)
                                     Case AjaxData
                                         '
                                         ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
@@ -960,7 +894,7 @@ Namespace Contensive.Core
                                         '
                                         ' returns OK if the server is alive
                                         '
-                                        returnResult = "ok"
+                                        result = "ok"
                                     Case AjaxOpenIndexFilter
                                         Call visitProperty.setProperty("IndexFilterOpen", "1")
                                     Case AjaxOpenIndexFilterGetContent
@@ -971,10 +905,10 @@ Namespace Contensive.Core
                                         Dim adminSite As New Contensive.Addons.addon_AdminSiteClass(cp_forAddonExecutionOnly)
                                         Dim ContentID As Integer = docProperties.getInteger("cid")
                                         If ContentID = 0 Then
-                                            returnResult = "No filter is available"
+                                            result = "No filter is available"
                                         Else
                                             Dim cdef As cdefModel = metaData.getCdef(ContentID)
-                                            returnResult = adminSite.GetForm_IndexFilterContent(cdef)
+                                            result = adminSite.GetForm_IndexFilterContent(cdef)
                                         End If
                                         adminSite = Nothing
                                     Case AjaxCloseIndexFilter
@@ -987,11 +921,11 @@ Namespace Contensive.Core
                                 'Call AppendLog("main_init(), 2810 - exit for ajax hook")
                                 '
                                 webServer.blockClosePageCopyright = True
-                                html_BlockClosePageLink = True
+                                blockClosePageLink = True
                                 'Call AppendLog("call main_getEndOfBody, from main_initf")
                                 ' -- removed, not sure what it did but this should just be part of getHtmlDoc() 
                                 'returnResult = returnResult & html.getHtmlDoc_beforeEndOfBodyHtml(False, False, True, False)
-                                Call html.writeAltBuffer(returnResult)
+                                Call html.writeAltBuffer(result)
                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
                                 Return doc.docBuffer
                             End If
@@ -1022,7 +956,7 @@ Namespace Contensive.Core
                                 EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
                                 CSLog = db.cs_insertRecord("Email Log")
                                 If db.cs_ok(CSLog) Then
-                                    Call db.cs_set(CSLog, "Name", "Opened " & CStr(app_startTime))
+                                    Call db.cs_set(CSLog, "Name", "Opened " & CStr(profileStartTime))
                                     Call db.cs_set(CSLog, "EmailDropID", recordid)
                                     Call db.cs_set(CSLog, "MemberID", EmailMemberID)
                                     Call db.cs_set(CSLog, "LogType", EmailLogTypeOpen)
@@ -1041,7 +975,7 @@ Namespace Contensive.Core
                                 EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
                                 CSLog = db.cs_insertRecord("Email Log")
                                 If db.cs_ok(CSLog) Then
-                                    Call db.cs_set(CSLog, "Name", "Clicked " & CStr(app_startTime))
+                                    Call db.cs_set(CSLog, "Name", "Clicked " & CStr(profileStartTime))
                                     Call db.cs_set(CSLog, "EmailDropID", emailDropId)
                                     Call db.cs_set(CSLog, "MemberID", EmailMemberID)
                                     Call db.cs_set(CSLog, "VisitId", authContext.visit.id)
@@ -1072,7 +1006,7 @@ Namespace Contensive.Core
                                     EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
                                     CSLog = db.cs_insertRecord("Email Log")
                                     If db.cs_ok(CSLog) Then
-                                        Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(app_startTime))
+                                        Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(profileStartTime))
                                         Call db.cs_set(CSLog, "EmailDropID", emailDropId)
                                         Call db.cs_set(CSLog, "MemberID", EmailMemberID)
                                         Call db.cs_set(CSLog, "VisitId", authContext.visit.id)
@@ -1215,7 +1149,7 @@ Namespace Contensive.Core
                         ' normalize adminRoute and test for hit
                         '--------------------------------------------------------------------------
                         '
-                        If (normalRoute = genericController.normalizeRoute(adminRoute)) Then
+                        If (normalRoute = genericController.normalizeRoute(serverConfig.appConfig.adminRoute.ToLower)) Then
                             '
                             'debugLog("executeRoute, route is admin")
                             '
@@ -1230,14 +1164,14 @@ Namespace Contensive.Core
                             ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
                             '
                             If True Then
-                                returnResult = Me.addon.execute_legacy4(adminSiteAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
+                                result = Me.addon.execute_legacy4(adminSiteAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
                             Else
                                 '
                                 ' until then, run it as an internal class
                                 '
-                                returnResult = Me.addon.execute_legacy4(basestlylesAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
+                                result = Me.addon.execute_legacy4(basestlylesAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
                                 Dim admin As New Contensive.Addons.addon_AdminSiteClass()
-                                returnResult = admin.execute(cp_forAddonExecutionOnly).ToString()
+                                result = admin.execute(cp_forAddonExecutionOnly).ToString()
                             End If
                             'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", authContext.user.userid, visit.visitAuthenticated)
                         Else
@@ -1254,14 +1188,14 @@ Namespace Contensive.Core
                             If (defaultAddonId = 0) Then
                                 '
                                 ' -- no default route set, assume html hit
-                                returnResult = "<p>This site is not configured for website traffic. Please set the default route.</p>"
+                                result = "<p>This site is not configured for website traffic. Please set the default route.</p>"
                             Else
                                 Dim addonStatusOk As Boolean = False
-                                returnResult = Me.addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.id, authContext.visit.VisitAuthenticated)
+                                result = Me.addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.id, authContext.visit.VisitAuthenticated)
                                 If (Not addonStatusOk) Then
                                     '
                                     ' -- there was an error in the default route addon
-                                    returnResult = "<p>This site is temporarily unavailable.</p>"
+                                    result = "<p>This site is temporarily unavailable.</p>"
                                 Else
                                 End If
                             End If
@@ -1271,60 +1205,24 @@ Namespace Contensive.Core
             Catch ex As Exception
                 Call handleException(ex)
             End Try
-            Return returnResult
+            Return result
         End Function
         '
         '=================================================================================================
-        '   Run and return results from a remotequery call from cj.ajax.data(handler,key,args,pagesize,pagenumber)
-        '
-        '   This routine builds an xml object inside a <result></result> node.
-        '       Right now, the response is in JSON format, and conforms to the google data visualization spec 0.5
-        '
-        '
-        '=================================================================================================
-        '
+        ''' <summary>
+        ''' Run and return results from a remotequery call from cj.ajax.data(handler,key,args,pagesize,pagenumber)
+        ''' This routine builds an xml object inside a <result></result> node. 
+        ''' Right now, the response is in JSON format, and conforms to the google data visualization spec 0.5
+        ''' </summary>
+        ''' <returns></returns>
         Private Function executeRoute_ProcessAjaxData() As String
             Dim result As String = ""
             Try
-                Dim SetPairs() As String
-                Dim Pos As Integer
-                Dim FieldValue As String
-                Dim SetPairString As String
-                Dim ArgCnt As Integer
-                Dim s As New stringBuilderLegacyController
-                Dim FieldName As String
-                Dim Copy As String
-                Dim PageSize As Integer
-                Dim ArgArray() As String
-                Dim RemoteKey As String
-                Dim EncodedArgs As String
-                Dim Args As String
-                Dim PageNumber As Integer
-                Dim CS As Integer
-                Dim SQLQuery As String
-                Dim maxRows As Integer
-                Dim ArgName As String() = {}
-                Dim ArgValue As String() = {}
-                Dim Ptr As Integer
-                Dim QueryType As Integer
-                Dim ContentName As String = ""
-                Dim Criteria As String
-                Dim SortFieldList As String = ""
-                Dim AllowInactiveRecords2 As Boolean
-                Dim SelectFieldList As String = ""
-                Dim gd As New GoogleDataType
-                Dim gv As New GoogleVisualizationType
+                Dim RemoteKey As String = docProperties.getText("key")
+                Dim EncodedArgs As String = docProperties.getText("args")
+                Dim PageSize As Integer = docProperties.getInteger("pagesize")
+                Dim PageNumber As Integer = docProperties.getInteger("pagenumber")
                 Dim RemoteFormat As RemoteFormatEnum
-                'Dim DataSource As Models.Entity.dataSourceModel
-                '
-                gv.status = GoogleVisualizationStatusEnum.OK
-                gd.IsEmpty = True
-                '
-                RemoteKey = docProperties.getText("key")
-                EncodedArgs = docProperties.getText("args")
-
-                PageSize = docProperties.getInteger("pagesize")
-                PageNumber = docProperties.getInteger("pagenumber")
                 Select Case genericController.vbLCase(docProperties.getText("responseformat"))
                     Case "jsonnamevalue"
                         RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue
@@ -1342,18 +1240,21 @@ Namespace Contensive.Core
                 If PageSize = 0 Then
                     PageSize = 100
                 End If
+                Dim maxRows As Integer = 0
                 If maxRows <> 0 And PageSize > maxRows Then
                     PageSize = maxRows
                 End If
                 '
+                Dim ArgName As String() = {}
+                Dim ArgValue As String() = {}
                 If EncodedArgs <> "" Then
-                    Args = EncodedArgs
-                    ArgArray = Split(Args, "&")
-                    ArgCnt = UBound(ArgArray) + 1
+                    Dim Args As String = EncodedArgs
+                    Dim ArgArray() As String = Split(Args, "&")
+                    Dim ArgCnt As Integer = UBound(ArgArray) + 1
                     ReDim ArgName(ArgCnt)
                     ReDim ArgValue(ArgCnt)
                     For Ptr = 0 To ArgCnt - 1
-                        Pos = genericController.vbInstr(1, ArgArray(Ptr), "=")
+                        Dim Pos As Integer = genericController.vbInstr(1, ArgArray(Ptr), "=")
                         If Pos > 0 Then
                             ArgName(Ptr) = genericController.DecodeResponseVariable(Mid(ArgArray(Ptr), 1, Pos - 1))
                             ArgValue(Ptr) = genericController.DecodeResponseVariable(Mid(ArgArray(Ptr), Pos + 1))
@@ -1363,13 +1264,23 @@ Namespace Contensive.Core
                 '
                 ' main_Get values out of the remote query record
                 '
+                Dim gv As New GoogleVisualizationType
+                gv.status = GoogleVisualizationStatusEnum.OK
+                '
                 If gv.status = GoogleVisualizationStatusEnum.OK Then
-                    CS = db.cs_open("Remote Queries", "((VisitId=" & authContext.visit.id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
+                    Dim SetPairString As String = ""
+                    Dim QueryType As Integer = 0
+                    Dim ContentName As String = ""
+                    Dim Criteria As String = ""
+                    Dim SortFieldList As String = ""
+                    Dim AllowInactiveRecords2 As Boolean = False
+                    Dim SelectFieldList As String = ""
+                    Dim CS As Integer = db.cs_open("Remote Queries", "((VisitId=" & authContext.visit.id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
                     If db.cs_ok(CS) Then
                         '
                         ' Use user definied query
                         '
-                        SQLQuery = db.cs_getText(CS, "sqlquery")
+                        Dim SQLQuery As String = db.cs_getText(CS, "sqlquery")
                         'DataSource = Models.Entity.dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
                         maxRows = db.cs_getInteger(CS, "maxrows")
                         QueryType = db.cs_getInteger(CS, "QueryTypeID")
@@ -1378,7 +1289,6 @@ Namespace Contensive.Core
                         SortFieldList = db.cs_getText(CS, "SortFieldList")
                         AllowInactiveRecords2 = db.cs_getBoolean(CS, "AllowInactiveRecords")
                         SelectFieldList = db.cs_getText(CS, "SelectFieldList")
-                        SetPairString = ""
                     Else
                         '
                         ' Try Hardcoded queries
@@ -1390,9 +1300,8 @@ Namespace Contensive.Core
                                 '
                                 If Not authContext.user.Developer Then
                                     gv.status = GoogleVisualizationStatusEnum.ErrorStatus
+                                    Dim Ptr As Integer = 0
                                     If IsArray(gv.errors) Then
-                                        Ptr = 0
-                                    Else
                                         Ptr = UBound(gv.errors) + 1
                                     End If
                                     ReDim gv.errors(Ptr)
@@ -1421,127 +1330,6 @@ Namespace Contensive.Core
                     '
                     If gv.status = GoogleVisualizationStatusEnum.OK Then
                         Select Case QueryType
-                        'Case QueryTypeSQL
-                        '    '
-                        '    ' ----- Run a SQL
-                        '    '
-                        '    If SQLQuery <> "" Then
-                        '        For Ptr = 0 To ArgCnt - 1
-                        '            SQLQuery = genericController.vbReplace(SQLQuery, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
-                        '            'Criteria = genericController.vbReplace(Criteria, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
-                        '        Next
-                        '        On Error Resume Next
-                        '        RS = main_ExecuteSQLCommand(DataSource, SQLQuery, 30, PageSize, PageNumber)
-                        '        ErrorNumber = Err.Number
-                        '        ErrorDescription = Err.Description
-                        '        Err.Clear()
-                        '        On Error GoTo ErrorTrap
-                        '        If ErrorNumber <> 0 Then
-                        '            '
-                        '            ' ----- Error
-                        '            '
-                        '            gv.status = GoogleVisualizationStatusEnum.ErrorStatus
-                        '            Ptr = UBound(gv.errors) + 1
-                        '            ReDim gv.errors(Ptr)
-                        '            gv.errors(Ptr) = "Error: " & Err.Description
-                        '        ElseIf (Not isDataTableOk(rs)) Then
-                        '            '
-                        '            ' ----- no result
-                        '            '
-                        '        ElseIf (RS.State <> 1) Then
-                        '            '
-                        '            ' ----- no result
-                        '            '
-                        '        ElseIf (rs.rows.count = 0) Then
-                        '            '
-                        '            ' ----- no result
-                        '            '
-                        '        Else
-                        '            PageSize = RS.PageSize
-                        '            Cells = RS.GetRows(PageSize)
-                        '            '
-                        '            gd.IsEmpty = False
-                        '            RowMax = UBound(Cells, 2)
-                        '            ColMax = UBound(Cells, 1)
-                        '            '
-                        '            ' Build headers
-                        '            '
-                        '            ReDim gd.col(ColMax)
-                        '            For ColPtr = 0 To ColMax
-                        '                RecordField = RS.Fields.Item(ColPtr)
-                        '                gd.col(ColPtr).Id = RecordField.Name
-                        '                gd.col(ColPtr).Label = RecordField.Name
-                        '                gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
-                        '            Next
-                        '            'RS.Close()
-                        '            'RS = Nothing
-                        '            '
-                        '            ' Build output table
-                        '            '
-                        '            ReDim gd.row(RowMax)
-                        '            For RowPtr = 0 To RowMax
-                        '                With gd.row(RowPtr)
-                        '                    ReDim .Cell(ColMax)
-                        '                    For ColPtr = 0 To ColMax
-                        '                        .Cell(ColPtr).v = genericController.encodeText(Cells(ColPtr, RowPtr))
-                        '                    Next
-                        '                End With
-                        '            Next
-                        '        End If
-                        '        If (isDataTableOk(rs)) Then
-                        '            If False Then
-                        '                'RS.Close()
-                        '            End If
-                        '            'RS = Nothing
-                        '        End If
-                        '    End If
-                        'Case QueryTypeOpenContent
-                        '    '
-                        '    ' Contensive Content Select, args are criteria replacements
-                        '    '
-
-                        '    CDef = app.getCdef(ContentName)
-                        '    CS = app.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords, , , SelectFieldList)
-                        '    Cells = app.csv_cs_getRows(CS)
-                        '    FieldList = app.cs_getSelectFieldList(CS)
-                        '    '
-                        '    RowMax = UBound(Cells, 2)
-                        '    ColMax = UBound(Cells, 1)
-                        '    If RowMax = 0 And ColMax = 0 Then
-                        '        '
-                        '        ' Single result, display with no table
-                        '        '
-                        '        Copy = genericController.encodeText(Cells(0, 0))
-                        '    Else
-                        '        '
-                        '        ' Build headers
-                        '        '
-                        '        gd.IsEmpty = False
-                        '        RowMax = UBound(Cells, 2)
-                        '        ColMax = UBound(Cells, 1)
-                        '        '
-                        '        ' Build headers
-                        '        '
-                        '        ReDim gd.col(ColMax)
-                        '        For ColPtr = 0 To ColMax
-                        '            RecordField = RS.Fields.Item(RowPtr)
-                        '            gd.col(ColPtr).Id = RecordField.Name
-                        '            gd.col(ColPtr).Label = RecordField.Name
-                        '            gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
-                        '        Next
-                        '        '
-                        '        ' Build output table
-                        '        '
-                        '        'RowStart = vbCrLf & "<Row>"
-                        '        'Rowend = "</Row>"
-                        '        For RowPtr = 0 To RowMax
-                        '            With gd.row(RowPtr)
-                        '                For ColPtr = 0 To ColMax
-                        '                    .Cell(ColPtr).v = Cells(ColPtr, RowPtr)
-                        '                Next
-                        '            End With
-                        '        Next
-                        '    End If
                             Case QueryTypeUpdateContent
                                 '
                                 ' Contensive Content Update, args are field=value updates
@@ -1552,7 +1340,7 @@ Namespace Contensive.Core
                                 '
                                 SetPairString = ""
                                 Criteria = ""
-                                For Ptr = 0 To ArgCnt - 1
+                                For Ptr = 0 To ArgName.Count - 1
                                     If genericController.vbLCase(ArgName(Ptr)) = "setpairs" Then
                                         SetPairString = ArgValue(Ptr)
                                     ElseIf genericController.vbLCase(ArgName(Ptr)) = "criteria" Then
@@ -1567,13 +1355,13 @@ Namespace Contensive.Core
                                     '
                                     ' update by looping through the args and setting name=values
                                     '
-                                    SetPairs = Split(SetPairString, "&")
+                                    Dim SetPairs() As String = Split(SetPairString, "&")
                                     For Ptr = 0 To UBound(SetPairs)
                                         If SetPairs(Ptr) <> "" Then
-                                            Pos = genericController.vbInstr(1, SetPairs(Ptr), "=")
+                                            Dim Pos As Integer = genericController.vbInstr(1, SetPairs(Ptr), "=")
                                             If Pos > 0 Then
-                                                FieldValue = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
-                                                FieldName = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
+                                                Dim FieldValue As String = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
+                                                Dim FieldName As String = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
                                                 If Not metaData.isContentFieldSupported(ContentName, FieldName) Then
                                                     Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
                                                     Throw (New ApplicationException(errorMessage))
@@ -1598,7 +1386,10 @@ Namespace Contensive.Core
                         '
                         ' output
                         '
-                        Copy = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormat)
+                        Dim gd As New GoogleDataType
+                        gd.IsEmpty = True
+                        '
+                        Dim Copy As String = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormat)
                         Copy = genericController.encodeHTML(Copy)
                         result = "<data>" & Copy & "</data>"
                     End If
@@ -1608,47 +1399,25 @@ Namespace Contensive.Core
             End Try
             Return result
         End Function
-
-
-
-
-        '
-        '
         '
         '=========================================================================================
-        '   In Init(), Print Hard Coded Pages
-        '       A Hard coded page replaces the entire output with an HTML compatible page
-        '=========================================================================================
-        '
+        ''' <summary>
+        ''' In Init(), Print Hard Coded Pages, A Hard coded page replaces the entire output with an HTML compatible page
+        ''' </summary>
+        ''' <param name="HardCodedPage"></param>
+        ''' <returns></returns>
         Private Function executeRoute_hardCodedPage(ByVal HardCodedPage As String) As Boolean
             Dim result As Boolean = False
             Try
-                Dim InsertTestOK As Boolean
-                Dim ConfirmOrderID As Integer
-                Dim PageSize As Integer
-                Dim PageNumber As Integer
-                Dim ContentName As String
-                Dim MsgLabel As String
-                Dim TrapID As Integer
-                Dim CS As Integer
-                Dim Copy As String = String.Empty
-                Dim Recipient As String
-                Dim Sender As String
-                Dim subject As String
-                Dim Message As String
-                Dim Emailtext As String
-                Dim LinkObjectName As String
-                Dim EditorObjectName As String
-                '
                 Select Case genericController.vbLCase(HardCodedPage)
                     Case HardCodedPageSendPassword
                         '
                         ' send password to the email address in the querystring
                         '
-                        Emailtext = docProperties.getText("email")
+                        Dim Emailtext As String = docProperties.getText("email")
                         If Emailtext <> "" Then
                             Call email.sendPassword(Emailtext)
-                            Copy = "" _
+                            Dim Copy As String = "" _
                             & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
                             & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
                             & "<p><a href=""?" & doc.refreshQueryString & """>Return to the Site.</a></p>" _
@@ -1663,8 +1432,8 @@ Namespace Contensive.Core
                         ' main_Get FormIndex (the index to the InsertImage# function called on selection)
                         '
                         Call doc.addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
-                        EditorObjectName = docProperties.getText("EditorObjectName")
-                        LinkObjectName = docProperties.getText("LinkObjectName")
+                        Dim EditorObjectName As String = docProperties.getText("EditorObjectName")
+                        Dim LinkObjectName As String = docProperties.getText("LinkObjectName")
                         If EditorObjectName <> "" Then
                             '
                             ' Open a page compatible with a dialog
@@ -1674,7 +1443,7 @@ Namespace Contensive.Core
                             'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                             Call doc.setMetaContent(0, 0)
                             Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Resource Library")
-                            Copy = html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
+                            Dim Copy As String = html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                             Dim htmlBody As String = "" _
                                 & genericController.htmlIndent(html.main_GetPanelHeader("Contensive Resource Library")) _
                                 & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
@@ -1688,24 +1457,6 @@ Namespace Contensive.Core
                                 & ""
                             Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                             Copy = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
-                            'Copy = "" _
-                            '& siteProperties.docTypeDeclaration() _
-                            '& "<html>" _
-                            '& cr & "<head>" _
-                            '& genericController.htmlIndent(doc.getHtmlDocHead(False)) _
-                            '& cr & "</head>" _
-                            '& cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            '& genericController.htmlIndent(html.main_GetPanelHeader("Contensive Resource Library")) _
-                            '& cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
-                            '& cr2 & "<div style=""border-top:1px solid white;border-bottom:1px solid black;height:2px""><img alt=""spacer"" src=""/ccLib/images/spacer.gif"" width=1 height=1></div>" _
-                            '& genericController.htmlIndent(Copy) _
-                            '& cr & "</td></tr>" _
-                            '& cr & "<tr><td>" _
-                            '& genericController.htmlIndent(html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)) _
-                            '& cr & "</td></tr></table>" _
-                            '& cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
-                            '& cr & "</body>" _
-                            '& "</html>"
                             Call html.writeAltBuffer(Copy)
                             result = True
                         ElseIf LinkObjectName <> "" Then
@@ -1724,7 +1475,7 @@ Namespace Contensive.Core
                                 & cr & "</td></tr></table>" _
                                 & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
                                 & ""
-                            Copy = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
+                            Dim Copy As String = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
                             Call html.writeAltBuffer(Copy)
                             result = True
                         End If
@@ -1758,7 +1509,7 @@ Namespace Contensive.Core
                         ' 7/8/9 - Moved from intercept pages
                         '
                         Call doc.addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
-                        LinkObjectName = docProperties.getText("LinkObjectName")
+                        Dim LinkObjectName As String = docProperties.getText("LinkObjectName")
                         If LinkObjectName <> "" Then
                             '
                             ' Open a page compatible with a dialog
@@ -1766,7 +1517,7 @@ Namespace Contensive.Core
                             Call doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
                             Call html.main_AddPagetitle("Site Explorer")
                             Call doc.setMetaContent(0, 0)
-                            Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
+                            Dim Copy As String = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
                             Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Site Explorer")
                             Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                             Dim htmlBody As String = "" _
@@ -1787,8 +1538,9 @@ Namespace Contensive.Core
                         '
                         ' test default data connection
                         '
-                        InsertTestOK = False
-                        CS = db.cs_insertRecord("Trap Log")
+                        Dim InsertTestOK As Boolean = False
+                        Dim TrapID As Integer = 0
+                        Dim CS As Integer = db.cs_insertRecord("Trap Log")
                         If Not db.cs_ok(CS) Then
                             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
                         Else
@@ -1811,13 +1563,13 @@ Namespace Contensive.Core
                         ' Close page
                         '
                         Call html.main_ClearStream()
-                        If app_errorCount = 0 Then
+                        If errorCount = 0 Then
                             Call html.writeAltBuffer("Contensive OK")
                         Else
-                            Call html.writeAltBuffer("Contensive Error Count = " & app_errorCount)
+                            Call html.writeAltBuffer("Contensive Error Count = " & errorCount)
                         End If
                         webServer.blockClosePageCopyright = True
-                        html_BlockClosePageLink = True
+                        blockClosePageLink = True
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
                         Call html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)
                         result = True
@@ -1828,13 +1580,13 @@ Namespace Contensive.Core
                         doc.redirectContentID = docProperties.getInteger(rnRedirectContentId)
                         doc.redirectRecordID = docProperties.getInteger(rnRedirectRecordId)
                         If doc.redirectContentID <> 0 And doc.redirectRecordID <> 0 Then
-                            ContentName = metaData.getContentNameByID(doc.redirectContentID)
+                            Dim ContentName As String = metaData.getContentNameByID(doc.redirectContentID)
                             If ContentName <> "" Then
                                 Call iisController.main_RedirectByRecord_ReturnStatus(Me, ContentName, doc.redirectRecordID)
                             End If
                         End If
                         webServer.blockClosePageCopyright = True
-                        html_BlockClosePageLink = True
+                        blockClosePageLink = True
                         result = False '--- should be disposed by caller --- Call dispose
                         result = True
                     Case HardCodedPageExportAscii
@@ -1850,12 +1602,12 @@ Namespace Contensive.Core
                             Call html.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
                         Else
                             webServer.blockClosePageCopyright = True
-                            ContentName = docProperties.getText("content")
-                            PageSize = docProperties.getInteger("PageSize")
+                            Dim ContentName As String = docProperties.getText("content")
+                            Dim PageSize As Integer = docProperties.getInteger("PageSize")
                             If PageSize = 0 Then
                                 PageSize = 20
                             End If
-                            PageNumber = docProperties.getInteger("PageNumber")
+                            Dim PageNumber As Integer = docProperties.getInteger("PageNumber")
                             If PageNumber = 0 Then
                                 PageNumber = 1
                             End If
@@ -1867,7 +1619,7 @@ Namespace Contensive.Core
                         End If
                         result = True
                         webServer.blockClosePageCopyright = True
-                        html_BlockClosePageLink = True
+                        blockClosePageLink = True
                         result = False '--- should be disposed by caller --- Call dispose
                         result = True
                     Case HardCodedPagePayPalConfirm
@@ -1878,15 +1630,15 @@ Namespace Contensive.Core
                         '----------------------------------------------------
                         '
                         '
-                        ConfirmOrderID = docProperties.getInteger("item_name")
+                        Dim ConfirmOrderID As Integer = docProperties.getInteger("item_name")
                         If ConfirmOrderID <> 0 Then
                             '
                             ' Confirm the order
                             '
-                            CS = db.cs_open("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
+                            Dim CS As Integer = db.cs_open("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
                             If db.cs_ok(CS) Then
                                 Call db.cs_set(CS, "OrderCompleted", True)
-                                Call db.cs_set(CS, "DateCompleted", app_startTime)
+                                Call db.cs_set(CS, "DateCompleted", profileStartTime)
                                 Call db.cs_set(CS, "ccAuthCode", docProperties.getText("txn_id"))
                                 Call db.cs_set(CS, "ccActionCode", docProperties.getText("payment_status"))
                                 Call db.cs_set(CS, "ccRefCode", docProperties.getText("pending_reason"))
@@ -1913,18 +1665,18 @@ Namespace Contensive.Core
                             '
                             ' TEmp fix until HardCodedPage is complete
                             '
-                            Recipient = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
+                            Dim Recipient As String = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
                             If genericController.vbInstr(genericController.encodeText(Recipient), "@") = 0 Then
                                 Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
                             Else
-                                Sender = siteProperties.getText("EmailOrderFromAddress")
-                                subject = webServer.requestDomain & " Online Order Pending, #" & ConfirmOrderID
-                                Message = "<p>An order confirmation has been recieved from PayPal for " & webServer.requestDomain & "</p>"
+                                Dim Sender As String = siteProperties.getText("EmailOrderFromAddress")
+                                Dim subject As String = webServer.requestDomain & " Online Order Pending, #" & ConfirmOrderID
+                                Dim Message As String = "<p>An order confirmation has been recieved from PayPal for " & webServer.requestDomain & "</p>"
                                 Call email.send_Legacy(Recipient, Sender, subject, Message, , False, True)
                             End If
                         End If
                         webServer.blockClosePageCopyright = True
-                        html_BlockClosePageLink = True
+                        blockClosePageLink = True
                         result = False '--- should be disposed by caller --- Call dispose
                         result = True
                 End Select
@@ -1991,9 +1743,13 @@ Namespace Contensive.Core
         End Sub
         Private _handlingExceptionRecursionBlock As Boolean = False
         '
+        '====================================================================================================
+        '
         Public Sub handleException(ByVal ex As Exception, ByVal cause As String)
             Call handleException(ex, cause, 2)
         End Sub
+        '
+        '====================================================================================================
         '
         Public Sub handleException(ByVal ex As Exception)
             Call handleException(ex, "n/a", 2)
@@ -2009,11 +1765,11 @@ Namespace Contensive.Core
             Try
                 '
                 docGuid = genericController.createGuid()
-                app_startTickCount = GetTickCount
+                profileStartTickCount = GetTickCount
                 CPTickCountBase = GetTickCount
-                main_ClosePageCounter = 0
-                debug_allowDebugLog = True
-                app_startTime = DateTime.Now()
+                closePageCounter = 0
+                allowDebugLog = True
+                profileStartTime = DateTime.Now()
                 testPointPrinting = True
                 '
                 ' -- attempt auth load
@@ -2031,7 +1787,7 @@ Namespace Contensive.Core
                     ' debug printed defaults on, so if not on, set it off and clear what was collected
                     If Not visitProperty.getBoolean("AllowDebugging") Then
                         testPointPrinting = False
-                        main_testPointMessage = ""
+                        testPointMessage = ""
                     End If
                 End If
             Catch ex As Exception
@@ -2082,12 +1838,6 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="disposing"></param>
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
-            Dim SQL As String
-            Dim ViewingName As String
-            Dim CSMax As Integer
-            Dim PageID As Integer
-            Dim FieldNames As String
-            '
             If Not Me.disposed Then
                 Me.disposed = True
                 If disposing Then
@@ -2115,8 +1865,8 @@ Namespace Contensive.Core
                                     '
                                     ' If visit tracking, save the viewing record
                                     '
-                                    ViewingName = Left(authContext.visit.id & "." & authContext.visit.PageVisits, 10)
-                                    PageID = 0
+                                    Dim ViewingName As String = Left(authContext.visit.id & "." & authContext.visit.PageVisits, 10)
+                                    Dim PageID As Integer = 0
                                     If (_doc IsNot Nothing) Then
                                         If (doc.page IsNot Nothing) Then
                                             PageID = doc.page.id
@@ -2125,28 +1875,25 @@ Namespace Contensive.Core
                                     '
                                     ' -- convert requestFormDict to a name=value string for Db storage
                                     Dim requestFormSerialized As String = genericController.convertNameValueDictToREquestString(webServer.requestFormDict)
-                                    FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
-                                    FieldNames = FieldNames & ",ExcludeFromAnalytics"
-                                    FieldNames = FieldNames & ",pagetitle"
-                                    SQL = "INSERT INTO ccViewings (" _
-                                    & FieldNames _
-                                    & ")VALUES(" _
-                                    & " " & db.encodeSQLText(ViewingName) _
-                                    & "," & db.encodeSQLNumber(authContext.visit.id) _
-                                    & "," & db.encodeSQLNumber(authContext.user.id) _
-                                    & "," & db.encodeSQLText(webServer.requestDomain) _
-                                    & "," & db.encodeSQLText(webServer.requestPath) _
-                                    & "," & db.encodeSQLText(webServer.requestPage) _
-                                    & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
-                                    & "," & db.encodeSQLText(Left(requestFormSerialized, 255)) _
-                                    & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
-                                    & "," & db.encodeSQLDate(app_startTime) _
-                                    & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
-                                    & "," & db.encodeSQLNumber(metaData.getContentId("Viewings")) _
-                                    & "," & db.encodeSQLNumber(appStopWatch.ElapsedMilliseconds) _
-                                    & ",1" _
-                                    & "," & db.encodeSQLNumber(CSMax) _
-                                    & "," & db.encodeSQLNumber(PageID)
+                                    Dim SQL As String = "INSERT INTO ccViewings (" _
+                                        & "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID,ExcludeFromAnalytics,pagetitle" _
+                                        & ")VALUES(" _
+                                        & " " & db.encodeSQLText(ViewingName) _
+                                        & "," & db.encodeSQLNumber(authContext.visit.id) _
+                                        & "," & db.encodeSQLNumber(authContext.user.id) _
+                                        & "," & db.encodeSQLText(webServer.requestDomain) _
+                                        & "," & db.encodeSQLText(webServer.requestPath) _
+                                        & "," & db.encodeSQLText(webServer.requestPage) _
+                                        & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
+                                        & "," & db.encodeSQLText(Left(requestFormSerialized, 255)) _
+                                        & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
+                                        & "," & db.encodeSQLDate(profileStartTime) _
+                                        & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
+                                        & "," & db.encodeSQLNumber(metaData.getContentId("Viewings")) _
+                                        & "," & db.encodeSQLNumber(appStopWatch.ElapsedMilliseconds) _
+                                        & ",1" _
+                                        & "," & db.encodeSQLNumber(0) _
+                                        & "," & db.encodeSQLNumber(PageID)
                                     SQL &= "," & db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
                                     SQL &= "," & db.encodeSQLText(doc.metaContent_Title)
                                     SQL &= ");"
@@ -2265,15 +2012,5 @@ Namespace Contensive.Core
             End If
         End Sub
 #End Region        '
-
-
-
-
-
-
-
-
-
-
     End Class
 End Namespace

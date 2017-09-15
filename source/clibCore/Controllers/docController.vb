@@ -318,7 +318,7 @@ Namespace Contensive.Core.Controllers
                     & "AND ((ccContentWatch.Active)<>0)" _
                     & "AND (ccContentWatch.Link is not null)" _
                     & "AND (ccContentWatch.LinkLabel is not null)" _
-                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & Me.cpcore.db.encodeSQLDate(cpcore.app_startTime) & "))" _
+                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & Me.cpcore.db.encodeSQLDate(cpcore.profileStartTime) & "))" _
                     & ")" _
                 & " ORDER BY " & iSortFieldList & ";"
                 result = Me.cpcore.db.cs_openSql(SQL, , PageSize, PageNumber)
@@ -827,7 +827,7 @@ Namespace Contensive.Core.Controllers
                         Call cpcore.db.cs_set(CSBlock, "active", True)
                         Call cpcore.db.cs_set(CSBlock, "ParentID", RecordID)
                         Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.id)
-                        Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.app_startTime & " by " & cpcore.authContext.user.Name)
+                        Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.Name)
                         Call cpcore.db.cs_set(CSBlock, "copyFilename", "")
                         RecordID = cpcore.db.cs_getInteger(CSBlock, "ID")
                         Call cpcore.db.cs_save2(CSBlock)
@@ -861,7 +861,7 @@ Namespace Contensive.Core.Controllers
                             Call cpcore.db.cs_set(CSBlock, "active", True)
                             Call cpcore.db.cs_set(CSBlock, "ParentID", ParentID)
                             Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.id)
-                            Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.app_startTime & " by " & cpcore.authContext.user.Name)
+                            Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.Name)
                             Call cpcore.db.cs_set(CSBlock, "copyFilename", "")
                             RecordID = cpcore.db.cs_getInteger(CSBlock, "ID")
                             Call cpcore.db.cs_save2(CSBlock)
@@ -1045,7 +1045,7 @@ Namespace Contensive.Core.Controllers
                             InactiveList = InactiveList & "[Hidden (Inactive): " & LinkedText & "]"
                             InactiveList = InactiveList & "</li>"
                         End If
-                    ElseIf (childPage.PubDate <> Date.MinValue) And (childPage.PubDate > cpcore.app_startTime) Then
+                    ElseIf (childPage.PubDate <> Date.MinValue) And (childPage.PubDate > cpcore.profileStartTime) Then
                         '
                         ' ----- Child page has not been published
                         '
@@ -1055,7 +1055,7 @@ Namespace Contensive.Core.Controllers
                             InactiveList = InactiveList & "[Hidden (To be published " & childPage.PubDate & "): " & LinkedText & "]"
                             InactiveList = InactiveList & "</li>"
                         End If
-                    ElseIf (childPage.DateExpires <> Date.MinValue) And (childPage.DateExpires < cpcore.app_startTime) Then
+                    ElseIf (childPage.DateExpires <> Date.MinValue) And (childPage.DateExpires < cpcore.profileStartTime) Then
                         '
                         ' ----- Child page has expired
                         '
@@ -1157,7 +1157,7 @@ Namespace Contensive.Core.Controllers
                     & " AND ((ccPageContentBlockRules.Active)<>0)" _
                     & " AND ((ccgroups.Active)<>0)" _
                     & " AND ((ccMemberRules.Active)<>0)" _
-                    & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & ")" _
+                    & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.profileStartTime) & ")" _
                     & " AND ((ccMemberRules.MemberID)=" & cpcore.authContext.user.id & "));"
                 CS = cpcore.db.cs_openSql(SQL)
                 bypassContentBlock = cpcore.db.cs_ok(CS)
@@ -1494,7 +1494,7 @@ ErrorTrap:
             Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName)
             Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName)
             Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString)
-            Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", cpcore.app_startTime.ToString)
+            Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", cpcore.profileStartTime.ToString)
             Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpcore.authContext.user.Name)
             '
             Call cpcore.email.sendGroup(cpcore.siteProperties.getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
@@ -2972,7 +2972,7 @@ ErrorTrap:
                 If cpcore.metaData.isContentFieldSupported(ContentName, "DateReviewed") Then
                     Dim DataSourceName As String = cpcore.metaData.getContentDataSource(ContentName)
                     Dim TableName As String = cpcore.metaData.getContentTablename(ContentName)
-                    Dim SQL As String = "update " & TableName & " set DateReviewed=" & cpcore.db.encodeSQLDate(cpcore.app_startTime)
+                    Dim SQL As String = "update " & TableName & " set DateReviewed=" & cpcore.db.encodeSQLDate(cpcore.profileStartTime)
                     If cpcore.metaData.isContentFieldSupported(ContentName, "ReviewedBy") Then
                         SQL &= ",ReviewedBy=" & cpcore.authContext.user.id
                     End If

@@ -88,7 +88,7 @@ Namespace Contensive.Core.Controllers
                             '
                             Do While cpCore.db.cs_ok(CSPointer)
                                 If Not (cpCore.db.cs_getBoolean(CSPointer, "Developer")) Then
-                                    Copy = cpCore.security.encodeToken((cpCore.db.cs_getInteger(CSPointer, "ID")), cpCore.app_startTime)
+                                    Copy = cpCore.security.encodeToken((cpCore.db.cs_getInteger(CSPointer, "ID")), cpCore.profileStartTime)
                                     Call sb.Append("""" & Copy & """")
                                     Delimiter = ","
                                     FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer)

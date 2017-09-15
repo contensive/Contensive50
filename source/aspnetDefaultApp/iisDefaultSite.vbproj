@@ -642,6 +642,7 @@
     <None Include="My Project\PublishProfiles\DevDefaultApp.pubxml" />
     <None Include="My Project\PublishProfiles\localTestSite.pubxml" />
     <None Include="My Project\PublishProfiles\StagingDefaultApp.pubxml" />
+    <None Include="My Project\PublishProfiles\test.pubxml" />
     <None Include="My Project\PublishProfiles\WebDeploymentPackage.pubxml" />
     <None Include="My Project\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -1202,7 +1202,7 @@ ErrorTrap:
                         '
                         ' Go ahead and redirect
                         '
-                        Copy = """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestUrlSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
+                        Copy = """" & FormatDateTime(cpCore.profileStartTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestUrlSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
                         logController.appendLog(cpCore, Copy, "performance", "redirects")
                         '
                         If cpCore.testPointPrinting Then

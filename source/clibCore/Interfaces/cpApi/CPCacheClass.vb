@@ -23,8 +23,8 @@ Namespace Contensive.Core
         Public Const EventsId As String = "11B23802-CBD3-48E6-9C3E-1DC26ED8775A"
 #End Region
         '
-        Private cpCore As Contensive.Core.coreClass
-        Private cp As CPClass
+        Private Property cpCore As Contensive.Core.coreClass
+        Private Property cp As CPClass
         '
         '====================================================================================================
         ''' <summary>
@@ -196,9 +196,13 @@ Namespace Contensive.Core
             cpCore.cache.setObject(key, value, invalidationDate, tagList)
         End Sub
         '
+        '====================================================================================================
+        '
         Public Overrides Sub setKey(key As String, Value As Object, tag As String)
             cpCore.cache.setObject(key, Value, tag)
         End Sub
+        '
+        '====================================================================================================
         '
         Public Overrides Sub setKey(key As String, Value As Object, invalidationDate As Date, tag As String)
             cpCore.cache.setObject(key, Value, invalidationDate, tag)

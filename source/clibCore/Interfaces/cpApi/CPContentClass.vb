@@ -23,9 +23,9 @@ Namespace Contensive.Core
         Public Const EventsId As String = "6E068297-E09E-42C8-97B6-02DE591009DD"
 #End Region
         '
-        Private cp As CPClass
-        Private cpCore As Contensive.Core.coreClass
-        Protected disposed As Boolean = False
+        Private Property cp As CPClass
+        Private Property cpCore As Contensive.Core.coreClass
+        Protected Property disposed As Boolean = False
         '
         '====================================================================================================
         '
@@ -33,26 +33,6 @@ Namespace Contensive.Core
             MyBase.New()
             cp = cpParent
             cpCore = cp.core
-        End Sub
-        '
-        '====================================================================================================
-        ' dispose
-        '
-        Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
-            If Not Me.disposed Then
-                Call appendDebugLog(".dispose, dereference main, csv")
-                If disposing Then
-                    '
-                    ' call .dispose for managed objects
-                    '
-                    cpCore = Nothing
-                    cp = Nothing
-                End If
-                '
-                ' Add code here to release the unmanaged resource.
-                '
-            End If
-            Me.disposed = True
         End Sub
         '
         '====================================================================================================
@@ -182,33 +162,32 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsWorkflow(ByVal ContentName As String) As Boolean
-            ' ****************************************************
-            ' this needs to be added to cmc
-            ' ****************************************************
+            '
+            ' -- workflow no longer supported (but may come back)
             Return False
         End Function
         '
         '====================================================================================================
         '
-        Public Overrides Sub PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer) 'Inherits CPContentBaseClass.PublishEdit
+        Public Overrides Sub PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
             Call cpCore.workflow.publishEdit(ContentName, RecordID, 0)
         End Sub
         '
         '====================================================================================================
         '
-        Public Overrides Sub SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer) 'Inherits CPContentBaseClass.SubmitEdit
+        Public Overrides Sub SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
             Call cpCore.workflow.submitEdit2(ContentName, RecordID, 0)
         End Sub
         '
         '====================================================================================================
         '
-        Public Overrides Sub AbortEdit(ByVal ContentName As String, ByVal RecordId As Integer) 'Inherits CPContentBaseClass.AbortEdit
+        Public Overrides Sub AbortEdit(ByVal ContentName As String, ByVal RecordId As Integer)
             Call cpCore.workflow.abortEdit2(ContentName, RecordId, 0)
         End Sub
         '
         '====================================================================================================
         '
-        Public Overrides Sub ApproveEdit(ByVal ContentName As String, ByVal RecordId As Integer) 'Inherits CPContentBaseClass.ApproveEdit
+        Public Overrides Sub ApproveEdit(ByVal ContentName As String, ByVal RecordId As Integer)
             Call cpCore.workflow.approveEdit(ContentName, RecordId, 0)
         End Sub
         '
@@ -394,17 +373,21 @@ Namespace Contensive.Core
         End Function
         '
         '====================================================================================================
-        ' append to logfile
         '
-        Private Sub appendDebugLog(ByVal copy As String)
-            'My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.content, " & copy & vbCrLf, True)
-        End Sub
-        '
-        '====================================================================================================
-        ' testpoint
-        '
-        Private Sub tp(ByVal msg As String)
-            'Call appendDebugLog(msg)
+        Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
+            If Not Me.disposed Then
+                If disposing Then
+                    '
+                    ' call .dispose for managed objects
+                    '
+                    cpCore = Nothing
+                    cp = Nothing
+                End If
+                '
+                ' Add code here to release the unmanaged resource.
+                '
+            End If
+            Me.disposed = True
         End Sub
         '
         '====================================================================================================

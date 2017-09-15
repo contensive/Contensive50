@@ -28,10 +28,10 @@ Namespace Contensive.Core.Controllers
                 '
                 ' write to stream
                 '
-                ElapsedTime = CSng(GetTickCount - cpcore.app_startTickCount) / 1000
+                ElapsedTime = CSng(GetTickCount - cpcore.profileStartTickCount) / 1000
                 iMessage = genericController.encodeText(Message)
                 iMessage = Format((ElapsedTime), "00.000") & " - " & iMessage
-                cpcore.main_testPointMessage = cpcore.main_testPointMessage & "<nobr>" & iMessage & "</nobr><br >"
+                cpcore.testPointMessage = cpcore.testPointMessage & "<nobr>" & iMessage & "</nobr><br >"
                 'writeAltBuffer ("<nobr>" & iMessage & "</nobr><br >")
             End If
             If cpcore.siteProperties.allowTestPointLogging Then

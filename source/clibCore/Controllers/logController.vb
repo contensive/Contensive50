@@ -238,7 +238,7 @@ ErrorTrap:
         '
         Friend Shared Sub log_appendLogPageNotFound(cpCore As coreClass, PageNotFoundLink As String)
             Try
-                Call appendLog(cpCore, """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""App=" & cpCore.serverConfig.appConfig.name & """,""main_VisitId=" & cpCore.authContext.visit.id & """,""" & PageNotFoundLink & """,""Referrer=" & cpCore.webServer.requestReferrer & """", "performance", "pagenotfound")
+                Call appendLog(cpCore, """" & FormatDateTime(cpCore.profileStartTime, vbGeneralDate) & """,""App=" & cpCore.serverConfig.appConfig.name & """,""main_VisitId=" & cpCore.authContext.visit.id & """,""" & PageNotFoundLink & """,""Referrer=" & cpCore.webServer.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 Throw (ex)
             End Try

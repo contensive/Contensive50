@@ -22,23 +22,21 @@ Namespace Contensive.Core
         Public Const EventsId As String = "8C6AC359-68B4-49A3-A3BC-7A53CA16EA45"
 #End Region
         '
-        Protected disposed As Boolean = False
-        Private cp As CPClass
-        Private localallowProfileLog As Boolean = False
+        Protected Property disposed As Boolean = False
+        Private Property cp As CPClass
+        Private Property localallowProfileLog As Boolean = False
         '
-        '
-        ' Constructor - Initialize the Main and Csv objects
+        '==========================================================================================
         '
         Public Sub New(ByRef cpParent As CPClass)
             MyBase.New()
             cp = cpParent
         End Sub
         '
-        ' dispose
+        '==========================================================================================
         '
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
             If Not Me.disposed Then
-                Call appendDebugLog(".dispose, dereference main, csv")
                 If disposing Then
                     '
                     ' call .dispose for managed objects
@@ -51,28 +49,18 @@ Namespace Contensive.Core
             End If
         End Sub
         '
+        '==========================================================================================
         '
         Public Property allowDebugLog() As Boolean
             Get
-                Return cp.core.debug_allowDebugLog
+                Return cp.core.allowDebugLog
             End Get
             Set(ByVal value As Boolean)
-                cp.core.debug_allowDebugLog = value
+                cp.core.allowDebugLog = value
             End Set
         End Property
-        ''
-        '' appName is set as the argument of init( appName ) - not really a context
-        ''
-        'Public Property appName() As String
-        '    Get
-        '        Return localappName
-        '    End Get
-        '    Set(ByVal value As String)
-        '        localappName = value
-        '    End Set
-        'End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property pathPage() As String
             Get
@@ -83,7 +71,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property referrer() As String
             Get
@@ -94,7 +82,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property domain() As String
             Get
@@ -105,7 +93,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property queryString() As String
             Get
@@ -116,7 +104,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property isSecure() As Boolean
             Get
@@ -127,7 +115,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property remoteIp() As String
             Get
@@ -138,7 +126,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property browserUserAgent() As String
             Get
@@ -149,7 +137,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property acceptLanguage() As String
             Get
@@ -160,7 +148,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property accept() As String
             Get
@@ -171,7 +159,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property acceptCharSet() As String
             Get
@@ -182,7 +170,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property profileUrl() As String
             Get
@@ -193,7 +181,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property xWapProfile() As String
             Get
@@ -204,7 +192,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property isBinaryRequest() As Boolean
             Get
@@ -215,7 +203,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property binaryRequest() As Byte()
             Get
@@ -226,7 +214,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '====================================================================================================
+        '==========================================================================================
         ''' <summary>
         ''' get or set request cookies using a name value string similar to a querystring 
         ''' </summary>
@@ -270,7 +258,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property form() As String
             Get
@@ -303,14 +291,14 @@ Namespace Contensive.Core
         <Obsolete("Deprecated", True)>
         Public Property formFiles() As String
             Get
-                Return "" 'cp.core.webServer.requesFilesString
+                Return ""
             End Get
             Set(ByVal value As String)
-                'cp.core.webServer.requesFilesString = value
+                '
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property requestNameSpaceAsUnderscore() As Boolean
             Get
@@ -321,7 +309,7 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public Property requestNameDotAsUnderscore() As Boolean
             Get
@@ -331,9 +319,8 @@ Namespace Contensive.Core
                 cp.core.webServer.requestDotAsUnderscore = value
             End Set
         End Property
-
         '
-        '
+        '==========================================================================================
         '
         Public ReadOnly Property responseRedirect() As String
             Get
@@ -341,7 +328,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public ReadOnly Property responseBuffer() As String
             Get
@@ -349,7 +336,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public ReadOnly Property responseContentType() As String
             Get
@@ -357,7 +344,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public ReadOnly Property responseCookies() As String
             Get
@@ -365,7 +352,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public ReadOnly Property responseHeaders() As String
             Get
@@ -373,7 +360,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '==========================================================================================
         '
         Public ReadOnly Property responseStatus() As String
             Get
@@ -381,19 +368,8 @@ Namespace Contensive.Core
             End Get
         End Property
         '
+        '==========================================================================================
         '
-        ' append to logfile
-        '
-        Private Sub appendDebugLog(ByVal copy As String)
-            'My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.content, " & copy & vbCrLf, True)
-            ' 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
-        End Sub
-        '
-        ' testpoint
-        '
-        Private Sub tp(ByVal msg As String)
-            'Call appendDebugLog(msg)
-        End Sub
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.
         ' Put cleanup code in Dispose(ByVal disposing As Boolean).

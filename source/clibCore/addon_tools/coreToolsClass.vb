@@ -1768,9 +1768,9 @@ ErrorTrap:
                                                     ' ----- redirect type, check redirect contentid
                                                     '
                                                     RedirectContentID = cpCore.db.cs_getInteger(CSFields, "RedirectContentID")
-                                                    ErrorCount = cpCore.app_errorCount
+                                                    ErrorCount = cpCore.errorCount
                                                     bitBucket = Local_GetContentNameByID(RedirectContentID)
-                                                    If IsNull(bitBucket) Or (ErrorCount <> cpCore.app_errorCount) Then
+                                                    If IsNull(bitBucket) Or (ErrorCount <> cpCore.errorCount) Then
                                                         DiagProblem = "PROBLEM: Content Field [" & ContentName & "].[" & FieldName & "] is a Redirection type, but the ContentID [" & RedirectContentID & "] is not valid."
                                                         If FieldName = "" Then
                                                             DiagProblem = DiagProblem & " Also, the field has no name attribute so these diagnostics can not automatically mark the field inactive."
@@ -1791,9 +1791,9 @@ ErrorTrap:
                                                     '
                                                     ' ----- lookup type, read value and check lookup contentid
                                                     '
-                                                    ErrorCount = cpCore.app_errorCount
+                                                    ErrorCount = cpCore.errorCount
                                                     bitBucket = cpCore.db.cs_getField(CSTestRecord, FieldName)
-                                                    If ErrorCount <> cpCore.app_errorCount Then
+                                                    If ErrorCount <> cpCore.errorCount Then
                                                         DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" & ContentName & "].[" & FieldName & "]"
                                                         ReDim DiagActions(1)
                                                         DiagActions(0).Name = "Ignore, or handle this issue manually"
@@ -1804,10 +1804,10 @@ ErrorTrap:
                                                         LookupList = cpCore.db.cs_getText(CSFields, "Lookuplist")
                                                         LookupContentID = cpCore.db.cs_getInteger(CSFields, "LookupContentID")
                                                         If LookupContentID <> 0 Then
-                                                            ErrorCount = cpCore.app_errorCount
+                                                            ErrorCount = cpCore.errorCount
                                                             bitBucket = Local_GetContentNameByID(LookupContentID)
                                                         End If
-                                                        If (LookupList = "") And ((LookupContentID = 0) Or (bitBucket = "") Or (ErrorCount <> cpCore.app_errorCount)) Then
+                                                        If (LookupList = "") And ((LookupContentID = 0) Or (bitBucket = "") Or (ErrorCount <> cpCore.errorCount)) Then
                                                             DiagProblem = "Content Field [" & ContentName & "].[" & FieldName & "] is a Lookup type, but LookupList is blank and LookupContentID [" & LookupContentID & "] is not valid."
                                                             ReDim DiagActions(2)
                                                             DiagActions(0).Name = "Ignore, or handle this issue manually"
@@ -1821,9 +1821,9 @@ ErrorTrap:
                                                     '
                                                     ' ----- check for value in database
                                                     '
-                                                    ErrorCount = cpCore.app_errorCount
+                                                    ErrorCount = cpCore.errorCount
                                                     bitBucket = cpCore.db.cs_getField(CSTestRecord, FieldName)
-                                                    If (ErrorCount <> cpCore.app_errorCount) Then
+                                                    If (ErrorCount <> cpCore.errorCount) Then
                                                         DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" & ContentName & "].[" & FieldName & "]"
                                                         ReDim DiagActions(3)
                                                         DiagActions(0).Name = "Ignore, or handle this issue manually"

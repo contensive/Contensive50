@@ -176,7 +176,7 @@ Namespace Contensive.Core.Models.Context
                                         '
                                         ' -- visit record is missing, create a new visit
                                         .visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
-                                    ElseIf .visit.LastVisitTime.AddHours(1) < cpCore.app_startTime Then
+                                    ElseIf .visit.LastVisitTime.AddHours(1) < cpCore.profileStartTime Then
                                         '
                                         ' -- visit has expired, create new visit
                                         .visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
@@ -187,7 +187,7 @@ Namespace Contensive.Core.Models.Context
                                         'cpCore.webServer.requestBrowser = .visit.Browser
                                         .visit.TimeToLastHit = 0
                                         If .visit.StartTime > Date.MinValue Then
-                                            .visit.TimeToLastHit = CInt((cpCore.app_startTime - .visit.StartTime).TotalSeconds)
+                                            .visit.TimeToLastHit = CInt((cpCore.profileStartTime - .visit.StartTime).TotalSeconds)
                                         End If
                                         .visit.CookieSupport = True
                                         If (.visit.VisitorID > 0) Then
@@ -220,8 +220,8 @@ Namespace Contensive.Core.Models.Context
                                     resultAuthContext.visit.Name = "User"
                                 End If
                                 resultAuthContext.visit.PageVisits = 0
-                                resultAuthContext.visit.StartTime = cpCore.app_startTime
-                                resultAuthContext.visit.StartDateValue = CInt(cpCore.app_startTime.ToOADate)
+                                resultAuthContext.visit.StartTime = cpCore.profileStartTime
+                                resultAuthContext.visit.StartDateValue = CInt(cpCore.profileStartTime.ToOADate)
                                 '
                                 ' -- setup referrer
                                 If (Not String.IsNullOrEmpty(cpCore.webServer.requestReferrer)) Then
@@ -421,7 +421,7 @@ Namespace Contensive.Core.Models.Context
                                 ' -- OnNewVisit Add-on call
                                 AllowOnNewVisitEvent = True
                             End If
-                            resultAuthContext.visit.LastVisitTime = cpCore.app_startTime
+                            resultAuthContext.visit.LastVisitTime = cpCore.profileStartTime
                             '
                             ' -- verify visitor
                             If (resultAuthContext.visitor.ID = 0) Then
@@ -590,7 +590,7 @@ Namespace Contensive.Core.Models.Context
                         End If
                         '
                         ' -- Write Visit Cookie
-                        visitCookie = cpCore.security.encodeToken(resultAuthContext.visit.id, cpCore.app_startTime)
+                        visitCookie = cpCore.security.encodeToken(resultAuthContext.visit.id, cpCore.profileStartTime)
                         Call cpCore.webServer.addResponseCookie(main_appNameCookiePrefix & constants.main_cookieNameVisit, visitCookie, , , requestAppRootPath, False)
                     End If
                 End If
@@ -681,7 +681,7 @@ Namespace Contensive.Core.Models.Context
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
-                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & "))" _
+                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "))" _
                                         & ")"
                                 CS = cpCore.db.cs_openSql(SQL)
                                 _isAuthenticatedContentManagerAnything = cpCore.db.cs_ok(CS)
@@ -834,7 +834,7 @@ Namespace Contensive.Core.Models.Context
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
-                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & "))" _
+                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "))" _
                                         & ");"
                                     CS = cpCore.db.cs_openSql(SQL)
                                     If cpCore.db.cs_ok(CS) Then
@@ -1017,7 +1017,7 @@ Namespace Contensive.Core.Models.Context
                         & " AND(ccMemberRules.active<>0)" _
                         & " AND(ccGroupRules.active<>0)" _
                         & " AND(ccGroupRules.ContentID=" & ContentID & ")" _
-                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & "))" _
+                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "))" _
                         & ");"
                     CSPointer = cpCore.db.cs_openSql(SQL)
                     If cpCore.db.cs_ok(CSPointer) Then
@@ -1107,7 +1107,7 @@ Namespace Contensive.Core.Models.Context
                     '
                     authContext.visit.VisitAuthenticated = True
                     If authContext.visit.StartTime = Date.MinValue Then
-                        authContext.visit.StartTime = cpCore.app_startTime
+                        authContext.visit.StartTime = cpCore.profileStartTime
                     End If
                     authContext.visit.saveObject(cpCore)
                 End If
@@ -1144,7 +1144,7 @@ Namespace Contensive.Core.Models.Context
                 Else
                     authContext.visit.MemberNew = False
                 End If
-                authContext.user.LastVisit = cpCore.app_startTime
+                authContext.user.LastVisit = cpCore.profileStartTime
                 authContext.visit.ExcludeFromAnalytics = visit.ExcludeFromAnalytics Or authContext.visit.Bot Or authContext.user.ExcludeFromAnalytics Or authContext.user.Admin Or authContext.user.Developer
                 Call authContext.visit.saveObject(cpCore)
                 Call authContext.visitor.saveObject(cpCore)
@@ -1515,7 +1515,7 @@ Namespace Contensive.Core.Models.Context
             '
             MethodName = "result"
             '
-            main_EditLockExpiresMinutes = CInt((main_EditLockExpires - cpcore.app_startTime).TotalMinutes)
+            main_EditLockExpiresMinutes = CInt((main_EditLockExpires - cpcore.profileStartTime).TotalMinutes)
             If Not cpcore.siteProperties.allowWorkflowAuthoring Then
                 '
                 ' ----- site does not support workflow authoring
