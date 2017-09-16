@@ -37,8 +37,8 @@ Namespace Contensive.Core
         Public Property profileStartTickCount As Integer = 0
         Public Property allowDebugLog As Boolean = False                       ' turn on in script -- use to write /debug.log in content files for whatever is needed
         Public Property blockExceptionReporting As Boolean = False                   ' used so error reporting can not call itself
-        Public Property pageErrorWithoutCsv As Boolean = False                  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
-        Public Property closePageCounter As Integer = 0
+        'Public Property pageErrorWithoutCsv As Boolean = False                  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
+        'Public Property closePageCounter As Integer = 0
         Public Property blockClosePageLink As Boolean = False                   ' if true,block the href to contensive
         Public Property continueProcessing As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
         Public Property upgradeInProgress() As Boolean
@@ -1028,7 +1028,10 @@ Namespace Contensive.Core
                         If True Then
                             Dim formType As String
                             Dim StyleSN As Integer
-                            formType = docProperties.getText("type")
+                            '
+                            ' -- must support this for tool panel addon, until it is fixed
+                            Dim legacyFormSn As String = docProperties.getText("ccformsn")
+                            formType = docProperties.getText(legacyFormSn & "type")
                             If (formType <> "") Then
                                 '
                                 ' set the meta content flag to show it is not needed for the head tag
@@ -1112,7 +1115,7 @@ Namespace Contensive.Core
                                         '
                                         ' ----- Administrator Tools Panel
                                         '
-                                        Call html.processFormToolsPanel()
+                                        Call html.processFormToolsPanel(legacyFormSn)
                                     Case FormTypePageAuthoring
                                         '
                                         ' ----- Page Authoring Tools Panel
@@ -1767,7 +1770,7 @@ Namespace Contensive.Core
                 docGuid = genericController.createGuid()
                 profileStartTickCount = GetTickCount
                 CPTickCountBase = GetTickCount
-                closePageCounter = 0
+                'closePageCounter = 0
                 allowDebugLog = True
                 profileStartTime = DateTime.Now()
                 testPointPrinting = True

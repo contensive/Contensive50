@@ -296,13 +296,7 @@ Namespace Contensive.Core
         End Sub
 
         Public Overrides Sub TestPoint(ByVal Message As String) 'Inherits BaseClasses.CPSiteBaseClass.TestPoint
-            If False Then
-                '
-                '
-                '
-            Else
-                Call debugController.debug_testPoint(cpCore, Message)
-            End If
+            Call debugController.testPoint(cpCore, Message)
         End Sub
 
         Public Overrides Function LandingPageId(Optional ByVal DomainName As String = "") As Integer 'Inherits BaseClasses.CPSiteBaseClass.LandingPageId

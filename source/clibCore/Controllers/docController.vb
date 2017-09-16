@@ -2567,45 +2567,22 @@ ErrorTrap:
         Public Function getHtmlHead(ByVal main_IsAdminSite As Boolean) As String
             Dim result As String = ""
             Try
-                Dim Ptr As Integer
-                Dim Pos As Integer
-                Dim BaseHref As String
-                Dim OtherHeadTags As String = String.Empty
-                Dim Copy As String
-                Dim VirtualFilename As String
-                Dim Ext As String
                 '
-                If False Then
-                    '
-                    ' -- no idea why this was hardcoded in line here - used to be conditional
-                    result = cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
+                ' -- meta content
+                result &= cr & "<title>" & cpcore.doc.metaContent_Title & "</title>"
+                If cpcore.doc.metaContent_KeyWordList <> "" Then
+                    result &= cr & "<meta name=""keywords"" content=""" & cpcore.doc.metaContent_KeyWordList & """ >"
+                End If
+                If cpcore.doc.metaContent_Description <> "" Then
+                    result &= cr & "<meta name=""description"" content=""" & cpcore.doc.metaContent_Description & """ >"
                 End If
                 '
-                ' meta content
-                '
-                Copy = cpcore.doc.metaContent_Title
-                If Copy <> "" Then
-                    result &= cr & "<title>" & Copy & "</title>"
-                End If
-                '
-                Copy = cpcore.doc.metaContent_KeyWordList
-                If Copy <> "" Then
-                    result &= cr & "<meta name=""keywords"" content=""" & Copy & """ >"
-                End If
-                '
-                Copy = cpcore.doc.metaContent_Description
-                If Copy <> "" Then
-                    result &= cr & "<meta name=""description"" content=""" & Copy & """ >"
-                End If
-                '
-                ' favicon
-                '
-                VirtualFilename = cpcore.siteProperties.getText("faviconfilename")
+                ' -- favicon
+                Dim VirtualFilename As String = cpcore.siteProperties.getText("faviconfilename")
                 If VirtualFilename <> "" Then
-                    Pos = InStrRev(VirtualFilename, ".")
+                    Dim Pos As Integer = InStrRev(VirtualFilename, ".")
                     If Pos > 0 Then
-                        Ext = genericController.vbLCase(Mid(VirtualFilename, Pos))
-                        Select Case Ext
+                        Select Case Mid(VirtualFilename, Pos).ToLower()
                             Case ".ico"
                                 result &= cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & genericController.getCdnFileLink(cpcore, VirtualFilename) & """ >"
                             Case ".png"
@@ -2618,11 +2595,9 @@ ErrorTrap:
                     End If
                 End If
                 '
-                ' misc caching, etc
-                '
+                ' -- misc caching, etc
                 Dim encoding As String = genericController.encodeHTML(cpcore.siteProperties.getText("Site Character Encoding", "utf-8"))
                 result = result _
-                    & OtherHeadTags _
                     & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
                     & cr & "<meta http-equiv=""content-language"" content=""en-us"" >" _
                     & cr & "<meta http-equiv=""cache-control"" content=""no-cache"" >" _
@@ -2630,47 +2605,31 @@ ErrorTrap:
                     & cr & "<meta http-equiv=""pragma"" content=""no-cache"" >" _
                     & cr & "<meta name=""generator"" content=""Contensive"" >"
                 '
-                ' no-follow
-                '
+                ' -- no-follow
                 If cpcore.webServer.response_NoFollow Then
                     result = result _
                     & cr & "<meta name=""robots"" content=""nofollow"" >" _
                     & cr & "<meta name=""mssmarttagspreventparsing"" content=""true"" >"
                 End If
                 '
-                ' Base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
-                '
-                BaseHref = cpcore.webServer.serverFormActionURL
-                If main_IsAdminSite Then
-                    '
-                    ' no base in admin site
-                    '
-                ElseIf BaseHref <> "" Then
+                ' -- base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
+                If (Not main_IsAdminSite) And (Not String.IsNullOrEmpty(cpcore.webServer.serverFormActionURL)) Then
+                    Dim BaseHref As String = cpcore.webServer.serverFormActionURL
                     If cpcore.doc.refreshQueryString <> "" Then
-                        BaseHref = BaseHref & "?" & cpcore.doc.refreshQueryString
+                        BaseHref &= "?" & cpcore.doc.refreshQueryString
                     End If
                     result &= cr & "<base href=""" & BaseHref & """ >"
                 End If
                 '
-                ' other head tags - always last
+                ' -- other head tags - always last
+                result &= cpcore.doc.metaContent_OtherHeadTags
+                cpcore.doc.metaContent_OtherHeadTags = String.Empty
                 '
-                OtherHeadTags = cpcore.doc.metaContent_OtherHeadTags
-                If OtherHeadTags <> "" Then
-                    If Left(OtherHeadTags, 2) <> vbCrLf Then
-                        OtherHeadTags = vbCrLf & OtherHeadTags
-                    End If
-                    result &= genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
-                End If
+                ' -- Styles
+                result &= cpcore.doc.metaContent_StyleSheetTags
+                cpcore.doc.metaContent_StyleSheetTags = String.Empty
                 '
-                ' Styles
-                '
-                If cpcore.doc.metaContent_StyleSheetTags <> "" Then
-                    result &= cpcore.doc.metaContent_StyleSheetTags
-                    cpcore.doc.metaContent_StyleSheetTags = ""
-                End If
-                '
-                ' Head Javascript -- (should be) last for performance
-                '
+                ' -- head Javascript
                 result &= cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & "/ccLib/ClientSide/Core.js""></script>"
                 If cpcore.doc.headScripts.Count > 0 Then
                     For Ptr = 0 To cpcore.doc.headScripts.Count - 1

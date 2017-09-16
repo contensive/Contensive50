@@ -181,6 +181,7 @@ namespace  Contensive.CLI {
                     catch (Exception ex)
                     {
                         Console.Write("Error attempting to update local host file:" + ex.ToString());
+                        Console.Write("Please manually add the following line to your host file (c:\\windows\\system32\\drivers\\etc\\hosts):" + "127.0.0.1\t" + appName);
                     }
                     //
                     // create the database on the server

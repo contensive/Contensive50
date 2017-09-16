@@ -22,7 +22,7 @@ Namespace Contensive.Core.Controllers
         '   State values that must be initialized before Init()
         '   Everything else is derived from these
         '
-        Public Property initCounter As Integer = 0        '
+        'Public Property initCounter As Integer = 0        '
         '
         ' -- Buffer request
         Public Property requestLanguage As String = ""            ' set externally from HTTP_Accept_LANGUAGE
@@ -396,7 +396,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' continue
                     '
-                    initCounter += 1
+                    'initCounter += 1
                     '
                     Call cpCore.html.enableOutputBuffer(True)
                     cpCore.continueProcessing = True

@@ -744,175 +744,46 @@ Namespace Contensive.Core.Controllers
             '
 ErrorTrap:
         End Function
-
-        '
-        '========================================================================
-        ' ----- Add a new DHTML menu entry
-        '========================================================================
-        '
-        Public Sub menu_AddEntry(ByVal Name As String, Optional ByVal ParentName As String = "", Optional ByVal ImageLink As String = "", Optional ByVal ImageOverLink As String = "", Optional ByVal Link As String = "", Optional ByVal Caption As String = "", Optional ByVal StyleSheet As String = "", Optional ByVal StyleSheetHover As String = "", Optional ByVal NewWindow As Boolean = False)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AddMenuEntry")
-            '
-            'If Not (true) Then Exit Sub
-            Dim MethodName As String
-            Dim Image As String
-            Dim ImageOver As String = String.Empty
-            '
-            MethodName = "AddMenu()"
-            '
-            Image = genericController.encodeText(ImageLink)
-            If Image <> "" Then
-                ImageOver = genericController.encodeText(ImageOverLink)
-                If Image = ImageOver Then
-                    ImageOver = ""
-                End If
-            End If
-            Call cpCore.menuFlyout.AddEntry(genericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, , NewWindow)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        '========================================================================
-        ' ----- main_Get all the menu close scripts
-        '
-        '   call this at the end of the page
-        '========================================================================
-        '
-        Public Function menu_GetClose() As String
-            Dim result As String = String.Empty
-            Try
-                Dim MenuFlyoutIcon As String
-                '
-                If Not (cpCore.menuFlyout Is Nothing) Then
-                    cpCore.doc.menuSystemCloseCount = cpCore.doc.menuSystemCloseCount + 1
-                    result = result & cpCore.menuFlyout.GetMenuClose()
-                    MenuFlyoutIcon = cpCore.siteProperties.getText("MenuFlyoutIcon", "&#187;")
-                    If MenuFlyoutIcon <> "&#187;" Then
-                        result = genericController.vbReplace(result, "&#187;</a>", MenuFlyoutIcon & "</a>")
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return result
-        End Function
         '
         '====================================================================================================
         '
         Public Function getHtmlDoc_beforeEndOfBodyHtml(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, main_IsAdminSite As Boolean) As String
-            Dim s As String = ""
+            Dim result As String = ""
             Try
-                Dim AllowPopupErrors As Boolean
-                Dim AllowPopupTraps As Boolean
                 Dim Ptr As Integer
                 Dim JSCodeAsString As String
-                'Dim Copy As String
                 Dim JS As String
-                Dim autoPrintText As String
                 Dim RenderTimeString As String = Format((GetTickCount - cpCore.profileStartTickCount) / 1000, "0.000")
                 '
-                ' ----- Developer debug counters
-                '
-                cpCore.closePageCounter = cpCore.closePageCounter + 1
-                If cpCore.webServer.initCounter = 0 Then
-                    cpCore.handleException(New Exception("Page was not initialized properly. Init(...) call may be missing."))
-                End If
-                If cpCore.webServer.initCounter > 1 Then
-                    cpCore.handleException(New Exception("Page was not initialized properly. Init(...) was called multiple times."))
-                End If
-                If cpCore.closePageCounter > 1 Then
-                    cpCore.handleException(New Exception("Page was not closed properly. main_GetEndOfBody was called multiple times."))
-                End If
-                '
-                ' ----- add window.print if this is the Printerversion
-                '
-                If cpCore.doc.isPrintVersion Then
-                    autoPrintText = cpCore.docProperties.getText("AutoPrint")
-                    If autoPrintText = "" Then
-                        autoPrintText = cpCore.siteProperties.getText("AllowAutoPrintDialog", "1")
-                    End If
-                    If genericController.EncodeBoolean(autoPrintText) Then
-                        Call addOnLoadJavascript("window.print(); window.close()", "Print Page")
-                    End If
-                End If
-                '
-                ' -- print what is needed
-                '
-                If (Not BlockNonContentExtras) And (Not cpCore.doc.isPrintVersion) Then
+                ' -- content extras like tool panel
+                If (Not BlockNonContentExtras) Then
                     If cpCore.authContext.isAuthenticatedContentManager(cpCore) And cpCore.authContext.user.AllowToolsPanel Then
                         If AllowTools Then
-                            s = s & cpCore.html.main_GetToolsPanel()
+                            result &= cpCore.html.main_GetToolsPanel()
                         End If
                     Else
                         If AllowLogin Then
-                            s = s & main_GetLoginLink()
+                            result &= main_GetLoginLink()
                         End If
                     End If
-                End If
-                '
-                ' ----- output the menu system
-                '
-                If Not (cpCore.menuFlyout Is Nothing) Then
-                    s = s & menu_GetClose()
-                End If
-                '
-                ' ----- Popup USER errors
-                '
-                If (Not BlockNonContentExtras) And (cpCore.debug_iUserError <> "") Then
-                    AllowPopupErrors = cpCore.siteProperties.getBoolean("AllowPopupErrors", True)
-                    If AllowPopupErrors Then
-                        's = s & main_GetPopupMessage("<div style=""margin:20px;"">" & main_GetUserError() & "</div>", 300, 200, False)
-                    End If
-                End If
-                '
-                If Not cpCore.webServer.blockClosePageCopyright Then
-                    s = s & vbCrLf & vbTab & "<!--" & vbCrLf & vbCrLf & vbTab & "Contensive Framework/" & cpCore.codeVersion & ", copyright 1999-2012 Contensive, www.Contensive.com, " & RenderTimeString & vbCrLf & vbCrLf & vbTab & "-->"
-                End If
-                '
-                If Not cpCore.blockClosePageLink Then
-                    s = s & vbCrLf & vbTab & "<a href=""http://www.contensive.com""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" border=""0""></a>"
-                End If
-                '
-                ' ----- popup error if this is a developer
-                '
-                If (Not BlockNonContentExtras) And cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
-                    AllowPopupTraps = cpCore.siteProperties.getBoolean("AllowPopupTraps", True)
-                    If AllowPopupTraps Then
-                        If cpCore.pageErrorWithoutCsv Then
-                            cpCore.trapLogMessage = "" _
-                                    & "<div style=""padding: 20px;"">" _
-                                    & genericController.vbReplace(cpCore.trapLogMessage, vbCrLf, "<br>") _
-                                    & "</div>"
-                            '  s = s & main_GetPopupMessage(main_TrapLogMessage, 600, 400, True, True)
-                        ElseIf (cpCore.errorCount > 0) Then
-                            '  s = s & main_GetPopupMessage(main_TrapLogMessage, "", "", "yes")
-                        End If
-                    End If
-                End If
-                '
-                ' ----- Include any other close page
-                '
-                If Not BlockNonContentExtras Then
+                    '
+                    ' -- Include any other close page
                     If cpCore.doc.htmlForEndOfBody <> "" Then
-                        s = s & cpCore.doc.htmlForEndOfBody
+                        result = result & cpCore.doc.htmlForEndOfBody
                     End If
                     If cpCore.testPointMessage <> "" Then
-                        s = s & "<div class=""ccTestPointMessageCon"">" & cpCore.testPointMessage & "</div>"
+                        result = result & "<div class=""ccTestPointMessageCon"">" & cpCore.testPointMessage & "</div>"
                     End If
                 End If
                 '
-                ' ----- Check for javascipt setup, but the appropriate calls are not in this site
+                ' TODO -- closing the menu attaches the flyout panels -- should be done when the menu is returned, not at page end
+                ' -- output the menu system
+                If Not (cpCore.menuFlyout Is Nothing) Then
+                    result &= cpCore.menuFlyout.menu_GetClose()
+                End If
                 '
+                ' -- Add Script Code to Head
                 JS = ""
-                '
-                ' Add Script Code to Head
-                '
                 If cpCore.doc.headScripts.Count > 0 Then
                     For Ptr = 0 To cpCore.doc.headScripts.Count - 1
                         With cpCore.doc.headScripts(Ptr)
@@ -952,44 +823,8 @@ ErrorTrap:
                     'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_StyleSheetTags) & "');"
                     cpCore.doc.metaContent_StyleSheetTags = ""
                 End If
-                ''
-                '' ----- Add any left over shared styles
-                ''
-                'Dim FileList As String
-                'Dim Files() As String
-                'Dim Parts() As String
-                'If (cpCore.doc.metaContent_SharedStyleIDList <> "") Then
-                '    FileList = htmlController.main_GetSharedStyleFileList(cpCore, cpCore.doc.metaContent_SharedStyleIDList, main_IsAdminSite)
-                '    cpCore.doc.metaContent_SharedStyleIDList = ""
-                '    If FileList <> "" Then
-                '        Files = Split(FileList, vbCrLf)
-                '        For Ptr = 0 To UBound(Files)
-                '            If Files(Ptr) <> "" Then
-                '                Parts = Split(Files(Ptr) & "<<", "<")
-                '                If Parts(1) <> "" Then
-                '                    headTags = headTags & cr & genericController.decodeHtml(Parts(1))
-                '                End If
-                '                headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Parts(0)) & """ >"
-                '                If Parts(2) <> "" Then
-                '                    headTags = headTags & cr & genericController.decodeHtml(Parts(2))
-                '                End If
-                '                'End If
-                '            End If
-                '        Next
-                '    End If
-                'End If
-                ''
-                '' ----- Add Member Stylesheet if left over
-                ''
-                'If cpCore.authContext.user.StyleFilename <> "" Then
-                '    Copy = cpCore.cdnFiles.readFile(cpCore.authContext.user.StyleFilename)
-                '    headTags = headTags & cr & "<style type=""text/css"">" & Copy & "</style>"
-                '    'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('<style type=""text/css"">" & Copy & "</style>');"
-                '    cpCore.authContext.user.StyleFilename = ""
-                'End If
                 '
-                ' ----- Add any left over head tags
-                '
+                ' -- Add any left over head tags
                 If (cpCore.doc.metaContent_OtherHeadTags <> "") Then
                     headTags = headTags & cr & cpCore.doc.metaContent_OtherHeadTags
                     'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_OtherHeadTags) & "');"
@@ -1000,26 +835,24 @@ ErrorTrap:
                     'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(headTags) & "');"
                 End If
                 '
-                ' ----- Add end of body javascript
-                '
+                ' -- Add end of body javascript
                 If (cpCore.doc.endOfBodyJavascript <> "") Then
                     JS = JS & vbCrLf & cpCore.doc.endOfBodyJavascript
                     cpCore.doc.endOfBodyJavascript = ""
                 End If
                 '
-                ' ----- If javascript stream, output it all now
-                '
+                ' -- If javascript stream, output it all now
                 If (cpCore.webServer.outStreamDevice = htmlDoc_OutStreamJavaScript) Then
                     '
                     ' This is a js output stream from a <script src=url></script>
                     ' process everything into a var=msg;document.write(var)
                     ' any js from the page should be added to this group
                     '
-                    Call writeAltBuffer(s)
+                    Call writeAltBuffer(result)
                     cpCore.webServer.outStreamDevice = htmlDoc_OutStreamStandard
-                    s = webServerIO_JavaStream_Text
+                    result = webServerIO_JavaStream_Text
                     If JS <> "" Then
-                        s = s & vbCrLf & JS
+                        result = result & vbCrLf & JS
                         JS = ""
                     End If
                 Else
@@ -1028,25 +861,24 @@ ErrorTrap:
                     ' any javascript collected should go in a <script tag
                     '
                     If JS <> "" Then
-                        s = s _
-                                & vbCrLf & "<script Language=""javascript"" type=""text/javascript"">" _
-                                & vbCrLf & "if(cj){" _
-                                & JS _
-                                & vbCrLf & "}" _
-                                & vbCrLf & "</script>"
+                        result = result _
+                            & vbCrLf & "<script Language=""javascript"" type=""text/javascript"">" _
+                            & vbCrLf & "if(cj){" _
+                            & JS _
+                            & vbCrLf & "}" _
+                            & vbCrLf & "</script>"
                         JS = ""
                     End If
                 End If
                 '
-                ' end-of-body string -- include it without csv because it may have error strings
-                '
+                ' -- end-of-body string -- include it without csv because it may have error strings
                 If (Not BlockNonContentExtras) And (cpCore.doc.endOfBodyString <> "") Then
-                    s = s & cpCore.doc.endOfBodyString
+                    result = result & cpCore.doc.endOfBodyString
                 End If
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
-            Return s
+            Return result
         End Function
         '
         '========================================================================
@@ -1263,20 +1095,12 @@ ErrorTrap:
                             '
                             CSPointer = cpCore.db.cs_open(ContentName, Criteria, SortFieldList, , , , , SelectFields)
                             If cpCore.db.cs_ok(CSPointer) Then
-                                Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 10 ContentName=[" & ContentName & "] Criteria=[" & Criteria & "] ")
                                 RowsArray = cpCore.db.cs_getRows(CSPointer)
-                                Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 20")
-                                'RowFieldArray = app.csv_cs_getRowFields(CSPointer)
                                 RowFieldArray = Split(cpCore.db.cs_getSelectFieldList(CSPointer), ",")
-                                Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 30")
                                 ColumnMax = UBound(RowsArray, 1)
-                                Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 40")
-
                                 RowMax = UBound(RowsArray, 2)
-                                Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 50")
                                 '
-                                ' setup IDFieldPointer
-                                '
+                                ' -- setup IDFieldPointer
                                 UcaseFieldName = "ID"
                                 For ColumnPointer = 0 To ColumnMax
                                     If UcaseFieldName = genericController.vbUCase(RowFieldArray(ColumnPointer)) Then
@@ -1329,17 +1153,11 @@ ErrorTrap:
                                     Criteria = Criteria & "(id=" & genericController.EncodeInteger(CurrentValue) & ")"
                                     CSPointer = cpCore.db.cs_open(ContentName, Criteria, SortFieldList, False, , , , SelectFields)
                                     If cpCore.db.cs_ok(CSPointer) Then
-                                        Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 110")
                                         RowsArray = cpCore.db.cs_getRows(CSPointer)
-                                        Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 120")
                                         RowFieldArray = Split(cpCore.db.cs_getSelectFieldList(CSPointer), ",")
-                                        Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 130")
                                         RowMax = UBound(RowsArray, 2)
-                                        Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 140")
                                         ColumnMax = UBound(RowsArray, 1)
-                                        Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 150")
                                         RecordID = genericController.EncodeInteger(RowsArray(IDFieldPointer, 0))
-                                        Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 160")
                                         Copy = DropDownPreField
                                         For FieldPointer = 0 To DropDownFieldCount - 1
                                             Copy = Copy & RowsArray(DropDownFieldPointer(FieldPointer), 0) & DropDownDelimiter(FieldPointer)
@@ -6025,7 +5843,7 @@ ErrorTrap:
         ' ----- Process the reply from the Tools Panel form
         '========================================================================
         '
-        Public Sub processFormToolsPanel()
+        Public Sub processFormToolsPanel(Optional legacyFormSn As String = "")
             Try
                 Dim Button As String
                 Dim username As String
@@ -6034,7 +5852,7 @@ ErrorTrap:
                 '
                 If (cpCore.authContext.user.id > 0) Then
                     If Not (cpCore.debug_iUserError <> "") Then
-                        Button = cpCore.docProperties.getText("mb")
+                        Button = cpCore.docProperties.getText(legacyFormSn & "mb")
                         Select Case Button
                             Case ButtonLogout
                                 '
@@ -6051,7 +5869,7 @@ ErrorTrap:
                                 '
                                 ' Apply
                                 '
-                                username = cpCore.docProperties.getText("username")
+                                username = cpCore.docProperties.getText(legacyFormSn & "username")
                                 If username <> "" Then
                                     Dim loginAddon As New Addons.loginPageClass(cpCore)
                                     Call loginAddon.processFormLoginDefault()
@@ -6059,23 +5877,23 @@ ErrorTrap:
                                 '
                                 ' ----- AllowAdminLinks
                                 '
-                                Call cpCore.visitProperty.setProperty("AllowEditing", genericController.encodeText(cpCore.docProperties.getBoolean("AllowEditing")))
+                                Call cpCore.visitProperty.setProperty("AllowEditing", genericController.encodeText(cpCore.docProperties.getBoolean(legacyFormSn & "AllowEditing")))
                                 '
                                 ' ----- Quick Editor
                                 '
-                                Call cpCore.visitProperty.setProperty("AllowQuickEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowQuickEditor")))
+                                Call cpCore.visitProperty.setProperty("AllowQuickEditor", genericController.encodeText(cpCore.docProperties.getBoolean(legacyFormSn & "AllowQuickEditor")))
                                 '
                                 ' ----- Advanced Editor
                                 '
-                                Call cpCore.visitProperty.setProperty("AllowAdvancedEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowAdvancedEditor")))
+                                Call cpCore.visitProperty.setProperty("AllowAdvancedEditor", genericController.encodeText(cpCore.docProperties.getBoolean(legacyFormSn & "AllowAdvancedEditor")))
                                 '
                                 ' ----- Allow Workflow authoring Render Mode - Visit Property
                                 '
-                                Call cpCore.visitProperty.setProperty("AllowWorkflowRendering", genericController.encodeText(cpCore.docProperties.getBoolean("AllowWorkflowRendering")))
+                                Call cpCore.visitProperty.setProperty("AllowWorkflowRendering", genericController.encodeText(cpCore.docProperties.getBoolean(legacyFormSn & "AllowWorkflowRendering")))
                                 '
                                 ' ----- developer Only parts
                                 '
-                                Call cpCore.visitProperty.setProperty("AllowDebugging", genericController.encodeText(cpCore.docProperties.getBoolean("AllowDebugging")))
+                                Call cpCore.visitProperty.setProperty("AllowDebugging", genericController.encodeText(cpCore.docProperties.getBoolean(legacyFormSn & "AllowDebugging")))
                         End Select
                     End If
                 End If
@@ -8974,7 +8792,7 @@ ErrorTrap:
                     Else
                         '
                         MenuName = genericController.GetRandomInteger().ToString
-                        Call cpCore.html.menu_AddEntry(MenuName, , "/ccLib/images/IconContentAdd.gif", , , , "stylesheet", "stylesheethover")
+                        Call cpCore.menuFlyout.menu_AddEntry(MenuName, , "/ccLib/images/IconContentAdd.gif", , , , "stylesheet", "stylesheethover")
                         LowestRequiredMenuName = main_GetRecordAddLink_AddMenuEntry(iContentName, iPresetNameValueList, "", MenuName, MenuName)
                     End If
                     '
@@ -9048,7 +8866,7 @@ ErrorTrap:
                     '       This must be here so if the call is made after main_ClosePage, the panels will still deliver
                     '
                     If LowestRequiredMenuName <> "" Then
-                        main_GetRecordAddLink2 = main_GetRecordAddLink2 & cpCore.html.menu_GetClose()
+                        main_GetRecordAddLink2 = main_GetRecordAddLink2 & cpCore.menuFlyout.menu_GetClose()
                         If genericController.vbInstr(1, main_GetRecordAddLink2, "IconContentAdd.gif", vbTextCompare) <> 0 Then
                             main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "IconContentAdd.gif"" ", "IconContentAdd.gif"" align=""absmiddle"" ")
                         End If
@@ -9203,7 +9021,7 @@ ErrorTrap:
                                 Link = Link & "&wc=" & cpCore.html.main_EncodeRequestVariable(PresetNameValueList)
                             End If
                         End If
-                        Call cpCore.html.menu_AddEntry(MenuName & ":" & ContentName, ParentMenuName, , , Link, ButtonCaption, "", "", True)
+                        Call cpCore.menuFlyout.menu_AddEntry(MenuName & ":" & ContentName, ParentMenuName, , , Link, ButtonCaption, "", "", True)
                         '
                         ' Create child submenu if Child Entries found
                         '

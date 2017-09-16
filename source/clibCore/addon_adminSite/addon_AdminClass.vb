@@ -9973,7 +9973,7 @@ ErrorTrap:
                             '    Link = Link
                             '    End If
                             NewWindow = cpCore.db.cs_getBoolean(CSMenus, "NewWindow")
-                            Call cpCore.html.menu_AddEntry(genericController.encodeText(Id), ParentID.ToString, ImageLink, ImageOverLink, Link, LinkLabel, StyleSheet, StyleSheetHover, NewWindow)
+                            Call cpCore.menuFlyout.menu_AddEntry(genericController.encodeText(Id), ParentID.ToString, ImageLink, ImageOverLink, Link, LinkLabel, StyleSheet, StyleSheetHover, NewWindow)
 
                             Call cpCore.db.cs_goNext(CSMenus)
                         Loop
@@ -10019,7 +10019,7 @@ ErrorTrap:
                     '
                     ' Save the Baked Menu
                     '
-                    MenuClose = cpCore.html.menu_GetClose()
+                    MenuClose = cpCore.menuFlyout.menu_GetClose()
                     'GetMenuTopMode = GetMenuTopMode & cpCore.main_GetMenuClose
                     Call cpCore.cache.setObject(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Navigator Entries,People,Content,Groups,Group Rules")
                 End If

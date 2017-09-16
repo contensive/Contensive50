@@ -19,7 +19,7 @@ Namespace Contensive.Core.Controllers
         '       If main_PageTestPointPrinting print a string, value paior
         '========================================================================
         '
-        Public Shared Sub debug_testPoint(cpcore As coreClass, Message As String)
+        Public Shared Sub testPoint(cpcore As coreClass, Message As String)
             '
             Dim ElapsedTime As Single
             Dim iMessage As String

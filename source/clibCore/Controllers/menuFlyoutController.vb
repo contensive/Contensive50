@@ -547,5 +547,63 @@ ErrorTrap:
             Throw (New Exception("unexpected error in method [" & MethodName & "], errDescription [" & ErrDescription & "]"))
             '
         End Sub
+
+        '
+        '========================================================================
+        ' ----- Add a new DHTML menu entry
+        '========================================================================
+        '
+        Public Sub menu_AddEntry(ByVal Name As String, Optional ByVal ParentName As String = "", Optional ByVal ImageLink As String = "", Optional ByVal ImageOverLink As String = "", Optional ByVal Link As String = "", Optional ByVal Caption As String = "", Optional ByVal StyleSheet As String = "", Optional ByVal StyleSheetHover As String = "", Optional ByVal NewWindow As Boolean = False)
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AddMenuEntry")
+            '
+            'If Not (true) Then Exit Sub
+            Dim MethodName As String
+            Dim Image As String
+            Dim ImageOver As String = String.Empty
+            '
+            MethodName = "AddMenu()"
+            '
+            Image = genericController.encodeText(ImageLink)
+            If Image <> "" Then
+                ImageOver = genericController.encodeText(ImageOverLink)
+                If Image = ImageOver Then
+                    ImageOver = ""
+                End If
+            End If
+            Call cpCore.menuFlyout.AddEntry(genericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, , NewWindow)
+            '
+            Exit Sub
+            '
+            ' ----- Error Trap
+            '
+ErrorTrap:
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            '
+        End Sub
+        '
+        '========================================================================
+        ' ----- main_Get all the menu close scripts
+        '
+        '   call this at the end of the page
+        '========================================================================
+        '
+        Public Function menu_GetClose() As String
+            Dim result As String = String.Empty
+            Try
+                Dim MenuFlyoutIcon As String
+                '
+                If Not (cpCore.menuFlyout Is Nothing) Then
+                    cpCore.doc.menuSystemCloseCount = cpCore.doc.menuSystemCloseCount + 1
+                    result = result & cpCore.menuFlyout.GetMenuClose()
+                    MenuFlyoutIcon = cpCore.siteProperties.getText("MenuFlyoutIcon", "&#187;")
+                    If MenuFlyoutIcon <> "&#187;" Then
+                        result = genericController.vbReplace(result, "&#187;</a>", MenuFlyoutIcon & "</a>")
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
+        End Function
     End Class
 End Namespace

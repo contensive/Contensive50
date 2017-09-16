@@ -327,10 +327,13 @@ Namespace Contensive.Core.Controllers
                 '
                 If addonId <> 0 Then
                     addon = cpCore.addonCache.getAddonById(addonId)
+                    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from id [" & addonId & "]")
                 ElseIf (genericController.isGuid(AddonNameOrGuid)) Then
                     addon = cpCore.addonCache.getAddonByGuid(AddonNameOrGuid)
+                    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from guid [" & AddonNameOrGuid & "]")
                 Else
                     addon = cpCore.addonCache.getAddonByName(AddonNameOrGuid)
+                    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from name [" & AddonNameOrGuid & "]")
                 End If
                 FoundAddon = False
                 If (addon Is Nothing) Then
@@ -364,6 +367,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' -- found
                     FoundAddon = True
+                    debugController.testPoint(cpCore, "execute [#" & addon.id & ", " & addon.name & ", guid " & addon.ccguid & "]")
                     If Not String.IsNullOrEmpty(addon.ObjectProgramID) Then
                         '
                         ' -- addons with activeX components are deprecated

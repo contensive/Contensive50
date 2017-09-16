@@ -1392,10 +1392,13 @@ Namespace Contensive.Core.Models.Context
                 End If
                 cacheTestName = genericController.vbLCase(cacheTestName)
                 If genericController.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",") Then
-                    Call debugController.debug_testPoint(cpCore, "...is in main_IsEditingContentList")
+                    '
+                    ' -- 
                     returnResult = True
                 ElseIf genericController.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",") Then
-                    Call debugController.debug_testPoint(cpCore, "...is in main_IsNotEditingContentList")
+                    '
+                    ' -- 
+                    'Call debugController.debug_testPoint(cpCore, "...is in main_IsNotEditingContentList")
                 Else
                     If isAuthenticated() Then
                         If Not cpcore.doc.isPrintVersion Then

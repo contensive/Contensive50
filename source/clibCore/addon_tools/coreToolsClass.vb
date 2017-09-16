@@ -211,38 +211,14 @@ Namespace Contensive.Core
                 DefaultCreateBlankRecord = cpCore.docProperties.getBoolean("dtblank")
                 '
                 Call cpCore.doc.addRefreshQueryString("dta", ToolsAction.ToString())
-                'Call cpCore.main_AddRefreshQueryString("Button=" & Button)
-                'Call cpCore.main_AddRefreshQueryString("af=" & AdminFormTool)
-                '
-                debugController.debug_testPoint(cpCore, "Button = " & Button)
-                debugController.debug_testPoint(cpCore, "ToolsQuery = " & ToolsQuery)
-                debugController.debug_testPoint(cpCore, "ToolsDataSource = " & ToolsDataSource)
-                debugController.debug_testPoint(cpCore, "AdminFormTool = " & AdminFormTool)
-                '
-                '
                 '
                 If (Button = ButtonCancel) Then
                     '
-                    ' Cancel
-                    '
+                    ' -- Cancel
                     Call cpCore.webServer.redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
-                    'If AdminFormTool = AdminFormToolRoot Then
-                    '    '
-                    '    ' Cancel to the admin site
-                    '    '
-                    '    Call cpCore.main_Redirect(cpCore.main_GetSiteProperty("AdminURL", "/admin/"))
-                    'Else
-                    '    '
-                    '    ' cancel to the root form
-                    '    '
-                    '    Call Stream.Add(GetForm_Root)
-                    'End If
                 Else
                     '
-                    '--------------------------------------------------------------------------------
-                    ' Print out the page
-                    '--------------------------------------------------------------------------------
-                    '
+                    ' -- Print out the page
                     Select Case AdminFormTool
                         Case AdminFormToolContentDiagnostic
                             '
@@ -313,7 +289,6 @@ Namespace Contensive.Core
                             Call Stream.Add(GetForm_CreateGUID())
                         Case Else
                             '
-                            debugController.debug_testPoint(cpCore, "Taking AdminFormToolRoot case")
                             Call Stream.Add(GetForm_Root)
                     End Select
                 End If
@@ -3075,7 +3050,6 @@ ErrorTrap:
                             cpCore.metaData.clear()
                         End If
                         If (ToolButton = ButtonAdd) Then
-                            debugController.debug_testPoint(cpCore, "ConfigureEdit, Process Add Button")
                             '
                             ' ----- Insert a blank Field
                             '
@@ -3434,7 +3408,6 @@ ErrorTrap:
                         Call Stream.Add("<br>**This field can not be inherited because the Parent Content Definition does not have a field with the same name.")
                     End If
                 End If
-                debugController.debug_testPoint(cpCore, "ConfigureEdit, Form Done")
                 If ContentID <> 0 Then
                     '
                     ' Save the content selection

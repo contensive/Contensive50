@@ -1693,7 +1693,6 @@ ErrorTrap:
                     End If
                 End If
                 '
-                Call debugController.debug_testPoint(cpcore, "getContentBox_content")
             Catch ex As Exception
                 cpcore.handleException(ex)
             End Try
