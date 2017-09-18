@@ -1577,7 +1577,7 @@ ErrorTrap:
                 If AllowLinkAliasIfEnabled And cpcore.siteProperties.allowLinkAlias Then
                     Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")and(QueryStringSuffix=" & cpcore.db.encodeSQLText(QueryStringSuffix) & ")", "id desc")
                     If linkAliasList.Count > 0 Then
-                        linkAlias = linkAliasList.First.Link
+                        linkAlias = linkAliasList.First.name
                         If Mid(linkAlias, 1, 1) <> "/" Then
                             linkAlias = "/" & linkAlias
                         End If
@@ -2251,7 +2251,7 @@ ErrorTrap:
             Dim linkAlias As String = DefaultLink
             Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")and(QueryStringSuffix=" & cpcore.db.encodeSQLText(QueryStringSuffix) & ")", "id desc")
             If linkAliasList.Count > 0 Then
-                linkAlias = linkAliasList.First.Link
+                linkAlias = linkAliasList.First.name
                 If Mid(linkAlias, 1, 1) <> "/" Then
                     linkAlias = "/" & linkAlias
                 End If

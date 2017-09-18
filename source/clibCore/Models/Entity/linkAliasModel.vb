@@ -21,7 +21,7 @@ Namespace Contensive.Core.Models.Entity
         '
         '====================================================================================================
         ' -- instance properties
-        Public Property Link As String
+        'Public Property Link As String
         Public Property PageID As Integer
         Public Property QueryStringSuffix As String
         '

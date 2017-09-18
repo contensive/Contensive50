@@ -441,7 +441,7 @@ Namespace Contensive.Core.Controllers
                             ' Test for Link Alias
                             '
                             If (linkAliasTest1 & linkAliasTest2 <> "") Then
-                                Dim sqlLinkAliasCriteria As String = "(link=" & cpCore.db.encodeSQLText(linkAliasTest1) & ")or(link=" & cpCore.db.encodeSQLText(linkAliasTest2) & ")"
+                                Dim sqlLinkAliasCriteria As String = "(name=" & cpCore.db.encodeSQLText(linkAliasTest1) & ")or(name=" & cpCore.db.encodeSQLText(linkAliasTest2) & ")"
                                 Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpCore, sqlLinkAliasCriteria, "id desc")
                                 If (linkAliasList.Count > 0) Then
                                     Dim linkAlias As Models.Entity.linkAliasModel = linkAliasList.First

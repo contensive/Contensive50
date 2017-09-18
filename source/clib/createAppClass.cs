@@ -7,6 +7,8 @@ using System.Text;
 using Contensive.Core;
 using System.Security.Permissions;
 using System.Security;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace  Contensive.CLI {
     class createAppClass {
@@ -115,56 +117,59 @@ namespace  Contensive.CLI {
                             appConfig.cdnFilesNetprefix = cliController.promptForReply("CDN files Url (website)", "http://" + cdnDomainName + "/");
                             break;
                     }
-                    FileIOPermission f2;
+                    setupDirectory(appConfig.appRootFilesPath);
+                    setupDirectory(appConfig.cdnFilesPath);
+                    setupDirectory(appConfig.privateFilesPath);
+                    setupDirectory(appConfig.tempFilesPath);
+                    //
+                    //FileIOPermission f2;
                     //
                     // -- setup appRoot
-                    System.IO.Directory.CreateDirectory(appConfig.appRootFilesPath);
-                    f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.appRootFilesPath);
-                    //f2.AddPathList(FileIOPermissionAccess.AllAccess, appConfig.appRootFilesPath);
-                    try
-                    {
-                        f2.Demand();
-                    }
-                    catch (SecurityException s)
-                    {
-                        Console.WriteLine(s.Message);
-                    }
+                    //f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.appRootFilesPath);
+                    //try
+                    //{
+                    //    f2.Demand();
+                    //}
+                    //catch (SecurityException s)
+                    //{
+                    //    Console.WriteLine(s.Message);
+                    //}
                     //
                     // -- setup cdn
-                    System.IO.Directory.CreateDirectory(appConfig.cdnFilesPath);
-                    f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.cdnFilesPath);
-                    try
-                    {
-                        f2.Demand();
-                    }
-                    catch (SecurityException s)
-                    {
-                        Console.WriteLine(s.Message);
-                    }
-                    //
-                    // -- setup private
-                    System.IO.Directory.CreateDirectory(appConfig.privateFilesPath);
-                    f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.privateFilesPath);
-                    try
-                    {
-                        f2.Demand();
-                    }
-                    catch (SecurityException s)
-                    {
-                        Console.WriteLine(s.Message);
-                    }
-                    //
-                    // -- setup temp
-                    System.IO.Directory.CreateDirectory(appConfig.tempFilesPath);
-                    f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.tempFilesPath);
-                    try
-                    {
-                        f2.Demand();
-                    }
-                    catch (SecurityException s)
-                    {
-                        Console.WriteLine(s.Message);
-                    }
+                    //System.IO.Directory.CreateDirectory(appConfig.cdnFilesPath);
+                    //f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.cdnFilesPath);
+                    //try
+                    //{
+                    //    f2.Demand();
+                    //}
+                    //catch (SecurityException s)
+                    //{
+                    //    Console.WriteLine(s.Message);
+                    //}
+                    ////
+                    //// -- setup private
+                    //System.IO.Directory.CreateDirectory(appConfig.privateFilesPath);
+                    //f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.privateFilesPath);
+                    //try
+                    //{
+                    //    f2.Demand();
+                    //}
+                    //catch (SecurityException s)
+                    //{
+                    //    Console.WriteLine(s.Message);
+                    //}
+                    ////
+                    //// -- setup temp
+                    //System.IO.Directory.CreateDirectory(appConfig.tempFilesPath);
+                    //f2 = new FileIOPermission(FileIOPermissionAccess.AllAccess, appConfig.tempFilesPath);
+                    //try
+                    //{
+                    //    f2.Demand();
+                    //}
+                    //catch (SecurityException s)
+                    //{
+                    //    Console.WriteLine(s.Message);
+                    //}
 
                     //
                     // -- save the app configuration and reload the server using this app
@@ -219,6 +224,33 @@ namespace  Contensive.CLI {
             {
                 Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a folder and make it full access for everyone
+        /// </summary>
+        /// <param name="folderPathPage"></param>
+        public void setupDirectory(string folderPathPage)
+        {
+            System.IO.Directory.CreateDirectory(folderPathPage);
+            DirectoryInfo dInfo = new DirectoryInfo(folderPathPage);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+            dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, AccessControlType.Allow));
+            // -- child objects were not given acces
+            //dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.InheritOnly, AccessControlType.Allow));
+            // -- child objects were not given acces
+            //dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+            dInfo.SetAccessControl(dSecurity);
+            //
+            //
+            //
+            //DirectoryInfo dInfo = new DirectoryInfo(file);
+            //DirectorySecurity dSecurity = dInfo.GetAccessControl();
+            //dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+            //dInfo.SetAccessControl(dSecurity);
+
+
         }
     }
 }
