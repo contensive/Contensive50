@@ -42,32 +42,39 @@ Namespace Contensive.Core
         Public Const ApplicationCollectionGuid = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}"           ' exported from application during upgrade
         '
         ' -- navigator entries
-        Public Const guidManageAddon As String = "{DBA354AB-5D3E-4882-8718-CF23CAAB7927}"
-        ' -- addons
-        Public Const basestlylesAddonGuid As String = "{0dd7df28-4924-4881-a1d8-421824f5c2d1}"
-        Public Const adminSiteAddonGuid As String = "{c2de2acf-ca39-4668-b417-aa491e7d8460}"
-        Public Const DashboardAddonGuid = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}"
-        Public Const PersonalizationGuid = "{C82CB8A6-D7B9-4288-97FF-934080F5FC9C}"
-        Public Const TextBoxGuid = "{7010002E-5371-41F7-9C77-0BBFF1F8B728}"
-        Public Const ContentBoxGuid = "{E341695F-C444-4E10-9295-9BEEC41874D8}"
-        Public Const DynamicMenuGuid = "{DB1821B3-F6E4-4766-A46E-48CA6C9E4C6E}"
-        Public Const ChildListGuid = "{D291F133-AB50-4640-9A9A-18DB68FF363B}"
-        Public Const DynamicFormGuid = "{8284FA0C-6C9D-43E1-9E57-8E9DD35D2DCC}"
-        Public Const AddonManagerGuid = "{1DC06F61-1837-419B-AF36-D5CC41E1C9FD}"
-        Public Const FormWizardGuid = "{2B1384C4-FD0E-4893-B3EA-11C48429382F}"
-        Public Const ImportWizardGuid = "{37F66F90-C0E0-4EAF-84B1-53E90A5B3B3F}"
-        Public Const JQueryGuid = "{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"
-        Public Const JQueryUIGuid = "{840B9AEF-9470-4599-BD47-7EC0C9298614}"
-        Public Const ImportProcessAddonGuid = "{5254FAC6-A7A6-4199-8599-0777CC014A13}"
-        Public Const StructuredDataProcessorGuid = "{65D58FE9-8B76-4490-A2BE-C863B372A6A4}"
-        Public Const jQueryFancyBoxGuid = "{24C2DBCF-3D84-44B6-A5F7-C2DE7EFCCE3D}"
-        Public Const addonSiteStructureGuid = "{8CDD7960-0FCA-4042-B5D8-3A65BE487AC4}"
+        Public Const addonGuidManageAddon As String = "{DBA354AB-5D3E-4882-8718-CF23CAAB7927}"
         '
+        ' -- addons
+        Public Const addonGuidBaseStlyles As String = "{0dd7df28-4924-4881-a1d8-421824f5c2d1}"
+        Public Const addonGuidAdminSite As String = "{c2de2acf-ca39-4668-b417-aa491e7d8460}"
+        Public Const addonGuidDashboard = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}"
+        Public Const addonGuidPersonalization = "{C82CB8A6-D7B9-4288-97FF-934080F5FC9C}"
+        Public Const addonGuidTextBox = "{7010002E-5371-41F7-9C77-0BBFF1F8B728}"
+        Public Const addonGuidContentBox = "{E341695F-C444-4E10-9295-9BEEC41874D8}"
+        Public Const addonGuidDynamicMenu = "{DB1821B3-F6E4-4766-A46E-48CA6C9E4C6E}"
+        Public Const addonGuidChildList = "{D291F133-AB50-4640-9A9A-18DB68FF363B}"
+        Public Const addonGuidDynamicForm = "{8284FA0C-6C9D-43E1-9E57-8E9DD35D2DCC}"
+        Public Const addonGuidAddonManager = "{1DC06F61-1837-419B-AF36-D5CC41E1C9FD}"
+        Public Const addonGuidFormWizard = "{2B1384C4-FD0E-4893-B3EA-11C48429382F}"
+        Public Const addonGuidImportWizard = "{37F66F90-C0E0-4EAF-84B1-53E90A5B3B3F}"
+        Public Const addonGuidJQuery = "{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"
+        Public Const addonGuidJQueryUI = "{840B9AEF-9470-4599-BD47-7EC0C9298614}"
+        Public Const addonGuidImportProcess = "{5254FAC6-A7A6-4199-8599-0777CC014A13}"
+        Public Const addonGuidStructuredDataProcessor = "{65D58FE9-8B76-4490-A2BE-C863B372A6A4}"
+        Public Const addonGuidjQueryFancyBox = "{24C2DBCF-3D84-44B6-A5F7-C2DE7EFCCE3D}"
+        Public Const addonGuidSiteStructureGuid = "{8CDD7960-0FCA-4042-B5D8-3A65BE487AC4}"
+        'Public Const addonGuidLoginDefaultPage As String = "{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}"
+        ' -- Login Page displays the currently selected login form addon
+        Public Const addonGuidLoginPage As String = "{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}"
+        ' -- Login Form, this is the addonGuid of the default login form. Login Page calls the addon
+        Public Const addonGuidLoginForm As String = "{E23C5941-19C2-4164-BCFD-83D6DD42F651}"
+        Public Const addonGuidPageManager = "{3a01572e-0f08-4feb-b189-18371752a3c3}"
+        '
+        ' -- content
         Public Const DefaultLandingPageGuid = "{925F4A57-32F7-44D9-9027-A91EF966FB0D}"
         Public Const DefaultLandingSectionGuid = "{D882ED77-DB8F-4183-B12C-F83BD616E2E1}"
         Public Const DefaultTemplateGuid = "{47BE95E4-5D21-42CC-9193-A343241E2513}"
         Public Const DefaultDynamicMenuGuid = "{E8D575B9-54AE-4BF9-93B7-C7E7FE6F2DB3}"
-        Public Const pageManagerAddonGuid = "{3a01572e-0f08-4feb-b189-18371752a3c3}"
         '
         Public Const fpoContentBox = "{1571E62A-972A-4BFF-A161-5F6075720791}"
         '

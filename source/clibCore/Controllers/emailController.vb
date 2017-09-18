@@ -900,7 +900,7 @@ ErrorTrap:
         ' Send the Member his username and password
         '=============================================================================
         '
-        Public Function sendPassword(ByVal Email As Object) As Boolean
+        Public Function sendPassword(ByVal Email As String) As Boolean
             Dim returnREsult As Boolean = False
             Try
                 Dim sqlCriteria As String
@@ -928,7 +928,7 @@ ErrorTrap:
                 returnREsult = False
                 If workingEmail = "" Then
                     'hint = "110"
-                    errorController.error_AddUserError(cpcore,"Please enter your email address before requesting your username and password.")
+                    errorController.error_AddUserError(cpcore, "Please enter your email address before requesting your username and password.")
                 Else
                     'hint = "120"
                     atPtr = genericController.vbInstr(1, workingEmail, "@")
@@ -937,7 +937,7 @@ ErrorTrap:
                         ' email not valid
                         '
                         'hint = "130"
-                        errorController.error_AddUserError(cpcore,"Please enter a valid email address before requesting your username and password.")
+                        errorController.error_AddUserError(cpcore, "Please enter a valid email address before requesting your username and password.")
                     Else
                         'hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1)
@@ -985,7 +985,7 @@ ErrorTrap:
                                 Call cpcore.db.cs_save2(CS)
                             Else
                                 'hint = "155"
-                                errorController.error_AddUserError(cpcore,"No current user was found matching this email address. Please try again. ")
+                                errorController.error_AddUserError(cpcore, "No current user was found matching this email address. Please try again. ")
                             End If
                         End If
                         If cpcore.db.cs_ok(CS) Then
@@ -1082,7 +1082,7 @@ ErrorTrap:
                     '    main_ClosePageHTML = main_ClosePageHTML & main_GetPopupMessage(app.publicFiles.ReadFile("ccLib\Popup\PasswordSent.htm"), 300, 300, "no")
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex) : Throw
+                cpcore.handleException(ex) : Throw
             End Try
             Return returnREsult
         End Function

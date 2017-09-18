@@ -321,7 +321,6 @@ Namespace Contensive.Core.Controllers
                 Dim trimLen As Integer
                 Dim whiteChrs As String
                 Dim trimming As Boolean
-                Dim addonStatusOK As Boolean
                 '
                 htmlDoc = New Controllers.htmlController(cpCore)
                 '
@@ -866,7 +865,7 @@ Namespace Contensive.Core.Controllers
                                 Next
                                 ArgOptionString &= "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
-                                CmdAccumulator = cpCore.addon.execute(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                             Case Else
                                 '
                                 ' attempts to execute an add-on with the command name
@@ -886,7 +885,7 @@ Namespace Contensive.Core.Controllers
                                 Next
                                 ArgOptionString = ArgOptionString & "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
-                                CmdAccumulator = cpCore.addon.execute(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                 'CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
                         End Select
                     Next

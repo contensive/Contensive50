@@ -396,6 +396,8 @@
   <ItemGroup>
     <Compile Include="addon_emailProcess\processEmailClass.vb" />
     <Compile Include="addon_housekeeping\houseKeepClass.vb" />
+    <Compile Include="addon_login\loginFormClass.vb" />
+    <Compile Include="Controllers\loginController.vb" />
     <Compile Include="addon_login\loginPageClass.vb" />
     <Compile Include="addon_pageManager\childPageResortClass.vb" />
     <Compile Include="addon_pageManager\pageManager.vb" />
@@ -436,6 +438,7 @@
     <Compile Include="Models\Entity\addonPageRules.vb" />
     <Compile Include="Models\Entity\AddonCollectionModel.vb" />
     <Compile Include="Models\Entity\contentModel.vb" />
+    <Compile Include="Models\Entity\linkForwardModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />

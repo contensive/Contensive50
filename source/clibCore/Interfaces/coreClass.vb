@@ -707,12 +707,7 @@ Namespace Contensive.Core
                                 hostRecordId = docProperties.getInteger("HostRecordID")
                                 '
                                 ' remote methods are add-ons
-                                '
-                                Dim AddonStatusOK As Boolean = True
-                                '
-                                ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
-                                '
-                                result = Me.addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.id, authContext.isAuthenticated)
+                                result = Me.addon.execute_legacy6(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", False, Nothing, "", Nothing, "", authContext.user.id, authContext.isAuthenticated)
                             End If
                             '
                             ' deliver styles, javascript and other head tags as javascript appends
@@ -1097,20 +1092,17 @@ Namespace Contensive.Core
                                         '
                                         '
                                         '
-                                        Dim loginAddon As New Addons.loginPageClass(Me)
-                                        Call loginAddon.processFormJoin()
+                                        Call Controllers.loginController.processFormJoin(Me)
                                     Case FormTypeSendPassword
                                         '
                                         '
                                         '
-                                        Dim loginAddon As New Addons.loginPageClass(Me)
-                                        Call loginAddon.processFormSendPassword()
+                                        Call Controllers.loginController.processFormSendPassword(Me)
                                     Case FormTypeLogin, "l09H58a195"
                                         '
                                         '
                                         '
-                                        Dim loginAddon As New Addons.loginPageClass(Me)
-                                        Call loginAddon.processFormLoginDefault()
+                                        Call Controllers.loginController.processFormLoginDefault(Me)
                                     Case FormTypeToolsPanel
                                         '
                                         ' ----- Administrator Tools Panel
@@ -1141,10 +1133,11 @@ Namespace Contensive.Core
                             '
                             'Call AppendLog("main_init(), 3110 - exit for hardcodedpage hook")
                             '
-                            Dim ExitNow As Boolean = executeRoute_hardCodedPage(HardCodedPage)
+                            Dim exitNow As Boolean = False
+                            result &= executeRoute_hardCodedPage(HardCodedPage, exitNow)
                             If ExitNow Then
                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                Return doc.docBuffer
+                                Return result
                             End If
                         End If
                         '
@@ -1167,12 +1160,12 @@ Namespace Contensive.Core
                             ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
                             '
                             If True Then
-                                result = Me.addon.execute_legacy4(adminSiteAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
+                                result = Me.addon.execute_legacy4(addonGuidAdminSite, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
                             Else
                                 '
                                 ' until then, run it as an internal class
                                 '
-                                result = Me.addon.execute_legacy4(basestlylesAddonGuid, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
+                                result = Me.addon.execute_legacy4(addonGuidBaseStlyles, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
                                 Dim admin As New Contensive.Addons.addon_AdminSiteClass()
                                 result = admin.execute(cp_forAddonExecutionOnly).ToString()
                             End If
@@ -1193,14 +1186,7 @@ Namespace Contensive.Core
                                 ' -- no default route set, assume html hit
                                 result = "<p>This site is not configured for website traffic. Please set the default route.</p>"
                             Else
-                                Dim addonStatusOk As Boolean = False
-                                result = Me.addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.id, authContext.visit.VisitAuthenticated)
-                                If (Not addonStatusOk) Then
-                                    '
-                                    ' -- there was an error in the default route addon
-                                    result = "<p>This site is temporarily unavailable.</p>"
-                                Else
-                                End If
+                                result = Me.addon.execute_legacy6(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", authContext.user.id, authContext.visit.VisitAuthenticated)
                             End If
                         End If
                     End If
@@ -1409,31 +1395,27 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="HardCodedPage"></param>
         ''' <returns></returns>
-        Private Function executeRoute_hardCodedPage(ByVal HardCodedPage As String) As Boolean
-            Dim result As Boolean = False
+        Private Function executeRoute_hardCodedPage(ByVal HardCodedPage As String, ByRef exitNow As Boolean) As String
+            Dim result As String = ""
             Try
+                exitNow = False
                 Select Case genericController.vbLCase(HardCodedPage)
                     Case HardCodedPageSendPassword
                         '
-                        ' send password to the email address in the querystring
-                        '
+                        ' -- send password
                         Dim Emailtext As String = docProperties.getText("email")
                         If Emailtext <> "" Then
                             Call email.sendPassword(Emailtext)
-                            Dim Copy As String = "" _
-                            & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
-                            & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
-                            & "<p><a href=""?" & doc.refreshQueryString & """>Return to the Site.</a></p>" _
-                            & "</div>"
-                            Call html.writeAltBuffer(Copy)
-                            result = True
-                        Else
-                            result = False
+                            result &= "" _
+                                & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
+                                & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
+                                & "<p><a href=""?" & doc.refreshQueryString & """>Return to the Site.</a></p>" _
+                                & "</div>"
+                            exitNow = True
                         End If
                     Case HardCodedPageResourceLibrary
                         '
-                        ' main_Get FormIndex (the index to the InsertImage# function called on selection)
-                        '
+                        ' -- resource library
                         Call doc.addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
                         Dim EditorObjectName As String = docProperties.getText("EditorObjectName")
                         Dim LinkObjectName As String = docProperties.getText("LinkObjectName")
@@ -1459,18 +1441,15 @@ Namespace Contensive.Core
                                 & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
                                 & ""
                             Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
-                            Copy = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
-                            Call html.writeAltBuffer(Copy)
-                            result = True
+                            result = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
+                            exitNow = True
                         ElseIf LinkObjectName <> "" Then
                             '
                             ' Open a page compatible with a dialog
-                            '
                             Call doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
                             Call html.addJavaScriptLinkHead("/ccLib/ClientSide/dialogs.js", "Resource Library")
                             Call doc.setMetaContent(0, 0)
                             Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Resource Library")
-                            Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                             Dim htmlBody As String = "" _
                                 & html.main_GetPanelHeader("Contensive Resource Library") _
                                 & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
@@ -1478,35 +1457,45 @@ Namespace Contensive.Core
                                 & cr & "</td></tr></table>" _
                                 & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
                                 & ""
-                            Dim Copy As String = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
-                            Call html.writeAltBuffer(Copy)
-                            result = True
+                            Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
+                            result = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
+                            exitNow = True
                         End If
                     Case HardCodedPageLoginDefault
                         '
-                        doc.refreshQueryString = webServer.requestQueryString
-                        Dim loginAddon As New Addons.loginPageClass(Me)
-                        Call html.writeAltBuffer(loginAddon.getLoginPage(True))
-                        result = True
+                        ' -- default login page
+                        exitNow = True
+                        Dim addonArguments As New Dictionary(Of String, String)
+                        addonArguments.Add("Force Default Login", "true")
+                        Return addon.execute(
+                            addonModel.create(Me, addonGuidLoginPage),
+                                New CPUtilsBaseClass.addonExecuteContext() With {
+                                    .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                    .instanceArguments = addonArguments
+                                }
+                            )
                     Case HardCodedPageLogin, HardCodedPageLogoutLogin
                         '
-                        ' Print the Login form as an intercept page
-                        ' Special case - set the current URL to the Refresh Query String
-                        ' Because you want the form created to save the refresh values
-                        '
+                        ' -- login
                         If genericController.vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
+                            '
+                            ' -- must logout first
                             Call authContext.logout(Me)
                         End If
-                        doc.refreshQueryString = webServer.requestQueryString
-                        Dim loginAddon As New Addons.loginPageClass(Me)
-                        Call html.writeAltBuffer(loginAddon.getLoginPage(False))
-                        result = True
+                        exitNow = True
+                        Dim addonArguments As New Dictionary(Of String, String)
+                        addonArguments.Add("Force Default Login", "false")
+                        Return addon.execute(
+                            addonModel.create(Me, addonGuidLoginPage),
+                                New CPUtilsBaseClass.addonExecuteContext() With {
+                                    .addonType = CPUtilsBaseClass.addonContext.ContextPage
+                                }
+                            )
                     Case HardCodedPageLogout
                         '
-                        ' ----- logout the current member
-                        '
+                        ' -- logout the current member
                         Call authContext.logout(Me)
-                        result = False
+                        Return String.Empty
                     Case HardCodedPageSiteExplorer
                         '
                         ' 7/8/9 - Moved from intercept pages
@@ -1529,9 +1518,8 @@ Namespace Contensive.Core
                                 & genericController.htmlIndent(Copy) _
                                 & cr & "</td></tr></table>" _
                                 & ""
-                            Copy = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
-                            Call html.writeAltBuffer(Copy)
-                            result = True
+                            result = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
+                            exitNow = True
                         End If
                     Case HardCodedPageStatus
                         '
@@ -1573,9 +1561,8 @@ Namespace Contensive.Core
                         End If
                         webServer.blockClosePageCopyright = True
                         blockClosePageLink = True
-                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
-                        Call html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)
-                        result = True
+                        result = html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)
+                        exitNow = True
                     Case HardCodedPageRedirect
                         '
                         ' ----- Redirect with RC and RI
@@ -1586,23 +1573,19 @@ Namespace Contensive.Core
                             Dim ContentName As String = metaData.getContentNameByID(doc.redirectContentID)
                             If ContentName <> "" Then
                                 Call iisController.main_RedirectByRecord_ReturnStatus(Me, ContentName, doc.redirectRecordID)
+                                result = ""
+                                blockClosePageLink = True
+                                exitNow = True
                             End If
                         End If
-                        webServer.blockClosePageCopyright = True
-                        blockClosePageLink = True
-                        result = False '--- should be disposed by caller --- Call dispose
-                        result = True
                     Case HardCodedPageExportAscii
                         '
-                        '----------------------------------------------------
-                        '   Should be a remote method in commerce
-                        '----------------------------------------------------
-                        '
+                        ' -- Should be a remote method in commerce
                         If Not authContext.isAuthenticatedAdmin(Me) Then
                             '
                             ' Administrator required
                             '
-                            Call html.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
+                            userErrorList.Add("Error: You must be an administrator to use the ExportAscii method")
                         Else
                             webServer.blockClosePageCopyright = True
                             Dim ContentName As String = docProperties.getText("content")
@@ -1615,24 +1598,17 @@ Namespace Contensive.Core
                                 PageNumber = 1
                             End If
                             If (ContentName = "") Then
-                                Call html.writeAltBuffer("Error: ExportAscii method requires ContentName")
+                                userErrorList.Add("Error: ExportAscii method requires ContentName")
                             Else
-                                Call html.writeAltBuffer(Controllers.exportAsciiController.exportAscii_GetAsciiExport(Me, ContentName, PageSize, PageNumber))
+                                result = Controllers.exportAsciiController.exportAscii_GetAsciiExport(Me, ContentName, PageSize, PageNumber)
+                                webServer.blockClosePageCopyright = True
+                                blockClosePageLink = True
+                                exitNow = True
                             End If
                         End If
-                        result = True
-                        webServer.blockClosePageCopyright = True
-                        blockClosePageLink = True
-                        result = False '--- should be disposed by caller --- Call dispose
-                        result = True
                     Case HardCodedPagePayPalConfirm
                         '
-                        '
-                        '----------------------------------------------------
-                        '   Should be a remote method in commerce
-                        '----------------------------------------------------
-                        '
-                        '
+                        ' -- Should be a remote method in commerce
                         Dim ConfirmOrderID As Integer = docProperties.getInteger("item_name")
                         If ConfirmOrderID <> 0 Then
                             '
@@ -1680,8 +1656,7 @@ Namespace Contensive.Core
                         End If
                         webServer.blockClosePageCopyright = True
                         blockClosePageLink = True
-                        result = False '--- should be disposed by caller --- Call dispose
-                        result = True
+                        exitNow = True
                 End Select
             Catch ex As Exception
                 handleException(ex)

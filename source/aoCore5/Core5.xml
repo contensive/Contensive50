@@ -590,7 +590,7 @@ End Function]]></Code>
 		<CopyText></CopyText>
 		<ActiveXProgramID><![CDATA[aoLoginForm.LoginClass]]></ActiveXProgramID>
 		<DotNetClass></DotNetClass>
-		<ArgumentList></ArgumentList>
+		<ArgumentList>Force Default Login=false</ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
 		<Help><![CDATA[<p>This is more complete instructions. This appears in the help bubble.</p>]]></Help>
@@ -599,6 +599,8 @@ End Function]]></Code>
 		<InIframe>No</InIframe>
 		<BlockEditTools>Yes</BlockEditTools>
 		<FormXML></FormXML>
+		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+		<IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
 		<IsInline>No</IsInline>
 		<JavascriptOnLoad></JavascriptOnLoad>
 		<JavascriptInHead></JavascriptInHead>
@@ -676,6 +678,8 @@ End Function]]></Code>
 		<InIframe>No</InIframe>
 		<BlockEditTools>yes</BlockEditTools>
 		<FormXML></FormXML>
+		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+		<IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
 		<IsInline>No</IsInline>
 		<JavascriptOnLoad></JavascriptOnLoad>
 		<JavascriptInHead></JavascriptInHead>

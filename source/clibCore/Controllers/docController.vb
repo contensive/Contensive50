@@ -441,7 +441,7 @@ Namespace Contensive.Core.Controllers
             Get
                 Dim returnStatus As Boolean = False
                 If Not siteStructure_LocalLoaded Then
-                    siteStructure = Me.cpcore.addon.execute_legacy2(0, addonSiteStructureGuid, "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
+                    siteStructure = Me.cpcore.addon.execute_legacy2(0, addonGuidSiteStructureGuid, "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
                     siteStructure_LocalLoaded = True
                 End If
                 main_SiteStructure = siteStructure

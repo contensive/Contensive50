@@ -169,7 +169,7 @@ Namespace Contensive.Core
             Dim result As String = ""
             Try
                 If Response.isOpen Then
-                    result = core.addon.execute(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.authContext.user.id, core.authContext.visit.VisitAuthenticated)
+                    result = core.addon.execute_legacy6(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.authContext.user.id, core.authContext.visit.VisitAuthenticated)
                 End If
                 '
             Catch ex As Exception

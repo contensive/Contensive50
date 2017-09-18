@@ -3995,7 +3995,7 @@ ErrorTrap:
                                                                 '
                                                                 ' all other add-ons, pass out to cpCoreClass to process
                                                                 '
-                                                                Copy = cpCore.addon.execute(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                                                Copy = cpCore.addon.execute_legacy6(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                                                 'Copy = "" _
                                                                 '    & "" _
                                                                 '    & "<!-- ADDON " _
@@ -5863,16 +5863,14 @@ ErrorTrap:
                                 '
                                 ' Login - This can only come from the Horizonal Tool Bar
                                 '
-                                Dim loginAddon As New Addons.loginPageClass(cpCore)
-                                Call loginAddon.processFormLoginDefault()
+                                Call Controllers.loginController.processFormLoginDefault(cpCore)
                             Case ButtonApply
                                 '
                                 ' Apply
                                 '
                                 username = cpCore.docProperties.getText(legacyFormSn & "username")
                                 If username <> "" Then
-                                    Dim loginAddon As New Addons.loginPageClass(cpCore)
-                                    Call loginAddon.processFormLoginDefault()
+                                    Call Controllers.loginController.processFormLoginDefault(cpCore)
                                 End If
                                 '
                                 ' ----- AllowAdminLinks
@@ -7169,7 +7167,6 @@ ErrorTrap:
             Dim returnValue As String
             Dim ArgCnt As Integer
             Dim AddonGuid As String
-            Dim AddonStatusOK As Boolean
             Dim SortMethodID As Integer
             Dim SortMethod As String
             Dim ACInstanceID As String
@@ -7319,7 +7316,7 @@ ErrorTrap:
                                             ' Dynamic Form - run the core addon replacement instead
                                             '
                                             'hint = hint & ",310"
-                                            returnValue = returnValue & cpCore.addon.execute(0, DynamicFormGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                            returnValue = returnValue & cpCore.addon.execute_legacy6(0, addonGuidDynamicForm, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                         Case ACTypeChildList
                                             '
                                             ' Child Page List
@@ -7415,9 +7412,9 @@ ErrorTrap:
                                 End If
                                 ' dont have any way of getting fieldname yet
                                 If AddonGuid <> "" Then
-                                    Copy = cpCore.addon.execute(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = cpCore.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 Else
-                                    Copy = cpCore.addon.execute(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = cpCore.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 End If
                             End If
                         End If

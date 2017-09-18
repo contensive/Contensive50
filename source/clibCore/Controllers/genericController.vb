@@ -5238,5 +5238,41 @@ ErrorTrap:
             encodeHTML = genericController.vbReplace(encodeHTML, "'", "&apos;")
             '
         End Function
+        '
+        '======================================================================================
+        ''' <summary>
+        ''' Convert addon argument list to a doc property compatible dictionary of strings
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="SrcOptionList"></param>
+        ''' <returns></returns>
+        Public Shared Function convertAddonArgumentstoDocPropertiesList(cpCore As coreClass, SrcOptionList As String) As Dictionary(Of String, String)
+            Dim returnList As New Dictionary(Of String, String)
+            Try
+                Dim SrcOptions As String()
+                Dim key As String
+                Dim value As String
+                Dim Pos As Integer
+                '
+                If Not String.IsNullOrEmpty(SrcOptionList) Then
+                    SrcOptions = Split(SrcOptionList.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr), vbCr)
+                    For Ptr = 0 To UBound(SrcOptions)
+                        key = SrcOptions(Ptr).Replace(vbTab, "")
+                        If Not String.IsNullOrEmpty(key) Then
+                            value = ""
+                            Pos = genericController.vbInstr(1, key, "=")
+                            If Pos > 0 Then
+                                value = Mid(key, Pos + 1)
+                                key = Mid(key, 1, Pos - 1)
+                            End If
+                            returnList.Add(key, value)
+                        End If
+                    Next
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex) : Throw
+            End Try
+            Return returnList
+        End Function
     End Class
 End Namespace

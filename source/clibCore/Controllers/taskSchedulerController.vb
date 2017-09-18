@@ -175,7 +175,7 @@ Namespace Contensive.Core.Controllers
                 Dim RightNow As Date
                 Dim AppName As String
                 '
-                appendLog(cpClusterCore, "taskScheduler.scheduleTasks")
+                logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks")
                 '
                 RightNow = DateTime.Now
                 For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cpClusterCore.serverConfig.apps
@@ -183,7 +183,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' schedule tasks for this app
                     '
-                    appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" & AppName & "]")
+                    logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" & AppName & "]")
                     '
                     Using cpSite As New CPClass(AppName)
                         If (cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready) And (cpSite.core.serverConfig.appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
@@ -224,7 +224,7 @@ Namespace Contensive.Core.Controllers
                                         cmdDetail = New cmdDetailClass
                                         cmdDetail.addonId = addonId
                                         cmdDetail.addonName = addonName
-                                        cmdDetail.docProperties = convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
+                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
                                         Call addTaskToQueue(cpSite.core, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
                                     ElseIf cpSite.core.db.cs_getDate(CS, "ProcessNextRun") = Date.MinValue Then
                                         '
@@ -242,7 +242,7 @@ Namespace Contensive.Core.Controllers
                                         cmdDetail = New cmdDetailClass
                                         cmdDetail.addonId = addonId
                                         cmdDetail.addonName = addonName
-                                        cmdDetail.docProperties = convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
+                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
                                         Call addTaskToQueue(cpSite.core, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
                                     End If
                                     Call cpSite.core.db.cs_goNext(CS)
@@ -277,7 +277,7 @@ Namespace Contensive.Core.Controllers
                 Dim cmdDetailJson As String = cpSiteCore.json.Serialize(cmdDetail)
                 Dim cs As Integer
                 '
-                appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.serverConfig.appConfig.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
+                logController.appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.serverConfig.appConfig.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
                 '
                 returnTaskAdded = True
                 LcaseCommand = genericController.vbLCase(Command)
@@ -311,51 +311,15 @@ Namespace Contensive.Core.Controllers
             End Try
             Return returnTaskAdded
         End Function
-        '
-        '======================================================================================
-        ''' <summary>
-        ''' Convert addon argument list to a doc property compatible dictionary of strings
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        ''' <param name="SrcOptionList"></param>
-        ''' <returns></returns>
-        Public Function convertAddonArgumentstoDocPropertiesList(cpCore As coreClass, SrcOptionList As String) As Dictionary(Of String, String)
-            Dim returnList As New Dictionary(Of String, String)
-            Try
-                Dim SrcOptions As String()
-                Dim key As String
-                Dim value As String
-                Dim Pos As Integer
-                '
-                If Not String.IsNullOrEmpty(SrcOptionList) Then
-                    SrcOptions = Split(SrcOptionList.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr), vbCr)
-                    For Ptr = 0 To UBound(SrcOptions)
-                        key = SrcOptions(Ptr).Replace(vbTab, "")
-                        If Not String.IsNullOrEmpty(key) Then
-                            value = ""
-                            Pos = genericController.vbInstr(1, key, "=")
-                            If Pos > 0 Then
-                                value = Mid(key, Pos + 1)
-                                key = Mid(key, 1, Pos - 1)
-                            End If
-                            returnList.Add(key, value)
-                        End If
-                    Next
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex) : Throw
-            End Try
-            Return returnList
-        End Function
-        '
-        Private Sub appendLog(cpCore As coreClass, ByVal logText As String, Optional isImportant As Boolean = False)
-            If (isImportant Or allowVerboseLogging) Then
-                logController.appendLog(cpCore, logText, "", "trace")
-            End If
-            If (allowConsoleWrite) Then
-                Console.WriteLine(logText)
-            End If
-        End Sub
+        ''
+        'Private Sub appendLog(cpCore As coreClass, ByVal logText As String, Optional isImportant As Boolean = False)
+        '    If (isImportant Or allowVerboseLogging) Then
+        '        logController.appendLog(cpCore, logText, "", "trace")
+        '    End If
+        '    If (allowConsoleWrite) Then
+        '        Console.WriteLine(logText)
+        '    End If
+        'End Sub
         '
         '
         '

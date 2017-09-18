@@ -443,7 +443,7 @@ Namespace Contensive.Core.Controllers
                         Dim defaultRouteAddonId As Integer = cpcore.siteProperties.getinteger(spDefaultRouteAddonId, 0)
                         Dim defaultRouteAddon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, defaultRouteAddonId)
                         If (defaultRouteAddon Is Nothing) Then
-                            defaultRouteAddon = Models.Entity.addonModel.create(cpcore, pageManagerAddonGuid)
+                            defaultRouteAddon = Models.Entity.addonModel.create(cpcore, addonGuidPageManager)
                             If (defaultRouteAddon IsNot Nothing) Then
                                 cpcore.siteProperties.setProperty(spDefaultRouteAddonId, defaultRouteAddon.id)
                             End If

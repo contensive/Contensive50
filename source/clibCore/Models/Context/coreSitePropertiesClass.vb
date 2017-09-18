@@ -222,7 +222,7 @@ Namespace Contensive.Core.Models.Context
                         If _childListAddonID_Local = 0 Then
                             BuildSupportsGuid = True
                             If BuildSupportsGuid Then
-                                CS = cpCore.db.cs_open(cnAddons, "ccguid='" & ChildListGuid & "'", , , ,,  , "ID")
+                                CS = cpCore.db.cs_open(cnAddons, "ccguid='" & addonGuidChildList & "'", , , ,,  , "ID")
                             Else
                                 CS = cpCore.db.cs_open(cnAddons, "name='Child Page List'", , , , ,, "ID")
                             End If
@@ -240,7 +240,7 @@ Namespace Contensive.Core.Models.Context
                                     Call cpCore.db.cs_set(CS, "Content", "1")
                                     Call cpCore.db.cs_set(CS, "StylesFilename", "")
                                     If BuildSupportsGuid Then
-                                        Call cpCore.db.cs_set(CS, "ccguid", ChildListGuid)
+                                        Call cpCore.db.cs_set(CS, "ccguid", addonGuidChildList)
                                     End If
                                 End If
                                 Call cpCore.db.cs_Close(CS)

@@ -3964,7 +3964,7 @@ ErrorTrap:
                 Dim cmdDetail As New cmdDetailClass
                 cmdDetail.addonId = 0
                 cmdDetail.addonName = "commandRestart"
-                cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(cpCore, "")
+                cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, "")
                 Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
                 '
                 'Call runAtServer.executeCmd("Restart", "appname=" & cpCore.app.config.name)
@@ -4511,7 +4511,7 @@ ErrorTrap:
                     Dim cmdDetail As New cmdDetailClass
                     cmdDetail.addonId = 0
                     cmdDetail.addonName = "GetForm_FindAndReplace"
-                    cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(cpCore, QS)
+                    cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, QS)
                     Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
 
 
@@ -4611,7 +4611,7 @@ ErrorTrap:
                 Dim cmdDetail As New cmdDetailClass
                 cmdDetail.addonId = 0
                 cmdDetail.addonName = "GetForm_IISReset"
-                cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(cpCore, "")
+                cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, "")
                 Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
 
 

@@ -197,7 +197,7 @@ Namespace Contensive.Core.Controllers
                                         '
                                         Select Case command.ToLower()
                                             Case taskQueueCommandEnumModule.runAddon
-                                                Call cpSite.core.addon.execute(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
+                                                Call cpSite.core.addon.execute_legacy7(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
                                         End Select
                                     End If
                                     cpSite.core.db.cs_Close(CS)

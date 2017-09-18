@@ -164,12 +164,11 @@ Namespace Contensive.Core.Controllers
         ''' <param name="properties">properties are nameValue pairs consumable by the addon during execution. These properties are added to cpcore.docproperties and made available. Originally this argument was for the nameValues modified in the page instance where the addon was placed.</param>
         ''' <param name="context">member of CPUtilsBaseClass.addonContext</param>
         ''' <returns></returns>
-        Public Function execute(ByVal addonId As Integer, properties As Dictionary(Of String, String), context As CPUtilsBaseClass.addonContext) As String
+        Public Function execute_legacy7(ByVal addonId As Integer, arguments As Dictionary(Of String, String), context As CPUtilsBaseClass.addonContext) As String
             Dim result As String = String.Empty
             Try
                 Dim optionString As String = ""
-                Dim return_StatusOk As Boolean
-                For Each kvp As KeyValuePair(Of String, String) In properties
+                For Each kvp As KeyValuePair(Of String, String) In arguments
                     If Not String.IsNullOrEmpty(kvp.Key) Then
                         optionString &= "&" & EncodeRequestVariable(kvp.Key) & "=" & EncodeRequestVariable(kvp.Value)
                     End If
@@ -177,7 +176,7 @@ Namespace Contensive.Core.Controllers
                 If Not String.IsNullOrEmpty(optionString) Then
                     optionString = optionString.Substring(1)
                 End If
-                result = execute(addonId, "", optionString, context, "", 0, "", "", False, 0, "", return_StatusOk, Nothing, "", Nothing, "", 0, False)
+                result = execute_legacy6(addonId, "", optionString, context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", 0, False)
             Catch ex As Exception
                 cpCore.handleException(ex)
             End Try
@@ -191,22 +190,43 @@ Namespace Contensive.Core.Controllers
         ''' <param name="addonId"></param>
         ''' <param name="context"></param>
         ''' <returns></returns>
-        Public Function executeDependency(ByVal addonId As Integer, context As CPUtilsBaseClass.addonContext, HostContentName As String, hostRecordId As Integer, hostFieldName As String, acInstanceId As String, defaultWrapperId As Integer, ByRef return_addonStatusOk As Boolean, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
+        Public Function executeDependency(ByVal addonId As Integer, context As CPUtilsBaseClass.addonContext, HostContentName As String, hostRecordId As Integer, hostFieldName As String, acInstanceId As String, defaultWrapperId As Integer, ByRef ignoreBoolean As Boolean, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
             Dim result As String = String.Empty
             Try
                 Dim optionString As String = ""
-                result = execute(addonId, "", "", context, HostContentName, hostRecordId, hostFieldName, acInstanceId, True, defaultWrapperId, "", return_addonStatusOk, Nothing, "," & addonId, Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                result = execute_legacy6(addonId, "", "", context, HostContentName, hostRecordId, hostFieldName, acInstanceId, True, defaultWrapperId, "", False, Nothing, "," & addonId, Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
             Catch ex As Exception
                 cpCore.handleException(ex)
             End Try
             Return result
         End Function
         '
-        'todo convert to addon model, and pass new model to subroutines to enhandle error reporting
+        'todo refactor as follows
+        ' - add primary interface to cp.addon and deprecate utils methods
+        ' - create addonContextObject (not this name as it is used) to hold instanceId, context, ect
+        ' - consider an addonInstance table referenced by instanceGuid to hold arguments, then eliminate the contextContentName and contextRecoreId because they are only used to exit the context content when editing arguments into the addon tag
+        ' - refactor to execute( addon as addonModel, addonContextObject, returnStatusBoolean )
+        ' - refactor to execute( addonId, addonContextObject, returnStatusBoolean )
+        ' - refactor to execute( addonGuid, addonContextObject, returnStatusBoolean )
+        ' - refactor to execute( addonName, addonContextObject, returnStatusBoolean ) -- somehow 
         '
+        ' - then 
         '====================================================================================================
         '
-        Public Function execute(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
+        Public Function execute(addon As Models.Entity.addonModel, context As CPUtilsBaseClass.addonExecuteContext) As String
+            Dim result As String = ""
+            Try
+                Dim optionString As String = ""
+                For Each kvp As KeyValuePair(Of String, String) In context.instanceArguments
+                    optionString &= vbCrLf & kvp.Key & "=" & kvp.Value
+                Next
+                result = execute_legacy6(addon.id, "", optionString, context.addonType, context.hostRecord.contentName, context.hostRecord.recordId, context.hostRecord.fieldName, context.instanceGuid, False, context.wrapperID, "", False, Nothing, "", Nothing, "", context.personalizationPeopleId, context.personalizationAuthenticated)
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
+        End Function
+        Public Function execute_legacy6(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal addonType As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef ignoreBoolean As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
             Dim returnVal As String = ""
             Try
                 Dim blockJavascriptAndCss As Boolean
@@ -225,8 +245,8 @@ Namespace Contensive.Core.Controllers
                 Dim ScriptingTimeout As Integer
                 Dim ScriptCallbackContent As String = String.Empty
                 Dim errorMessageForAdmin As String = String.Empty
-                Dim CollectionGuid As String = String.Empty
-                Dim DotNetClassFullName As String = String.Empty
+                'Dim CollectionGuid As String = String.Empty
+                'Dim DotNetClassFullName As String = String.Empty
                 Dim ScriptingEntryPoint As String = String.Empty
                 Dim scriptinglanguageid As Integer
                 Dim ScriptingLanguage As String = String.Empty
@@ -308,7 +328,6 @@ Namespace Contensive.Core.Controllers
                 ' ----- Debug timer
                 '
                 StartTickCount = GetTickCount
-                return_StatusOK = True
                 WrapperID = DefaultWrapperID
                 If (personalizationPeopleId = 0) Then
                     '
@@ -339,8 +358,7 @@ Namespace Contensive.Core.Controllers
                 If (addon Is Nothing) Then
                     '
                     ' -- not found 
-                    return_StatusOK = False
-                    If (Context = CPUtilsBaseClass.addonContext.ContextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
+                    If (addonType = CPUtilsBaseClass.addonContext.ContextEmail) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (addonType = CPUtilsBaseClass.addonContext.ContextSimple) Then
                         '
                         ' Block all output even on error
                         '
@@ -351,7 +369,7 @@ Namespace Contensive.Core.Controllers
                         If AddonNameOrGuid = "" And addonId <> 0 Then
                             AddonNameOrGuid = "Addon #" & addonId
                         End If
-                        If Context = CPUtilsBaseClass.addonContext.ContextAdmin Then
+                        If addonType = CPUtilsBaseClass.addonContext.ContextAdmin Then
                             returnVal = "The Add-on '" & AddonNameOrGuid & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.id & """>click here</a> to automatically reset the dashboard."
                         Else
                             returnVal = "The Add-on '" & AddonNameOrGuid & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
@@ -377,7 +395,7 @@ Namespace Contensive.Core.Controllers
                     Else
                         addonId = addon.id
                         Link = addon.Link
-                        DotNetClassFullName = addon.DotNetClass
+                        'DotNetClassFullName = addon.DotNetClass
                         AddonOptionConstructor = addon.ArgumentList
                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
@@ -433,7 +451,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' temporary fix for Content Box not handling ajax or inframe
                         '
-                        If genericController.vbLCase(addon.ccguid) = genericController.vbLCase(ContentBoxGuid) Then
+                        If genericController.vbLCase(addon.ccguid) = genericController.vbLCase(addonGuidContentBox) Then
                             AsAjax = False
                             InFrame = False
                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_BlockNoAjax
@@ -466,16 +484,16 @@ Namespace Contensive.Core.Controllers
                             If True Then
                                 IncludeEditWrapper =
                                 (Not AddonBlockEditTools) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextEditor) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextEmail) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextSimple) _
+                                And (addonType <> CPUtilsBaseClass.addonContext.ContextEditor) _
+                                And (addonType <> CPUtilsBaseClass.addonContext.ContextEmail) _
+                                And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) _
+                                And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) _
+                                And (addonType <> CPUtilsBaseClass.addonContext.ContextSimple) _
                                 And (Not IsIncludeAddon)
                                 If IncludeEditWrapper Then
                                     IncludeEditWrapper = IncludeEditWrapper _
                                     And (cpCore.visitProperty.getBoolean("AllowAdvancedEditor") _
-                                    And ((Context = CPUtilsBaseClass.addonContext.ContextAdmin) Or cpCore.authContext.isEditing(HostContentName)))
+                                    And ((addonType = CPUtilsBaseClass.addonContext.ContextAdmin) Or cpCore.authContext.isEditing(HostContentName)))
                                     'IncludeEditWrapper = IncludeEditWrapper _
                                     '    And ( _
                                     '        ( _
@@ -674,7 +692,7 @@ Namespace Contensive.Core.Controllers
                                 ' Process the content for each context as needed
                                 '-----------------------------------------------------------------------------------------------------
                                 '
-                                If (InFrame And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
+                                If (InFrame And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                     '
                                     '-----------------------------------------------------------------
                                     ' inFrame and this is NOT the callback - setup the iframe for a callback
@@ -706,7 +724,7 @@ Namespace Contensive.Core.Controllers
                                         & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
                                         & cr & "</script>"
                                     End If
-                                ElseIf (AsAjax And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
+                                ElseIf (AsAjax And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                     '
                                     '-----------------------------------------------------------------
                                     ' AsAjax and this is NOT the callback - setup the ajax callback
@@ -786,7 +804,7 @@ Namespace Contensive.Core.Controllers
                                     '   setup RQS as needed - RQS provides the querystring for add-ons to create links that return to the same page
                                     '-----------------------------------------------------------------------------------------------------
                                     '
-                                    If (InFrame And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
+                                    If (InFrame And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                         '
                                         ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
                                         '
@@ -794,7 +812,7 @@ Namespace Contensive.Core.Controllers
                                             Call cpCore.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, addon.id.ToString)
                                             Call cpCore.doc.addRefreshQueryString("optionstring", WorkingOptionString)
                                         End If
-                                    ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
+                                    ElseIf (AsAjax And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                         '
                                         ' Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
                                         ' restore form values
@@ -876,7 +894,7 @@ Namespace Contensive.Core.Controllers
                                     ' CP compatible section
                                     '-----------------------------------------------------------------
                                     '
-                                    If (addonIncludeRules.Count > 0) Or (ScriptingCode <> "") Or (DotNetClassFullName <> "") Then
+                                    If (addonIncludeRules.Count > 0) Or (ScriptingCode <> "") Or (addon.DotNetClass <> "") Then
                                         For Ptr = 0 To UBound(OptionsForCPVars)
                                             '
                                             ' REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR
@@ -920,16 +938,18 @@ Namespace Contensive.Core.Controllers
                                         '   If no collection, just look in the /addon path
                                         '
                                         'hint = hint & ",10"
-                                        If DotNetClassFullName <> "" Then
+                                        If addon.DotNetClass <> "" Then
                                             '
-                                            Dim csTmp As Integer
-                                            csTmp = cpCore.db.cs_openCsSql_rev("default", "select ccGuid from ccAddonCollections where id=" & addon.CollectionID)
-                                            If cpCore.db.cs_ok(csTmp) Then
-                                                CollectionGuid = cpCore.db.cs_getText(csTmp, "ccGuid")
-                                            End If
-                                            Call cpCore.db.cs_Close(csTmp)
+                                            Dim addonCollection As Models.Entity.AddonCollectionModel = Models.Entity.AddonCollectionModel.create(cpCore, addon.CollectionID)
+
+                                            'Dim csTmp As Integer
+                                            'csTmp = cpCore.db.cs_openCsSql_rev("default", "select ccGuid from ccAddonCollections where id=" & addon.CollectionID)
+                                            'If cpCore.db.cs_ok(csTmp) Then
+                                            '    CollectionGuid = cpCore.db.cs_getText(csTmp, "ccGuid")
+                                            'End If
+                                            'Call cpCore.db.cs_Close(csTmp)
                                             '
-                                            AssemblyContent = executeAssembly(addonId, addon.name, DotNetClassFullName, CollectionGuid, Nothing, errorMessageForAdmin)
+                                            AssemblyContent = executeAssembly(addon, addonCollection, errorMessageForAdmin)
                                             If (errorMessageForAdmin <> "") Then
                                                 '
                                                 ' log the error
@@ -939,7 +959,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 ' Put up an admin hint
                                                 '
-                                                If (Not True) Or (Context = CPUtilsBaseClass.addonContext.ContextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                                If (Not True) Or (addonType = CPUtilsBaseClass.addonContext.ContextEmail) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (addonType = CPUtilsBaseClass.addonContext.ContextSimple) Then
                                                     '
                                                     ' Block all output even on error
                                                     '
@@ -950,7 +970,7 @@ Namespace Contensive.Core.Controllers
                                                     If addon.name = "" And addonId <> 0 Then
                                                         addon.name = "Addon #" & addonId
                                                     End If
-                                                    AssemblyContent = cpCore.html.html_GetAdminHintWrapper("<p>There was an error executing the assembly component of Add-on [" & addon.name & "], AddonOptionString [" & WorkingOptionString & "] with class name [" & DotNetClassFullName & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
+                                                    AssemblyContent = cpCore.html.html_GetAdminHintWrapper("<p>There was an error executing the assembly component of Add-on [" & addon.name & "], AddonOptionString [" & WorkingOptionString & "] with class name [" & addon.DotNetClass & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
                                                 End If
                                             End If
                                         End If
@@ -1091,7 +1111,7 @@ Namespace Contensive.Core.Controllers
                                     'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ab"
                                     '#End If
                                     Dim layoutErrors As String = String.Empty
-                                    If (Context = CPUtilsBaseClass.addonContext.ContextEditor) Then
+                                    If (addonType = CPUtilsBaseClass.addonContext.ContextEditor) Then
                                         '
                                         ' editor -- no encoding and no contentcommands
                                         '
@@ -1117,7 +1137,7 @@ Namespace Contensive.Core.Controllers
                                         '
                                         ' csv_EncodeContent everything
                                         '
-                                        returnVal = cpCore.html.encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
+                                        returnVal = cpCore.html.encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (addonType = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, addonType, personalizationIsAuthenticated, Nothing, False)
                                     End If
                                     '
                                     '-----------------------------------------------------------------
@@ -1187,7 +1207,7 @@ Namespace Contensive.Core.Controllers
                                 'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ae"
                                 '#End If
                                 If True Then
-                                    If (InFrame And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
+                                    If (InFrame And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                         '
                                         ' Return IFrame content
                                         '   Framed in content, during the remote method call
@@ -1203,22 +1223,22 @@ Namespace Contensive.Core.Controllers
                                         & cr & TemplateDefaultBodyTag _
                                         & cr & "</body>" _
                                         & vbCrLf & "</html>"
-                                    ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
+                                    ElseIf (AsAjax And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                         '
                                         ' Return Ajax content
                                         '   AsAjax addon, during the Ajax callback
                                         '   need to create an onload event that runs everything appended to onload within this content
                                         '
                                         returnVal = returnVal
-                                    ElseIf ((Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
+                                    ElseIf ((addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                         '
                                         ' Return non-ajax/non-Iframe remote method content (no wrapper)
                                         '
-                                    ElseIf (Context = CPUtilsBaseClass.addonContext.ContextEmail) Then
+                                    ElseIf (addonType = CPUtilsBaseClass.addonContext.ContextEmail) Then
                                         '
                                         ' Return Email context (no wrappers)
                                         '
-                                    ElseIf (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                    ElseIf (addonType = CPUtilsBaseClass.addonContext.ContextSimple) Then
                                         '
                                         ' Add-on called by another add-on, subroutine style (no wrappers)
                                         '
@@ -1239,7 +1259,7 @@ Namespace Contensive.Core.Controllers
                                                 If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
                                                     AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & addon.name & " Add-on", "Edit the " & addon.name & " Add-on", "", True, "")
                                                     AddonEditIcon = "<a href=""" & cpCore.siteProperties.adminURL & "?cid=" & cpCore.metaData.getContentId(cnAddons) & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
-                                                    InstanceSettingsEditIcon = getInstanceBubble(addon.name, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, Context, DialogList)
+                                                    InstanceSettingsEditIcon = getInstanceBubble(addon.name, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, addonType, DialogList)
                                                     AddonStylesEditIcon = getAddonStylesBubble(addonId, DialogList)
                                                     HTMLViewerEditIcon = getHTMLViewerBubble(addonId, "editWrapper" & cpCore.doc.editWrapperCnt, DialogList)
                                                     HelpIcon = getHelpBubble(addonId, helpCopy, addon.CollectionID, DialogList)
@@ -1256,7 +1276,7 @@ Namespace Contensive.Core.Controllers
                                         '
                                         ' Add Comment wrapper - to help debugging except email, remote methods and admin (empty is used to detect no result)
                                         '
-                                        If True And (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (Context <> CPUtilsBaseClass.addonContext.ContextEmail) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) And (Context <> CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                        If True And (addonType <> CPUtilsBaseClass.addonContext.ContextAdmin) And (addonType <> CPUtilsBaseClass.addonContext.ContextEmail) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) And (addonType <> CPUtilsBaseClass.addonContext.ContextSimple) Then
                                             If cpCore.visitProperty.getBoolean("AllowDebugging") Then
                                                 AddonCommentName = genericController.vbReplace(addon.name, "-->", "..>")
                                                 If IsInline Then
@@ -2277,56 +2297,47 @@ Namespace Contensive.Core.Controllers
         '
         '
         '
-        Private Function executeAssembly(ByVal addonId As Integer, ByVal AddonCaption As String, ByVal AssemblyClassFullName As String, ByVal CollectionGuid As String, ByVal nothingObject As Object, ByRef return_ErrorMessageForAdmin As String) As String
+        Private Function executeAssembly(addon As Models.Entity.addonModel, addonCollection As Models.Entity.AddonCollectionModel, ByRef return_ErrorMessageForAdmin As String) As String
             Dim result As String = ""
             Try
                 Dim AddonFound As Boolean = False
-                Dim addonAppRootPath As String
-                Dim AddonPath As String
-                Dim addonInstall As addonInstallClass
-                Dim AddonVersionPath As String
-                Dim commonAssemblyPath As String
-                Dim appAddonPath As String
-                '
-                ' first try debug folder -- cclibCommonAssemblies
-                '
-                commonAssemblyPath = cpCore.programDataFiles.rootLocalPath & "AddonAssemblyBypass\"
+                Dim commonAssemblyPath As String = cpCore.programDataFiles.rootLocalPath & "AddonAssemblyBypass\"
                 If Not IO.Directory.Exists(commonAssemblyPath) Then
                     IO.Directory.CreateDirectory(commonAssemblyPath)
                 Else
-                    result = executeAssembly_byFilePath(addonId, AddonCaption, commonAssemblyPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
+                    result = executeAssembly_byFilePath(addon.id, addon.name, commonAssemblyPath, addon.DotNetClass, True, AddonFound, return_ErrorMessageForAdmin)
                 End If
                 If Not AddonFound Then
                     '
                     ' try app /bin folder
                     '
-                    addonAppRootPath = cpCore.privateFiles.joinPath(cpCore.appRootFiles.rootLocalPath, "bin\")
-                    result = executeAssembly_byFilePath(addonId, AddonCaption, addonAppRootPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
+                    Dim addonAppRootPath As String = cpCore.privateFiles.joinPath(cpCore.appRootFiles.rootLocalPath, "bin\")
+                    result = executeAssembly_byFilePath(addon.id, addon.name, addonAppRootPath, addon.DotNetClass, True, AddonFound, return_ErrorMessageForAdmin)
                     If Not AddonFound Then
                         '
                         ' legacy mode, consider eliminating this and storing addon binaries in apps /bin folder
                         '
-                        AddonVersionPath = ""
-                        If String.IsNullOrEmpty(CollectionGuid) Then
-                            Throw New ApplicationException("The assembly for addon [" & AddonCaption & "] could not be executed because it's collection has an invalid guid.")
+                        If String.IsNullOrEmpty(addonCollection.ccguid) Then
+                            Throw New ApplicationException("The assembly for addon [" & addon.name & "] could not be executed because it's collection has an invalid guid.")
                         Else
-                            addonInstall = New addonInstallClass(cpCore)
-                            Call addonInstall.GetCollectionConfig(CollectionGuid, AddonVersionPath, New Date(), "")
+                            Dim AddonVersionPath As String = ""
+                            Dim addonInstall As New addonInstallClass(cpCore)
+                            Call addonInstall.GetCollectionConfig(addonCollection.ccguid, AddonVersionPath, New Date(), "")
                             If (String.IsNullOrEmpty(AddonVersionPath)) Then
-                                Throw New ApplicationException("The assembly for addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.")
+                                Throw New ApplicationException("The assembly for addon [" & addon.name & "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.")
                             Else
-                                AddonPath = cpCore.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath)
-                                appAddonPath = cpCore.privateFiles.joinPath(cpCore.privateFiles.rootLocalPath, AddonPath)
-                                result = executeAssembly_byFilePath(addonId, AddonCaption, appAddonPath, AssemblyClassFullName, False, AddonFound, return_ErrorMessageForAdmin)
+                                Dim AddonPath As String = cpCore.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath)
+                                Dim appAddonPath As String = cpCore.privateFiles.joinPath(cpCore.privateFiles.rootLocalPath, AddonPath)
+                                result = executeAssembly_byFilePath(addon.id, addon.name, appAddonPath, addon.DotNetClass, False, AddonFound, return_ErrorMessageForAdmin)
                                 If (Not AddonFound) Then
                                     '
                                     ' assembly not found in addon path and in development path, if core collection, try in local /bin nm 
                                     '
-                                    If (CollectionGuid <> CoreCollectionGuid) Then
+                                    If (addonCollection.ccguid <> CoreCollectionGuid) Then
                                         '
                                         ' assembly not found
                                         '
-                                        Throw New ApplicationException("The addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in the server common assembly path [" & commonAssemblyPath & "], the application binary folder [" & addonAppRootPath & "], or in the legacy collection folder [" & appAddonPath & "].")
+                                        Throw New ApplicationException("The addon [" & addon.name & "] could not be executed because it's assembly could not be found in the server common assembly path [" & commonAssemblyPath & "], the application binary folder [" & addonAppRootPath & "], or in the legacy collection folder [" & appAddonPath & "].")
                                     Else
                                     End If
                                 End If
@@ -2568,7 +2579,7 @@ Namespace Contensive.Core.Controllers
                     Dim cmdDetail As New cmdDetailClass
                     cmdDetail.addonId = addon.id
                     cmdDetail.addonName = addon.name
-                    cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(cpCore, cmdQueryString)
+                    cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, cmdQueryString)
                     Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
                     '
                     logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" & addon.name & "/" & addon.id & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
@@ -2654,8 +2665,8 @@ Namespace Contensive.Core.Controllers
         ' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
         '=============================================================================================================
         '
-        Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.doc.includedAddonIDList, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
+        Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef ignore As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
+            execute_legacy2 = execute_legacy6(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, False, nothingObject, AddonInUseIdList, Nothing, cpCore.doc.includedAddonIDList, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
         End Function
         '
         '===============================================================================================================================================
@@ -4355,7 +4366,7 @@ ErrorTrap:
                 If ArgumentList <> "" Then
                     ArgumentList = ArgumentList & vbCrLf
                 End If
-                If genericController.vbLCase(AddonGuid) = genericController.vbLCase(ContentBoxGuid) Then
+                If genericController.vbLCase(AddonGuid) = genericController.vbLCase(addonGuidContentBox) Then
                     ArgumentList = ArgumentList & AddonOptionConstructor_BlockNoAjax
                 ElseIf IsInline Then
                     ArgumentList = ArgumentList & AddonOptionConstructor_Inline
@@ -4489,6 +4500,37 @@ ErrorTrap:
                 addonDescription &= ", collection [" & collection.name & "]"
             End If
             Return addonDescription
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Special case addon as it is a required core service. This method attempts the addon call and it if fails, calls the safe-mode version, tested for this build
+        ''' </summary>
+        ''' <returns></returns>
+        Public Shared Function GetAddonManager(cpCore As coreClass) As String
+            Dim addonManager As String = ""
+            Try
+                Dim AddonStatusOK As Boolean
+                Dim AddonMan As addon_AddonMngrSafeClass
+                '
+                Try
+                    addonManager = cpCore.addon.execute_legacy2(0, addonGuidAddonManager, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
+                Catch ex As Exception
+                    Call cpCore.handleException(New Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" & ex.ToString & "]"))
+                    AddonStatusOK = False
+                End Try
+                If addonManager = "" Then
+                    Call cpCore.handleException(New Exception("AddonManager returned blank, calling Safe Mode Addon Manager."))
+                    AddonStatusOK = False
+                End If
+                If Not AddonStatusOK Then
+                    AddonMan = New addon_AddonMngrSafeClass(cpCore)
+                    addonManager = AddonMan.GetForm_SafeModeAddonManager()
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex) : Throw
+            End Try
+            Return addonManager
         End Function
 
         '====================================================================================================

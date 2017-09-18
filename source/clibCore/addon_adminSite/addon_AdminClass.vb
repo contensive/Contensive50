@@ -68,29 +68,12 @@ Namespace Contensive.Addons
                     '
                     ' --- must be authenticated to continue. Force a local login
                     '
-                    Dim loginAddon As New Addons.loginPageClass(cpCore)
-                    adminBody = "" _
-                        & cr & "<p class=""ccAdminNormal"">You are attempting to enter an access controlled area. Continue only if you have authority to enter this area. Information about your visit will be recorded for security purposes.</p>" _
-                        & loginAddon.getLoginForm() _
-                        & ""
-                    '
-                    adminBody = "" _
-                        & cpCore.html.main_GetPanel(adminBody, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) _
-                        & cr & "<p>&nbsp;</p>" _
-                        & cr & "<p>&nbsp;</p>" _
-                        & cr & "<p style=""text-align:center""><a href=""http://www.Contensive.com"" target=""_blank""><img src=""/ccLib/images/ccLibLogin.GIF"" width=""80"" height=""33"" border=""0"" alt=""Contensive Content Control"" ></A></p>" _
-                        & cr & "<p style=""text-align:center"" class=""ccAdminSmall"">The content on this web site is managed and delivered by the Contensive Site Management Server. If you do not have member access, please use your back button to return to the public area.</p>" _
-                        & ""
-                    '
-                    ' --- create an outer table to hold the form
-                    adminBody = "" _
-                        & cr & "<div class=""ccCon"" style=""width:400px;margin:100px auto 0 auto;"">" _
-                        & htmlIndent(cpCore.html.main_GetPanelHeader("Login")) _
-                        & htmlIndent(adminBody) _
-                        & "</div>"
-                    '
-                    Call cpCore.doc.setMetaContent(0, 0)
-                    Call cpCore.html.doc_AddPagetitle2("Login", "adminSite")
+                    returnHtml = cpCore.addon.execute(
+                        Models.Entity.addonModel.create(cpCore, addonGuidLoginPage),
+                        New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {
+                            .addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
+                        }
+                    )
                 ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
                     '
                     ' --- member must have proper access to continue
@@ -114,13 +97,14 @@ Namespace Contensive.Addons
                     '
                     Call cpCore.doc.setMetaContent(0, 0)
                     Call cpCore.html.doc_AddPagetitle2("Unauthorized Access", "adminSite")
+                    returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False, True)
                 Else
                     '
                     ' get admin content
                     '
                     adminBody = getAdminBody()
+                    returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False, True)
                 End If
-                returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False, True)
                 '
                 ' Log response
                 '
@@ -272,7 +256,7 @@ Namespace Contensive.Addons
                         ' patch out any old links to the legacy addon manager
                         '
                         AdminForm = 0
-                        AddonGuid = AddonManagerGuid
+                        AddonGuid = addonGuidAddonManager
                     End If
                     '
                     '-------------------------------------------------------------------------------
@@ -423,13 +407,13 @@ Namespace Contensive.Addons
                             Case AdminformRSSControl
                                 Call cpCore.webServer.redirect("?cid=" & cpCore.metaData.getContentId("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
                             Case AdminFormImportWizard
-                                ContentCell = cpCore.addon.execute_legacy4(ImportWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                                ContentCell = cpCore.addon.execute_legacy4(addonGuidImportWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                             Case AdminFormCustomReports
                                 ContentCell = GetForm_CustomReports()
                             Case AdminFormFormWizard
-                                ContentCell = cpCore.addon.execute_legacy4(FormWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                                ContentCell = cpCore.addon.execute_legacy4(addonGuidFormWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                             Case AdminFormLegacyAddonManager
-                                ContentCell = GetAddonManager()
+                                ContentCell = addonController.GetAddonManager(cpCore)
                             Case AdminFormEditorConfig
                                 ContentCell = GetForm_EditConfig()
                             Case Else
@@ -439,12 +423,12 @@ Namespace Contensive.Addons
                         '
                         ' execute an addon
                         '
-                        If (AddonGuid = AddonManagerGuid) Or (LCase(AddonName) = "add-on manager") Or (LCase(AddonName) = "addon manager") Then
+                        If (AddonGuid = addonGuidAddonManager) Or (LCase(AddonName) = "add-on manager") Or (LCase(AddonName) = "addon manager") Then
                             '
                             ' Special case, call the routine that provides a backup
                             '
-                            Call cpCore.doc.addRefreshQueryString("addonguid", AddonManagerGuid)
-                            ContentCell = GetAddonManager()
+                            Call cpCore.doc.addRefreshQueryString("addonguid", addonGuidAddonManager)
+                            ContentCell = addonController.GetAddonManager(cpCore)
                         Else
                             If addonId <> 0 Then
                                 Call cpCore.doc.addRefreshQueryString("addonid", CStr(addonId))
@@ -497,7 +481,7 @@ Namespace Contensive.Addons
                     ' include fancybox if it was needed
                     '
                     If includeFancyBox Then
-                        Call cpCore.addon.execute_legacy4(jQueryFancyBoxGuid)
+                        Call cpCore.addon.execute_legacy4(addonGuidjQueryFancyBox)
                         Call cpCore.html.addHeadJavascriptCode("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});", "")
                     End If
                     '
@@ -5389,25 +5373,20 @@ ErrorTrap:
                                     '    & "&editorStyleOptions=" & genericController.encodeNvaArgument(styleOptionList) _
                                     '    & ""
                                 End If
-
-                                EditorString = cpCore.addon.execute(editorAddonID, "", addonOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor, "", 0, "", "", False, 0, "", useEditorAddon, Nothing, "", Nothing, "", 0, False)
+                                EditorString = cpCore.addon.execute_legacy6(editorAddonID, "", addonOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", 0, False)
+                                useEditorAddon = Not String.IsNullOrEmpty(EditorString)
                                 If useEditorAddon Then
+                                    '
+                                    ' -- editor worked
                                     return_NewFieldList = return_NewFieldList & "," & FieldName
                                 Else
                                     '
-                                    ' editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
-                                    '
-                                    Dim SQL As String
-                                    SQL = "select id from ccaggregatefunctions where id=" & editorAddonID
+                                    ' -- editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
+                                    Dim SQL As String = "select id from ccaggregatefunctions where id=" & editorAddonID
                                     CS = cpCore.db.cs_openSql(SQL)
-                                    If cpCore.db.cs_ok(CS) Then
+                                    If Not cpCore.db.cs_ok(CS) Then
                                         '
-                                        ' just inactive
-                                        '
-                                    Else
-                                        '
-                                        ' missing
-                                        '
+                                        ' -- missing, not just inactive
                                         EditorString = ""
                                         '
                                         ' load user's editor preferences to fieldEditorPreferences() - this is the editor this user has picked when there are >1
@@ -5415,13 +5394,10 @@ ErrorTrap:
                                         '   with custom FancyBox form in edit window with button "set editor preference"
                                         '   this button causes a 'refresh' action, reloads fields with stream without save
                                         '
-                                        Dim tmpList As String
-                                        Dim PosStart As Integer
-                                        Dim PosEnd As Integer
-                                        tmpList = cpCore.userProperty.getText("editorPreferencesForContent:" & adminContent.Id, "")
-                                        PosStart = genericController.vbInstr(1, "," & tmpList, "," & fieldId & ":")
+                                        Dim tmpList As String = cpCore.userProperty.getText("editorPreferencesForContent:" & adminContent.Id, "")
+                                        Dim PosStart As Integer = genericController.vbInstr(1, "," & tmpList, "," & fieldId & ":")
                                         If PosStart > 0 Then
-                                            PosEnd = genericController.vbInstr(PosStart + 1, "," & tmpList, ",")
+                                            Dim PosEnd As Integer = genericController.vbInstr(PosStart + 1, "," & tmpList, ",")
                                             If PosEnd = 0 Then
                                                 tmpList = Mid(tmpList, 1, PosStart - 1)
                                             Else
@@ -5429,12 +5405,9 @@ ErrorTrap:
                                             End If
                                             Call cpCore.userProperty.setProperty("editorPreferencesForContent:" & adminContent.Id, tmpList)
                                         End If
-
-
                                     End If
                                     Call cpCore.db.cs_Close(CS)
                                 End If
-                                'EditorString = cpCore.main_ExecuteAddon3(CStr(editorAddonID), addonOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor)
                             End If
                             If Not useEditorAddon Then
                                 '
@@ -7059,7 +7032,7 @@ ErrorTrap:
                 addonId = 0
                 If (cpCore.authContext.visit.id = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
                     '$$$$$ cache this
-                    CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
+                    CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(addonGuidDashboard))
                     If cpCore.db.cs_ok(CS) Then
                         addonId = cpCore.db.cs_getInteger(CS, "id")
                         Call cpCore.siteProperties.setProperty("AdminRootAddonID", genericController.encodeText(addonId))
@@ -7104,7 +7077,7 @@ ErrorTrap:
                         ' This has never been set, try to get the dashboard ID
                         '
                         '$$$$$ cache this
-                        CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
+                        CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(addonGuidDashboard))
                         If cpCore.db.cs_ok(CS) Then
                             addonId = cpCore.db.cs_getInteger(CS, "id")
                             Call cpCore.siteProperties.setProperty("AdminRootAddonID", genericController.encodeText(addonId))
@@ -7135,7 +7108,7 @@ ErrorTrap:
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.authContext.user.Name & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Quick Reports</div><div style=""float:left;""><a Href=""?" & RequestNameAdminForm & "=" & AdminFormQuickStats & """>Real-Time Activity</A></div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.id & """>Run Dashboard</A></div></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?addonguid=" & AddonManagerGuid & """>Add-on Manager</A></div></div>"
+                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?addonguid=" & addonGuidAddonManager & """>Add-on Manager</A></div></div>"
                     '
                     If (cpCore.debug_iUserError <> "") Then
                         returnHtml = returnHtml _
@@ -16509,34 +16482,6 @@ ErrorTrap:
                 cpCore.handleException(ex) : Throw
             End Try
             Return returnHelp
-        End Function
-        '
-        '
-        '
-        Private Function GetAddonManager() As String
-            Dim addonManager As String = ""
-            Try
-                Dim AddonStatusOK As Boolean
-                Dim AddonMan As addon_AddonMngrSafeClass
-                '
-                Try
-                    addonManager = cpCore.addon.execute_legacy2(0, AddonManagerGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
-                Catch ex As Exception
-                    Call cpCore.handleException(New Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" & ex.ToString & "]"))
-                    AddonStatusOK = False
-                End Try
-                If addonManager = "" Then
-                    Call cpCore.handleException(New Exception("AddonManager returned blank, calling Safe Mode Addon Manager."))
-                    AddonStatusOK = False
-                End If
-                If Not AddonStatusOK Then
-                    AddonMan = New addon_AddonMngrSafeClass(cpCore)
-                    addonManager = AddonMan.GetForm_SafeModeAddonManager()
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex) : Throw
-            End Try
-            Return addonManager
         End Function
         '
         '

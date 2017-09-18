@@ -1288,7 +1288,7 @@ Namespace Contensive.Core
                                                         return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the collection name in the xml collection file is blank</P>"
                                                     Else
                                                         CollectionSystem = genericController.EncodeBoolean(GetXMLAttribute(CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""))
-                                                        Parent_NavID = appBuilderController.verifyNavigatorEntry(cpCore, guidManageAddon, "", "Manage Add-ons", "", "", "", False, False, False, True, "", "", "", 0)
+                                                        Parent_NavID = appBuilderController.verifyNavigatorEntry(cpCore, addonGuidManageAddon, "", "Manage Add-ons", "", "", "", False, False, False, True, "", "", "", 0)
                                                         'Parent_NavID = GetManageAddonNavID()
                                                         'If CollectionSystem Then
                                                         '    'Parent_NavID = appBuilderController.verifyNavigatorEntry(cpCore, ccguid, "")

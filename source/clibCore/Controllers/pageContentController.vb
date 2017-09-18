@@ -544,46 +544,28 @@ Namespace Contensive.Core.Controllers
                             Select Case AnonymousUserResponseID
                                 Case 1
                                     '
-                                    ' block with login
-                                    '
-                                    '
-                                    'Call AppendLog("main_init(), 3410 - exit for login block")
-                                    '
-                                    Call cpCore.doc.setMetaContent(0, 0)
-                                    Dim login As New Addons.loginPageClass(cpCore)
-                                    Call cpCore.html.writeAltBuffer(login.getLoginPage(False))
-                                    cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                    Return cpCore.doc.docBuffer
+                                    ' -- block with login
+                                    cpCore.continueProcessing = False
+                                    Return cpCore.addon.execute(
+                                        addonModel.create(cpCore, addonGuidLoginPage),
+                                        New CPUtilsBaseClass.addonExecuteContext() With {
+                                            .addonType = CPUtilsBaseClass.addonContext.ContextPage
+                                        }
+                                    )
                                 Case 2
                                     '
-                                    ' block with custom content
-                                    '
-                                    '
-                                    'Call AppendLog("main_init(), 3420 - exit for custom content block")
-                                    '
+                                    ' -- block with custom content
+                                    cpCore.continueProcessing = False
                                     Call cpCore.doc.setMetaContent(0, 0)
                                     Call cpCore.html.addOnLoadJavascript("document.body.style.overflow='scroll'", "Anonymous User Block")
-                                    Dim Copy As String = cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
-                                    Copy = cpCore.html.getHtmlDoc(Copy, TemplateDefaultBodyTag, True, True, False, False)
-                                    '' -- already encoded
-                                    ''Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
-                                    'Copy = "" _
-                                    '        & cpCore.siteProperties.docTypeDeclaration() _
-                                    '        & vbCrLf & "<html>" _
-                                    '        & cr & "<head>" _
-                                    '        & genericController.htmlIndent(cpCore.doc.getHtmlDocHead(False)) _
-                                    '        & cr & "</head>" _
-                                    '        & cr & TemplateDefaultBodyTag _
-                                    '        & genericController.htmlIndent(Copy) _
-                                    '        & cr2 & "<div>" _
-                                    '        & cr3 & cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False) _
-                                    '        & cr2 & "</div>" _
-                                    '        & cr & "</body>" _
-                                    '        & vbCrLf & "</html>"
-                                    ''& "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
-                                    Call cpCore.html.writeAltBuffer(Copy)
-                                    cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                    Return cpCore.doc.docBuffer
+                                    Return cpCore.html.getHtmlDoc(
+                                        cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated),
+                                        TemplateDefaultBodyTag,
+                                        True,
+                                        True,
+                                        False,
+                                        False
+                                    )
                             End Select
                         End If
                     End If
@@ -1325,41 +1307,33 @@ ErrorTrap:
                             If Not cpCore.authContext.isAuthenticated() Then
                                 If Not cpCore.authContext.isRecognized(cpCore) Then
                                     '
-                                    ' not recognized
-                                    '
-                                    BlockCopy = "" _
+                                    ' -- not recognized
+                                    BlockForm = "" _
                                         & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
+                                        & cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), New CPUtilsBaseClass.addonExecuteContext With {.addonType = CPUtilsBaseClass.addonContext.ContextPage}) _
                                         & ""
-                                    Dim loginAddon As New Addons.loginPageClass(cpCore)
-                                    BlockForm = loginAddon.getLoginForm()
                                 Else
                                     '
-                                    ' recognized, not authenticated
-                                    '
-                                    BlockCopy = "" _
+                                    ' -- recognized, not authenticated
+                                    BlockForm = "" _
                                         & "<p>This content has limited access. You were recognized as ""<b>" & cpCore.authContext.user.Name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
+                                        & cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), New CPUtilsBaseClass.addonExecuteContext With {.addonType = CPUtilsBaseClass.addonContext.ContextPage}) _
                                         & ""
-                                    Dim loginAddon As New Addons.loginPageClass(cpCore)
-                                    BlockForm = loginAddon.getLoginForm()
                                 End If
                             Else
                                 '
-                                ' authenticated
-                                '
-                                BlockCopy = "" _
+                                ' -- authenticated
+                                BlockForm = "" _
                                     & "<p>You are currently logged in as ""<b>" & cpCore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
+                                    & cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), New CPUtilsBaseClass.addonExecuteContext With {.addonType = CPUtilsBaseClass.addonContext.ContextPage}) _
                                     & ""
-                                Dim loginAddon As New Addons.loginPageClass(cpCore)
-                                BlockForm = loginAddon.getLoginForm()
                             End If
                             returnHtml = "" _
-                                & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
-                                & "<div style=""width:400px;text-align:left;"">" _
+                                & "<div style=""margin: 100px, auto, auto, auto;text-align:left;"">" _
                                 & errorController.error_GetUserError(cpCore) _
-                                & BlockCopy _
                                 & BlockForm _
-                                & "</div></td></tr></table>"
+                                & "</div>"
                         Case main_BlockSourceRegistration
                             '
                             ' ----- Registration
@@ -1368,12 +1342,10 @@ ErrorTrap:
                             If cpCore.docProperties.getInteger("subform") = main_BlockSourceLogin Then
                                 '
                                 ' login subform form
-                                '
-                                Dim loginAddon As New Addons.loginPageClass(cpCore)
-                                BlockForm = loginAddon.getLoginForm()
-                                BlockCopy = "" _
+                                BlockForm = "" _
                                     & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                     & "<p>If you do not have an account, <a href=?" & cpCore.doc.refreshQueryString & "&subform=0>click here to register</a>.</p>" _
+                                    & cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), New CPUtilsBaseClass.addonExecuteContext With {.addonType = CPUtilsBaseClass.addonContext.ContextPage}) _
                                     & ""
                             Else
                                 '
@@ -1381,45 +1353,34 @@ ErrorTrap:
                                 '
                                 If Not cpCore.authContext.isAuthenticated() And cpCore.authContext.isRecognized(cpCore) Then
                                     '
-                                    ' Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
-                                    '
+                                    ' -- Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
                                     Call cpCore.authContext.logout(cpCore)
                                 End If
                                 If Not cpCore.authContext.isAuthenticated() Then
                                     '
-                                    ' Not Authenticated
-                                    '
-                                    BlockCopy = "" _
+                                    ' -- Not Authenticated
+                                    Call cpCore.doc.verifyRegistrationFormPage(cpCore)
+                                    BlockForm = "" _
                                         & "<p>This content has limited access. If you have an account, <a href=?" & cpCore.doc.refreshQueryString & "&subform=" & main_BlockSourceLogin & ">Click Here to login</a>.</p>" _
                                         & "<p>To view this content, please complete this form.</p>" _
+                                        & getFormPage(cpCore, "Registration Form", RegistrationGroupID) _
                                         & ""
                                 Else
+                                    '
+                                    ' -- Authenticated
+                                    Call cpCore.doc.verifyRegistrationFormPage(cpCore)
                                     BlockCopy = "" _
                                         & "<p>You are currently logged in as ""<b>" & cpCore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                         & "<p>This account does not have access to this content. To view this content, please complete this form.</p>" _
+                                        & getFormPage(cpCore, "Registration Form", RegistrationGroupID) _
                                         & ""
-                                End If
-                                '
-                                If False Then '.3.551" Then
-                                    '
-                                    ' Old Db - use Joinform
-                                    '
-                                    'BlockForm = main_GetJoinForm()
-                                Else
-                                    '
-                                    ' Use Registration FormPage
-                                    '
-                                    Call cpCore.doc.verifyRegistrationFormPage(cpCore)
-                                    BlockForm = getFormPage(cpCore, "Registration Form", RegistrationGroupID)
                                 End If
                             End If
                             returnHtml = "" _
-                                & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
-                                & "<div style=""width:400px;text-align:left;"">" _
+                                & "<div style=""margin: 100px, auto, auto, auto;text-align:left;"">" _
                                 & errorController.error_GetUserError(cpCore) _
-                                & BlockCopy _
                                 & BlockForm _
-                                & "</div></td></tr></table>"
+                                & "</div>"
                         Case Else
                             '
                             ' ----- Content as blocked - convert from site property to content page
@@ -2116,10 +2077,7 @@ ErrorTrap:
             Dim returnBody As String = ""
             Try
                 Dim AddonReturn As String
-                'Dim Ptr As Integer
-                'Dim Cnt As Integer
                 Dim layoutError As String = String.Empty
-                Dim FilterStatusOK As Boolean
                 Dim Result As New stringBuilderLegacyController
                 Dim PageContent As String
                 Dim Stream As New stringBuilderLegacyController
@@ -2127,21 +2085,10 @@ ErrorTrap:
                 Dim LocalTemplateName As String
                 Dim LocalTemplateBody As String
                 Dim blockSiteWithLogin As Boolean
-                'Dim addonCachePtr As Integer
-                'Dim addonId As Integer
-                'Dim AddonName As String
                 '
-                returnBody = ""
-                '
-                ' ----- OnBodyStart add-ons
-                '
-                FilterStatusOK = False
+                ' -- OnBodyStart add-ons
                 For Each addon As addonModel In cpCore.addonCache.getOnBodyStartAddonList
-                    returnBody &= cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
-                    If Not FilterStatusOK Then
-                        Throw New ApplicationException("Unexpected exception")
-                        Exit For
-                    End If
+                    returnBody &= cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", False, Nothing)
                 Next
                 '
                 ' ----- main_Get Content (Already Encoded)
@@ -2210,39 +2157,11 @@ ErrorTrap:
                     '
                     For Each addon In cpCore.addonCache.getOnBodyEndAddonList()
                         cpCore.doc.docBodyFilter = returnBody
-                        AddonReturn = cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                        AddonReturn = cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", False, Nothing)
                         returnBody = cpCore.doc.docBodyFilter & AddonReturn
-                        If Not FilterStatusOK Then
-                            Throw New ApplicationException("Unexpected exception")
-                            Exit For
-                        End If
                     Next
-                    ''hint = hint & ",onBodyEnd"
-                    'FilterStatusOK = False
-                    'Cnt = UBound(cpCore.addonIdDict.addonCache.onBodyEndPtrs) + 1
-                    ''hint = hint & ",cnt=" & Cnt
-                    'For Ptr = 0 To Cnt - 1
-                    '    addonCachePtr = cpCore.addonIdDict.addonCache.onBodyEndPtrs(Ptr)
-                    '    'hint = hint & ",ptr=" & Ptr & ",addonCachePtr=" & addonCachePtr
-                    '    If addonCachePtr > -1 Then
-                    '        addonId = cpCore.addonIdDict.addonCache.addonList(addonCachePtr.ToString).id
-                    '        'hint = hint & ",addonId=" & addonId
-                    '        If addonId > 0 Then
-                    '            AddonName = cpCore.addonIdDict.addonCache.addonList(addonCachePtr.ToString).name
-                    '            'hint = hint & ",AddonName=" & AddonName
-                    '            cpCore.doc.docBodyFilter = returnBody
-                    '            AddonReturn = cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
-                    '            returnBody = cpCore.doc.docBodyFilter & AddonReturn
-                    '            If Not FilterStatusOK Then
-                    '                Throw New ApplicationException("Unexpected exception")
-                    '                Exit For
-                    '            End If
-                    '        End If
-                    '    End If
-                    'Next
                     '
-                    ' Make it pretty for those who care
-                    '
+                    ' -- Make it pretty for those who care
                     returnBody = htmlReflowController.reflow(cpCore, returnBody)
                 End If
                 '

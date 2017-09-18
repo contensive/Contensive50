@@ -23,6 +23,60 @@ Namespace Contensive.BaseClasses
             ContextOnBodyEnd = 17
             ContextRemoteMethodJson = 18
         End Enum
+        '
+        Public Class addonExecuteHostRecordContext
+            Public contentName As String
+            Public recordId As Integer
+            Public fieldName As String
+        End Class
+        '
+        Public Class addonExecuteContext
+            ''' <summary>
+            ''' select enumeration option the describes the environment in which the addon is being executed (in an email, on a page, as a remote method, etc)
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property addonType As addonContext
+            ''' <summary>
+            ''' Optional. If the addon is run from a page, it includes an instanceGuid which can be used by addon programming to locate date for this instance.
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property instanceGuid As String
+            ''' <summary>
+            ''' Optional. Name value pairs added to the document environment during execution so they be read by addon programming during and after execution with cp.doc.getText(), etc.
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property instanceArguments As New Dictionary(Of String, String)
+            ''' <summary>
+            ''' Optional. If this addon is run automatically because it was included in content, this is the contentName, recordId and fieldName of the record that held that content.
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property hostRecord As New addonExecuteHostRecordContext
+            ''' <summary>
+            ''' Optional. If included, this is the id value of a record in the Wrappers content and that wrapper will be added to the addon return result.
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property wrapperID As Integer
+            ''' <summary>
+            ''' Optional. If included, the addon will be wrapped with a div and this will be the html Id value of the div. May be used to customize the resulting html styles.
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property cssContainerId As String
+            ''' <summary>
+            ''' Optional. If included, the addon will be wrapped with a div and this will be the html class value of the div. May be used to customize the resulting html styles.
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property cssContainerClass As String
+            ''' <summary>
+            ''' Optional. If included with personizationPeopleId, the addon will be run in a authentication context for this people record. If not included, the current documents authentication context is used. This may be used for cases like addons that send email where email content may include personalization.
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property personalizationPeopleId As Integer
+            ''' <summary>
+            ''' Optional. If included with personizationPeopleId, the addon will be run in a authentication context for this people record. If not included, the current documents authentication context is used. This may be used for cases like addons that send email where email content may include personalization.
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property personalizationAuthenticated As Boolean
+        End Class
 
         Public MustOverride Function ConvertHTML2Text(ByVal Source As String) As String
         Public MustOverride Function ConvertText2HTML(ByVal Source As String) As String
