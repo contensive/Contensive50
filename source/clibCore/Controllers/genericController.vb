@@ -4514,50 +4514,50 @@ ErrorTrap:
         Public Shared Function isMinDate(sourceDate As Date) As Boolean
             Return encodeDateMinValue(sourceDate) = Date.MinValue
         End Function
-        '
-        Public Shared Function getVirtualTableFieldPath(ByVal TableName As String, ByVal FieldName As String) As String
-            Dim result As String = TableName & "/" & FieldName & "/"
-            Return result.Replace(" ", "_").Replace(".", "_")
-        End Function
-        Public Shared Function getVirtualTableFieldIdPath(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer) As String
-            Return getVirtualTableFieldPath(TableName, FieldName) & RecordID.ToString().PadLeft(12, "0"c) & "/"
-        End Function
-        '
-        '========================================================================
-        ' ----- Create a filename for the Virtual Directory
-        '   Do not allow spaces.
-        '   If the content supports authoring, the filename returned will be for the
-        '   current authoring record.
-        '========================================================================
-        '
-        Public Shared Function getVirtualRecordPathFilename(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer, ByVal OriginalFilename As String, ByVal fieldType As Integer) As String
-            Dim result As String = ""
-            '
-            Dim iOriginalFilename As String = OriginalFilename.Replace(" ", "_").Replace(".", "_")
-            If OriginalFilename <> "" Then
-                result = getVirtualTableFieldIdPath(TableName, FieldName, RecordID) & OriginalFilename
-            Else
-                Dim IdFilename As String = CStr(RecordID)
-                If RecordID = 0 Then
-                    IdFilename = getGUID().Replace("{", "").Replace("}", "").Replace("-", "")
-                Else
-                    IdFilename = RecordID.ToString().PadLeft(12, "0"c)
-                End If
-                Select Case fieldType
-                    Case FieldTypeIdFileCSS
-                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".css"
-                    Case FieldTypeIdFileXML
-                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".xml"
-                    Case FieldTypeIdFileJavascript
-                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".js"
-                    Case FieldTypeIdFileHTML
-                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".html"
-                    Case Else
-                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".txt"
-                End Select
-            End If
-            Return result
-        End Function
+        ''
+        'Public Shared Function getVirtualTableFieldPath(ByVal TableName As String, ByVal FieldName As String) As String
+        '    Dim result As String = TableName & "/" & FieldName & "/"
+        '    Return result.Replace(" ", "_").Replace(".", "_")
+        'End Function
+        'Public Shared Function getVirtualTableFieldIdPath(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer) As String
+        '    Return getVirtualTableFieldPath(TableName, FieldName) & RecordID.ToString().PadLeft(12, "0"c) & "/"
+        'End Function
+        ''
+        ''========================================================================
+        '' ----- Create a filename for the Virtual Directory
+        ''   Do not allow spaces.
+        ''   If the content supports authoring, the filename returned will be for the
+        ''   current authoring record.
+        ''========================================================================
+        ''
+        'Public Shared Function getVirtualRecordPathFilename(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer, ByVal OriginalFilename As String, ByVal fieldType As Integer) As String
+        '    Dim result As String = ""
+        '    '
+        '    Dim iOriginalFilename As String = OriginalFilename.Replace(" ", "_").Replace(".", "_")
+        '    If OriginalFilename <> "" Then
+        '        result = getVirtualTableFieldIdPath(TableName, FieldName, RecordID) & OriginalFilename
+        '    Else
+        '        Dim IdFilename As String = CStr(RecordID)
+        '        If RecordID = 0 Then
+        '            IdFilename = getGUID().Replace("{", "").Replace("}", "").Replace("-", "")
+        '        Else
+        '            IdFilename = RecordID.ToString().PadLeft(12, "0"c)
+        '        End If
+        '        Select Case fieldType
+        '            Case FieldTypeIdFileCSS
+        '                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".css"
+        '            Case FieldTypeIdFileXML
+        '                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".xml"
+        '            Case FieldTypeIdFileJavascript
+        '                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".js"
+        '            Case FieldTypeIdFileHTML
+        '                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".html"
+        '            Case Else
+        '                result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".txt"
+        '        End Select
+        '    End If
+        '    Return result
+        'End Function
         '
         '====================================================================================================
         ' the the name of the current executable

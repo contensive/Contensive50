@@ -2236,7 +2236,11 @@ Namespace Contensive.Core.Controllers
                                     End If
                                 End If
                             End If
-                            returnFilename = genericController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
+                            If (OriginalFilename = "") Then
+                                returnFilename = fileController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, fieldTypeId)
+                            Else
+                                returnFilename = fileController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, OriginalFilename)
+                            End If
                             ' 20160607 - no, if you call the cs_set, it stack-overflows. this is a get, so do not save it here.
                             'Call cs_set(CSPointer, fieldNameUpper, returnFilename)
                         End With
@@ -3985,7 +3989,11 @@ Namespace Contensive.Core.Controllers
                         '
                         fieldTypeId = CDef.fields(FieldName.ToLower()).fieldTypeId
                         '
-                        returnResult = genericController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
+                        If OriginalFilename = "" Then
+                            returnResult = fileController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, fieldTypeId)
+                        Else
+                            returnResult = fileController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, OriginalFilename)
+                        End If
                     End If
                 End If
             Catch ex As Exception

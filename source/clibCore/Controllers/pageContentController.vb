@@ -1701,7 +1701,7 @@ ErrorTrap:
             Try
                 Dim allowChildListComposite As Boolean = AllowChildList And cpcore.doc.page.AllowChildListDisplay
                 Dim allowReturnLinkComposite As Boolean = AllowReturnLink And cpcore.doc.page.AllowReturnLinkDisplay
-                Dim bodyCopy As String = cpcore.doc.page.Copyfilename.copy
+                Dim bodyCopy As String = cpcore.doc.page.Copyfilename.content(cpcore)
                 Dim breadCrumb As String = ""
                 Dim BreadCrumbDelimiter As String
                 Dim BreadCrumbPrefix As String

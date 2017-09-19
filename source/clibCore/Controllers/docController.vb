@@ -668,7 +668,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Friend Function getQuickEditingBody(ByVal ContentName As String, ByVal OrderByClause As String, ByVal AllowChildList As Boolean, ByVal Authoring As Boolean, ByVal rootPageId As Integer, ByVal readOnlyField As Boolean, ByVal AllowReturnLink As Boolean, ByVal RootPageContentName As String, ByVal ArchivePage As Boolean, ByVal contactMemberID As Integer) As String
-            Dim pageCopy As String = page.Copyfilename.copy
+            Dim pageCopy As String = page.Copyfilename.content(cpcore)
             'If page.Copyfilename <> "" Then
             '    pageCopy = page.Copyfilename.copy(cpcore)
             '    'pageCopy = cpcore.cdnFiles.readFile(page.Copyfilename)

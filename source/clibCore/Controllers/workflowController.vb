@@ -369,7 +369,7 @@ Namespace Contensive.Core.Controllers
                                                                                 If EditFilename = "" Then
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
                                                                                 Else
-                                                                                    NewEditFilename = getVirtualRecordPathFilename(EditTableName, FieldName, NewEditRecordID, "", fieldTypeId)
+                                                                                    NewEditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, NewEditRecordID, fieldTypeId)
                                                                                     'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
                                                                                     Call cpCore.cdnFiles.copyFile(EditFilename, NewEditFilename)
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(NewEditFilename))
@@ -382,7 +382,7 @@ Namespace Contensive.Core.Controllers
                                                                                 If EditFilename = "" Then
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
                                                                                 Else
-                                                                                    NewEditFilename = getVirtualRecordPathFilename(EditTableName, FieldName, NewEditRecordID, "", fieldTypeId)
+                                                                                    NewEditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, NewEditRecordID, fieldTypeId)
                                                                                     'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
                                                                                     Call cpCore.cdnFiles.copyFile(EditFilename, NewEditFilename)
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(NewEditFilename))
@@ -638,7 +638,7 @@ Namespace Contensive.Core.Controllers
                                                                 '
                                                                 LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
                                                                 If LiveFilename <> "" Then
-                                                                    EditFilename = getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
+                                                                    EditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, fieldTypeId)
                                                                     Call cpCore.cdnFiles.copyFile(LiveFilename, EditFilename)
                                                                     LiveSQLValue = cpCore.db.encodeSQLText(EditFilename)
                                                                 End If
@@ -649,7 +649,7 @@ Namespace Contensive.Core.Controllers
                                                                 '
                                                                 LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
                                                                 If LiveFilename <> "" Then
-                                                                    EditFilename = getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
+                                                                    EditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, fieldTypeId)
                                                                     Call cpCore.cdnFiles.copyFile(LiveFilename, EditFilename)
                                                                     LiveSQLValue = cpCore.db.encodeSQLText(EditFilename)
                                                                 End If

@@ -1081,8 +1081,8 @@ Namespace Contensive.Core
                                             addonId = docProperties.getInteger("AddonID")
                                             If (addonId > 0) Then
                                                 Dim styleAddon As Models.Entity.addonModel = Models.Entity.addonModel.create(Me, addonId)
-                                                If (styleAddon.StylesFilename.copy <> docProperties.getText("CustomStyles")) Then
-                                                    styleAddon.StylesFilename.copy = docProperties.getText("CustomStyles")
+                                                If (styleAddon.StylesFilename.content(Me) <> docProperties.getText("CustomStyles")) Then
+                                                    styleAddon.StylesFilename.content(Me) = docProperties.getText("CustomStyles")
                                                     styleAddon.save(Me)
                                                     '
                                                     ' Clear Caches

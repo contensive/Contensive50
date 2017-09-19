@@ -910,7 +910,65 @@ Namespace Contensive.Core.Controllers
             Return success
         End Function
         '
+        Public Shared Function getVirtualTableFieldPath(ByVal TableName As String, ByVal FieldName As String) As String
+            Dim result As String = TableName & "/" & FieldName & "/"
+            Return result.Replace(" ", "_").Replace(".", "_")
+        End Function
+        Public Shared Function getVirtualTableFieldIdPath(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer) As String
+            Return getVirtualTableFieldPath(TableName, FieldName) & RecordID.ToString().PadLeft(12, "0"c) & "/"
+        End Function
         '
+        '========================================================================
+        ''' <summary>
+        ''' Create a filename for the Virtual Directory for a fieldtypeFile or Image (an uploaded file)
+        ''' </summary>
+        ''' <param name="TableName"></param>
+        ''' <param name="FieldName"></param>
+        ''' <param name="RecordID"></param>
+        ''' <param name="OriginalFilename"></param>
+        ''' <param name="fieldType"></param>
+        ''' <returns></returns>
+        Public Shared Function getVirtualRecordPathFilename(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer, ByVal OriginalFilename As String) As String
+            Dim result As String = ""
+            '
+            Dim iOriginalFilename As String = OriginalFilename.Replace(" ", "_").Replace(".", "_")
+            Return getVirtualTableFieldIdPath(TableName, FieldName, RecordID) & OriginalFilename
+        End Function
+        '
+        '========================================================================
+        ''' <summary>
+        ''' Create a filename for the virtual directory for field types not associated to upload files
+        ''' </summary>
+        ''' <param name="TableName"></param>
+        ''' <param name="FieldName"></param>
+        ''' <param name="RecordID"></param>
+        ''' <param name="OriginalFilename"></param>
+        ''' <param name="fieldType"></param>
+        ''' <returns></returns>
+        Public Shared Function getVirtualRecordPathFilename(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer, ByVal fieldType As Integer) As String
+            Dim result As String = ""
+            Dim IdFilename As String = CStr(RecordID)
+            If RecordID = 0 Then
+                IdFilename = getGUID().Replace("{", "").Replace("}", "").Replace("-", "")
+            Else
+                IdFilename = RecordID.ToString().PadLeft(12, "0"c)
+            End If
+            Select Case fieldType
+                Case FieldTypeIdFileCSS
+                    result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".css"
+                Case FieldTypeIdFileXML
+                    result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".xml"
+                Case FieldTypeIdFileJavascript
+                    result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".js"
+                Case FieldTypeIdFileHTML
+                    result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".html"
+                Case Else
+                    result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".txt"
+            End Select
+            Return result
+        End Function
+        '
+        '========================================================================
         '
         Public Function main_GetFileSize(ByVal VirtualFilePathPage As String) As Integer
             Dim files As IO.FileInfo() = getFileList(VirtualFilePathPage)

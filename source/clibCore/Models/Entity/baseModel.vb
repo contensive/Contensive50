@@ -71,21 +71,59 @@ Namespace Contensive.Core.Models.Entity
         '====================================================================================================
         '-- field types
         '
-        Public Class fieldTypeTextFile
+        Public MustInherit Class fieldCdnFile
             Public Property filename As String = ""
-            Public Property copy As String = ""
+            Public Property content(cpCore As coreClass) As String
+                Set(value As String)
+                    _content = value
+                End Set
+                Get
+                    If (_content Is Nothing) Then
+                        _content = ""
+                        If (filename IsNot Nothing) Then
+                            _content = cpCore.cdnFiles.readFile(filename)
+                        End If
+                    End If
+                    Return _content
+                End Get
+            End Property
+            '
+            ' -- for later. move the save to this field so it is not repeated for each file type
+            'Public Sub save(cpCore As coreClass, tableName As String, fieldName As String, recordId As Integer, fieldTypeId As Integer)
+            '    If (_content IsNot Nothing) Then
+            '        '
+            '        ' -- content needs to be saved
+            '        If (filename = "") Then
+            '            '
+            '            ' -- filename needs to be created
+            '            filename = Contensive.Core.Controllers.fileController.getVirtualRecordPathFilename(tableName, fieldName, recordId, fieldTypeId)
+            '        End If
+            '        cpCore.cdnFiles.saveFile(filename, _content)
+            '    End If
+            'End Sub
+            Private _content As String = Nothing
+        End Class
+
+        '
+        Public Class fieldTypeTextFile
+            Inherits fieldCdnFile
+            'Public Property filename As String = ""
+            'Public Property copy As String = ""
         End Class
         Public Class fieldTypeJavascriptFile
-            Public Property filename As String = ""
-            Public Property copy As String = ""
+            Inherits fieldCdnFile
+            'Public Property filename As String = ""
+            'Public Property copy As String = ""
         End Class
         Public Class fieldTypeCSSFile
-            Public Property filename As String = ""
-            Public Property copy As String = ""
+            Inherits fieldCdnFile
+            'Public Property filename As String = ""
+            'Public Property copy As String = ""
         End Class
         Public Class fieldTypeHTMLFile
-            Public Property filename As String = ""
-            Public Property copy As String = ""
+            Inherits fieldCdnFile
+            'Public Property filename As String = ""
+            'Public Property copy As String = ""
         End Class
         '
         '====================================================================================================
@@ -352,40 +390,36 @@ Namespace Contensive.Core.Models.Entity
                                         ' -- cdn files
                                         Dim instanceFileType As New fieldTypeTextFile
                                         instanceFileType.filename = cs.getValue(modelProperty.Name)
-                                        If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            instanceFileType.copy = cpCore.cdnFiles.readFile(instanceFileType.filename)
-                                        End If
-                                        'instanceFileType.copy = cs.getText(modelProperty.Name)
+                                        'If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
+                                        '    instanceFileType.content(cpCore) = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                        'End If
                                         modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case "fieldTypeJavascriptFile"
                                         '
                                         ' -- cdn files
                                         Dim instanceFileType As New fieldTypeJavascriptFile
                                         instanceFileType.filename = cs.getValue(modelProperty.Name)
-                                        If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            instanceFileType.copy = cpCore.cdnFiles.readFile(instanceFileType.filename)
-                                        End If
-                                        'instanceFileType.copy = cs.getText(modelProperty.Name)
+                                        'If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
+                                        '    instanceFileType.content(cpCore) = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                        'End If
                                         modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case "fieldTypeCSSFile"
                                         '
                                         ' -- cdn files
                                         Dim instanceFileType As New fieldTypeCSSFile
                                         instanceFileType.filename = cs.getValue(modelProperty.Name)
-                                        If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            instanceFileType.copy = cpCore.cdnFiles.readFile(instanceFileType.filename)
-                                        End If
-                                        'instanceFileType.copy = cs.getText(modelProperty.Name)
+                                        'If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
+                                        '    instanceFileType.content(cpCore) = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                        'End If
                                         modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case "fieldTypeHTMLFile"
                                         '
                                         ' -- private files
                                         Dim instanceFileType As New fieldTypeHTMLFile
                                         instanceFileType.filename = cs.getValue(modelProperty.Name)
-                                        If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            instanceFileType.copy = cpCore.cdnFiles.readFile(instanceFileType.filename)
-                                        End If
-                                        'instanceFileType.copy = cs.getText(modelProperty.Name)
+                                        'If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
+                                        '    instanceFileType.content(cpCore) = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                        'End If
                                         modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case Else
                                         modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), Nothing)
@@ -497,7 +531,7 @@ Namespace Contensive.Core.Models.Entity
                                             '
                                             ' -- save content
                                             If (String.IsNullOrEmpty(filename)) Then
-                                                filename = genericController.getVirtualRecordPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, "", FieldTypeIdFileText)
+                                                filename = fileController.getVirtualRecordPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, FieldTypeIdFileText)
                                             End If
                                             cs.setFile(instanceProperty.Name, copy, contentName)
                                         End If

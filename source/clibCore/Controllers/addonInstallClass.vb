@@ -137,8 +137,6 @@ Namespace Contensive.Core
                 Dim CDefInterfaces As XmlNode
                 Dim ActiveXNode As XmlNode
                 Dim errorPrefix As String
-                Dim reader As XmlTextReader
-                Dim responseStream As IO.Stream
                 Dim downloadRetry As Integer
                 Const downloadRetryMax As Integer = 3
                 '
@@ -149,14 +147,14 @@ Namespace Contensive.Core
                 '---------------------------------------------------------------------------------------------------------------
                 '
                 Doc = New XmlDocument
-                DownloadCollectionFiles = True
                 URL = "http://support.contensive.com/GetCollection?iv=" & cpCore.codeVersion() & "&guid=" & CollectionGuid
                 errorPrefix = "DownloadCollectionFiles, Error reading the collection library status file from the server for Collection [" & CollectionGuid & "], download URL [" & URL & "]. "
-                return_ErrorMessage = ""
                 downloadRetry = 0
                 Dim downloadDelay As Integer = 2000
                 Do
                     Try
+                        DownloadCollectionFiles = True
+                        return_ErrorMessage = ""
                         '
                         ' -- pause for a second between fetches to pace the server (<10 hits in 10 seconds)
                         Threading.Thread.Sleep(downloadDelay)
@@ -165,8 +163,8 @@ Namespace Contensive.Core
                         Dim rq As System.Net.WebRequest = System.Net.WebRequest.Create(URL)
                         rq.Timeout = 60000
                         Dim response As System.Net.WebResponse = rq.GetResponse()
-                        responseStream = response.GetResponseStream()
-                        reader = New XmlTextReader(responseStream)
+                        Dim responseStream As IO.Stream = response.GetResponseStream()
+                        Dim reader As XmlTextReader = New XmlTextReader(responseStream)
                         Doc.Load(reader)
                         Exit Do
                         'Call Doc.Load(URL)

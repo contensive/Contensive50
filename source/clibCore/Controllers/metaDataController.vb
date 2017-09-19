@@ -823,7 +823,7 @@ Namespace Contensive.Core.Controllers
                                                                 EditFilename = ""
                                                                 LiveFilename = genericController.encodeText(FieldValueVariant)
                                                                 If LiveFilename <> "" Then
-                                                                    EditFilename = getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
+                                                                    EditFilename = fileController.getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
                                                                         Copy = cpCore.cdnFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
@@ -842,7 +842,7 @@ Namespace Contensive.Core.Controllers
                                                                 EditFilename = ""
                                                                 LiveFilename = genericController.encodeText(FieldValueVariant)
                                                                 If LiveFilename <> "" Then
-                                                                    EditFilename = getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
+                                                                    EditFilename = fileController.getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
                                                                         Copy = cpCore.cdnFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
@@ -2080,7 +2080,6 @@ ErrorTrap:
                             Call sqlList.add("TYPE", cpCore.db.encodeSQLNumber(fieldTypeId)) ' Pointer)
                             Call sqlList.add("CAPTION", cpCore.db.encodeSQLText(FieldCaption)) ' Pointer)
                             Call sqlList.add("ReadOnly", cpCore.db.encodeSQLBoolean(FieldReadOnly)) ' Pointer)
-                            Call sqlList.add("LOOKUPCONTENTID", cpCore.db.encodeSQLNumber(LookupContentID)) ' Pointer)
                             Call sqlList.add("REQUIRED", cpCore.db.encodeSQLBoolean(FieldRequired)) ' Pointer)
                             Call sqlList.add("TEXTBUFFERED", SQLFalse) ' Pointer)
                             Call sqlList.add("PASSWORD", cpCore.db.encodeSQLBoolean(Password)) ' Pointer)
@@ -2107,6 +2106,7 @@ ErrorTrap:
                             Call sqlList.add("EDITTAB", cpCore.db.encodeSQLText(EditTab)) ' Pointer)
                             Call sqlList.add("SCRAMBLE", cpCore.db.encodeSQLBoolean(Scramble)) ' Pointer)
                             Call sqlList.add("ISBASEFIELD", cpCore.db.encodeSQLBoolean(IsBaseField)) ' Pointer)
+                            Call sqlList.add("LOOKUPLIST", cpCore.db.encodeSQLText(LookupList))
                             '
                             ' -- conditional fields
                             Select Case fieldTypeId
@@ -2120,7 +2120,7 @@ ErrorTrap:
                                             logController.appendLog(cpCore, "Could not create lookup field [" & field.nameLc & "] for content definition [" & ContentName & "] because no content definition was found For lookup-content [" & LookupContentName & "].")
                                         End If
                                     End If
-                                    Call sqlList.add("LOOKUPLIST", cpCore.db.encodeSQLText(LookupList))
+                                    Call sqlList.add("LOOKUPCONTENTID", cpCore.db.encodeSQLNumber(LookupContentID)) ' Pointer)
                                 Case FieldTypeIdManyToMany
                                     '
                                     ' -- many-to-many field

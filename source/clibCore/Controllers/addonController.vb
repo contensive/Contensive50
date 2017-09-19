@@ -2836,7 +2836,7 @@ ErrorTrap:
                             & "" _
                             & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
                             & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>" _
-                            & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b>" & cpCore.html.html_GetFormInputTextExpandable2("CustomStyles", addon.StylesFilename.copy, 10, "400px") & "</td></tr>"
+                            & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b>" & cpCore.html.html_GetFormInputTextExpandable2("CustomStyles", addon.StylesFilename.content(cpCore), 10, "400px") & "</td></tr>"
                         'If DefaultStylesheet = "" Then
                         '    CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
                         'Else
