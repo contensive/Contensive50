@@ -151,7 +151,12 @@ Namespace Contensive.Core
         Public Function executeAddon(addonNameOrGuid As String, Optional addonContext As Contensive.BaseClasses.CPUtilsBaseClass.addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) As String
             Dim result As String = ""
             Try
-                result = core.addon.execute_legacy4(addonNameOrGuid, core.docProperties.getLegacyOptionStringFromVar(), addonContext, Nothing)
+                If genericController.isGuid(addonNameOrGuid) Then
+                    core.addon.execute(Models.Entity.addonModel.create(core, addonNameOrGuid), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = addonNameOrGuid})
+                Else
+                    core.addon.execute(Models.Entity.addonModel.createByName(core, addonNameOrGuid), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = addonNameOrGuid})
+                End If
+                'result = core.addon.execute_legacy4(addonNameOrGuid, core.docProperties.getLegacyOptionStringFromVar(), addonContext, Nothing)
             Catch ex As Exception
                 Site.ErrorReport(ex)
             End Try
@@ -168,9 +173,10 @@ Namespace Contensive.Core
         Public Function executeAddon(addonId As Integer, Optional addonContext As Contensive.BaseClasses.CPUtilsBaseClass.addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) As String
             Dim result As String = ""
             Try
-                If Response.isOpen Then
-                    result = core.addon.execute_legacy6(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.authContext.user.id, core.authContext.visit.VisitAuthenticated)
-                End If
+                core.addon.execute(Models.Entity.addonModel.create(core, addonId), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = "id:" & addonId.ToString()})
+                'If Response.isOpen Then
+                '    result = core.addon.execute_legacy6(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.authContext.user.id, core.authContext.visit.VisitAuthenticated)
+                'End If
                 '
             Catch ex As Exception
                 Site.ErrorReport(ex)

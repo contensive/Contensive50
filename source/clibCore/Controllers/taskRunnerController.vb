@@ -197,7 +197,15 @@ Namespace Contensive.Core.Controllers
                                         '
                                         Select Case command.ToLower()
                                             Case taskQueueCommandEnumModule.runAddon
-                                                Call cpSite.core.addon.execute_legacy7(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
+                                                Call cpSite.core.addon.execute(
+                                                    Models.Entity.addonModel.create(
+                                                        cpSite.core, cmdDetail.addonId),
+                                                        New BaseClasses.CPUtilsBaseClass.addonExecuteContext With {
+                                                            .addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
+                                                            .instanceArguments = cmdDetail.docProperties
+                                                        }
+                                                    )
+                                                'Call cpSite.core.addon.execute_legacy7(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
                                         End Select
                                     End If
                                     cpSite.core.db.cs_Close(CS)

@@ -304,25 +304,25 @@ Namespace Contensive.Core
         Public Function getHtml(ByVal FieldName As String) As String
             Return getText(FieldName)
         End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' returns the text stored in a textfile type field instead of the filename.
-        ''' </summary>
-        ''' <param name="FieldName"></param>
-        ''' <returns></returns>
-        Public Function getTextFile(ByVal FieldName As String) As String
-            Dim result As String = String.Empty
-            Try
-                result = cpCore.db.cs_getTextFile(csPtr, FieldName)
-                If result Is Nothing Then
-                    result = String.Empty
-                End If
-            Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw
-            End Try
-            Return result
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' returns the text stored in a textfile type field instead of the filename.
+        '''' </summary>
+        '''' <param name="FieldName"></param>
+        '''' <returns></returns>
+        'Public Function getTextFile(ByVal FieldName As String) As String
+        '    Dim result As String = String.Empty
+        '    Try
+        '        result = cpCore.db.cs_getTextFile(csPtr, FieldName)
+        '        If result Is Nothing Then
+        '            result = String.Empty
+        '        End If
+        '    Catch ex As Exception
+        '        Call cpCore.handleException(ex) : Throw
+        '    End Try
+        '    Return result
+        'End Function
         '
         '====================================================================================================
         Public Sub goNext()
@@ -448,6 +448,21 @@ Namespace Contensive.Core
                 ContentName = cpcore.metaData.getContentNameByID(cpcore.db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
             result = cpcore.html.encodeContent10(cpcore.db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything())
+            Return result
+        End Function
+        '
+        '========================================================================
+        '
+        Public Function getValue(ByVal FieldName As String) As String
+            Dim result As String = String.Empty
+            Try
+                result = cpCore.db.cs_getValue(csPtr, FieldName)
+                If result Is Nothing Then
+                    result = String.Empty
+                End If
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
             Return result
         End Function
 

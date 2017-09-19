@@ -1008,7 +1008,7 @@ Namespace Contensive.Core.Controllers
                         returnType = "Int NULL"
                     Case FieldTypeIdLookup, FieldTypeIdMemberSelect
                         returnType = "Int NULL"
-                    Case FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdText, FieldTypeIdFile, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
+                    Case FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdText, FieldTypeIdFile, FieldTypeIdFileText, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTML
                         returnType = "VarChar(255) NULL"
                     Case FieldTypeIdLongText, FieldTypeIdHTML
                         '
@@ -1197,7 +1197,7 @@ Namespace Contensive.Core.Controllers
                     Case FieldTypeNameLcaseManyToMany
                         returnTypeId = FieldTypeIdManyToMany
                     Case FieldTypeNameLcaseTextFile, "text file", "textfile"
-                        returnTypeId = FieldTypeIdFileTextPrivate
+                        returnTypeId = FieldTypeIdFileText
                     Case FieldTypeNameLcaseCSSFile, "cssfile", "css file"
                         returnTypeId = FieldTypeIdFileCSS
                     Case FieldTypeNameLcaseXMLFile, "xmlfile", "xml file"
@@ -1213,7 +1213,7 @@ Namespace Contensive.Core.Controllers
                     Case FieldTypeNameLcaseHTML
                         returnTypeId = FieldTypeIdHTML
                     Case FieldTypeNameLcaseHTMLFile, "html file"
-                        returnTypeId = FieldTypeIdFileHTMLPrivate
+                        returnTypeId = FieldTypeIdFileHTML
                     Case Else
                         '
                         ' Bad field type is a text field
@@ -1631,13 +1631,13 @@ Namespace Contensive.Core.Controllers
                                                     Call cpCore.cdnFiles.deleteFile(Filename)
                                                     'Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
                                                 End If
-                                            Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
+                                            Case FieldTypeIdFileText, FieldTypeIdFileHTML
                                                 '
                                                 ' private files
                                                 '
                                                 Filename = cs_getText(CSPointer, fieldName)
                                                 If Filename <> "" Then
-                                                    Call cpCore.privateFiles.deleteFile(Filename)
+                                                    Call cpCore.cdnFiles.deleteFile(Filename)
                                                 End If
                                         End Select
                                     End With
@@ -1873,7 +1873,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="CSPointer"></param>
         ''' <param name="FieldName"></param>
         ''' <returns></returns>
-        Public Function cs_getField(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+        Public Function cs_getValue(ByVal CSPointer As Integer, ByVal FieldName As String) As String
             Dim returnValue As String = ""
             Try
                 Dim fieldFound As Boolean
@@ -1883,11 +1883,8 @@ Namespace Contensive.Core.Controllers
                 '
                 fieldNameTrim = FieldName.Trim()
                 fieldNameTrimUpper = genericController.vbUCase(fieldNameTrim)
-                If (fieldNameTrimUpper = "STYLESFILENAME") Then
-                    fieldNameTrimUpper = fieldNameTrimUpper
-                End If
                 If Not cs_ok(CSPointer) Then
-                    Throw New ApplicationException("Attempt To getField fieldname[" & FieldName & "], but the dataset Is empty Or does Not point To a valid row")
+                    Throw New ApplicationException("Attempt To GetValue fieldname[" & FieldName & "], but the dataset Is empty Or does Not point To a valid row")
                 Else
                     With contentSetStore(CSPointer)
                         '
@@ -2153,7 +2150,7 @@ Namespace Contensive.Core.Controllers
                     Throw New ArgumentException("Fieldname Is blank")
                 Else
                     fieldNameUpper = genericController.vbUCase(Trim(FieldName))
-                    returnFilename = cs_getField(CSPointer, fieldNameUpper)
+                    returnFilename = cs_getValue(CSPointer, fieldNameUpper)
                     If returnFilename <> "" Then
                         '
                         ' ----- A filename came from the record
@@ -2254,31 +2251,31 @@ Namespace Contensive.Core.Controllers
         '   csv_cs_getText
         '
         Public Function cs_getText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            cs_getText = genericController.encodeText(cs_getField(CSPointer, FieldName))
+            cs_getText = genericController.encodeText(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '   genericController.EncodeInteger( csv_cs_getField )
         '
         Public Function cs_getInteger(ByVal CSPointer As Integer, ByVal FieldName As String) As Integer
-            cs_getInteger = genericController.EncodeInteger(cs_getField(CSPointer, FieldName))
+            cs_getInteger = genericController.EncodeInteger(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '   encodeNumber( csv_cs_getField )
         '
         Public Function cs_getNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
-            cs_getNumber = genericController.EncodeNumber(cs_getField(CSPointer, FieldName))
+            cs_getNumber = genericController.EncodeNumber(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '    genericController.EncodeDate( csv_cs_getField )
         '
         Public Function cs_getDate(ByVal CSPointer As Integer, ByVal FieldName As String) As Date
-            cs_getDate = genericController.EncodeDate(cs_getField(CSPointer, FieldName))
+            cs_getDate = genericController.EncodeDate(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '   genericController.EncodeBoolean( csv_cs_getField )
         '
         Public Function cs_getBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
-            cs_getBoolean = genericController.EncodeBoolean(cs_getField(CSPointer, FieldName))
+            cs_getBoolean = genericController.EncodeBoolean(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '   genericController.EncodeBoolean( csv_cs_getField )
@@ -2311,12 +2308,12 @@ Namespace Contensive.Core.Controllers
                             Throw New ApplicationException("Attempting To update an unupdateable data set")
                         Else
                             Dim OldFilename As String = cs_getText(CSPointer, FieldName)
-                            Dim Filename As String = cs_getFilename(CSPointer, FieldName, "", ContentName, FieldTypeIdFileTextPrivate)
+                            Dim Filename As String = cs_getFilename(CSPointer, FieldName, "", ContentName, FieldTypeIdFileText)
                             If OldFilename <> Filename Then
                                 '
                                 ' Filename changed, mark record changed
                                 '
-                                Call cpCore.privateFiles.saveFile(Filename, Copy)
+                                Call cpCore.cdnFiles.saveFile(Filename, Copy)
                                 Call cs_set(CSPointer, FieldName, Filename)
                             Else
                                 Dim OldCopy As String = cpCore.cdnFiles.readFile(Filename)
@@ -2324,7 +2321,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' copy changed, mark record changed
                                     '
-                                    Call cpCore.privateFiles.saveFile(Filename, Copy)
+                                    Call cpCore.cdnFiles.saveFile(Filename, Copy)
                                     Call cs_set(CSPointer, FieldName, Filename)
                                 End If
                             End If
@@ -2335,34 +2332,34 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleException(ex) : Throw
             End Try
         End Sub
-        '
-        '====================================================================================
-        ''' <summary>
-        ''' Get the value of a a csv_ContentSet Field for a TextFile fieldtype
-        ''' (returns the content of the filename stored in the field)
-        ''' 
-        ''' </summary>
-        ''' <param name="CSPointer"></param>
-        ''' <param name="FieldName"></param>
-        ''' <returns></returns>
-        Public Function cs_getTextFile(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            Dim result As String = ""
-            Try
-                If Not cs_ok(CSPointer) Then
-                    Throw New ArgumentException("dataset must be valid")
-                ElseIf String.IsNullOrEmpty(FieldName) Then
-                    Throw New ArgumentException("fieldname cannot be blank")
-                Else
-                    Dim Filename As String = cs_getText(CSPointer, FieldName)
-                    If Not String.IsNullOrEmpty(Filename) Then
-                        result = cpCore.privateFiles.readFile(Filename)
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex) : Throw
-            End Try
-            Return result
-        End Function
+        ''
+        ''====================================================================================
+        '''' <summary>
+        '''' Get the value of a a csv_ContentSet Field for a TextFile fieldtype
+        '''' (returns the content of the filename stored in the field)
+        '''' 
+        '''' </summary>
+        '''' <param name="CSPointer"></param>
+        '''' <param name="FieldName"></param>
+        '''' <returns></returns>
+        '<Obsolete("Use getText for copy, getFilename for filename", True)> Public Function cs_getTextFile(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+        '    Dim result As String = ""
+        '    Try
+        '        If Not cs_ok(CSPointer) Then
+        '            Throw New ArgumentException("dataset must be valid")
+        '        ElseIf String.IsNullOrEmpty(FieldName) Then
+        '            Throw New ArgumentException("fieldname cannot be blank")
+        '        Else
+        '            Dim Filename As String = cs_getText(CSPointer, FieldName)
+        '            If Not String.IsNullOrEmpty(Filename) Then
+        '                result = cpCore.cdnFiles.readFile(Filename)
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex) : Throw
+        '    End Try
+        '    Return result
+        'End Function
         ''
         ''========================================================================
         '''' <summary>
@@ -2860,7 +2857,7 @@ Namespace Contensive.Core.Controllers
                                             Call cs_set(CSDestination, FieldName, DestFilename)
                                             Call cpCore.cdnFiles.copyFile(SourceFilename, DestFilename)
                                         End If
-                                    Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
+                                    Case FieldTypeIdFileText, FieldTypeIdFileHTML
                                         '
                                         ' ----- private file
                                         '
@@ -2870,13 +2867,13 @@ Namespace Contensive.Core.Controllers
                                             DestFilename = cs_getFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId)
                                             'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                             Call cs_set(CSDestination, FieldName, DestFilename)
-                                            Call cpCore.privateFiles.copyFile(SourceFilename, DestFilename)
+                                            Call cpCore.cdnFiles.copyFile(SourceFilename, DestFilename)
                                         End If
                                     Case Else
                                         '
                                         ' ----- value
                                         '
-                                        Call cs_set(CSDestination, FieldName, cs_getField(CSSource, FieldName))
+                                        Call cs_set(CSDestination, FieldName, cs_getValue(CSSource, FieldName))
                                 End Select
                         End Select
                         FieldName = cs_getNextFieldName(CSSource)
@@ -2945,7 +2942,7 @@ Namespace Contensive.Core.Controllers
                             ' Not updateable -- Just return what is there as a string
                             '
                             Try
-                                fieldValue = genericController.encodeText(cs_getField(CSPointer, FieldName))
+                                fieldValue = genericController.encodeText(cs_getValue(CSPointer, FieldName))
                             Catch ex As Exception
                                 Throw New ApplicationException("Error [" & ex.Message & "] reading field [" & FieldName.ToLower & "] In source [" & .Source & "")
                             End Try
@@ -2957,7 +2954,7 @@ Namespace Contensive.Core.Controllers
                             Dim field As CDefFieldModel
                             If Not .CDef.fields.ContainsKey(FieldName.ToLower()) Then
                                 Try
-                                    fieldValue = genericController.encodeText(cs_getField(CSPointer, FieldName))
+                                    fieldValue = genericController.encodeText(cs_getValue(CSPointer, FieldName))
                                 Catch ex As Exception
                                     Throw New ApplicationException("Error [" & ex.Message & "] reading field [" & FieldName.ToLower & "] In content [" & .CDef.Name & "] With custom field list [" & .SelectTableFieldList & "")
                                 End Try
@@ -2974,7 +2971,7 @@ Namespace Contensive.Core.Controllers
                                     Dim SQL As String
                                     Dim rs As DataTable
                                     If .CDef.fields.ContainsKey("id") Then
-                                        RecordID = genericController.EncodeInteger(cs_getField(CSPointer, "id"))
+                                        RecordID = genericController.EncodeInteger(cs_getValue(CSPointer, "id"))
                                         With field
                                             ContentName = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                                             DbTable = cpCore.metaData.getContentTablename(ContentName)
@@ -2994,7 +2991,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     fieldTypeId = fieldTypeId
                                 Else
-                                    FieldValueVariant = cs_getField(CSPointer, FieldName)
+                                    FieldValueVariant = cs_getValue(CSPointer, FieldName)
                                     If Not genericController.IsNull(FieldValueVariant) Then
                                         '
                                         ' Field is good
@@ -3063,11 +3060,11 @@ Namespace Contensive.Core.Controllers
                                                     fieldValue = FormatCurrency(FieldValueVariant, 2, vbFalse, vbFalse, vbFalse)
                                                 End If
                                             'NeedsHTMLEncode = False
-                                            Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
+                                            Case FieldTypeIdFileText, FieldTypeIdFileHTML
                                                 '
                                                 '
                                                 '
-                                                fieldValue = cpCore.privateFiles.readFile(genericController.encodeText(FieldValueVariant))
+                                                fieldValue = cpCore.cdnFiles.readFile(genericController.encodeText(FieldValueVariant))
                                             Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                                 '
                                                 '
@@ -3161,7 +3158,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 'FieldValueVariantLocal = FieldValueVariantLocal
                                                 SetNeeded = True
-                                            Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
+                                            Case FieldTypeIdFileText, FieldTypeIdFileHTML
                                                 '
                                                 ' Always set
                                                 ' A virtual file is created to hold the content, 'tablename/FieldNameLocal/0000.ext
@@ -3177,7 +3174,7 @@ Namespace Contensive.Core.Controllers
                                                 'FieldValue = genericController.encodeText(FieldValueVariantLocal)
                                                 If FieldValue = "" Then
                                                     If fileNameNoExt <> "" Then
-                                                        Call cpCore.privateFiles.deleteFile(fileNameNoExt)
+                                                        Call cpCore.cdnFiles.deleteFile(fileNameNoExt)
                                                         'Call publicFiles.DeleteFile(fileNameNoExt)
                                                         fileNameNoExt = ""
                                                     End If
@@ -3185,7 +3182,7 @@ Namespace Contensive.Core.Controllers
                                                     If fileNameNoExt = "" Then
                                                         fileNameNoExt = cs_getFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId)
                                                     End If
-                                                    Call cpCore.privateFiles.saveFile(fileNameNoExt, FieldValue)
+                                                    Call cpCore.cdnFiles.saveFile(fileNameNoExt, FieldValue)
                                                     'Call publicFiles.SaveFile(fileNameNoExt, FieldValue)
                                                 End If
                                                 FieldValue = fileNameNoExt
@@ -3549,7 +3546,7 @@ Namespace Contensive.Core.Controllers
                                                     Copy = cpCore.metaData.TextScramble(Copy)
                                                 End If
                                                 SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
-                                            Case FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
+                                            Case FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTML
                                                 Copy = Left(genericController.encodeText(writeCacheValueVariant), 255)
                                                 SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
                                             Case FieldTypeIdLongText, FieldTypeIdHTML
@@ -3833,7 +3830,7 @@ Namespace Contensive.Core.Controllers
                         returnResult = encodeSQLDate(genericController.EncodeDate(expression))
                     Case FieldTypeIdLongText, FieldTypeIdHTML
                         returnResult = encodeSQLText(genericController.encodeText(expression))
-                    Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
+                    Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileText, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTML
                         returnResult = encodeSQLText(genericController.encodeText(expression))
                     Case Else
                         cpCore.handleException(New ApplicationException("Unknown Field Type [" & fieldType & ""))
@@ -4416,7 +4413,7 @@ Namespace Contensive.Core.Controllers
                         returnFieldTypeName = FieldTypeNameRedirect
                     Case FieldTypeIdManyToMany
                         returnFieldTypeName = FieldTypeNameManyToMany
-                    Case FieldTypeIdFileTextPrivate
+                    Case FieldTypeIdFileText
                         returnFieldTypeName = FieldTypeNameTextFile
                     Case FieldTypeIdFileCSS
                         returnFieldTypeName = FieldTypeNameCSSFile
@@ -4428,7 +4425,7 @@ Namespace Contensive.Core.Controllers
                         returnFieldTypeName = FieldTypeNameText
                     Case FieldTypeIdHTML
                         returnFieldTypeName = FieldTypeNameHTML
-                    Case FieldTypeIdFileHTMLPrivate
+                    Case FieldTypeIdFileHTML
                         returnFieldTypeName = FieldTypeNameHTMLFile
                     Case Else
                         If fieldType = FieldTypeIdAutoIdIncrement Then
@@ -5178,12 +5175,12 @@ Namespace Contensive.Core.Controllers
                         field.ReadOnly = False
                     Case "COPYFILENAME"
                         field.caption = "Copy"
-                        field.fieldTypeId = FieldTypeIdFileHTMLPrivate
+                        field.fieldTypeId = FieldTypeIdFileHTML
                         field.TextBuffered = True
                         field.editSortPriority = 2010
                     Case "BRIEFFILENAME"
                         field.caption = "Overview"
-                        field.fieldTypeId = FieldTypeIdFileHTMLPrivate
+                        field.fieldTypeId = FieldTypeIdFileHTML
                         field.TextBuffered = True
                         field.editSortPriority = 2020
                         field.htmlContent = False

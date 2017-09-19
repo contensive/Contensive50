@@ -2435,7 +2435,7 @@ ErrorTrap:
                         ' main_Get the current value if the record was found
                         '
                         If cpCore.db.cs_ok(CSPointer) Then
-                            FieldValueVariant = cpCore.db.cs_getField(CSPointer, FieldName)
+                            FieldValueVariant = cpCore.db.cs_getValue(CSPointer, FieldName)
                         End If
                         '
                         If FieldPassword Then
@@ -2460,12 +2460,12 @@ ErrorTrap:
                                         returnResult = html_GetFormInputHTML(FieldName, FieldValueText, , Width.ToString)
                                     End If
                                 '
-                                ' html private files, read from privatefiles and use html editor
+                                ' html files, read from cdnFiles and use html editor
                                 '
-                                Case FieldTypeIdFileHTMLPrivate
+                                Case FieldTypeIdFileHTML
                                     FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = cpCore.privateFiles.readFile(FieldValueText)
+                                        FieldValueText = cpCore.cdnFiles.readFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -2474,12 +2474,12 @@ ErrorTrap:
                                         returnResult = html_GetFormInputHTML(FieldName, FieldValueText, , Width.ToString)
                                     End If
                                 '
-                                ' text private files, read from privatefiles and use text editor
+                                ' text cdnFiles files, read from cdnFiles and use text editor
                                 '
-                                Case FieldTypeIdFileTextPrivate
+                                Case FieldTypeIdFileText
                                     FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = cpCore.privateFiles.readFile(FieldValueText)
+                                        FieldValueText = cpCore.cdnFiles.readFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -2888,7 +2888,7 @@ ErrorTrap:
 
                             Dim FieldValuefilename As String = ""
                             Dim FieldValuePath As String = ""
-                            cpCore.privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
+                            cpCore.cdnFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
                             result = result & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                             result = result & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                             result = result & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
@@ -2913,7 +2913,7 @@ ErrorTrap:
                         Else
                             Dim FieldValuefilename As String = ""
                             Dim FieldValuePath As String = ""
-                            cpCore.privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
+                            cpCore.cdnFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
                             result = result & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                             result = result & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                             result = result & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
@@ -3014,7 +3014,7 @@ ErrorTrap:
                         If HtmlStyle <> "" Then
                             result = genericController.vbReplace(result, ">", " style=""" & HtmlStyle & """>")
                         End If
-                    Case FieldTypeIdLongText, FieldTypeIdFileTextPrivate
+                    Case FieldTypeIdLongText, FieldTypeIdFileText
                         '
                         '
                         '
@@ -3030,7 +3030,7 @@ ErrorTrap:
                         If HtmlStyle <> "" Then
                             result = genericController.vbReplace(result, ">", " style=""" & HtmlStyle & """>")
                         End If
-                    Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
+                    Case FieldTypeIdHTML, FieldTypeIdFileHTML
                         '
                         '
                         '
@@ -3994,17 +3994,23 @@ ErrorTrap:
                                                             Case Else
                                                                 '
                                                                 ' all other add-ons, pass out to cpCoreClass to process
-                                                                '
-                                                                Copy = cpCore.addon.execute_legacy6(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
-                                                                'Copy = "" _
-                                                                '    & "" _
-                                                                '    & "<!-- ADDON " _
-                                                                '    & """" & ACName & """" _
-                                                                '    & ",""" & AddonOptionStringHTMLEncoded & """" _
-                                                                '    & ",""" & ACInstanceID & """" _
-                                                                '    & ",""" & ACGuid & """" _
-                                                                '    & " -->" _
-                                                                '    & ""
+                                                                Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                                                    .addonType = CPUtilsBaseClass.addonContext.ContextEmail,
+                                                                    .cssContainerClass = "",
+                                                                    .cssContainerId = "",
+                                                                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                                                        .contentName = ContextContentName,
+                                                                        .fieldName = "",
+                                                                        .recordId = ContextRecordID
+                                                                    },
+                                                                    .personalizationAuthenticated = personalizationIsAuthenticated,
+                                                                    .personalizationPeopleId = personalizationPeopleId,
+                                                                    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, AddonOptionStringHTMLEncoded),
+                                                                    .instanceGuid = ACInstanceID
+                                                                }
+                                                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, ACName)
+                                                                Copy = cpCore.addon.execute(addon, executeContext)
+                                                                'Copy = cpCore.addon.execute_legacy6(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                                         End Select
                                                     End If
                                                 Else
@@ -5799,7 +5805,6 @@ ErrorTrap:
             Try
                 Dim FieldTypeDefaultEditorAddonIdList As String
                 Dim FieldTypeDefaultEditorAddonIds() As String
-                Dim addonOption_String As String
                 Dim FieldTypeDefaultEditorAddonId As Integer
                 '
                 FieldTypeDefaultEditorAddonIdList = editorController.getFieldTypeDefaultEditorAddonIdList(cpCore)
@@ -5815,22 +5820,38 @@ ErrorTrap:
                     '
                     ' use addon editor
                     '
-                    addonOption_String = "" _
-                        & "editorName=" & genericController.encodeNvaArgument(htmlName) _
-                        & "&editorValue=" & genericController.encodeNvaArgument(DefaultValue) _
-                        & "&editorFieldType=" & FieldTypeIdHTML _
-                        & "&editorReadOnly=" & readOnlyfield _
-                        & "&editorWidth=" & styleWidth _
-                        & "&editorHeight=" & styleHeight _
-                        & ""
-                    addonOption_String = addonOption_String _
-                        & "&editorAllowResourceLibrary=" & genericController.encodeNvaArgument(CStr(allowResourceLibrary)) _
-                        & "&editorAllowActiveContent=" & genericController.encodeNvaArgument(CStr(allowActiveContent)) _
-                        & "&editorAddonList=" & genericController.encodeNvaArgument(addonListJSON) _
-                        & "&editorStyles=" & genericController.encodeNvaArgument(styleList) _
-                        & "&editorStyleOptions=" & genericController.encodeNvaArgument(styleOptionList) _
-                        & ""
-                    returnHtml = cpCore.addon.execute_legacy4(FieldTypeDefaultEditorAddonId.ToString, addonOption_String, CPUtilsBaseClass.addonContext.ContextEditor)
+                    Dim arguments As New Dictionary(Of String, String)
+                    arguments.Add("editorName", htmlName)
+                    arguments.Add("editorValue", DefaultValue)
+                    arguments.Add("editorFieldType", FieldTypeIdHTML.ToString())
+                    arguments.Add("editorReadOnly", readOnlyfield.ToString())
+                    arguments.Add("editorWidth", styleWidth)
+                    arguments.Add("editorHeight", styleHeight)
+                    arguments.Add("editorAllowResourceLibrary", allowResourceLibrary.ToString())
+                    arguments.Add("editorAllowActiveContent", allowActiveContent.ToString())
+                    arguments.Add("editorAddonList", addonListJSON)
+                    arguments.Add("editorStyles", styleList)
+                    arguments.Add("editorStyleOptions", styleOptionList)
+                    returnHtml = cpCore.addon.execute(addonModel.create(cpCore, FieldTypeDefaultEditorAddonId), New CPUtilsBaseClass.addonExecuteContext() With {
+                        .addonType = CPUtilsBaseClass.addonContext.ContextEditor,
+                        .instanceArguments = arguments
+                    })
+                    'addonOption_String = "" _
+                    '    & "editorName=" & genericController.encodeNvaArgument(htmlName) _
+                    '    & "&editorValue=" & genericController.encodeNvaArgument(DefaultValue) _
+                    '    & "&editorFieldType=" & FieldTypeIdHTML _
+                    '    & "&editorReadOnly=" & readOnlyfield _
+                    '    & "&editorWidth=" & styleWidth _
+                    '    & "&editorHeight=" & styleHeight _
+                    '    & ""
+                    'addonOption_String = addonOption_String _
+                    '    & "&editorAllowResourceLibrary=" & genericController.encodeNvaArgument(CStr(allowResourceLibrary)) _
+                    '    & "&editorAllowActiveContent=" & genericController.encodeNvaArgument(CStr(allowActiveContent)) _
+                    '    & "&editorAddonList=" & genericController.encodeNvaArgument(addonListJSON) _
+                    '    & "&editorStyles=" & genericController.encodeNvaArgument(styleList) _
+                    '    & "&editorStyleOptions=" & genericController.encodeNvaArgument(styleOptionList) _
+                    '    & ""
+                    'returnHtml = cpCore.addon.execute_legacy4(FieldTypeDefaultEditorAddonId.ToString, addonOption_String, CPUtilsBaseClass.addonContext.ContextEditor)
                 End If
 
             Catch ex As Exception
@@ -6103,7 +6124,7 @@ ErrorTrap:
                         Do While FieldName <> ""
                             fieldType = cpCore.db.cs_getFieldTypeId(CS, FieldName)
                             Select Case fieldType
-                                Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
+                                Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTML
                                     Copy = cpCore.db.cs_get(CS, FieldName)
                                     PosACInstanceID = genericController.vbInstr(1, Copy, "ACInstanceID=""" & ACInstanceID & """", vbTextCompare)
                                     If PosACInstanceID <> 0 Then
@@ -7314,9 +7335,22 @@ ErrorTrap:
                                         Case ACTypeDynamicForm
                                             '
                                             ' Dynamic Form - run the core addon replacement instead
-                                            '
-                                            'hint = hint & ",310"
-                                            returnValue = returnValue & cpCore.addon.execute_legacy6(0, addonGuidDynamicForm, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                            Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                                .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                                .cssContainerClass = "",
+                                                .cssContainerId = "",
+                                                .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                                    .contentName = ContextContentName,
+                                                    .fieldName = "",
+                                                    .recordId = ContextRecordID
+                                                },
+                                                .personalizationAuthenticated = personalizationIsAuthenticated,
+                                                .personalizationPeopleId = iPersonalizationPeopleId,
+                                                .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
+                                            }
+                                            Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpCore, addonGuidDynamicForm)
+                                            returnValue &= cpCore.addon.execute(addon, executeContext)
+                                            'returnValue = returnValue & cpCore.addon.execute_legacy6(0, addonGuidDynamicForm, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                         Case ACTypeChildList
                                             '
                                             ' Child Page List
@@ -7411,10 +7445,27 @@ ErrorTrap:
                                     End If
                                 End If
                                 ' dont have any way of getting fieldname yet
+
+                                Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                    .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                    .cssContainerClass = "",
+                                    .cssContainerId = "",
+                                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                        .contentName = ContextContentName,
+                                        .fieldName = "",
+                                        .recordId = ContextRecordID
+                                    },
+                                    .personalizationAuthenticated = personalizationIsAuthenticated,
+                                    .personalizationPeopleId = iPersonalizationPeopleId,
+                                    .instanceGuid = ACInstanceID,
+                                    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
+                                }
                                 If AddonGuid <> "" Then
-                                    Copy = cpCore.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = cpCore.addon.execute(Models.Entity.addonModel.create(cpCore, AddonGuid), executeContext)
+                                    'Copy = cpCore.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 Else
-                                    Copy = cpCore.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = cpCore.addon.execute(Models.Entity.addonModel.createByName(cpCore, AddonName), executeContext)
+                                    'Copy = cpCore.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 End If
                             End If
                         End If
@@ -8349,16 +8400,30 @@ ErrorTrap:
         '
         '
         Public Function main_GetResourceLibrary2(ByVal RootFolderName As String, ByVal AllowSelectResource As Boolean, ByVal SelectResourceEditorName As String, ByVal SelectLinkObjectName As String, ByVal AllowGroupAdd As Boolean) As String
-            Dim Option_String As String
-            '
-            Option_String = "" _
-                & "RootFolderName=" & RootFolderName _
-                & "&AllowSelectResource=" & AllowSelectResource _
-                & "&SelectResourceEditorName=" & SelectResourceEditorName _
-                & "&SelectLinkObjectName=" & SelectLinkObjectName _
-                & "&AllowGroupAdd=" & AllowGroupAdd _
-                & ""
-            Return cpCore.addon.execute_legacy4("{564EF3F5-9673-4212-A692-0942DD51FF1A}", Option_String, CPUtilsBaseClass.addonContext.ContextAdmin)
+            Dim addonGuidResourceLibrary As String = "{564EF3F5-9673-4212-A692-0942DD51FF1A}"
+            Dim arguments As New Dictionary(Of String, String)
+            arguments.Add("RootFolderName", RootFolderName)
+            arguments.Add("AllowSelectResource", AllowSelectResource.ToString())
+            arguments.Add("SelectResourceEditorName", SelectResourceEditorName)
+            arguments.Add("SelectLinkObjectName", SelectLinkObjectName)
+            arguments.Add("AllowGroupAdd", AllowGroupAdd.ToString())
+            Return cpCore.addon.execute(
+                addonModel.create(cpCore, addonGuidResourceLibrary),
+                New CPUtilsBaseClass.addonExecuteContext() With {
+                    .addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
+                    .instanceArguments = arguments
+                }
+            )
+            'Dim Option_String As String
+            'Option_String = "" _
+            '    & "RootFolderName=" & RootFolderName _
+            '    & "&AllowSelectResource=" & AllowSelectResource _
+            '    & "&SelectResourceEditorName=" & SelectResourceEditorName _
+            '    & "&SelectLinkObjectName=" & SelectLinkObjectName _
+            '    & "&AllowGroupAdd=" & AllowGroupAdd _
+            '    & ""
+
+            'Return cpCore.addon.execute_legacy4(addonGuidResourceLibrary, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin)
         End Function
         '
         '========================================================================

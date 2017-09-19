@@ -1378,7 +1378,7 @@ ErrorTrap:
                                     ' not authorable
                                     '
                                     Stream.Add("<IMG src=""/ccLib/images/Spacer.gif"" width=""50"" height=""15"" border=""0""> " & .caption & " (not authorable field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdFileTextPrivate) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileText) Then
                                     '
                                     ' text filename can not be search
                                     '
@@ -1626,7 +1626,7 @@ ErrorTrap:
                                 DiagActions(0).Name = "Ignore, or handle this issue manually"
                                 DiagActions(0).Command = ""
                                 DiagActions(1).Name = "Mark all duplicate definitions inactive"
-                                DiagActions(1).Command = CStr(DiagActionContentDeDupe) & "," & cpCore.db.cs_getField(CSPointer, "name")
+                                DiagActions(1).Command = CStr(DiagActionContentDeDupe) & "," & cpCore.db.cs_getValue(CSPointer, "name")
                                 Stream.Add(GetDiagError(DiagProblem, DiagActions))
                                 Call cpCore.db.cs_goNext(CSPointer)
                             Loop
@@ -1767,7 +1767,7 @@ ErrorTrap:
                                                     ' ----- lookup type, read value and check lookup contentid
                                                     '
                                                     ErrorCount = cpCore.errorCount
-                                                    bitBucket = cpCore.db.cs_getField(CSTestRecord, FieldName)
+                                                    bitBucket = cpCore.db.cs_getValue(CSTestRecord, FieldName)
                                                     If ErrorCount <> cpCore.errorCount Then
                                                         DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" & ContentName & "].[" & FieldName & "]"
                                                         ReDim DiagActions(1)
@@ -1797,7 +1797,7 @@ ErrorTrap:
                                                     ' ----- check for value in database
                                                     '
                                                     ErrorCount = cpCore.errorCount
-                                                    bitBucket = cpCore.db.cs_getField(CSTestRecord, FieldName)
+                                                    bitBucket = cpCore.db.cs_getValue(CSTestRecord, FieldName)
                                                     If (ErrorCount <> cpCore.errorCount) Then
                                                         DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" & ContentName & "].[" & FieldName & "]"
                                                         ReDim DiagActions(3)
@@ -2383,7 +2383,7 @@ ErrorTrap:
                     Do While cpCore.db.cs_ok(CS)
                         '
                         TestTicks = GetTickCount
-                        TestCopy = genericController.encodeText(cpCore.db.cs_getField(CS, "Name"))
+                        TestCopy = genericController.encodeText(cpCore.db.cs_getValue(CS, "Name"))
                         ReadTicks = ReadTicks + GetTickCount - TestTicks
                         '
                         TestTicks = GetTickCount
@@ -2419,7 +2419,7 @@ ErrorTrap:
                     Do While cpCore.db.cs_ok(CS)
                         '
                         TestTicks = GetTickCount
-                        TestCopy = genericController.encodeText(cpCore.db.cs_getField(CS, "Name"))
+                        TestCopy = genericController.encodeText(cpCore.db.cs_getValue(CS, "Name"))
                         ReadTicks = ReadTicks + GetTickCount - TestTicks
                         '
                         TestTicks = GetTickCount
@@ -4383,36 +4383,24 @@ ErrorTrap:
         '=============================================================================
         '
         Private Function GetForm_ContentFileManager() As String
-            On Error GoTo ErrorTrap
-            '
-            'Dim QueryOld As String
-            'Dim QueryNew As String
-            Dim ButtonList As String
-            'Dim FileView As New FileViewClass
-            Dim IsContentManager As Boolean
-            Dim Adminui As New adminUIController(cpCore)
-            Dim Content As String
-            Dim Description As String
-            Dim InstanceOptionString As String
-            '
-            ButtonList = ButtonApply & "," & ButtonCancel
-            '
-            InstanceOptionString = "AdminLayout=1&filesystem=content files"
-            'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
-            Content = cpCore.addon.execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
-            'If Content = "" Then
-            '    IsContentManager = cpcore.authContext.user.main_IsContentManager()
-            '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
-            'End If
-            Description = "Manage files and folders within the virtual content file area."
-            GetForm_ContentFileManager = Adminui.GetBody("Content File Manager", ButtonList, "", False, False, Description, "", 0, Content)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ContentFileManager", "ErrorTrap")
+            Dim result As String = ""
+            Try
+                Dim Adminui As New adminUIController(cpCore)
+                Dim InstanceOptionString As String = "AdminLayout=1&filesystem=content files"
+                Dim addon As addonModel = addonModel.create(cpCore, "{B966103C-DBF4-4655-856A-3D204DEF6B21}")
+                Dim Content As String = cpCore.addon.execute(addon, New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {
+                    .addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
+                    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, InstanceOptionString),
+                    .instanceGuid = "-2",
+                    .errorCaption = "File Manager"
+                })
+                Dim Description As String = "Manage files and folders within the virtual content file area."
+                Dim ButtonList As String = ButtonApply & "," & ButtonCancel
+                result = Adminui.GetBody("Content File Manager", ButtonList, "", False, False, Description, "", 0, Content)
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '=============================================================================
@@ -4420,36 +4408,24 @@ ErrorTrap:
         '=============================================================================
         '
         Private Function GetForm_WebsiteFileManager() As String
-            On Error GoTo ErrorTrap
-            '
-            'Dim QueryOld As String
-            'Dim QueryNew As String
-            Dim ButtonList As String
-            'Dim FileView As New FileViewClass
-            Dim IsContentManager As Boolean
-            Dim Adminui As New adminUIController(cpCore)
-            Dim Content As String
-            Dim Description As String
-            Dim InstanceOptionString As String
-            '
-            ButtonList = ButtonApply & "," & ButtonCancel
-            '
-            InstanceOptionString = "AdminLayout=1&filesystem=website files"
-            'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
-            Content = cpCore.addon.execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
-            'If Content = "" Then
-            '    IsContentManager = cpcore.authContext.user.main_IsContentManager()
-            '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
-            'End If
-            Description = "Manage files and folders within the Website's file area."
-            GetForm_WebsiteFileManager = Adminui.GetBody("Website File Manager", ButtonList, "", False, False, Description, "", 0, Content)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_WebsiteFileManager", "ErrorTrap")
+            Dim result As String = ""
+            Try
+                Dim Adminui As New adminUIController(cpCore)
+                Dim InstanceOptionString As String = "AdminLayout=1&filesystem=website files"
+                Dim addon As addonModel = addonModel.create(cpCore, "{B966103C-DBF4-4655-856A-3D204DEF6B21}")
+                Dim Content As String = cpCore.addon.execute(addon, New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {
+                    .addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
+                    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, InstanceOptionString),
+                    .instanceGuid = "-2",
+                    .errorCaption = "File Manager"
+                })
+                Dim Description As String = "Manage files and folders within the Website's file area."
+                Dim ButtonList As String = ButtonApply & "," & ButtonCancel
+                result = Adminui.GetBody("Website File Manager", ButtonList, "", False, False, Description, "", 0, Content)
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '=============================================================================

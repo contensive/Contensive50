@@ -374,7 +374,7 @@ Namespace Contensive.Core.Controllers
                                                                                     Call cpCore.cdnFiles.copyFile(EditFilename, NewEditFilename)
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(NewEditFilename))
                                                                                 End If
-                                                                            Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
+                                                                            Case FieldTypeIdFileText, FieldTypeIdFileHTML
                                                                                 '
                                                                                 ' ----- private files - create copy of File for neweditrecord
                                                                                 '
@@ -384,7 +384,7 @@ Namespace Contensive.Core.Controllers
                                                                                 Else
                                                                                     NewEditFilename = getVirtualRecordPathFilename(EditTableName, FieldName, NewEditRecordID, "", fieldTypeId)
                                                                                     'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
-                                                                                    Call cpCore.privateFiles.copyFile(EditFilename, NewEditFilename)
+                                                                                    Call cpCore.cdnFiles.copyFile(EditFilename, NewEditFilename)
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(NewEditFilename))
                                                                                 End If
                                                                             Case Else
@@ -643,14 +643,14 @@ Namespace Contensive.Core.Controllers
                                                                     LiveSQLValue = cpCore.db.encodeSQLText(EditFilename)
                                                                 End If
                                                             End If
-                                                            If (fieldTypeId = FieldTypeIdFileTextPrivate) Or (fieldTypeId = FieldTypeIdFileHTMLPrivate) Then
+                                                            If (fieldTypeId = FieldTypeIdFileText) Or (fieldTypeId = FieldTypeIdFileHTML) Then
                                                                 '
                                                                 '   pivatefiles - create copy of Live TextFile for Edit record
                                                                 '
                                                                 LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
                                                                 If LiveFilename <> "" Then
                                                                     EditFilename = getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
-                                                                    Call cpCore.privateFiles.copyFile(LiveFilename, EditFilename)
+                                                                    Call cpCore.cdnFiles.copyFile(LiveFilename, EditFilename)
                                                                     LiveSQLValue = cpCore.db.encodeSQLText(EditFilename)
                                                                 End If
                                                             End If

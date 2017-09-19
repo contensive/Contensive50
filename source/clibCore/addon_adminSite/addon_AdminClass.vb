@@ -71,6 +71,7 @@ Namespace Contensive.Addons
                     returnHtml = cpCore.addon.execute(
                         Models.Entity.addonModel.create(cpCore, addonGuidLoginPage),
                         New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {
+                            .errorCaption = "Login Page",
                             .addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                         }
                     )
@@ -163,7 +164,6 @@ Namespace Contensive.Addons
                 Dim CurrentLink As String
                 Dim EditReferer As String
                 Dim ContentCell As String
-                Dim CS As Integer
                 Dim Stream As New stringBuilderLegacyController
                 Dim addonId As Integer
                 Dim AddonGuid As String
@@ -372,13 +372,15 @@ Namespace Contensive.Addons
                             Case AdminFormMetaKeywordTool
                                 ContentCell = GetForm_MetaKeywordTool()
                             Case AdminFormMobileBrowserControl, AdminFormPageControl, AdminFormEmailControl
-                                ContentCell = cpCore.addon.execute_legacy4(AddonGuidPreferences, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                                ContentCell = cpCore.addon.execute(addonModel.create(cpCore, AddonGuidPreferences), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, .errorCaption = "Preferences"})
+                                'ContentCell = cpCore.addon.execute_legacy4(AddonGuidPreferences, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                             Case AdminFormClearCache
                                 ContentCell = GetForm_ClearCache()
                             Case AdminFormEDGControl
-                                ContentCell = (GetForm_StaticPublishControl())
+                                ContentCell = GetForm_StaticPublishControl()
                             Case AdminFormSpiderControl
-                                ContentCell = cpCore.addon.execute_legacy4("Content Spider Control", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                                ContentCell = cpCore.addon.execute(addonModel.createByName(cpCore, "Content Spider Control"), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, .errorCaption = "Content Spider Control"})
+                                'ContentCell = cpCore.addon.execute_legacy4("Content Spider Control", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                             Case AdminFormResourceLibrary
                                 ContentCell = cpCore.html.main_GetResourceLibrary2("", False, "", "", True)
                             Case AdminFormQuickStats
@@ -407,11 +409,13 @@ Namespace Contensive.Addons
                             Case AdminformRSSControl
                                 Call cpCore.webServer.redirect("?cid=" & cpCore.metaData.getContentId("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
                             Case AdminFormImportWizard
-                                ContentCell = cpCore.addon.execute_legacy4(addonGuidImportWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                                ContentCell = cpCore.addon.execute(addonModel.create(cpCore, addonGuidImportWizard), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, .errorCaption = "Import Wizard"})
+                                'ContentCell = cpCore.addon.execute_legacy4(addonGuidImportWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                             Case AdminFormCustomReports
                                 ContentCell = GetForm_CustomReports()
                             Case AdminFormFormWizard
-                                ContentCell = cpCore.addon.execute_legacy4(addonGuidFormWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                                ContentCell = cpCore.addon.execute(addonModel.create(cpCore, addonGuidFormWizard), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, .errorCaption = "Form Wizard"})
+                                'ContentCell = cpCore.addon.execute_legacy4(addonGuidFormWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                             Case AdminFormLegacyAddonManager
                                 ContentCell = addonController.GetAddonManager(cpCore)
                             Case AdminFormEditorConfig
@@ -430,46 +434,36 @@ Namespace Contensive.Addons
                             Call cpCore.doc.addRefreshQueryString("addonguid", addonGuidAddonManager)
                             ContentCell = addonController.GetAddonManager(cpCore)
                         Else
+                            Dim addon As addonModel = Nothing
+                            Dim executeContextErrorCaption As String = "unknown"
                             If addonId <> 0 Then
+                                executeContextErrorCaption = "id:" & addonId
                                 Call cpCore.doc.addRefreshQueryString("addonid", CStr(addonId))
-                                CS = cpCore.db.csOpenRecord(cnAddons, addonId)
-                                If Not cpCore.db.cs_ok(CS) Then
-                                    Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its id " & addonId)
-                                End If
+                                addon = addonModel.create(cpCore, addonId)
                             ElseIf AddonGuid <> "" Then
+                                executeContextErrorCaption = "guid:" & AddonGuid
                                 Call cpCore.doc.addRefreshQueryString("addonguid", AddonGuid)
-                                '$$$$$ cache this
-                                If True Then ' 3.4.060" Then
-                                    CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(AddonGuid))
-                                Else
-                                    CS = cpCore.db.cs_open(cnAddons, "aoguid=" & cpCore.db.encodeSQLText(AddonGuid))
-                                End If
-                                If Not cpCore.db.cs_ok(CS) Then
-                                    Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its guid " & AddonGuid)
-                                End If
+                                addon = addonModel.create(cpCore, AddonGuid)
                             ElseIf AddonName <> "" Then
+                                executeContextErrorCaption = AddonName
                                 Call cpCore.doc.addRefreshQueryString("addonname", AddonName)
-                                CS = cpCore.db.cs_open(cnAddons, "name=" & cpCore.db.encodeSQLText(AddonName))
-                                If Not cpCore.db.cs_ok(CS) Then
-                                    Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its name " & AddonName)
-                                End If
+                                addon = addonModel.createByName(cpCore, AddonName)
                             End If
-                            If cpCore.db.cs_ok(CS) Then
-                                addonId = cpCore.db.cs_getInteger(CS, "ID")
-                                AddonName = cpCore.db.cs_getText(CS, "name")
-                                AddonHelpCopy = cpCore.db.cs_getText(CS, "help")
+                            If (addon IsNot Nothing) Then
+                                addonId = addon.id
+                                AddonName = addon.name
+                                AddonHelpCopy = addon.Help
                                 Call cpCore.doc.addRefreshQueryString(RequestNameRunAddon, addonId.ToString)
                             End If
-                            Call cpCore.db.cs_Close(CS)
                             InstanceOptionString = cpCore.userProperty.getText("Addon [" & AddonName & "] Options", "")
-                            ' default wrapper does not apply to admin
                             DefaultWrapperID = -1
-                            'DefaultWrapperID = cpCore.main_GetSiteProperty2("DefaultWrapperID", "0")
-                            ContentCell = cpCore.addon.execute_legacy1(addonId, "", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, AddonName, "-2", DefaultWrapperID)
-                            ' no must allow for an add-on to return blank to return to root
-                            'If ContentCell = "" Then
-                            '    ContentCell = "<div class=""ccAdminMsg"">The Add-on you requested did not return a valid response.</div>"
-                            'End If
+                            ContentCell = cpCore.addon.execute(addon, New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {
+                                .addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
+                                .instanceGuid = "-2",
+                                .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, InstanceOptionString),
+                                .wrapperID = DefaultWrapperID,
+                                .errorCaption = executeContextErrorCaption
+                            })
                         End If
                     Else
                         '
@@ -481,7 +475,8 @@ Namespace Contensive.Addons
                     ' include fancybox if it was needed
                     '
                     If includeFancyBox Then
-                        Call cpCore.addon.execute_legacy4(addonGuidjQueryFancyBox)
+                        Call cpCore.addon.executeDependency(addonModel.create(cpCore, addonGuidjQueryFancyBox), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin})
+                        'Call cpCore.addon.execute_legacy4(addonGuidjQueryFancyBox)
                         Call cpCore.html.addHeadJavascriptCode("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});", "")
                     End If
                     '
@@ -2051,10 +2046,10 @@ ErrorTrap:
                                 Select Case .fieldTypeId
                                     Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                         DBValueVariant = ""
-                                    Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
+                                    Case FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTML
                                         DBValueVariant = cpCore.db.cs_get(CSPointer, .nameLc)
                                     Case Else
-                                        DBValueVariant = cpCore.db.cs_getField(CSPointer, .nameLc)
+                                        DBValueVariant = cpCore.db.cs_getValue(CSPointer, .nameLc)
                                 End Select
                                 '
                                 ' Check for required and null case loading error
@@ -2557,7 +2552,7 @@ ErrorTrap:
                                             If Left(LCase(ResponseFieldValueText), 4) = "www." Then
                                                 ResponseFieldValueText = "http//" & ResponseFieldValueText
                                             End If
-                                        Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
+                                        Case FieldTypeIdHTML, FieldTypeIdFileHTML
                                             '
                                             ' ----- Html fields
                                             '
@@ -3335,7 +3330,7 @@ ErrorTrap:
                                             RecordChanged = True
                                             Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
                                         End If
-                                    Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
+                                    Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTML
                                         '
                                         ' Text
                                         '
@@ -3578,7 +3573,7 @@ ErrorTrap:
                                 FieldText = Mid(FieldText, 1, 50) & "[more]"
                             End If
                             Stream.Add(FieldText)
-                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
+                        Case FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTML
                             ' rw( "n/a" )
                             Filename = cpCore.db.cs_get(CS, .nameLc)
                             If Filename <> "" Then
@@ -5203,7 +5198,7 @@ ErrorTrap:
                     '
                     ' There are no visible fiels, return empty
                     '
-                    Throw (New ApplicationException("The content definition for this record is invalid. It contains no valid fields."))
+                    cpCore.handleException(New ApplicationException("The content definition for this record is invalid. It contains no valid fields."))
                 Else
                     RecordReadOnly = ForceReadOnly
                     '
@@ -5354,7 +5349,7 @@ ErrorTrap:
                                 '    & "&editorWidth=" _
                                 '    & "&editorHeight=" _
                                 '    & ""
-                                If genericController.EncodeBoolean((fieldTypeId = FieldTypeIdHTML) Or (fieldTypeId = FieldTypeIdFileHTMLPrivate)) Then
+                                If genericController.EncodeBoolean((fieldTypeId = FieldTypeIdHTML) Or (fieldTypeId = FieldTypeIdFileHTML)) Then
                                     '
                                     ' include html related arguments
                                     '
@@ -5373,7 +5368,8 @@ ErrorTrap:
                                     '    & "&editorStyleOptions=" & genericController.encodeNvaArgument(styleOptionList) _
                                     '    & ""
                                 End If
-                                EditorString = cpCore.addon.execute_legacy6(editorAddonID, "", addonOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", 0, False)
+                                EditorString = cpCore.addon.execute(addonModel.create(cpCore, editorAddonID), New BaseClasses.CPUtilsBaseClass.addonExecuteContext With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor, .errorCaption = "field editor id:" & editorAddonID})
+                                'EditorString = cpCore.addon.execute_legacy6(editorAddonID, "", addonOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", 0, False)
                                 useEditorAddon = Not String.IsNullOrEmpty(EditorString)
                                 If useEditorAddon Then
                                     '
@@ -5481,7 +5477,7 @@ ErrorTrap:
                                             Else
                                                 Dim filename As String = ""
                                                 Dim path As String = ""
-                                                cpCore.privateFiles.splitPathFilename(FieldValueText, path, filename)
+                                                cpCore.cdnFiles.splitPathFilename(FieldValueText, path, filename)
                                                 EditorString &= ("&nbsp;<a href=""http://" & EncodedLink & """ target=""_blank"">" & SpanClassAdminSmall & "[" & filename & "]</A>")
                                             End If
                                             EditorString &= WhyReadOnlyMsg
@@ -5602,7 +5598,7 @@ ErrorTrap:
                                             EditorString &= (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , True, "number"))
                                             EditorString &= WhyReadOnlyMsg
                                             '
-                                        Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
+                                        Case FieldTypeIdHTML, FieldTypeIdFileHTML
                                             '
                                             ' ----- HTML types
                                             '
@@ -5652,7 +5648,7 @@ ErrorTrap:
                                                 '
                                                 EditorString &= cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , True, "text")
                                             End If
-                                        Case FieldTypeIdLongText, FieldTypeIdFileTextPrivate
+                                        Case FieldTypeIdLongText, FieldTypeIdFileText
                                             '
                                             ' ----- LongText, TextFile
                                             '
@@ -5742,7 +5738,7 @@ ErrorTrap:
                                                 EncodedLink = genericController.encodeHTML(NonEncodedLink)
                                                 Dim filename As String = ""
                                                 Dim path As String = ""
-                                                cpCore.privateFiles.splitPathFilename(FieldValueText, path, filename)
+                                                cpCore.cdnFiles.splitPathFilename(FieldValueText, path, filename)
                                                 EditorString &= ("&nbsp;<a href=""http://" & EncodedLink & """ target=""_blank"">" & SpanClassAdminSmall & "[" & filename & "]</A>")
                                                 EditorString &= ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html.html_GetFormInputCheckBox2(FormFieldLCaseName & ".DeleteFlag", False))
                                                 EditorString &= ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.html.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
@@ -5780,7 +5776,9 @@ ErrorTrap:
                                                     EditorString &= cpCore.html.getInputSelectList2(FormFieldLCaseName, FieldValueInteger, .lookupList, "", "", "select")
                                                 End If
                                             Else
-                                                Throw (New ApplicationException("Field [" & FieldName & "] is a Lookup field, but no LookupContent or LookupList has been configured"))
+                                                '
+                                                ' -- log exception but dont throw
+                                                cpCore.handleException(New ApplicationException("Field [" & FieldName & "] is a Lookup field, but no LookupContent or LookupList has been configured"))
                                                 EditorString &= "[Selection not configured]"
                                             End If
                                             '
@@ -5906,7 +5904,7 @@ ErrorTrap:
                                                 End If
                                             End If
                                             '
-                                        Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
+                                        Case FieldTypeIdHTML, FieldTypeIdFileHTML
                                             '
                                             ' content is html
                                             '
@@ -5942,7 +5940,7 @@ ErrorTrap:
                                                 FieldOptionRow = "&nbsp;"
                                             End If
                                             '
-                                        Case FieldTypeIdLongText, FieldTypeIdFileTextPrivate
+                                        Case FieldTypeIdLongText, FieldTypeIdFileText
                                             '
                                             ' -- Long Text, use text editor
                                             '
@@ -7094,7 +7092,8 @@ ErrorTrap:
                         & "<div style=""clear:both;margin-top:20px;"">&nbsp;</div>" _
                         & "<div style=""clear:both;margin-top:20px;"">" & errorController.error_GetUserError(cpCore) & "</div>"
                     End If
-                    returnHtml = returnHtml & cpCore.addon.execute_legacy4(CStr(addonId), "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                    returnHtml &= cpCore.addon.execute(addonModel.create(cpCore, addonId), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, .errorCaption = "id:" & addonId})
+                    'returnHtml = returnHtml & cpCore.addon.execute_legacy4(CStr(addonId), "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                 End If
                 If returnHtml = "" Then
                     '
@@ -8868,21 +8867,9 @@ ErrorTrap:
                     AdminFormBottom = AdminFormBottom & cr & "</div>"
                 Else
                     '
-                    ' #Navigator is to the right, #Content is to the left
-                    '
-                    '
-                    ' --- Menu Mode Left
-                    '
-                    '        Stream.Add( "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">")
-                    '        Stream.Add( "<tr><td width=""10"" valign=""top"" align=""left"">")
-                    '        Stream.Add( GetMenuLeftMode())
-                    '        Stream.Add( "</td>")
-                    '        Stream.Add( "<td width=""100%"" valign=""top"" align=""left"">")
-                    '        AdminFormBottom = AdminFormBottom & "</td></tr></table>"
-                    '
-                    ' Admin Navigator
-                    '
-                    AdminNavFull = cpCore.addon.execute_legacy4(AdminNavigatorGuid)
+                    ' -- Admin Navigator
+                    AdminNavFull = cpCore.addon.execute(addonModel.create(cpCore, AdminNavigatorGuid), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, .errorCaption = "Admin Navigator"})
+                    'AdminNavFull = cpCore.addon.execute_legacy4(AdminNavigatorGuid)
                     Stream.Add("" _
                         & cr & "<table border=0 cellpadding=0 cellspacing=0><tr>" _
                         & cr & "<td class=""ccToolsCon"" valign=top>" _
@@ -14418,7 +14405,7 @@ ErrorTrap:
                             '                        & "</tr></table>" _
                             '                        & "</td>" _
                             '                        & "</tr>"
-                            Case FieldTypeIdText, FieldTypeIdLongText, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate, FieldTypeIdFileCSS, FieldTypeIdFileJavascript, FieldTypeIdFileXML
+                            Case FieldTypeIdText, FieldTypeIdLongText, FieldTypeIdHTML, FieldTypeIdFileHTML, FieldTypeIdFileCSS, FieldTypeIdFileJavascript, FieldTypeIdFileXML
                                 '
                                 ' Text
                                 '
@@ -15288,12 +15275,12 @@ ErrorTrap:
                                     ' file can not be search
                                     '
                                     Stream.Add("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""50"" height=""15"" border=""0"" > " & .caption & " (file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdFileTextPrivate) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileText) Then
                                     '
                                     ' filename can not be search
                                     '
                                     Stream.Add("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""50"" height=""15"" border=""0"" > " & .caption & " (text file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdFileHTMLPrivate) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileHTML) Then
                                     '
                                     ' filename can not be search
                                     '
@@ -16573,7 +16560,7 @@ ErrorTrap:
                         ' disallow IncludedInColumns if a non-supported field type
                         '
                         Select Case .fieldTypeId
-                            Case FieldTypeIdFileCSS, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileJavascript, FieldTypeIdLongText, FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileTextPrivate, FieldTypeIdFileXML, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
+                            Case FieldTypeIdFileCSS, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileJavascript, FieldTypeIdLongText, FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileText, FieldTypeIdFileXML, FieldTypeIdHTML, FieldTypeIdFileHTML
                                 IncludedInColumns = False
                         End Select
                         'FieldName = genericController.vbLCase(.Name)

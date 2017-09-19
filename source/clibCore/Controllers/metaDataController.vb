@@ -378,8 +378,8 @@ Namespace Contensive.Core.Controllers
                                                 If fieldHtmlContent Then
                                                     If fieldTypeId = FieldTypeIdLongText Then
                                                         fieldTypeId = FieldTypeIdHTML
-                                                    ElseIf fieldTypeId = FieldTypeIdFileTextPrivate Then
-                                                        fieldTypeId = FieldTypeIdFileHTMLPrivate
+                                                    ElseIf fieldTypeId = FieldTypeIdFileText Then
+                                                        fieldTypeId = FieldTypeIdFileHTML
                                                     End If
                                                 End If
                                                 .active = genericController.EncodeBoolean(row.Item(24))
@@ -816,7 +816,7 @@ Namespace Contensive.Core.Controllers
                                                     Select Case field.nameLc
                                                         Case "ID", "EDITSOURCEID", "EDITARCHIVE", ""
                                                         Case Else
-                                                            If (field.fieldTypeId = FieldTypeIdFileTextPrivate) Or (field.fieldTypeId = FieldTypeIdFileHTMLPrivate) Then
+                                                            If (field.fieldTypeId = FieldTypeIdFileText) Or (field.fieldTypeId = FieldTypeIdFileHTML) Then
                                                                 '
                                                                 ' create new text file and copy field - private files
                                                                 '
@@ -826,11 +826,11 @@ Namespace Contensive.Core.Controllers
                                                                     EditFilename = getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
-                                                                        Copy = cpCore.privateFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
+                                                                        Copy = cpCore.cdnFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
                                                                     End If
                                                                     'Copy = contentFiles.ReadFile(LiveFilename)
                                                                     If Copy <> "" Then
-                                                                        Call cpCore.privateFiles.saveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+                                                                        Call cpCore.cdnFiles.saveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
                                                                         'Call publicFiles.SaveFile(EditFilename, Copy)
                                                                     End If
                                                                 End If
@@ -1917,12 +1917,6 @@ ErrorTrap:
                 Dim EditTab As String
                 Dim Scramble As Boolean
                 Dim LookupList As String
-                Dim ManyToManyContent As String
-                Dim ManyToManyContentID As Integer
-                Dim ManyToManyRuleContent As String
-                Dim ManyToManyRuleContentID As Integer
-                Dim ManyToManyRulePrimaryField As String
-                Dim ManyToManyRuleSecondaryField As String
                 Dim rs As DataTable
                 Dim isNewFieldRecord As Boolean = True
                 '
@@ -1976,12 +1970,10 @@ ErrorTrap:
                     FieldCaption = field.caption
                     FieldReadOnly = field.ReadOnly
                     fieldTypeId = field.fieldTypeId
-                    'FieldSortOrder = field.indexSortOrder
                     FieldAuthorable = field.authorable
                     DefaultValue = genericController.encodeText(field.defaultValue)
                     NotEditable = field.NotEditable
                     LookupContentName = field.lookupContentName(cpCore)
-                    'field.indexColumn = field.indexColumn
                     AdminIndexWidth = field.indexWidth
                     AdminIndexSort = field.indexSortOrder
                     RedirectContentName = field.RedirectContentName(cpCore)
@@ -1998,38 +1990,6 @@ ErrorTrap:
                     EditTab = field.editTabName
                     Scramble = field.Scramble
                     LookupList = field.lookupList
-                    ManyToManyContent = field.ManyToManyContentName(cpCore)
-                    ManyToManyRuleContent = field.ManyToManyRuleContentName(cpCore)
-                    ManyToManyRulePrimaryField = field.ManyToManyRulePrimaryField
-                    ManyToManyRuleSecondaryField = field.ManyToManyRuleSecondaryField
-                    '
-                    If RedirectContentName <> "" Then
-                        RedirectContentID = cpCore.metaData.getContentId(RedirectContentName)
-                        If RedirectContentID <= 0 Then
-                            Throw (New Exception("Could Not create redirect For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For RedirectContentName [" & RedirectContentName & "]."))
-                        End If
-                    End If
-                    '
-                    If LookupContentName <> "" Then
-                        LookupContentID = cpCore.metaData.getContentId(LookupContentName)
-                        If LookupContentID <= 0 Then
-                            Throw (New Exception("Could Not create lookup For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For [" & LookupContentName & "]."))
-                        End If
-                    End If
-                    '
-                    If ManyToManyContent <> "" Then
-                        ManyToManyContentID = cpCore.metaData.getContentId(ManyToManyContent)
-                        If ManyToManyContentID <= 0 Then
-                            Throw (New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyContent [" & ManyToManyContent & "]."))
-                        End If
-                    End If
-                    '
-                    If ManyToManyRuleContent <> "" Then
-                        ManyToManyRuleContentID = cpCore.metaData.getContentId(ManyToManyRuleContent)
-                        If ManyToManyRuleContentID <= 0 Then
-                            Throw (New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyRuleContent [" & ManyToManyRuleContent & "]."))
-                        End If
-                    End If
                     '
                     ' ----- Check error conditions before starting
                     '
@@ -2137,7 +2097,6 @@ ErrorTrap:
                             Call sqlList.add("INDEXCOLUMN", cpCore.db.encodeSQLNumber(field.indexColumn)) ' Pointer)
                             Call sqlList.add("INDEXWIDTH", cpCore.db.encodeSQLText(AdminIndexWidth)) ' Pointer)
                             Call sqlList.add("INDEXSORTPRIORITY", cpCore.db.encodeSQLNumber(AdminIndexSort)) ' Pointer)
-                            Call sqlList.add("REDIRECTCONTENTID", cpCore.db.encodeSQLNumber(RedirectContentID)) ' Pointer)
                             Call sqlList.add("REDIRECTID", cpCore.db.encodeSQLText(RedirectIDField)) ' Pointer)
                             Call sqlList.add("REDIRECTPATH", cpCore.db.encodeSQLText(RedirectPath)) ' Pointer)
                             Call sqlList.add("UNIQUENAME", cpCore.db.encodeSQLBoolean(UniqueName)) ' Pointer)
@@ -2147,12 +2106,55 @@ ErrorTrap:
                             Call sqlList.add("installedByCollectionId", cpCore.db.encodeSQLNumber(InstalledByCollectionID)) ' Pointer)
                             Call sqlList.add("EDITTAB", cpCore.db.encodeSQLText(EditTab)) ' Pointer)
                             Call sqlList.add("SCRAMBLE", cpCore.db.encodeSQLBoolean(Scramble)) ' Pointer)
-                            Call sqlList.add("LOOKUPLIST", cpCore.db.encodeSQLText(LookupList)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYCONTENTID", cpCore.db.encodeSQLNumber(ManyToManyContentID)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYRULECONTENTID", cpCore.db.encodeSQLNumber(ManyToManyRuleContentID)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYRULEPRIMARYFIELD", cpCore.db.encodeSQLText(ManyToManyRulePrimaryField)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYRULESECONDARYFIELD", cpCore.db.encodeSQLText(ManyToManyRuleSecondaryField)) ' Pointer)
                             Call sqlList.add("ISBASEFIELD", cpCore.db.encodeSQLBoolean(IsBaseField)) ' Pointer)
+                            '
+                            ' -- conditional fields
+                            Select Case fieldTypeId
+                                Case FieldTypeIdLookup
+                                    '
+                                    ' -- lookup field
+                                    '
+                                    If LookupContentName <> "" Then
+                                        LookupContentID = cpCore.metaData.getContentId(LookupContentName)
+                                        If LookupContentID <= 0 Then
+                                            logController.appendLog(cpCore, "Could not create lookup field [" & field.nameLc & "] for content definition [" & ContentName & "] because no content definition was found For lookup-content [" & LookupContentName & "].")
+                                        End If
+                                    End If
+                                    Call sqlList.add("LOOKUPLIST", cpCore.db.encodeSQLText(LookupList))
+                                Case FieldTypeIdManyToMany
+                                    '
+                                    ' -- many-to-many field
+                                    '
+                                    Dim ManyToManyContent As String = field.ManyToManyContentName(cpCore)
+                                    If ManyToManyContent <> "" Then
+                                        Dim ManyToManyContentID As Integer = cpCore.metaData.getContentId(ManyToManyContent)
+                                        If ManyToManyContentID <= 0 Then
+                                            logController.appendLog(cpCore, "Could not create many-to-many field [" & field.nameLc & "] for [" & ContentName & "] because no content definition was found For many-to-many-content [" & ManyToManyContent & "].")
+                                        End If
+                                        Call sqlList.add("MANYTOMANYCONTENTID", cpCore.db.encodeSQLNumber(ManyToManyContentID))
+                                    End If
+                                    '
+                                    Dim ManyToManyRuleContent As String = field.ManyToManyRuleContentName(cpCore)
+                                    If ManyToManyRuleContent <> "" Then
+                                        Dim ManyToManyRuleContentID As Integer = cpCore.metaData.getContentId(ManyToManyRuleContent)
+                                        If ManyToManyRuleContentID <= 0 Then
+                                            logController.appendLog(cpCore, "Could not create many-to-many field [" & field.nameLc & "] for [" & ContentName & "] because no content definition was found For many-to-many-rule-content [" & ManyToManyRuleContent & "].")
+                                        End If
+                                        Call sqlList.add("MANYTOMANYRULECONTENTID", cpCore.db.encodeSQLNumber(ManyToManyRuleContentID))
+                                    End If
+                                    Call sqlList.add("MANYTOMANYRULEPRIMARYFIELD", cpCore.db.encodeSQLText(field.ManyToManyRulePrimaryField))
+                                    Call sqlList.add("MANYTOMANYRULESECONDARYFIELD", cpCore.db.encodeSQLText(field.ManyToManyRuleSecondaryField))
+                                Case FieldTypeIdRedirect
+                                    '
+                                    ' -- redirect field
+                                    If RedirectContentName <> "" Then
+                                        RedirectContentID = cpCore.metaData.getContentId(RedirectContentName)
+                                        If RedirectContentID <= 0 Then
+                                            logController.appendLog(cpCore, "Could not create redirect field [" & field.nameLc & "] for Content Definition [" & ContentName & "] because no content definition was found For redirect-content [" & RedirectContentName & "].")
+                                        End If
+                                    End If
+                                    Call sqlList.add("REDIRECTCONTENTID", cpCore.db.encodeSQLNumber(RedirectContentID)) ' Pointer)
+                            End Select
                             '
                             If RecordID = 0 Then
                                 Call sqlList.add("NAME", cpCore.db.encodeSQLText(field.nameLc)) ' Pointer)

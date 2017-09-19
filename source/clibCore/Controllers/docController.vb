@@ -441,7 +441,9 @@ Namespace Contensive.Core.Controllers
             Get
                 Dim returnStatus As Boolean = False
                 If Not siteStructure_LocalLoaded Then
-                    siteStructure = Me.cpcore.addon.execute_legacy2(0, addonGuidSiteStructureGuid, "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
+                    Dim addon As addonModel = addonModel.create(cpcore, addonGuidSiteStructureGuid)
+                    siteStructure = Me.cpcore.addon.execute(addon, New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextSimple})
+                    'siteStructure = Me.cpcore.addon.execute_legacy2(0, addonGuidSiteStructureGuid, "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
                     siteStructure_LocalLoaded = True
                 End If
                 main_SiteStructure = siteStructure
@@ -461,7 +463,6 @@ Namespace Contensive.Core.Controllers
             '
             Dim RootPageContentName As String = Models.Entity.pageContentModel.contentName
             Dim LiveRecordContentName As String = Models.Entity.pageContentModel.contentName
-            Dim AddonStatusOK As Boolean
             Dim Link As String
             Dim page_ParentID As Integer
             Dim PageList As String
@@ -612,7 +613,19 @@ Namespace Contensive.Core.Controllers
             '
             ' ----- Child pages
             '
-            PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+            Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, cpcore.siteProperties.childListAddonID)
+            Dim executeContext As New CPUtilsBaseClass.addonExecuteContext With {
+                .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                    .contentName = Models.Entity.pageContentModel.contentName,
+                    .fieldName = "",
+                    .recordId = page.id
+                },
+                .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpcore, page.ChildListInstanceOptions),
+                .instanceGuid = PageChildListInstanceID
+            }
+            PageList = cpcore.addon.execute(addon, executeContext)
+            'PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
             If genericController.vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
                 PageList = "(there are no child pages)"
             End If

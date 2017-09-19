@@ -7,6 +7,7 @@ Imports Contensive.BaseClasses
 Imports Contensive.Core.Controllers.genericController
 
 Imports System.Xml
+Imports Contensive.Core.Models.Entity
 
 Namespace Contensive.Core.Controllers
     '
@@ -46,143 +47,6 @@ Namespace Contensive.Core.Controllers
         End Property
         Private _addonInstall As addonInstallClass
         '
-        '=============================================================================================================
-        '   Get Addon Content - internal (to support include add-ons)
-        '
-        '   Argument field in addons is encode as "AddonOptionConstructor"
-        '   the input argument OptionString to executeAddon is encoded as "OptionString"
-        '       delmited with "&" and all elements encoded with encodeNvaArgument
-        '   the optionstring passed to addons is like OptionString encoding, except it is crlf delimited
-        '       only ever decode with cpcore.getAddonOption( name, string )
-        '
-        '
-        '   OptionString
-        '       This is a string, similar to a QueryString.
-        '           It is used (htmlencoded) in AC Edit Icons to hold instance properties in the 5th comma delimited position of the AC Tag's ID attribute
-        '           It is (htmlencoded) in AC Tags as the QueryString value "... Querystring=OptionString ..."
-        '           It is used internally to carry properties from the csv to the websclient for:
-        '               1) AC tags that have to be executed at the webclient but are interpreted in the cmc.csv_
-        '                   not htmlencoded
-        '                   like {{ACTextBox?name=&new name=text name}}
-        '               2) Addons found in csv during csv_EncodeContent that must be executed in the webclient.
-        '                   htmlencoded
-        '                   <!-- Addon "acname","htmlencodedOptionString","instanceid" -->
-        '       This is called "AddonOption" format, or AddonOptionEncoding
-        '       It usually contains the instance prefernces for the Add-on placed in the content
-        '       It's basic form is:
-        '           name=value[selector]&name=value[selector]
-        '           ( why are the selector's necessary, since the add-on will be looked up before arguments are prepared for any editor )
-        '       To get a value from the string:
-        '           value = cpcore.csv_GetAddonOption( OptionString )
-        '           csv_DecodeAddonOptionArgument(RemoveSelector(GetArgument(name,string,default,"&")))
-        '       To add a value to the string
-        '           s = s & "&" & encodeNvaArgument(name) & "=" & encodeNvaArgument(value)
-        '       "&" delimits the name=value pairs
-        '       encodeNvaArgument() is used to encode each name and value
-        '       csv_DecodeAddonOptionArgument() is used to decode each name and value
-        '       Previously, I wrote:
-        '           this is the name=value&name=value set of arguments that come from the AC tag in the content
-        '           it includes all name=value pairs set the last time the page was edited.
-        '           it may contain names that are not in the add-on, these may be valid
-        '
-        '   AddonOptionConstructor
-        '       This is the format saved in the addon record in the argument field.
-        '       This is as crlf delimited list of name=default[selector] that is stored in the Add-on record and controls the building of the instance selectors
-        '       It's basic form is:
-        '           name=DefaultValue[selector]descriptor
-        '           name=DefaultValue[option:integer|option:integer]descriptor
-        '           name=DefaultValue[option:integer|option:integer]descriptor
-        '           name=DefaultValue[list(contentname)]descriptor
-        '       for example:
-        '           link=http://www.contensive.com/index.asp?i=1\&u=2
-        '
-        '       This is called "AddonConstructor" format, or AddonConstructorEncoding
-        '           ConstructorEncoding is similiar to how javascript encodes strings
-        '           This standard is used because it is visible to the end user
-        '           name can not include:
-        '               '\', instead use '\\'
-        '               '=', instead use '\='
-        '           DefaultValue can not include:
-        '               '\', instead use '\\'
-        '               '[', instead use '\['
-        '               ']', instead use '\]'
-        '               ':', instead use '\:'
-        '               newline, instead use '\n'
-        '           selector can not include:
-        '               '['
-        '               ']'
-        '               '|'
-        '
-        '       crlf delimits arguments
-        '       EncodeAddonConstructorArgument() is used to encode each name and value
-        '       DecodeAddonConstructorArgument() is used to decode each name and value
-        '
-        '   AddonOptionNameValueList
-        '       This is as crlf delimited list of name=value that is sent to the Add-ons in the OptionString
-        '
-        '   AddonOptionExpandedConstructor
-        '       passed to the editors to create instance selectors
-        '       Similar to the AddonOptionConstructor, but all the list and listid functions are expanded
-        '
-        '
-        '
-        '   Wrappers
-        '       Instance WrapperID is forced into the Instance properies, choose from:
-        '           none = -1
-        '           default = 0, use the DefaultWrapperId passed into the call
-        '           or id of a wrapper record
-        '
-        '   Context
-        '       These values represent the situation around the call for execute cpcore.addon. This determines the
-        '       type of data returned, and other actions taken. For instance, a ContextPage is used when the add-on
-        '       results will be put on a page for output. In this case, javascript in the add-on will be put into
-        '       the current document head.
-        '       * these are in CPUtilsBaseClass.addonContext and are duplicated in the contentserver object also
-        '       ContextPage = 1
-        '       ContextAdmin = 2
-        '       ContextTemplate = 3
-        '       ContextEmail = 4
-        '       ContextRemoteMethod = 5
-        '       ContextOnNewVisit = 6
-        '       ContextOnPageEnd = 7
-        '       ContextOnPageStart = 8
-        '       ContextEditor = 9
-        '       ContextHelpUser = 10
-        '       ContextHelpAdmin = 11
-        '       ContextHelpDeveloper = 12
-        '       ContextOnContentChange = 13
-        '       ContextFilter = 14
-        '       ContextSimple = 15
-        '       ContextOnBodyStart = 16
-        '       ContextOnBodyEnd = 17
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' execute addon
-        ''' </summary>
-        ''' <param name="addonId">The Id of the addon to execute.</param>
-        ''' <param name="properties">properties are nameValue pairs consumable by the addon during execution. These properties are added to cpcore.docproperties and made available. Originally this argument was for the nameValues modified in the page instance where the addon was placed.</param>
-        ''' <param name="context">member of CPUtilsBaseClass.addonContext</param>
-        ''' <returns></returns>
-        Public Function execute_legacy7(ByVal addonId As Integer, arguments As Dictionary(Of String, String), context As CPUtilsBaseClass.addonContext) As String
-            Dim result As String = String.Empty
-            Try
-                Dim optionString As String = ""
-                For Each kvp As KeyValuePair(Of String, String) In arguments
-                    If Not String.IsNullOrEmpty(kvp.Key) Then
-                        optionString &= "&" & EncodeRequestVariable(kvp.Key) & "=" & EncodeRequestVariable(kvp.Value)
-                    End If
-                Next
-                If Not String.IsNullOrEmpty(optionString) Then
-                    optionString = optionString.Substring(1)
-                End If
-                result = execute_legacy6(addonId, "", optionString, context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", 0, False)
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return result
-        End Function
-        '
         '====================================================================================================
         ''' <summary>
         ''' Execute an addon because it is a dependency of another addon/page/template
@@ -190,299 +54,298 @@ Namespace Contensive.Core.Controllers
         ''' <param name="addonId"></param>
         ''' <param name="context"></param>
         ''' <returns></returns>
-        Public Function executeDependency(ByVal addonId As Integer, context As CPUtilsBaseClass.addonContext, HostContentName As String, hostRecordId As Integer, hostFieldName As String, acInstanceId As String, defaultWrapperId As Integer, ByRef ignoreBoolean As Boolean, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
-            Dim result As String = String.Empty
-            Try
-                Dim optionString As String = ""
-                result = execute_legacy6(addonId, "", "", context, HostContentName, hostRecordId, hostFieldName, acInstanceId, True, defaultWrapperId, "", False, Nothing, "," & addonId, Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
+        ''' 
+        Public Function executeDependency(addon As Models.Entity.addonModel, context As CPUtilsBaseClass.addonExecuteContext) As String
+            Dim saveContextIsIncludeAddon As Boolean = context.isIncludeAddon
+            context.isIncludeAddon = True
+            Dim result As String = execute(addon, context)
+            context.isIncludeAddon = saveContextIsIncludeAddon
             Return result
         End Function
-        '
-        'todo refactor as follows
-        ' - add primary interface to cp.addon and deprecate utils methods
-        ' - create addonContextObject (not this name as it is used) to hold instanceId, context, ect
-        ' - consider an addonInstance table referenced by instanceGuid to hold arguments, then eliminate the contextContentName and contextRecoreId because they are only used to exit the context content when editing arguments into the addon tag
-        ' - refactor to execute( addon as addonModel, addonContextObject, returnStatusBoolean )
-        ' - refactor to execute( addonId, addonContextObject, returnStatusBoolean )
-        ' - refactor to execute( addonGuid, addonContextObject, returnStatusBoolean )
-        ' - refactor to execute( addonName, addonContextObject, returnStatusBoolean ) -- somehow 
-        '
-        ' - then 
         '====================================================================================================
         '
-        Public Function execute(addon As Models.Entity.addonModel, context As CPUtilsBaseClass.addonExecuteContext) As String
-            Dim result As String = ""
-            Try
-                Dim optionString As String = ""
-                For Each kvp As KeyValuePair(Of String, String) In context.instanceArguments
-                    optionString &= vbCrLf & kvp.Key & "=" & kvp.Value
-                Next
-                result = execute_legacy6(addon.id, "", optionString, context.addonType, context.hostRecord.contentName, context.hostRecord.recordId, context.hostRecord.fieldName, context.instanceGuid, False, context.wrapperID, "", False, Nothing, "", Nothing, "", context.personalizationPeopleId, context.personalizationAuthenticated)
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return result
-        End Function
-        Public Function execute_legacy6(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal addonType As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef ignoreBoolean As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
+        Public Function execute(addon As Models.Entity.addonModel, executeContext As CPUtilsBaseClass.addonExecuteContext) As String
             Dim returnVal As String = ""
             Try
-                Dim blockJavascriptAndCss As Boolean
-                Dim JSOnLoad As String = String.Empty
-                Dim JSBodyEnd As String = String.Empty
-                Dim JSFilename As String = String.Empty
-                Dim DefaultStylesFilename As String = String.Empty
-                'Dim CustomStylesFilename As String = String.Empty
-                Dim TestString As String
-                Dim ReplaceSource As String
-                Dim ReplaceValue As String
-                Dim AddonStylesEditIcon As String
-                Dim SiteStylesEditIcon As String = String.Empty
-                Dim DialogList As String = String.Empty
-                Dim ToolBar As String
-                Dim ScriptingTimeout As Integer
-                Dim ScriptCallbackContent As String = String.Empty
-                Dim errorMessageForAdmin As String = String.Empty
-                'Dim CollectionGuid As String = String.Empty
-                'Dim DotNetClassFullName As String = String.Empty
-                Dim ScriptingEntryPoint As String = String.Empty
-                Dim scriptinglanguageid As Integer
-                Dim ScriptingLanguage As String = String.Empty
-                Dim ScriptingCode As String = String.Empty
-                Dim AddonStatusOK As Boolean
-                Dim EditWrapperHTMLID As String
-                Dim QS As String
-                Dim QSSplit() As String
-                Dim NVPair As String
-                Dim NVSplit() As String
-                Dim FrameID As String
-                Dim AsAjaxID As String
-                Dim OptionNames() As String
-                Dim OptionValues() As String
-                Dim OptionsForCPVars As NameValuePrivateType() = {}
-                Dim OptionsForCPVars_Cnt As Integer
-                Dim RemoteAssetContent As String = String.Empty
-                Dim kmaHTTP As httpRequestController
-                Dim WorkingLink As String
-                Dim FormContent As String = String.Empty
-                Dim ExitAddonWithBlankResponse As Boolean
-                Dim RemoteAssetLink As String = String.Empty
-                Dim AsAjax As Boolean
-                Dim InFrame As Boolean
-                Dim IncludeEditWrapper As Boolean
-                Dim AddedByName As String = String.Empty
-                Dim AddonCommentName As String
-                Dim AddonOptionConstructor As String = String.Empty
-                Dim AddonOptionExpandedConstructor As String = String.Empty
-                Dim OptionString_ForObjectCall As String = String.Empty
-                Dim Pos As Integer
-                Dim Ptr As Integer
-                Dim HelpIcon As String = String.Empty
-                Dim InstanceSettingsEditIcon As String
-                Dim OptionPair As String() = {}
-                Dim OptionPtr As Integer
-                Dim OptionCnt As Integer
-                Dim Link As String = String.Empty
-                'Dim ProgramID As String = String.Empty
-                Dim Options() As String
-                Dim OptionName As String
-                Dim OptionValue As String
-                '  Dim addonCopy As String = String.Empty
-                Dim TextContent As String = String.Empty
-                Dim ObjectContent As String = String.Empty
-                Dim AssemblyContent As String = String.Empty
-                Dim ScriptContent As String = String.Empty
-                Dim helpCopy As String = String.Empty
-                Dim helpLink As String = String.Empty
-                Dim PageTitle As String = String.Empty
-                Dim MetaDescription As String = String.Empty
-                Dim MetaKeywordList As String = String.Empty
-                Dim OtherHeadTags As String = String.Empty
-                Dim AddonEditIcon As String
-                Dim FoundAddon As Boolean
-                Dim FormXML As String = String.Empty
-                Dim WrapperID As Integer
-                Dim ContainerCssID As String = String.Empty
-                Dim ContainerCssClass As String = String.Empty
-                Dim IsInline As Boolean
-                Dim WorkingOptionString As String
-                Dim HTMLViewerEditIcon As String
-                Dim AddonBlockEditTools As Boolean
-                Dim ReplaceCnt As Integer
-                Dim ReplaceNames As String() = {}
-                Dim ReplaceValues As String() = {}
-                Dim StartTickCount As Integer
-                'Dim addonCachePtr As Integer
-                '   Dim addonCollectionId As Integer
-                '
-                ' -- build a parallel addon model to convert later, but for now so it will pass to subroutines to include in error reporting
-                Dim addon As Models.Entity.addonModel
-                '
-                ' ----- OptionString and FilterInput values before this call are saved on the stack
-                '
-                Dim PushOptionString As String
-                PushOptionString = OptionString
-                '
-                ' ----- Debug timer
-                '
-                StartTickCount = GetTickCount
-                WrapperID = DefaultWrapperID
-                If (personalizationPeopleId = 0) Then
-                    '
-                    ' just in case - during transition from cpCoreClass to csv, in case a call is missing.
-                    '
-                    personalizationPeopleId = cpCore.authContext.user.id
-                    personalizationIsAuthenticated = cpCore.authContext.isAuthenticated()
-                End If
-                '
-                ' ----- Set WorkingOptionString to what came in from the tag of the object
-                '       This may be replaced later if the tag is empty, and the actual add-on arguments have default values
-                '
-                WorkingOptionString = OptionString
-                '
-                ' ----- Lookup the addon
-                '
-                If addonId <> 0 Then
-                    addon = cpCore.addonCache.getAddonById(addonId)
-                    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from id [" & addonId & "]")
-                ElseIf (genericController.isGuid(AddonNameOrGuid)) Then
-                    addon = cpCore.addonCache.getAddonByGuid(AddonNameOrGuid)
-                    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from guid [" & AddonNameOrGuid & "]")
-                Else
-                    addon = cpCore.addonCache.getAddonByName(AddonNameOrGuid)
-                    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from name [" & AddonNameOrGuid & "]")
-                End If
-                FoundAddon = False
                 If (addon Is Nothing) Then
                     '
-                    ' -- not found 
-                    If (addonType = CPUtilsBaseClass.addonContext.ContextEmail) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (addonType = CPUtilsBaseClass.addonContext.ContextSimple) Then
-                        '
-                        ' Block all output even on error
-                        '
-                    ElseIf cpCore.authContext.isAuthenticatedAdmin(cpCore) Or cpCore.authContext.isAuthenticatedContentManager(cpCore, "Page Content") Then
-                        '
-                        ' Provide hint to administrators
-                        '
-                        If AddonNameOrGuid = "" And addonId <> 0 Then
-                            AddonNameOrGuid = "Addon #" & addonId
-                        End If
-                        If addonType = CPUtilsBaseClass.addonContext.ContextAdmin Then
-                            returnVal = "The Add-on '" & AddonNameOrGuid & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.id & """>click here</a> to automatically reset the dashboard."
-                        Else
-                            returnVal = "The Add-on '" & AddonNameOrGuid & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
-                        End If
-                        returnVal = cpCore.html.html_GetAdminHintWrapper(returnVal)
-                    End If
-                    If (addonId > 0) Then
-                        Throw New ApplicationException("The Add-on could not be found by id [" & addonId & "] or name/guid [" & AddonNameOrGuid & "]")
-                    Else
-                        Throw New ApplicationException("The Add-on could not be found by name/guid [" & AddonNameOrGuid & "]")
-                    End If
+                    ' -- addon not found
+                    returnVal = "The Add-on could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
+                ElseIf (executeContext Is Nothing) Then
+                    '
+                    ' -- context not configured 
                 Else
                     '
-                    ' -- found
-                    FoundAddon = True
-                    debugController.testPoint(cpCore, "execute [#" & addon.id & ", " & addon.name & ", guid " & addon.ccguid & "]")
-                    If Not String.IsNullOrEmpty(addon.ObjectProgramID) Then
+                    'Todo -- refactor this out
+                    ' -- fake the legacy environment
+                    Dim addonId As Integer = addon.id
+                    Dim AddonNameOrGuid As String = addon.ccguid
+                    Dim optionString As String = ""
+                    For Each kvp As KeyValuePair(Of String, String) In executeContext.instanceArguments
+                        optionString &= vbCrLf & kvp.Key & "=" & kvp.Value
+                    Next
+                    Dim addonType As CPUtilsBaseClass.addonContext = executeContext.addonType
+                    Dim HostContentName As String = executeContext.hostRecord.contentName
+                    Dim HostRecordID As Integer = executeContext.hostRecord.recordId
+                    Dim HostFieldName As String = executeContext.hostRecord.fieldName
+                    Dim ACInstanceID As String = executeContext.instanceGuid
+                    Dim IsIncludeAddon As Boolean = executeContext.isIncludeAddon
+                    Dim DefaultWrapperID As Integer = executeContext.wrapperID
+                    Dim personalizationPeopleId As Integer = executeContext.personalizationPeopleId
+                    Dim personalizationIsAuthenticated As Boolean = executeContext.personalizationAuthenticated
+                    '
+                    ' -- past in the legacy code
+                    Dim blockJavascriptAndCss As Boolean
+                    Dim JSOnLoad As String = String.Empty
+                    Dim JSBodyEnd As String = String.Empty
+                    Dim JSFilename As String = String.Empty
+                    Dim DefaultStylesFilename As String = String.Empty
+                    'Dim CustomStylesFilename As String = String.Empty
+                    Dim TestString As String
+                    Dim ReplaceSource As String
+                    Dim ReplaceValue As String
+                    Dim AddonStylesEditIcon As String
+                    Dim SiteStylesEditIcon As String = String.Empty
+                    Dim DialogList As String = String.Empty
+                    Dim ToolBar As String
+                    Dim ScriptingTimeout As Integer
+                    Dim ScriptCallbackContent As String = String.Empty
+                    Dim errorMessageForAdmin As String = String.Empty
+                    'Dim CollectionGuid As String = String.Empty
+                    'Dim DotNetClassFullName As String = String.Empty
+                    Dim ScriptingEntryPoint As String = String.Empty
+                    Dim scriptinglanguageid As Integer
+                    Dim ScriptingLanguage As String = String.Empty
+                    Dim ScriptingCode As String = String.Empty
+                    Dim EditWrapperHTMLID As String
+                    Dim QS As String
+                    Dim QSSplit() As String
+                    Dim NVPair As String
+                    Dim NVSplit() As String
+                    Dim FrameID As String
+                    Dim AsAjaxID As String
+                    Dim OptionNames() As String
+                    Dim OptionValues() As String
+                    Dim OptionsForCPVars As NameValuePrivateType() = {}
+                    Dim OptionsForCPVars_Cnt As Integer
+                    Dim RemoteAssetContent As String = String.Empty
+                    Dim kmaHTTP As httpRequestController
+                    Dim WorkingLink As String
+                    Dim FormContent As String = String.Empty
+                    Dim ExitAddonWithBlankResponse As Boolean
+                    Dim RemoteAssetLink As String = String.Empty
+                    Dim AsAjax As Boolean
+                    Dim InFrame As Boolean
+                    Dim IncludeEditWrapper As Boolean
+                    Dim AddedByName As String = String.Empty
+                    Dim AddonCommentName As String
+                    Dim AddonOptionConstructor As String = String.Empty
+                    Dim AddonOptionExpandedConstructor As String = String.Empty
+                    Dim OptionString_ForObjectCall As String = String.Empty
+                    Dim Pos As Integer
+                    Dim Ptr As Integer
+                    Dim HelpIcon As String = String.Empty
+                    Dim InstanceSettingsEditIcon As String
+                    Dim OptionPair As String() = {}
+                    Dim OptionPtr As Integer
+                    Dim OptionCnt As Integer
+                    Dim Link As String = String.Empty
+                    'Dim ProgramID As String = String.Empty
+                    Dim Options() As String
+                    Dim OptionName As String
+                    Dim OptionValue As String
+                    '  Dim addonCopy As String = String.Empty
+                    Dim TextContent As String = String.Empty
+                    Dim ObjectContent As String = String.Empty
+                    Dim AssemblyContent As String = String.Empty
+                    Dim ScriptContent As String = String.Empty
+                    Dim helpCopy As String = String.Empty
+                    Dim helpLink As String = String.Empty
+                    Dim PageTitle As String = String.Empty
+                    Dim MetaDescription As String = String.Empty
+                    Dim MetaKeywordList As String = String.Empty
+                    Dim OtherHeadTags As String = String.Empty
+                    Dim AddonEditIcon As String
+                    Dim FoundAddon As Boolean
+                    Dim FormXML As String = String.Empty
+                    Dim WrapperID As Integer
+                    Dim ContainerCssID As String = String.Empty
+                    Dim ContainerCssClass As String = String.Empty
+                    Dim IsInline As Boolean
+                    Dim WorkingOptionString As String
+                    Dim HTMLViewerEditIcon As String
+                    Dim AddonBlockEditTools As Boolean
+                    Dim ReplaceCnt As Integer
+                    Dim ReplaceNames As String() = {}
+                    Dim ReplaceValues As String() = {}
+                    Dim StartTickCount As Integer
+                    'Dim addonCachePtr As Integer
+                    '   Dim addonCollectionId As Integer
+                    '
+                    '
+                    ' ----- OptionString and FilterInput values before this call are saved on the stack
+                    '
+                    Dim PushOptionString As String
+                    PushOptionString = optionString
+                    '
+                    ' ----- Debug timer
+                    '
+                    StartTickCount = GetTickCount
+                    WrapperID = DefaultWrapperID
+                    If (personalizationPeopleId = 0) Then
                         '
-                        ' -- addons with activeX components are deprecated
-
-                        Dim addonDescription As String = getAddonDescription(cpCore, addon)
-                        Throw New ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " & addonDescription & ".")
-                    Else
-                        addonId = addon.id
-                        Link = addon.Link
-                        'DotNetClassFullName = addon.DotNetClass
-                        AddonOptionConstructor = addon.ArgumentList
-                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
-                        AddonBlockEditTools = False
-                        TextContent = ""
-                        FormXML = ""
-                        TextContent = addon.CopyText
-                        IsInline = genericController.EncodeBoolean(addon.IsInline)
-                        DefaultStylesFilename = addon.StylesFilename.filename
+                        ' just in case - during transition from cpCoreClass to csv, in case a call is missing.
                         '
-                        ' Add custom styles
+                        personalizationPeopleId = cpCore.authContext.user.id
+                        personalizationIsAuthenticated = cpCore.authContext.isAuthenticated()
+                    End If
+                    '
+                    ' ----- Set WorkingOptionString to what came in from the tag of the object
+                    '       This may be replaced later if the tag is empty, and the actual add-on arguments have default values
+                    '
+                    WorkingOptionString = optionString
+                    ''
+                    '' ----- Lookup the addon
+                    ''
+                    'If addonId <> 0 Then
+                    '    addon = cpCore.addonCache.getAddonById(addonId)
+                    '    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from id [" & addonId & "]")
+                    'ElseIf (genericController.isGuid(AddonNameOrGuid)) Then
+                    '    addon = cpCore.addonCache.getAddonByGuid(AddonNameOrGuid)
+                    '    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from guid [" & AddonNameOrGuid & "]")
+                    'Else
+                    '    addon = cpCore.addonCache.getAddonByName(AddonNameOrGuid)
+                    '    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from name [" & AddonNameOrGuid & "]")
+                    'End If
+                    FoundAddon = False
+                    If (addon Is Nothing) Then
                         '
-                        FormXML = addon.FormXML
-                        RemoteAssetLink = addon.RemoteAssetLink
-                        AsAjax = genericController.EncodeBoolean(addon.AsAjax)
-                        InFrame = genericController.EncodeBoolean(addon.InFrame)
-                        ScriptingEntryPoint = addon.ScriptingEntryPoint
-                        scriptinglanguageid = genericController.EncodeInteger(addon.ScriptingLanguageID)
-                        '
-                        ' Get Language
-                        '
-                        ScriptingLanguage = ""
-                        If scriptinglanguageid <> 0 Then
-                            ScriptingLanguage = cpCore.db.getRecordName("Scripting Languages", scriptinglanguageid)
-                        End If
-                        If ScriptingLanguage = "" Then
-                            ScriptingLanguage = "VBScript"
-                        End If
-                        ScriptingCode = addon.ScriptingCode
-                        AddonBlockEditTools = genericController.EncodeBoolean(addon.BlockEditTools)
-                        ScriptingTimeout = genericController.EncodeInteger(addon.ScriptingTimeout)
-                        helpCopy = addon.Help
-                        helpLink = addon.HelpLink
-                        JSOnLoad = addon.JavaScriptOnLoad
-                        JSBodyEnd = addon.JavaScriptBodyEnd
-                        PageTitle = addon.PageTitle
-                        MetaDescription = addon.MetaDescription
-                        MetaKeywordList = addon.MetaKeywordList
-                        OtherHeadTags = addon.OtherHeadTags
-                        JSFilename = addon.JSFilename.filename
-                        If JSFilename <> "" Then
-                            JSFilename = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
-                        End If
-                        '
-                        '----------------------------------------------------------------------------------------------------
-                        ' Add the common addon options to the AddonOptionConstructor
-                        '----------------------------------------------------------------------------------------------------
-                        '
-                        If AddonOptionConstructor <> "" Then
-                            AddonOptionConstructor = AddonOptionConstructor & vbCrLf
-                        End If
-                        '
-                        ' temporary fix for Content Box not handling ajax or inframe
-                        '
-                        If genericController.vbLCase(addon.ccguid) = genericController.vbLCase(addonGuidContentBox) Then
-                            AsAjax = False
-                            InFrame = False
-                            AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_BlockNoAjax
-                        ElseIf IsInline Then
-                            AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
-                        Else
-                            AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
-                        End If
-                        '
-                        '-----------------------------------------------------------------
-                        ' Process the Add-on
-                        '-----------------------------------------------------------------
-                        '
-                        If FoundAddon Then
+                        ' -- not found 
+                        If (addonType = CPUtilsBaseClass.addonContext.ContextEmail) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (addonType = CPUtilsBaseClass.addonContext.ContextSimple) Then
                             '
-                            'determine if it has already run once (if so, block javascript and styles)
+                            ' Block all output even on error
                             '
-                            If cpCore.addonsRunOnThisPageIdList.Contains(addonId) Then
-                                blockJavascriptAndCss = True
-                            Else
-                                cpCore.addonsRunOnThisPageIdList.Add(addonId)
+                        ElseIf cpCore.authContext.isAuthenticatedAdmin(cpCore) Or cpCore.authContext.isAuthenticatedContentManager(cpCore, "Page Content") Then
+                            '
+                            ' Provide hint to administrators
+                            '
+                            If AddonNameOrGuid = "" And addonId <> 0 Then
+                                AddonNameOrGuid = "Addon #" & addonId
                             End If
-                            'blockJavascriptAndCss = (InStr(1, "," & csv_addon_execute_AddonsRunOnThisPageIdList & ",", "," & addonId & ",") <> 0)
-                            'csv_addon_execute_AddonsRunOnThisPageIdList = csv_addon_execute_AddonsRunOnThisPageIdList & "," & addonId
+                            If addonType = CPUtilsBaseClass.addonContext.ContextAdmin Then
+                                returnVal = "The Add-on '" & AddonNameOrGuid & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.id & """>click here</a> to automatically reset the dashboard."
+                            Else
+                                returnVal = "The Add-on '" & AddonNameOrGuid & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
+                            End If
+                            returnVal = cpCore.html.html_GetAdminHintWrapper(returnVal)
+                        End If
+                        If (addonId > 0) Then
+                            Throw New ApplicationException("The Add-on could not be found by id [" & addonId & "] or name/guid [" & AddonNameOrGuid & "]")
+                        Else
+                            Throw New ApplicationException("The Add-on could not be found by name/guid [" & AddonNameOrGuid & "]")
+                        End If
+                    Else
+                        '
+                        ' -- found
+                        FoundAddon = True
+                        debugController.testPoint(cpCore, "execute [#" & addon.id & ", " & addon.name & ", guid " & addon.ccguid & "]")
+                        If Not String.IsNullOrEmpty(addon.ObjectProgramID) Then
+                            '
+                            ' -- addons with activeX components are deprecated
+
+                            Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                            Throw New ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " & addonDescription & ".")
+                        Else
+                            addonId = addon.id
+                            Link = addon.Link
+                            'DotNetClassFullName = addon.DotNetClass
+                            AddonOptionConstructor = addon.ArgumentList
+                            AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                            AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                            AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
+                            AddonBlockEditTools = False
+                            TextContent = ""
+                            FormXML = ""
+                            TextContent = addon.CopyText
+                            IsInline = genericController.EncodeBoolean(addon.IsInline)
+                            DefaultStylesFilename = addon.StylesFilename.filename
+                            '
+                            ' Add custom styles
+                            '
+                            FormXML = addon.FormXML
+                            RemoteAssetLink = addon.RemoteAssetLink
+                            AsAjax = genericController.EncodeBoolean(addon.AsAjax)
+                            InFrame = genericController.EncodeBoolean(addon.InFrame)
+                            ScriptingEntryPoint = addon.ScriptingEntryPoint
+                            scriptinglanguageid = genericController.EncodeInteger(addon.ScriptingLanguageID)
+                            '
+                            ' Get Language
+                            '
+                            ScriptingLanguage = ""
+                            If scriptinglanguageid <> 0 Then
+                                ScriptingLanguage = cpCore.db.getRecordName("Scripting Languages", scriptinglanguageid)
+                            End If
+                            If ScriptingLanguage = "" Then
+                                ScriptingLanguage = "VBScript"
+                            End If
+                            ScriptingCode = addon.ScriptingCode
+                            AddonBlockEditTools = genericController.EncodeBoolean(addon.BlockEditTools)
+                            ScriptingTimeout = genericController.EncodeInteger(addon.ScriptingTimeout)
+                            helpCopy = addon.Help
+                            helpLink = addon.HelpLink
+                            JSOnLoad = addon.JavaScriptOnLoad
+                            JSBodyEnd = addon.JavaScriptBodyEnd
+                            PageTitle = addon.PageTitle
+                            MetaDescription = addon.MetaDescription
+                            MetaKeywordList = addon.MetaKeywordList
+                            OtherHeadTags = addon.OtherHeadTags
+                            JSFilename = addon.JSFilename.filename
+                            If JSFilename <> "" Then
+                                JSFilename = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
+                            End If
+                            '
+                            '----------------------------------------------------------------------------------------------------
+                            ' Add the common addon options to the AddonOptionConstructor
+                            '----------------------------------------------------------------------------------------------------
+                            '
+                            If AddonOptionConstructor <> "" Then
+                                AddonOptionConstructor = AddonOptionConstructor & vbCrLf
+                            End If
+                            '
+                            ' temporary fix for Content Box not handling ajax or inframe
+                            '
+                            If genericController.vbLCase(addon.ccguid) = genericController.vbLCase(addonGuidContentBox) Then
+                                AsAjax = False
+                                InFrame = False
+                                AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_BlockNoAjax
+                            ElseIf IsInline Then
+                                AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
+                            Else
+                                AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
+                            End If
                             '
                             '-----------------------------------------------------------------
-                            ' Enable Edit Wrapper for Page Content edit mode
+                            ' Process the Add-on
                             '-----------------------------------------------------------------
                             '
-                            If True Then
-                                IncludeEditWrapper =
+                            If FoundAddon Then
+                                '
+                                'determine if it has already run once (if so, block javascript and styles)
+                                '
+                                If cpCore.addonsRunOnThisPageIdList.Contains(addonId) Then
+                                    blockJavascriptAndCss = True
+                                Else
+                                    cpCore.addonsRunOnThisPageIdList.Add(addonId)
+                                End If
+                                'blockJavascriptAndCss = (InStr(1, "," & csv_addon_execute_AddonsRunOnThisPageIdList & ",", "," & addonId & ",") <> 0)
+                                'csv_addon_execute_AddonsRunOnThisPageIdList = csv_addon_execute_AddonsRunOnThisPageIdList & "," & addonId
+                                '
+                                '-----------------------------------------------------------------
+                                ' Enable Edit Wrapper for Page Content edit mode
+                                '-----------------------------------------------------------------
+                                '
+                                If True Then
+                                    IncludeEditWrapper =
                                 (Not AddonBlockEditTools) _
                                 And (addonType <> CPUtilsBaseClass.addonContext.ContextEditor) _
                                 And (addonType <> CPUtilsBaseClass.addonContext.ContextEmail) _
@@ -490,252 +353,252 @@ Namespace Contensive.Core.Controllers
                                 And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) _
                                 And (addonType <> CPUtilsBaseClass.addonContext.ContextSimple) _
                                 And (Not IsIncludeAddon)
-                                If IncludeEditWrapper Then
-                                    IncludeEditWrapper = IncludeEditWrapper _
+                                    If IncludeEditWrapper Then
+                                        IncludeEditWrapper = IncludeEditWrapper _
                                     And (cpCore.visitProperty.getBoolean("AllowAdvancedEditor") _
                                     And ((addonType = CPUtilsBaseClass.addonContext.ContextAdmin) Or cpCore.authContext.isEditing(HostContentName)))
-                                    'IncludeEditWrapper = IncludeEditWrapper _
-                                    '    And ( _
-                                    '        ( _
-                                    '            (csv_VisitProperty_AllowAdvancedEditor And ((Context = ContextAdmin) Or IsEditing(HostContentName))) _
-                                    '        ) Or ( _
-                                    '            (csv_VisitProperty_AllowEditing And ((AddonGuid = ContentBoxGuid) Or (AddonGuid = DynamicMenuGuid) Or (AddonGuid = TextBoxGuid))) _
-                                    '        ) _
-                                    '    )
-                                End If
-                            End If
-                            '
-                            ' ----- Test if this Addon is already in use
-                            '
-                            If cpCore.addonsCurrentlyRunningIdList.Contains(addonId) Then
-                                '
-                                ' This addon is running, can not reenter
-                                '
-                                Call logController.appendLog(cpCore, "addon_execute, Addon [" & addon.name & "] was called by itself. This is not allowed. AddonID [" & addonId & "]")
-                            Else
-                                cpCore.addonsCurrentlyRunningIdList.Add(addonId)
-                                'csv_addon_execute_AddonsCurrentlyRunningIdList = csv_addon_execute_AddonsCurrentlyRunningIdList & "," & addonId
-                                '
-                                '-----------------------------------------------------------------------------------------------------
-                                ' Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
-                                '-----------------------------------------------------------------------------------------------------
-                                '
-                                ' Setup InstanceOptions - if InstanceOptionString is empty, use the defaults from the Addon Arguments
-                                '
-                                OptionCnt = 0
-                                If WorkingOptionString <> "" Then
-                                    If genericController.vbInstr(1, WorkingOptionString, vbCrLf) <> 0 Then
-                                        '
-                                        ' this should never be the case
-                                        '
-                                        Options = genericController.SplitCRLF(WorkingOptionString)
-                                        OptionCnt = UBound(Options) + 1
-                                    Else
-                                        '
-                                        '
-                                        '
-                                        Options = Split(WorkingOptionString, "&")
-                                        OptionCnt = UBound(Options) + 1
+                                        'IncludeEditWrapper = IncludeEditWrapper _
+                                        '    And ( _
+                                        '        ( _
+                                        '            (csv_VisitProperty_AllowAdvancedEditor And ((Context = ContextAdmin) Or IsEditing(HostContentName))) _
+                                        '        ) Or ( _
+                                        '            (csv_VisitProperty_AllowEditing And ((AddonGuid = ContentBoxGuid) Or (AddonGuid = DynamicMenuGuid) Or (AddonGuid = TextBoxGuid))) _
+                                        '        ) _
+                                        '    )
                                     End If
-                                    OptionsForCPVars_Cnt = OptionCnt
-                                    ReDim OptionsForCPVars(OptionCnt - 1)
-                                    ReDim OptionNames(OptionCnt - 1)
-                                    ReDim OptionValues(OptionCnt - 1)
-                                    For OptionPtr = 0 To OptionCnt - 1
-                                        With OptionsForCPVars(OptionPtr)
-                                            .Name = Options(OptionPtr)
-                                            If genericController.vbInstr(1, .Name, "=") <> 0 Then
-                                                Dim nameLc As String
-                                                OptionPair = Split(.Name, "=")
-                                                .Name = Trim(OptionPair(0))
-                                                .Value = OptionPair(1)
-                                                '
-                                                ' added this because when a row of apostrophes were added to an instance argument, they showed up here
-                                                ' so it appears (though not documented very well) that the WorkingOptionString argument is really
-                                                ' the Addon Encoded Instance OptionString
-                                                ' So, as I parse it for use in the add-on, I need to unencode it
-                                                '
-                                                .Name = genericController.decodeNvaArgument(.Name)
-                                                .Value = genericController.decodeNvaArgument(.Value)
-                                                '
-                                                '
-                                                nameLc = .Name.ToLower()
-                                                If nameLc = "wrapper" Then
-                                                    WrapperID = genericController.EncodeInteger(.Value)
-                                                    If WrapperID = 0 Then
-                                                        WrapperID = DefaultWrapperID
-                                                    End If
-                                                ElseIf nameLc = "as ajax" Then
-                                                    If genericController.EncodeBoolean(.Value) Then
-                                                        AsAjax = True
-                                                    End If
-                                                ElseIf nameLc = "css container id" Then
-                                                    ContainerCssID = .Value
-                                                ElseIf nameLc = "css container class" Then
-                                                    ContainerCssClass = .Value
-                                                End If
-                                                OptionNames(OptionPtr) = .Name
-                                                OptionValues(OptionPtr) = .Value
-                                            End If
-                                        End With
-                                    Next
                                 End If
-                                If AddonOptionConstructor <> "" Then
-                                    '        If WorkingOptionString = "" Then
-                                    'WorkingOptionString = AddonOptionConstructor
+                                '
+                                ' ----- Test if this Addon is already in use
+                                '
+                                If cpCore.addonsCurrentlyRunningIdList.Contains(addonId) Then
                                     '
-                                    ' convert from AddonConstructor format (crlf delimited, constructorincoded) to AddonOption format without selector (& delimited, addonencoded)
+                                    ' This addon is running, can not reenter
                                     '
-                                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
-                                    Options = genericController.SplitCRLF(AddonOptionConstructor)
-                                    OptionCnt = UBound(Options) + 1
-                                    For OptionPtr = 0 To OptionCnt - 1
-                                        OptionName = Options(OptionPtr)
-                                        OptionValue = ""
-                                        '
-                                        OptionName = genericController.vbReplace(OptionName, "\=", vbCrLf)
-                                        If genericController.vbInstr(1, OptionName, "=") <> 0 Then
-                                            OptionPair = Split(OptionName, "=")
-                                            OptionName = OptionPair(0)
-                                            OptionPair(0) = ""
-                                            OptionValue = Mid(Join(OptionPair, "="), 2)
+                                    Call logController.appendLog(cpCore, "addon_execute, Addon [" & addon.name & "] was called by itself. This is not allowed. AddonID [" & addonId & "]")
+                                Else
+                                    cpCore.addonsCurrentlyRunningIdList.Add(addonId)
+                                    'csv_addon_execute_AddonsCurrentlyRunningIdList = csv_addon_execute_AddonsCurrentlyRunningIdList & "," & addonId
+                                    '
+                                    '-----------------------------------------------------------------------------------------------------
+                                    ' Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
+                                    '-----------------------------------------------------------------------------------------------------
+                                    '
+                                    ' Setup InstanceOptions - if InstanceOptionString is empty, use the defaults from the Addon Arguments
+                                    '
+                                    OptionCnt = 0
+                                    If WorkingOptionString <> "" Then
+                                        If genericController.vbInstr(1, WorkingOptionString, vbCrLf) <> 0 Then
+                                            '
+                                            ' this should never be the case
+                                            '
+                                            Options = genericController.SplitCRLF(WorkingOptionString)
+                                            OptionCnt = UBound(Options) + 1
+                                        Else
+                                            '
+                                            '
+                                            '
+                                            Options = Split(WorkingOptionString, "&")
+                                            OptionCnt = UBound(Options) + 1
                                         End If
-                                        OptionName = genericController.vbReplace(OptionName, vbCrLf, "\=")
-                                        OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\=")
+                                        OptionsForCPVars_Cnt = OptionCnt
+                                        ReDim OptionsForCPVars(OptionCnt - 1)
+                                        ReDim OptionNames(OptionCnt - 1)
+                                        ReDim OptionValues(OptionCnt - 1)
+                                        For OptionPtr = 0 To OptionCnt - 1
+                                            With OptionsForCPVars(OptionPtr)
+                                                .Name = Options(OptionPtr)
+                                                If genericController.vbInstr(1, .Name, "=") <> 0 Then
+                                                    Dim nameLc As String
+                                                    OptionPair = Split(.Name, "=")
+                                                    .Name = Trim(OptionPair(0))
+                                                    .Value = OptionPair(1)
+                                                    '
+                                                    ' added this because when a row of apostrophes were added to an instance argument, they showed up here
+                                                    ' so it appears (though not documented very well) that the WorkingOptionString argument is really
+                                                    ' the Addon Encoded Instance OptionString
+                                                    ' So, as I parse it for use in the add-on, I need to unencode it
+                                                    '
+                                                    .Name = genericController.decodeNvaArgument(.Name)
+                                                    .Value = genericController.decodeNvaArgument(.Value)
+                                                    '
+                                                    '
+                                                    nameLc = .Name.ToLower()
+                                                    If nameLc = "wrapper" Then
+                                                        WrapperID = genericController.EncodeInteger(.Value)
+                                                        If WrapperID = 0 Then
+                                                            WrapperID = DefaultWrapperID
+                                                        End If
+                                                    ElseIf nameLc = "as ajax" Then
+                                                        If genericController.EncodeBoolean(.Value) Then
+                                                            AsAjax = True
+                                                        End If
+                                                    ElseIf nameLc = "css container id" Then
+                                                        ContainerCssID = .Value
+                                                    ElseIf nameLc = "css container class" Then
+                                                        ContainerCssClass = .Value
+                                                    End If
+                                                    OptionNames(OptionPtr) = .Name
+                                                    OptionValues(OptionPtr) = .Value
+                                                End If
+                                            End With
+                                        Next
+                                    End If
+                                    If AddonOptionConstructor <> "" Then
+                                        '        If WorkingOptionString = "" Then
+                                        'WorkingOptionString = AddonOptionConstructor
                                         '
-                                        Do While (Mid(OptionName, 1, 1) = vbTab) And Len(OptionName) > 1
-                                            OptionName = Mid(OptionName, 2)
-                                        Loop
-                                        OptionName = Trim(OptionName)
+                                        ' convert from AddonConstructor format (crlf delimited, constructorincoded) to AddonOption format without selector (& delimited, addonencoded)
                                         '
-                                        ' split on [, throw out the right side
-                                        OptionValue = genericController.vbReplace(OptionValue, "\[", vbCrLf)
-                                        If genericController.vbInstr(1, OptionValue, "[") <> 0 Then
-                                            OptionValue = Left(OptionValue, genericController.vbInstr(1, OptionValue, "[") - 1)
-                                        End If
-                                        OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\[")
-                                        '
-                                        ' Decode Constructor format
-                                        '
-                                        OptionName = DecodeAddonConstructorArgument(OptionName)
-                                        OptionValue = DecodeAddonConstructorArgument(OptionValue)
-                                        '
-                                        ' check for duplicates
-                                        '
-                                        For Ptr = 0 To OptionsForCPVars_Cnt - 1
-                                            If genericController.vbLCase(OptionName) = genericController.vbLCase(OptionsForCPVars(Ptr).Name) Then
-                                                Exit For
+                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
+                                        Options = genericController.SplitCRLF(AddonOptionConstructor)
+                                        OptionCnt = UBound(Options) + 1
+                                        For OptionPtr = 0 To OptionCnt - 1
+                                            OptionName = Options(OptionPtr)
+                                            OptionValue = ""
+                                            '
+                                            OptionName = genericController.vbReplace(OptionName, "\=", vbCrLf)
+                                            If genericController.vbInstr(1, OptionName, "=") <> 0 Then
+                                                OptionPair = Split(OptionName, "=")
+                                                OptionName = OptionPair(0)
+                                                OptionPair(0) = ""
+                                                OptionValue = Mid(Join(OptionPair, "="), 2)
+                                            End If
+                                            OptionName = genericController.vbReplace(OptionName, vbCrLf, "\=")
+                                            OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\=")
+                                            '
+                                            Do While (Mid(OptionName, 1, 1) = vbTab) And Len(OptionName) > 1
+                                                OptionName = Mid(OptionName, 2)
+                                            Loop
+                                            OptionName = Trim(OptionName)
+                                            '
+                                            ' split on [, throw out the right side
+                                            OptionValue = genericController.vbReplace(OptionValue, "\[", vbCrLf)
+                                            If genericController.vbInstr(1, OptionValue, "[") <> 0 Then
+                                                OptionValue = Left(OptionValue, genericController.vbInstr(1, OptionValue, "[") - 1)
+                                            End If
+                                            OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\[")
+                                            '
+                                            ' Decode Constructor format
+                                            '
+                                            OptionName = DecodeAddonConstructorArgument(OptionName)
+                                            OptionValue = DecodeAddonConstructorArgument(OptionValue)
+                                            '
+                                            ' check for duplicates
+                                            '
+                                            For Ptr = 0 To OptionsForCPVars_Cnt - 1
+                                                If genericController.vbLCase(OptionName) = genericController.vbLCase(OptionsForCPVars(Ptr).Name) Then
+                                                    Exit For
+                                                End If
+                                            Next
+                                            If Ptr = OptionsForCPVars_Cnt Then
+                                                '
+                                                ' not found, add it to option pairs
+                                                '
+                                                ReDim Preserve OptionsForCPVars(Ptr)
+                                                OptionsForCPVars(Ptr).Name = Trim(OptionName)
+                                                OptionsForCPVars(Ptr).Value = OptionValue
+                                                OptionsForCPVars_Cnt = OptionsForCPVars_Cnt + 1
                                             End If
                                         Next
-                                        If Ptr = OptionsForCPVars_Cnt Then
+                                    End If
+                                    '
+                                    ' this is a hack -- add instanceID to the OptionsForCPVars. do the same in addon_executeAsProcess
+                                    '   it is also added in csv_BuildAddonOptionLists() which is called by both, but does not effect OptionsForCPVars.
+                                    '   the cpCoreClass execute should call executeAsProcess and share all this code.
+                                    '
+                                    If ACInstanceID <> "" Then
+                                        ReDim Preserve OptionsForCPVars(OptionsForCPVars_Cnt)
+                                        OptionsForCPVars(OptionsForCPVars_Cnt).Name = "instanceid"
+                                        OptionsForCPVars(OptionsForCPVars_Cnt).Value = ACInstanceID
+                                        OptionsForCPVars_Cnt = OptionsForCPVars_Cnt + 1
+                                    End If
+                                    '
+                                    '-----------------------------------------------------------------------------------------------------
+                                    ' Build ReplaceName, ReplaceValue pairs for call to cmc.csv_ExecuteScript
+                                    '-----------------------------------------------------------------------------------------------------
+                                    '
+                                    ReplaceCnt = OptionsForCPVars_Cnt
+                                    If ReplaceCnt > 0 Then
+                                        ReDim ReplaceNames(ReplaceCnt - 1)
+                                        ReDim ReplaceValues(ReplaceCnt - 1)
+                                        For Ptr = 0 To ReplaceCnt - 1
+                                            With OptionsForCPVars(Ptr)
+                                                If .Name <> "" Then
+                                                    ReplaceNames(Ptr) = .Name
+                                                    'ReplaceNames(Ptr) = "$" & .Name & "$"
+                                                    ReplaceValues(Ptr) = .Value
+                                                End If
+                                            End With
+                                        Next
+                                    End If
+                                    '
+                                    '-----------------------------------------------------------------------------------------------------
+                                    '   Common to Add-ons and built-in Add-ons
+                                    '-----------------------------------------------------------------------------------------------------
+                                    '
+                                    ' Update the option selector from the addon record
+                                    '
+                                    '!!!!!
+                                    ' instanceId option pair is added here, but OptionsForCPVars() is already constructed and does not have it -- so scripts will not get it
+                                    ' instanceId needs to be added early in preprocess so it gets picked up in OptionsForCPVars()
+                                    '!!!!!
+                                    Call buildAddonOptionLists(OptionString_ForObjectCall, AddonOptionExpandedConstructor, AddonOptionConstructor, WorkingOptionString, ACInstanceID, IncludeEditWrapper)
+                                    '
+                                    ' set global public value that can be accessed by scripts
+                                    '
+                                    optionString = OptionString_ForObjectCall
+                                    '
+                                    '
+                                    '-----------------------------------------------------------------------------------------------------
+                                    ' Process the content for each context as needed
+                                    '-----------------------------------------------------------------------------------------------------
+                                    '
+                                    If (InFrame And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
+                                        '
+                                        '-----------------------------------------------------------------
+                                        ' inFrame and this is NOT the callback - setup the iframe for a callback
+                                        ' js,styles and other features are NOT added to the host page, they go to the remotemethod page
+                                        '-----------------------------------------------------------------
+                                        '
+                                        'todo true is a check for iis driven page - move to iisController
+                                        If True Then
                                             '
-                                            ' not found, add it to option pairs
+                                            ' web-only
                                             '
-                                            ReDim Preserve OptionsForCPVars(Ptr)
-                                            OptionsForCPVars(Ptr).Name = Trim(OptionName)
-                                            OptionsForCPVars(Ptr).Value = OptionValue
-                                            OptionsForCPVars_Cnt = OptionsForCPVars_Cnt + 1
-                                        End If
-                                    Next
-                                End If
-                                '
-                                ' this is a hack -- add instanceID to the OptionsForCPVars. do the same in addon_executeAsProcess
-                                '   it is also added in csv_BuildAddonOptionLists() which is called by both, but does not effect OptionsForCPVars.
-                                '   the cpCoreClass execute should call executeAsProcess and share all this code.
-                                '
-                                If ACInstanceID <> "" Then
-                                    ReDim Preserve OptionsForCPVars(OptionsForCPVars_Cnt)
-                                    OptionsForCPVars(OptionsForCPVars_Cnt).Name = "instanceid"
-                                    OptionsForCPVars(OptionsForCPVars_Cnt).Value = ACInstanceID
-                                    OptionsForCPVars_Cnt = OptionsForCPVars_Cnt + 1
-                                End If
-                                '
-                                '-----------------------------------------------------------------------------------------------------
-                                ' Build ReplaceName, ReplaceValue pairs for call to cmc.csv_ExecuteScript
-                                '-----------------------------------------------------------------------------------------------------
-                                '
-                                ReplaceCnt = OptionsForCPVars_Cnt
-                                If ReplaceCnt > 0 Then
-                                    ReDim ReplaceNames(ReplaceCnt - 1)
-                                    ReDim ReplaceValues(ReplaceCnt - 1)
-                                    For Ptr = 0 To ReplaceCnt - 1
-                                        With OptionsForCPVars(Ptr)
-                                            If .Name <> "" Then
-                                                ReplaceNames(Ptr) = .Name
-                                                'ReplaceNames(Ptr) = "$" & .Name & "$"
-                                                ReplaceValues(Ptr) = .Value
+                                            Link = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
+                                            If genericController.vbInstr(1, Link, "?") = 0 Then
+                                                Link = Link & "?"
+                                            Else
+                                                Link = Link & "&"
                                             End If
-                                        End With
-                                    Next
-                                End If
-                                '
-                                '-----------------------------------------------------------------------------------------------------
-                                '   Common to Add-ons and built-in Add-ons
-                                '-----------------------------------------------------------------------------------------------------
-                                '
-                                ' Update the option selector from the addon record
-                                '
-                                '!!!!!
-                                ' instanceId option pair is added here, but OptionsForCPVars() is already constructed and does not have it -- so scripts will not get it
-                                ' instanceId needs to be added early in preprocess so it gets picked up in OptionsForCPVars()
-                                '!!!!!
-                                Call buildAddonOptionLists(OptionString_ForObjectCall, AddonOptionExpandedConstructor, AddonOptionConstructor, WorkingOptionString, ACInstanceID, IncludeEditWrapper)
-                                '
-                                ' set global public value that can be accessed by scripts
-                                '
-                                OptionString = OptionString_ForObjectCall
-                                '
-                                '
-                                '-----------------------------------------------------------------------------------------------------
-                                ' Process the content for each context as needed
-                                '-----------------------------------------------------------------------------------------------------
-                                '
-                                If (InFrame And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' inFrame and this is NOT the callback - setup the iframe for a callback
-                                    ' js,styles and other features are NOT added to the host page, they go to the remotemethod page
-                                    '-----------------------------------------------------------------
-                                    '
-                                    'todo true is a check for iis driven page - move to iisController
-                                    If True Then
-                                        '
-                                        ' web-only
-                                        '
-                                        Link = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
-                                        If genericController.vbInstr(1, Link, "?") = 0 Then
-                                            Link = Link & "?"
-                                        Else
-                                            Link = Link & "&"
-                                        End If
-                                        Link = Link _
+                                            Link = Link _
                                         & "nocache=" & Rnd() _
                                         & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
                                         & "&HostRecordID=" & HostRecordID _
                                         & "&remotemethodaddon=" & EncodeURL(addon.id.ToString) _
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                                         & ""
-                                        FrameID = "frame" & GetRandomInteger()
-                                        returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
+                                            FrameID = "frame" & GetRandomInteger()
+                                            returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
                                         & cr & "<script language=javascript type=""text/javascript"">" _
                                         & cr & "// Safari and Opera need a kick-start." _
                                         & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
                                         & cr & "</script>"
-                                    End If
-                                ElseIf (AsAjax And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' AsAjax and this is NOT the callback - setup the ajax callback
-                                    ' js,styles and other features from the addon record are added to the host page
-                                    ' during the remote method, these are blocked, but if any are added during
-                                    '   DLL processing, they have to be handled
-                                    '-----------------------------------------------------------------
-                                    '
-                                    If True Then
-                                        AsAjaxID = "asajax" & GetRandomInteger()
-                                        QS = "" _
+                                        End If
+                                    ElseIf (AsAjax And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
+                                        '
+                                        '-----------------------------------------------------------------
+                                        ' AsAjax and this is NOT the callback - setup the ajax callback
+                                        ' js,styles and other features from the addon record are added to the host page
+                                        ' during the remote method, these are blocked, but if any are added during
+                                        '   DLL processing, they have to be handled
+                                        '-----------------------------------------------------------------
+                                        '
+                                        If True Then
+                                            AsAjaxID = "asajax" & GetRandomInteger()
+                                            QS = "" _
                                         & RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(addon.id.ToString()) _
                                         & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
                                         & "&HostRecordID=" & HostRecordID _
@@ -743,478 +606,478 @@ Namespace Contensive.Core.Controllers
                                         & "&HostQS=" & EncodeRequestVariable(cpCore.webServer.requestQueryString) _
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                                         & ""
-                                        '
-                                        ' -- exception made here. AsAjax is not used often, and this can create a QS too long
-                                        '& "&HostForm=" & EncodeRequestVariable(cpCore.webServer.requestFormString) _
-                                        If IsInline Then
-                                            returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
-                                        Else
-                                            returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
-                                        End If
-                                        returnVal = returnVal _
+                                            '
+                                            ' -- exception made here. AsAjax is not used often, and this can create a QS too long
+                                            '& "&HostForm=" & EncodeRequestVariable(cpCore.webServer.requestFormString) _
+                                            If IsInline Then
+                                                returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                                            Else
+                                                returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                                            End If
+                                            returnVal = returnVal _
                                         & cr & "<script Language=""javaScript"" type=""text/javascript"">" _
                                         & cr & "cj.ajax.qs('" & QS & "','','" & AsAjaxID & "');AdminNavPop=true;" _
                                         & cr & "</script>"
-                                        '
-                                        ' Problem - AsAjax addons must add styles, js and meta to the head
-                                        '   Adding them to the host page covers most cases, but sometimes the DLL itself
-                                        '   adds styles, etc during processing. These have to be added during the remote method processing.
-                                        '   appending the .innerHTML of the head works for FF, but ie blocks it.
-                                        '   using .createElement works in ie, but the tag system right now not written
-                                        '   to save links, etc, it is written to store the entire tag.
-                                        '   Also, OtherHeadTags can not be added this was.
-                                        '
-                                        ' Short Term Fix
-                                        '   For Ajax, Add javascript and style features to head of host page
-                                        '   Then during remotemethod, clear these strings before dll processing. Anything
-                                        '   that is added must have come from the dll. So far, the only addons we have that
-                                        '   do this load styles, so instead of putting in the the head (so ie fails), add styles inline.
-                                        '
-                                        '   This is because ie does not allow innerHTML updates to head tag
-                                        '   scripts and js could be handled with .createElement if only the links were saved, but
-                                        '   otherhead could not.
-                                        '   The case this does not cover is if the addon itself manually adds one of these entries.
-                                        '   In no case can ie handle the OtherHead, however, all the others can be done with .createElement.
-                                        ' Long Term Fix
-                                        '   Convert js, style, and meta tag system to use .createElement during remote method processing
-                                        '
-                                        Call cpCore.html.doc_AddPagetitle2(PageTitle, AddedByName)
-                                        Call cpCore.html.doc_addMetaDescription2(MetaDescription, AddedByName)
-                                        Call cpCore.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                                        Call cpCore.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
-                                        If Not blockJavascriptAndCss Then
                                             '
-                                            ' add javascript and styles if it has not run already
+                                            ' Problem - AsAjax addons must add styles, js and meta to the head
+                                            '   Adding them to the host page covers most cases, but sometimes the DLL itself
+                                            '   adds styles, etc during processing. These have to be added during the remote method processing.
+                                            '   appending the .innerHTML of the head works for FF, but ie blocks it.
+                                            '   using .createElement works in ie, but the tag system right now not written
+                                            '   to save links, etc, it is written to store the entire tag.
+                                            '   Also, OtherHeadTags can not be added this was.
                                             '
-                                            Call cpCore.html.addOnLoadJavascript(JSOnLoad, AddedByName)
-                                            Call cpCore.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
-                                            Call cpCore.html.addJavaScriptLinkHead(JSFilename, AddedByName)
-                                            If DefaultStylesFilename <> "" Then
-                                                Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), addon.name & " default")
-                                            End If
-                                            'If CustomStylesFilename <> "" Then
-                                            '    Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
-                                            'End If
-                                        End If
-                                    End If
-                                Else
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' otherwise - produce the content from the addon
-                                    '   setup RQS as needed - RQS provides the querystring for add-ons to create links that return to the same page
-                                    '-----------------------------------------------------------------------------------------------------
-                                    '
-                                    If (InFrame And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
-                                        '
-                                        ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
-                                        '
-                                        If True Then
-                                            Call cpCore.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, addon.id.ToString)
-                                            Call cpCore.doc.addRefreshQueryString("optionstring", WorkingOptionString)
-                                        End If
-                                    ElseIf (AsAjax And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
-                                        '
-                                        ' Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
-                                        ' restore form values
-                                        '
-                                        If True Then
-                                            QS = cpCore.docProperties.getText("Hostform")
-                                            If QS <> "" Then
-                                                Call cpCore.docProperties.addQueryString(QS)
-                                            End If
+                                            ' Short Term Fix
+                                            '   For Ajax, Add javascript and style features to head of host page
+                                            '   Then during remotemethod, clear these strings before dll processing. Anything
+                                            '   that is added must have come from the dll. So far, the only addons we have that
+                                            '   do this load styles, so instead of putting in the the head (so ie fails), add styles inline.
                                             '
-                                            ' restore refresh querystring values
+                                            '   This is because ie does not allow innerHTML updates to head tag
+                                            '   scripts and js could be handled with .createElement if only the links were saved, but
+                                            '   otherhead could not.
+                                            '   The case this does not cover is if the addon itself manually adds one of these entries.
+                                            '   In no case can ie handle the OtherHead, however, all the others can be done with .createElement.
+                                            ' Long Term Fix
+                                            '   Convert js, style, and meta tag system to use .createElement during remote method processing
                                             '
-                                            QS = cpCore.docProperties.getText("HostRQS")
-                                            QSSplit = Split(QS, "&")
-                                            For Ptr = 0 To UBound(QSSplit)
-                                                NVPair = QSSplit(Ptr)
-                                                If NVPair <> "" Then
-                                                    NVSplit = Split(NVPair, "=")
-                                                    If UBound(NVSplit) > 0 Then
-                                                        Call cpCore.doc.addRefreshQueryString(NVSplit(0), NVSplit(1))
-                                                    End If
-                                                End If
-                                            Next
-                                            '
-                                            ' restore query string
-                                            '
-                                            QS = cpCore.docProperties.getText("HostQS")
-                                            Call cpCore.docProperties.addQueryString(QS)
-                                            '
-                                            ' Clear the style,js and meta features that were delivered to the host page
-                                            ' After processing, if these strings are not empty, they must have been added by the DLL
-                                            '
-                                            '
-                                            JSOnLoad = ""
-                                            JSBodyEnd = ""
-                                            PageTitle = ""
-                                            MetaDescription = ""
-                                            MetaKeywordList = ""
-                                            OtherHeadTags = ""
-                                            DefaultStylesFilename = ""
-                                            '  CustomStylesFilename = ""
-                                        End If
-                                    End If
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' gather list of included add-ons
-                                    ' do not run yet because CP has not been created
-                                    ' moved here from below to catch scripting entry
-                                    ' moved to within the CP check bc this call includes CP which has not been created
-                                    '-----------------------------------------------------------------
-                                    '
-                                    Dim addonIncludeRules As List(Of Models.Entity.addonIncludeRuleModel) = Models.Entity.addonIncludeRuleModel.createList(cpCore, "(addonid=" & addonId & ")")
-                                    Dim IncludeContent As String = ""
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' Do replacements from Option String and Pick out WrapperID, and AsAjax
-                                    '-----------------------------------------------------------------
-                                    '
-                                    TestString = addon.Copy & TextContent & PageTitle & MetaDescription & MetaKeywordList & OtherHeadTags & FormXML
-                                    If (TestString <> "") And (ReplaceCnt > 0) Then
-                                        For Ptr = 0 To ReplaceCnt - 1
-                                            ReplaceSource = "$" & ReplaceNames(Ptr) & "$"
-                                            ' this section takes 15msec every addon, 32 addons is 480msec.
-                                            ' 20131221 - 4.2.317 - try test first to save time
-                                            If isInStr(1, TestString, ReplaceSource) Then
-                                                ReplaceValue = ReplaceValues(Ptr)
-                                                addon.Copy = genericController.vbReplace(addon.Copy, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                                TextContent = genericController.vbReplace(TextContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                                PageTitle = genericController.vbReplace(PageTitle, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                                MetaDescription = genericController.vbReplace(MetaDescription, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                                MetaKeywordList = genericController.vbReplace(MetaKeywordList, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                                OtherHeadTags = genericController.vbReplace(OtherHeadTags, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                                FormXML = genericController.vbReplace(FormXML, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            End If
-                                        Next
-                                    End If
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' CP compatible section
-                                    '-----------------------------------------------------------------
-                                    '
-                                    If (addonIncludeRules.Count > 0) Or (ScriptingCode <> "") Or (addon.DotNetClass <> "") Then
-                                        For Ptr = 0 To UBound(OptionsForCPVars)
-                                            '
-                                            ' REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR
-                                            ' all these legacy option string systems need to do -- but this was creating a problem and it needed to be fixed asap
-                                            ' if an addon processes an upload, this setProperty() would crush the docproperties .isFile , etc
-                                            ' so -- only add the ones that are not already there -- this is  temp fix until all this is removed
-                                            '
-                                            If Not cpCore.docProperties.containsKey(OptionsForCPVars(Ptr).Name) Then
-                                                cpCore.docProperties.setProperty(OptionsForCPVars(Ptr).Name, OptionsForCPVars(Ptr).Value)
-                                            End If
-                                            'cpCore.docProperties.setProperty(OptionsForCPVars(Ptr).Name, OptionsForCPVars(Ptr).Value)
-                                        Next
-                                        '
-                                        ' ----- run included add-ons before their parent
-                                        ' should be the first executable to run so includes run first
-                                        ' moved here from above because CP is needed
-                                        '
-                                        If addonIncludeRules.Count > 0 Then
-                                            For Each addonRule As Models.Entity.addonIncludeRuleModel In addonIncludeRules
-                                                If addonRule.IncludedAddonID > 0 Then
-                                                    IncludeContent = IncludeContent & executeDependency(addonRule.IncludedAddonID, CPUtilsBaseClass.addonContext.ContextAdmin, HostContentName, HostRecordID, HostFieldName, ACInstanceID, DefaultWrapperID, AddonStatusOK, personalizationPeopleId, personalizationIsAuthenticated)
-                                                End If
-                                            Next
-                                        End If
-                                        '
-                                        ' ----- Scripting
-                                        '
-                                        'hint = hint & ",9"
-                                        If (ScriptingCode <> "") Then
-                                            'hint = "Processing Addon [" & AddonName & "], calling script component."
-                                            Try
-                                                ScriptContent = executeScript(addon, ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & addon.name & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
-                                            Catch ex As Exception
-                                                Dim addonDescription As String = getAddonDescription(cpCore, addon)
-                                                Throw New ApplicationException("There was an error executing the script component of Add-on " & addonDescription & ", AddonOptionString [" & WorkingOptionString & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
-                                            End Try
-                                        End If
-                                        '
-                                        ' ----- Dot Net Addons
-                                        '   Get path to the addon from the collection guid
-                                        '   If no collection, just look in the /addon path
-                                        '
-                                        'hint = hint & ",10"
-                                        If addon.DotNetClass <> "" Then
-                                            '
-                                            Dim addonCollection As Models.Entity.AddonCollectionModel = Models.Entity.AddonCollectionModel.create(cpCore, addon.CollectionID)
-
-                                            'Dim csTmp As Integer
-                                            'csTmp = cpCore.db.cs_openCsSql_rev("default", "select ccGuid from ccAddonCollections where id=" & addon.CollectionID)
-                                            'If cpCore.db.cs_ok(csTmp) Then
-                                            '    CollectionGuid = cpCore.db.cs_getText(csTmp, "ccGuid")
-                                            'End If
-                                            'Call cpCore.db.cs_Close(csTmp)
-                                            '
-                                            AssemblyContent = executeAssembly(addon, addonCollection, errorMessageForAdmin)
-                                            If (errorMessageForAdmin <> "") Then
+                                            Call cpCore.html.doc_AddPagetitle2(PageTitle, AddedByName)
+                                            Call cpCore.html.doc_addMetaDescription2(MetaDescription, AddedByName)
+                                            Call cpCore.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
+                                            Call cpCore.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
+                                            If Not blockJavascriptAndCss Then
                                                 '
-                                                ' log the error
+                                                ' add javascript and styles if it has not run already
                                                 '
-                                                Dim addonDescription As String = getAddonDescription(cpCore, addon)
-                                                Throw New ApplicationException("Unexpected exception in addon " & addonDescription)
-                                                '
-                                                ' Put up an admin hint
-                                                '
-                                                If (Not True) Or (addonType = CPUtilsBaseClass.addonContext.ContextEmail) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (addonType = CPUtilsBaseClass.addonContext.ContextSimple) Then
-                                                    '
-                                                    ' Block all output even on error
-                                                    '
-                                                ElseIf cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
-                                                    '
-                                                    ' Provide hint to administrators
-                                                    '
-                                                    If addon.name = "" And addonId <> 0 Then
-                                                        addon.name = "Addon #" & addonId
-                                                    End If
-                                                    AssemblyContent = cpCore.html.html_GetAdminHintWrapper("<p>There was an error executing the assembly component of Add-on [" & addon.name & "], AddonOptionString [" & WorkingOptionString & "] with class name [" & addon.DotNetClass & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
+                                                Call cpCore.html.addOnLoadJavascript(JSOnLoad, AddedByName)
+                                                Call cpCore.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
+                                                Call cpCore.html.addJavaScriptLinkHead(JSFilename, AddedByName)
+                                                If DefaultStylesFilename <> "" Then
+                                                    Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), addon.name & " default")
                                                 End If
+                                                'If CustomStylesFilename <> "" Then
+                                                '    Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
+                                                'End If
                                             End If
                                         End If
-                                    End If
-                                    ''
-                                    ''-----------------------------------------------------------------
-                                    '' ActiveX Addons
-                                    ''-----------------------------------------------------------------
-                                    ''
-                                    ''hint = "Processing Addon [" & AddonName & "], ActiveX Addons section"
-                                    'If addon.ObjectProgramID <> "" Then
-                                    '    '
-                                    '    ' Go ahead
-                                    '    '
-                                    '    Try
-                                    '        ObjectContent = csv_ExecuteActiveX(addon.ObjectProgramID, AddonName, OptionString_ForObjectCall, WorkingOptionString, errorMessageForAdmin)
-                                    '    Catch ex As Exception
-                                    '        handleException(ex, "There was an error executing the activex component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "], with Program ID [" & addon.ObjectProgramID & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
-                                    '    End Try
-                                    '    AggrObject = Nothing
-                                    'End If
-                                    ''hint = ""
-                                    '
-                                    '-----------------------------------------------------------------------------------------------------
-                                    '   RemoteAssetLink
-                                    '-----------------------------------------------------------------------------------------------------
-                                    '
-                                    If (True) Then
-                                        If RemoteAssetLink <> "" Then
-                                            WorkingLink = RemoteAssetLink
-                                            If genericController.vbInstr(1, WorkingLink, "://") = 0 Then
-                                                If True Then
-                                                    '
-                                                    ' use request object to build link
-                                                    '
-                                                    If Mid(WorkingLink, 1, 1) = "/" Then
-                                                        WorkingLink = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & WorkingLink
-                                                    Else
-                                                        WorkingLink = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & cpCore.webServer.requestVirtualFilePath & WorkingLink
-                                                    End If
-                                                Else
-                                                    '
-                                                    ' use assumptions
-                                                    '
-                                                    If Mid(WorkingLink, 1, 1) = "/" Then
-                                                        WorkingLink = "http://" & cpCore.serverConfig.appConfig.domainList(0) & WorkingLink
-                                                    Else
-                                                        WorkingLink = "http://" & cpCore.serverConfig.appConfig.domainList(0) & "/" & WorkingLink
-                                                    End If
-                                                End If
-                                            End If
-                                            Dim PosStart As Integer
-                                            kmaHTTP = New httpRequestController()
-                                            RemoteAssetContent = kmaHTTP.getURL(WorkingLink)
-                                            Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", vbTextCompare)
-                                            If Pos > 0 Then
-                                                Pos = genericController.vbInstr(Pos, RemoteAssetContent, ">")
-                                                If Pos > 0 Then
-                                                    PosStart = Pos + 1
-                                                    Pos = genericController.vbInstr(Pos, RemoteAssetContent, "</body", vbTextCompare)
-                                                    If Pos > 0 Then
-                                                        RemoteAssetContent = Mid(RemoteAssetContent, PosStart, Pos - PosStart)
-                                                    End If
-                                                End If
-                                            End If
-
-                                        End If
-                                    End If
-                                    '
-                                    '-----------------------------------------------------------------------------------------------------
-                                    '   FormXML
-                                    '-----------------------------------------------------------------------------------------------------
-                                    '
-                                    If True And (FormXML <> "") Then
-                                        FormContent = getFormContent(Nothing, FormXML, ExitAddonWithBlankResponse)
-                                        If ExitAddonWithBlankResponse Then
-                                            Return String.Empty
-                                        End If
-                                    End If
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' Script Callback
-                                    '-----------------------------------------------------------------
-                                    '
-                                    '#If traceExecuteAddon Then
-                                    'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") z"
-                                    '#End If
-                                    If True And (Link <> "") Then
-                                        If WorkingOptionString <> "" Then
-                                            If genericController.vbInstr(1, Link, "?") = 0 Then
-                                                Link = Link & "?" & WorkingOptionString
-                                            Else
-                                                Link = Link & "&" & WorkingOptionString
-                                            End If
-                                        End If
-                                        Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
-                                        Link = EncodeAppRootPath(Link, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
-                                        ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
-                                    End If
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' Add javascripts and other features to page
-                                    '-----------------------------------------------------------------
-                                    '
-                                    AddedByName = addon.name & " addon"
-                                    '
-                                    '#If traceExecuteAddon Then
-                                    'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") aa"
-                                    '#End If
-                                    If True Then
-                                        Call cpCore.html.doc_AddPagetitle2(PageTitle, AddedByName)
-                                        Call cpCore.html.doc_addMetaDescription2(MetaDescription, AddedByName)
-                                        Call cpCore.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                                        Call cpCore.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
-                                        If Not blockJavascriptAndCss Then
-                                            Call cpCore.html.addOnLoadJavascript(JSOnLoad, AddedByName)
-                                            Call cpCore.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
-                                            Call cpCore.html.addJavaScriptLinkHead(JSFilename, AddedByName)
-                                            If DefaultStylesFilename <> "" Then
-                                                Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), addon.name & " default")
-                                            End If
-                                            'If CustomStylesFilename <> "" Then
-                                            '    Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
-                                            'End If
-                                        End If
-                                    End If
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' 2012-6-8 Merge together all the pieces
-                                    '   - moved the encode content call here from below so the content parts can be encoded and not the rest
-                                    '   - below, the csv_EncodeContent addonContext was being hard-coded to contextAdmin, which makes no sense.
-                                    '   - now I let the original context get through, but only call executeContentCommand on the content part (that the admin controls)
-                                    '   - csv_executeContentCommands on only the content parts
-                                    '   - csv_EncodeContent on everything
-                                    '-----------------------------------------------------------------
-                                    '
-                                    '#If traceExecuteAddon Then
-                                    'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ab"
-                                    '#End If
-                                    Dim layoutErrors As String = String.Empty
-                                    If (addonType = CPUtilsBaseClass.addonContext.ContextEditor) Then
-                                        '
-                                        ' editor -- no encoding and no contentcommands
-                                        '
-                                        returnVal = TextContent & addon.Copy
-                                        returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent
-                                        '
-                                        ' csv_EncodeContent everything
-                                        '
-                                        's = csv_EncodeContent9(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = ContextEmail),  WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, nothing, False)
                                     Else
                                         '
-                                        ' encode the content parts of the addon
+                                        '-----------------------------------------------------------------
+                                        ' otherwise - produce the content from the addon
+                                        '   setup RQS as needed - RQS provides the querystring for add-ons to create links that return to the same page
+                                        '-----------------------------------------------------------------------------------------------------
                                         '
-                                        returnVal = TextContent & addon.Copy
-                                        If returnVal <> "" Then
-                                            returnVal = cpCore.html.html_executeContentCommands(Nothing, returnVal, CPUtilsBaseClass.addonContext.ContextAdmin, personalizationPeopleId, personalizationIsAuthenticated, layoutErrors)
-                                            's = csv_EncodeContent9(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, nothing, False)
+                                        If (InFrame And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
+                                            '
+                                            ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
+                                            '
+                                            If True Then
+                                                Call cpCore.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, addon.id.ToString)
+                                                Call cpCore.doc.addRefreshQueryString("optionstring", WorkingOptionString)
+                                            End If
+                                        ElseIf (AsAjax And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
+                                            '
+                                            ' Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
+                                            ' restore form values
+                                            '
+                                            If True Then
+                                                QS = cpCore.docProperties.getText("Hostform")
+                                                If QS <> "" Then
+                                                    Call cpCore.docProperties.addQueryString(QS)
+                                                End If
+                                                '
+                                                ' restore refresh querystring values
+                                                '
+                                                QS = cpCore.docProperties.getText("HostRQS")
+                                                QSSplit = Split(QS, "&")
+                                                For Ptr = 0 To UBound(QSSplit)
+                                                    NVPair = QSSplit(Ptr)
+                                                    If NVPair <> "" Then
+                                                        NVSplit = Split(NVPair, "=")
+                                                        If UBound(NVSplit) > 0 Then
+                                                            Call cpCore.doc.addRefreshQueryString(NVSplit(0), NVSplit(1))
+                                                        End If
+                                                    End If
+                                                Next
+                                                '
+                                                ' restore query string
+                                                '
+                                                QS = cpCore.docProperties.getText("HostQS")
+                                                Call cpCore.docProperties.addQueryString(QS)
+                                                '
+                                                ' Clear the style,js and meta features that were delivered to the host page
+                                                ' After processing, if these strings are not empty, they must have been added by the DLL
+                                                '
+                                                '
+                                                JSOnLoad = ""
+                                                JSBodyEnd = ""
+                                                PageTitle = ""
+                                                MetaDescription = ""
+                                                MetaKeywordList = ""
+                                                OtherHeadTags = ""
+                                                DefaultStylesFilename = ""
+                                                '  CustomStylesFilename = ""
+                                            End If
                                         End If
                                         '
-                                        ' add in the rest
+                                        '-----------------------------------------------------------------
+                                        ' gather list of included add-ons
+                                        ' do not run yet because CP has not been created
+                                        ' moved here from below to catch scripting entry
+                                        ' moved to within the CP check bc this call includes CP which has not been created
+                                        '-----------------------------------------------------------------
                                         '
-                                        returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent
+                                        Dim addonIncludeRules As List(Of Models.Entity.addonIncludeRuleModel) = Models.Entity.addonIncludeRuleModel.createList(cpCore, "(addonid=" & addonId & ")")
+                                        Dim IncludeContent As String = ""
                                         '
-                                        ' csv_EncodeContent everything
+                                        '-----------------------------------------------------------------
+                                        ' Do replacements from Option String and Pick out WrapperID, and AsAjax
+                                        '-----------------------------------------------------------------
                                         '
-                                        returnVal = cpCore.html.encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (addonType = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, addonType, personalizationIsAuthenticated, Nothing, False)
-                                    End If
-                                    '
-                                    '-----------------------------------------------------------------
-                                    ' check for xml contensive process instruction
-                                    '   This is also handled in Encode Content, but here we can return the admin error message
-                                    '   Once processed, it will skip the csv_EncodeContent processesing anyway
-                                    '-----------------------------------------------------------------
-                                    '
-                                    '#If traceExecuteAddon Then
-                                    'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ac"
-                                    '#End If
-                                    Pos = genericController.vbInstr(1, returnVal, "<?contensive", vbTextCompare)
-                                    If Pos > 0 Then
-                                        Dim addonDescription As String = getAddonDescription(cpCore, addon)
-                                        Throw New ApplicationException("xml structured commands are no longer supported, addon" & addonDescription)
+                                        TestString = addon.Copy & TextContent & PageTitle & MetaDescription & MetaKeywordList & OtherHeadTags & FormXML
+                                        If (TestString <> "") And (ReplaceCnt > 0) Then
+                                            For Ptr = 0 To ReplaceCnt - 1
+                                                ReplaceSource = "$" & ReplaceNames(Ptr) & "$"
+                                                ' this section takes 15msec every addon, 32 addons is 480msec.
+                                                ' 20131221 - 4.2.317 - try test first to save time
+                                                If isInStr(1, TestString, ReplaceSource) Then
+                                                    ReplaceValue = ReplaceValues(Ptr)
+                                                    addon.Copy = genericController.vbReplace(addon.Copy, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                                    TextContent = genericController.vbReplace(TextContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                                    PageTitle = genericController.vbReplace(PageTitle, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                                    MetaDescription = genericController.vbReplace(MetaDescription, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                                    MetaKeywordList = genericController.vbReplace(MetaKeywordList, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                                    OtherHeadTags = genericController.vbReplace(OtherHeadTags, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                                    FormXML = genericController.vbReplace(FormXML, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                                End If
+                                            Next
+                                        End If
+                                        '
+                                        '-----------------------------------------------------------------
+                                        ' CP compatible section
+                                        '-----------------------------------------------------------------
+                                        '
+                                        If (addonIncludeRules.Count > 0) Or (ScriptingCode <> "") Or (addon.DotNetClass <> "") Then
+                                            For Ptr = 0 To UBound(OptionsForCPVars)
+                                                '
+                                                ' REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR
+                                                ' all these legacy option string systems need to do -- but this was creating a problem and it needed to be fixed asap
+                                                ' if an addon processes an upload, this setProperty() would crush the docproperties .isFile , etc
+                                                ' so -- only add the ones that are not already there -- this is  temp fix until all this is removed
+                                                '
+                                                If Not cpCore.docProperties.containsKey(OptionsForCPVars(Ptr).Name) Then
+                                                    cpCore.docProperties.setProperty(OptionsForCPVars(Ptr).Name, OptionsForCPVars(Ptr).Value)
+                                                End If
+                                                'cpCore.docProperties.setProperty(OptionsForCPVars(Ptr).Name, OptionsForCPVars(Ptr).Value)
+                                            Next
+                                            '
+                                            ' ----- run included add-ons before their parent
+                                            ' should be the first executable to run so includes run first
+                                            ' moved here from above because CP is needed
+                                            '
+                                            If addonIncludeRules.Count > 0 Then
+                                                For Each addonRule As Models.Entity.addonIncludeRuleModel In addonIncludeRules
+                                                    If addonRule.IncludedAddonID > 0 Then
+                                                        IncludeContent = IncludeContent & executeDependency(Models.Entity.addonModel.create(cpCore, addonRule.IncludedAddonID), executeContext)
+                                                    End If
+                                                Next
+                                            End If
+                                            '
+                                            ' ----- Scripting
+                                            '
+                                            'hint = hint & ",9"
+                                            If (ScriptingCode <> "") Then
+                                                'hint = "Processing Addon [" & AddonName & "], calling script component."
+                                                Try
+                                                    ScriptContent = executeScript(addon, ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & addon.name & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
+                                                Catch ex As Exception
+                                                    Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                                                    Throw New ApplicationException("There was an error executing the script component of Add-on " & addonDescription & ", AddonOptionString [" & WorkingOptionString & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
+                                                End Try
+                                            End If
+                                            '
+                                            ' ----- Dot Net Addons
+                                            '   Get path to the addon from the collection guid
+                                            '   If no collection, just look in the /addon path
+                                            '
+                                            'hint = hint & ",10"
+                                            If addon.DotNetClass <> "" Then
+                                                '
+                                                Dim addonCollection As Models.Entity.AddonCollectionModel = Models.Entity.AddonCollectionModel.create(cpCore, addon.CollectionID)
+
+                                                'Dim csTmp As Integer
+                                                'csTmp = cpCore.db.cs_openCsSql_rev("default", "select ccGuid from ccAddonCollections where id=" & addon.CollectionID)
+                                                'If cpCore.db.cs_ok(csTmp) Then
+                                                '    CollectionGuid = cpCore.db.cs_getText(csTmp, "ccGuid")
+                                                'End If
+                                                'Call cpCore.db.cs_Close(csTmp)
+                                                '
+                                                AssemblyContent = executeAssembly(addon, addonCollection, errorMessageForAdmin)
+                                                If (errorMessageForAdmin <> "") Then
+                                                    '
+                                                    ' log the error
+                                                    '
+                                                    Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                                                    Throw New ApplicationException("Unexpected exception in addon " & addonDescription)
+                                                    '
+                                                    ' Put up an admin hint
+                                                    '
+                                                    If (Not True) Or (addonType = CPUtilsBaseClass.addonContext.ContextEmail) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (addonType = CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                                        '
+                                                        ' Block all output even on error
+                                                        '
+                                                    ElseIf cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                                                        '
+                                                        ' Provide hint to administrators
+                                                        '
+                                                        If addon.name = "" And addonId <> 0 Then
+                                                            addon.name = "Addon #" & addonId
+                                                        End If
+                                                        AssemblyContent = cpCore.html.html_GetAdminHintWrapper("<p>There was an error executing the assembly component of Add-on [" & addon.name & "], AddonOptionString [" & WorkingOptionString & "] with class name [" & addon.DotNetClass & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
+                                                    End If
+                                                End If
+                                            End If
+                                        End If
                                         ''
-                                        ''output is xml structured data
-                                        '' pass the data in as an argument to the structured data processor
-                                        '' and return its result
+                                        ''-----------------------------------------------------------------
+                                        '' ActiveX Addons
+                                        ''-----------------------------------------------------------------
                                         ''
-                                        's = Mid(s, Pos)
-                                        'LayoutEngineOptionString = "data=" & encodeNvaArgument(s)
-                                        'Dim structuredData As New core_primitivesStructuredDataClass(Me)
-                                        's = structuredData.execute()
-                                        's = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", errorMessageForAdmin)
-                                        'If (errorMessageForAdmin <> "") Then
+                                        ''hint = "Processing Addon [" & AddonName & "], ActiveX Addons section"
+                                        'If addon.ObjectProgramID <> "" Then
                                         '    '
-                                        '    ' Put up an admin hint
+                                        '    ' Go ahead
                                         '    '
-                                        '    If (Not true) Or (Context = CPUtilsBaseClass.addonContext.contextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethod) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
-                                        '        '
-                                        '        ' Block all output even on error
-                                        '        '
-                                        '    ElseIf  cpcore.authContext.user.user_isAdmin() Then
-                                        '        '
-                                        '        ' Provide hint to administrators
-                                        '        '
-                                        '        If AddonName = "" And addonId <> 0 Then
-                                        '            AddonName = "Addon #" & addonId
-                                        '        End If
-                                        '        s = s & cpCore.main_GetAdminHintWrapper("<p>There was an error executing the Layout Engine for addon [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "], with Program ID [" & addon.ObjectProgramID & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
-                                        '    End If
+                                        '    Try
+                                        '        ObjectContent = csv_ExecuteActiveX(addon.ObjectProgramID, AddonName, OptionString_ForObjectCall, WorkingOptionString, errorMessageForAdmin)
+                                        '    Catch ex As Exception
+                                        '        handleException(ex, "There was an error executing the activex component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "], with Program ID [" & addon.ObjectProgramID & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
+                                        '    End Try
+                                        '    AggrObject = Nothing
                                         'End If
+                                        ''hint = ""
+                                        '
+                                        '-----------------------------------------------------------------------------------------------------
+                                        '   RemoteAssetLink
+                                        '-----------------------------------------------------------------------------------------------------
+                                        '
+                                        If (True) Then
+                                            If RemoteAssetLink <> "" Then
+                                                WorkingLink = RemoteAssetLink
+                                                If genericController.vbInstr(1, WorkingLink, "://") = 0 Then
+                                                    If True Then
+                                                        '
+                                                        ' use request object to build link
+                                                        '
+                                                        If Mid(WorkingLink, 1, 1) = "/" Then
+                                                            WorkingLink = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & WorkingLink
+                                                        Else
+                                                            WorkingLink = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & cpCore.webServer.requestVirtualFilePath & WorkingLink
+                                                        End If
+                                                    Else
+                                                        '
+                                                        ' use assumptions
+                                                        '
+                                                        If Mid(WorkingLink, 1, 1) = "/" Then
+                                                            WorkingLink = "http://" & cpCore.serverConfig.appConfig.domainList(0) & WorkingLink
+                                                        Else
+                                                            WorkingLink = "http://" & cpCore.serverConfig.appConfig.domainList(0) & "/" & WorkingLink
+                                                        End If
+                                                    End If
+                                                End If
+                                                Dim PosStart As Integer
+                                                kmaHTTP = New httpRequestController()
+                                                RemoteAssetContent = kmaHTTP.getURL(WorkingLink)
+                                                Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", vbTextCompare)
+                                                If Pos > 0 Then
+                                                    Pos = genericController.vbInstr(Pos, RemoteAssetContent, ">")
+                                                    If Pos > 0 Then
+                                                        PosStart = Pos + 1
+                                                        Pos = genericController.vbInstr(Pos, RemoteAssetContent, "</body", vbTextCompare)
+                                                        If Pos > 0 Then
+                                                            RemoteAssetContent = Mid(RemoteAssetContent, PosStart, Pos - PosStart)
+                                                        End If
+                                                    End If
+                                                End If
+
+                                            End If
+                                        End If
+                                        '
+                                        '-----------------------------------------------------------------------------------------------------
+                                        '   FormXML
+                                        '-----------------------------------------------------------------------------------------------------
+                                        '
+                                        If True And (FormXML <> "") Then
+                                            FormContent = getFormContent(Nothing, FormXML, ExitAddonWithBlankResponse)
+                                            If ExitAddonWithBlankResponse Then
+                                                Return String.Empty
+                                            End If
+                                        End If
+                                        '
+                                        '-----------------------------------------------------------------
+                                        ' Script Callback
+                                        '-----------------------------------------------------------------
+                                        '
+                                        '#If traceExecuteAddon Then
+                                        'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") z"
+                                        '#End If
+                                        If True And (Link <> "") Then
+                                            If WorkingOptionString <> "" Then
+                                                If genericController.vbInstr(1, Link, "?") = 0 Then
+                                                    Link = Link & "?" & WorkingOptionString
+                                                Else
+                                                    Link = Link & "&" & WorkingOptionString
+                                                End If
+                                            End If
+                                            Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
+                                            Link = EncodeAppRootPath(Link, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
+                                            ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
+                                        End If
+                                        '
+                                        '-----------------------------------------------------------------
+                                        ' Add javascripts and other features to page
+                                        '-----------------------------------------------------------------
+                                        '
+                                        AddedByName = addon.name & " addon"
+                                        '
+                                        '#If traceExecuteAddon Then
+                                        'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") aa"
+                                        '#End If
+                                        If True Then
+                                            Call cpCore.html.doc_AddPagetitle2(PageTitle, AddedByName)
+                                            Call cpCore.html.doc_addMetaDescription2(MetaDescription, AddedByName)
+                                            Call cpCore.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
+                                            Call cpCore.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
+                                            If Not blockJavascriptAndCss Then
+                                                Call cpCore.html.addOnLoadJavascript(JSOnLoad, AddedByName)
+                                                Call cpCore.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
+                                                Call cpCore.html.addJavaScriptLinkHead(JSFilename, AddedByName)
+                                                If DefaultStylesFilename <> "" Then
+                                                    Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), addon.name & " default")
+                                                End If
+                                                'If CustomStylesFilename <> "" Then
+                                                '    Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
+                                                'End If
+                                            End If
+                                        End If
+                                        '
+                                        '-----------------------------------------------------------------
+                                        ' 2012-6-8 Merge together all the pieces
+                                        '   - moved the encode content call here from below so the content parts can be encoded and not the rest
+                                        '   - below, the csv_EncodeContent addonContext was being hard-coded to contextAdmin, which makes no sense.
+                                        '   - now I let the original context get through, but only call executeContentCommand on the content part (that the admin controls)
+                                        '   - csv_executeContentCommands on only the content parts
+                                        '   - csv_EncodeContent on everything
+                                        '-----------------------------------------------------------------
+                                        '
+                                        '#If traceExecuteAddon Then
+                                        'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ab"
+                                        '#End If
+                                        Dim layoutErrors As String = String.Empty
+                                        If (addonType = CPUtilsBaseClass.addonContext.ContextEditor) Then
+                                            '
+                                            ' editor -- no encoding and no contentcommands
+                                            '
+                                            returnVal = TextContent & addon.Copy
+                                            returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent
+                                            '
+                                            ' csv_EncodeContent everything
+                                            '
+                                            's = csv_EncodeContent9(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = ContextEmail),  WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, nothing, False)
+                                        Else
+                                            '
+                                            ' encode the content parts of the addon
+                                            '
+                                            returnVal = TextContent & addon.Copy
+                                            If returnVal <> "" Then
+                                                returnVal = cpCore.html.html_executeContentCommands(Nothing, returnVal, CPUtilsBaseClass.addonContext.ContextAdmin, personalizationPeopleId, personalizationIsAuthenticated, layoutErrors)
+                                                's = csv_EncodeContent9(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, nothing, False)
+                                            End If
+                                            '
+                                            ' add in the rest
+                                            '
+                                            returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent
+                                            '
+                                            ' csv_EncodeContent everything
+                                            '
+                                            returnVal = cpCore.html.encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (addonType = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, "", addonType, personalizationIsAuthenticated, Nothing, False)
+                                        End If
+                                        '
+                                        '-----------------------------------------------------------------
+                                        ' check for xml contensive process instruction
+                                        '   This is also handled in Encode Content, but here we can return the admin error message
+                                        '   Once processed, it will skip the csv_EncodeContent processesing anyway
+                                        '-----------------------------------------------------------------
+                                        '
+                                        '#If traceExecuteAddon Then
+                                        'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ac"
+                                        '#End If
+                                        Pos = genericController.vbInstr(1, returnVal, "<?contensive", vbTextCompare)
+                                        If Pos > 0 Then
+                                            Dim addonDescription As String = getAddonDescription(cpCore, addon)
+                                            Throw New ApplicationException("xml structured commands are no longer supported, addon" & addonDescription)
+                                            ''
+                                            ''output is xml structured data
+                                            '' pass the data in as an argument to the structured data processor
+                                            '' and return its result
+                                            ''
+                                            's = Mid(s, Pos)
+                                            'LayoutEngineOptionString = "data=" & encodeNvaArgument(s)
+                                            'Dim structuredData As New core_primitivesStructuredDataClass(Me)
+                                            's = structuredData.execute()
+                                            's = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", errorMessageForAdmin)
+                                            'If (errorMessageForAdmin <> "") Then
+                                            '    '
+                                            '    ' Put up an admin hint
+                                            '    '
+                                            '    If (Not true) Or (Context = CPUtilsBaseClass.addonContext.contextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethod) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                            '        '
+                                            '        ' Block all output even on error
+                                            '        '
+                                            '    ElseIf  cpcore.authContext.user.user_isAdmin() Then
+                                            '        '
+                                            '        ' Provide hint to administrators
+                                            '        '
+                                            '        If AddonName = "" And addonId <> 0 Then
+                                            '            AddonName = "Addon #" & addonId
+                                            '        End If
+                                            '        s = s & cpCore.main_GetAdminHintWrapper("<p>There was an error executing the Layout Engine for addon [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "], with Program ID [" & addon.ObjectProgramID & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
+                                            '    End If
+                                            'End If
+                                        End If
+                                        '
+                                        '-----------------------------------------------------------------
+                                        ' Add Css containers
+                                        '-----------------------------------------------------------------
+                                        '
+                                        '#If traceExecuteAddon Then
+                                        'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ad"
+                                        '#End If
+                                        If ContainerCssID <> "" Or ContainerCssClass <> "" Then
+                                            If IsInline Then
+                                                returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """ style=""display:inline;"">" & returnVal & "</div>"
+                                            Else
+                                                returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """>" & htmlIndent(returnVal) & cr & "</div>"
+                                            End If
+                                        End If
                                     End If
                                     '
                                     '-----------------------------------------------------------------
-                                    ' Add Css containers
+                                    '   Add Wrappers to content
                                     '-----------------------------------------------------------------
                                     '
                                     '#If traceExecuteAddon Then
-                                    'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ad"
+                                    'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ae"
                                     '#End If
-                                    If ContainerCssID <> "" Or ContainerCssClass <> "" Then
-                                        If IsInline Then
-                                            returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """ style=""display:inline;"">" & returnVal & "</div>"
-                                        Else
-                                            returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """>" & htmlIndent(returnVal) & cr & "</div>"
-                                        End If
-                                    End If
-                                End If
-                                '
-                                '-----------------------------------------------------------------
-                                '   Add Wrappers to content
-                                '-----------------------------------------------------------------
-                                '
-                                '#If traceExecuteAddon Then
-                                'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ae"
-                                '#End If
-                                If True Then
-                                    If (InFrame And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
-                                        '
-                                        ' Return IFrame content
-                                        '   Framed in content, during the remote method call
-                                        '   add in the rest of the html page
-                                        '
-                                        Call cpCore.doc.setMetaContent(0, 0)
-                                        returnVal = "" _
+                                    If True Then
+                                        If (InFrame And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
+                                            '
+                                            ' Return IFrame content
+                                            '   Framed in content, during the remote method call
+                                            '   add in the rest of the html page
+                                            '
+                                            Call cpCore.doc.setMetaContent(0, 0)
+                                            returnVal = "" _
                                         & cpCore.siteProperties.docTypeDeclaration() _
                                         & vbCrLf & "<html>" _
                                         & cr & "<head>" _
@@ -1223,96 +1086,94 @@ Namespace Contensive.Core.Controllers
                                         & cr & TemplateDefaultBodyTag _
                                         & cr & "</body>" _
                                         & vbCrLf & "</html>"
-                                    ElseIf (AsAjax And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
-                                        '
-                                        ' Return Ajax content
-                                        '   AsAjax addon, during the Ajax callback
-                                        '   need to create an onload event that runs everything appended to onload within this content
-                                        '
-                                        returnVal = returnVal
-                                    ElseIf ((addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
-                                        '
-                                        ' Return non-ajax/non-Iframe remote method content (no wrapper)
-                                        '
-                                    ElseIf (addonType = CPUtilsBaseClass.addonContext.ContextEmail) Then
-                                        '
-                                        ' Return Email context (no wrappers)
-                                        '
-                                    ElseIf (addonType = CPUtilsBaseClass.addonContext.ContextSimple) Then
-                                        '
-                                        ' Add-on called by another add-on, subroutine style (no wrappers)
-                                        '
-                                    Else
-                                        '
-                                        ' Return all other types
-                                        '
-                                        If IncludeEditWrapper Then
+                                        ElseIf (AsAjax And (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                             '
-                                            ' Add Edit Wrapper
+                                            ' Return Ajax content
+                                            '   AsAjax addon, during the Ajax callback
+                                            '   need to create an onload event that runs everything appended to onload within this content
                                             '
-                                            EditWrapperHTMLID = "eWrapper" & cpCore.pageAddonCnt
-                                            'HelpIcon = cpcore.main_GetHelpLink("", "Add-on " & AddonName, helpCopy, helpLink)
+                                            returnVal = returnVal
+                                        ElseIf ((addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                             '
-                                            ' Edit Icon
+                                            ' Return non-ajax/non-Iframe remote method content (no wrapper)
                                             '
-                                            If (addonId <> 0) Then
-                                                If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
-                                                    AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & addon.name & " Add-on", "Edit the " & addon.name & " Add-on", "", True, "")
-                                                    AddonEditIcon = "<a href=""" & cpCore.siteProperties.adminURL & "?cid=" & cpCore.metaData.getContentId(cnAddons) & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
-                                                    InstanceSettingsEditIcon = getInstanceBubble(addon.name, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, addonType, DialogList)
-                                                    AddonStylesEditIcon = getAddonStylesBubble(addonId, DialogList)
-                                                    HTMLViewerEditIcon = getHTMLViewerBubble(addonId, "editWrapper" & cpCore.doc.editWrapperCnt, DialogList)
-                                                    HelpIcon = getHelpBubble(addonId, helpCopy, addon.CollectionID, DialogList)
-                                                    ToolBar = InstanceSettingsEditIcon & AddonEditIcon & AddonStylesEditIcon & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
-                                                    ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
-                                                    returnVal = cpCore.html.main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & addon.name & DialogList & "</div>", returnVal)
-                                                    's = GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "</div><div class=""ccAddonEditTools"">" & ToolBar & "</div>", s)
-                                                ElseIf cpCore.visitProperty.getBoolean("AllowEditing") Then
-                                                    returnVal = cpCore.html.main_GetEditWrapper("<div class=""ccAddonEditCaption"">" & addon.name & "&nbsp;" & HelpIcon & "</div>", returnVal)
+                                        ElseIf (addonType = CPUtilsBaseClass.addonContext.ContextEmail) Then
+                                            '
+                                            ' Return Email context (no wrappers)
+                                            '
+                                        ElseIf (addonType = CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                            '
+                                            ' Add-on called by another add-on, subroutine style (no wrappers)
+                                            '
+                                        Else
+                                            '
+                                            ' Return all other types
+                                            '
+                                            If IncludeEditWrapper Then
+                                                '
+                                                ' Add Edit Wrapper
+                                                '
+                                                EditWrapperHTMLID = "eWrapper" & cpCore.pageAddonCnt
+                                                'HelpIcon = cpcore.main_GetHelpLink("", "Add-on " & AddonName, helpCopy, helpLink)
+                                                '
+                                                ' Edit Icon
+                                                '
+                                                If (addonId <> 0) Then
+                                                    If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
+                                                        AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & addon.name & " Add-on", "Edit the " & addon.name & " Add-on", "", True, "")
+                                                        AddonEditIcon = "<a href=""" & cpCore.siteProperties.adminURL & "?cid=" & cpCore.metaData.getContentId(cnAddons) & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
+                                                        InstanceSettingsEditIcon = getInstanceBubble(addon.name, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, addonType, DialogList)
+                                                        AddonStylesEditIcon = getAddonStylesBubble(addonId, DialogList)
+                                                        HTMLViewerEditIcon = getHTMLViewerBubble(addonId, "editWrapper" & cpCore.doc.editWrapperCnt, DialogList)
+                                                        HelpIcon = getHelpBubble(addonId, helpCopy, addon.CollectionID, DialogList)
+                                                        ToolBar = InstanceSettingsEditIcon & AddonEditIcon & AddonStylesEditIcon & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
+                                                        ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
+                                                        returnVal = cpCore.html.main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & addon.name & DialogList & "</div>", returnVal)
+                                                        's = GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "</div><div class=""ccAddonEditTools"">" & ToolBar & "</div>", s)
+                                                    ElseIf cpCore.visitProperty.getBoolean("AllowEditing") Then
+                                                        returnVal = cpCore.html.main_GetEditWrapper("<div class=""ccAddonEditCaption"">" & addon.name & "&nbsp;" & HelpIcon & "</div>", returnVal)
+                                                    End If
                                                 End If
                                             End If
-                                        End If
-                                        ' moved to calling routines - so if this is called from an add-on without context, the data may not be html
-                                        '
-                                        ' Add Comment wrapper - to help debugging except email, remote methods and admin (empty is used to detect no result)
-                                        '
-                                        If True And (addonType <> CPUtilsBaseClass.addonContext.ContextAdmin) And (addonType <> CPUtilsBaseClass.addonContext.ContextEmail) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) And (addonType <> CPUtilsBaseClass.addonContext.ContextSimple) Then
-                                            If cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                                                AddonCommentName = genericController.vbReplace(addon.name, "-->", "..>")
-                                                If IsInline Then
-                                                    returnVal = "<!-- Add-on " & AddonCommentName & " -->" & returnVal & "<!-- /Add-on " & AddonCommentName & " -->"
-                                                Else
-                                                    returnVal = "" _
+                                            ' moved to calling routines - so if this is called from an add-on without context, the data may not be html
+                                            '
+                                            ' Add Comment wrapper - to help debugging except email, remote methods and admin (empty is used to detect no result)
+                                            '
+                                            If True And (addonType <> CPUtilsBaseClass.addonContext.ContextAdmin) And (addonType <> CPUtilsBaseClass.addonContext.ContextEmail) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) And (addonType <> CPUtilsBaseClass.addonContext.ContextSimple) Then
+                                                If cpCore.visitProperty.getBoolean("AllowDebugging") Then
+                                                    AddonCommentName = genericController.vbReplace(addon.name, "-->", "..>")
+                                                    If IsInline Then
+                                                        returnVal = "<!-- Add-on " & AddonCommentName & " -->" & returnVal & "<!-- /Add-on " & AddonCommentName & " -->"
+                                                    Else
+                                                        returnVal = "" _
                                                     & cr & "<!-- Add-on " & AddonCommentName & " -->" _
                                                     & htmlIndent(returnVal) _
                                                     & cr & "<!-- /Add-on " & AddonCommentName & " -->"
+                                                    End If
                                                 End If
                                             End If
-                                        End If
-                                        '
-                                        ' Add Design Wrapper
-                                        '
-                                        If (returnVal <> "") And (Not IsInline) And (WrapperID > 0) And (True) Then
-                                            returnVal = addWrapperToResult(returnVal, WrapperID, "for Add-on " & addon.name)
+                                            '
+                                            ' Add Design Wrapper
+                                            '
+                                            If (returnVal <> "") And (Not IsInline) And (WrapperID > 0) And (True) Then
+                                                returnVal = addWrapperToResult(returnVal, WrapperID, "for Add-on " & addon.name)
+                                            End If
                                         End If
                                     End If
+                                    '
+                                    ' this completes the execute of this cpcore.addon. remove it from the 'running' list
+                                    '
+                                    cpCore.addonsCurrentlyRunningIdList.Remove(addonId)
+                                    'csv_addon_execute_AddonsCurrentlyRunningIdList = genericController.vbReplace(csv_addon_execute_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
                                 End If
-                                '
-                                ' this completes the execute of this cpcore.addon. remove it from the 'running' list
-                                '
-                                cpCore.addonsCurrentlyRunningIdList.Remove(addonId)
-                                'csv_addon_execute_AddonsCurrentlyRunningIdList = genericController.vbReplace(csv_addon_execute_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
                             End If
                         End If
                     End If
+                    optionString = PushOptionString
+                    '
+                    cpCore.pageAddonCnt = cpCore.pageAddonCnt + 1
                 End If
-                OptionString = PushOptionString
-                '
-                cpCore.pageAddonCnt = cpCore.pageAddonCnt + 1
             Catch ex As Exception
-                '
-                ' protect environment from addon error
-                '
                 cpCore.handleException(ex)
             End Try
             Return returnVal
@@ -1353,7 +1214,6 @@ Namespace Contensive.Core.Controllers
                 Dim NonEncodedLink As String
                 Dim EncodedLink As String
                 Dim VirtualFilePath As String
-                Dim OptionString As String
                 Dim TabName As String
                 Dim TabDescription As String
                 Dim TabHeading As String
@@ -1621,8 +1481,16 @@ Namespace Contensive.Core.Controllers
                                                                     '
                                                                     ' Use Editor Addon
                                                                     '
-                                                                    OptionString = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
-                                                                    Copy = execute_legacy5(0, FieldAddon, OptionString, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
+                                                                    Dim arguments As New Dictionary(Of String, String)
+                                                                    arguments.Add("FieldName", FieldName)
+                                                                    arguments.Add("FieldValue", cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
+                                                                    'OptionString = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
+                                                                    Dim addon As addonModel = addonModel.createByName(cpCore, FieldAddon)
+                                                                    Copy = cpCore.addon.execute(addon, New CPUtilsBaseClass.addonExecuteContext() With {
+                                                                        .addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
+                                                                        .instanceArguments = arguments
+                                                                    })
+                                                                    'Copy = execute_legacy5(0, FieldAddon, OptionString, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
                                                                 ElseIf FieldSelector <> "" Then
                                                                     '
                                                                     ' Use Selector
@@ -2589,65 +2457,65 @@ Namespace Contensive.Core.Controllers
             End Try
             Return result
         End Function
-        '
-        '=============================================================================================================
-        '   cpcore.main_Get Addon Content
-        ' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
-        '=============================================================================================================
-        '
-        Public Function execute_legacy5(ByVal addonId As Integer, ByVal AddonName As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String, ByVal ACInstanceID As Integer) As String
-            Dim AddonStatusOK As Boolean
-            execute_legacy5 = execute_legacy2(addonId, AddonName, Option_String, Context, ContentName, RecordID, FieldName, CStr(ACInstanceID), False, 0, "", AddonStatusOK, Nothing)
-        End Function
-        '
-        '====================================================================================================
-        ' Public Interface
-        ' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
-        '====================================================================================================
-        '
-        Public Function execute_legacy1(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal DefaultWrapperID As Integer) As String
-            Dim AddonStatusOK As Boolean
-            Dim workingContext As CPUtilsBaseClass.addonContext
-            '
-            workingContext = Context
-            If workingContext = 0 Then
-                workingContext = CPUtilsBaseClass.addonContext.ContextPage
-            End If
-            execute_legacy1 = execute_legacy2(addonId, AddonNameOrGuid, Option_String, workingContext, HostContentName, HostRecordID, HostFieldName, ACInstanceID, False, DefaultWrapperID, "", AddonStatusOK, Nothing)
-        End Function
-        '
-        '====================================================================================================
-        ' Public Interface to support AsProcess
-        '   Programmatic calls to executeAddon would not require Context, HostContent, etc because the host would be an add-on, and the
-        '   addon has control or settings, not the administrator
-        ' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
-        '====================================================================================================
-        '
-        Public Function execute_legacy3(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal WrapperID As Integer = 0) As String
-            Dim AddonStatusOK As Boolean
-            If genericController.vbIsNumeric(AddonIDGuidOrName) Then
-                Return execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, Nothing)
-            Else
-                Return execute_legacy2(0, AddonIDGuidOrName, Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, Nothing)
-            End If
-        End Function
-        '
-        ' Public Interface to support AsProcess
-        '
-        Public Function execute_legacy4(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal Context As CPUtilsBaseClass.addonContext = CPUtilsBaseClass.addonContext.ContextPage, Optional ByVal nothingObject As Object = Nothing) As String
-            Dim AddonStatusOK As Boolean
-            Dim workingContext As CPUtilsBaseClass.addonContext
-            '
-            workingContext = Context
-            If workingContext = 0 Then
-                workingContext = CPUtilsBaseClass.addonContext.ContextPage
-            End If
-            If genericController.vbIsNumeric(AddonIDGuidOrName) Then
-                execute_legacy4 = execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
-            Else
-                execute_legacy4 = execute_legacy2(0, AddonIDGuidOrName, Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
-            End If
-        End Function
+        ''
+        ''=============================================================================================================
+        ''   cpcore.main_Get Addon Content
+        '' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
+        ''=============================================================================================================
+        ''
+        'Public Function execute_legacy5(ByVal addonId As Integer, ByVal AddonName As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String, ByVal ACInstanceID As Integer) As String
+        '    Dim AddonStatusOK As Boolean
+        '    execute_legacy5 = execute_legacy2(addonId, AddonName, Option_String, Context, ContentName, RecordID, FieldName, CStr(ACInstanceID), False, 0, "", AddonStatusOK, Nothing)
+        'End Function
+        ''
+        ''====================================================================================================
+        '' Public Interface
+        '' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
+        ''====================================================================================================
+        ''
+        'Public Function execute_legacy1(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal DefaultWrapperID As Integer) As String
+        '    Dim AddonStatusOK As Boolean
+        '    Dim workingContext As CPUtilsBaseClass.addonContext
+        '    '
+        '    workingContext = Context
+        '    If workingContext = 0 Then
+        '        workingContext = CPUtilsBaseClass.addonContext.ContextPage
+        '    End If
+        '    execute_legacy1 = execute_legacy2(addonId, AddonNameOrGuid, Option_String, workingContext, HostContentName, HostRecordID, HostFieldName, ACInstanceID, False, DefaultWrapperID, "", AddonStatusOK, Nothing)
+        'End Function
+        ''
+        ''====================================================================================================
+        '' Public Interface to support AsProcess
+        ''   Programmatic calls to executeAddon would not require Context, HostContent, etc because the host would be an add-on, and the
+        ''   addon has control or settings, not the administrator
+        '' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
+        ''====================================================================================================
+        ''
+        'Public Function execute_legacy3(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal WrapperID As Integer = 0) As String
+        '    Dim AddonStatusOK As Boolean
+        '    If genericController.vbIsNumeric(AddonIDGuidOrName) Then
+        '        Return execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, Nothing)
+        '    Else
+        '        Return execute_legacy2(0, AddonIDGuidOrName, Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, Nothing)
+        '    End If
+        'End Function
+        ''
+        '' Public Interface to support AsProcess
+        ''
+        'Public Function execute_legacy4(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal Context As CPUtilsBaseClass.addonContext = CPUtilsBaseClass.addonContext.ContextPage, Optional ByVal nothingObject As Object = Nothing) As String
+        '    Dim AddonStatusOK As Boolean
+        '    Dim workingContext As CPUtilsBaseClass.addonContext
+        '    '
+        '    workingContext = Context
+        '    If workingContext = 0 Then
+        '        workingContext = CPUtilsBaseClass.addonContext.ContextPage
+        '    End If
+        '    If genericController.vbIsNumeric(AddonIDGuidOrName) Then
+        '        execute_legacy4 = execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
+        '    Else
+        '        execute_legacy4 = execute_legacy2(0, AddonIDGuidOrName, Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
+        '    End If
+        'End Function
         ''
         ''=============================================================================================================
         ''   Run Add-on as process
@@ -2659,15 +2527,15 @@ Namespace Contensive.Core.Controllers
         '    executeAddonAsProcess_legacy1 = executeAddonAsProcess(AddonIDGuidOrName, Option_String, nothingObject, WaitForResults)
         '    '
         'End Function
-        '
-        '=============================================================================================================
-        '   cpcore.main_Get Addon Content - internal (to support include add-ons)
-        ' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
-        '=============================================================================================================
-        '
-        Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef ignore As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            execute_legacy2 = execute_legacy6(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, False, nothingObject, AddonInUseIdList, Nothing, cpCore.doc.includedAddonIDList, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
-        End Function
+        ''
+        ''=============================================================================================================
+        ''   cpcore.main_Get Addon Content - internal (to support include add-ons)
+        '' REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
+        ''=============================================================================================================
+        ''
+        'Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef ignore As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
+        '    execute_legacy2 = execute_legacy6(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, False, nothingObject, AddonInUseIdList, Nothing, cpCore.doc.includedAddonIDList, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
+        'End Function
         '
         '===============================================================================================================================================
         '   cpcore.main_Get the editable options bubble
@@ -3224,7 +3092,6 @@ ErrorTrap:
                 Dim NonEncodedLink As String
                 Dim EncodedLink As String
                 Dim VirtualFilePath As String
-                Dim Option_String As String
                 Dim TabName As String
                 Dim TabDescription As String
                 Dim TabHeading As String
@@ -3511,8 +3378,14 @@ ErrorTrap:
                                                                     '
                                                                     ' Use Editor Addon
                                                                     '
-                                                                    Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
-                                                                    Copy = execute_legacy5(0, FieldAddon, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
+                                                                    Dim arguments As New Dictionary(Of String, String)
+                                                                    arguments.Add("FieldName", FieldName)
+                                                                    arguments.Add("FieldValue", cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
+                                                                    Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextAdmin}
+                                                                    Dim addon As addonModel = addonModel.createByName(cpCore, FieldAddon)
+                                                                    Copy = cpCore.addon.execute(addon, executeContext)
+                                                                    'Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(cpCore.siteProperties.getText(FieldName, FieldDefaultValue))
+                                                                    'Copy = execute_legacy5(0, FieldAddon, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
                                                                 ElseIf FieldSelector <> "" Then
                                                                     '
                                                                     ' Use Selector
@@ -4510,11 +4383,11 @@ ErrorTrap:
         Public Shared Function GetAddonManager(cpCore As coreClass) As String
             Dim addonManager As String = ""
             Try
-                Dim AddonStatusOK As Boolean
-                Dim AddonMan As addon_AddonMngrSafeClass
-                '
+                Dim AddonStatusOK As Boolean = True
                 Try
-                    addonManager = cpCore.addon.execute_legacy2(0, addonGuidAddonManager, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
+                    Dim addon As addonModel = addonModel.create(cpCore, addonGuidAddonManager)
+                    addonManager = cpCore.addon.execute(addon, New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextAdmin})
+                    'addonManager = cpCore.addon.execute_legacy2(0, addonGuidAddonManager, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
                 Catch ex As Exception
                     Call cpCore.handleException(New Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" & ex.ToString & "]"))
                     AddonStatusOK = False
@@ -4524,7 +4397,7 @@ ErrorTrap:
                     AddonStatusOK = False
                 End If
                 If Not AddonStatusOK Then
-                    AddonMan = New addon_AddonMngrSafeClass(cpCore)
+                    Dim AddonMan As New addon_AddonMngrSafeClass(cpCore)
                     addonManager = AddonMan.GetForm_SafeModeAddonManager()
                 End If
             Catch ex As Exception

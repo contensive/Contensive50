@@ -8,6 +8,7 @@ Imports Contensive.Core.Controllers.genericController
 Imports System.Xml
 Imports Contensive.Core
 Imports Contensive.Core.Models.Entity
+Imports Contensive.BaseClasses
 '
 Namespace Contensive.Core.Controllers
     '
@@ -219,7 +220,12 @@ Namespace Contensive.Core.Controllers
                     If loginAddonID <> 0 Then
                         '
                         ' -- Custom Login
-                        returnHtml = cpcore.addon.execute_legacy2(loginAddonID, "", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", False, Nothing)
+                        Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, loginAddonID)
+                        Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                            .addonType = CPUtilsBaseClass.addonContext.ContextPage
+                        }
+                        returnHtml = cpcore.addon.execute(addon, executeContext)
+                        'returnHtml = cpcore.addon.execute_legacy2(loginAddonID, "", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", False, Nothing)
                         If (String.IsNullOrEmpty(returnHtml)) Then
                             '
                             ' -- login successful, redirect back to this page (without a method)

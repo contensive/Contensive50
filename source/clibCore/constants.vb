@@ -566,7 +566,7 @@ Namespace Contensive.Core
         Public Const FieldTypeIdLookup = 7        ' A lookup is a FieldTypeInteger that indexes into another table
         Public Const FieldTypeIdRedirect = 8      ' creates a link to another section
         Public Const FieldTypeIdCurrency = 9      ' A Float that prints in dollars
-        Public Const FieldTypeIdFileTextPrivate = 10     ' Text saved in a file in the files area.
+        Public Const FieldTypeIdFileText = 10     ' Text saved in a file in the files area.
         Public Const FieldTypeIdFileImage = 11        ' A filename of a file in the files directory.
         Public Const FieldTypeIdFloat = 12        ' A float number
         Public Const FieldTypeIdAutoIdIncrement = 13 'long that automatically increments with the new record
@@ -578,7 +578,7 @@ Namespace Contensive.Core
         Public Const FieldTypeIdLink = 19           ' Links used in href tags -- can go to pages or resources
         Public Const FieldTypeIdResourceLink = 20   ' Links used in resources, link <img or <object. Should not be pages
         Public Const FieldTypeIdHTML = 21           ' LongText field that expects HTML content
-        Public Const FieldTypeIdFileHTMLPrivate = 22       ' TextFile field that expects HTML content
+        Public Const FieldTypeIdFileHTML = 22       ' TextFile field that expects HTML content
         Public Const FieldTypeIdMax = 22
         '
         ' ----- Field Descriptors for these type

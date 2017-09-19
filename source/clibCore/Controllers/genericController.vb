@@ -4550,7 +4550,7 @@ ErrorTrap:
                         result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".xml"
                     Case FieldTypeIdFileJavascript
                         result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".js"
-                    Case FieldTypeIdFileHTMLPrivate
+                    Case FieldTypeIdFileHTML
                         result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".html"
                     Case Else
                         result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".txt"

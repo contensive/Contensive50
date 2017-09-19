@@ -145,7 +145,7 @@ Namespace Contensive.Core.Controllers
                                 FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer)
                                 Do While (FieldNameVariant <> "")
                                     Select Case cpCore.db.cs_getFieldTypeId(CSPointer, genericController.encodeText(FieldNameVariant))
-                                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
+                                        Case FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTML
                                             Copy = csController.main_cs_getEncodedField(cpCore, CSPointer, genericController.encodeText(FieldNameVariant))
                                         Case FieldTypeIdLookup
                                             Copy = cpCore.db.cs_getLookup(CSPointer, genericController.encodeText(FieldNameVariant))

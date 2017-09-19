@@ -707,7 +707,20 @@ Namespace Contensive.Core
                                 hostRecordId = docProperties.getInteger("HostRecordID")
                                 '
                                 ' remote methods are add-ons
-                                result = Me.addon.execute_legacy6(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", False, Nothing, "", Nothing, "", authContext.user.id, authContext.isAuthenticated)
+                                Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                    .addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson,
+                                    .cssContainerClass = "",
+                                    .cssContainerId = "",
+                                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                        .contentName = HostContentName,
+                                        .fieldName = "",
+                                        .recordId = hostRecordId
+                                    },
+                                    .personalizationAuthenticated = authContext.isAuthenticated,
+                                    .personalizationPeopleId = authContext.user.id
+                                }
+                                result = Me.addon.execute(Models.Entity.addonModel.createByName(Me, addonRoute), executeContext)
+                                'result = Me.addon.execute_legacy6(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", False, Nothing, "", Nothing, "", authContext.user.id, authContext.isAuthenticated)
                             End If
                             '
                             ' deliver styles, javascript and other head tags as javascript appends
@@ -1147,29 +1160,11 @@ Namespace Contensive.Core
                         '
                         If (normalRoute = genericController.normalizeRoute(serverConfig.appConfig.adminRoute.ToLower)) Then
                             '
-                            'debugLog("executeRoute, route is admin")
-                            '
-                            '--------------------------------------------------------------------------
                             ' route is admin
                             '   If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
                             '   runAtServerClass in the admin addon.
-                            '--------------------------------------------------------------------------
-                            '
-                            Dim returnStatusOK As Boolean = False
-                            '
-                            ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
-                            '
-                            If True Then
-                                result = Me.addon.execute_legacy4(addonGuidAdminSite, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
-                            Else
-                                '
-                                ' until then, run it as an internal class
-                                '
-                                result = Me.addon.execute_legacy4(addonGuidBaseStlyles, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
-                                Dim admin As New Contensive.Addons.addon_AdminSiteClass()
-                                result = admin.execute(cp_forAddonExecutionOnly).ToString()
-                            End If
-                            'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", authContext.user.userid, visit.visitAuthenticated)
+                            result = Me.addon.execute(addonModel.create(Me, addonGuidAdminSite), New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextAdmin})
+                            'result = Me.addon.execute_legacy4(addonGuidAdminSite, docProperties.getLegacyOptionStringFromVar(), CPUtilsBaseClass.addonContext.ContextAdmin, Nothing)
                         Else
                             '--------------------------------------------------------------------------
                             ' default routing addon takes what is left
@@ -1186,7 +1181,20 @@ Namespace Contensive.Core
                                 ' -- no default route set, assume html hit
                                 result = "<p>This site is not configured for website traffic. Please set the default route.</p>"
                             Else
-                                result = Me.addon.execute_legacy6(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", authContext.user.id, authContext.visit.VisitAuthenticated)
+                                Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                    .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                    .cssContainerClass = "",
+                                    .cssContainerId = "",
+                                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                        .contentName = "",
+                                        .fieldName = "",
+                                        .recordId = 0
+                                    },
+                                    .personalizationAuthenticated = authContext.visit.VisitAuthenticated,
+                                    .personalizationPeopleId = authContext.user.id
+                                }
+                                result = Me.addon.execute(Models.Entity.addonModel.create(Me, defaultAddonId), executeContext)
+                                'result = Me.addon.execute_legacy6(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", authContext.user.id, authContext.visit.VisitAuthenticated)
                             End If
                         End If
                     End If
@@ -1509,7 +1517,8 @@ Namespace Contensive.Core
                             Call doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
                             Call html.main_AddPagetitle("Site Explorer")
                             Call doc.setMetaContent(0, 0)
-                            Dim Copy As String = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
+                            Dim copy As String = addon.execute(addonModel.createByName(Me, "Site Explorer"), New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextPage})
+                            'Dim Copy As String = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
                             Call html.addOnLoadJavascript("document.body.style.overflow='scroll';", "Site Explorer")
                             Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                             Dim htmlBody As String = "" _

@@ -53,18 +53,36 @@ Namespace Contensive.Core.Controllers
                     ' -- load requested page/template
                     cpCore.doc.loadPage(cpCore.docProperties.getInteger(rnPageId), cpCore.webServer.requestDomain)
                     '
+                    ' -- execute context for included addons
+                    Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                        .addonType = CPUtilsBaseClass.addonContext.ContextSimple,
+                        .cssContainerClass = "",
+                        .cssContainerId = "",
+                        .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                            .contentName = pageContentModel.contentName,
+                            .fieldName = "copyfilename",
+                            .recordId = cpCore.doc.page.id
+                        },
+                        .isIncludeAddon = False,
+                        .personalizationAuthenticated = cpCore.authContext.visit.VisitAuthenticated,
+                        .personalizationPeopleId = cpCore.authContext.user.id
+                    }
+
+                    '
                     ' -- execute template Dependencies
                     Dim templateAddonList As List(Of Models.Entity.addonModel) = addonModel.createList_templateDependencies(cpCore, cpCore.doc.page.id)
                     For Each addon As addonModel In templateAddonList
                         Dim AddonStatusOK As Boolean = True
-                        returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.authContext.user.id, cpCore.authContext.visit.VisitAuthenticated)
+                        returnHtml &= cpCore.addon.executeDependency(addon, executeContext)
+                        'returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.authContext.user.id, cpCore.authContext.visit.VisitAuthenticated)
                     Next
                     '
                     ' -- execute page Dependencies
                     Dim pageAddonList As List(Of Models.Entity.addonModel) = addonModel.createList_pageDependencies(cpCore, cpCore.doc.page.id)
                     For Each addon As addonModel In pageAddonList
                         Dim AddonStatusOK As Boolean = True
-                        returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.authContext.user.id, cpCore.authContext.visit.VisitAuthenticated)
+                        returnHtml &= cpCore.addon.executeDependency(addon, executeContext)
+                        'returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.authContext.user.id, cpCore.authContext.visit.VisitAuthenticated)
                     Next
                     '
                     cpCore.doc.adminWarning = cpCore.docProperties.getText("main_AdminWarningMsg")
@@ -1162,7 +1180,6 @@ ErrorTrap:
         Public Shared Function getContentBox(cpCore As coreClass, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, ignoreme As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
             Dim returnHtml As String = ""
             Try
-                Dim AddonContent As String
                 Dim DateModified As Date
                 Dim PageRecordID As Integer
                 Dim PageName As String
@@ -1564,22 +1581,26 @@ ErrorTrap:
                     Call cpCore.html.doc_AddHeadTag2(cpCore.doc.page.OtherHeadTags, "page content")
                     Call cpCore.html.doc_addMetaKeywordList2(cpCore.doc.page.MetaKeywordList, "page content")
                     '
-                    '---------------------------------------------------------------------------------
-                    ' ----- OnPageStartEvent
-                    '---------------------------------------------------------------------------------
+                    Dim instanceArguments As New Dictionary(Of String, String)
+                    instanceArguments.Add("CSPage", "-1")
+                    Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {.instanceGuid = "-1", .instanceArguments = instanceArguments}
                     '
+                    ' -- OnPageStartEvent
                     cpCore.doc.bodyContent = returnHtml
+                    executeContext.addonType = CPUtilsBaseClass.addonContext.ContextOnPageStart
                     Dim addonList As List(Of addonModel) = Models.Entity.addonModel.createList_OnPageStartEvent(cpCore, New List(Of String))
                     For Each addon As Models.Entity.addonModel In addonList
-                        AddonContent = cpCore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                        cpCore.doc.bodyContent = AddonContent & cpCore.doc.bodyContent
+                        cpCore.doc.bodyContent = cpCore.addon.execute(addon, executeContext) & cpCore.doc.bodyContent
+                        'AddonContent = cpCore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                     Next
                     returnHtml = cpCore.doc.bodyContent
                     '
-                    ' ----- OnPageEndEvent
+                    ' -- OnPageEndEvent / filter
                     cpCore.doc.bodyContent = returnHtml
+                    executeContext.addonType = CPUtilsBaseClass.addonContext.ContextOnPageEnd
                     For Each addon As addonModel In cpCore.addonCache.getOnPageEndAddonList
-                        cpCore.doc.bodyContent &= cpCore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                        cpCore.doc.bodyContent &= cpCore.addon.execute(addon, executeContext)
+                        'cpCore.doc.bodyContent &= cpCore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                     Next
                     returnHtml = cpCore.doc.bodyContent
                     '
@@ -1772,7 +1793,20 @@ ErrorTrap:
                             Cell = Cell & cpcore.html.html_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.")
                         End If
                         Dim AddonStatusOK As Boolean = False
-                        Cell = Cell & cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", cpcore.doc.page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, cpcore.doc.page.id, "", PageChildListInstanceID, False, cpcore.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
+                        Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, cpcore.siteProperties.childListAddonID)
+                        Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                            .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                            .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                .contentName = Models.Entity.pageContentModel.contentName,
+                                .fieldName = "",
+                                .recordId = cpcore.doc.page.id
+                            },
+                            .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpcore, cpcore.doc.page.ChildListInstanceOptions),
+                            .instanceGuid = PageChildListInstanceID,
+                            .wrapperID = cpcore.siteProperties.defaultWrapperID
+                        }
+                        Cell &= cpcore.addon.execute(addon, executeContext)
+                        'Cell = Cell & cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", cpcore.doc.page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, cpcore.doc.page.id, "", PageChildListInstanceID, False, cpcore.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
                     End If
                 End If
                 '
@@ -2087,8 +2121,10 @@ ErrorTrap:
                 Dim blockSiteWithLogin As Boolean
                 '
                 ' -- OnBodyStart add-ons
+                Dim bodyStartContext As New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextOnBodyStart}
                 For Each addon As addonModel In cpCore.addonCache.getOnBodyStartAddonList
-                    returnBody &= cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", False, Nothing)
+                    returnBody &= cpCore.addon.execute(addon, bodyStartContext)
+                    'returnBody &= cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", False, Nothing)
                 Next
                 '
                 ' ----- main_Get Content (Already Encoded)
@@ -2155,9 +2191,11 @@ ErrorTrap:
                     '
                     ' ----- OnBodyEnd add-ons
                     '
+                    Dim bodyEndContext As New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextFilter}
                     For Each addon In cpCore.addonCache.getOnBodyEndAddonList()
                         cpCore.doc.docBodyFilter = returnBody
-                        AddonReturn = cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", False, Nothing)
+                        AddonReturn = cpCore.addon.execute(addon, bodyEndContext)
+                        'AddonReturn = cpCore.addon.execute_legacy2(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", False, Nothing)
                         returnBody = cpCore.doc.docBodyFilter & AddonReturn
                     Next
                     '

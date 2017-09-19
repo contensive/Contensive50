@@ -252,7 +252,7 @@ Namespace Contensive.Core.Controllers
                 '
                 CS = cpcore.db.cs_open2("Groups", iGroupID)
                 If cpcore.db.cs_ok(CS) Then
-                    group_GetGroupName = genericController.encodeText(cpcore.db.cs_getField(CS, "Name"))
+                    group_GetGroupName = genericController.encodeText(cpcore.db.cs_getValue(CS, "Name"))
                 End If
                 Call cpcore.db.cs_Close(CS)
             End If
@@ -281,7 +281,7 @@ Namespace Contensive.Core.Controllers
             Else
                 CS = cpcore.db.cs_insertRecord("Groups", SystemMemberID)
                 If cpcore.db.cs_ok(CS) Then
-                    group_Add = genericController.EncodeInteger(cpcore.db.cs_getField(CS, "ID"))
+                    group_Add = genericController.EncodeInteger(cpcore.db.cs_getValue(CS, "ID"))
                     Call cpcore.db.cs_set(CS, "name", iGroupName)
                     Call cpcore.db.cs_set(CS, "caption", iGroupCaption)
                     Call cpcore.db.cs_set(CS, "active", True)

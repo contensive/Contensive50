@@ -584,8 +584,12 @@ Namespace Contensive.Core.Models.Context
                         End If
                         resultAuthContext.visit_initialized = True
                         If (AllowOnNewVisitEvent) And (True) Then
+                            Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                .addonType = CPUtilsBaseClass.addonContext.ContextOnNewVisit
+                            }
                             For Each addon As addonModel In addonModel.createList_OnNewVisitEvent(cpCore, New List(Of String))
-                                Call cpCore.addon.execute_legacy5(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
+                                executeContext.errorCaption = addon.name
+                                Call cpCore.addon.execute(addon, executeContext)
                             Next
                         End If
                         '

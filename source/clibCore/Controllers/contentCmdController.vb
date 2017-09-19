@@ -865,7 +865,22 @@ Namespace Contensive.Core.Controllers
                                 Next
                                 ArgOptionString &= "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
-                                CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                    .addonType = Context,
+                                    .cssContainerClass = "",
+                                    .cssContainerId = "",
+                                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                        .contentName = "",
+                                        .fieldName = "",
+                                        .recordId = 0
+                                    },
+                                    .personalizationAuthenticated = personalizationIsAuthenticated,
+                                    .personalizationPeopleId = personalizationPeopleId,
+                                    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, ArgOptionString)
+                                }
+                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, addonName)
+                                CmdAccumulator = cpCore.addon.execute(addon, executeContext)
+                                'CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                             Case Else
                                 '
                                 ' attempts to execute an add-on with the command name
@@ -885,7 +900,22 @@ Namespace Contensive.Core.Controllers
                                 Next
                                 ArgOptionString = ArgOptionString & "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
-                                CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                    .addonType = Context,
+                                    .cssContainerClass = "",
+                                    .cssContainerId = "",
+                                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                        .contentName = "",
+                                        .fieldName = "",
+                                        .recordId = 0
+                                    },
+                                    .personalizationAuthenticated = personalizationIsAuthenticated,
+                                    .personalizationPeopleId = personalizationPeopleId,
+                                    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, ArgOptionString)
+                                }
+                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, addonName)
+                                CmdAccumulator = cpCore.addon.execute(addon, executeContext)
+                                'CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                 'CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
                         End Select
                     Next

@@ -10,6 +10,7 @@ Namespace Contensive.Core
     Public Class CPCSClass
         Inherits CPCSBaseClass
         Implements IDisposable
+
         '
 #Region "COM GUIDs"
         Public Const ClassId As String = "63745D9C-795E-4C01-BD6D-4BA35FC4A843"
@@ -30,14 +31,13 @@ Namespace Contensive.Core
             cp = cpParent
             cpCore = cp.core
             CSPointer = -1
-            OpeningMemberID = cpcore.authContext.user.id
+            OpeningMemberID = cpCore.authContext.user.id
         End Sub
         '
         ' dispose
         '
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
             If Not Me.disposed Then
-                Call appendDebugLog(".dispose, dereference cp, main, csv")
                 If disposing Then
                     '
                     ' call .dispose for managed objects
@@ -176,7 +176,7 @@ Namespace Contensive.Core
             Return success
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function OpenSQL(ByVal sql As String, ByVal DataSourcename As String, Optional ByVal PageSize As Integer = 10, Optional ByVal PageNumber As Integer = 1) As Boolean
             Dim success As Boolean = False
@@ -201,7 +201,7 @@ Namespace Contensive.Core
             Return success
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function OpenSQL2(ByVal sql As String, Optional ByVal DataSourcename As String = "default", Optional ByVal PageSize As Integer = 10, Optional ByVal PageNumber As Integer = 1) As Boolean
             Dim success As Boolean = False
@@ -225,7 +225,8 @@ Namespace Contensive.Core
             End Try
             Return success
         End Function
-
+        '
+        '====================================================================================================
         '
         Public Overrides Sub Close()
             Try
@@ -237,7 +238,9 @@ Namespace Contensive.Core
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Close")
             End Try
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function GetFormInput(ByVal ContentName As String, ByVal FieldName As String, Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlId As String = "") As Object
             If True Then
                 Return cpCore.html.html_GetFormInputCS(CSPointer, ContentName, FieldName, Height, Width, HtmlId)
@@ -245,7 +248,9 @@ Namespace Contensive.Core
                 Return ""
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Sub Delete()
             Try
                 Call cpCore.db.cs_deleteRecord(CSPointer)
@@ -253,7 +258,9 @@ Namespace Contensive.Core
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Delete")
             End Try
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function FieldOK(ByVal FieldName As String) As Boolean
             Dim result As Boolean = False
             '
@@ -264,7 +271,9 @@ Namespace Contensive.Core
             End Try
             Return result
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Sub GoFirst()
             Try
                 Call cpCore.db.cs_goFirst(CSPointer, False)
@@ -273,7 +282,7 @@ Namespace Contensive.Core
             End Try
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetAddLink(Optional ByVal PresetNameValueList As String = "", Optional ByVal AllowPaste As Boolean = False) As String
             Dim result As Object
@@ -290,7 +299,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetBoolean(ByVal FieldName As String) As Boolean
             Dim result As Boolean = False
@@ -303,7 +312,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetDate(ByVal FieldName As String) As Date
             Dim result As Date = #12:00:00 AM#
@@ -315,7 +324,9 @@ Namespace Contensive.Core
             End Try
             Return result
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function GetEditLink(Optional ByVal AllowCut As Boolean = False) As String
             Dim result As Object
             Try
@@ -330,7 +341,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetFilename(ByVal FieldName As String, Optional ByVal OriginalFilename As String = "", Optional ByVal ContentName As String = "") As String
             Dim result As Object
@@ -348,7 +359,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetInteger(ByVal FieldName As String) As Integer
             Dim result As Integer = 0
@@ -361,7 +372,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetNumber(ByVal FieldName As String) As Double
             Dim result As Double = 0
@@ -374,7 +385,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetRowCount() As Integer
             Dim result As Integer = 0
@@ -387,7 +398,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetSQL() As String
             Dim result As Object
@@ -405,7 +416,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetText(ByVal FieldName As String) As String
             Dim result As Object
@@ -423,6 +434,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
+        '====================================================================================================
         ' Needs to be implemented (refactor to check the field type. if not fieldTypeHtml, encodeHtml)
         '
         Public Overrides Function GetHtml(ByVal FieldName As String) As String
@@ -431,12 +443,13 @@ Namespace Contensive.Core
             Return result
         End Function
         '
+        '====================================================================================================
         '
-        '
-        Public Overrides Function GetTextFile(ByVal FieldName As String) As String
+        <Obsolete("Use getText for copy. getFilename for filename", False)> Public Overrides Function GetTextFile(ByVal FieldName As String) As String
             Dim result As String = String.Empty
             Try
-                result = cpCore.db.cs_getTextFile(CSPointer, FieldName)
+                result = cpCore.db.cs_getText(CSPointer, FieldName)
+                'result = cpCore.db.cs_getTextFile(CSPointer, FieldName)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -469,7 +482,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function OK() As Boolean
             Dim result As Boolean = False
@@ -482,7 +495,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub Save()
             Try
@@ -511,7 +524,9 @@ Namespace Contensive.Core
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetField")
             End Try
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Sub SetFile(ByVal FieldName As String, ByVal Copy As String, ByVal ContentName As String)
             Try
                 Call cpCore.db.SetCSTextFile(CSPointer, FieldName, Copy, ContentName)
@@ -519,7 +534,9 @@ Namespace Contensive.Core
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetFile")
             End Try
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Sub SetFormInput(ByVal FieldName As String, Optional ByVal RequestName As String = "")
             Dim success As Boolean = False
             Try
@@ -528,16 +545,17 @@ Namespace Contensive.Core
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetFormInput")
             End Try
         End Sub
-        Private Sub appendDebugLog(ByVal copy As String)
-            ''My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.cs, " & copy & vbCrLf, True)
-            ' 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
-        End Sub
         '
-        ' testpoint
-        '
-        Private Sub tp(ByVal msg As String)
-            My.Computer.FileSystem.WriteAllText("c:\clibCpTestPoint.log", Now & " - cp.block, " & msg & vbCrLf, True)
-        End Sub
+        '====================================================================================================
+        ''' <summary>
+        ''' Return the value in the field
+        ''' </summary>
+        ''' <param name="fieldName"></param>
+        ''' <returns></returns>
+        Public Overrides Function GetValue(fieldName As String) As String
+            Return cpCore.db.cs_getValue(CSPointer, fieldName)
+        End Function
+
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.
         ' Put cleanup code in Dispose(ByVal disposing As Boolean).

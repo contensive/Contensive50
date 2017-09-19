@@ -220,7 +220,7 @@ Namespace Contensive.BaseClasses
         ''' <param name="FieldName"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride Function GetTextFile(ByVal FieldName As String) As String
+        <Obsolete("Use getText to get copy, getFilename to get file.", False)> Public MustOverride Function GetTextFile(ByVal FieldName As String) As String
         ''' <summary>
         ''' Move to the next record in a result set.
         ''' </summary>
@@ -265,6 +265,13 @@ Namespace Contensive.BaseClasses
         ''' <param name="RequestName"></param>
         ''' <remarks></remarks>
         Public MustOverride Sub SetFormInput(ByVal FieldName As String, Optional ByVal RequestName As String = "")
+        ''' <summary>
+        ''' Return the value directly from the field, without the conversions associated with GetText().
+        ''' </summary>
+        ''' <param name="fieldName"></param>
+        ''' <returns></returns>
+        Public MustOverride Function GetValue(ByVal fieldName As String) As String
+
     End Class
 
 End Namespace

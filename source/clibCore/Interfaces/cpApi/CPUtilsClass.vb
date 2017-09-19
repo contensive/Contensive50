@@ -240,19 +240,53 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String) As String
-            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), 0)
+            Dim executeConext As New addonExecuteContext() With {
+                    .addonType = addonContext.ContextPage
+            }
+            If (IsNumeric(IdGuidOrName)) Then
+                executeConext.errorCaption = "id:" & IdGuidOrName
+                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext)
+            ElseIf genericController.isGuid(IdGuidOrName) Then
+                executeConext.errorCaption = "guid:" & IdGuidOrName
+                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, IdGuidOrName), executeConext)
+            Else
+                executeConext.errorCaption = IdGuidOrName
+                Return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext)
+            End If
+            'Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), 0)
         End Function
         '
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal WrapperId As Integer) As String
-            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), WrapperId)
+            Dim executeConext As New addonExecuteContext() With {
+                    .addonType = addonContext.ContextPage,
+                    .wrapperID = WrapperId
+            }
+            If (IsNumeric(IdGuidOrName)) Then
+                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext)
+            ElseIf genericController.isGuid(IdGuidOrName) Then
+                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, IdGuidOrName), executeConext)
+            Else
+                Return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext)
+            End If
+            'Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), WrapperId)
         End Function
         '
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal context As addonContext) As String
-            Return CP.core.addon.execute_legacy4(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), context, Nothing)
+            Dim executeConext As New addonExecuteContext() With {
+                    .addonType = context
+            }
+            If (IsNumeric(IdGuidOrName)) Then
+                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext)
+            ElseIf genericController.isGuid(IdGuidOrName) Then
+                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, IdGuidOrName), executeConext)
+            Else
+                Return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext)
+            End If
+            'Return CP.core.addon.execute_legacy4(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), context, Nothing)
         End Function
 
         Public Overrides Function ExecuteAddonAsProcess(ByVal IdGuidOrName As String) As String
