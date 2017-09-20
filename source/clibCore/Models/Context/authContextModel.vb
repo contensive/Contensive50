@@ -1523,122 +1523,18 @@ Namespace Contensive.Core.Models.Context
             MethodName = "result"
             '
             main_EditLockExpiresMinutes = CInt((main_EditLockExpires - cpcore.profileStartTime).TotalMinutes)
-            If Not cpcore.siteProperties.allowWorkflowAuthoring Then
-                '
-                ' ----- site does not support workflow authoring
-                '
-                If RecordEditLocked Then
-                    Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                    result &= Delimiter & Copy
-                    Delimiter = "<BR >"
-                End If
-                result &= Delimiter & Msg_WorkflowDisabled
+            '
+            ' ----- site does not support workflow authoring
+            '
+            If RecordEditLocked Then
+                Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
+                result &= Delimiter & Copy
                 Delimiter = "<BR >"
-            ElseIf Not IsContentWorkflowAuthoring Then
-                '
-                ' ----- content does not support workflow authoring
-                '
-                If RecordEditLocked Then
-                    Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                    result &= Delimiter & Copy
-                    Delimiter = "<BR >"
-                End If
-                result &= Delimiter & Msg_ContentWorkflowDisabled
-                Delimiter = "<BR >"
-            Else
-                '
-                ' ----- Workflow Authoring is supported, check deleted, inserted or modified
-                '
-                If RecordApproved Then
-                    '
-                    ' Approved
-                    '
-                    If isAuthenticatedAdmin(cpcore) Then
-                        Copy = genericController.vbReplace(Msg_AuthoringApprovedAdmin, "<EDITNAME>", ApprovedBy)
-                        result &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    Else
-                        Copy = genericController.vbReplace(Msg_AuthoringApproved, "<EDITNAME>", ApprovedBy)
-                        result &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    End If
-                ElseIf RecordSubmitted Then
-                    '
-                    ' Submitted
-                    '
-                    If isAuthenticatedAdmin(cpcore) Then
-                        Copy = genericController.vbReplace(Msg_AuthoringSubmittedAdmin, "<EDITNAME>", SubmittedBy)
-                        result &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    Else
-                        Copy = genericController.vbReplace(Msg_AuthoringSubmitted, "<EDITNAME>", SubmittedBy)
-                        result &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    End If
-                ElseIf RecordDeleted Then
-                    '
-                    ' deleted
-                    '
-                    result &= Delimiter & Msg_AuthoringDeleted
-                    Delimiter = "<BR >"
-                ElseIf RecordInserted Then
-                    '
-                    ' inserted
-                    '
-                    result &= Delimiter & Msg_AuthoringInserted
-                    Delimiter = "<BR >"
-                ElseIf RecordModified Then
-                    '
-                    ' modified, submitted or approved
-                    '
-                    If isAuthenticatedAdmin(cpcore) Then
-                        If RecordEditLocked Then
-                            Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                            result &= Delimiter & Copy
-                            Delimiter = "<BR >"
-                        End If
-                        Copy = genericController.vbReplace(Msg_AuthoringRecordModifedAdmin, "<EDITNAME>", ModifiedBy)
-                        result &= Delimiter & Copy
-                        'result &=  Delimiter & Msg_AuthoringRecordModifedAdmin
-                        Delimiter = "<BR >"
-                    Else
-                        If RecordEditLocked Then
-                            Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                            result &= Delimiter & Copy
-                            Delimiter = "<BR >"
-                        End If
-                        Copy = genericController.vbReplace(Msg_AuthoringRecordModifed, "<EDITNAME>", ModifiedBy)
-                        result &= Delimiter & Copy
-                        'result &=  Delimiter & Msg_AuthoringRecordModifed
-                        Delimiter = "<BR >"
-                    End If
-                End If
-                '
-                ' ----- Check for authoring status messages if it has been modified
-                '
-                If result = "" Then
-                    '
-                    ' no changes
-                    '
-                    If RecordEditLocked Then
-                        Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                        Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                        Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                        result &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    End If
-                    result &= Delimiter & Msg_AuthoringRecordNotModifed
-                    Delimiter = "<BR >"
-                End If
             End If
+            result &= Delimiter & Msg_WorkflowDisabled
+            Delimiter = "<BR >"
             Return result
         End Function
         '

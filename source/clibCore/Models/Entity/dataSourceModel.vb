@@ -168,14 +168,14 @@ Namespace Contensive.Core.Models.Entity
                         .username = cs.getText("username")
                         .password = cs.getText("password")
                         .type = cs.getInteger("dbTypeId")
-                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        ''
                         .ContentControlID = cs.getInteger("ContentControlID")
                         .CreatedBy = cs.getInteger("CreatedBy")
                         .CreateKey = cs.getInteger("CreateKey")
                         .DateAdded = cs.getDate("DateAdded")
-                        .EditArchive = cs.getBoolean("EditArchive")
-                        .EditBlank = cs.getBoolean("EditBlank")
-                        .EditSourceID = cs.getInteger("EditSourceID")
+                        ''
+                        ''
+                        ''
                         .ModifiedBy = cs.getInteger("ModifiedBy")
                         .ModifiedDate = cs.getDate("ModifiedDate")
                         .Name = normalizeDataSourceName(cs.getText("Name"))
@@ -237,14 +237,14 @@ Namespace Contensive.Core.Models.Entity
                     cs.setField("username", username)
                     cs.setField("password", password)
                     cs.setField("dbTypeId", type)
-                    cs.setField("ContentCategoryID", ContentCategoryID.ToString())
+                    ''
                     cs.setField("ContentControlID", ContentControlID.ToString())
                     cs.setField("CreatedBy", CreatedBy.ToString())
                     cs.setField("CreateKey", CreateKey.ToString())
                     cs.setField("DateAdded", DateAdded.ToString())
-                    cs.setField("EditArchive", EditArchive.ToString())
-                    cs.setField("EditBlank", EditBlank.ToString())
-                    cs.setField("EditSourceID", EditSourceID.ToString())
+                    ''
+                    ''
+                    ''
                     cs.setField("ModifiedBy", ModifiedBy.ToString())
                     cs.setField("ModifiedDate", ModifiedDate.ToString())
                     cs.setField("Name", normalizeDataSourceName(Name))

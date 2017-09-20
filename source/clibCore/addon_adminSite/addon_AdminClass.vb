@@ -266,7 +266,7 @@ Namespace Contensive.Addons
                     '-------------------------------------------------------------------------------
                     '
                     If (AdminSourceForm = AdminFormEdit) Then
-                        If (Not (cpCore.debug_iUserError <> "")) And cpCore.html.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete) Or (AdminButton = ButtonPublish) Or (AdminButton = ButtonPublishApprove) Or (AdminButton = ButtonAbortEdit) Or (AdminButton = ButtonPublishSubmit)) Then
+                        If (Not (cpCore.debug_iUserError <> "")) And cpCore.html.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete)) Then
                             EditReferer = cpCore.docProperties.getText("EditReferer")
                             CurrentLink = genericController.modifyLinkQuery(cpCore.webServer.requestUrl, "editreferer", "", False)
                             CurrentLink = genericController.vbLCase(CurrentLink)
@@ -898,119 +898,119 @@ ErrorTrap:
                             ' Load the record as if it will be saved, but skip the save
                             '
                             Call LoadEditRecord(adminContent, editRecord)
-                            Call LoadEditResponse(adminContent, editRecord)
+                            Call LoadEditRecord_Request(adminContent, editRecord)
                         Case AdminActionMarkReviewed
                             '
                             ' Mark the record reviewed without making any changes
                             '
                             Call cpCore.doc.markRecordReviewed(adminContent.Name, editRecord.id)
-                        Case AdminActionWorkflowPublishSelected
-                            '
-                            ' Publish everything selected
-                            '
-                            RowCnt = cpCore.docProperties.getInteger("RowCnt")
-                            For RowPtr = 0 To RowCnt - 1
-                                If cpCore.docProperties.getBoolean("Row" & RowPtr) Then
-                                    RecordID = cpCore.docProperties.getInteger("RowID" & RowPtr)
-                                    ContentName = cpCore.docProperties.getText("RowContentName" & RowPtr)
-                                    Call cpCore.workflow.publishEdit(ContentName, RecordID)
-                                    Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
-                                    Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
-                                    Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & cpCore.metaData.getContentId(ContentName))
-                                End If
-                            Next
-                        Case AdminActionWorkflowPublishApproved
-                            '
-                            ' Publish all approved workflow publishing records
-                            '
-                            CS = cpCore.db.cs_open("Authoring Controls", "ControlType=3", "ID")
-                            Do While cpCore.db.cs_ok(CS)
-                                ContentID = cpCore.db.cs_getInteger(CS, "ContentID")
-                                RecordID = cpCore.db.cs_getInteger(CS, "RecordID")
-                                ContentName = cpCore.metaData.getContentNameByID(ContentID)
-                                If ContentName <> "" Then
-                                    Call cpCore.workflow.publishEdit(ContentName, RecordID)
-                                    Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
-                                    Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
-                                End If
-                                cpCore.db.cs_goNext(CS)
-                            Loop
-                            Call cpCore.db.cs_Close(CS)
-                            'AdminForm = AdminFormRoot
-                        Case AdminActionPublishApprove
-                            If (editRecord.Read_Only) Then
-                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is locked.")
-                            ElseIf Not adminContent.AllowWorkflowAuthoring Then
-                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because content you selected does not support workflow authoring.")
-                            Else
-                                '
-                                Call LoadEditRecord(adminContent, editRecord)
-                                Call LoadEditResponse(adminContent, editRecord)
-                                Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (cpCore.debug_iUserError <> "") Then
-                                    'no - if WF, on process on publish
-                                    'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
-                                    Call cpCore.workflow.approveEdit(adminContent.Name, editRecord.id)
-                                Else
-                                    AdminForm = AdminSourceForm
-                                End If
-                            End If
-                            AdminAction = AdminActionNop ' convert so action can be used in as a refresh
-                        Case AdminActionPublishSubmit
-                            If (editRecord.Read_Only) Then
-                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is locked.")
-                            ElseIf Not adminContent.AllowWorkflowAuthoring Then
-                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because content you selected does not support workflow authoring.")
-                            Else
-                                '
-                                Call LoadEditRecord(adminContent, editRecord)
-                                Call LoadEditResponse(adminContent, editRecord)
-                                Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (cpCore.debug_iUserError <> "") Then
-                                    'no - if WF, on process on publish
-                                    'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
-                                    Call cpCore.workflow.main_SubmitEdit(adminContent.Name, editRecord.id)
-                                    Call cpCore.doc.sendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
-                                Else
-                                    AdminForm = AdminSourceForm
-                                End If
-                            End If
-                            AdminAction = AdminActionNop ' convert so action can be used in as a refresh
-                        Case AdminActionPublish
-                            '
-                            ' --- Publish edit record to live record - not AuthoringLock blocked
-                            '
-                            Call LoadEditRecord(adminContent, editRecord)
-                            Call LoadEditResponse(adminContent, editRecord)
-                            Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                            If Not (cpCore.debug_iUserError <> "") Then
-                                Call cpCore.workflow.publishEdit(adminContent.Name, editRecord.id)
-                                CS = cpCore.db.csOpenRecord(adminContent.Name, editRecord.id)
-                                Dim IsDeleted As Boolean
-                                IsDeleted = Not cpCore.db.cs_ok(CS)
-                                Call cpCore.db.cs_Close(CS)
-                                Call cpCore.doc.processAfterSave(IsDeleted, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
-                            Else
-                                AdminForm = AdminSourceForm
-                            End If
-                        Case AdminActionAbortEdit
-                            '
-                            ' --- copy live record over edit record
-                            '
-                            Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.authContext.user.id)
-                            Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                            If MenuDepth > 0 Then
-                                '
-                                ' opened as a child, close the window
-                                '
-                                AdminForm = AdminFormClose
-                            Else
-                                '
-                                ' opened as a main window, go to the contents index page
-                                '
-                                AdminForm = AdminFormIndex
-                            End If
+                        'Case AdminActionWorkflowPublishSelected
+                        '    '
+                        '    ' Publish everything selected
+                        '    '
+                        '    RowCnt = cpCore.docProperties.getInteger("RowCnt")
+                        '    For RowPtr = 0 To RowCnt - 1
+                        '        If cpCore.docProperties.getBoolean("Row" & RowPtr) Then
+                        '            RecordID = cpCore.docProperties.getInteger("RowID" & RowPtr)
+                        '            ContentName = cpCore.docProperties.getText("RowContentName" & RowPtr)
+                        '            Call cpCore.workflow.publishEdit(ContentName, RecordID)
+                        '            Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
+                        '            Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
+                        '            Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & cpCore.metaData.getContentId(ContentName))
+                        '        End If
+                        '    Next
+                        'Case AdminActionWorkflowPublishApproved
+                        '    '
+                        '    ' Publish all approved workflow publishing records
+                        '    '
+                        '    CS = cpCore.db.cs_open("Authoring Controls", "ControlType=3", "ID")
+                        '    Do While cpCore.db.cs_ok(CS)
+                        '        ContentID = cpCore.db.cs_getInteger(CS, "ContentID")
+                        '        RecordID = cpCore.db.cs_getInteger(CS, "RecordID")
+                        '        ContentName = cpCore.metaData.getContentNameByID(ContentID)
+                        '        If ContentName <> "" Then
+                        '            Call cpCore.workflow.publishEdit(ContentName, RecordID)
+                        '            Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
+                        '            Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
+                        '        End If
+                        '        cpCore.db.cs_goNext(CS)
+                        '    Loop
+                        '    Call cpCore.db.cs_Close(CS)
+                        '    'AdminForm = AdminFormRoot
+                        'Case AdminActionPublishApprove
+                        '    If (editRecord.Read_Only) Then
+                        '        Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is locked.")
+                        '    ElseIf Not adminContent.AllowWorkflowAuthoring Then
+                        '        Call errorController.error_AddUserError(cpCore, "Your request was blocked because content you selected does not support workflow authoring.")
+                        '    Else
+                        '        '
+                        '        Call LoadEditRecord(adminContent, editRecord)
+                        '        Call LoadEditResponse(adminContent, editRecord)
+                        '        Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
+                        '        If Not (cpCore.debug_iUserError <> "") Then
+                        '            'no - if WF, on process on publish
+                        '            'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
+                        '            Call cpCore.workflow.approveEdit(adminContent.Name, editRecord.id)
+                        '        Else
+                        '            AdminForm = AdminSourceForm
+                        '        End If
+                        '    End If
+                        '    AdminAction = AdminActionNop ' convert so action can be used in as a refresh
+                        'Case AdminActionPublishSubmit
+                        '    If (editRecord.Read_Only) Then
+                        '        Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is locked.")
+                        '    ElseIf Not adminContent.AllowWorkflowAuthoring Then
+                        '        Call errorController.error_AddUserError(cpCore, "Your request was blocked because content you selected does not support workflow authoring.")
+                        '    Else
+                        '        '
+                        '        Call LoadEditRecord(adminContent, editRecord)
+                        '        Call LoadEditResponse(adminContent, editRecord)
+                        '        Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
+                        '        If Not (cpCore.debug_iUserError <> "") Then
+                        '            'no - if WF, on process on publish
+                        '            'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
+                        '            Call cpCore.workflow.main_SubmitEdit(adminContent.Name, editRecord.id)
+                        '            Call cpCore.doc.sendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
+                        '        Else
+                        '            AdminForm = AdminSourceForm
+                        '        End If
+                        '    End If
+                        '    AdminAction = AdminActionNop ' convert so action can be used in as a refresh
+                        'Case AdminActionPublish
+                        '    '
+                        '    ' --- Publish edit record to live record - not AuthoringLock blocked
+                        '    '
+                        '    Call LoadEditRecord(adminContent, editRecord)
+                        '    Call LoadEditResponse(adminContent, editRecord)
+                        '    Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
+                        '    If Not (cpCore.debug_iUserError <> "") Then
+                        '        Call cpCore.workflow.publishEdit(adminContent.Name, editRecord.id)
+                        '        CS = cpCore.db.csOpenRecord(adminContent.Name, editRecord.id)
+                        '        Dim IsDeleted As Boolean
+                        '        IsDeleted = Not cpCore.db.cs_ok(CS)
+                        '        Call cpCore.db.cs_Close(CS)
+                        '        Call cpCore.doc.processAfterSave(IsDeleted, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                        '        Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
+                        '    Else
+                        '        AdminForm = AdminSourceForm
+                        '    End If
+                        'Case AdminActionAbortEdit
+                        '    '
+                        '    ' --- copy live record over edit record
+                        '    '
+                        '    Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.authContext.user.id)
+                        '    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
+                        '    If MenuDepth > 0 Then
+                        '        '
+                        '        ' opened as a child, close the window
+                        '        '
+                        '        AdminForm = AdminFormClose
+                        '    Else
+                        '        '
+                        '        ' opened as a main window, go to the contents index page
+                        '        '
+                        '        AdminForm = AdminFormIndex
+                        '    End If
                         Case AdminActionDelete
                             If (editRecord.Read_Only) Then
                                 Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
@@ -1018,7 +1018,7 @@ ErrorTrap:
                                 Call LoadEditRecord(adminContent, editRecord)
                                 CSEditRecord = cpCore.db.cs_open2(adminContent.Name, editRecord.id, True, True)
                                 If cpCore.db.cs_ok(CSEditRecord) Then
-                                    If Not AdminContentWorkflowAuthoring Then
+                                    If Not False Then
                                         '
                                         ' non-Workflow Delete
                                         '
@@ -1086,11 +1086,9 @@ ErrorTrap:
                                 Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
-                                Call LoadEditResponse(adminContent, editRecord)
+                                Call LoadEditRecord_Request(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                End If
+                                Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                             End If
                             AdminAction = AdminActionNop ' convert so action can be used in as a refresh
                             '
@@ -1102,11 +1100,9 @@ ErrorTrap:
                                 Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
-                                Call LoadEditResponse(adminContent, editRecord)
+                                Call LoadEditRecord_Request(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                End If
+                                Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 editRecord.id = 0
                                 editRecord.Loaded = False
                                 'If AdminContent.fields.Count > 0 Then
@@ -1125,11 +1121,9 @@ ErrorTrap:
                                     Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                                 Else
                                     Call LoadEditRecord(adminContent, editRecord)
-                                    Call LoadEditResponse(adminContent, editRecord)
+                                    Call LoadEditRecord_Request(adminContent, editRecord)
                                     Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                    If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                        Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                    End If
+                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                     Call ProcessActionDuplicate(adminContent, editRecord)
                                 End If
                             Else
@@ -1145,11 +1139,9 @@ ErrorTrap:
                                 Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
-                                Call LoadEditResponse(adminContent, editRecord)
+                                Call LoadEditRecord_Request(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                End If
+                                Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 If Not (cpCore.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Group Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The send action only supports Group Email.")
@@ -1206,11 +1198,9 @@ ErrorTrap:
                                 Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
-                                Call LoadEditResponse(adminContent, editRecord)
+                                Call LoadEditRecord_Request(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                End If
+                                Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 If Not (cpCore.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The activate action only supports Conditional Email.")
@@ -1237,11 +1227,9 @@ ErrorTrap:
                             Else
                                 '
                                 Call LoadEditRecord(adminContent, editRecord)
-                                Call LoadEditResponse(adminContent, editRecord)
+                                Call LoadEditRecord_Request(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
-                                    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                End If
+                                Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 '
                                 If Not (cpCore.debug_iUserError <> "") Then
                                     '
@@ -1271,7 +1259,7 @@ ErrorTrap:
                                         If cpCore.db.cs_ok(CSEditRecord) Then
                                             RecordID = cpCore.db.cs_getInteger(CSEditRecord, "ID")
                                             Call cpCore.db.cs_deleteRecord(CSEditRecord)
-                                            If (Not AdminContentWorkflowAuthoring) Then
+                                            If (Not False) Then
                                                 '
                                                 ' non-Workflow Delete
                                                 '
@@ -1304,7 +1292,7 @@ ErrorTrap:
                                 Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified Is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
-                                Call LoadEditResponse(adminContent, editRecord)
+                                Call LoadEditRecord_Request(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 cpCore.cache.invalidateAll()
                                 cpCore.metaData.clear()
@@ -1900,12 +1888,10 @@ ErrorTrap:
             Try
                 '
                 Dim DBValueVariant As Object
-                Dim SQL As String
                 Dim CSEditRecord As Integer
-                Dim CSLiveRecord As Integer
                 Dim NullVariant As Object
                 Dim CSPointer As Integer
-                Dim WorkflowAuthoring As Boolean
+                'Dim WorkflowAuthoring As Boolean
                 '
                 ' ----- test for content problem
                 '
@@ -1958,43 +1944,43 @@ ErrorTrap:
                     CSEditRecord = cpCore.db.cs_open2(adminContent.Name, editrecord.id, True, True)
                     '
                     ' Problem with this deal is when the record is saved as with it's parent cdef, when we attempt to reload, the record can not be read bc the id is not in the parent
-                    CSLiveRecord = CSEditRecord
+                    'CSEditRecord = CSEditRecord
                     '##### if not workflow authoring, just point them both to the same data
                     '##### that way throughout the code, just use the appropriate CS, and the data works
-                    'CSLiveRecord = -1
-                    WorkflowAuthoring = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
-                    If WorkflowAuthoring Then
-                        '
-                        ' 32467-852: check for duplicate edit records
-                        '
-                        SQL = "Update " & adminContent.AuthoringTableName _
-                        & " Set EditArchive=1" _
-                        & " Where ID In (" _
-                            & " Select B.ID" _
-                            & " from " & adminContent.AuthoringTableName & " As A" _
-                            & "," & adminContent.AuthoringTableName & " As B" _
-                            & " where A.EditSourceID=B.EditSourceID" _
-                            & " And A.EditSourceID Is Not null And B.EditSourceID Is Not null" _
-                            & " And A.EditArchive=0 And B.EditArchive=0" _
-                            & " And A.ID>B.ID" _
-                        & ");"
-                        Call cpCore.db.executeSql(SQL, adminContent.AuthoringDataSourceName)
-                        'Call cpCore.main_ExecuteSQL(AdminContent.AuthoringDataSourceName, SQL)
-                        '
-                        ' 202-31245: quick fix. The CS should handle this instead.
-                        ' Workflow authoring, also load the live record to display  Read_Only and Not_Editable records
-                        '
-                        CSLiveRecord = cpCore.db.cs_open2(adminContent.Name, editrecord.id, False)
-                        If Not cpCore.db.cs_ok(CSLiveRecord) Then
-                            '
-                            ' Special case, if live record can not open, we may be in workflow mode, and this may
-                            '   be a new record. If that is the case, display the edit record data, which should be
-                            '   the defaults for ReadOnly, or the First Values for NotEditable.
-                            '
-                            Call cpCore.db.cs_Close(CSLiveRecord)
-                            CSLiveRecord = CSEditRecord
-                        End If
-                    End If
+                    'CSEditRecord = -1
+                    'WorkflowAuthoring = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
+                    'If WorkflowAuthoring Then
+                    '    '
+                    '    ' 32467-852: check for duplicate edit records
+                    '    '
+                    '    SQL = "Update " & adminContent.AuthoringTableName _
+                    '    & " Set EditArchive=1" _
+                    '    & " Where ID In (" _
+                    '        & " Select B.ID" _
+                    '        & " from " & adminContent.AuthoringTableName & " As A" _
+                    '        & "," & adminContent.AuthoringTableName & " As B" _
+                    '        & " where A.EditSourceID=B.EditSourceID" _
+                    '        & " And A.EditSourceID Is Not null And B.EditSourceID Is Not null" _
+                    '        & " And A.EditArchive=0 And B.EditArchive=0" _
+                    '        & " And A.ID>B.ID" _
+                    '    & ");"
+                    '    Call cpCore.db.executeSql(SQL, adminContent.AuthoringDataSourceName)
+                    '    'Call cpCore.main_ExecuteSQL(AdminContent.AuthoringDataSourceName, SQL)
+                    '    '
+                    '    ' 202-31245: quick fix. The CS should handle this instead.
+                    '    ' Workflow authoring, also load the live record to display  Read_Only and Not_Editable records
+                    '    '
+                    '    CSEditRecord = cpCore.db.cs_open2(adminContent.Name, editrecord.id, False)
+                    '    If Not cpCore.db.cs_ok(CSEditRecord) Then
+                    '        '
+                    '        ' Special case, if live record can not open, we may be in workflow mode, and this may
+                    '        '   be a new record. If that is the case, display the edit record data, which should be
+                    '        '   the defaults for ReadOnly, or the First Values for NotEditable.
+                    '        '
+                    '        Call cpCore.db.cs_Close(CSEditRecord)
+                    '        CSEditRecord = CSEditRecord
+                    '    End If
+                    'End If
                     '
                     ' store fieldvalues in RecordValuesVariant
                     '
@@ -2031,12 +2017,12 @@ ErrorTrap:
                             Dim fieldValue As Object
                             fieldValue = NullVariant
                             With adminContentField
-                                If WorkflowAuthoring And (.ReadOnly Or .NotEditable) Then
+                                If (.ReadOnly Or .NotEditable) Then
                                     '
                                     ' 202-31245: quick fix. The CS should handle this instead.
                                     ' Workflowauthoring, If read only, use the live record data
                                     '
-                                    CSPointer = CSLiveRecord
+                                    CSPointer = CSEditRecord
                                 Else
                                     CSPointer = CSEditRecord
                                 End If
@@ -2084,28 +2070,28 @@ ErrorTrap:
                                 '
                                 Select Case genericController.vbUCase(.nameLc)
                                     Case "DATEADDED"
-                                        editrecord.dateAdded = cpCore.db.cs_getDate(CSLiveRecord, .nameLc)
+                                        editrecord.dateAdded = cpCore.db.cs_getDate(CSEditRecord, .nameLc)
                                     Case "MODIFIEDDATE"
-                                        editrecord.modifiedDate = cpCore.db.cs_getDate(CSLiveRecord, .nameLc)
+                                        editrecord.modifiedDate = cpCore.db.cs_getDate(CSEditRecord, .nameLc)
                                     Case "CREATEDBY"
-                                        editrecord.createByMemberId = cpCore.db.cs_getInteger(CSLiveRecord, .nameLc)
+                                        editrecord.createByMemberId = cpCore.db.cs_getInteger(CSEditRecord, .nameLc)
                                     Case "MODIFIEDBY"
-                                        editrecord.modifiedByMemberID = cpCore.db.cs_getInteger(CSLiveRecord, .nameLc)
+                                        editrecord.modifiedByMemberID = cpCore.db.cs_getInteger(CSEditRecord, .nameLc)
                                     Case "CONTENTCATEGORYID"
-                                        editrecord.contentCategoryID = cpCore.db.cs_getInteger(CSLiveRecord, .nameLc)
+                                        editrecord.contentCategoryID = cpCore.db.cs_getInteger(CSEditRecord, .nameLc)
                                     Case "ACTIVE"
-                                        editrecord.active = cpCore.db.cs_getBoolean(CSLiveRecord, .nameLc)
+                                        editrecord.active = cpCore.db.cs_getBoolean(CSEditRecord, .nameLc)
                                     Case "CONTENTCONTROLID"
-                                        editrecord.contentControlId = cpCore.db.cs_getInteger(CSLiveRecord, .nameLc)
+                                        editrecord.contentControlId = cpCore.db.cs_getInteger(CSEditRecord, .nameLc)
                                         editrecord.contentControlId_Name = cpCore.metaData.getContentNameByID(editrecord.contentControlId)
                                     Case "ID"
-                                        editrecord.id = cpCore.db.cs_getInteger(CSLiveRecord, .nameLc)
+                                        editrecord.id = cpCore.db.cs_getInteger(CSEditRecord, .nameLc)
                                     Case "MENUHEADLINE"
-                                        editrecord.menuHeadline = cpCore.db.cs_getText(CSLiveRecord, .nameLc)
+                                        editrecord.menuHeadline = cpCore.db.cs_getText(CSEditRecord, .nameLc)
                                     Case "NAME"
-                                        editrecord.nameLc = cpCore.db.cs_getText(CSLiveRecord, .nameLc)
+                                        editrecord.nameLc = cpCore.db.cs_getText(CSEditRecord, .nameLc)
                                     Case "PARENTID"
-                                        editrecord.parentID = cpCore.db.cs_getInteger(CSLiveRecord, .nameLc)
+                                        editrecord.parentID = cpCore.db.cs_getInteger(CSEditRecord, .nameLc)
                                         'Case Else
                                         '    EditRecordValuesVariant(FieldPointer) = DBValueVariant
                                 End Select
@@ -2116,13 +2102,6 @@ ErrorTrap:
                         Next
                     End If
                     Call cpCore.db.cs_Close(CSEditRecord)
-                    If WorkflowAuthoring Then
-                        '
-                        ' 202-31245: quick fix. The CS should handle this instead.
-                        ' Workflow authoring, close live record used to display Read_Only and Not_Editable records
-                        '
-                        Call cpCore.db.cs_Close(CSLiveRecord)
-                    End If
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -2133,7 +2112,7 @@ ErrorTrap:
         '   Read the Form into the fields array
         '========================================================================
         '
-        Private Sub LoadEditResponse(adminContent As cdefModel, editRecord As editRecordClass)
+        Private Sub LoadEditRecord_Request(adminContent As cdefModel, editRecord As editRecordClass)
             Try
                 Dim PageNotFoundPageID As Integer
                 Dim FormFieldListToBeLoaded As String
@@ -2170,7 +2149,7 @@ ErrorTrap:
                     'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
                     For Each keyValuePair In adminContent.fields
                         Dim field As CDefFieldModel = keyValuePair.Value
-                        Call LoadEditResponseByPointer(adminContent, editRecord, field, datasource.Name, FormFieldListToBeLoaded, FormEmptyFieldList)
+                        Call LoadEditRecord_RequestField(adminContent, editRecord, field, datasource.Name, FormFieldListToBeLoaded, FormEmptyFieldList)
                     Next
                     '
                     ' If there are any form fields that were no loaded, flag the error now
@@ -2255,7 +2234,7 @@ ErrorTrap:
         '   Read the Form into the fields array
         '========================================================================
         '
-        Private Sub LoadEditResponseByPointer(adminContent As cdefModel, editRecord As editRecordClass, field As CDefFieldModel, DataSourceName As String, ByRef FormFieldListToBeLoaded As String, FormEmptyFieldList As String)
+        Private Sub LoadEditRecord_RequestField(adminContent As cdefModel, editRecord As editRecordClass, field As CDefFieldModel, ignore As String, ByRef FormFieldListToBeLoaded As String, FormEmptyFieldList As String)
             Try
                 Const LoopPtrMax = 100
                 Dim blockDuplicateUsername As Boolean
@@ -2270,7 +2249,7 @@ ErrorTrap:
                 Dim Copy As String
                 Dim FieldName As String
                 Dim ResponseFieldValueIsOKToSave As Boolean
-                Dim SQLUnique As String
+
                 Dim CSPointer As Integer
                 Dim ResponseFieldIsEmpty As Boolean
                 Dim ResponseFieldValueText As String
@@ -2690,33 +2669,13 @@ ErrorTrap:
                                         '
                                         ' ----- Do the unique check for this field
                                         '
-                                        ' 7/22/2009 - moved this out of EditRecord.ID<>0 check -- so unique does not check edit or archive records
-                                        If editRecord.id = 0 Then
+                                        Dim SQLUnique As String = "select id from " & adminContent.ContentTableName & " where (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")and(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
+                                        If editRecord.id > 0 Then
                                             '
-                                            ' new record
-                                            '
-                                            If AdminContentWorkflowAuthoring Then
-                                                SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
-                                                SQLUnique = SQLUnique & "And((EditArchive Is null)Or(EditArchive=0))"
-                                            Else
-                                                SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
-                                            End If
-                                        Else
-                                            '
-                                            ' editing record
-                                            '
-                                            If AdminContentWorkflowAuthoring Then
-                                                '
-                                                ' check for another edit record that matches this record -or- a live record that matches it
-                                                '
-                                                SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
-                                                SQLUnique = SQLUnique & "And( (EditSourceID Is null) Or ((EditSourceID<>" & editRecord.id & ")And((EditArchive Is null)Or(EditArchive=0))))"
-                                            Else
-                                                SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
-                                            End If
-                                            SQLUnique = SQLUnique & "And(ID<>" & editRecord.id & ")"
+                                            ' --editing record
+                                            SQLUnique = SQLUnique & "and(id<>" & editRecord.id & ")"
                                         End If
-                                        CSPointer = cpCore.db.cs_openCsSql_rev(DataSourceName, SQLUnique)
+                                        CSPointer = cpCore.db.cs_openCsSql_rev(adminContent.ContentDataSourceName, SQLUnique)
                                         If cpCore.db.cs_ok(CSPointer) Then
                                             '
                                             ' field is not unique, skip it and flag error
@@ -2731,21 +2690,7 @@ ErrorTrap:
                                                 '
                                                 '
                                                 errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Email Login Is checked.")
-                                            ElseIf AdminContentWorkflowAuthoring Then
-                                                '
-                                                ' Workflow
-                                                '
-                                                If (cpCore.db.cs_getInteger(CSPointer, "EditSourceID") = 0) Then
-                                                    '
-                                                    ' there is a live record that matches
-                                                    '
-                                                    errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with the value [" & ResponseFieldValueText & "].")
-                                                Else
-                                                    '
-                                                    ' there is an edit record that matches
-                                                    '
-                                                    errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record whose current edits include the value [" & ResponseFieldValueText & "].")
-                                                End If
+                                            ElseIf False Then
                                             Else
                                                 '
                                                 ' non-workflow
@@ -3010,7 +2955,7 @@ ErrorTrap:
                         If OverRideDuplicate Then
                             Call cpCore.db.executeSql("update " & adminContent.ContentTableName & " set linkalias=null where ( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ") and (id<>" & editRecord.id & ")")
                         Else
-                            CS = cpCore.db.cs_open(adminContent.Name, "( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ")and(id<>" & editRecord.id & ")and(editsourceid is null)")
+                            CS = cpCore.db.cs_open(adminContent.Name, "( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ")and(id<>" & editRecord.id & ")")
                             If cpCore.db.cs_ok(CS) Then
                                 isDupError = True
                                 Call errorController.error_AddUserError(cpCore, "The Link Alias you entered can not be used because another record uses this value [" & linkAlias & "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.")
@@ -3407,7 +3352,7 @@ ErrorTrap:
                     '            If RecordChanged And SaveCCIDValue <> 0 Then
                     '                Call cpCore.main_SetContentControl(EditRecord.ContentID, EditRecord.ID, SaveCCIDValue)
                     '            End If
-                    If RecordChanged And Not AdminContentWorkflowAuthoring Then
+                    If RecordChanged And Not False Then
                         '
                         ' if record is changed, and not workflow, clear the contenttimestamp
                         '
@@ -3443,7 +3388,7 @@ ErrorTrap:
                         adminContent = cpCore.metaData.getCdef(editRecord.contentControlId_Name)
                         adminContent.Id = adminContent.Id
                         adminContent.Name = adminContent.Name
-                        AdminContentWorkflowAuthoring = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
+                        ' false = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
                     End If
                 End If
                 editRecord.Saved = True
@@ -3616,13 +3561,11 @@ ErrorTrap:
             Dim CS As Integer
             Dim AllowMarkReviewed As Boolean
             '
-            If Not AdminContentWorkflowAuthoring Then
-                IsPageContent = cpCore.metaData.isWithinContent(adminContent.Id, cpCore.metaData.getContentId("Page Content"))
-                If cpCore.metaData.isContentFieldSupported(adminContent.Name, "parentid") Then
-                    CS = cpCore.db.cs_open(adminContent.Name, "parentid=" & editRecord.id, , , , , , "ID")
-                    HasChildRecords = cpCore.db.cs_ok(CS)
-                    Call cpCore.db.cs_Close(CS)
-                End If
+            IsPageContent = cpCore.metaData.isWithinContent(adminContent.Id, cpCore.metaData.getContentId("Page Content"))
+            If cpCore.metaData.isContentFieldSupported(adminContent.Name, "parentid") Then
+                CS = cpCore.db.cs_open(adminContent.Name, "parentid=" & editRecord.id, , , , , , "ID")
+                HasChildRecords = cpCore.db.cs_ok(CS)
+                Call cpCore.db.cs_Close(CS)
             End If
             IncludeCDefReload = (LCase(adminContent.ContentTableName) = "cccontent") Or (LCase(adminContent.ContentTableName) = "ccdatasources") Or (LCase(adminContent.ContentTableName) = "cctables") Or (LCase(adminContent.ContentTableName) = "ccfields")
             AllowMarkReviewed = cpCore.db.isSQLTableField("default", adminContent.ContentTableName, "DateReviewed")
@@ -3763,12 +3706,6 @@ ErrorTrap:
                     End If
                 End If
                 '
-                ' Set if in workflow mode, if so, call getpccptr.
-                ' problem was the GetLandingPageID uses IsWorkflowAuthoring to trigger EditRecord use. If you are editing
-                ' you need editrecords, but the cache for PCC gets loaded during the GetLandingPageID call.
-                '
-                AdminContentWorkflowAuthoring = AdminContentWorkflowAuthoring
-                '
                 ' Test if this editors has access to this record
                 '
                 If Not userHasContentAccess(editRecord.contentControlId) Then
@@ -3904,7 +3841,7 @@ ErrorTrap:
                 If IsTemplateTable Then
                     TemplateIDForStyles = editRecord.id
                 ElseIf IsPageContentTable Then
-                    'Call cpCore.pages.getPageArgs(editRecord.id, AdminContentWorkflowAuthoring, False, IgnoreInteger, TemplateIDForStyles, IgnoreInteger, IgnoreString, IgnoreBoolean, IgnoreInteger, IgnoreBoolean, "")
+                    'Call cpCore.pages.getPageArgs(editRecord.id, false, False, ignoreInteger, TemplateIDForStyles, ignoreInteger, IgnoreString, IgnoreBoolean, ignoreInteger, IgnoreBoolean, "")
                 End If
                 '
                 ' ----- create page headers
@@ -3988,7 +3925,7 @@ ErrorTrap:
                         Else
                         End If
                     End If
-                    If AdminContentWorkflowAuthoring Then
+                    If False Then
                         If editRecord.IsInserted Then
                             HeaderDescription = HeaderDescription & "<BR >Last Published: not published"
                         Else
@@ -4006,7 +3943,7 @@ ErrorTrap:
                     '
                     HeaderDescription = HeaderDescription & "</td></tr>"
                     '
-                    If Not AdminContentWorkflowAuthoring Then
+                    If Not False Then
                         HeaderDescription = HeaderDescription & "<tr><td colspan=2>Authoring Mode: Immediate</td></tr>"
                     Else
                         HeaderDescription = HeaderDescription & "<tr><td style=""vertical-align:top;"">Authoring Mode: Workflow</td>"
@@ -5078,7 +5015,7 @@ ErrorTrap:
                 Else
                     ButtonList = ButtonList & "," & ButtonCancel
                 End If
-                ButtonList = ButtonList & "," & ButtonWorkflowPublishApproved & "," & ButtonWorkflowPublishSelected
+                'ButtonList = ButtonList & "," & ButtonWorkflowPublishApproved & "," & ButtonWorkflowPublishSelected
                 ButtonList = Mid(ButtonList, 2)
                 '
                 ' Assemble Page
@@ -5959,8 +5896,7 @@ ErrorTrap:
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                            EditorString = main_GetFormInputStyles(cpCore, FormFieldLCaseName, FieldValueText, , "styles")
-                                            '
+                                            EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, 10, , , , , "styles")
                                         Case FieldTypeIdFileJavascript
                                             '
                                             ' ----- Javascript field
@@ -6483,7 +6419,7 @@ ErrorTrap:
                 ''
                 'FieldHelp = "In immediate authoring mode, the live site is changed when each record is saved. In Workflow authoring mode, there are several steps to publishing a change. This field displays the current stage of this record."
                 'FieldRequired = False
-                'AuthoringStatusMessage = cpCore.authContext.main_GetAuthoringStatusMessage(cpCore, AdminContentWorkflowAuthoring, editRecord.EditLock, editRecord.EditLockMemberName, editRecord.EditLockExpires, editRecord.ApproveLock, editRecord.ApprovedName, editRecord.SubmitLock, editRecord.SubmittedName, editRecord.IsDeleted, editRecord.IsInserted, editRecord.IsModified, editRecord.LockModifiedName)
+                'AuthoringStatusMessage = cpCore.authContext.main_GetAuthoringStatusMessage(cpCore, false, editRecord.EditLock, editRecord.EditLockMemberName, editRecord.EditLockExpires, editRecord.ApproveLock, editRecord.ApprovedName, editRecord.SubmitLock, editRecord.SubmittedName, editRecord.IsDeleted, editRecord.IsInserted, editRecord.IsModified, editRecord.LockModifiedName)
                 'Call FastString.Add(Adminui.GetEditRow(AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
                 ''Call FastString.Add(AdminUI.GetEditRow( AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
                 '
@@ -9149,12 +9085,6 @@ ErrorTrap:
                         ' Publish Form
                         '
                         Select Case AdminButton
-                            Case ButtonWorkflowPublishApproved
-                                AdminAction = AdminActionWorkflowPublishApproved
-                                AdminForm = AdminSourceForm
-                            Case ButtonWorkflowPublishSelected
-                                AdminAction = AdminActionWorkflowPublishSelected
-                                AdminForm = AdminSourceForm
                             Case ButtonCancel
                                 AdminAction = AdminActionNop
                                 AdminForm = AdminFormRoot
@@ -9218,21 +9148,6 @@ ErrorTrap:
                                 '                    AdminAction = AdminActionSetHTMLEdit
                                 '                Case ButtonSetTextEdit
                                 '                    AdminAction = AdminActionSetTextEdit
-                            Case ButtonPublishApprove
-                                AdminAction = AdminActionPublishApprove
-                                AdminForm = GetForm_Close(MenuDepth, adminContent.Name, editRecord.id)
-                            Case ButtonPublishSubmit
-                                AdminAction = AdminActionPublishSubmit
-                                AdminForm = GetForm_Close(MenuDepth, adminContent.Name, editRecord.id)
-                            Case ButtonPublish
-                                AdminAction = AdminActionPublish
-                                AdminForm = GetForm_Close(MenuDepth, adminContent.Name, editRecord.id)
-                            Case ButtonAbortEdit
-                                AdminAction = AdminActionAbortEdit
-                                AdminForm = AdminFormEdit
-                                '                Case ButtonOpenActiveEditor
-                                '                    AdminAction = AdminActionSave
-                                '                    AdminForm = AdminFormDHTMLEdit
                             Case ButtonSave
                                 AdminAction = AdminActionSave
                                 AdminForm = AdminFormEdit
@@ -9480,7 +9395,7 @@ ErrorTrap:
                 '
             Else
                 Select Case genericController.vbUCase(Name)
-                    Case "ACTIVE", "ID", "CONTENTCONTROLID", "CREATEDBY", "DATEADDED", "MODIFIEDBY", "MODIFIEDDATE", "CREATEKEY", "EDITSOURCEID", "EDITBLANK", "EDITARCHIVE", "CONTENTCATEGORYID", "CCGUID"
+                    Case "ACTIVE", "ID", "CONTENTCONTROLID", "CREATEDBY", "DATEADDED", "MODIFIEDBY", "MODIFIEDDATE", "CREATEKEY", "CCGUID"
                         '
                         ' ----- control fields are not editable user fields
                         '
@@ -9756,7 +9671,7 @@ ErrorTrap:
                         ' --- preload array with values that may not come back in response
                         '
                         Call LoadEditRecord(adminContent, editRecord)
-                        Call LoadEditResponse(adminContent, editRecord)
+                        Call LoadEditRecord_Request(adminContent, editRecord)
                         '
                         If Not (cpCore.debug_iUserError <> "") Then
                             '
@@ -9780,7 +9695,7 @@ ErrorTrap:
                         ' --- preload array with values that may not come back in response
                         '
                         Call LoadEditRecord(adminContent, editRecord)
-                        Call LoadEditResponse(adminContent, editRecord)
+                        Call LoadEditRecord_Request(adminContent, editRecord)
                         '
                         If Not (cpCore.debug_iUserError <> "") Then
                             '
@@ -16499,7 +16414,7 @@ ErrorTrap:
                 'Dim FieldName As String
                 Dim Ptr As Integer
                 Dim IncludedInLeftJoin As Boolean
-                Dim SupportWorkflowFields As Boolean
+                '  Dim SupportWorkflowFields As Boolean
                 Dim FieldPtr As Integer
                 Dim IncludedInColumns As Boolean
                 Dim LookupContentName As String
@@ -16518,17 +16433,9 @@ ErrorTrap:
                 Call ProcessIndexConfigRequests(adminContent, editRecord, IndexConfig)
                 Call SaveIndexConfig(IndexConfig)
                 '
-                ' ----- Go through fields and create select and leftjoin sections of sql first
-                '
-                SupportWorkflowFields = cpCore.workflow.isWorkflowAuthoringCompatible(adminContent.Name) And cpCore.siteProperties.allowWorkflowAuthoring
-                '
                 ' ----- Workflow Fields
                 '
-                If SupportWorkflowFields Then
-                    return_sqlFieldList = return_sqlFieldList & adminContent.ContentTableName & ".EditSourceID as ID"
-                Else
-                    return_sqlFieldList = return_sqlFieldList & adminContent.ContentTableName & ".ID"
-                End If
+                return_sqlFieldList = return_sqlFieldList & adminContent.ContentTableName & ".ID"
                 '
                 ' ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
                 '
@@ -16751,11 +16658,11 @@ ErrorTrap:
                 '
                 ' Where Clause: Workflow
                 '
-                If SupportWorkflowFields Then
-                    '
-                    ' Workflow - Either a live record or an unpublished inserted record
-                    '
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".EditSourceID is not null)AND(" & adminContent.ContentTableName & ".EditArchive=0)"
+                If False Then
+                    ''
+                    '' Workflow - Either a live record or an unpublished inserted record
+                    ''
+                    'return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".EditSourceID is not null)AND(" & adminContent.ContentTableName & ".EditArchive=0)"
                 Else
                     '
                     ' no - if restarted without workflow, all edit records are removed
@@ -16818,9 +16725,6 @@ ErrorTrap:
                                                     ' integer
                                                     '
                                                     Dim FindWordValueInteger As Integer = genericController.EncodeInteger(FindWordValue)
-                                                    If SupportWorkflowFields And genericController.vbLCase(.nameLc) = "id" Then
-                                                        FindWordName = "EditSourceID"
-                                                    End If
                                                     Select Case FindMatchOption
                                                         Case FindWordMatchEnum.MatchEmpty
                                                             return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & " is null)"
@@ -17149,7 +17053,7 @@ ErrorTrap:
         '
         Private requestedContentId As Integer
         Private requestedRecordId As Integer
-        Private AdminContentWorkflowAuthoring As Boolean    ' set if content and site support workflow authoring
+        'Private false As Boolean    ' set if content and site support workflow authoring
         Private BlockEditForm As Boolean                    ' true if there was an error loading the edit record - use to block the edit form
         '
         ' ----- Storage for current EditRecord, loaded in LoadEditRecord
@@ -17499,19 +17403,5 @@ ErrorTrap:
             Return New adminUIController(cpCore).GetBody(Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content)
         End Function
         '
-        '==========================================================================================================================================
-        '   Input element for Style Sheets
-        '
-        '   Opens a temp file in the appcache folder with the styles copies in
-        '   click on one of the styles on the left, and main_Get the right pane with AJAX.
-        '   then on the next click, save the results in the right page back to the temp file.
-        '   on OK or save, first save the right pane results to the temp file, then copy the temp file to the real file
-        '   on cancel, just delete the temp file
-        '==========================================================================================================================================
-        '
-        Public Shared Function main_GetFormInputStyles(cpCore As coreClass, ByVal TagName As String, ByVal StyleCopy As String, Optional ByVal HtmlId As String = "", Optional ByVal HtmlClass As String = "") As String
-            Dim Copy As String = genericController.encodeHTML(StyleCopy)
-            Return cpCore.html.html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
-        End Function
     End Class
 End Namespace

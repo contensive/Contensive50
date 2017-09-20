@@ -176,7 +176,7 @@
 '                        .AllowWorkflowAuthoring = cs.getBoolean("AllowWorkflowAuthoring")
 '                        .AuthoringTableID = cs.getInteger("AuthoringTableID")
 '                        .ccGuid = cs.getText("ccGuid")
-'                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+'                        '
 '                        .ContentControlID = cs.getInteger("ContentControlID")
 '                        .ContentTableID = cs.getInteger("ContentTableID")
 '                        .CreatedBy = cs.getInteger("CreatedBy")
@@ -185,10 +185,10 @@
 '                        .DefaultSortMethodID = cs.getInteger("DefaultSortMethodID")
 '                        .DeveloperOnly = cs.getBoolean("DeveloperOnly")
 '                        .DropDownFieldList = cs.getText("DropDownFieldList")
-'                        .EditArchive = cs.getBoolean("EditArchive")
-'                        .EditBlank = cs.getBoolean("EditBlank")
+'                        '
+'                        '
 '                        .EditorGroupID = cs.getInteger("EditorGroupID")
-'                        .EditSourceID = cs.getInteger("EditSourceID")
+'                        '
 '                        .IconHeight = cs.getInteger("IconHeight")
 '                        .IconLink = cs.getText("IconLink")
 '                        .IconSprites = cs.getInteger("IconSprites")
@@ -258,7 +258,7 @@
 '                    cs.setField("AllowWorkflowAuthoring", AllowWorkflowAuthoring.ToString())
 '                    cs.setField("AuthoringTableID", AuthoringTableID.ToString())
 '                    cs.setField("ccGuid", ccGuid)
-'                    cs.setField("ContentCategoryID", ContentCategoryID.ToString())
+'                    '
 '                    cs.setField("ContentControlID", ContentControlID.ToString())
 '                    cs.setField("ContentTableID", ContentTableID.ToString())
 '                    cs.setField("CreatedBy", CreatedBy.ToString())
@@ -267,10 +267,10 @@
 '                    cs.setField("DefaultSortMethodID", DefaultSortMethodID.ToString())
 '                    cs.setField("DeveloperOnly", DeveloperOnly.ToString())
 '                    cs.setField("DropDownFieldList", DropDownFieldList)
-'                    cs.setField("EditArchive", EditArchive.ToString())
-'                    cs.setField("EditBlank", EditBlank.ToString())
+'                    '
+'                    '
 '                    cs.setField("EditorGroupID", EditorGroupID.ToString())
-'                    cs.setField("EditSourceID", EditSourceID.ToString())
+'                    '
 '                    cs.setField("IconHeight", IconHeight.ToString())
 '                    cs.setField("IconLink", IconLink)
 '                    cs.setField("IconSprites", IconSprites.ToString())
@@ -477,7 +477,7 @@
 '                        instance.AllowWorkflowAuthoring = genericController.EncodeBoolean(.fields("AllowWorkflowAuthoring").defaultValue)
 '                        instance.AuthoringTableID = genericController.EncodeInteger(.fields("AuthoringTableID").defaultValue)
 '                        instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
-'                        instance.ContentCategoryID = genericController.EncodeInteger(.fields("ContentCategoryID").defaultValue)
+
 '                        instance.ContentControlID = CDef.Id
 '                        instance.ContentTableID = genericController.EncodeInteger(.fields("ContentTableID").defaultValue)
 '                        instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
@@ -486,10 +486,10 @@
 '                        instance.DefaultSortMethodID = genericController.EncodeInteger(.fields("DefaultSortMethodID").defaultValue)
 '                        instance.DeveloperOnly = genericController.EncodeBoolean(.fields("DeveloperOnly").defaultValue)
 '                        instance.DropDownFieldList = genericController.encodeText(.fields("DropDownFieldList").defaultValue)
-'                        instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
-'                        instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
+
+
 '                        instance.EditorGroupID = genericController.EncodeInteger(.fields("EditorGroupID").defaultValue)
-'                        instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
+
 '                        instance.IconHeight = genericController.EncodeInteger(.fields("IconHeight").defaultValue)
 '                        instance.IconLink = genericController.encodeText(.fields("IconLink").defaultValue)
 '                        instance.IconSprites = genericController.EncodeInteger(.fields("IconSprites").defaultValue)

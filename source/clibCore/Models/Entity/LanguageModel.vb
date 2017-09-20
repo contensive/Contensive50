@@ -126,14 +126,14 @@ Namespace Contensive.Core.Models.Entity
                         .ID = cs.getInteger("ID")
                         .Active = cs.getBoolean("Active")
                         .ccGuid = cs.getText("ccGuid")
-                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        ''
                         .ContentControlID = cs.getInteger("ContentControlID")
                         .CreatedBy = cs.getInteger("CreatedBy")
                         .CreateKey = cs.getInteger("CreateKey")
                         .DateAdded = cs.getDate("DateAdded")
-                        .EditArchive = cs.getBoolean("EditArchive")
-                        .EditBlank = cs.getBoolean("EditBlank")
-                        .EditSourceID = cs.getInteger("EditSourceID")
+                        ''
+                        ''
+                        ''
                         .HTTP_Accept_Language = cs.getText("HTTP_Accept_Language")
                         .ModifiedBy = cs.getInteger("ModifiedBy")
                         .ModifiedDate = cs.getDate("ModifiedDate")
@@ -171,34 +171,34 @@ Namespace Contensive.Core.Models.Entity
         Public Function saveObject(cpCore As coreClass) As Integer
             Try
                 Dim cs As New csController(cpCore)
-                If (id > 0) Then
-                    If Not cs.open(primaryContentName, "id=" & id) Then
-                        id = 0
+                If (ID > 0) Then
+                    If Not cs.open(primaryContentName, "id=" & ID) Then
+                        ID = 0
                         cs.Close()
-                        Throw New ApplicationException("Unable to open record in content [" & primaryContentName & "], with id [" & id & "]")
+                        Throw New ApplicationException("Unable to open record in content [" & primaryContentName & "], with id [" & ID & "]")
                     End If
                 Else
                     If Not cs.Insert(primaryContentName) Then
                         cs.Close()
-                        id = 0
+                        ID = 0
                         Throw New ApplicationException("Unable to insert record in content [" & primaryContentName & "]")
                     End If
                 End If
                 If cs.ok() Then
-                    id = cs.getInteger("id")
+                    ID = cs.getInteger("id")
                     If (String.IsNullOrEmpty(ccGuid)) Then
                         ccGuid = Controllers.genericController.getGUID()
                     End If
                     cs.setField("Active", Active.ToString())
                     cs.setField("ccGuid", ccGuid)
-                    cs.setField("ContentCategoryID", ContentCategoryID.ToString())
+                    ''
                     cs.setField("ContentControlID", ContentControlID.ToString())
                     cs.setField("CreatedBy", CreatedBy.ToString())
                     cs.setField("CreateKey", CreateKey.ToString())
                     cs.setField("DateAdded", DateAdded.ToString())
-                    cs.setField("EditArchive", EditArchive.ToString())
-                    cs.setField("EditBlank", EditBlank.ToString())
-                    cs.setField("EditSourceID", EditSourceID.ToString())
+                    ''
+                    ''
+                    ''
                     cs.setField("HTTP_Accept_Language", HTTP_Accept_Language)
                     cs.setField("ModifiedBy", ModifiedBy.ToString())
                     cs.setField("ModifiedDate", ModifiedDate.ToString())

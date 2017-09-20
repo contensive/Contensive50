@@ -4126,11 +4126,7 @@ Namespace Contensive.Core
                                                     .AllowContentChildTool = GetXMLAttributeBoolean(Found, CDef_Node, "AllowContentChildTool", DefaultCDef.AllowContentChildTool)
                                                     .AllowContentTracking = GetXMLAttributeBoolean(Found, CDef_Node, "AllowContentTracking", DefaultCDef.AllowContentTracking)
                                                     .AllowDelete = GetXMLAttributeBoolean(Found, CDef_Node, "AllowDelete", DefaultCDef.AllowDelete)
-                                                    '.AllowMetaContent = GetXMLAttributeBoolean(Found, CDef_Node, "AllowMetaContent", DefaultCDef.AllowMetaContent)
                                                     .AllowTopicRules = GetXMLAttributeBoolean(Found, CDef_Node, "AllowTopicRules", DefaultCDef.AllowTopicRules)
-                                                    .AllowWorkflowAuthoring = GetXMLAttributeBoolean(Found, CDef_Node, "AllowWorkflowAuthoring", DefaultCDef.AllowWorkflowAuthoring)
-                                                    .AuthoringDataSourceName = GetXMLAttribute(Found, CDef_Node, "AuthoringDataSourceName", DefaultCDef.AuthoringDataSourceName)
-                                                    .AuthoringTableName = GetXMLAttribute(Found, CDef_Node, "AuthoringTableName", DefaultCDef.AuthoringTableName)
                                                     .guid = GetXMLAttribute(Found, CDef_Node, "guid", DefaultCDef.guid)
                                                     .dataChanged = setAllDataChanged
                                                     .childIdList(cpCore) = New List(Of Integer)
@@ -5035,7 +5031,7 @@ Namespace Contensive.Core
                                     , .parentName _
                                     , .DefaultSortMethod _
                                     , .DropDownFieldList _
-                                    , .AllowWorkflowAuthoring _
+                                    , False _
                                     , .AllowCalendarEvents _
                                     , .AllowContentTracking _
                                     , .AllowTopicRules _
@@ -5282,15 +5278,6 @@ Namespace Contensive.Core
                                 If Not okToUpdateDstFromSrc Then n = "AllowTopicRules"
                                 okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.AllowTopicRules <> srcCollectionCdef.AllowTopicRules)
                                 '
-                                If Not okToUpdateDstFromSrc Then n = "AllowWorkflowAuthoring"
-                                okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.AllowWorkflowAuthoring <> srcCollectionCdef.AllowWorkflowAuthoring)
-                                '
-                                If Not okToUpdateDstFromSrc Then n = "AuthoringDataSourceName"
-                                okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.AuthoringDataSourceName, srcCollectionCdef.AuthoringDataSourceName)
-                                '
-                                If Not okToUpdateDstFromSrc Then n = "AuthoringTableName"
-                                okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.AuthoringTableName, srcCollectionCdef.AuthoringTableName)
-                                '
                                 If Not okToUpdateDstFromSrc Then n = "ContentDataSourceName"
                                 okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.ContentDataSourceName, srcCollectionCdef.ContentDataSourceName)
                                 '
@@ -5386,14 +5373,9 @@ Namespace Contensive.Core
                             .AllowContentChildTool = srcCollectionCdef.AllowContentChildTool
                             .AllowContentTracking = srcCollectionCdef.AllowContentTracking
                             .AllowDelete = srcCollectionCdef.AllowDelete
-                            '.AllowMetaContent = srcCollectionCdef.AllowMetaContent
                             .AllowTopicRules = srcCollectionCdef.AllowTopicRules
-                            .AllowWorkflowAuthoring = srcCollectionCdef.AllowWorkflowAuthoring
-                            .AuthoringDataSourceName = srcCollectionCdef.AuthoringDataSourceName
-                            .AuthoringTableName = srcCollectionCdef.AuthoringTableName
                             .guid = srcCollectionCdef.guid
                             .dataChanged = True
-                            '.childIdList
                             .ContentControlCriteria = srcCollectionCdef.ContentControlCriteria
                             .ContentDataSourceName = srcCollectionCdef.ContentDataSourceName
                             .ContentTableName = srcCollectionCdef.ContentTableName

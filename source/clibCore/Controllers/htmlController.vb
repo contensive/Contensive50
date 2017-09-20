@@ -6486,9 +6486,6 @@ ErrorTrap:
                             If SecondaryContentSelectCriteria <> "" Then
                                 SQL &= "AND(" & SecondaryContentSelectCriteria & ")"
                             End If
-                            If SecondaryCDef.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring Then
-                                SQL &= "and(" & SecondaryTablename & ".editsourceid is null)"
-                            End If
                             CS = cpCore.db.cs_openSql(SQL)
                             If cpCore.db.cs_ok(CS) Then
                                 If True Then
@@ -6536,9 +6533,6 @@ ErrorTrap:
                                 & " Where (" & SecondaryTablename & ".Active<>" & SQLFalse & ")" _
                                 & " And (AllowedContent.Active<>" & SQLFalse & ")" _
                                 & " And (" & SecondaryTablename & ".ContentControlID IN (" & String.Join(",", ContentIDList) & "))"
-                        End If
-                        If SecondaryCDef.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring Then
-                            SQL &= "and(" & SecondaryTablename & ".editsourceid is null)"
                         End If
                         If SecondaryContentSelectCriteria <> "" Then
                             SQL &= "AND(" & SecondaryContentSelectCriteria & ")"
@@ -8127,7 +8121,7 @@ ErrorTrap:
                         Call cpCore.db.cs_set(CS, "name", CopyName)
                         Call cpCore.db.cs_set(CS, "copy", genericController.encodeText(DefaultContent))
                         Call cpCore.db.cs_save2(CS)
-                        Call cpCore.workflow.publishEdit("copy content", RecordID)
+                        '   Call cpCore.workflow.publishEdit("copy content", RecordID)
                     End If
                 End If
                 If cpCore.db.cs_ok(CS) Then
@@ -9516,14 +9510,14 @@ ErrorTrap:
                             '
                             helpLink = ""
                             'helpLink = main_GetHelpLink(9, "Enable Workflow Rendering", "Control the display of workflow rendering. With workflow rendering enabled, any changes saved to content records that have not been published will be visible for your review.")
-                            If cpCore.siteProperties.allowWorkflowAuthoring Then
-                                iValueBoolean = cpCore.visitProperty.getBoolean("AllowWorkflowRendering")
-                                Tag = cpCore.html.html_GetFormInputCheckBox2(WorkflowTagID, iValueBoolean, WorkflowTagID)
-                                OptionsPanel = OptionsPanel _
-                                & cr & "<div class=""ccAdminSmall"">" _
-                                & cr2 & "<LABEL for=""" & WorkflowTagID & """>" & Tag & "&nbsp;Render Workflow Authoring Changes</LABEL>" & helpLink _
-                                & cr & "</div>"
-                            End If
+                            'If cpCore.siteProperties.allowWorkflowAuthoring Then
+                            '    iValueBoolean = cpCore.visitProperty.getBoolean("AllowWorkflowRendering")
+                            '    Tag = cpCore.html.html_GetFormInputCheckBox2(WorkflowTagID, iValueBoolean, WorkflowTagID)
+                            '    OptionsPanel = OptionsPanel _
+                            '    & cr & "<div class=""ccAdminSmall"">" _
+                            '    & cr2 & "<LABEL for=""" & WorkflowTagID & """>" & Tag & "&nbsp;Render Workflow Authoring Changes</LABEL>" & helpLink _
+                            '    & cr & "</div>"
+                            'End If
                             helpLink = ""
                             iValueBoolean = cpCore.visitProperty.getBoolean("AllowDebugging")
                             TagID = "AllowDebugging"

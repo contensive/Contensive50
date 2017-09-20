@@ -204,19 +204,6 @@ Namespace Contensive.Core.Controllers
                     '       This may be replaced later if the tag is empty, and the actual add-on arguments have default values
                     '
                     WorkingOptionString = optionString
-                    ''
-                    '' ----- Lookup the addon
-                    ''
-                    'If addonId <> 0 Then
-                    '    addon = cpCore.addonCache.getAddonById(addonId)
-                    '    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from id [" & addonId & "]")
-                    'ElseIf (genericController.isGuid(AddonNameOrGuid)) Then
-                    '    addon = cpCore.addonCache.getAddonByGuid(AddonNameOrGuid)
-                    '    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from guid [" & AddonNameOrGuid & "]")
-                    'Else
-                    '    addon = cpCore.addonCache.getAddonByName(AddonNameOrGuid)
-                    '    If (addon Is Nothing) Then debugController.testPoint(cpCore, "execute, addon not found from name [" & AddonNameOrGuid & "]")
-                    'End If
                     FoundAddon = False
                     If (addon Is Nothing) Then
                         '
@@ -346,25 +333,17 @@ Namespace Contensive.Core.Controllers
                                 '
                                 If True Then
                                     IncludeEditWrapper =
-                                (Not AddonBlockEditTools) _
-                                And (addonType <> CPUtilsBaseClass.addonContext.ContextEditor) _
-                                And (addonType <> CPUtilsBaseClass.addonContext.ContextEmail) _
-                                And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) _
-                                And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) _
-                                And (addonType <> CPUtilsBaseClass.addonContext.ContextSimple) _
-                                And (Not IsIncludeAddon)
+                                        (Not AddonBlockEditTools) _
+                                        And (addonType <> CPUtilsBaseClass.addonContext.ContextEditor) _
+                                        And (addonType <> CPUtilsBaseClass.addonContext.ContextEmail) _
+                                        And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) _
+                                        And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) _
+                                        And (addonType <> CPUtilsBaseClass.addonContext.ContextSimple) _
+                                        And (Not IsIncludeAddon)
                                     If IncludeEditWrapper Then
                                         IncludeEditWrapper = IncludeEditWrapper _
-                                    And (cpCore.visitProperty.getBoolean("AllowAdvancedEditor") _
-                                    And ((addonType = CPUtilsBaseClass.addonContext.ContextAdmin) Or cpCore.authContext.isEditing(HostContentName)))
-                                        'IncludeEditWrapper = IncludeEditWrapper _
-                                        '    And ( _
-                                        '        ( _
-                                        '            (csv_VisitProperty_AllowAdvancedEditor And ((Context = ContextAdmin) Or IsEditing(HostContentName))) _
-                                        '        ) Or ( _
-                                        '            (csv_VisitProperty_AllowEditing And ((AddonGuid = ContentBoxGuid) Or (AddonGuid = DynamicMenuGuid) Or (AddonGuid = TextBoxGuid))) _
-                                        '        ) _
-                                        '    )
+                                            And (cpCore.visitProperty.getBoolean("AllowAdvancedEditor") _
+                                            And ((addonType = CPUtilsBaseClass.addonContext.ContextAdmin) Or cpCore.authContext.isEditing(HostContentName)))
                                     End If
                                 End If
                                 '
@@ -574,18 +553,18 @@ Namespace Contensive.Core.Controllers
                                                 Link = Link & "&"
                                             End If
                                             Link = Link _
-                                        & "nocache=" & Rnd() _
-                                        & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
-                                        & "&HostRecordID=" & HostRecordID _
-                                        & "&remotemethodaddon=" & EncodeURL(addon.id.ToString) _
-                                        & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
-                                        & ""
+                                                & "nocache=" & Rnd() _
+                                                & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
+                                                & "&HostRecordID=" & HostRecordID _
+                                                & "&remotemethodaddon=" & EncodeURL(addon.id.ToString) _
+                                                & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
+                                                & ""
                                             FrameID = "frame" & GetRandomInteger()
                                             returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
-                                        & cr & "<script language=javascript type=""text/javascript"">" _
-                                        & cr & "// Safari and Opera need a kick-start." _
-                                        & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
-                                        & cr & "</script>"
+                                                & cr & "<script language=javascript type=""text/javascript"">" _
+                                                & cr & "// Safari and Opera need a kick-start." _
+                                                & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
+                                                & cr & "</script>"
                                         End If
                                     ElseIf (AsAjax And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (addonType <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                         '
@@ -908,7 +887,7 @@ Namespace Contensive.Core.Controllers
                                         '-----------------------------------------------------------------------------------------------------
                                         '
                                         If True And (FormXML <> "") Then
-                                            FormContent = getFormContent(Nothing, FormXML, ExitAddonWithBlankResponse)
+                                            FormContent = execute_formContent(Nothing, FormXML, ExitAddonWithBlankResponse)
                                             If ExitAddonWithBlankResponse Then
                                                 Return String.Empty
                                             End If
@@ -1187,7 +1166,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="FormXML"></param>
         ''' <param name="return_ExitAddonBlankWithResponse"></param>
         ''' <returns></returns>
-        Private Function getFormContent(ByVal nothingObject As Object, ByVal FormXML As String, ByRef return_ExitAddonBlankWithResponse As Boolean) As String
+        Private Function execute_formContent(ByVal nothingObject As Object, ByVal FormXML As String, ByRef return_ExitAddonBlankWithResponse As Boolean) As String
             Dim result As String = ""
             Try
                 '
@@ -1633,7 +1612,7 @@ Namespace Contensive.Core.Controllers
                                                                         Call cpCore.db.cs_set(CS, "name", FieldName)
                                                                         Call cpCore.db.cs_set(CS, "copy", genericController.encodeText(TabNode.InnerText))
                                                                         Call cpCore.db.cs_save2(CS)
-                                                                        Call cpCore.workflow.publishEdit("Copy Content", RecordID)
+                                                                        ' Call cpCore.workflow.publishEdit("Copy Content", RecordID)
                                                                     End If
                                                                 End If
                                                                 If cpCore.db.cs_ok(CS) Then
@@ -2592,12 +2571,12 @@ Namespace Contensive.Core.Controllers
                         '
                         CopyContent = "This addon does not support instance options."
                         CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
-                    ElseIf (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (cpCore.siteProperties.allowWorkflowAuthoring And Not cpCore.visitProperty.getBoolean("AllowWorkflowRendering")) Then
-                        '
-                        ' workflow with no rendering (or within admin site)
-                        '
-                        CopyContent = "With Workflow editing enabled, you can not edit Add-on settings for live records. To make changes to the editable version of this page, turn on Render Workflow Authoring Changes and Advanced Edit together."
-                        CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
+                        'ElseIf (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (cpCore.siteProperties.allowWorkflowAuthoring And Not cpCore.visitProperty.getBoolean("AllowWorkflowRendering")) Then
+                        '    '
+                        '    ' workflow with no rendering (or within admin site)
+                        '    '
+                        '    CopyContent = "With Workflow editing enabled, you can not edit Add-on settings for live records. To make changes to the editable version of this page, turn on Render Workflow Authoring Changes and Advanced Edit together."
+                        '    CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
                     ElseIf ACInstanceID = "" Then
                         '
                         ' No instance ID - must be edited and saved
@@ -3526,7 +3505,7 @@ ErrorTrap:
                                                                         Call cpCore.db.cs_set(CS, "name", FieldName)
                                                                         Call cpCore.db.cs_set(CS, "copy", genericController.encodeText(TabNode.InnerText))
                                                                         Call cpCore.db.cs_save2(CS)
-                                                                        Call cpCore.workflow.publishEdit("Copy Content", RecordID)
+                                                                        '   Call cpCore.workflow.publishEdit("Copy Content", RecordID)
                                                                     End If
                                                                 End If
                                                                 If cpCore.db.cs_ok(CS) Then

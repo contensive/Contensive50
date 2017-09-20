@@ -478,20 +478,20 @@ Namespace Contensive.Core.Models.Context
         End Property
         Private _DefaultFormInputHTMLHeight_Local As Integer
         Private _DefaultFormInputHTMLHeight_LocalLoaded As Boolean = False
-        '
-        '====================================================================================================
-        '
-        Public ReadOnly Property allowWorkflowAuthoring() As Boolean
-            Get
-                If Not _AllowWorkflowAuthoring_LocalLoaded Then
-                    _AllowWorkflowAuthoring_Local = getBoolean("AllowWorkflowAuthoring", False)
-                    _AllowWorkflowAuthoring_LocalLoaded = True
-                End If
-                Return _AllowWorkflowAuthoring_Local
-            End Get
-        End Property
-        Private _AllowWorkflowAuthoring_Local As Boolean
-        Private _AllowWorkflowAuthoring_LocalLoaded As Boolean = False
+        ''
+        ''====================================================================================================
+        ''
+        'Public ReadOnly Property allowWorkflowAuthoring() As Boolean
+        '    Get
+        '        If Not _AllowWorkflowAuthoring_LocalLoaded Then
+        '            _AllowWorkflowAuthoring_Local = getBoolean("AllowWorkflowAuthoring", False)
+        '            _AllowWorkflowAuthoring_LocalLoaded = True
+        '        End If
+        '        Return _AllowWorkflowAuthoring_Local
+        '    End Get
+        'End Property
+        'Private _AllowWorkflowAuthoring_Local As Boolean
+        'Private _AllowWorkflowAuthoring_LocalLoaded As Boolean = False
         '
         '====================================================================================================
         '

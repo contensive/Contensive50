@@ -207,7 +207,7 @@ Namespace Contensive.Core.Models.Entity
                         .ccGuid = cs.getText("ccGuid")
                         .City = cs.getText("City")
                         .Company = cs.getText("Company")
-                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        '
                         .ContentControlID = cs.getInteger("ContentControlID")
                         .Country = cs.getText("Country")
                         .CreatedBy = cs.getInteger("CreatedBy")
@@ -216,9 +216,9 @@ Namespace Contensive.Core.Models.Entity
                         .DateAdded = cs.getDate("DateAdded")
                         .DateExpires = cs.getDate("DateExpires")
                         .Developer = cs.getBoolean("Developer")
-                        .EditArchive = cs.getBoolean("EditArchive")
-                        .EditBlank = cs.getBoolean("EditBlank")
-                        .EditSourceID = cs.getInteger("EditSourceID")
+                        '
+                        '
+                        '
                         .Email = cs.getText("Email")
                         .ExcludeFromAnalytics = cs.getBoolean("ExcludeFromAnalytics")
                         .Fax = cs.getText("Fax")
@@ -327,18 +327,18 @@ Namespace Contensive.Core.Models.Entity
                     cs.SetField("ccGuid", ccGuid)
                     cs.SetField("City", City)
                     cs.SetField("Company", Company)
-                    cs.SetField("ContentCategoryID", ContentCategoryID.ToString())
-                    cs.SetField("ContentControlID", ContentControlID.ToString())
-                    cs.SetField("Country", Country)
-                    cs.SetField("CreatedBy", CreatedBy.ToString())
-                    cs.SetField("CreatedByVisit", CreatedByVisit.ToString())
-                    cs.SetField("CreateKey", CreateKey.ToString())
-                    cs.SetField("DateAdded", DateAdded.ToString())
-                    cs.SetField("DateExpires", DateExpires.ToString())
-                    cs.SetField("Developer", Developer.ToString())
-                    cs.SetField("EditArchive", EditArchive.ToString())
-                    cs.SetField("EditBlank", EditBlank.ToString())
-                    cs.SetField("EditSourceID", EditSourceID.ToString())
+                    '
+                    cs.setField("ContentControlID", ContentControlID.ToString())
+                    cs.setField("Country", Country)
+                    cs.setField("CreatedBy", CreatedBy.ToString())
+                    cs.setField("CreatedByVisit", CreatedByVisit.ToString())
+                    cs.setField("CreateKey", CreateKey.ToString())
+                    cs.setField("DateAdded", DateAdded.ToString())
+                    cs.setField("DateExpires", DateExpires.ToString())
+                    cs.setField("Developer", Developer.ToString())
+                    '
+                    '
+                    '
                     cs.SetField("Email", Email)
                     cs.SetField("ExcludeFromAnalytics", ExcludeFromAnalytics.ToString())
                     cs.SetField("Fax", Fax)

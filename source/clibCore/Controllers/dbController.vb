@@ -71,9 +71,9 @@ Namespace Contensive.Core.Controllers
             Dim OwnerMemberID As Integer               ' ID of the member who opened the csv_ContentSet
             '
             ' Workflow editing modes
-            Dim WorkflowAuthoringMode As Boolean    ' if true, these records came from the AuthoringTable, else ContentTable
-            Dim WorkflowEditingRequested As Boolean ' if true, the CS was opened requesting WorkflowEditingMode
-            Dim WorkflowEditingMode As Boolean      ' if true, the current record can be edited, else just rendered (effects EditBlank and csv_SaveCSRecord)
+            'Dim WorkflowAuthoringMode As Boolean    ' if true, these records came from the AuthoringTable, else ContentTable
+            'Dim WorkflowEditingRequested As Boolean ' if true, the CS was opened requesting WorkflowEditingMode
+            'Dim WorkflowEditingMode As Boolean      ' if true, the current record can be edited, else just rendered (effects EditBlank and csv_SaveCSRecord)
             '
             ' Write Cache
             Dim writeCache As Dictionary(Of String, String)
@@ -344,7 +344,10 @@ Namespace Contensive.Core.Controllers
         Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999, Optional ByRef recordsAffected As Integer = 0) As DataTable
             Dim returnData As New DataTable
             Try
-                If (cpCore.serverConfig Is Nothing) Then
+                If Not dbEnabled Then
+                    '
+                    ' -- db not available
+                ElseIf (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- server config fail
                     cpCore.handleException(New ApplicationException("Cannot execute Sql in dbController without an application"))
@@ -353,7 +356,27 @@ Namespace Contensive.Core.Controllers
                     ' -- server config fail
                     cpCore.handleException(New ApplicationException("Cannot execute Sql in dbController without an application"))
                 Else
-                    returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
+                    Dim connString As String = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName)
+                    'returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
+                    '
+                    ' REFACTOR
+                    ' consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
+                    ' https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldatareader.aspx
+                    '
+                    Dim sw As Stopwatch = Stopwatch.StartNew()
+                    Using connSQL As New SqlConnection(connString)
+                        connSQL.Open()
+                        Using cmdSQL As New SqlCommand()
+                            cmdSQL.CommandType = Data.CommandType.Text
+                            cmdSQL.CommandText = sql
+                            cmdSQL.Connection = connSQL
+                            Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
+                                recordsAffected = adptSQL.Fill(startRecord, maxRecords, returnData)
+                            End Using
+                        End Using
+                    End Using
+                    dbVerified = True
+                    saveTransactionLog(sql, sw.ElapsedMilliseconds)
                 End If
             Catch ex As Exception
                 Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
@@ -361,46 +384,46 @@ Namespace Contensive.Core.Controllers
             End Try
             Return returnData
         End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' executeSql without handling. Used from executeSql(), and as an initial connection test.
-        ''' </summary>
-        ''' <param name="sql"></param>
-        ''' <param name="connString"></param>
-        ''' <param name="startRecord"></param>
-        ''' <param name="maxRecords"></param>
-        ''' <returns></returns>
-        Private Function executeSql_noErrorHandling(ByVal sql As String, ByVal connString As String, ByVal startRecord As Integer, ByVal maxRecords As Integer, ByRef recordsAffected As Integer) As DataTable
-            '
-            ' REFACTOR
-            ' consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
-            ' https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldatareader.aspx
-            '
-            Dim sw As Stopwatch = Stopwatch.StartNew()
-            Dim returnData As New DataTable
-            Dim tickCountStart As Integer = GetTickCount
-            If dbEnabled Then
-                Using connSQL As New SqlConnection(connString)
-                    connSQL.Open()
-                    Using cmdSQL As New SqlCommand()
-                        cmdSQL.CommandType = Data.CommandType.Text
-                        cmdSQL.CommandText = sql
-                        cmdSQL.Connection = connSQL
-                        Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
-                            recordsAffected = adptSQL.Fill(startRecord, maxRecords, returnData)
-                        End Using
-                    End Using
-                End Using
-                dbVerified = True
-                sw.Stop()
-                saveTransactionLog("duration [" & sw.ElapsedMilliseconds & "], sql [" & sql & "]")
-                If (sw.ElapsedMilliseconds > sqlSlowThreshholdMsec) Then
-                    saveSlowQueryLog(CInt(sw.ElapsedMilliseconds), sql)
-                End If
-            End If
-            Return returnData
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' executeSql without handling. Used from executeSql(), and as an initial connection test.
+        '''' </summary>
+        '''' <param name="sql"></param>
+        '''' <param name="connString"></param>
+        '''' <param name="startRecord"></param>
+        '''' <param name="maxRecords"></param>
+        '''' <returns></returns>
+        'Private Function executeSql_noErrorHandling(ByVal sql As String, ByVal connString As String, ByVal startRecord As Integer, ByVal maxRecords As Integer, ByRef recordsAffected As Integer) As DataTable
+        '    '
+        '    ' REFACTOR
+        '    ' consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
+        '    ' https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldatareader.aspx
+        '    '
+        '    Dim sw As Stopwatch = Stopwatch.StartNew()
+        '    Dim returnData As New DataTable
+        '    Dim tickCountStart As Integer = GetTickCount
+        '    If dbEnabled Then
+        '        Using connSQL As New SqlConnection(connString)
+        '            connSQL.Open()
+        '            Using cmdSQL As New SqlCommand()
+        '                cmdSQL.CommandType = Data.CommandType.Text
+        '                cmdSQL.CommandText = sql
+        '                cmdSQL.Connection = connSQL
+        '                Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
+        '                    recordsAffected = adptSQL.Fill(startRecord, maxRecords, returnData)
+        '                End Using
+        '            End Using
+        '        End Using
+        '        dbVerified = True
+        '        sw.Stop()
+        '        saveTransactionLog("duration [" & sw.ElapsedMilliseconds & "], sql [" & sql & "]")
+        '        If (sw.ElapsedMilliseconds > sqlSlowThreshholdMsec) Then
+        '            saveSlowQueryLog(CInt(sw.ElapsedMilliseconds), sql)
+        '        End If
+        '    End If
+        '    Return returnData
+        'End Function
         '
         '====================================================================================================
         ''' <summary>
@@ -555,9 +578,6 @@ Namespace Contensive.Core.Controllers
                 sqlList.add("createdby", encodeSQLNumber(MemberID))
                 sqlList.add("ModifiedDate", DateAddedString)
                 sqlList.add("ModifiedBy", encodeSQLNumber(MemberID))
-                sqlList.add("EditSourceID", encodeSQLNumber(0))
-                sqlList.add("EditArchive", encodeSQLNumber(0))
-                sqlList.add("EditBlank", encodeSQLNumber(0))
                 sqlList.add("ContentControlID", encodeSQLNumber(0))
                 sqlList.add("Name", encodeSQLText(""))
                 sqlList.add("Active", encodeSQLNumber(1))
@@ -627,56 +647,50 @@ Namespace Contensive.Core.Controllers
         '
         '====================================================================================================
         ''' <summary>
-        ''' log a slow query
-        ''' </summary>
-        ''' <param name="TransactionTickCount"></param>
-        ''' <param name="SQL"></param>
-        Private Sub saveSlowQueryLog(ByVal TransactionTickCount As Integer, ByVal SQL As String)
-            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "query time  " & genericController.GetIntegerString(TransactionTickCount, 7) & "ms: " & SQL, "dll", "cpCoreClass", "csv_ExecuteSQL", 0, "", SQL, False, True, "", "Performance", "SlowSQL")
-        End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
         ''' update the transaction log
         ''' </summary>
         ''' <param name="LogEntry"></param>
-        Private Sub saveTransactionLog(ByVal LogEntry As String)
-            If Not String.IsNullOrEmpty(LogEntry) Then
-                Dim Message As String = LogEntry.Replace(vbCr, "")
-                Message = Message.Replace(vbLf, "")
-                logController.appendLog(cpCore, Message, "DbTransactions")
+        Private Sub saveTransactionLog(sql As String, ElapsedMilliseconds As Long)
+            If (cpCore.serverConfig.enableLogging) Then
+                If (cpCore.siteProperties.allowTransactionLog) Then
+                    Dim LogEntry As String = ("duration [" & ElapsedMilliseconds & "], sql [" & sql & "]").Replace(vbCr, "").Replace(vbLf, "")
+                    logController.appendLog(cpCore, LogEntry, "DbTransactions")
+                End If
+                If (ElapsedMilliseconds > sqlSlowThreshholdMsec) Then
+                    logController.appendLog(cpCore, "query time  " & ElapsedMilliseconds & "ms, sql: " & sql, "SlowSQL")
+                End If
             End If
         End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Finds the where clause (first WHERE not in single quotes). returns 0 if not found, otherwise returns locaion of word where
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <returns></returns>
-        Private Function getSQLWherePosition(ByVal SQL As String) As Integer
-            Dim returnPos As Integer = 0
-            Try
-                If genericController.isInStr(1, SQL, "WHERE", vbTextCompare) Then
-                    '
-                    ' ----- contains the word "WHERE", now weed out if not a where clause
-                    '
-                    returnPos = InStrRev(SQL, " WHERE ", , vbTextCompare)
-                    If returnPos = 0 Then
-                        returnPos = InStrRev(SQL, ")WHERE ", , vbTextCompare)
-                        If returnPos = 0 Then
-                            returnPos = InStrRev(SQL, " WHERE(", , vbTextCompare)
-                            If returnPos = 0 Then
-                                returnPos = InStrRev(SQL, ")WHERE(", , vbTextCompare)
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex) : Throw
-            End Try
-            Return returnPos
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Finds the where clause (first WHERE not in single quotes). returns 0 if not found, otherwise returns locaion of word where
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <returns></returns>
+        'Private Function getSQLWherePosition(ByVal SQL As String) As Integer
+        '    Dim returnPos As Integer = 0
+        '    Try
+        '        If genericController.isInStr(1, SQL, "WHERE", vbTextCompare) Then
+        '            '
+        '            ' ----- contains the word "WHERE", now weed out if not a where clause
+        '            '
+        '            returnPos = InStrRev(SQL, " WHERE ", , vbTextCompare)
+        '            If returnPos = 0 Then
+        '                returnPos = InStrRev(SQL, ")WHERE ", , vbTextCompare)
+        '                If returnPos = 0 Then
+        '                    returnPos = InStrRev(SQL, " WHERE(", , vbTextCompare)
+        '                    If returnPos = 0 Then
+        '                        returnPos = InStrRev(SQL, ")WHERE(", , vbTextCompare)
+        '                    End If
+        '                End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex) : Throw
+        '    End Try
+        '    Return returnPos
+        'End Function
         '
         '========================================================================
         ''' <summary>
@@ -729,10 +743,6 @@ Namespace Contensive.Core.Controllers
         ''' <param name="AllowAutoIncrement"></param>
         Public Sub createSQLTable(ByVal DataSourceName As String, ByVal TableName As String, Optional ByVal AllowAutoIncrement As Boolean = True)
             Try
-                '
-                Dim SQL As String
-                Dim iAllowAutoIncrement As Boolean
-                '
                 If String.IsNullOrEmpty(TableName) Then
                     '
                     ' tablename required
@@ -747,14 +757,12 @@ Namespace Contensive.Core.Controllers
                     '
                     ' Local table -- create if not in schema
                     '
-                    iAllowAutoIncrement = AllowAutoIncrement
-                    '
                     If (cpCore.metaData.getTableSchema(TableName, DataSourceName) Is Nothing) Then
-                        If Not iAllowAutoIncrement Then
-                            SQL = "Create Table " & TableName & "(ID " & getSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) & ");"
+                        If Not AllowAutoIncrement Then
+                            Dim SQL As String = "Create Table " & TableName & "(ID " & getSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) & ");"
                             executeSql(SQL, DataSourceName).Dispose()
                         Else
-                            SQL = "Create Table " & TableName & "(ID " & getSQLAlterColumnType(DataSourceName, FieldTypeIdAutoIdIncrement) & ");"
+                            Dim SQL As String = "Create Table " & TableName & "(ID " & getSQLAlterColumnType(DataSourceName, FieldTypeIdAutoIdIncrement) & ");"
                             executeSql(SQL, DataSourceName).Dispose()
                         End If
                     End If
@@ -771,10 +779,6 @@ Namespace Contensive.Core.Controllers
                     Call createSQLTableField(DataSourceName, TableName, "createKey", FieldTypeIdInteger)
                     Call createSQLTableField(DataSourceName, TableName, "sortOrder", FieldTypeIdText)
                     Call createSQLTableField(DataSourceName, TableName, "contentControlID", FieldTypeIdInteger)
-                    Call createSQLTableField(DataSourceName, TableName, "editSourceID", FieldTypeIdInteger)
-                    Call createSQLTableField(DataSourceName, TableName, "editArchive", FieldTypeIdBoolean)
-                    Call createSQLTableField(DataSourceName, TableName, "editBlank", FieldTypeIdBoolean)
-                    Call createSQLTableField(DataSourceName, TableName, "contentCategoryID", FieldTypeIdInteger)
                     Call createSQLTableField(DataSourceName, TableName, "ccGuid", FieldTypeIdText)
                     '
                     ' ----- setup core indexes
@@ -785,10 +789,8 @@ Namespace Contensive.Core.Controllers
                     Call createSQLIndex(DataSourceName, TableName, TableName & "SortOrder", "SORTORDER")
                     Call createSQLIndex(DataSourceName, TableName, TableName & "DateAdded", "DATEADDED")
                     Call createSQLIndex(DataSourceName, TableName, TableName & "CreateKey", "CREATEKEY")
-                    Call createSQLIndex(DataSourceName, TableName, TableName & "EditSourceID", "EDITSOURCEID")
                     Call createSQLIndex(DataSourceName, TableName, TableName & "ContentControlID", "CONTENTCONTROLID")
                     Call createSQLIndex(DataSourceName, TableName, TableName & "ModifiedDate", "MODIFIEDDATE")
-                    Call createSQLIndex(DataSourceName, TableName, TableName & "ContentCategoryID", "CONTENTCATEGORYID")
                     Call createSQLIndex(DataSourceName, TableName, TableName & "ccGuid", "CCGUID")
                 End If
                 cpCore.metaData.tableSchemaListClear()
@@ -1235,19 +1237,17 @@ Namespace Contensive.Core.Controllers
         ''' <param name="SortFieldList"></param>
         ''' <param name="ActiveOnly"></param>
         ''' <param name="MemberID"></param>
-        ''' <param name="WorkflowRenderingMode"></param>
-        ''' <param name="WorkflowEditingMode"></param>
+        ''' <param name="ignorefalse2"></param>
+        ''' <param name="ignorefalse"></param>
         ''' <param name="SelectFieldList"></param>
         ''' <param name="PageSize"></param>
         ''' <param name="PageNumber"></param>
         ''' <returns></returns>
         '========================================================================
         '
-        Public Function cs_open(ByVal ContentName As String, Optional ByVal Criteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal MemberID As Integer = 0, Optional ByVal WorkflowRenderingMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
+        Public Function cs_open(ByVal ContentName As String, Optional ByVal Criteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal MemberID As Integer = 0, Optional ByVal ignorefalse2 As Boolean = False, Optional ByVal ignorefalse As Boolean = False, Optional ByVal SelectFieldList As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
             Dim returnCs As Integer = -1
             Try
-                '
-                Dim Copy2 As String
                 Dim SortFields() As String
                 Dim SortField As String
                 Dim Ptr As Integer
@@ -1257,11 +1257,10 @@ Namespace Contensive.Core.Controllers
                 Dim DataSourceName As String
                 Dim iActiveOnly As Boolean
                 Dim iSortFieldList As String
-                Dim iWorkflowRenderingMode As Boolean
-                Dim AllowWorkflowSave As Boolean
+                'Dim iWorkflowRenderingMode As Boolean
+                'Dim AllowWorkflowSave As Boolean
                 Dim iMemberID As Integer
                 Dim iCriteria As String
-                Dim RecordID As Integer
                 Dim iSelectFieldList As String
                 Dim CDef As cdefModel
                 Dim TestUcaseFieldList As String
@@ -1280,14 +1279,9 @@ Namespace Contensive.Core.Controllers
                         'hint = hint & ", 100"
                         iActiveOnly = ((ActiveOnly))
                         iSortFieldList = genericController.encodeEmptyText(SortFieldList, CDef.DefaultSortMethod)
-                        iWorkflowRenderingMode = cpCore.siteProperties.allowWorkflowAuthoring And CDef.AllowWorkflowAuthoring And (WorkflowRenderingMode)
-                        AllowWorkflowSave = iWorkflowRenderingMode And (WorkflowEditingMode)
                         iMemberID = MemberID
                         iCriteria = genericController.encodeEmptyText(Criteria, "")
                         iSelectFieldList = genericController.encodeEmptyText(SelectFieldList, CDef.SelectCommaList)
-                        If AllowWorkflowSave Then
-                            AllowWorkflowSave = AllowWorkflowSave
-                        End If
                         '
                         ' verify the sortfields are in this table
                         '
@@ -1354,131 +1348,11 @@ Namespace Contensive.Core.Controllers
                             End If
                         End If
                         '
-                        'hint = hint & ",200"
-                        If Not iWorkflowRenderingMode Then
-                            '
-                            ' Return Live Records
-                            '
-                            '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                            '
-                            ' I really can not be sure if this is for workflow/non-rendering, or for non-workflow mode
-                            '   if non-rendering, it has to stay (workflow mode that shows the live records
-                            '
-                            '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                            '
-                            TableName = CDef.ContentTableName
-                            DataSourceName = CDef.ContentDataSourceName
-                            If CDef.AllowWorkflowAuthoring Then
-                                '
-                                ' Workflow Authoring table - block edit records
-                                '
-                                ContentCriteria = ContentCriteria & "And((EditSourceID=0)Or(EditSourceID Is null))"
-                                ContentCriteria = ContentCriteria & "And((EditBlank=0)Or(EditBlank Is null))"
-                            Else
-                                '
-                                ' Live Authoring table - just let sql go as-is
-                                '
-                                ContentCriteria = ContentCriteria
-                            End If
-                        Else
-                            '
-                            '------------------------------------------------------------------------------
-                            ' Workflow authoring mode - PhantomID substitution
-                            ' REturn the edit records instead of the live records
-                            '------------------------------------------------------------------------------
-                            '
-                            'hint = hint & ",300"
-                            TableName = CDef.AuthoringTableName
-                            'UcaseTablename = genericController.vbUCase(TableName)
-                            DataSourceName = CDef.AuthoringDataSourceName
-                            '
-                            ' Substitute ID for EditSourceID in criteria
-                            '
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, " ID=", " " & TableName & ".EditSourceID=")
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, " ID>", " " & TableName & ".EditSourceID>")
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, " ID<", " " & TableName & ".EditSourceID<")
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, " ID ", " " & TableName & ".EditSourceID ")
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, "(ID=", "(" & TableName & ".EditSourceID=")
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, "(ID>", "(" & TableName & ".EditSourceID>")
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, "(ID<", "(" & TableName & ".EditSourceID<")
-                            ContentCriteria = genericController.vbReplace(ContentCriteria, "(ID ", "(" & TableName & ".EditSourceID ")
-                            '
-                            ' Require non-null editsourceid and editarchive false
-                            ' include tablename so fields are used, not aliases created for phantomID
-                            '
-                            ContentCriteria = ContentCriteria & "And(" & TableName & ".EditSourceID Is Not null)"
-                            ContentCriteria = ContentCriteria & "And(" & TableName & ".EditArchive=0)"
-                            '
-                            ' Workflow Rendering (WorkflowEditing false) - block deleted records, allow inserted records.
-                            '
-                            If Not AllowWorkflowSave Then
-                                ContentCriteria = ContentCriteria & "And(" & TableName & ".EditBlank=0)"
-                            End If
-                            '
-                            ' Order by clause is included, translate ID to EditSourceID
-                            '
-                            If iSortFieldList <> "" Then
-                                iSortFieldList = "," & iSortFieldList & ","
-                                iSortFieldList = genericController.vbReplace(iSortFieldList, ",ID,", "," & TableName & ".EditSourceID,")
-                                iSortFieldList = genericController.vbReplace(iSortFieldList, ",ID ", "," & TableName & ".EditSourceID ")
-                                iSortFieldList = Mid(iSortFieldList, 2, Len(iSortFieldList) - 2)
-                            End If
-                            '
-                            ' Change select field list from ID to EditSourceID
-                            '
-                            If iSelectFieldList <> "" Then
-                                iSelectFieldList = "," & iSelectFieldList & ","
-                                '
-                                ' WorkflowR2
-                                ' conversion the ID field to EditSourceID
-                                ' this was done in the csv_cs_getField, but then a csv_cs_getrows call would return incorrect
-                                ' values because there is no translation
-                                '
-                                If genericController.vbInstr(1, iSelectFieldList, ",ID,", vbTextCompare) = 0 Then
-                                    '
-                                    ' Add ID select if not there
-                                    '
-                                    iSelectFieldList = iSelectFieldList & TableName & ".EditSourceID As ID,"
-                                Else
-                                    '
-                                    ' remove ID, and add ID alias to return EditSourceID (the live records id)
-                                    '
-                                    iSelectFieldList = genericController.vbReplace(iSelectFieldList, ",ID,", "," & TableName & ".EditSourceID As ID,")
-                                End If
-                                '
-                                ' Add the edit fields to the select
-                                '
-                                Copy2 = TableName & ".EDITSOURCEID,"
-                                If (InStr(1, iSelectFieldList, ",EDITSOURCEID,", vbTextCompare) <> 0) Then
-                                    iSelectFieldList = genericController.vbReplace(iSelectFieldList, ",EDITSOURCEID,", "," & Copy2, 1, 99, vbTextCompare)
-                                Else
-                                    iSelectFieldList = iSelectFieldList & Copy2
-                                End If
-                                Copy2 = TableName & ".EDITARCHIVE,"
-                                If (InStr(1, iSelectFieldList, ",EDITARCHIVE,", vbTextCompare) <> 0) Then
-                                    iSelectFieldList = genericController.vbReplace(iSelectFieldList, ",EDITARCHIVE,", "," & Copy2, 1, 99, vbTextCompare)
-                                Else
-                                    iSelectFieldList = iSelectFieldList & Copy2
-                                End If
-                                Copy2 = TableName & ".EDITBLANK,"
-                                If (InStr(1, iSelectFieldList, ",EDITBLANK,", vbTextCompare) <> 0) Then
-                                    iSelectFieldList = genericController.vbReplace(iSelectFieldList, ",EDITBLANK,", "," & Copy2, 1, 99, vbTextCompare)
-                                Else
-                                    iSelectFieldList = iSelectFieldList & Copy2
-                                End If
-                                '
-                                ' WorkflowR2 - this also came from the csv_cs_getField - if EditID is requested, return the edit records id
-                                ' must include the tablename or the ID would be the alias ID, which has the editsourceid in it.
-                                '
-                                iSelectFieldList = iSelectFieldList & TableName & ".ID As EditID,"
-                                '
-                                iSelectFieldList = Mid(iSelectFieldList, 2, Len(iSelectFieldList) - 2)
-                            End If
-                        End If
+                        TableName = CDef.ContentTableName
+                        DataSourceName = CDef.ContentDataSourceName
                         '
                         ' ----- Check for blank Tablename or DataSource
                         '
-                        'hint = hint & ",400"
                         If TableName = "" Then
                             Throw (New Exception("Error opening csv_ContentSet because Content Definition [" & ContentName & "] does Not reference a valid table"))
                         ElseIf DataSourceName = "" Then
@@ -1497,9 +1371,6 @@ Namespace Contensive.Core.Controllers
                         With contentSetStore(returnCs)
                             .Updateable = True
                             .ContentName = ContentName
-                            .WorkflowAuthoringMode = iWorkflowRenderingMode
-                            .WorkflowEditingRequested = AllowWorkflowSave
-                            .WorkflowEditingMode = False ' set only if lock is OK
                             .PageNumber = PageNumber
                             If .PageNumber <= 0 Then
                                 .PageNumber = 1
@@ -1533,35 +1404,7 @@ Namespace Contensive.Core.Controllers
                                 contentSetStore(returnCs).dt = executeSql(SQL, DataSourceName, .PageSize * (.PageNumber - 1), .PageSize)
                             End If
                         End With
-                        'hint = hint & ",600"
                         Call cs_initData(returnCs)
-                        'Call cs_loadCurrentRow(returnCs)
-                        '
-                        'hint = hint & ",700"
-                        If iWorkflowRenderingMode Then
-                            '
-                            ' Authoring mode
-                            '
-                            'Call verifyWorkflowAuthoringRecord(returnCs)
-                            If AllowWorkflowSave Then
-                                '
-                                ' Workflow Editing Mode - lock the first record
-                                '
-                                If Not cs_IsEOF(returnCs) Then
-                                    If contentSetStore(returnCs).WorkflowEditingRequested Then
-                                        RecordID = cs_getInteger(returnCs, "ID")
-                                        If Not cpCore.workflow.isRecordLocked(ContentName, RecordID, MemberID) Then
-                                            contentSetStore(returnCs).WorkflowEditingMode = True
-                                            Call cpCore.workflow.setEditLock(ContentName, RecordID, MemberID)
-                                        End If
-                                    End If
-                                End If
-                            Else
-                                '
-                                ' Workflow Rendering Mode
-                                '
-                            End If
-                        End If
                     End If
                 End If
             Catch ex As Exception
@@ -1579,17 +1422,13 @@ Namespace Contensive.Core.Controllers
             Try
                 '
                 Dim LiveRecordID As Integer
-                Dim EditRecordID As Integer
                 Dim ContentID As Integer
                 Dim ContentName As String
                 Dim ContentDataSourceName As String
                 Dim ContentTableName As String
-                Dim AuthoringDataSourceName As String
-                Dim AuthoringTableName As String
                 Dim SQLName(5) As String
                 Dim SQLValue(5) As String
                 Dim Filename As String
-                Dim sqlList As sqlFieldListClass
                 '
                 If Not cs_ok(CSPointer) Then
                     '
@@ -1603,67 +1442,52 @@ Namespace Contensive.Core.Controllers
                         ContentName = .Name
                         ContentTableName = .ContentTableName
                         ContentDataSourceName = .ContentDataSourceName
-                        AuthoringTableName = .AuthoringTableName
-                        AuthoringDataSourceName = .AuthoringDataSourceName
                     End With
                     If (ContentName = "") Then
                         Throw New ArgumentException("csv_ContentSet Is Not based On a Content Definition")
                     Else
                         LiveRecordID = cs_getInteger(CSPointer, "ID")
-                        If Not contentSetStore(CSPointer).WorkflowAuthoringMode Then
-                            '
-                            ' delete any files
-                            '
-                            Dim fieldName As String
-                            Dim field As CDefFieldModel
-                            With contentSetStore(CSPointer).CDef
-                                For Each keyValue In .fields
-                                    field = keyValue.Value
-                                    With field
-                                        fieldName = .nameLc
-                                        Select Case .fieldTypeId
-                                            Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileCSS, FieldTypeIdFileJavascript, FieldTypeIdFileXML
-                                                '
-                                                ' public content files
-                                                '
-                                                Filename = cs_getText(CSPointer, fieldName)
-                                                If Filename <> "" Then
-                                                    Call cpCore.cdnFiles.deleteFile(Filename)
-                                                    'Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
-                                                End If
-                                            Case FieldTypeIdFileText, FieldTypeIdFileHTML
-                                                '
-                                                ' private files
-                                                '
-                                                Filename = cs_getText(CSPointer, fieldName)
-                                                If Filename <> "" Then
-                                                    Call cpCore.cdnFiles.deleteFile(Filename)
-                                                End If
-                                        End Select
-                                    End With
-                                Next
-                            End With
-                            '
-                            ' non-workflow mode, delete the live record
-                            '
-                            Call deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName)
-                            If workflowController.csv_AllowAutocsv_ClearContentTimeStamp Then
-                                Call cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(ContentTableName, "id", LiveRecordID.ToString()))
-                                'Call cpCore.cache.invalidateObject(ContentName)
-                            End If
-                            Call deleteContentRules(ContentID, LiveRecordID)
-                        Else
-                            '
-                            ' workflow mode, mark the editrecord "Blanked"
-                            '
-                            EditRecordID = cs_getInteger(CSPointer, "EditID")
-                            sqlList = New sqlFieldListClass
-                            Call sqlList.add("EDITBLANK", SQLTrue) ' Pointer)
-                            Call sqlList.add("MODIFIEDBY", encodeSQLNumber(contentSetStore(CSPointer).OwnerMemberID)) ' Pointer)
-                            Call sqlList.add("MODIFIEDDATE", encodeSQLDate(Now)) ' Pointer)
-                            Call updateTableRecord(AuthoringDataSourceName, AuthoringTableName, "ID=" & EditRecordID, sqlList)
-                            Call cpCore.workflow.setAuthoringControl(ContentName, LiveRecordID, AuthoringControlsModified, contentSetStore(CSPointer).OwnerMemberID)
+                        '
+                        ' delete any files
+                        '
+                        Dim fieldName As String
+                        Dim field As CDefFieldModel
+                        With contentSetStore(CSPointer).CDef
+                            For Each keyValue In .fields
+                                field = keyValue.Value
+                                With field
+                                    fieldName = .nameLc
+                                    Select Case .fieldTypeId
+                                        Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileCSS, FieldTypeIdFileJavascript, FieldTypeIdFileXML
+                                            '
+                                            ' public content files
+                                            '
+                                            Filename = cs_getText(CSPointer, fieldName)
+                                            If Filename <> "" Then
+                                                Call cpCore.cdnFiles.deleteFile(Filename)
+                                                'Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
+                                            End If
+                                        Case FieldTypeIdFileText, FieldTypeIdFileHTML
+                                            '
+                                            ' private files
+                                            '
+                                            Filename = cs_getText(CSPointer, fieldName)
+                                            If Filename <> "" Then
+                                                Call cpCore.cdnFiles.deleteFile(Filename)
+                                            End If
+                                    End Select
+                                End With
+                            Next
+                        End With
+                        '
+                        ' non-workflow mode, delete the live record
+                        '
+                        Call deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName)
+                        If workflowController.csv_AllowAutocsv_ClearContentTimeStamp Then
+                            Call cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(ContentTableName, "id", LiveRecordID.ToString()))
+                            'Call cpCore.cache.invalidateObject(ContentName)
                         End If
+                        Call deleteContentRules(ContentID, LiveRecordID)
                     End If
                 End If
             Catch ex As Exception
@@ -1757,7 +1581,7 @@ Namespace Contensive.Core.Controllers
                 '
                 With contentSetStore(returnCs)
                     .IsOpen = True
-                    .WorkflowAuthoringMode = False
+                    '.WorkflowAuthoringMode = False
                     .ContentName = ""
                     .NewRecord = True
                     '.writeCacheSize = 0
@@ -1821,7 +1645,7 @@ Namespace Contensive.Core.Controllers
                     Throw New ApplicationException("CSPointer Not csv_IsCSOK.")
                 Else
                     Call cs_save2(CSPointer, AsyncSave)
-                    contentSetStore(CSPointer).WorkflowEditingMode = False
+                    'contentSetStore(CSPointer).WorkflowEditingMode = False
                     '
                     ' Move to next row
                     '
@@ -1834,11 +1658,10 @@ Namespace Contensive.Core.Controllers
                         '
                         ' Set Workflow Edit Mode from Request and EditLock state
                         '
-                        If (Not cs_IsEOF(CSPointer)) And contentSetStore(CSPointer).WorkflowEditingRequested Then
+                        If (Not cs_IsEOF(CSPointer)) Then
                             ContentName = contentSetStore(CSPointer).ContentName
                             RecordID = cs_getInteger(CSPointer, "ID")
                             If Not cpCore.workflow.isRecordLocked(ContentName, RecordID, contentSetStore(CSPointer).OwnerMemberID) Then
-                                contentSetStore(CSPointer).WorkflowEditingMode = True
                                 Call cpCore.workflow.setEditLock(ContentName, RecordID, contentSetStore(CSPointer).OwnerMemberID)
                             End If
                         End If
@@ -1888,20 +1711,6 @@ Namespace Contensive.Core.Controllers
                 Else
                     With contentSetStore(CSPointer)
                         '
-                        ' WorkflowR2
-                        ' this code ws replaced in csv_InitContentSetResult by replacing the column names. That was to fix the
-                        ' problem of csv_cs_getRows and csv_cs_getRowNames. In those cases, the FieldNameLocal swap could not be done.Even
-                        ' with this EditID can not be swapped in csv_cs_getRow
-                        '
-                        If .WorkflowAuthoringMode Then
-                            '    If (FieldNameLocalUcase = "EDITSOURCEID") Then
-                            '        FieldNameLocalUcase = "ID"
-                            '    End If
-                        Else
-                            If (fieldNameTrimUpper = "EDITID") Then
-                                fieldNameTrimUpper = "ID"
-                            End If
-                        End If
                         '
                         fieldFound = False
                         If .writeCache.Count > 0 Then
@@ -2196,11 +2005,7 @@ Namespace Contensive.Core.Controllers
                                 ' Get tablename from Content Definition
                                 '
                                 ContentName = .CDef.Name
-                                If contentSetStore(CSPointer).WorkflowAuthoringMode Then
-                                    TableName = .CDef.AuthoringTableName
-                                Else
-                                    TableName = .CDef.ContentTableName
-                                End If
+                                TableName = .CDef.ContentTableName
                             ElseIf ContentName <> "" Then
                                 '
                                 ' CS is SQL-based, use the contentname
@@ -2428,15 +2233,6 @@ Namespace Contensive.Core.Controllers
         '        '            If Not SetNeeded Then
         '        '                SetNeeded = SetNeeded
         '        '            Else
-        '        '                If contentSetStore(CSPointer).WorkflowAuthoringMode Then
-        '        '                    '
-        '        '                    ' Do phantom ID replacement
-        '        '                    '
-        '        '                    If FieldNameLocalUcase = "ID" Then
-        '        '                        FieldNameLocal = "EditSourceID"
-        '        '                        FieldNameLocalUcase = genericController.vbUCase(FieldNameLocal)
-        '        '                    End If
-        '        '                End If
         '        '                If .writeCache.ContainsKey(FieldName.ToLower) Then
         '        '                    .writeCache.Item(FieldName.ToLower) = genericController.encodeText(FieldValue)
         '        '                Else
@@ -2569,7 +2365,7 @@ Namespace Contensive.Core.Controllers
                         Call cs_Close(CSPointer)
                         Call cpCore.cache.invalidateObjectList(invaldiateObjectList)
 
-                        '    ElseIf cpCore.siteProperties.allowWorkflowAuthoring And (CDef.AllowWorkflowAuthoring) Then
+                        '    ElseIf cpCore.siteProperties.allowWorkflowAuthoring And (false) Then
                         '    '
                         '    ' Supports Workflow Authoring, handle it record at a time
                         '    '
@@ -2611,8 +2407,6 @@ Namespace Contensive.Core.Controllers
                 Dim DataSourceName As String
                 Dim FieldName As String
                 Dim TableName As String
-                Dim WorkflowAuthoringMode As Boolean
-                Dim LiveRecordID As Integer
                 Dim CDef As cdefModel
                 Dim DefaultValueText As String
                 Dim LookupContentName As String
@@ -2634,30 +2428,11 @@ Namespace Contensive.Core.Controllers
                             MemberID = cpCore.authContext.user.id
                         End If
                         With CDef
-                            WorkflowAuthoringMode = .AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring
-                            If WorkflowAuthoringMode Then
-                                '
-                                ' authoring, Create Blank in Live Table
-                                '
-                                LiveRecordID = insertTableRecordGetId(.ContentDataSourceName, .ContentTableName, MemberID)
-                                sqlList = New sqlFieldListClass
-                                ' refactor -- only put edit- fields in pagecontent
-                                Call sqlList.add("EDITBLANK", SQLTrue) ' Pointer)
-                                Call sqlList.add("EDITSOURCEID", encodeSQLNumber(Nothing)) ' Pointer)
-                                Call sqlList.add("EDITARCHIVE", SQLFalse) ' Pointer)
-                                Call updateTableRecord(.ContentDataSourceName, .ContentTableName, "ID=" & LiveRecordID, sqlList)
-                                '
-                                ' Create default record in Edit Table
-                                '
-                                DataSourceName = .AuthoringDataSourceName
-                                TableName = .AuthoringTableName
-                            Else
-                                '
-                                ' no authoring, create default record in Live table
-                                '
-                                DataSourceName = .ContentDataSourceName
-                                TableName = .ContentTableName
-                            End If
+                            '
+                            ' no authoring, create default record in Live table
+                            '
+                            DataSourceName = .ContentDataSourceName
+                            TableName = .ContentTableName
                             If .fields.Count > 0 Then
                                 For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In .fields
                                     Dim field As CDefFieldModel = keyValuePair.Value
@@ -2665,7 +2440,7 @@ Namespace Contensive.Core.Controllers
                                         FieldName = .nameLc
                                         If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
                                             Select Case genericController.vbUCase(FieldName)
-                                                Case "CREATEKEY", "DATEADDED", "CREATEDBY", "CONTENTCONTROLID", "EDITSOURCEID", "EDITARCHIVE", "EDITBLANK", "ID"
+                                                Case "CREATEKEY", "DATEADDED", "CREATEDBY", "CONTENTCONTROLID", "ID"
                                                     '
                                                     ' Block control fields
                                                     '
@@ -2727,16 +2502,6 @@ Namespace Contensive.Core.Controllers
                                     End With
                                 Next
                             End If
-                            ' -- refactor -- only for pagecontent
-                            If WorkflowAuthoringMode Then
-                                Call sqlList.add("EDITSOURCEID", encodeSQLNumber(LiveRecordID)) ' ArrayPointer)
-                                Call sqlList.add("EDITARCHIVE", SQLFalse) ' ArrayPointer)
-                                Call sqlList.add("EDITBLANK", SQLFalse) ' ArrayPointer)
-                            Else
-                                Call sqlList.add("EDITSOURCEID", encodeSQLNumber(Nothing)) ' ArrayPointer)
-                                Call sqlList.add("EDITARCHIVE", SQLFalse) ' ArrayPointer)
-                                Call sqlList.add("EDITBLANK", SQLFalse) ' ArrayPointer)
-                            End If
                             '
                             CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger)
                             DateAddedString = encodeSQLDate(Now)
@@ -2751,7 +2516,7 @@ Namespace Contensive.Core.Controllers
                             ' ----- Get the record back so we can use the ID
                             '
                             Criteria = "((createkey=" & CreateKeyString & ")And(DateAdded=" & DateAddedString & "))"
-                            returnCs = cs_open(ContentName, Criteria, "ID DESC", False, MemberID, WorkflowAuthoringMode, True)
+                            returnCs = cs_open(ContentName, Criteria, "ID DESC", False, MemberID, False, True)
                             ''
                             '' ----- Clear Time Stamp because a record changed
                             ''
@@ -2841,7 +2606,7 @@ Namespace Contensive.Core.Controllers
                     FieldName = cs_getFirstFieldName(CSSource)
                     Do While (Not String.IsNullOrEmpty(FieldName))
                         Select Case genericController.vbUCase(FieldName)
-                            Case "ID", "EDITSOURCEID", "EDITARCHIVE"
+                            Case "ID"
                             Case Else
                                 '
                                 ' ----- fields to copy
@@ -3302,14 +3067,6 @@ Namespace Contensive.Core.Controllers
                             If Not SetNeeded Then
                                 SetNeeded = SetNeeded
                             Else
-                                If contentSetStore(CSPointer).WorkflowAuthoringMode Then
-                                    '
-                                    ' Do phantom ID replacement
-                                    '
-                                    If FieldNameLc = "id" Then
-                                        FieldNameLc = "editsourceid"
-                                    End If
-                                End If
                                 '
                                 ' ----- set the new value into the row buffer
                                 '
@@ -3384,42 +3141,40 @@ Namespace Contensive.Core.Controllers
             Try
                 Dim sqlModifiedDate As Date
                 Dim sqlModifiedBy As Integer
-                Dim writeCacheValueVariant As Object
+                Dim writeCacheValue As Object
                 Dim UcaseFieldName As String
                 Dim FieldName As String
                 Dim FieldFoundCount As Integer
                 Dim FieldAdminAuthorable As Boolean
                 Dim FieldReadOnly As Boolean
-                Dim dt As DataTable
                 Dim SQL As String
                 Dim SQLSetPair As String
                 Dim SQLUpdate As String
-                Dim SQLEditUpdate As String
-                Dim SQLEditDelimiter As String
+                'Dim SQLEditUpdate As String
+                'Dim SQLEditDelimiter As String
                 Dim SQLLiveUpdate As String
                 Dim SQLLiveDelimiter As String
-                Dim SQLUnique As String = String.Empty
+                Dim SQLCriteriaUnique As String = String.Empty
                 Dim UniqueViolationFieldList As String = String.Empty
-                Dim UniqueViolation As Boolean
-                Dim RSUnique As DataTable
+
                 Dim LiveTableName As String
                 Dim LiveDataSourceName As String
                 Dim LiveRecordID As Integer
-                Dim EditRecordID As Integer
+                'Dim EditRecordID As Integer
                 Dim LiveRecordContentControlID As Integer
                 Dim LiveRecordContentName As String
-                Dim EditTableName As String
-                Dim EditDataSourceName As String
+                'Dim EditTableName As String
+                'Dim EditDataSourceName As String = ""
                 Dim AuthorableFieldUpdate As Boolean            ' true if an Edit field is being updated
-                Dim WorkflowRenderingMode As Boolean
-                Dim AllowWorkflowSave As Boolean
+                'Dim WorkflowRenderingMode As Boolean
+                ' Dim AllowWorkflowSave As Boolean
                 Dim Copy As String
                 Dim ContentID As Integer
                 Dim ContentName As String
-                Dim WorkflowMode As Boolean
+                ' Dim WorkflowMode As Boolean
                 Dim LiveRecordInactive As Boolean
                 Dim ColumnPtr As Integer
-                Dim writeCacheValueText As String
+
                 '
                 If Not cs_ok(CSPointer) Then
                     '
@@ -3435,19 +3190,11 @@ Namespace Contensive.Core.Controllers
                 Else
                     With contentSetStore(CSPointer)
                         '
-                        ' ----- input is good, build sql statement
-                        '
-                        WorkflowRenderingMode = .WorkflowAuthoringMode
-                        AllowWorkflowSave = .WorkflowEditingMode
-                        '
                         With .CDef
                             LiveTableName = .ContentTableName
                             LiveDataSourceName = .ContentDataSourceName
-                            EditTableName = .AuthoringTableName
-                            EditDataSourceName = .AuthoringDataSourceName
                             ContentName = .Name
                             ContentID = .Id
-                            WorkflowMode = .AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring
                         End With
                         '
                         LiveRecordID = cs_getInteger(CSPointer, "ID")
@@ -3455,40 +3202,12 @@ Namespace Contensive.Core.Controllers
                         LiveRecordContentName = cpCore.metaData.getContentNameByID(LiveRecordContentControlID)
                         LiveRecordInactive = Not cs_getBoolean(CSPointer, "ACTIVE")
                         '
-                        ' Get Edit Record ID
-                        '
-                        If Not WorkflowMode Then
-                            '
-                            ' Live Mode
-                            '
-                            EditRecordID = cs_getInteger(CSPointer, "ID")
-                        ElseIf Not (WorkflowRenderingMode) Then
-                            '
-                            ' Workflow Live Mode, (Workflow system, but opened the live record)
-                            ' need to get the Record ID manually
-                            '
-                            SQL = "Select ID" _
-                                & " from " & EditTableName _
-                                & " where editsourceid=" & LiveRecordID _
-                                & " And (EditArchive=0) And (editblank=0)" _
-                                & " order by id desc;"
-                            dt = executeSql(SQL, EditDataSourceName)
-                            If genericController.isDataTableOk(dt) Then
-                                EditRecordID = genericController.EncodeInteger(getDataRowColumnName(dt.Rows(0), "ID"))
-                            End If
-                            dt.Dispose()
-                        Else
-                            '
-                            ' Workflow Render or Workflow Edit mode, get the Edit Record ID from the original recordset
-                            '
-                            EditRecordID = cs_getInteger(CSPointer, "EDITID")
-                        End If
                         '
                         SQLLiveDelimiter = ""
                         SQLLiveUpdate = ""
                         SQLLiveDelimiter = ""
-                        SQLEditUpdate = ""
-                        SQLEditDelimiter = ""
+                        'SQLEditUpdate = ""
+                        'SQLEditDelimiter = ""
                         sqlModifiedDate = DateTime.Now
                         sqlModifiedBy = .OwnerMemberID
                         '
@@ -3497,7 +3216,7 @@ Namespace Contensive.Core.Controllers
                         For Each keyValuePair In .writeCache
                             FieldName = keyValuePair.Key
                             UcaseFieldName = genericController.vbUCase(FieldName)
-                            writeCacheValueVariant = keyValuePair.Value
+                            writeCacheValue = keyValuePair.Value
                             '
                             ' field has changed
                             '
@@ -3506,231 +3225,144 @@ Namespace Contensive.Core.Controllers
                                 ' capture and block it - it is hardcoded in sql
                                 '
                                 AuthorableFieldUpdate = True
-                                sqlModifiedBy = genericController.EncodeInteger(writeCacheValueVariant)
+                                sqlModifiedBy = genericController.EncodeInteger(writeCacheValue)
                             ElseIf UcaseFieldName = "MODIFIEDDATE" Then
                                 '
                                 ' capture and block it - it is hardcoded in sql
                                 '
                                 AuthorableFieldUpdate = True
-                                sqlModifiedDate = genericController.EncodeDate(writeCacheValueVariant)
+                                sqlModifiedDate = genericController.EncodeDate(writeCacheValue)
                             Else
                                 '
                                 ' let these field be added to the sql
                                 '
-                                If UcaseFieldName = "ACTIVE" And (Not genericController.EncodeBoolean(writeCacheValueVariant)) Then
-                                    '
-                                    ' Record being saved inactive
-                                    '
-                                    LiveRecordInactive = True
-                                End If
-                                '
+                                LiveRecordInactive = (UcaseFieldName = "ACTIVE" And (Not genericController.EncodeBoolean(writeCacheValue)))
+                                FieldFoundCount += 1
                                 Dim field As CDefFieldModel = .CDef.fields(FieldName.ToLower())
-                                If True Then
-                                    FieldFoundCount = FieldFoundCount + 1
-                                    With field
-                                        SQLSetPair = ""
-                                        FieldReadOnly = (.ReadOnly)
-                                        FieldAdminAuthorable = ((Not .ReadOnly) And (Not .NotEditable) And (.authorable))
-                                        '
-                                        ' ----- Set SQLSetPair to the name=value pair for the SQL statement
-                                        '
-                                        Select Case .fieldTypeId
-                                            Case FieldTypeIdRedirect, FieldTypeIdManyToMany
-                                            Case FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdAutoIdIncrement, FieldTypeIdMemberSelect
-                                                SQLSetPair = FieldName & "=" & encodeSQLNumber(genericController.EncodeInteger(writeCacheValueVariant))
-                                            Case FieldTypeIdCurrency, FieldTypeIdFloat
-                                                SQLSetPair = FieldName & "=" & encodeSQLNumber(genericController.EncodeNumber(writeCacheValueVariant))
-                                            Case FieldTypeIdBoolean
-                                                SQLSetPair = FieldName & "=" & encodeSQLBoolean(genericController.EncodeBoolean(writeCacheValueVariant))
-                                            Case FieldTypeIdDate
-                                                SQLSetPair = FieldName & "=" & encodeSQLDate(genericController.EncodeDate(writeCacheValueVariant))
-                                            Case FieldTypeIdText
-                                                Copy = Left(genericController.encodeText(writeCacheValueVariant), 255)
-                                                If .Scramble Then
-                                                    Copy = cpCore.metaData.TextScramble(Copy)
-                                                End If
-                                                SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
-                                            Case FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTML
-                                                Copy = Left(genericController.encodeText(writeCacheValueVariant), 255)
-                                                SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
-                                            Case FieldTypeIdLongText, FieldTypeIdHTML
-                                                SQLSetPair = FieldName & "=" & encodeSQLText(genericController.encodeText(writeCacheValueVariant))
-                                            Case Else
-                                                '
-                                                ' Invalid fieldtype
-                                                '
-                                                Throw New ApplicationException("Can Not save this record because the field [" & .nameLc & "] has an invalid field type Id [" & .fieldTypeId & "]")
-                                        End Select
-                                        If SQLSetPair <> "" Then
-                                            '
-                                            ' ----- Set the new value in the 
-                                            '
-                                            With contentSetStore(CSPointer)
-                                                If .ResultColumnCount > 0 Then
-                                                    For ColumnPtr = 0 To .ResultColumnCount - 1
-                                                        If .fieldNames(ColumnPtr) = UcaseFieldName Then
-                                                            If useCSReadCacheMultiRow Then
-                                                                .readCache(ColumnPtr, .readCacheRowPtr) = writeCacheValueVariant.ToString()
-                                                            Else
-                                                                .readCache(ColumnPtr, 0) = writeCacheValueVariant.ToString()
-                                                            End If
-                                                            Exit For
-                                                        End If
-                                                    Next
-                                                End If
-                                            End With
-                                            If .UniqueName And (genericController.encodeText(writeCacheValueVariant) <> "") Then
-                                                '
-                                                ' ----- set up for unique name check
-                                                '
-                                                If (Not String.IsNullOrEmpty(SQLUnique)) Then
-                                                    SQLUnique &= "Or"
-                                                    UniqueViolationFieldList &= ","
-                                                End If
-                                                writeCacheValueText = genericController.encodeText(writeCacheValueVariant)
-                                                If Len(writeCacheValueText) < 255 Then
-                                                    UniqueViolationFieldList &= .nameLc & "=""" & writeCacheValueText & """"
-                                                Else
-                                                    UniqueViolationFieldList &= .nameLc & "=""" & Left(writeCacheValueText, 255) & "..."""
-                                                End If
-                                                Select Case .fieldTypeId
-                                                    Case FieldTypeIdRedirect, FieldTypeIdManyToMany
-                                                    Case Else
-                                                        SQLUnique &= "(" & .nameLc & "=" & EncodeSQL(writeCacheValueVariant, .fieldTypeId) & ")"
-                                                End Select
+                                With field
+                                    SQLSetPair = ""
+                                    FieldReadOnly = (.ReadOnly)
+                                    FieldAdminAuthorable = ((Not .ReadOnly) And (Not .NotEditable) And (.authorable))
+                                    '
+                                    ' ----- Set SQLSetPair to the name=value pair for the SQL statement
+                                    '
+                                    Select Case .fieldTypeId
+                                        Case FieldTypeIdRedirect, FieldTypeIdManyToMany
+                                        Case FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdAutoIdIncrement, FieldTypeIdMemberSelect
+                                            SQLSetPair = FieldName & "=" & encodeSQLNumber(genericController.EncodeInteger(writeCacheValue))
+                                        Case FieldTypeIdCurrency, FieldTypeIdFloat
+                                            SQLSetPair = FieldName & "=" & encodeSQLNumber(genericController.EncodeNumber(writeCacheValue))
+                                        Case FieldTypeIdBoolean
+                                            SQLSetPair = FieldName & "=" & encodeSQLBoolean(genericController.EncodeBoolean(writeCacheValue))
+                                        Case FieldTypeIdDate
+                                            SQLSetPair = FieldName & "=" & encodeSQLDate(genericController.EncodeDate(writeCacheValue))
+                                        Case FieldTypeIdText
+                                            Copy = Left(genericController.encodeText(writeCacheValue), 255)
+                                            If .Scramble Then
+                                                Copy = cpCore.metaData.TextScramble(Copy)
                                             End If
-                                            If Not WorkflowMode Then
-                                                '
-                                                ' ----- Live mode: update live record
-                                                '
-                                                SQLLiveUpdate = SQLLiveUpdate & SQLLiveDelimiter & SQLSetPair
-                                                SQLLiveDelimiter = ","
-                                                If FieldAdminAuthorable Then
-                                                    AuthorableFieldUpdate = True
-                                                End If
-                                            ElseIf Not WorkflowRenderingMode Then
-                                                '
-                                                ' ----- Workflow Live Mode
-                                                '
-                                                If allowWorkflowErrors And FieldAdminAuthorable Then
-                                                    Throw New ApplicationException("Workflow Edit Error In content[" & ContentName & "], field[" & .nameLc & "]. A csv_ContentSet opened In non-WorkflowRenderingMode, based On a Content Definition which supports Workflow Edit, can Not update fields marked 'Authorable', non-'NotEditable', non-'ReadOnly' or 'Active'. These fields can only be updated through Edit protocols.")
-                                                Else
-                                                    '
-                                                    ' update non-FieldAdminAuthorable in Both Records
-                                                    '
-                                                    SQLLiveUpdate = SQLLiveUpdate & SQLLiveDelimiter & SQLSetPair
-                                                    SQLLiveDelimiter = ","
-                                                    SQLEditUpdate = SQLEditUpdate & SQLEditDelimiter & SQLSetPair
-                                                    SQLEditDelimiter = ","
-                                                End If
-                                            ElseIf Not AllowWorkflowSave Then
-                                                '
-                                                ' ----- Workflow Rendering mode: only allow non-authorable saves
-                                                '       save non-authorables to both live and edit record
-                                                '
-                                                If allowWorkflowErrors And FieldAdminAuthorable Then
-                                                    Throw New ApplicationException("Workflow Edit error in content[" & ContentName & "], field[" & .nameLc & "]. You can not update an Authorable field in Workflow Authoring mode without Workflow Editing enabled.")
-                                                Else
-                                                    '
-                                                    ' update non-FieldAdminAuthorable in Both Records
-                                                    '
-                                                    SQLLiveUpdate = SQLLiveUpdate & SQLLiveDelimiter & SQLSetPair
-                                                    SQLLiveDelimiter = ","
-                                                    SQLEditUpdate = SQLEditUpdate & SQLEditDelimiter & SQLSetPair
-                                                    SQLEditDelimiter = ","
-                                                End If
+                                            SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
+                                        Case FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTML
+                                            Copy = Left(genericController.encodeText(writeCacheValue), 255)
+                                            SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
+                                        Case FieldTypeIdLongText, FieldTypeIdHTML
+                                            SQLSetPair = FieldName & "=" & encodeSQLText(genericController.encodeText(writeCacheValue))
+                                        Case Else
+                                            '
+                                            ' Invalid fieldtype
+                                            '
+                                            Throw New ApplicationException("Can Not save this record because the field [" & .nameLc & "] has an invalid field type Id [" & .fieldTypeId & "]")
+                                    End Select
+                                    If SQLSetPair <> "" Then
+                                        '
+                                        ' ----- Set the new value in the 
+                                        '
+                                        With contentSetStore(CSPointer)
+                                            If .ResultColumnCount > 0 Then
+                                                For ColumnPtr = 0 To .ResultColumnCount - 1
+                                                    If .fieldNames(ColumnPtr) = UcaseFieldName Then
+                                                        .readCache(ColumnPtr, .readCacheRowPtr) = writeCacheValue.ToString()
+                                                        Exit For
+                                                    End If
+                                                Next
+                                            End If
+                                        End With
+                                        If .UniqueName And (genericController.encodeText(writeCacheValue) <> "") Then
+                                            '
+                                            ' ----- set up for unique name check
+                                            '
+                                            If (Not String.IsNullOrEmpty(SQLCriteriaUnique)) Then
+                                                SQLCriteriaUnique &= "Or"
+                                                UniqueViolationFieldList &= ","
+                                            End If
+                                            Dim writeCacheValueText As String = genericController.encodeText(writeCacheValue)
+                                            If Len(writeCacheValueText) < 255 Then
+                                                UniqueViolationFieldList &= .nameLc & "=""" & writeCacheValueText & """"
                                             Else
-                                                '
-                                                ' ----- Workflow Editing mode, allow saves
-                                                '
-                                                If FieldAdminAuthorable Then
-                                                    '
-                                                    ' update authorable field in authoring record
-                                                    '
-                                                    AuthorableFieldUpdate = True
-                                                    SQLEditUpdate = SQLEditUpdate & SQLEditDelimiter & SQLSetPair
-                                                    SQLEditDelimiter = ","
-                                                Else
-                                                    '
-                                                    ' update non-authorable field in Both Records
-                                                    '
-                                                    SQLLiveUpdate = SQLLiveUpdate & SQLLiveDelimiter & SQLSetPair
-                                                    SQLLiveDelimiter = ","
-                                                    SQLEditUpdate = SQLEditUpdate & SQLEditDelimiter & SQLSetPair
-                                                    SQLEditDelimiter = ","
-                                                End If
+                                                UniqueViolationFieldList &= .nameLc & "=""" & Left(writeCacheValueText, 255) & "..."""
                                             End If
+                                            Select Case .fieldTypeId
+                                                Case FieldTypeIdRedirect, FieldTypeIdManyToMany
+                                                Case Else
+                                                    SQLCriteriaUnique &= "(" & .nameLc & "=" & EncodeSQL(writeCacheValue, .fieldTypeId) & ")"
+                                            End Select
                                         End If
-                                    End With
-                                End If
+                                        '
+                                        ' ----- Live mode: update live record
+                                        '
+                                        SQLLiveUpdate = SQLLiveUpdate & SQLLiveDelimiter & SQLSetPair
+                                        SQLLiveDelimiter = ","
+                                        If FieldAdminAuthorable Then
+                                            AuthorableFieldUpdate = True
+                                        End If
+                                    End If
+                                End With
                             End If
                         Next
                         '
                         ' ----- Set ModifiedBy,ModifiedDate Fields if an admin visible field has changed
                         '
                         If AuthorableFieldUpdate Then
-                            If WorkflowRenderingMode Then
-                                If (SQLEditUpdate <> "") Then
-                                    '
-                                    ' ----- Authorable Fields Updated in Authoring Mode, set Edit Record Modified
-                                    '
-                                    SQLEditUpdate = SQLEditUpdate & ",MODIFIEDDATE=" & encodeSQLDate(sqlModifiedDate) & ",MODIFIEDBY=" & encodeSQLNumber(sqlModifiedBy)
-                                End If
-                            Else
-                                If (SQLLiveUpdate <> "") Then
-                                    '
-                                    ' ----- Authorable Fields Updated in non-Authoring Mode, set Live Record Modified
-                                    '
-                                    SQLLiveUpdate = SQLLiveUpdate & ",MODIFIEDDATE=" & encodeSQLDate(sqlModifiedDate) & ",MODIFIEDBY=" & encodeSQLNumber(sqlModifiedBy)
-                                End If
+                            If (SQLLiveUpdate <> "") Then
+                                '
+                                ' ----- Authorable Fields Updated in non-Authoring Mode, set Live Record Modified
+                                '
+                                SQLLiveUpdate = SQLLiveUpdate & ",MODIFIEDDATE=" & encodeSQLDate(sqlModifiedDate) & ",MODIFIEDBY=" & encodeSQLNumber(sqlModifiedBy)
                             End If
                         End If
-                        '
-                        ' not sure why, but this section was commented out.
-                        ' Modified was not being set, so I un-commented it
-                        '
-                        If (SQLEditUpdate <> "") And (AuthorableFieldUpdate) Then
-                            '
-                            ' ----- set the csv_ContentSet Modified
-                            '
-                            Call cpCore.workflow.setAuthoringControl(ContentName, LiveRecordID, AuthoringControlsModified, .OwnerMemberID)
-                        End If
+                        ''
+                        '' not sure why, but this section was commented out.
+                        '' Modified was not being set, so I un-commented it
+                        ''
+                        'If (SQLEditUpdate <> "") And (AuthorableFieldUpdate) Then
+                        '    '
+                        '    ' ----- set the csv_ContentSet Modified
+                        '    '
+                        '    Call cpCore.workflow.setRecordLocking(ContentName, LiveRecordID, AuthoringControlsModified, .OwnerMemberID)
+                        'End If
                         '
                         ' ----- Do the unique check on the content table, if necessary
                         '
-                        UniqueViolation = False
-                        If SQLUnique <> "" Then
-                            SQLUnique = "SELECT ID FROM " & LiveTableName & " WHERE (ID<>" & LiveRecordID & ")AND(" & SQLUnique & ")and(editsourceid is null)and(" & .CDef.ContentControlCriteria & ");"
-                            RSUnique = executeSql(SQLUnique, LiveDataSourceName)
-                            If (RSUnique.Rows.Count > 0) Then
-                                UniqueViolation = True
-                            End If
-                            Call RSUnique.Dispose()
+                        If SQLCriteriaUnique <> "" Then
+                            Dim sqlUnique As String = "SELECT ID FROM " & LiveTableName & " WHERE (ID<>" & LiveRecordID & ")AND(" & SQLCriteriaUnique & ")and(" & .CDef.ContentControlCriteria & ");"
+                            Using dt As DataTable = executeSql(sqlUnique, LiveDataSourceName)
+                                '
+                                ' -- unique violation
+                                Throw New ApplicationException(("Can not save record to content [" & LiveRecordContentName & "] because it would create a non-unique record for one or more of the following field(s) [" & UniqueViolationFieldList & "]"))
+                            End Using
                         End If
-                        If UniqueViolation Then
-                            '
-                            ' ----- trap unique violations here
-                            '
-                            Throw New ApplicationException(("Can not save record to content [" & LiveRecordContentName & "] because it would create a non-unique record for one or more of the following field(s) [" & UniqueViolationFieldList & "]"))
-                        ElseIf (FieldFoundCount > 0) Then
+                        If (FieldFoundCount > 0) Then
                             '
                             ' ----- update live table (non-workflowauthoring and non-authorable fields)
                             '
                             If (SQLLiveUpdate <> "") Then
                                 SQLUpdate = "UPDATE " & LiveTableName & " SET " & SQLLiveUpdate & " WHERE ID=" & LiveRecordID & ";"
-                                Call executeSql(SQLUpdate, EditDataSourceName)
-                            End If
-                            '
-                            ' ----- update edit table (authoring and non-authoring fields)
-                            '
-                            If (SQLEditUpdate <> "") Then
-                                SQLUpdate = "UPDATE " & EditTableName & " SET " & SQLEditUpdate & " WHERE ID=" & EditRecordID & ";"
-                                Call executeSql(SQLUpdate, EditDataSourceName)
+                                Call executeSql(SQLUpdate, LiveDataSourceName)
                             End If
                             '
                             ' ----- Live record has changed
                             '
-                            If AuthorableFieldUpdate And (Not WorkflowRenderingMode) Then
+                            If AuthorableFieldUpdate Then
                                 '
                                 ' ----- reset the ContentTimeStamp to csv_ClearBake
                                 '
@@ -3738,7 +3370,7 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' ----- mark the record NOT UpToDate for SpiderDocs
                                 '
-                                If (LCase(EditTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
+                                If (LCase(LiveTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
                                     If isSQLTableField("default", "ccSpiderDocs", "PageID") Then
                                         SQL = "UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" & LiveRecordID
                                         Call executeSql(SQL)
@@ -4615,7 +4247,7 @@ Namespace Contensive.Core.Controllers
                             FieldName = .nameLc
                             If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
                                 Select Case genericController.vbUCase(FieldName)
-                                    Case "ID", "CCGUID", "CREATEKEY", "DATEADDED", "CREATEDBY", "CONTENTCONTROLID", "EDITSOURCEID", "EDITARCHIVE", "EDITBLANK"
+                                    Case "ID", "CCGUID", "CREATEKEY", "DATEADDED", "CREATEDBY", "CONTENTCONTROLID"
                                         '
                                         ' Block control fields
                                         '
@@ -5138,26 +4770,6 @@ Namespace Contensive.Core.Controllers
                         field.ReadOnly = True
                         field.editSortPriority = 5080
                         field.authorable = False
-                    Case "EDITSOURCEID"
-                        field.caption = "Edit Source"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5090
-                        field.authorable = False
-                        field.defaultValue = "null"
-                    Case "EDITARCHIVE"
-                        field.caption = "Edit Archive"
-                        field.fieldTypeId = FieldTypeIdBoolean
-                        field.ReadOnly = True
-                        field.editSortPriority = 5100
-                        field.authorable = False
-                        field.defaultValue = "0"
-                    Case "EDITBLANK"
-                        field.caption = "Edit Blank"
-                        field.fieldTypeId = FieldTypeIdBoolean
-                        field.ReadOnly = True
-                        field.editSortPriority = 5110
-                        field.authorable = False
-                        field.defaultValue = "0"
                     '
                     ' --- fields related to body content
                     '

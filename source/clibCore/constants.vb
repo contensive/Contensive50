@@ -716,13 +716,13 @@ Namespace Contensive.Core
         Public Const ButtonActivate = "  Activate   "
         Public Const ButtonDeactivate = "  Deactivate   "
         Public Const ButtonOpenActiveEditor = "Active Edit"
-        Public Const ButtonPublish = " Publish Changes "
-        Public Const ButtonAbortEdit = " Abort Edits "
-        Public Const ButtonPublishSubmit = " Submit for Publishing "
-        Public Const ButtonPublishApprove = " Approve for Publishing "
-        Public Const ButtonPublishDeny = " Deny for Publishing "
-        Public Const ButtonWorkflowPublishApproved = " Publish Approved Records "
-        Public Const ButtonWorkflowPublishSelected = " Publish Selected Records "
+        'Public Const ButtonPublish = " Publish Changes "
+        'Public Const ButtonAbortEdit = " Abort Edits "
+        'Public Const ButtonPublishSubmit = " Submit for Publishing "
+        'Public Const ButtonPublishApprove = " Approve for Publishing "
+        'Public Const ButtonPublishDeny = " Deny for Publishing "
+        'Public Const ButtonWorkflowPublishApproved = " Publish Approved Records "
+        'Public Const ButtonWorkflowPublishSelected = " Publish Selected Records "
         Public Const ButtonSetHTMLEdit = " Edit WYSIWYG "
         Public Const ButtonSetTextEdit = " Edit HTML "
         Public Const ButtonRefresh = " Refresh "
@@ -806,7 +806,7 @@ Namespace Contensive.Core
         Public Const AdminActionAbortEdit = 20          ' Publish record live
         Public Const AdminActionPublishSubmit = 21      ' Submit for Workflow Publishing
         Public Const AdminActionPublishApprove = 22     ' Approve for Workflow Publishing
-        Public Const AdminActionWorkflowPublishApproved = 23    ' Publish what was approved
+        'Public Const AdminActionWorkflowPublishApproved = 23    ' Publish what was approved
         Public Const AdminActionSetHTMLEdit = 24        ' Set Member Property for this field to HTML Edit
         Public Const AdminActionSetTextEdit = 25        ' Set Member Property for this field to Text Edit
         Public Const AdminActionSave = 26               ' Save Record
@@ -816,7 +816,7 @@ Namespace Contensive.Core
         Public Const AdminActionDeleteRows = 30         ' Delete from rows of records, row0 is boolean, rowid0 is ID, rowcnt is count
         Public Const AdminActionSaveAddNew = 31         ' Save Record and add a new record
         Public Const AdminActionReloadCDef = 32         ' Load Content Definitions
-        Public Const AdminActionWorkflowPublishSelected = 33 ' Publish what was selected
+        ' Public Const AdminActionWorkflowPublishSelected = 33 ' Publish what was selected
         Public Const AdminActionMarkReviewed = 34       ' Mark the record reviewed without making any changes
         Public Const AdminActionEditRefresh = 35        ' reload the page just like a save, but do not save
         '

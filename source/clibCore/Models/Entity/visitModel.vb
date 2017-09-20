@@ -154,15 +154,15 @@ Namespace Contensive.Core.Models.Entity
                         .Bot = cs.getBoolean("Bot")
                         .Browser = cs.getText("Browser")
                         .ccGuid = cs.getText("ccGuid")
-                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        '
                         .ContentControlID = cs.getInteger("ContentControlID")
                         .CookieSupport = cs.getBoolean("CookieSupport")
                         .CreatedBy = cs.getInteger("CreatedBy")
                         .CreateKey = cs.getInteger("CreateKey")
                         .DateAdded = cs.getDate("DateAdded")
-                        .EditArchive = cs.getBoolean("EditArchive")
-                        .EditBlank = cs.getBoolean("EditBlank")
-                        .EditSourceID = cs.getInteger("EditSourceID")
+                        '
+                        '
+                        '
                         .ExcludeFromAnalytics = cs.getBoolean("ExcludeFromAnalytics")
                         .HTTP_FROM = cs.getText("HTTP_FROM")
                         .HTTP_REFERER = cs.getText("HTTP_REFERER")
@@ -245,15 +245,15 @@ Namespace Contensive.Core.Models.Entity
                     cs.SetField("Bot", Bot.ToString())
                     cs.SetField("Browser", Browser)
                     cs.SetField("ccGuid", ccGuid)
-                    cs.SetField("ContentCategoryID", ContentCategoryID.ToString())
+                    '
                     cs.SetField("ContentControlID", ContentControlID.ToString())
                     cs.SetField("CookieSupport", CookieSupport.ToString())
                     cs.SetField("CreatedBy", CreatedBy.ToString())
                     cs.SetField("CreateKey", CreateKey.ToString())
                     cs.SetField("DateAdded", DateAdded.ToString())
-                    cs.SetField("EditArchive", EditArchive.ToString())
-                    cs.SetField("EditBlank", EditBlank.ToString())
-                    cs.SetField("EditSourceID", EditSourceID.ToString())
+                    '
+                    '
+                    '
                     cs.SetField("ExcludeFromAnalytics", ExcludeFromAnalytics.ToString())
                     cs.SetField("HTTP_FROM", HTTP_FROM)
                     cs.SetField("HTTP_REFERER", HTTP_REFERER)

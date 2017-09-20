@@ -160,9 +160,9 @@ Namespace Contensive.Core.Controllers
                                 & ", c.DropDownFieldList" _
                                 & ", ContentTable.Name AS ContentTableName" _
                                 & ", ContentDataSource.Name AS ContentDataSourceName" _
-                                & ", AuthoringTable.Name AS AuthoringTableName" _
-                                & ", AuthoringDataSource.Name AS AuthoringDataSourceName" _
-                                & ", c.AllowWorkflowAuthoring AS AllowWorkflowAuthoring" _
+                                & ", '' AS AuthoringTableName" _
+                                & ", '' AS AuthoringDataSourceName" _
+                                & ", 0 AS AllowWorkflowAuthoring" _
                                 & ", c.AllowCalendarEvents as AllowCalendarEvents" _
                                 & ", ContentTable.DataSourceID" _
                                 & ", ccSortMethods.OrderByClause as DefaultSortMethod" _
@@ -210,9 +210,6 @@ Namespace Contensive.Core.Controllers
                                 .DropDownFieldList = genericController.vbUCase(genericController.encodeText(row.Item(9)))
                                 .ContentTableName = genericController.encodeText(contentTablename)
                                 .ContentDataSourceName = "default"
-                                .AuthoringDataSourceName = "default"
-                                .AuthoringTableName = genericController.encodeText(row.Item(12))
-                                .AllowWorkflowAuthoring = genericController.EncodeBoolean(row.Item(14))
                                 .AllowCalendarEvents = genericController.EncodeBoolean(row.Item(15))
                                 .DefaultSortMethod = genericController.encodeText(row.Item(17))
                                 If .DefaultSortMethod = "" Then
@@ -484,15 +481,6 @@ Namespace Contensive.Core.Controllers
                                     .SelectCommaList = String.Join(",", .selectList)
                                 End If
                                 '
-                                ' ----- Apply WorkflowAuthoring Rule that any definition must match its parent
-                                '
-                                If .parentID > 0 Then
-                                    Dim parentCdef As cdefModel = getCdef(.parentID)
-                                    If Not (parentCdef Is Nothing) Then
-                                        .AllowWorkflowAuthoring = parentCdef.AllowWorkflowAuthoring
-                                    End If
-                                End If
-                                '
                                 ' ----- Create the ContentControlCriteria
                                 '
                                 .ContentControlCriteria = getContentControlCriteria(.Id, .ContentTableName, .ContentDataSourceName, New List(Of Integer))
@@ -666,282 +654,270 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleException(ex) : Throw
             End Try
         End Sub
-        ''
-        '
-        '
-        '========================================================================
-        '   Verify AuthoringTable is complete
-        '       find all Live Records without Authoring Records
-        '       create an authoring record for each one found missing
-        '           EditSourceID = Live.ID
-        '           create new TextFile for each that needs it
-        '========================================================================
-        '
-        Private Sub loadMetaCache_VerifyAuthoring()
-            On Error GoTo ErrorTrap
-            '
-            Dim MethodName As String
-            'Dim ContentPointer As Integer
-            Dim ContentID As Integer
-            Dim dtContent As DataTable
-            'Dim dtAuthoring as datatable
-            Dim ContentTableName As String
-            Dim ContentDataSourceName As String
-            Dim AuthoringTableName As String
-            Dim AuthoringDataSourceName As String
-            Dim FieldPointer As Integer
-            Dim FieldCount As Integer
-            'Dim Field.Name As String
-            Dim FieldValueVariant As Object
-            Dim SQLNames() As String
-            Dim sqlFieldList As New sqlFieldListClass
-            'Dim fieldType As Integer
-            Dim SQL As String
-            '
-            Dim JoinCount As Integer                 ' number of joins for this content definition
-            Dim JoinFieldPointer() As Integer        ' Field which contains join
-            Dim JoinContent() As String           ' Content Definition of joined table
-            '
-            Dim EditFilename As String
-            Dim EditRecordID As Integer
-            '
-            Dim LiveFilename As String
-            Dim LiveRecordID As Integer
-            '
-            Dim ContentName As String
-            '
-            Dim RSJoin As DataTable
-            Dim JoinPointer As Integer
-            Dim JoinContentName As String
-            Dim JoinContentPointer As Integer
-            Dim iJoinFieldPointer As Integer
-            Dim JoinFieldName As String
-            Dim JoinFieldValue As Integer
-            Dim JoinContentAuthoringTablename As String
-            Dim JoinContentAuthoringDataSourceName As String
-            Dim JoinRecordID As Integer
-            Dim Copy As String = ""
-            Dim rowPtr As Integer
-            '
-            MethodName = "new_loadCdefCache_loadContentEngineContentEngine_VerifyAuthoring"
-            '
-            If False Then
-                '
-                ' Database needs to be updated - Until this upgrade, Request Follow Allow
-                ' After upgrade, Allow Follows Request
-                '
-                Call cpCore.siteProperties.setProperty("RequestWorkflowAuthoring", cpCore.siteProperties.getText("AllowWorkflowAuthoring", "0"))
-            Else
-                '
-                ' Database is up-to-date, Set Allow from state of Request
-                '
-                Call cpCore.siteProperties.setProperty("AllowWorkflowAuthoring", cpCore.siteProperties.getText("RequestWorkflowAuthoring", "0"))
-            End If
-            '
-            Dim dt As DataTable
-            dt = cpCore.db.executeSql("select id,name from ccContent where active<>0")
-            If Not (dt Is Nothing) Then
-                For Each row As DataRow In dt.Rows
-                    Dim cdef As cdefModel = getCdef(EncodeInteger(row("id")))
-                    'If genericController.vbUCase(cdef.Name) = "PAGE CONTENT" Then
-                    '    Copy = Copy
-                    '    End If
-                    ContentName = cdef.Name
-                    With cdef
-                        ContentTableName = .ContentTableName
-                        ContentDataSourceName = .ContentDataSourceName
-                        AuthoringTableName = .AuthoringTableName
-                        AuthoringDataSourceName = .AuthoringDataSourceName
-                        FieldCount = .fields.Count
-                        ContentID = .Id
-                    End With
-                    If (ContentName <> "") And (ContentTableName <> "") And (ContentDataSourceName <> "") Then
-                        If Not ((cpCore.siteProperties.allowWorkflowAuthoring) And (cdef.AllowWorkflowAuthoring)) Then
-                            '
-                            ' Not Authoring - delete edit and archive records
-                            '
-                            If (LCase(ContentTableName) = "ccpagecontent") Or (LCase(ContentTableName) = "cccopycontent") Then
-                                '
-                                ' for now, limit the housekeep to just the tables that are allowed to have workflow
-                                ' to stop timeouts on members/visits/etc.
-                                '
-                                SQL = "delete from " & ContentTableName & " where (editsourceid>0)"
-                                Call cpCore.db.executeSql(SQL, ContentDataSourceName)
-                            End If
-                        Else
-                            '
-                            ' Authoring - verify edit record
-                            '
-                            If FieldCount > 0 Then
-                                '
-                                ' mark all records with a 0 createkey so we can tell which ones are changed
-                                ' NO -- THIS IS NOT USED IN THE REST OF THE PROC, AND IT IS SLOW
-                                'SQL = "UPDATE " & AuthoringTableName & " Set CreateKey=0"
-                                'Call executesql(SQL,ContentDataSourceName)
-                                '
-                                ' Select all records that need to be copied
-                                '
-                                SQL = "SELECT ContentTable.*" _
-                                    & " FROM " & ContentTableName & " AS ContentTable LEFT JOIN " & AuthoringTableName & " AS AuthoringTable ON ContentTable.ID = AuthoringTable.EditSourceID" _
-                                    & " WHERE ((ContentTable.ContentControlID=" & cpCore.db.encodeSQLNumber(ContentID) & ")AND(ContentTable.EditSourceID Is Null)AND(AuthoringTable.ID Is Null));"
-                                dtContent = cpCore.db.executeSql(SQL)
-                                If dtContent.Rows.Count > 0 Then
-                                    Do While rowPtr < dtContent.Rows.Count
+        '        ''
+        '        '
+        '        '
+        '        '========================================================================
+        '        '   Verify AuthoringTable is complete
+        '        '       find all Live Records without Authoring Records
+        '        '       create an authoring record for each one found missing
+        '        '           EditSourceID = Live.ID
+        '        '           create new TextFile for each that needs it
+        '        '========================================================================
+        '        '
+        '        Private Sub loadMetaCache_VerifyAuthoring()
+        '            On Error GoTo ErrorTrap
+        '            '
+        '            Dim MethodName As String
+        '            'Dim ContentPointer As Integer
+        '            Dim ContentID As Integer
+        '            Dim dtContent As DataTable
+        '            'Dim dtAuthoring as datatable
+        '            Dim ContentTableName As String
+        '            Dim ContentDataSourceName As String
+        '            Dim AuthoringTableName As String
+        '            Dim AuthoringDataSourceName As String
+        '            Dim FieldPointer As Integer
+        '            Dim FieldCount As Integer
+        '            'Dim Field.Name As String
+        '            Dim FieldValueVariant As Object
+        '            Dim SQLNames() As String
+        '            Dim sqlFieldList As New sqlFieldListClass
+        '            'Dim fieldType As Integer
+        '            Dim SQL As String
+        '            '
+        '            Dim JoinCount As Integer                 ' number of joins for this content definition
+        '            Dim JoinFieldPointer() As Integer        ' Field which contains join
+        '            Dim JoinContent() As String           ' Content Definition of joined table
+        '            '
+        '            Dim EditFilename As String
+        '            Dim EditRecordID As Integer
+        '            '
+        '            Dim LiveFilename As String
+        '            Dim LiveRecordID As Integer
+        '            '
+        '            Dim ContentName As String
+        '            '
+        '            Dim RSJoin As DataTable
+        '            Dim JoinPointer As Integer
+        '            Dim JoinContentName As String
+        '            Dim JoinContentPointer As Integer
+        '            Dim iJoinFieldPointer As Integer
+        '            Dim JoinFieldName As String
+        '            Dim JoinFieldValue As Integer
+        '            Dim JoinContentAuthoringTablename As String
+        '            Dim JoinContentAuthoringDataSourceName As String
+        '            Dim JoinRecordID As Integer
+        '            Dim Copy As String = ""
+        '            Dim rowPtr As Integer
+        '            '
+        '            MethodName = "new_loadCdefCache_loadContentEngineContentEngine_VerifyAuthoring"
+        '            '
+        '            If False Then
+        '                '
+        '                ' Database needs to be updated - Until this upgrade, Request Follow Allow
+        '                ' After upgrade, Allow Follows Request
+        '                '
+        '                Call cpCore.siteProperties.setProperty("RequestWorkflowAuthoring", cpCore.siteProperties.getText("AllowWorkflowAuthoring", "0"))
+        '            Else
+        '                '
+        '                ' Database is up-to-date, Set Allow from state of Request
+        '                '
+        '                Call cpCore.siteProperties.setProperty("AllowWorkflowAuthoring", cpCore.siteProperties.getText("RequestWorkflowAuthoring", "0"))
+        '            End If
+        '            '
+        '            Dim dt As DataTable
+        '            dt = cpCore.db.executeSql("select id,name from ccContent where active<>0")
+        '            If Not (dt Is Nothing) Then
+        '                For Each row As DataRow In dt.Rows
+        '                    Dim cdef As cdefModel = getCdef(EncodeInteger(row("id")))
+        '                    'If genericController.vbUCase(cdef.Name) = "PAGE CONTENT" Then
+        '                    '    Copy = Copy
+        '                    '    End If
+        '                    ContentName = cdef.Name
+        '                    With cdef
+        '                        ContentTableName = .ContentTableName
+        '                        ContentDataSourceName = .ContentDataSourceName
+        '                        AuthoringTableName = .AuthoringTableName
+        '                        AuthoringDataSourceName = .AuthoringDataSourceName
+        '                        FieldCount = .fields.Count
+        '                        ContentID = .Id
+        '                    End With
+        '                    If (ContentName <> "") And (ContentTableName <> "") And (ContentDataSourceName <> "") Then
+        '                        If Not ((cpCore.siteProperties.allowWorkflowAuthoring) And (false)) Then
+        '                            '
+        '                            ' Not Authoring - delete edit and archive records
+        '                            '
+        '                            If (LCase(ContentTableName) = "ccpagecontent") Or (LCase(ContentTableName) = "cccopycontent") Then
+        '                                '
+        '                                ' for now, limit the housekeep to just the tables that are allowed to have workflow
+        '                                ' to stop timeouts on members/visits/etc.
+        '                                '
+        '                                SQL = "delete from " & ContentTableName & " where (editsourceid>0)"
+        '                                Call cpCore.db.executeSql(SQL, ContentDataSourceName)
+        '                            End If
+        '                        Else
+        '                            '
+        '                            ' Authoring - verify edit record
+        '                            '
+        '                            If FieldCount > 0 Then
+        '                                '
+        '                                ' mark all records with a 0 createkey so we can tell which ones are changed
+        '                                ' NO -- THIS IS NOT USED IN THE REST OF THE PROC, AND IT IS SLOW
+        '                                'SQL = "UPDATE " & AuthoringTableName & " Set CreateKey=0"
+        '                                'Call executesql(SQL,ContentDataSourceName)
+        '                                '
+        '                                ' Select all records that need to be copied
+        '                                '
+        '                                SQL = "SELECT ContentTable.*" _
+        '                                    & " FROM " & ContentTableName & " AS ContentTable LEFT JOIN " & AuthoringTableName & " AS AuthoringTable ON ContentTable.ID = AuthoringTable.EditSourceID" _
+        '                                    & " WHERE ((ContentTable.ContentControlID=" & cpCore.db.encodeSQLNumber(ContentID) & ")AND(ContentTable.EditSourceID Is Null)AND(AuthoringTable.ID Is Null));"
+        '                                dtContent = cpCore.db.executeSql(SQL)
+        '                                If dtContent.Rows.Count > 0 Then
+        '                                    Do While rowPtr < dtContent.Rows.Count
 
-                                        '
-                                        ' clear arrays
-                                        '
-                                        'ReDim SQLNames(FieldCount + 1)
-                                        'ReDim sqlFieldList(FieldCount + 1)
-                                        '
-                                        ' Create sqlFieldList array for each live record
-                                        '
-                                        EditRecordID = cpCore.db.insertTableRecordGetId(AuthoringDataSourceName, AuthoringTableName, SystemMemberID)
-                                        LiveRecordID = genericController.EncodeInteger(dtContent.Rows(rowPtr).Item("ID"))
-                                        If LiveRecordID = 159 Then
-                                            LiveRecordID = LiveRecordID
-                                        End If
-                                        For Each keyValuePair In cdef.fields
-                                            Dim field As CDefFieldModel = keyValuePair.Value
-                                            Select Case field.fieldTypeId
-                                                Case FieldTypeIdManyToMany, FieldTypeIdRedirect
-                                                    '
-                                                    ' These content field types have no Db field
-                                                    '
-                                                Case Else
-                                                    '
-                                                    ' reproduce the field types
-                                                    '
-                                                    FieldValueVariant = dtContent.Rows(rowPtr).Item(field.nameLc)
-                                                    Select Case field.nameLc
-                                                        Case "ID", "EDITSOURCEID", "EDITARCHIVE", ""
-                                                        Case Else
-                                                            If (field.fieldTypeId = FieldTypeIdFileText) Or (field.fieldTypeId = FieldTypeIdFileHTML) Then
-                                                                '
-                                                                ' create new text file and copy field - private files
-                                                                '
-                                                                EditFilename = ""
-                                                                LiveFilename = genericController.encodeText(FieldValueVariant)
-                                                                If LiveFilename <> "" Then
-                                                                    EditFilename = fileController.getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, field.fieldTypeId)
-                                                                    FieldValueVariant = EditFilename
-                                                                    If EditFilename <> "" Then
-                                                                        Copy = cpCore.cdnFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
-                                                                    End If
-                                                                    'Copy = contentFiles.ReadFile(LiveFilename)
-                                                                    If Copy <> "" Then
-                                                                        Call cpCore.cdnFiles.saveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
-                                                                        'Call publicFiles.SaveFile(EditFilename, Copy)
-                                                                    End If
-                                                                End If
-                                                            End If
-                                                            If (field.fieldTypeId = FieldTypeIdFileCSS) Or (field.fieldTypeId = FieldTypeIdFileXML) Or (field.fieldTypeId = FieldTypeIdFileJavascript) Then
-                                                                '
-                                                                ' create new text file and copy field - public files
-                                                                '
-                                                                EditFilename = ""
-                                                                LiveFilename = genericController.encodeText(FieldValueVariant)
-                                                                If LiveFilename <> "" Then
-                                                                    EditFilename = fileController.getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, field.fieldTypeId)
-                                                                    FieldValueVariant = EditFilename
-                                                                    If EditFilename <> "" Then
-                                                                        Copy = cpCore.cdnFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
-                                                                    End If
-                                                                    'Copy = contentFiles.ReadFile(LiveFilename)
-                                                                    If Copy <> "" Then
-                                                                        Call cpCore.cdnFiles.saveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
-                                                                        'Call publicFiles.SaveFile(EditFilename, Copy)
-                                                                    End If
-                                                                End If
-                                                            End If
-                                                            'SQLNames(FieldPointer) = field.Name
-                                                            sqlFieldList.add(field.nameLc, cpCore.db.EncodeSQL(FieldValueVariant, field.fieldTypeId))
-                                                            'end case
-                                                    End Select
-                                                    'end case
-                                            End Select
-                                        Next
-                                        '
-                                        ' EditSourceID
-                                        '
-                                        'SQLNames(FieldPointer) = "EDITSOURCEID"
-                                        sqlFieldList.add("editsourceid", cpCore.db.encodeSQLNumber(LiveRecordID))
-                                        FieldPointer = FieldPointer + 1
-                                        '
-                                        ' EditArchive
-                                        '
-                                        'SQLNames(FieldPointer) = "EDITARCHIVE"
-                                        sqlFieldList.add("EDITARCHIVE", SQLFalse)
-                                        FieldPointer = FieldPointer + 1
-                                        '
-                                        Call cpCore.db.updateTableRecord(AuthoringDataSourceName, AuthoringTableName, "ID=" & EditRecordID, sqlFieldList)
-                                    Loop
-                                    '
-                                    ' ----- Verify good DateAdded
-                                    '
-                                    Dim testDate As Date = Date.MinValue
-                                    SQL = "UPDATE " & ContentTableName & " set DateAdded=" & cpCore.db.encodeSQLDate(testDate) & " where dateadded is null;"
-                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
-                                    If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set DateAdded=" & cpCore.db.encodeSQLDate(testDate) & " where dateadded is null;"
-                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
-                                    End If
-                                    '
-                                    ' ----- Verify good CreatedBy
-                                    '
-                                    SQL = "UPDATE " & ContentTableName & " set CreatedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
-                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
-                                    If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set CreatedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
-                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
-                                    End If
-                                    '
-                                    ' ----- Verify good ModifiedDate
-                                    '
-                                    SQL = "UPDATE " & ContentTableName & " set ModifiedDate=DateAdded where ModifiedDate is null;"
-                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
-                                    If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set ModifiedDate=DateAdded where ModifiedDate is null;"
-                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
-                                    End If
-                                    '
-                                    ' ----- Verify good ModifiedBy
-                                    '
-                                    SQL = "UPDATE " & ContentTableName & " set ModifiedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
-                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
-                                    If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set ModifiedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
-                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
-                                    End If
-                                    '
-                                    ' ----- Verify good EditArchive in authoring table
-                                    '
-                                    SQL = "UPDATE " & AuthoringTableName & " set EditArchive=" & SQLFalse & " where EditArchive is null;"
-                                    Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
-                                    '
-                                    ' ----- Verify good EditBlank
-                                    '
-                                    SQL = "UPDATE " & AuthoringTableName & " set EditBlank=" & SQLFalse & " where EditBlank is null;"
-                                    Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
-                                    If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & ContentTableName & " set EditBlank=" & SQLFalse & " where EditBlank is null;"
-                                        Call cpCore.db.executeSql(SQL, ContentDataSourceName)
-                                    End If
-                                End If
-                                dtContent = Nothing
-                            End If
-                        End If
-                    End If
-                Next
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            'Call handleLegacyClassError1(MethodName, "trap")
-        End Sub
+        '                                        '
+        '                                        ' clear arrays
+        '                                        '
+        '                                        'ReDim SQLNames(FieldCount + 1)
+        '                                        'ReDim sqlFieldList(FieldCount + 1)
+        '                                        '
+        '                                        ' Create sqlFieldList array for each live record
+        '                                        '
+        '                                        EditRecordID = cpCore.db.insertTableRecordGetId(AuthoringDataSourceName, AuthoringTableName, SystemMemberID)
+        '                                        LiveRecordID = genericController.EncodeInteger(dtContent.Rows(rowPtr).Item("ID"))
+        '                                        If LiveRecordID = 159 Then
+        '                                            LiveRecordID = LiveRecordID
+        '                                        End If
+        '                                        For Each keyValuePair In cdef.fields
+        '                                            Dim field As CDefFieldModel = keyValuePair.Value
+        '                                            Select Case field.fieldTypeId
+        '                                                Case FieldTypeIdManyToMany, FieldTypeIdRedirect
+        '                                                    '
+        '                                                    ' These content field types have no Db field
+        '                                                    '
+        '                                                Case Else
+        '                                                    '
+        '                                                    ' reproduce the field types
+        '                                                    '
+        '                                                    FieldValueVariant = dtContent.Rows(rowPtr).Item(field.nameLc)
+        '                                                    Select Case field.nameLc
+        '                                                        Case "ID", ""
+        '                                                        Case Else
+        '                                                            If (field.fieldTypeId = FieldTypeIdFileText) Or (field.fieldTypeId = FieldTypeIdFileHTML) Then
+        '                                                                '
+        '                                                                ' create new text file and copy field - private files
+        '                                                                '
+        '                                                                EditFilename = ""
+        '                                                                LiveFilename = genericController.encodeText(FieldValueVariant)
+        '                                                                If LiveFilename <> "" Then
+        '                                                                    EditFilename = fileController.getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, field.fieldTypeId)
+        '                                                                    FieldValueVariant = EditFilename
+        '                                                                    If EditFilename <> "" Then
+        '                                                                        Copy = cpCore.cdnFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
+        '                                                                    End If
+        '                                                                    'Copy = contentFiles.ReadFile(LiveFilename)
+        '                                                                    If Copy <> "" Then
+        '                                                                        Call cpCore.cdnFiles.saveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+        '                                                                        'Call publicFiles.SaveFile(EditFilename, Copy)
+        '                                                                    End If
+        '                                                                End If
+        '                                                            End If
+        '                                                            If (field.fieldTypeId = FieldTypeIdFileCSS) Or (field.fieldTypeId = FieldTypeIdFileXML) Or (field.fieldTypeId = FieldTypeIdFileJavascript) Then
+        '                                                                '
+        '                                                                ' create new text file and copy field - public files
+        '                                                                '
+        '                                                                EditFilename = ""
+        '                                                                LiveFilename = genericController.encodeText(FieldValueVariant)
+        '                                                                If LiveFilename <> "" Then
+        '                                                                    EditFilename = fileController.getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, field.fieldTypeId)
+        '                                                                    FieldValueVariant = EditFilename
+        '                                                                    If EditFilename <> "" Then
+        '                                                                        Copy = cpCore.cdnFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
+        '                                                                    End If
+        '                                                                    'Copy = contentFiles.ReadFile(LiveFilename)
+        '                                                                    If Copy <> "" Then
+        '                                                                        Call cpCore.cdnFiles.saveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+        '                                                                        'Call publicFiles.SaveFile(EditFilename, Copy)
+        '                                                                    End If
+        '                                                                End If
+        '                                                            End If
+        '                                                            'SQLNames(FieldPointer) = field.Name
+        '                                                            sqlFieldList.add(field.nameLc, cpCore.db.EncodeSQL(FieldValueVariant, field.fieldTypeId))
+        '                                                            'end case
+        '                                                    End Select
+        '                                                    'end case
+        '                                            End Select
+        '                                        Next
+        '                                        '
+        '                                        Call cpCore.db.updateTableRecord(AuthoringDataSourceName, AuthoringTableName, "ID=" & EditRecordID, sqlFieldList)
+        '                                    Loop
+        '                                    '
+        '                                    ' ----- Verify good DateAdded
+        '                                    '
+        '                                    Dim testDate As Date = Date.MinValue
+        '                                    SQL = "UPDATE " & ContentTableName & " set DateAdded=" & cpCore.db.encodeSQLDate(testDate) & " where dateadded is null;"
+        '                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
+        '                                    If ContentTableName <> AuthoringTableName Then
+        '                                        SQL = "UPDATE " & AuthoringTableName & " set DateAdded=" & cpCore.db.encodeSQLDate(testDate) & " where dateadded is null;"
+        '                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
+        '                                    End If
+        '                                    '
+        '                                    ' ----- Verify good CreatedBy
+        '                                    '
+        '                                    SQL = "UPDATE " & ContentTableName & " set CreatedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
+        '                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
+        '                                    If ContentTableName <> AuthoringTableName Then
+        '                                        SQL = "UPDATE " & AuthoringTableName & " set CreatedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
+        '                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
+        '                                    End If
+        '                                    '
+        '                                    ' ----- Verify good ModifiedDate
+        '                                    '
+        '                                    SQL = "UPDATE " & ContentTableName & " set ModifiedDate=DateAdded where ModifiedDate is null;"
+        '                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
+        '                                    If ContentTableName <> AuthoringTableName Then
+        '                                        SQL = "UPDATE " & AuthoringTableName & " set ModifiedDate=DateAdded where ModifiedDate is null;"
+        '                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
+        '                                    End If
+        '                                    '
+        '                                    ' ----- Verify good ModifiedBy
+        '                                    '
+        '                                    SQL = "UPDATE " & ContentTableName & " set ModifiedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
+        '                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
+        '                                    If ContentTableName <> AuthoringTableName Then
+        '                                        SQL = "UPDATE " & AuthoringTableName & " set ModifiedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
+        '                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
+        '                                    End If
+        '                                    '
+        '                                    ' ----- Verify good EditArchive in authoring table
+        '                                    '
+        '                                    SQL = "UPDATE " & AuthoringTableName & " set EditArchive=" & SQLFalse & " where EditArchive is null;"
+        '                                    Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
+        '                                    '
+        '                                    ' ----- Verify good EditBlank
+        '                                    '
+        '                                    SQL = "UPDATE " & AuthoringTableName & " set EditBlank=" & SQLFalse & " where EditBlank is null;"
+        '                                    Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
+        '                                    If ContentTableName <> AuthoringTableName Then
+        '                                        SQL = "UPDATE " & ContentTableName & " set EditBlank=" & SQLFalse & " where EditBlank is null;"
+        '                                        Call cpCore.db.executeSql(SQL, ContentDataSourceName)
+        '                                    End If
+        '                                End If
+        '                                dtContent = Nothing
+        '                            End If
+        '                        End If
+        '                    End If
+        '                Next
+        '            End If
+        '            '
+        '            Exit Sub
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            'Call handleLegacyClassError1(MethodName, "trap")
+        '        End Sub
 
         '
         '===========================================================================
@@ -1778,61 +1754,6 @@ ErrorTrap:
                                     field.isBaseField = IsBaseContent
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
-                                '
-                                ' REFACTOR - these fieldsonly apply to page content
-                                '
-                                If Not cpCore.db.isCdefField(returnContentId, "EditSourceID") Then
-                                    field = New CDefFieldModel
-                                    field.nameLc = "EditSourceID"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdInteger
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Edit Source ID"
-                                    field.lookupContentName(cpCore) = ""
-                                    field.defaultValue = "null"
-                                    field.isBaseField = IsBaseContent
-                                    Call verifyCDefField_ReturnID(contentName, field)
-                                End If
-                                If Not cpCore.db.isCdefField(returnContentId, "EditArchive") Then
-                                    field = New CDefFieldModel
-                                    field.nameLc = "EditArchive"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdBoolean
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Edit Archive"
-                                    field.lookupContentName(cpCore) = ""
-                                    field.defaultValue = "0"
-                                    field.isBaseField = IsBaseContent
-                                    Call verifyCDefField_ReturnID(contentName, field)
-                                End If
-                                If Not cpCore.db.isCdefField(returnContentId, "EditBlank") Then
-                                    field = New CDefFieldModel
-                                    field.nameLc = "EditBlank"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdBoolean
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Edit Blank"
-                                    field.lookupContentName(cpCore) = ""
-                                    field.defaultValue = "0"
-                                    field.isBaseField = IsBaseContent
-                                    Call verifyCDefField_ReturnID(contentName, field)
-                                End If
-                                If Not cpCore.db.isCdefField(returnContentId, "ContentCategoryID") Then
-                                    field = New CDefFieldModel
-                                    field.nameLc = "ContentCategoryID"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdLookup
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Content Category"
-                                    field.lookupContentName(cpCore) = "Content Categories"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call verifyCDefField_ReturnID(contentName, field)
-                                End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ccGuid") Then
                                     field = New CDefFieldModel
                                     field.nameLc = "ccGuid"
@@ -2268,7 +2189,7 @@ ErrorTrap:
                     '
                     ' either Workflow on non-workflow - it changes everything
                     '
-                    SQL = "update " & RecordTableName & " set ContentControlID=" & NewContentControlID & " where ID=" & RecordID & " or EditSourceID=" & RecordID
+                    SQL = "update " & RecordTableName & " set ContentControlID=" & NewContentControlID & " where ID=" & RecordID
                     Call cpCore.db.executeSql(SQL, DataSourceName)
                     If HasParentID Then
                         SQL = "select contentcontrolid,ID from " & RecordTableName & " where ParentID=" & RecordID
@@ -2406,14 +2327,14 @@ ErrorTrap:
                     result = Contentdefinition.ContentTableName
                 Case "CONTENTDATASOURCENAME"
                     result = Contentdefinition.ContentDataSourceName
-                Case "AUTHORINGTABLENAME"
-                    result = Contentdefinition.AuthoringTableName
-                Case "AUTHORINGDATASOURCENAME"
-                    result = Contentdefinition.AuthoringDataSourceName
+                'Case "AUTHORINGTABLENAME"
+                '    result = Contentdefinition.AuthoringTableName
+                'Case "AUTHORINGDATASOURCENAME"
+                '    result = Contentdefinition.AuthoringDataSourceName
                 Case "WHERECLAUSE"
                     result = Contentdefinition.WhereClause
-                Case "ALLOWWORKFLOWAUTHORING"
-                    result = Contentdefinition.AllowWorkflowAuthoring.ToString
+                'Case "ALLOWWORKFLOWAUTHORING"
+                '    result = Contentdefinition.AllowWorkflowAuthoring.ToString
                 Case "DROPDOWNFIELDLIST"
                     result = Contentdefinition.DropDownFieldList
                 Case "SELECTFIELDLIST"

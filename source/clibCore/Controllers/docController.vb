@@ -472,10 +472,6 @@ Namespace Contensive.Core.Controllers
             Dim AllowCancel As Boolean
             Dim allowSave As Boolean
             Dim AllowDelete As Boolean
-            Dim AllowPublish As Boolean
-            Dim AllowAbort As Boolean
-            Dim AllowSubmit As Boolean
-            Dim AllowApprove As Boolean
             Dim AllowMarkReviewed As Boolean
             Dim CDef As cdefModel
             Dim readOnlyField As Boolean
@@ -509,9 +505,9 @@ Namespace Contensive.Core.Controllers
             Dim IsInserted As Boolean = False
             Dim IsRootPage As Boolean = False
             Call getAuthoringStatus(LiveRecordContentName, page.id, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
-            Call getAuthoringPermissions(LiveRecordContentName, page.id, AllowInsert, AllowCancel, allowSave, AllowDelete, AllowPublish, AllowAbort, AllowSubmit, AllowApprove, readOnlyField)
+            Call getAuthoringPermissions(LiveRecordContentName, page.id, AllowInsert, AllowCancel, allowSave, AllowDelete, False, False, False, False, readOnlyField)
             AllowMarkReviewed = cpcore.metaData.isContentFieldSupported(Models.Entity.pageContentModel.contentName, "DateReviewed")
-            OptionsPanelAuthoringStatus = cpcore.authContext.main_GetAuthoringStatusMessage(cpcore, CDef.AllowWorkflowAuthoring, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
+            OptionsPanelAuthoringStatus = cpcore.authContext.main_GetAuthoringStatusMessage(cpcore, False, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
             '
             ' Set Editing Authoring Control
             '
@@ -534,18 +530,6 @@ Namespace Contensive.Core.Controllers
             End If
             If (page_ParentID <> 0) And AllowInsert Then
                 ButtonList = ButtonList & "," & ButtonAddSiblingPage
-            End If
-            If AllowPublish Then
-                ButtonList = ButtonList & "," & ButtonPublish
-            End If
-            If AllowAbort Then
-                ButtonList = ButtonList & "," & ButtonAbortEdit
-            End If
-            If AllowSubmit Then
-                ButtonList = ButtonList & "," & ButtonPublishSubmit
-            End If
-            If AllowApprove Then
-                ButtonList = ButtonList & "," & ButtonPublishApprove
             End If
             If AllowMarkReviewed Then
                 ButtonList = ButtonList & "," & ButtonMarkReviewed
@@ -740,7 +724,7 @@ Namespace Contensive.Core.Controllers
             Dim ApprovedDate As Date
             Dim allowSave As Boolean
             Dim iIsAdmin As Boolean
-            Dim main_WorkflowSupport As Boolean
+            ' Dim main_WorkflowSupport As Boolean
             '
             RecordModified = False
             RecordID = (cpcore.docProperties.getInteger("ID"))
@@ -748,7 +732,7 @@ Namespace Contensive.Core.Controllers
             iIsAdmin = cpcore.authContext.isAuthenticatedAdmin(cpcore)
             '
             If (Button <> "") And (RecordID <> 0) And (pageContentModel.contentName <> "") And (cpcore.authContext.isAuthenticatedContentManager(cpcore, pageContentModel.contentName)) Then
-                main_WorkflowSupport = cpcore.siteProperties.allowWorkflowAuthoring And cpcore.workflow.isWorkflowAuthoringCompatible(pageContentModel.contentName)
+                ' main_WorkflowSupport = cpcore.siteProperties.allowWorkflowAuthoring And cpcore.workflow.isWorkflowAuthoringCompatible(pageContentModel.contentName)
                 Dim SubmittedMemberName As String = ""
                 Dim ApprovedMemberName As String = ""
                 Dim ModifiedMemberName As String = ""
@@ -775,10 +759,7 @@ Namespace Contensive.Core.Controllers
                             Or (Button = ButtonAddChildPage) _
                             Or (Button = ButtonAddSiblingPage) _
                             Or (Button = ButtonSave) _
-                            Or (Button = ButtonOK) _
-                            Or (Button = ButtonPublish) _
-                            Or (Button = ButtonPublishSubmit) _
-                            Or (Button = ButtonPublishApprove)
+                            Or (Button = ButtonOK)
                     Else
                         '
                         ' cases that CM can save
@@ -787,8 +768,7 @@ Namespace Contensive.Core.Controllers
                             Or (Button = ButtonAddChildPage) _
                             Or (Button = ButtonAddSiblingPage) _
                             Or (Button = ButtonSave) _
-                            Or (Button = ButtonOK) _
-                            Or (Button = ButtonPublishSubmit)
+                            Or (Button = ButtonOK)
                     End If
                 End If
                 If allowSave Then
@@ -847,12 +827,12 @@ Namespace Contensive.Core.Controllers
                         '
                         Link = getPageLink(RecordID, "", True, False)
                         'Link = main_GetPageLink(RecordID)
-                        If main_WorkflowSupport Then
-                            If Not cpcore.authContext.isWorkflowRendering() Then
-                                Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
-                                Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
-                            End If
-                        End If
+                        'If main_WorkflowSupport Then
+                        '    If Not cpcore.authContext.isWorkflowRendering() Then
+                        '        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
+                        '        Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
+                        '    End If
+                        'End If
                         Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", False)
                     End If
                     Call cpcore.db.cs_Close(CSBlock)
@@ -881,12 +861,12 @@ Namespace Contensive.Core.Controllers
                             '
                             Link = getPageLink(RecordID, "", True, False)
                             'Link = main_GetPageLink(RecordID)
-                            If main_WorkflowSupport Then
-                                If Not cpcore.authContext.isWorkflowRendering() Then
-                                    Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
-                                    Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
-                                End If
-                            End If
+                            'If main_WorkflowSupport Then
+                            '    If Not cpcore.authContext.isWorkflowRendering() Then
+                            '        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
+                            '        Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
+                            '    End If
+                            'End If
                             Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", False)
                         End If
                         Call cpcore.db.cs_Close(CSBlock)
@@ -903,11 +883,11 @@ Namespace Contensive.Core.Controllers
                     Call deleteChildRecords(pageContentModel.contentName, RecordID, False)
                     Call cpcore.db.deleteContentRecord(pageContentModel.contentName, RecordID)
                     '
-                    If Not main_WorkflowSupport Then
+                    If Not False Then
                         Call cpcore.cache.invalidateContent(pageContentModel.contentName)
                     End If
                     '
-                    If Not main_WorkflowSupport Then
+                    If Not False Then
                         Link = getPageLink(ParentID, "", True, False)
                         Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "The page has been deleted, and you have been redirected to the parent of the deleted page.", True)
                         Call cpcore.webServer.redirect(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", redirectBecausePageNotFound)
@@ -915,30 +895,18 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
                 '
-                If (Button = ButtonAbortEdit) Then
-                    Call cpcore.workflow.abortEdit2(pageContentModel.contentName, RecordID, cpcore.authContext.user.id)
-                End If
-                If (Button = ButtonPublishSubmit) Then
-                    Call cpcore.workflow.main_SubmitEdit(pageContentModel.contentName, RecordID)
-                    Call sendPublishSubmitNotice(pageContentModel.contentName, RecordID, "")
-                End If
-                If (Not (cpcore.debug_iUserError <> "")) And ((Button = ButtonOK) Or (Button = ButtonCancel) Or (Button = ButtonPublish)) Then
+                'If (Button = ButtonAbortEdit) Then
+                '    Call cpcore.workflow.abortEdit2(pageContentModel.contentName, RecordID, cpcore.authContext.user.id)
+                'End If
+                'If (Button = ButtonPublishSubmit) Then
+                '    Call cpcore.workflow.main_SubmitEdit(pageContentModel.contentName, RecordID)
+                '    Call sendPublishSubmitNotice(pageContentModel.contentName, RecordID, "")
+                'End If
+                If (Not (cpcore.debug_iUserError <> "")) And ((Button = ButtonOK) Or (Button = ButtonCancel)) Then
                     '
                     ' ----- Turn off Quick Editor if not save or add child
                     '
                     Call cpcore.visitProperty.setProperty("AllowQuickEditor", "0")
-                End If
-                If iIsAdmin Then
-                    '
-                    ' ----- Admin only functions
-                    '
-                    If (Button = ButtonPublish) Then
-                        Call cpcore.workflow.publishEdit(pageContentModel.contentName, RecordID)
-                        Call cpcore.cache.invalidateContent(pageContentModel.contentName)
-                    End If
-                    If (Button = ButtonPublishApprove) Then
-                        Call cpcore.workflow.approveEdit(pageContentModel.contentName, RecordID)
-                    End If
                 End If
             End If
         End Sub
@@ -1287,7 +1255,7 @@ ErrorTrap:
         '       etc.
         '========================================================================
         '
-        Public Sub getAuthoringPermissions(ByVal ContentName As String, ByVal RecordID As Integer, ByRef AllowInsert As Boolean, ByRef AllowCancel As Boolean, ByRef allowSave As Boolean, ByRef AllowDelete As Boolean, ByRef AllowPublish As Boolean, ByRef AllowAbort As Boolean, ByRef AllowSubmit As Boolean, ByRef AllowApprove As Boolean, ByRef readOnlyField As Boolean)
+        Public Sub getAuthoringPermissions(ByVal ContentName As String, ByVal RecordID As Integer, ByRef AllowInsert As Boolean, ByRef AllowCancel As Boolean, ByRef allowSave As Boolean, ByRef AllowDelete As Boolean, ByRef ignore1 As Boolean, ByRef ignore2 As Boolean, ByRef ignore3 As Boolean, ByRef ignore4 As Boolean, ByRef readOnlyField As Boolean)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00270")
             '
             'If Not (true) Then Exit Sub
@@ -1330,7 +1298,7 @@ ErrorTrap:
                 '
                 AllowCancel = True
                 readOnlyField = True
-            ElseIf (Not cpcore.siteProperties.allowWorkflowAuthoring) Or (Not CDef.AllowWorkflowAuthoring) Then
+            ElseIf (Not False) Or (Not False) Then
                 '
                 ' No Workflow Authoring
                 '
@@ -1342,137 +1310,137 @@ ErrorTrap:
                 If (CDef.AllowAdd) And (Not IsInserted) Then
                     AllowInsert = True
                 End If
-            ElseIf cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
-                '
-                ' Workflow, Admin
-                '
-                If IsApproved Then
-                    '
-                    ' Workflow, Admin, Approved
-                    '
-                    AllowCancel = True
-                    AllowPublish = True
-                    AllowAbort = True
-                    readOnlyField = True
-                    AllowInsert = True
-                ElseIf IsSubmitted Then
-                    '
-                    ' Workflow, Admin, Submitted (not approved)
-                    '
-                    AllowCancel = True
-                    If Not IsDeleted Then
-                        allowSave = True
-                    End If
-                    AllowPublish = True
-                    AllowAbort = True
-                    AllowApprove = True
-                    If IsDeleted Then
-                        readOnlyField = True
-                    End If
-                    AllowInsert = True
-                ElseIf IsInserted Then
-                    '
-                    ' Workflow, Admin, Inserted (not submitted, not approved)
-                    '
-                    AllowCancel = True
-                    allowSave = True
-                    AllowPublish = True
-                    AllowAbort = True
-                    AllowSubmit = True
-                    AllowApprove = True
-                    AllowInsert = True
-                ElseIf IsDeleted Then
-                    '
-                    ' Workflow, Admin, Deleted record (not submitted, not approved)
-                    '
-                    AllowCancel = True
-                    AllowPublish = True
-                    AllowAbort = True
-                    AllowSubmit = True
-                    AllowApprove = True
-                    readOnlyField = True
-                    AllowInsert = True
-                ElseIf IsModified Then
-                    '
-                    ' Workflow, Admin, Modified (not submitted, not approved, not inserted, not deleted)
-                    '
-                    AllowCancel = True
-                    allowSave = True
-                    AllowPublish = True
-                    AllowAbort = True
-                    AllowSubmit = True
-                    AllowApprove = True
-                    AllowDelete = True
-                    AllowInsert = True
-                Else
-                    '
-                    ' Workflow, Admin, Not Modified (not submitted, not approved, not inserted, not deleted)
-                    '
-                    AllowCancel = True
-                    allowSave = True
-                    AllowPublish = True
-                    AllowApprove = True
-                    AllowSubmit = True
-                    AllowDelete = True
-                    AllowInsert = True
-                End If
-            Else
-                '
-                ' Workflow, Content Manager
-                '
-                If IsApproved Then
-                    '
-                    ' Workflow, Content Manager, Approved
-                    '
-                    AllowCancel = True
-                    readOnlyField = True
-                    AllowInsert = True
-                ElseIf IsSubmitted Then
-                    '
-                    ' Workflow, Content Manager, Submitted (not approved)
-                    '
-                    AllowCancel = True
-                    readOnlyField = True
-                    AllowInsert = True
-                ElseIf IsInserted Then
-                    '
-                    ' Workflow, Content Manager, Inserted (not submitted, not approved)
-                    '
-                    AllowCancel = True
-                    allowSave = True
-                    AllowAbort = True
-                    AllowSubmit = True
-                    AllowInsert = True
-                ElseIf IsDeleted Then
-                    '
-                    ' Workflow, Content Manager, Deleted record (not submitted, not approved)
-                    '
-                    AllowCancel = True
-                    AllowAbort = True
-                    AllowSubmit = True
-                    readOnlyField = True
-                    AllowInsert = True
-                ElseIf IsModified Then
-                    '
-                    ' Workflow, Content Manager, Modified (not submitted, not approved, not inserted, not deleted)
-                    '
-                    AllowCancel = True
-                    allowSave = True
-                    AllowDelete = True
-                    AllowAbort = True
-                    AllowSubmit = True
-                    AllowInsert = True
-                Else
-                    '
-                    ' Workflow, Content Manager, Not Modified (not submitted, not approved, not inserted, not deleted)
-                    '
-                    AllowCancel = True
-                    allowSave = True
-                    AllowDelete = True
-                    AllowAbort = True
-                    AllowSubmit = True
-                    AllowInsert = True
-                End If
+                'ElseIf cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                '    '
+                '    ' Workflow, Admin
+                '    '
+                '    If IsApproved Then
+                '        '
+                '        ' Workflow, Admin, Approved
+                '        '
+                '        AllowCancel = True
+                '        ignore1 = True
+                '        ignore2 = True
+                '        readOnlyField = True
+                '        AllowInsert = True
+                '    ElseIf IsSubmitted Then
+                '        '
+                '        ' Workflow, Admin, Submitted (not approved)
+                '        '
+                '        AllowCancel = True
+                '        If Not IsDeleted Then
+                '            allowSave = True
+                '        End If
+                '        ignore1 = True
+                '        ignore2 = True
+                '        ignore4 = True
+                '        If IsDeleted Then
+                '            readOnlyField = True
+                '        End If
+                '        AllowInsert = True
+                '    ElseIf IsInserted Then
+                '        '
+                '        ' Workflow, Admin, Inserted (not submitted, not approved)
+                '        '
+                '        AllowCancel = True
+                '        allowSave = True
+                '        ignore1 = True
+                '        ignore2 = True
+                '        ignore3 = True
+                '        ignore4 = True
+                '        AllowInsert = True
+                '    ElseIf IsDeleted Then
+                '        '
+                '        ' Workflow, Admin, Deleted record (not submitted, not approved)
+                '        '
+                '        AllowCancel = True
+                '        ignore1 = True
+                '        ignore2 = True
+                '        ignore3 = True
+                '        ignore4 = True
+                '        readOnlyField = True
+                '        AllowInsert = True
+                '    ElseIf IsModified Then
+                '        '
+                '        ' Workflow, Admin, Modified (not submitted, not approved, not inserted, not deleted)
+                '        '
+                '        AllowCancel = True
+                '        allowSave = True
+                '        ignore1 = True
+                '        ignore2 = True
+                '        ignore3 = True
+                '        ignore4 = True
+                '        AllowDelete = True
+                '        AllowInsert = True
+                '    Else
+                '        '
+                '        ' Workflow, Admin, Not Modified (not submitted, not approved, not inserted, not deleted)
+                '        '
+                '        AllowCancel = True
+                '        allowSave = True
+                '        ignore1 = True
+                '        ignore4 = True
+                '        ignore3 = True
+                '        AllowDelete = True
+                '        AllowInsert = True
+                '    End If
+                'Else
+                '    '
+                '    ' Workflow, Content Manager
+                '    '
+                '    If IsApproved Then
+                '        '
+                '        ' Workflow, Content Manager, Approved
+                '        '
+                '        AllowCancel = True
+                '        readOnlyField = True
+                '        AllowInsert = True
+                '    ElseIf IsSubmitted Then
+                '        '
+                '        ' Workflow, Content Manager, Submitted (not approved)
+                '        '
+                '        AllowCancel = True
+                '        readOnlyField = True
+                '        AllowInsert = True
+                '    ElseIf IsInserted Then
+                '        '
+                '        ' Workflow, Content Manager, Inserted (not submitted, not approved)
+                '        '
+                '        AllowCancel = True
+                '        allowSave = True
+                '        ignore2 = True
+                '        ignore3 = True
+                '        AllowInsert = True
+                '    ElseIf IsDeleted Then
+                '        '
+                '        ' Workflow, Content Manager, Deleted record (not submitted, not approved)
+                '        '
+                '        AllowCancel = True
+                '        ignore2 = True
+                '        ignore3 = True
+                '        readOnlyField = True
+                '        AllowInsert = True
+                '    ElseIf IsModified Then
+                '        '
+                '        ' Workflow, Content Manager, Modified (not submitted, not approved, not inserted, not deleted)
+                '        '
+                '        AllowCancel = True
+                '        allowSave = True
+                '        AllowDelete = True
+                '        ignore2 = True
+                '        ignore3 = True
+                '        AllowInsert = True
+                '    Else
+                '        '
+                '        ' Workflow, Content Manager, Not Modified (not submitted, not approved, not inserted, not deleted)
+                '        '
+                '        AllowCancel = True
+                '        allowSave = True
+                '        AllowDelete = True
+                '        ignore2 = True
+                '        ignore3 = True
+                '        AllowInsert = True
+                '    End If
             End If
             '
             Exit Sub
@@ -2248,7 +2216,7 @@ ErrorTrap:
                     Call cpcore.db.cs_set(CS, "ccGuid", pageGuid)
                 End If
                 Call cpcore.db.cs_save2(CS)
-                Call cpcore.workflow.publishEdit("Page Content", Id)
+                '   Call cpcore.workflow.publishEdit("Page Content", Id)
             End If
             Call cpcore.db.cs_Close(CS)
             '
@@ -2951,11 +2919,6 @@ ErrorTrap:
                     '
                     ' -- Mark the live record
                     Call cpcore.db.executeSql(SQL & " where id=" & RecordID, DataSourceName)
-                    '
-                    ' -- Mark the edit record if in workflow
-                    If cpcore.metaData.isContentFieldSupported(ContentName, "editsourceid") Then
-                        Call cpcore.db.executeSql(SQL & " where (editsourceid=" & RecordID & ")and(editarchive=0)", DataSourceName)
-                    End If
                 End If
             Catch ex As Exception
                 cpcore.handleException(ex)

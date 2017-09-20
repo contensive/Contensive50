@@ -21,14 +21,10 @@
 '        Public ID As Integer
 '        'Public Active As Boolean
 '        'Public ccGuid As String
-'        'Public ContentCategoryID As Integer
 '        'Public ContentControlID As Integer
 '        'Public CreatedBy As Integer
 '        'Public CreateKey As Integer
 '        'Public DateAdded As Date
-'        'Public EditArchive As Boolean
-'        'Public EditBlank As Boolean
-'        'Public EditSourceID As Integer
 '        Public FieldValue As String
 '        'Public ModifiedBy As Integer
 '        'Public ModifiedDate As Date
@@ -150,14 +146,14 @@
 '                        .ID = cs.getInteger("ID")
 '                        '.Active = cs.getBoolean("Active")
 '                        '.ccGuid = cs.getText("ccGuid")
-'                        '.ContentCategoryID = cs.getInteger("ContentCategoryID")
+'                        ''
 '                        '.ContentControlID = cs.getInteger("ContentControlID")
 '                        '.CreatedBy = cs.getInteger("CreatedBy")
 '                        '.CreateKey = cs.getInteger("CreateKey")
 '                        '.DateAdded = cs.getDate("DateAdded")
-'                        '.EditArchive = cs.getBoolean("EditArchive")
-'                        '.EditBlank = cs.getBoolean("EditBlank")
-'                        '.EditSourceID = cs.getInteger("EditSourceID")
+'                        ''
+'                        ''
+'                        ''
 '                        .FieldValue = cs.getText("FieldValue")
 '                        '.ModifiedBy = cs.getInteger("ModifiedBy")
 '                        '.ModifiedDate = cs.getDate("ModifiedDate")
@@ -217,14 +213,14 @@
 '                    id = cs.getInteger("id")
 '                    'cs.setField("Active", Active.ToString())
 '                    'cs.setField("ccGuid", ccGuid)
-'                    'cs.setField("ContentCategoryID", ContentCategoryID.ToString())
+'                    ''
 '                    'cs.setField("ContentControlID", ContentControlID.ToString())
 '                    'cs.setField("CreatedBy", CreatedBy.ToString())
 '                    'cs.setField("CreateKey", CreateKey.ToString())
 '                    'cs.setField("DateAdded", DateAdded.ToString())
-'                    'cs.setField("EditArchive", EditArchive.ToString())
-'                    'cs.setField("EditBlank", EditBlank.ToString())
-'                    'cs.setField("EditSourceID", EditSourceID.ToString())
+'                    ''
+'                    ';'
+'                    ''
 '                    cs.setField("FieldValue", FieldValue)
 '                    'cs.setField("ModifiedBy", ModifiedBy.ToString())
 '                    'cs.setField("ModifiedDate", ModifiedDate.ToString())
@@ -416,14 +412,10 @@
 '                    With CDef
 '                        'instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
 '                        'instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
-'                        'instance.ContentCategoryID = genericController.EncodeInteger(.fields("ContentCategoryID").defaultValue)
 '                        'instance.ContentControlID = CDef.Id
 '                        'instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
 '                        'instance.CreateKey = genericController.EncodeInteger(.fields("CreateKey").defaultValue)
 '                        'instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultValue)
-'                        'instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
-'                        'instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
-'                        'instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
 '                        instance.FieldValue = genericController.encodeText(.fields("FieldValue").defaultValue)
 '                        'instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)
 '                        'instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").defaultValue)

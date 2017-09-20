@@ -21,14 +21,10 @@ Namespace Contensive.Core.Models.Entity
         Public ID As Integer
         Public Active As Boolean
         Public ccGuid As String
-        Public ContentCategoryID As Integer
         Public ContentControlID As Integer
         Public CreatedBy As Integer
         Public CreateKey As Integer
         Public DateAdded As Date
-        Public EditArchive As Boolean
-        Public EditBlank As Boolean
-        Public EditSourceID As Integer
         Public ForceBrowserMobile As Integer
         Public MemberID As Integer
         Public ModifiedBy As Integer
@@ -140,14 +136,14 @@ Namespace Contensive.Core.Models.Entity
                         .ID = cs.getInteger("ID")
                         .Active = cs.getBoolean("Active")
                         .ccGuid = cs.getText("ccGuid")
-                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        '
                         .ContentControlID = cs.getInteger("ContentControlID")
                         .CreatedBy = cs.getInteger("CreatedBy")
                         .CreateKey = cs.getInteger("CreateKey")
                         .DateAdded = cs.getDate("DateAdded")
-                        .EditArchive = cs.getBoolean("EditArchive")
-                        .EditBlank = cs.getBoolean("EditBlank")
-                        .EditSourceID = cs.getInteger("EditSourceID")
+                        '
+                        '
+                        '
                         .ForceBrowserMobile = cs.getInteger("ForceBrowserMobile")
                         .MemberID = cs.getInteger("MemberID")
                         .ModifiedBy = cs.getInteger("ModifiedBy")
@@ -211,14 +207,14 @@ Namespace Contensive.Core.Models.Entity
                     End If
                     cs.setField("Active", Active.ToString())
                     cs.setField("ccGuid", ccGuid)
-                    cs.setField("ContentCategoryID", ContentCategoryID.ToString())
+                    '
                     cs.setField("ContentControlID", ContentControlID.ToString())
                     cs.setField("CreatedBy", CreatedBy.ToString())
                     cs.setField("CreateKey", CreateKey.ToString())
                     cs.setField("DateAdded", DateAdded.ToString())
-                    cs.setField("EditArchive", EditArchive.ToString())
-                    cs.setField("EditBlank", EditBlank.ToString())
-                    cs.setField("EditSourceID", EditSourceID.ToString())
+                    '
+                    '
+                    '
                     cs.setField("ForceBrowserMobile", ForceBrowserMobile.ToString())
                     cs.setField("MemberID", MemberID.ToString())
                     cs.setField("ModifiedBy", ModifiedBy.ToString())
@@ -358,14 +354,11 @@ Namespace Contensive.Core.Models.Entity
                     With CDef
                         instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
                         instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
-                        instance.ContentCategoryID = CDef.Id
+                        'instance.ContentCategoryID = CDef.Id
                         instance.ContentControlID = genericController.EncodeInteger(.fields("ContentControlID").defaultValue)
                         instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
                         instance.CreateKey = genericController.EncodeInteger(.fields("CreateKey").defaultValue)
                         instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultValue)
-                        instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
-                        instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
-                        instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
                         instance.ForceBrowserMobile = genericController.EncodeInteger(.fields("ForceBrowserMobile").defaultValue)
                         instance.MemberID = genericController.EncodeInteger(.fields("MemberID").defaultValue)
                         instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)

@@ -25,8 +25,8 @@ Namespace Contensive.Core.Models.Entity
         Public Name As String                       ' Name of Content
         Public ContentTableName As String           ' the name of the content table
         Public ContentDataSourceName As String      '
-        Public AuthoringTableName As String         ' the name of the authoring table
-        Public AuthoringDataSourceName As String    '
+        'Public AuthoringTableName As String         ' the name of the authoring table
+        'Public AuthoringDataSourceName As String    '
         Public AllowAdd As Boolean                  ' Allow adding records
         Public AllowDelete As Boolean               ' Allow deleting records
         Public WhereClause As String                ' Used to filter records in the admin area
@@ -34,7 +34,7 @@ Namespace Contensive.Core.Models.Entity
         Public ActiveOnly As Boolean                ' When true
         Public AdminOnly As Boolean                 ' Only allow administrators to modify content
         Public DeveloperOnly As Boolean             ' Only allow developers to modify content
-        Public AllowWorkflowAuthoring As Boolean    ' if true, treat this content with authoring proceses
+        'Public AllowWorkflowAuthoring As Boolean    ' if true, treat this content with authoring proceses
         Public DropDownFieldList As String          ' String used to populate select boxes
         Public EditorGroupName As String            ' Group of members who administer Workflow Authoring
         Public dataSourceId As Integer

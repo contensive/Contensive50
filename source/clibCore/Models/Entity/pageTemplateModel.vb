@@ -23,14 +23,10 @@ Namespace Contensive.Core.Models.Entity
         Public Property BodyHTML As String
         ' Public Property BodyTag As String
         Public Property ccGuid As String
-        Public Property ContentCategoryID As Integer
         Public Property ContentControlID As Integer
         Public Property CreatedBy As Integer
         Public Property CreateKey As Integer
         Public Property DateAdded As Date
-        Public Property EditArchive As Boolean
-        Public Property EditBlank As Boolean
-        Public Property EditSourceID As Integer
         Public Property IsSecure As Boolean
         ' Public Property JSEndBody As String
         ' Public Property JSFilename As String
@@ -200,14 +196,14 @@ Namespace Contensive.Core.Models.Entity
                         .BodyHTML = cs.getText("BodyHTML")
                         ' .BodyTag = cs.getText("BodyTag")
                         .ccGuid = cs.getText("ccGuid")
-                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        ''
                         .ContentControlID = cs.getInteger("ContentControlID")
                         .CreatedBy = cs.getInteger("CreatedBy")
                         .CreateKey = cs.getInteger("CreateKey")
                         .DateAdded = cs.getDate("DateAdded")
-                        .EditArchive = cs.getBoolean("EditArchive")
-                        .EditBlank = cs.getBoolean("EditBlank")
-                        .EditSourceID = cs.getInteger("EditSourceID")
+                        ''
+                        ''
+                        ''
                         .IsSecure = cs.getBoolean("IsSecure")
                         ' .JSEndBody = cs.getText("JSEndBody")
                         ' .JSFilename = cs.getText("JSFilename")
@@ -228,11 +224,11 @@ Namespace Contensive.Core.Models.Entity
                         ' -- set primary cache to the object created
                         ' -- set secondary caches to the primary cache
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.id.ToString())
+                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.ID.ToString())
                         callersCacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccguid)
+                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccGuid)
                         callersCacheNameList.Add(cacheName1)
                         cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
                         '
@@ -257,34 +253,34 @@ Namespace Contensive.Core.Models.Entity
         Public Function save(cpCore As coreClass) As Integer
             Try
                 Dim cs As New csController(cpCore)
-                If (id > 0) Then
-                    If Not cs.open(primaryContentName, "id=" & id) Then
-                        Dim message As String = "Unable to open record in content [" & primaryContentName & "], with id [" & id & "]"
+                If (ID > 0) Then
+                    If Not cs.open(primaryContentName, "id=" & ID) Then
+                        Dim message As String = "Unable to open record in content [" & primaryContentName & "], with id [" & ID & "]"
                         cs.Close()
-                        id = 0
+                        ID = 0
                         Throw New ApplicationException(message)
                     End If
                 Else
                     If Not cs.Insert(primaryContentName) Then
                         cs.Close()
-                        id = 0
+                        ID = 0
                         Throw New ApplicationException("Unable to insert record in content [" & primaryContentName & "]")
                     End If
                 End If
                 If cs.ok() Then
-                    id = cs.getInteger("id")
+                    ID = cs.getInteger("id")
                     cs.setField("Active", Active.ToString())
                     cs.setField("BodyHTML", BodyHTML)
                     ' cs.setField("BodyTag", BodyTag)
                     cs.setField("ccGuid", ccGuid)
-                    cs.setField("ContentCategoryID", ContentCategoryID.ToString())
+                    '
                     cs.setField("ContentControlID", ContentControlID.ToString())
                     cs.setField("CreatedBy", CreatedBy.ToString())
                     cs.setField("CreateKey", CreateKey.ToString())
                     cs.setField("DateAdded", DateAdded.ToString())
-                    cs.setField("EditArchive", EditArchive.ToString())
-                    cs.setField("EditBlank", EditBlank.ToString())
-                    cs.setField("EditSourceID", EditSourceID.ToString())
+                    ''''
+                    ''
+                    ''
                     cs.setField("IsSecure", IsSecure.ToString())
                     ' cs.setField("JSEndBody", JSEndBody)
                     ' cs.setField("JSFilename", JSFilename)
@@ -485,14 +481,10 @@ Namespace Contensive.Core.Models.Entity
                         instance.BodyHTML = genericController.encodeText(.fields("BodyHTML").defaultValue)
                         ' instance.BodyTag = genericController.encodeText(.fields("BodyTag").defaultValue)
                         instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
-                        instance.ContentCategoryID = genericController.EncodeInteger(.fields("ContentCategoryID").defaultValue)
                         instance.ContentControlID = CDef.Id
                         instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
                         instance.CreateKey = genericController.EncodeInteger(.fields("CreateKey").defaultValue)
                         instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultValue)
-                        instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
-                        instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
-                        instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
                         instance.IsSecure = genericController.EncodeBoolean(.fields("IsSecure").defaultValue)
                         ' instance.JSEndBody = genericController.encodeText(.fields("JSEndBody").defaultValue)
                         ' instance.JSFilename = genericController.encodeText(.fields("JSFilename").defaultValue)

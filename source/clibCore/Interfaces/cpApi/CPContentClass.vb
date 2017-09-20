@@ -161,7 +161,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Function IsWorkflow(ByVal ContentName As String) As Boolean
+        <Obsolete("workflow editing is deprecated", False)> Public Overrides Function IsWorkflow(ByVal ContentName As String) As Boolean
             '
             ' -- workflow no longer supported (but may come back)
             Return False
@@ -169,26 +169,26 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Sub PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call cpCore.workflow.publishEdit(ContentName, RecordID, 0)
+        <Obsolete("workflow editing is deprecated", False)> Public Overrides Sub PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
+            ' Call cpCore.workflow.publishEdit(ContentName, RecordID, 0)
         End Sub
         '
         '====================================================================================================
         '
-        Public Overrides Sub SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call cpCore.workflow.submitEdit2(ContentName, RecordID, 0)
+        <Obsolete("workflow editing is deprecated", False)> Public Overrides Sub SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
+            'Call cpCore.workflow.submitEdit2(ContentName, RecordID, 0)
         End Sub
         '
         '====================================================================================================
         '
-        Public Overrides Sub AbortEdit(ByVal ContentName As String, ByVal RecordId As Integer)
-            Call cpCore.workflow.abortEdit2(ContentName, RecordId, 0)
+        <Obsolete("workflow editing is deprecated", False)> Public Overrides Sub AbortEdit(ByVal ContentName As String, ByVal RecordId As Integer)
+            ' Call cpCore.workflow.abortEdit2(ContentName, RecordId, 0)
         End Sub
         '
         '====================================================================================================
         '
-        Public Overrides Sub ApproveEdit(ByVal ContentName As String, ByVal RecordId As Integer)
-            Call cpCore.workflow.approveEdit(ContentName, RecordId, 0)
+        <Obsolete("workflow editing is deprecated", False)> Public Overrides Sub ApproveEdit(ByVal ContentName As String, ByVal RecordId As Integer)
+            'Call cpCore.workflow.approveEdit(ContentName, RecordId, 0)
         End Sub
         '
         '====================================================================================================

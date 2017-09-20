@@ -21,15 +21,11 @@ Namespace Contensive.Core.Models.Entity
         Public ID As Integer
         Public Active As Boolean
         Public ccGuid As String
-        'Public ContentCategoryID As Integer
         'Public ContentControlID As Integer
         Public CreatedBy As Integer
         Public CreateKey As Integer
         Public DateAdded As Date
         Public DefaultTemplateId As Integer
-        'Public EditArchive As Boolean
-        'Public EditBlank As Boolean
-        'Public EditSourceID As Integer
         Public forwardDomainId As Integer
         Public ForwardURL As String
         Public ModifiedBy As Integer
@@ -201,15 +197,15 @@ Namespace Contensive.Core.Models.Entity
                         .ID = cs.getInteger("ID")
                         .Active = cs.getBoolean("Active")
                         .ccGuid = cs.getText("ccGuid")
-                        '.ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        ''
                         '.ContentControlID = cs.getInteger("ContentControlID")
                         .CreatedBy = cs.getInteger("CreatedBy")
                         .CreateKey = cs.getInteger("CreateKey")
                         .DateAdded = cs.getDate("DateAdded")
                         .DefaultTemplateId = cs.getInteger("DefaultTemplateId")
-                        '.EditArchive = cs.getBoolean("EditArchive")
-                        '.EditBlank = cs.getBoolean("EditBlank")
-                        '.EditSourceID = cs.getInteger("EditSourceID")
+                        ''
+                        ''
+                        ''
                         .forwardDomainId = cs.getInteger("forwardDomainId")
                         .ForwardURL = cs.getText("ForwardURL")
                         .ModifiedBy = cs.getInteger("ModifiedBy")
@@ -227,15 +223,15 @@ Namespace Contensive.Core.Models.Entity
                         ' -- set primary cache to the object created
                         ' -- set secondary caches to the primary cache
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.id.ToString())
+                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.ID.ToString())
                         callersCacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccguid)
+                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccGuid)
                         callersCacheNameList.Add(cacheName1)
                         cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
                         '
-                        Dim cacheName2 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "name", result.name)
+                        Dim cacheName2 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "name", result.Name)
                         callersCacheNameList.Add(cacheName2)
                         cpCore.cache.setSecondaryObject(cacheName2, cacheName0)
                     End If
@@ -256,33 +252,33 @@ Namespace Contensive.Core.Models.Entity
         Public Function save(cpCore As coreClass) As Integer
             Try
                 Dim cs As New csController(cpCore)
-                If (id > 0) Then
-                    If Not cs.open(primaryContentName, "id=" & id) Then
-                        Dim message As String = "Unable to open record in content [" & primaryContentName & "], with id [" & id & "]"
+                If (ID > 0) Then
+                    If Not cs.open(primaryContentName, "id=" & ID) Then
+                        Dim message As String = "Unable to open record in content [" & primaryContentName & "], with id [" & ID & "]"
                         cs.Close()
-                        id = 0
+                        ID = 0
                         Throw New ApplicationException(message)
                     End If
                 Else
                     If Not cs.Insert(primaryContentName) Then
                         cs.Close()
-                        id = 0
+                        ID = 0
                         Throw New ApplicationException("Unable to insert record in content [" & primaryContentName & "]")
                     End If
                 End If
                 If cs.ok() Then
-                    id = cs.getInteger("id")
+                    ID = cs.getInteger("id")
                     cs.setField("Active", Active.ToString())
                     cs.setField("ccGuid", ccGuid)
-                    'cs.setField("ContentCategoryID", ContentCategoryID.ToString())
+                    ''
                     'cs.setField("ContentControlID", ContentControlID.ToString())
                     cs.setField("CreatedBy", CreatedBy.ToString())
                     cs.setField("CreateKey", CreateKey.ToString())
                     cs.setField("DateAdded", DateAdded.ToString())
                     cs.setField("DefaultTemplateId", DefaultTemplateId.ToString())
-                    'cs.setField("EditArchive", EditArchive.ToString())
-                    'cs.setField("EditBlank", EditBlank.ToString())
-                    'cs.setField("EditSourceID", EditSourceID.ToString())
+                    ''
+                    ''
+                    ''
                     cs.setField("forwardDomainId", forwardDomainId.ToString())
                     cs.setField("ForwardURL", ForwardURL)
                     cs.setField("ModifiedBy", ModifiedBy.ToString())
@@ -478,15 +474,11 @@ Namespace Contensive.Core.Models.Entity
                     With CDef
                         instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
                         instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
-                        'instance.ContentCategoryID = genericController.EncodeInteger(.fields("ContentCategoryID").defaultValue)
                         'instance.ContentControlID = CDef.Id
                         instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
                         instance.CreateKey = genericController.EncodeInteger(.fields("CreateKey").defaultValue)
                         instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultValue)
                         instance.DefaultTemplateId = genericController.EncodeInteger(.fields("DefaultTemplateId").defaultValue)
-                        'instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
-                        'instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
-                        'instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
                         instance.forwardDomainId = genericController.EncodeInteger(.fields("forwardDomainId").defaultValue)
                         instance.ForwardURL = genericController.encodeText(.fields("ForwardURL").defaultValue)
                         instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)

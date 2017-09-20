@@ -310,19 +310,11 @@ Namespace Contensive.Core.Controllers
                                                         Call cpCore.db.cs_set(CSClip, "ChildPagesFound", True.ToString)
                                                     End If
                                                     Call cpCore.db.cs_Close(CSClip)
-                                                    'Call cache_pageContent_clear()
-                                                    If (cpCore.siteProperties.allowWorkflowAuthoring And cpCore.workflow.isWorkflowAuthoringCompatible(ClipChildContentName)) Then
-                                                        '
-                                                        ' Workflow editing
-                                                        '
-                                                    Else
-                                                        '
-                                                        ' Live Editing
-                                                        '
-                                                        Call cpCore.cache.invalidateContent(ClipChildContentName)
-                                                        Call cpCore.cache.invalidateContent(ClipParentContentName)
-                                                        'Call cache_pageContent_clear()
-                                                    End If
+                                                    '
+                                                    ' Live Editing
+                                                    '
+                                                    Call cpCore.cache.invalidateContent(ClipChildContentName)
+                                                    Call cpCore.cache.invalidateContent(ClipParentContentName)
                                                 End If
                                             End If
                                         End If
@@ -2444,7 +2436,7 @@ ErrorTrap:
                 Call cpcore.db.cs_set(CS, "Name", ContentBlockCopyName)
                 Call cpcore.db.cs_set(CS, "Copy", getDefaultBlockMessage)
                 Call cpcore.db.cs_save2(CS)
-                Call cpcore.workflow.publishEdit("Copy Content", genericController.EncodeInteger(cpcore.db.cs_get(CS, "ID")))
+                'Call cpcore.workflow.publishEdit("Copy Content", genericController.EncodeInteger(cpcore.db.cs_get(CS, "ID")))
             End If
             '
             Exit Function

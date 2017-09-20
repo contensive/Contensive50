@@ -79,7 +79,7 @@ ErrorTrap:
         '   used on Normal Edit and others
         '========================================================================
         '
-        Public Function GetEditButtonBar2(ByVal MenuDepth As Integer, ByVal AllowDelete As Boolean, ByVal AllowCancel As Boolean, ByVal allowSave As Boolean, ByVal AllowSpellCheck As Boolean, ByVal AllowPublish As Boolean, ByVal AllowAbort As Boolean, ByVal AllowSubmit As Boolean, ByVal AllowApprove As Boolean, ByVal AllowAdd As Boolean, ByVal ignore_AllowReloadCDef As Boolean, ByVal HasChildRecords As Boolean, ByVal IsPageContent As Boolean, ByVal AllowMarkReviewed As Boolean, ByVal AllowRefresh As Boolean, ByVal AllowCreateDuplicate As Boolean) As String
+        Public Function GetEditButtonBar2(ByVal MenuDepth As Integer, ByVal AllowDelete As Boolean, ByVal AllowCancel As Boolean, ByVal allowSave As Boolean, ByVal AllowSpellCheck As Boolean, ByVal ignorefalse As Boolean, ByVal ignorefalse2 As Boolean, ByVal ignorefalse3 As Boolean, ByVal ignorefalse4 As Boolean, ByVal AllowAdd As Boolean, ByVal ignore_AllowReloadCDef As Boolean, ByVal HasChildRecords As Boolean, ByVal IsPageContent As Boolean, ByVal AllowMarkReviewed As Boolean, ByVal AllowRefresh As Boolean, ByVal AllowCreateDuplicate As Boolean) As String
             On Error GoTo ErrorTrap
             '
             Dim JSOnClick As String
@@ -136,30 +136,30 @@ ErrorTrap:
             '        '
             '        GetEditButtonBar2 = GetEditButtonBar2 & "<input TYPE=""SUBMIT"" NAME=""BUTTON"" VALUE=""" & ButtonSpellCheck & """ onClick=""return processSubmit(this);"">"
             '    End If
-            If AllowPublish Then
-                '
-                ' Publish
-                '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublish, RequestNameButton)
-            End If
-            If AllowAbort Then
-                '
-                ' Abort
-                '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonAbortEdit, RequestNameButton)
-            End If
-            If AllowSubmit Then
-                '
-                ' Submit for Publishing
-                '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublishSubmit, RequestNameButton)
-            End If
-            If AllowApprove Then
-                '
-                ' Approve Publishing
-                '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublishApprove, RequestNameButton)
-            End If
+            'If ignorefalse Then
+            '    '
+            '    ' Publish
+            '    '
+            '    GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublish, RequestNameButton)
+            'End If
+            'If ignorefalse2 Then
+            '    '
+            '    ' Abort
+            '    '
+            '    GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonAbortEdit, RequestNameButton)
+            'End If
+            'If ignorefalse3 Then
+            '    '
+            '    ' Submit for Publishing
+            '    '
+            '    GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublishSubmit, RequestNameButton)
+            'End If
+            'If ignorefalse4 Then
+            '    '
+            '    ' Approve Publishing
+            '    '
+            '    GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublishApprove, RequestNameButton)
+            'End If
             If ignore_AllowReloadCDef Then
                 '
                 ' Reload Content Definitions
