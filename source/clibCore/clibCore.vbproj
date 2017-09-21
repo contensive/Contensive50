@@ -448,7 +448,7 @@
     <Compile Include="Models\Entity\domainLegacyModel.vb" />
     <Compile Include="Controllers\docController.vb" />
     <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
-    <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
+    <Compile Include="Controllers\sitePropertiesController.vb" />
     <Compile Include="Controllers\webServerIOController.vb" />
     <Compile Include="Controllers\metaDataController.vb" />
     <Compile Include="Controllers\cacheKeyPtrController.vb" />

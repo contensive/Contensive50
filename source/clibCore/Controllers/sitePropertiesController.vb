@@ -5,13 +5,13 @@ Option Strict On
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 
-Namespace Contensive.Core.Models.Context
+Namespace Contensive.Core.Controllers
     '
     '====================================================================================================
     ''' <summary>
     ''' Site Properties
     ''' </summary>
-    Public Class siteContextModel
+    Public Class sitePropertiesController
         '
         Private cpCore As coreClass
         '
@@ -42,7 +42,7 @@ Namespace Contensive.Core.Models.Context
         Friend ReadOnly Property sitePropertyContentId() As Integer
             Get
                 If _sitePropertyContentId Is Nothing Then
-                    _sitePropertyContentId = cpCore.metaData.getContentID("site properties")
+                    _sitePropertyContentId = cpCore.metaData.getContentId("site properties")
                 End If
                 Return CInt(_sitePropertyContentId)
             End Get
@@ -515,13 +515,12 @@ Namespace Contensive.Core.Models.Context
         ''' <param name="Value"></param>
         Public Sub setProperty(ByVal propertyName As String, ByVal Value As String)
             Try
-                Dim SQL As String
-                Dim SQLNow As String = cpCore.db.encodeSQLDate(Now)
-                Dim recordsAffected As Integer = 0
-                Dim cacheName As String = "siteproperty" & propertyName.Trim().ToLower()
-                '
                 If (Not String.IsNullOrEmpty(propertyName.Trim())) Then
-                    SQL = "UPDATE ccSetup Set FieldValue=" & cpCore.db.encodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE name=" & cpCore.db.encodeSQLText(propertyName)
+                    '
+                    ' -- set value in Db
+                    Dim SQLNow As String = cpCore.db.encodeSQLDate(Now)
+                    Dim SQL As String = "UPDATE ccSetup Set FieldValue=" & cpCore.db.encodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE name=" & cpCore.db.encodeSQLText(propertyName)
+                    Dim recordsAffected As Integer = 0
                     Call cpCore.db.executeNonQuery(SQL,, recordsAffected)
                     If (recordsAffected = 0) Then
                         SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" _
@@ -535,11 +534,15 @@ Namespace Contensive.Core.Models.Context
                         Call cpCore.db.executeQuery(SQL)
                     End If
                     '
-                    ' -- update simple lazy cache
+                    ' -- set simple lazy cache
+                    Dim cacheName As String = "siteproperty" & propertyName.Trim().ToLower()
                     If nameValueDict.ContainsKey(cacheName) Then
                         nameValueDict.Remove(cacheName)
                     End If
                     nameValueDict.Add(cacheName, Value)
+                    '
+                    ' -- set cache, no memory cache not used, instead load all into local cache on load
+                    'cpCore.cache.setObject(cacheName, Value)
                 End If
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
@@ -616,13 +619,46 @@ Namespace Contensive.Core.Models.Context
             Try
                 Dim cacheName As String = "siteproperty" & PropertyName.Trim().ToLower()
                 If (String.IsNullOrEmpty(PropertyName.Trim())) Then
+                    '
+                    ' -- bad property name 
                     returnString = DefaultValue
                 Else
+                    '
+                    ' -- test simple lazy cache to keep from reading the same property mulitple times on one doc
                     If nameValueDict.ContainsKey(cacheName) Then
+                        '
+                        ' -- property in memory cache
                         returnString = nameValueDict(cacheName)
                     Else
-                        returnString = DefaultValue
-                        Call setProperty(cacheName, DefaultValue)
+                        '
+                        ' -- read property from cache, no, with preloaded local cache, this will never be used
+                        If False Then
+                            'Dim returnObj As Object = cpCore.cache.getObject(Of String)(cacheName)
+                            'If (returnObj IsNot Nothing) Then
+                            ''
+                            '' -- found in cache, save in simple cache and return
+                            'returnString = encodeText(returnObj)
+                            'nameValueDict.Add(cacheName, returnString)
+                        Else
+                            '
+                            ' -- not found in cache, read property from Db
+                            Dim propertyFound As Boolean = False
+                            returnString = getTextFromDb(PropertyName, DefaultValue, propertyFound)
+                            If (propertyFound) Then
+                                '
+                                ' -- found in Db, already saved in local cache, memory cache not used
+                                ' nameValueDict.Add(cacheName, returnString)
+                                'cpCore.cache.setObject(cacheName, returnString)
+                            Else
+                                '
+                                ' -- property not found in db, if default is not blank, write it and set cache
+                                returnString = DefaultValue
+                                nameValueDict.Add(cacheName, returnString)
+                                If (returnString <> "") Then
+                                    Call setProperty(cacheName, DefaultValue)
+                                End If
+                            End If
+                        End If
                     End If
                 End If
                 'Dim cacheName As String = "siteProperty-" & PropertyName
@@ -734,7 +770,7 @@ Namespace Contensive.Core.Models.Context
         '
         '====================================================================================================
         ''' <summary>
-        ''' pattern get a list of objects from this model
+        ''' setup a local simple cache (not lazy because it preloads)
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="someCriteria"></param>
@@ -743,9 +779,7 @@ Namespace Contensive.Core.Models.Context
             Dim result As New Dictionary(Of String, String)
             Try
                 Dim cs As New csController(cpCore)
-                Dim ignoreCacheNames As New List(Of String)
-                Dim sql As String = "select name,FieldValue from ccsetup where (active>0) order by id"
-                If (cs.openSQL(sql)) Then
+                If (cs.openSQL("select name,FieldValue from ccsetup where (active>0) order by id")) Then
                     Do
                         Dim name As String = cs.getText("name").Trim().ToLower()
                         If (Not String.IsNullOrEmpty(name)) Then

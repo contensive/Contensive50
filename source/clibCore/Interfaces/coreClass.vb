@@ -196,15 +196,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property siteProperties() As Models.Context.siteContextModel
+        Public ReadOnly Property siteProperties() As sitePropertiesController
             Get
                 If (_siteProperties Is Nothing) Then
-                    _siteProperties = New Models.Context.siteContextModel(Me)
+                    _siteProperties = New sitePropertiesController(Me)
                 End If
                 Return _siteProperties
             End Get
         End Property
-        Private _siteProperties As Models.Context.siteContextModel = Nothing
+        Private _siteProperties As sitePropertiesController = Nothing
         '
         '===================================================================================================
         Public ReadOnly Property webServer As iisController
