@@ -197,7 +197,7 @@ Namespace Contensive.Core
         ''' <param name="PageSize"></param>
         ''' <param name="PageNumber"></param>
         ''' <returns></returns>
-        <Obsolete("deprecated. Use ExecuteSql_GetRecordSet() or ExecuteSql_GetDataTable()", False)>
+        <Obsolete("deprecated. Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", False)>
         Public Overrides Function ExecuteSQL(ByVal SQL As String, Optional ByVal DataSourcename As String = "Default", Optional ByVal Retries As String = "0", Optional ByVal PageSize As String = "10", Optional ByVal PageNumber As String = "1") As Object
             Return cp.core.db.executeSql_getRecordSet(SQL, DataSourcename, Controllers.genericController.EncodeInteger(PageNumber) * Controllers.genericController.EncodeInteger(PageSize), Controllers.genericController.EncodeInteger(PageSize))
         End Function
@@ -208,114 +208,114 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="SQL"></param>
         ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetDataTable(SQL As String) As DataTable
-            Return cp.core.db.executeSql(SQL)
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute sql or command on the default datasource and return MaxRows in a datatable.
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <param name="MaxRows"></param>
-        ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, MaxRows As Integer) As DataTable
-            Return cp.core.db.executeSql(SQL, "", 0, MaxRows)
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute sql or command on a specific datasource and return all rows in a datatable. The default datasource is either "", or "default"
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <param name="DataSourcename"></param>
-        ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, DataSourcename As String) As DataTable
-            Return cp.core.db.executeSql(SQL, DataSourcename)
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute sql or command on a specific datasource and return MaxRows starting on page PageNumber (0 based) as a datatable.
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <param name="DataSourcename"></param>
-        ''' <param name="PageSize"></param>
-        ''' <param name="PageNumber"></param>
-        ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, DataSourcename As String, MaxRows As Integer, PageSize As Integer, PageNumber As Integer) As DataTable
-            Return cp.core.db.executeSql(SQL, "", (PageSize * PageNumber), MaxRows)
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute sql or command on the default datasource and return all rows started on page pageNumber (0 based) as a datatable. Limit the number of rows within the query. The default datasource is either "", or "default"
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <param name="PageSize"></param>
-        ''' <param name="PageNumber"></param>
-        ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, MaxRows As Integer, PageSize As Integer, PageNumber As Integer) As DataTable
-            Throw New NotImplementedException()
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute sql or command on the default datasource and return all rows a recordset (ADODB).
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String) As Recordset
-            Throw New NotImplementedException()
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute sql or command on the default datasource and return MaxRows in a recordset (ADODB)
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <param name="MaxRows"></param>
-        ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String, MaxRows As Integer) As Recordset
-            Throw New NotImplementedException()
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute sql or command on a sepcific datasource and a recordset (ADODB). The default datasource is either "", or "default"
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <param name="DataSourcename"></param>
-        ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String, DataSourcename As String) As Recordset
-            Return cp.core.db.executeSql_getRecordSet(SQL, DataSourcename, 0, -1)
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute sql or command on the default datasource and return all rows started on page pageNumber (0 based) as a datatable. Limit the number of rows within the query. The default datasource is either "", or "default"
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <param name="MaxRows"></param>
-        ''' <param name="PageSize"></param>
-        ''' <param name="PageNumber"></param>
-        ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String, MaxRows As Integer, PageSize As Integer, PageNumber As Integer) As Recordset
-            Return cp.core.db.executeSql_getRecordSet(SQL, "", (PageSize * PageNumber), MaxRows)
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute sql or command on a specific datasource and return all rows started on page pageNumber (0 based) as a datatable. Limit the number of rows within the query. The default datasource is either "", or "default"
-        ''' </summary>
-        ''' <param name="SQL"></param>
-        ''' <param name="DataSourcename"></param>
-        ''' <param name="PageSize"></param>
-        ''' <param name="PageNumber"></param>
-        ''' <returns></returns>
-        Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String, DataSourcename As String, MaxRows As Integer, PageSize As Integer, PageNumber As Integer) As Recordset
-            Return cp.core.db.executeSql_getRecordSet(SQL, DataSourcename, (PageSize * PageNumber), MaxRows)
-        End Function
+        'Public Overrides Function ExecuteSQL_GetDataTable(SQL As String) As DataTable
+        '    Return cp.core.db.executeQuery(SQL)
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute sql or command on the default datasource and return MaxRows in a datatable.
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <param name="MaxRows"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, MaxRows As Integer) As DataTable
+        '    Return cp.core.db.executeQuery(SQL, "", 0, MaxRows)
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute sql or command on a specific datasource and return all rows in a datatable. The default datasource is either "", or "default"
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <param name="DataSourcename"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, DataSourcename As String) As DataTable
+        '    Return cp.core.db.executeQuery(SQL, DataSourcename)
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute sql or command on a specific datasource and return MaxRows starting on page PageNumber (0 based) as a datatable.
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <param name="DataSourcename"></param>
+        '''' <param name="PageSize"></param>
+        '''' <param name="PageNumber"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, DataSourcename As String, MaxRows As Integer, PageSize As Integer, PageNumber As Integer) As DataTable
+        '    Return cp.core.db.executeQuery(SQL, "", (PageSize * PageNumber), MaxRows)
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute sql or command on the default datasource and return all rows started on page pageNumber (0 based) as a datatable. Limit the number of rows within the query. The default datasource is either "", or "default"
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <param name="PageSize"></param>
+        '''' <param name="PageNumber"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, MaxRows As Integer, PageSize As Integer, PageNumber As Integer) As DataTable
+        '    Throw New NotImplementedException()
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute sql or command on the default datasource and return all rows a recordset (ADODB).
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String) As Recordset
+        '    Throw New NotImplementedException()
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute sql or command on the default datasource and return MaxRows in a recordset (ADODB)
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <param name="MaxRows"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String, MaxRows As Integer) As Recordset
+        '    Throw New NotImplementedException()
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute sql or command on a sepcific datasource and a recordset (ADODB). The default datasource is either "", or "default"
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <param name="DataSourcename"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String, DataSourcename As String) As Recordset
+        '    Return cp.core.db.executeSql_getRecordSet(SQL, DataSourcename, 0, -1)
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute sql or command on the default datasource and return all rows started on page pageNumber (0 based) as a datatable. Limit the number of rows within the query. The default datasource is either "", or "default"
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <param name="MaxRows"></param>
+        '''' <param name="PageSize"></param>
+        '''' <param name="PageNumber"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String, MaxRows As Integer, PageSize As Integer, PageNumber As Integer) As Recordset
+        '    Return cp.core.db.executeSql_getRecordSet(SQL, "", (PageSize * PageNumber), MaxRows)
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute sql or command on a specific datasource and return all rows started on page pageNumber (0 based) as a datatable. Limit the number of rows within the query. The default datasource is either "", or "default"
+        '''' </summary>
+        '''' <param name="SQL"></param>
+        '''' <param name="DataSourcename"></param>
+        '''' <param name="PageSize"></param>
+        '''' <param name="PageNumber"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ExecuteSQL_GetRecordSet(SQL As String, DataSourcename As String, MaxRows As Integer, PageSize As Integer, PageNumber As Integer) As Recordset
+        '    Return cp.core.db.executeSql_getRecordSet(SQL, DataSourcename, (PageSize * PageNumber), MaxRows)
+        'End Function
         '
         '====================================================================================================
         '
@@ -369,5 +369,35 @@ Namespace Contensive.Core
             MyBase.Finalize()
         End Sub
 #End Region
+        '
+        '====================================================================================================
+        ' -- version 4.1
+        '
+        'Public MustOverride Sub Delete(ByVal DataSourcename As String, ByVal TableName As String, ByVal RecordId As Integer)
+        'Public MustOverride Function GetConnectionString(ByVal DataSourcename As String) As String
+        'Public MustOverride Function GetDataSourceType(ByVal DataSourcename As String) As Integer
+        'Public MustOverride Function GetTableID(ByVal TableName As String) As Integer
+        'Public MustOverride Function IsTable(ByVal DataSourcename As String, ByVal TableName As String) As Boolean
+        'Public MustOverride Function IsTableField(ByVal DataSourcename As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
+        'Public MustOverride Function EncodeSQLBoolean(ByVal SourceBoolean As Boolean) As String
+        'Public MustOverride Function EncodeSQLDate(ByVal SourceDate As Date) As String
+        'Public MustOverride Function EncodeSQLNumber(ByVal SourceNumber As Double) As String
+        'Public MustOverride Function EncodeSQLText(ByVal SourceText As String) As String
+        'Public MustOverride Function ExecuteSQL(ByVal SQL As String, Optional ByVal DataSourcename As String = "Default", Optional ByVal Retries As String = "0", Optional ByVal PageSize As String = "10", Optional ByVal PageNumber As String = "1") As Object
+        'Public MustOverride Property SQLTimeout() As Integer
+        'Public MustOverride Function GetRemoteQueryKey(ByVal sql As String, Optional ByVal DataSourceName As String = "Default", Optional ByVal pageSize As Integer = 100) As String
+        ''
+        '' deprecated
+        ''
+        'Public MustOverride Function DbGetConnectionString(ByVal DataSourcename As String) As String
+        'Public MustOverride Function DbGetDataSourceType(ByVal DataSourcename As String) As Integer
+        'Public MustOverride Function DbGetTableID(ByVal TableName As String) As Integer
+        'Public MustOverride Function DbIsTable(ByVal DataSourcename As String, ByVal TableName As String) As Boolean
+        'Public MustOverride Function DbIsTableField(ByVal DataSourcename As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
+
+
+
+
+
     End Class
 End Namespace

@@ -66,7 +66,7 @@ Namespace Contensive.Core.Models.Entity
                             ' select all Normal domains (non-Forward)
                             '
                             SQL = "select name from ccDomains where typeId=1"
-                            dt = cpCore.db.executeSql(SQL)
+                            dt = cpCore.db.executeQuery(SQL)
                             For Each dr As DataRow In dt.Rows
                                 domainList_local.Add(dr(0).ToString)
                             Next

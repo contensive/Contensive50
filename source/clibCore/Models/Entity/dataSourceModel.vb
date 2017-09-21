@@ -31,14 +31,14 @@ Namespace Contensive.Core.Models.Entity
         Public username As String
         Public password As String
         Public type As Integer
-        Public ContentCategoryID As Integer
+        
         Public ContentControlID As Integer
         Public CreatedBy As Integer
         Public CreateKey As Integer
         Public DateAdded As Date
-        Public EditArchive As Boolean
-        Public EditBlank As Boolean
-        Public EditSourceID As Integer
+        
+        
+        
         Public ModifiedBy As Integer
         Public ModifiedDate As Date
         Public Name As String
@@ -492,7 +492,6 @@ Namespace Contensive.Core.Models.Entity
                     .Active = True
                     .ccGuid = ""
                     .ConnString = ""
-                    .ContentCategoryID = 0
                     .ContentControlID = 0
                     .CreatedBy = 0
                     .CreateKey = 0

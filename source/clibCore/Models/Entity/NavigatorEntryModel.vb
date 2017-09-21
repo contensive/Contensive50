@@ -28,9 +28,9 @@ Namespace Contensive.Core.Models.Entity
         Public Property AdminOnly As Boolean
         Public Property ContentID As Integer
         Public Property DeveloperOnly As Boolean
-        Public Property EditArchive As Boolean
-        Public Property EditBlank As Boolean
-        Public Property EditSourceID As Integer
+        
+        
+        
         Public Property HelpAddonID As Integer
         Public Property HelpCollectionID As Integer
         Public Property InstalledByCollectionID As Integer

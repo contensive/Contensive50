@@ -109,14 +109,14 @@ public ID as Integer
 public Active as Boolean
 public ccGuid as String
 public ConnString as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -178,15 +178,15 @@ TableModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DataSourceID as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -256,7 +256,7 @@ public AllowTopicRules as Boolean
 public AllowWorkflowAuthoring as Boolean
 public AuthoringTableID as Integer
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentTableID as Integer
 public CreatedBy as Integer
@@ -265,10 +265,10 @@ public DateAdded as Date
 public DefaultSortMethodID as Integer
 public DeveloperOnly as Boolean
 public DropDownFieldList as String
-public EditArchive as Boolean
-public EditBlank as Boolean
+
+
 public EditorGroupID as Integer
-public EditSourceID as Integer
+
 public IconHeight as Integer
 public IconLink as String
 public IconSprites as Integer
@@ -397,7 +397,7 @@ public AdminOnly as Boolean
 public Authorable as Boolean
 public Caption as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
@@ -406,11 +406,11 @@ public createResourceFilesOnRoot as Boolean
 public DateAdded as Date
 public DefaultValue as String
 public DeveloperOnly as Boolean
-public EditArchive as Boolean
-public EditBlank as Boolean
+
+
 public editorAddonID as Integer
 public EditSortPriority as Integer
-public EditSourceID as Integer
+
 public EditTab as String
 public HTMLContent as Boolean
 public IndexColumn as Integer
@@ -612,14 +612,14 @@ ContentFieldHelpModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public FieldID as Integer
 public HelpCustom as String
 public HelpDefault as String
@@ -690,15 +690,15 @@ ContentFieldTypeModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
+
+
 public EditorAddonId as Integer
-public EditSourceID as Integer
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -761,15 +761,15 @@ public ID as Integer
 public Active as Boolean
 public addonID as Integer
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public contentFieldTypeID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -834,14 +834,14 @@ SortMethodModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -904,14 +904,14 @@ ContentCategorieModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -973,15 +973,15 @@ public AuthenticatedVisits as Integer
 public AveTimeOnSite as Integer
 public BotVisits as Integer
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DateNumber as Integer
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public MobileVisits as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -1086,15 +1086,15 @@ public Active as Boolean
 public AuthenticatedPageViews as Integer
 public BotPageViews as Integer
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DateNumber as Integer
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public MobilePageViews as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -1190,14 +1190,14 @@ VisitorModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ForceBrowserMobile as Integer
 public MemberID as Integer
 public ModifiedBy as Integer
@@ -1270,15 +1270,15 @@ public Active as Boolean
 public Bot as Boolean
 public Browser as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CookieSupport as Boolean
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ExcludeFromAnalytics as Boolean
 public HTTP_FROM as String
 public HTTP_REFERER as String
@@ -1430,14 +1430,14 @@ ViewingModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ExcludeFromAnalytics as Boolean
 public Form as String
 public Host as String
@@ -1554,16 +1554,16 @@ public Active as Boolean
 public AddonID as Integer
 public AdminOnly as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DeveloperOnly as Boolean
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public HelpAddonID as Integer
 public HelpCollectionID as Integer
 public InstalledByCollectionID as Integer
@@ -1675,16 +1675,16 @@ public Active as Boolean
 public AddonID as Integer
 public AdminOnly as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DeveloperOnly as Boolean
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public HelpAddonID as Integer
 public HelpCollectionID as Integer
 public InstalledByCollectionID as Integer
@@ -1706,14 +1706,14 @@ public Active as Boolean
 public Address as String
 public Browser as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -1778,15 +1778,15 @@ TrapLogModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CopyFilename as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Host as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -1868,14 +1868,14 @@ SitePropertieModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public FieldValue as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -1946,14 +1946,14 @@ public ID as Integer
 public Active as Boolean
 public AllowBulkEmail as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -2019,14 +2019,14 @@ PageContentTopicRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -2093,14 +2093,14 @@ MemberTopicRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public MemberID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -2167,15 +2167,15 @@ TopicHabitModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentRecordKey as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public MemberID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -2253,14 +2253,14 @@ LanguageModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public HTTP_Accept_Language as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -2346,7 +2346,7 @@ public BirthdayYear as Integer
 public ccGuid as String
 public City as String
 public Company as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public Country as String
 public CreatedBy as Integer
@@ -2355,9 +2355,9 @@ public CreateKey as Integer
 public DateAdded as Date
 public DateExpires as Date
 public Developer as Boolean
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Email as String
 public ExcludeFromAnalytics as Boolean
 public Fax as String
@@ -2626,15 +2626,15 @@ public Active as Boolean
 public AllowBulkEmail as Boolean
 public Caption as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CopyFilename as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -2708,15 +2708,15 @@ public Active as Boolean
 public AllowAdd as Boolean
 public AllowDelete as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public GroupID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -2788,15 +2788,15 @@ MemberRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DateExpires as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public GroupID as Integer
 public MemberID as Integer
 public ModifiedBy as Integer
@@ -2872,16 +2872,16 @@ public ccGuid as String
 public City as String
 public Clicks as Integer
 public ContactMemberID as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CopyFilename as String
 public Country as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Email as String
 public Fax as String
 public ImageFilename as String
@@ -3029,7 +3029,7 @@ public ChildListSortMethodID as Integer
 public ChildPagesFound as Boolean
 public Clicks as Integer
 public ContactMemberID as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentPadding as Integer
 public Copyfilename as String
@@ -3040,9 +3040,9 @@ public DateAdded as Date
 public DateArchive as Date
 public DateExpires as Date
 public DateReviewed as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Headline as String
 public ImageFilename as String
 public IsSecure as Boolean
@@ -3326,14 +3326,14 @@ PageContentBlockRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public GroupID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -3406,15 +3406,15 @@ public ccGuid as String
 public ConditionExpireDate as Date
 public ConditionID as Integer
 public ConditionPeriod as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CopyFilename as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public EmailTemplateID as Integer
 public EmailWizardID as Integer
 public FromAddress as String
@@ -3542,14 +3542,14 @@ EmailStyleRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public emailId as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -3700,14 +3700,14 @@ EmailGroupModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public EmailID as Integer
 public GroupID as Integer
 public ModifiedBy as Integer
@@ -3774,14 +3774,14 @@ EmailTopicModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public EmailID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -3848,14 +3848,14 @@ EmailDropModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public EmailID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -3918,15 +3918,15 @@ EmailLogModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DateBlockExpires as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public EmailDropID as Integer
 public EmailID as Integer
 public FromAddress as String
@@ -4025,14 +4025,14 @@ public ID as Integer
 public Active as Boolean
 public BodyHTML as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -4099,7 +4099,7 @@ public ID as Integer
 public Active as Boolean
 public AllowSpamFooterDefault as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentFormInstructions as String
 public CreatedBy as Integer
@@ -4108,9 +4108,9 @@ public DateAdded as Date
 public DefaultConditionPeriod as Integer
 public DefaultContent as String
 public DefaultTemplateID as Integer
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public EmailTypeID as Integer
 public GroupFormInstructions as String
 public IncludeAllowSpamFooter as Boolean
@@ -4230,16 +4230,16 @@ public Active as Boolean
 public AllowWhatsNew as Boolean
 public ccGuid as String
 public Clicks as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public Contentid as Integer
 public ContentRecordKey as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Link as String
 public LinkLabel as String
 public ModifiedBy as Integer
@@ -4326,14 +4326,14 @@ ContentWatchListModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -4388,16 +4388,16 @@ ContentWatchListRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentWatchID as Integer
 public ContentWatchListID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -4463,15 +4463,15 @@ public ID as Integer
 public Active as Boolean
 public Brief as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Link as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -4544,14 +4544,14 @@ PathModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -4610,14 +4610,14 @@ PathRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public GroupID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -4685,15 +4685,15 @@ public ID as Integer
 public Abbreviation as String
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CountryID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public FIPSState as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -4771,15 +4771,15 @@ public ID as Integer
 public Abbreviation as String
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DomesticShipping as Boolean
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -4848,15 +4848,15 @@ public Caption as String
 public ccGuid as String
 public Clicks as Integer
 public ClicksMax as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DateExpires as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Height as Integer
 public ImageFilename as String
 public LastViewDate as Date
@@ -4974,14 +4974,14 @@ PropertieModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public FieldValue as String
 public KeyID as Integer
 public ModifiedBy as Integer
@@ -5052,7 +5052,7 @@ AuthoringControlModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public ContentRecordKey as String
@@ -5061,9 +5061,9 @@ public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DateExpires as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -5138,14 +5138,14 @@ SharedStylesIncludeRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public IncludedStyleID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -5213,14 +5213,14 @@ public ID as Integer
 public Active as Boolean
 public AlwaysInclude as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -5295,14 +5295,14 @@ public ID as Integer
 public Active as Boolean
 public AddonID as Integer
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -5369,14 +5369,14 @@ public ID as Integer
 public Active as Boolean
 public ccGuid as String
 public Code as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -5438,14 +5438,14 @@ ScriptingLanguageModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -5506,14 +5506,14 @@ public ID as Integer
 public Active as Boolean
 public AddonID as Integer
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public IncludedAddonID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -5580,15 +5580,15 @@ public ID as Integer
 public Active as Boolean
 public AddonID as Integer
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -5653,14 +5653,14 @@ Add-onEventModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -5720,14 +5720,14 @@ public ID as Integer
 public Active as Boolean
 public ccGuid as String
 public collectionId as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public eventId as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -5794,14 +5794,14 @@ public ID as Integer
 public Active as Boolean
 public addonId as Integer
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public eventId as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -5873,7 +5873,7 @@ public BlockEditTools as Boolean
 public ccGuid as String
 public CollectionID as Integer
 public Content as Boolean
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public Copy as String
 public CopyText as String
@@ -5882,9 +5882,9 @@ public CreateKey as Integer
 public CustomStylesFilename as String
 public DateAdded as Date
 public DotNetClass as String
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Email as Boolean
 public Filter as Boolean
 public FormXML as String
@@ -6190,14 +6190,14 @@ public ID as Integer
 public Active as Boolean
 public ccGuid as String
 public ChildID as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -6264,15 +6264,15 @@ public ID as Integer
 public Active as Boolean
 public ccGuid as String
 public CollectionID as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -6338,14 +6338,14 @@ public ID as Integer
 public Active as Boolean
 public ccGuid as String
 public CollectionID as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -6408,16 +6408,16 @@ public ID as Integer
 public Active as Boolean
 public blockNavigatorNode as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentFileList as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DataRecordList as String
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ExecFileList as String
 public Help as String
 public helpLink as String
@@ -6521,15 +6521,15 @@ LibraryFolderModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public Description as String
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -6595,14 +6595,14 @@ LibraryFolderRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public FolderID as Integer
 public GroupID as Integer
 public ModifiedBy as Integer
@@ -6672,15 +6672,15 @@ public AltSizeList as String
 public AltText as String
 public ccGuid as String
 public Clicks as Integer
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public Description as String
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Filename as String
 public FileSize as Integer
 public FileTypeID as Integer
@@ -6775,15 +6775,15 @@ LibraryFileTypeModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DownloadIconFilename as String
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ExtensionList as String
 public IconFilename as String
 public IsDownload as Boolean
@@ -6873,14 +6873,14 @@ LibraryFileLogModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public FileID as Integer
 public MemberID as Integer
 public ModifiedBy as Integer
@@ -6951,15 +6951,15 @@ LinkForwardModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DestinationLink as String
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public GroupID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -7033,14 +7033,14 @@ LinkAliaseModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Link as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -7111,15 +7111,15 @@ DomainModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DefaultTemplateId as Integer
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public forwardDomainId as Integer
 public ForwardURL as String
 public ModifiedBy as Integer
@@ -7211,14 +7211,14 @@ public Active as Boolean
 public BodyHTML as String
 public BodyTag as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public IsSecure as Boolean
 public JSEndBody as String
 public JSFilename as String
@@ -7323,15 +7323,15 @@ TemplateDomainRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public domainId as Integer
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -7397,14 +7397,14 @@ SharedStylesTemplateRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -7473,15 +7473,15 @@ public Active as Boolean
 public BlockSection as Boolean
 public Caption as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public HideMenu as Boolean
 public JSEndBody as String
 public JSFilename as String
@@ -7593,14 +7593,14 @@ SectionBlockRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public GroupID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -7667,15 +7667,15 @@ MetaContentModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public MetaDescription as String
 public MetaKeywordList as String
 public ModifiedBy as Integer
@@ -7753,14 +7753,14 @@ MetaKeywordModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -7819,14 +7819,14 @@ MetaKeywordRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public MetaContentID as Integer
 public MetaKeywordID as Integer
 public ModifiedBy as Integer
@@ -7893,14 +7893,14 @@ AggregateAccesModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Link as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -7963,15 +7963,15 @@ CopyContentModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public Copy as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -8033,15 +8033,15 @@ UserFormResponseModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public Copy as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -8108,7 +8108,7 @@ public ID as Integer
 public Active as Boolean
 public ccGuid as String
 public Command as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
@@ -8116,9 +8116,9 @@ public DataSource as String
 public DateAdded as Date
 public DateCompleted as Date
 public DateStarted as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Filename as String
 public ImportMapFilename as String
 public ModifiedBy as Integer
@@ -8219,16 +8219,16 @@ public classTierList as String
 public classTopItem as String
 public classTopList as String
 public classTopWrapper as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public Delimiter as String
 public Depth as Integer
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public FlyoutDirection as Integer
 public FlyoutOnHover as Boolean
 public JavaScriptOnLoad as String
@@ -8359,15 +8359,15 @@ DynamicMenuSectionRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DynamicMenuID as Integer
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -8433,14 +8433,14 @@ CustomReportModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -8504,14 +8504,14 @@ public ID as Integer
 public Active as Boolean
 public Body as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Instructions as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -8578,7 +8578,7 @@ public ID as Integer
 public Active as Boolean
 public AllowInactiveRecords as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public CreatedBy as Integer
@@ -8587,9 +8587,9 @@ public Criteria as String
 public DataSourceID as Integer
 public DateAdded as Date
 public DateExpires as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public MaxRows as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -8691,15 +8691,15 @@ WrapperModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public copytext as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public javascriptbodyend as String
 public javascriptinhead as String
 public javascriptonload as String
@@ -8789,14 +8789,14 @@ ActivityLogModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Link as String
 public MemberID as Integer
 public Message as String
@@ -8879,14 +8879,14 @@ LayoutModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Layout as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -8953,14 +8953,14 @@ SharedStylesLayoutRuleModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public LayoutID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -9027,7 +9027,7 @@ SiteWarningModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public count as Integer
 public CreatedBy as Integer
@@ -9035,9 +9035,9 @@ public CreateKey as Integer
 public DateAdded as Date
 public DateLastReported as Date
 public description as String
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public generalKey as String
 public location as String
 public ModifiedBy as Integer
@@ -9130,16 +9130,16 @@ public AddContinueButton as Boolean
 public BackButtonName as String
 public CancelButtonName as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentID as Integer
 public ContinueButtonName as String
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public FormSetID as Integer
 public HTMLBody as String
 public ModifiedBy as Integer
@@ -9243,16 +9243,16 @@ ImportWizardTaskModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public DateCompleted as Date
 public DateStarted as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ImportMapFilename as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -9333,14 +9333,14 @@ FormSetModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public JoinGroupID as Integer
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -9417,15 +9417,15 @@ public Active as Boolean
 public ButtonActionID as Integer
 public Caption as String
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public ContentFieldID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public FormID as Integer
 public InputType as String
 public ModifiedBy as Integer
@@ -9509,14 +9509,14 @@ RSSAggregatorModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -9575,14 +9575,14 @@ RSSAggregatorSourceModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public Link as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -9646,14 +9646,14 @@ public ID as Integer
 public Active as Boolean
 public AggregatorID as Integer
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -9719,15 +9719,15 @@ RSSAggregatorSourceStorieModel
 public ID as Integer
 public Active as Boolean
 public ccGuid as String
-public ContentCategoryID as Integer
+
 public ContentControlID as Integer
 public CreatedBy as Integer
 public CreateKey as Integer
 public DateAdded as Date
 public description as String
-public EditArchive as Boolean
-public EditBlank as Boolean
-public EditSourceID as Integer
+
+
+
 public itemGuid as String
 public link as String
 public ModifiedBy as Integer

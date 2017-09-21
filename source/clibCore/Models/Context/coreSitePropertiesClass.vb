@@ -518,10 +518,11 @@ Namespace Contensive.Core.Models.Context
                 Dim SQL As String
                 Dim SQLNow As String = cpCore.db.encodeSQLDate(Now)
                 Dim recordsAffected As Integer = 0
+                Dim cacheName As String = "siteproperty" & propertyName.Trim().ToLower()
                 '
-                If (Not String.IsNullOrEmpty(propertyName)) Then
+                If (Not String.IsNullOrEmpty(propertyName.Trim())) Then
                     SQL = "UPDATE ccSetup Set FieldValue=" & cpCore.db.encodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE name=" & cpCore.db.encodeSQLText(propertyName)
-                    Call cpCore.db.executeSql(SQL,,,, recordsAffected)
+                    Call cpCore.db.executeNonQuery(SQL,, recordsAffected)
                     If (recordsAffected = 0) Then
                         SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" _
                             & SQLTrue _
@@ -531,33 +532,15 @@ Namespace Contensive.Core.Models.Context
                             & "," & SQLNow _
                             & "," & SQLNow _
                             & ");"
-                        Call cpCore.db.executeSql(SQL)
+                        Call cpCore.db.executeQuery(SQL)
                     End If
+                    '
+                    ' -- update simple lazy cache
+                    If nameValueDict.ContainsKey(cacheName) Then
+                        nameValueDict.Remove(cacheName)
+                    End If
+                    nameValueDict.Add(cacheName, Value)
                 End If
-                'Dim cacheName As String = "siteProperty-" & propertyName
-                'Dim RecordID As Integer
-                'Dim dt As DataTable
-                'RecordID = 0
-                'SQL = "SELECT ID FROM CCSETUP WHERE NAME=" & cpCore.db.encodeSQLText(propertyName) & " order by id"
-                'dt = cpCore.db.executeSql(SQL)
-                'If dt.Rows.Count > 0 Then
-                '    RecordID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
-                'End If
-                'If RecordID <> 0 Then
-                '    SQL = "UPDATE ccSetup Set FieldValue=" & cpCore.db.encodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE ID=" & RecordID
-                '    Call cpCore.db.executeSql(SQL)
-                'Else
-                '    ' get contentId manually, getContentId call checks cache, which gets site property, which may set
-                '    ContentID = 0
-                '    SQL = "SELECT ID FROM cccontent WHERE NAME='site properties' order by id"
-                '    dt = cpCore.db.executeSql(SQL)
-                '    If dt.Rows.Count > 0 Then
-                '        ContentID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
-                '    End If
-                '    SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & cpCore.db.encodeSQLNumber(ContentID) & "," & cpCore.db.encodeSQLText(UCase(propertyName)) & "," & cpCore.db.encodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
-                '    Call cpCore.db.executeSql(SQL)
-                'End If
-                'Call cpCore.cache.setObject(cacheName, Value)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -599,7 +582,7 @@ Namespace Contensive.Core.Models.Context
         Public Function getTextFromDb(ByVal PropertyName As String, ByVal DefaultValue As String, ByRef return_propertyFound As Boolean) As String
             Dim returnString As String = ""
             Try
-                Using dt As DataTable = cpCore.db.executeSql("select FieldValue from ccSetup where name=" & cpCore.db.encodeSQLText(PropertyName) & " order by id")
+                Using dt As DataTable = cpCore.db.executeQuery("select FieldValue from ccSetup where name=" & cpCore.db.encodeSQLText(PropertyName) & " order by id")
                     If dt.Rows.Count > 0 Then
                         returnString = genericController.encodeText(dt.Rows(0).Item("FieldValue"))
                         return_propertyFound = True
@@ -631,15 +614,15 @@ Namespace Contensive.Core.Models.Context
         Public Function getText(ByVal PropertyName As String, ByVal DefaultValue As String) As String
             Dim returnString As String = ""
             Try
-                Dim name As String = PropertyName.Trim().ToLower()
-                If (String.IsNullOrEmpty(name)) Then
+                Dim cacheName As String = "siteproperty" & PropertyName.Trim().ToLower()
+                If (String.IsNullOrEmpty(PropertyName.Trim())) Then
                     returnString = DefaultValue
                 Else
-                    If nameValueDict.ContainsKey(name) Then
-                        returnString = nameValueDict(name)
+                    If nameValueDict.ContainsKey(cacheName) Then
+                        returnString = nameValueDict(cacheName)
                     Else
                         returnString = DefaultValue
-                        Call setProperty(name, DefaultValue)
+                        Call setProperty(cacheName, DefaultValue)
                     End If
                 End If
                 'Dim cacheName As String = "siteProperty-" & PropertyName

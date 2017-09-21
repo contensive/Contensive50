@@ -43,7 +43,7 @@ Namespace Contensive.Core.Models.Entity
         Public ccGuid As String
         Public City As String
         Public Company As String
-        Public ContentCategoryID As Integer
+        
         Public ContentControlID As Integer
         Public Country As String
         Public CreatedBy As Integer
@@ -52,9 +52,9 @@ Namespace Contensive.Core.Models.Entity
         Public DateAdded As Date
         Public DateExpires As Date
         Public Developer As Boolean
-        Public EditArchive As Boolean
-        Public EditBlank As Boolean
-        Public EditSourceID As Integer
+        
+        
+        
         Public Email As String
         Public ExcludeFromAnalytics As Boolean
         Public Fax As String

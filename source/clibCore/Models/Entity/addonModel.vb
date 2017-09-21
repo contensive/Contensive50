@@ -22,28 +22,15 @@ Namespace Contensive.Core.Models.Entity
         '====================================================================================================
         ' -- instance properties
         '
-        'Public Property ID As Integer
-        'Public Property Active As Boolean
         Public Property Admin As Boolean
         Public Property ArgumentList As String
         Public Property AsAjax As Boolean
-        'Public Property BlockDefaultStyles As Boolean
         Public Property BlockEditTools As Boolean
-        'Public Property ccGuid As String
         Public Property CollectionID As Integer
         Public Property Content As Boolean
-        Public Property ContentCategoryID As Integer
-        'Public Property ContentControlID As Integer
         Public Property Copy As String
         Public Property CopyText As String
-        'Public Property CreatedBy As Integer
-        'Public Property CreateKey As Integer
-        'Public Property CustomStylesFilename As String
-        'Public Property DateAdded As Date
         Public Property DotNetClass As String
-        Public Property EditArchive As Boolean
-        Public Property EditBlank As Boolean
-        Public Property EditSourceID As Integer
         Public Property Email As Boolean
         Public Property Filter As Boolean
         Public Property FormXML As String
@@ -61,9 +48,6 @@ Namespace Contensive.Core.Models.Entity
         Public Property Link As String
         Public Property MetaDescription As String
         Public Property MetaKeywordList As String
-        'Public Property ModifiedBy As Integer
-        'Public Property ModifiedDate As Date
-        'Public Property Name As String
         Public Property NavTypeID As Integer
         Public Property ObjectProgramID As String
         Public Property OnBodyEnd As Boolean
@@ -84,7 +68,6 @@ Namespace Contensive.Core.Models.Entity
         Public Property ScriptingEntryPoint As String
         Public Property ScriptingLanguageID As Integer
         Public Property ScriptingTimeout As String
-        'Public Property SortOrder As String
         Public Property StylesFilename As fieldTypeCSSFile
         Public Property Template As Boolean        '
         '====================================================================================================

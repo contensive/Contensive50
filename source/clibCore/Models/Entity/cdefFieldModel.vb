@@ -87,7 +87,7 @@ Namespace Contensive.Core.Models.Entity
                 If (_RedirectContentName Is Nothing) Then
                     If RedirectContentID > 0 Then
                         _RedirectContentName = ""
-                        Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & RedirectContentID.ToString())
+                        Dim dt As DataTable = cpCore.db.executeQuery("select name from cccontent where id=" & RedirectContentID.ToString())
                         If dt.Rows.Count > 0 Then
                             _RedirectContentName = genericController.encodeText(dt.Rows(0).Item(0))
                         End If
@@ -105,7 +105,7 @@ Namespace Contensive.Core.Models.Entity
                 If (_MemberSelectGroupName Is Nothing) Then
                     If MemberSelectGroupID > 0 Then
                         _MemberSelectGroupName = ""
-                        Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & MemberSelectGroupID.ToString())
+                        Dim dt As DataTable = cpCore.db.executeQuery("select name from cccontent where id=" & MemberSelectGroupID.ToString())
                         If dt.Rows.Count > 0 Then
                             _MemberSelectGroupName = genericController.encodeText(dt.Rows(0).Item(0))
                         End If
@@ -123,7 +123,7 @@ Namespace Contensive.Core.Models.Entity
                 If (_ManyToManyRuleContentName Is Nothing) Then
                     If manyToManyContentID > 0 Then
                         _ManyToManyRuleContentName = ""
-                        Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & manyToManyContentID.ToString())
+                        Dim dt As DataTable = cpCore.db.executeQuery("select name from cccontent where id=" & manyToManyContentID.ToString())
                         If dt.Rows.Count > 0 Then
                             _ManyToManyContentName = genericController.encodeText(dt.Rows(0).Item(0))
                         End If
@@ -141,7 +141,7 @@ Namespace Contensive.Core.Models.Entity
                 If (_ManyToManyRuleContentName Is Nothing) Then
                     If manyToManyRuleContentID > 0 Then
                         _ManyToManyRuleContentName = ""
-                        Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & manyToManyRuleContentID.ToString())
+                        Dim dt As DataTable = cpCore.db.executeQuery("select name from cccontent where id=" & manyToManyRuleContentID.ToString())
                         If dt.Rows.Count > 0 Then
                             _ManyToManyRuleContentName = genericController.encodeText(dt.Rows(0).Item(0))
                         End If
@@ -159,7 +159,7 @@ Namespace Contensive.Core.Models.Entity
                 If (_lookupContentName Is Nothing) Then
                     If lookupContentID > 0 Then
                         _lookupContentName = ""
-                        Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & lookupContentID.ToString())
+                        Dim dt As DataTable = cpCore.db.executeQuery("select name from cccontent where id=" & lookupContentID.ToString())
                         If dt.Rows.Count > 0 Then
                             _lookupContentName = genericController.encodeText(dt.Rows(0).Item(0))
                         End If

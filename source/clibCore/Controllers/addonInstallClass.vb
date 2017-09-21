@@ -4612,7 +4612,7 @@ Namespace Contensive.Core
                     '
                     NodeCount = 0
                     Dim installedContentList As New List(Of String)
-                    rs = cpCore.db.executeSql("SELECT Name from ccContent where (active<>0)")
+                    rs = cpCore.db.executeQuery("SELECT Name from ccContent where (active<>0)")
                     If isDataTableOk(rs) Then
                         installedContentList = New List(Of String)(convertDataTableColumntoItemList(rs))
                     End If
@@ -4624,7 +4624,7 @@ Namespace Contensive.Core
                                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef name [" & .Name & "]")
                                 If (Not installedContentList.Contains(.Name.ToLower())) Then
                                     SQL = "Insert into ccContent (name,ccguid,active,createkey)values(" & cpCore.db.encodeSQLText(.Name) & "," & cpCore.db.encodeSQLText(.guid) & ",1,0);"
-                                    Call cpCore.db.executeSql(SQL)
+                                    Call cpCore.db.executeQuery(SQL)
                                     installedContentList.Add(.Name.ToLower())
                                     RequireReload = True
                                 End If
@@ -4694,7 +4694,7 @@ Namespace Contensive.Core
                                 If .HelpChanged Then
                                     fieldId = 0
                                     SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" & cpCore.db.encodeSQLText(FieldName) & ")and(c.name=" & cpCore.db.encodeSQLText(ContentName) & ") order by f.id"
-                                    rs = cpCore.db.executeSql(SQL)
+                                    rs = cpCore.db.executeQuery(SQL)
                                     If isDataTableOk(rs) Then
                                         fieldId = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "id"))
                                     End If
@@ -4703,7 +4703,7 @@ Namespace Contensive.Core
                                         Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
                                     Else
                                         SQL = "select id from ccfieldhelp where fieldid=" & fieldId & " order by id"
-                                        rs = cpCore.db.executeSql(SQL)
+                                        rs = cpCore.db.executeQuery(SQL)
                                         If isDataTableOk(rs) Then
                                             FieldHelpID = genericController.EncodeInteger(rs.Rows(0).Item("id"))
                                         Else
@@ -4719,7 +4719,7 @@ Namespace Contensive.Core
                                                 End If
                                             End If
                                             SQL = "update ccfieldhelp set active=1,contentcontrolid=" & FieldHelpCID & ",fieldid=" & fieldId & ",helpdefault=" & cpCore.db.encodeSQLText(Copy) & " where id=" & FieldHelpID
-                                            Call cpCore.db.executeSql(SQL)
+                                            Call cpCore.db.executeQuery(SQL)
                                         End If
                                     End If
                                 End If
@@ -4993,7 +4993,7 @@ Namespace Contensive.Core
                         ' get contentid and protect content with IsBaseContent true
                         '
                         SQL = cpCore.db.GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" & cpCore.db.encodeSQLText(ContentName), "ID", , 1)
-                        rs = cpCore.db.executeSql(SQL)
+                        rs = cpCore.db.executeQuery(SQL)
                         If (isDataTableOk(rs)) Then
                             If rs.Rows.Count > 0 Then
                                 'EditorGroupID = cpcore.app.getDataRowColumnName(RS.rows(0), "ID")
@@ -5053,7 +5053,7 @@ Namespace Contensive.Core
                                 '
                                 EditorGroupID = 0
                                 If .EditorGroupName <> "" Then
-                                    rs = cpCore.db.executeSql("select ID from ccGroups where name=" & cpCore.db.encodeSQLText(.EditorGroupName))
+                                    rs = cpCore.db.executeQuery("select ID from ccGroups where name=" & cpCore.db.encodeSQLText(.EditorGroupName))
                                     If (isDataTableOk(rs)) Then
                                         If rs.Rows.Count > 0 Then
                                             EditorGroupID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
@@ -5066,7 +5066,7 @@ Namespace Contensive.Core
                                     & ",isbasecontent=" & cpCore.db.encodeSQLBoolean(.IsBaseContent) _
                                     & " where id=" & ContentID _
                                     & ""
-                                Call cpCore.db.executeSql(SQL)
+                                Call cpCore.db.executeQuery(SQL)
                             End If
                         End If
                         '
@@ -5093,7 +5093,7 @@ Namespace Contensive.Core
                                     ' ----- update content field help records
                                     '
                                     If (.HelpChanged) Then
-                                        rs = cpCore.db.executeSql("select ID from ccFieldHelp where fieldid=" & fieldId)
+                                        rs = cpCore.db.executeQuery("select ID from ccFieldHelp where fieldid=" & fieldId)
                                         If (isDataTableOk(rs)) Then
                                             If rs.Rows.Count > 0 Then
                                                 FieldHelpID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
@@ -5112,7 +5112,7 @@ Namespace Contensive.Core
                                                 & ",helpdefault=" & cpCore.db.encodeSQLText(.HelpDefault) _
                                                 & ",helpcustom=" & cpCore.db.encodeSQLText(.HelpCustom) _
                                                 & " where id=" & FieldHelpID
-                                            Call cpCore.db.executeSql(SQL)
+                                            Call cpCore.db.executeQuery(SQL)
                                         End If
                                     End If
                                 End With
@@ -6184,7 +6184,7 @@ Namespace Contensive.Core
                 '
                 TableBad = False
                 RowsFound = 0
-                Using rs As DataTable = cpCore.db.executeSql("Select ID from ccFieldTypes order by id")
+                Using rs As DataTable = cpCore.db.executeQuery("Select ID from ccFieldTypes order by id")
                     If (Not isDataTableOk(rs)) Then
                         '
                         ' problem
@@ -6229,7 +6229,7 @@ Namespace Contensive.Core
                         cpCore.handleException(New ApplicationException("Content Field Types content definition was not found"))
                     Else
                         Do While RowsNeeded > 0
-                            Call cpCore.db.executeSql("Insert into ccFieldTypes (active,contentcontrolid)values(1," & CID & ")")
+                            Call cpCore.db.executeQuery("Insert into ccFieldTypes (active,contentcontrolid)values(1," & CID & ")")
                             RowsNeeded = RowsNeeded - 1
                         Loop
                     End If
@@ -6237,28 +6237,28 @@ Namespace Contensive.Core
                 '
                 ' ----- Update the Names of each row
                 '
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Integer' where ID=1;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Text' where ID=2;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='LongText' where ID=3;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Boolean' where ID=4;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Date' where ID=5;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='File' where ID=6;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Lookup' where ID=7;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Redirect' where ID=8;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Currency' where ID=9;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='TextFile' where ID=10;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Image' where ID=11;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Float' where ID=12;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='AutoIncrement' where ID=13;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='ManyToMany' where ID=14;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Member Select' where ID=15;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='CSS File' where ID=16;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='XML File' where ID=17;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Javascript File' where ID=18;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Link' where ID=19;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Resource Link' where ID=20;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Integer' where ID=1;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Text' where ID=2;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='LongText' where ID=3;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Boolean' where ID=4;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Date' where ID=5;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='File' where ID=6;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Lookup' where ID=7;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Redirect' where ID=8;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Currency' where ID=9;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='TextFile' where ID=10;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Image' where ID=11;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Float' where ID=12;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='AutoIncrement' where ID=13;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='ManyToMany' where ID=14;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Member Select' where ID=15;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='CSS File' where ID=16;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='XML File' where ID=17;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Javascript File' where ID=18;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Link' where ID=19;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='Resource Link' where ID=20;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;")
+                Call cpCore.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;")
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try

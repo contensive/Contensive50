@@ -627,7 +627,7 @@ Namespace Contensive.Core.Controllers
                                 Next
                                 If ArgName <> "" Then
                                     'CmdAccumulator = cpCore.main_GetContentCopy(ArgName, "copy content")
-                                    Dim dt As DataTable = cpCore.db.executeSql("select layout from ccLayouts where name=" & cpCore.db.encodeSQLText(ArgName))
+                                    Dim dt As DataTable = cpCore.db.executeQuery("select layout from ccLayouts where name=" & cpCore.db.encodeSQLText(ArgName))
                                     If Not (dt Is Nothing) Then
                                         CmdAccumulator = genericController.encodeText(dt.Rows(0).Item("layout"))
                                     End If
@@ -851,6 +851,7 @@ Namespace Contensive.Core.Controllers
                                 addonName = ""
                                 ArgInstanceId = ""
                                 ArgGuid = ""
+                                Dim addonArgDict As New Dictionary(Of String, String)
                                 For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
                                     Select Case kvp.Key.ToLower()
                                         Case "addon"
@@ -860,11 +861,13 @@ Namespace Contensive.Core.Controllers
                                         Case "guid"
                                             ArgGuid = kvp.Value.ToString()
                                         Case Else
-                                            ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
+                                            addonArgDict.Add(kvp.Key, kvp.Value.ToString())
+                                            'ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
                                     End Select
                                 Next
-                                ArgOptionString &= "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
-                                ArgOptionString = Mid(ArgOptionString, 2)
+                                addonArgDict.Add("cmdAccumulator", CmdAccumulator)
+                                'ArgOptionString &= "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
+                                'ArgOptionString = Mid(ArgOptionString, 2)
                                 Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
                                     .addonType = Context,
                                     .cssContainerClass = "",
@@ -876,18 +879,18 @@ Namespace Contensive.Core.Controllers
                                     },
                                     .personalizationAuthenticated = personalizationIsAuthenticated,
                                     .personalizationPeopleId = personalizationPeopleId,
-                                    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, ArgOptionString)
+                                    .instanceArguments = addonArgDict
                                 }
                                 Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, addonName)
                                 CmdAccumulator = cpCore.addon.execute(addon, executeContext)
-                                'CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                             Case Else
                                 '
-                                ' attempts to execute an add-on with the command name
+                                ' execute an add-on
                                 '
                                 addonName = cmdText
                                 ArgInstanceId = ""
                                 ArgGuid = ""
+                                Dim addonArgDict As New Dictionary(Of String, String)
                                 For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
                                     Select Case kvp.Key.ToLower()
                                         Case "instanceid"
@@ -895,11 +898,11 @@ Namespace Contensive.Core.Controllers
                                         Case "guid"
                                             ArgGuid = kvp.Value.ToString()
                                         Case Else
-                                            ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key)) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
+                                            addonArgDict.Add(kvp.Key, kvp.Value.ToString())
+                                            'ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
                                     End Select
                                 Next
-                                ArgOptionString = ArgOptionString & "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
-                                ArgOptionString = Mid(ArgOptionString, 2)
+                                addonArgDict.Add("cmdAccumulator", CmdAccumulator)
                                 Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
                                     .addonType = Context,
                                     .cssContainerClass = "",
@@ -911,17 +914,52 @@ Namespace Contensive.Core.Controllers
                                     },
                                     .personalizationAuthenticated = personalizationIsAuthenticated,
                                     .personalizationPeopleId = personalizationPeopleId,
-                                    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, ArgOptionString)
+                                    .instanceArguments = addonArgDict
                                 }
                                 Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, addonName)
                                 CmdAccumulator = cpCore.addon.execute(addon, executeContext)
-                                'CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
-                                'CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
+
+
+                                ''
+                                '' attempts to execute an add-on with the command name
+                                ''
+                                'addonName = cmdText
+                                'ArgInstanceId = ""
+                                'ArgGuid = ""
+                                'For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
+                                '    Select Case kvp.Key.ToLower()
+                                '        Case "instanceid"
+                                '            ArgInstanceId = kvp.Value.ToString()
+                                '        Case "guid"
+                                '            ArgGuid = kvp.Value.ToString()
+                                '        Case Else
+                                '            ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key)) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
+                                '    End Select
+                                'Next
+                                'ArgOptionString = ArgOptionString & "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
+                                'ArgOptionString = Mid(ArgOptionString, 2)
+                                'Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                '    .addonType = Context,
+                                '    .cssContainerClass = "",
+                                '    .cssContainerId = "",
+                                '    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                '        .contentName = "",
+                                '        .fieldName = "",
+                                '        .recordId = 0
+                                '    },
+                                '    .personalizationAuthenticated = personalizationIsAuthenticated,
+                                '    .personalizationPeopleId = personalizationPeopleId,
+                                '    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, ArgOptionString)
+                                '}
+                                'Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, addonName)
+                                'CmdAccumulator = cpCore.addon.execute(addon, executeContext)
+                                ''CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                ''CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
                         End Select
                     Next
                 End If
                 '
-                ExecuteAllCmdLists_Execute = CmdAccumulator
+                returnValue = CmdAccumulator
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try

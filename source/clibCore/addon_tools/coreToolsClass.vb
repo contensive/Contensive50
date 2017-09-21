@@ -567,7 +567,7 @@ ErrorTrap:
                     Call Stream.Add("<P>" & SpanClassAdminSmall)
                     Stream.Add(Now() & " Executing sql [" & SQL & "] on DataSource [" & datasource.Name & "]")
                     Try
-                        dt = cpCore.db.executeSql(SQL, datasource.Name, PageSize * (PageNumber - 1), PageSize)
+                        dt = cpCore.db.executeQuery(SQL, datasource.Name, PageSize * (PageNumber - 1), PageSize)
                     Catch ex As Exception
                         '
                         ' ----- error
@@ -2125,7 +2125,7 @@ ErrorTrap:
                 '
                 Call Stream.Add("<br>")
                 Call Stream.Add("<br>Clearing Content Watch Link field...")
-                Call cpCore.db.executeSql("update ccContentWatch set Link=null;")
+                Call cpCore.db.executeQuery("update ccContentWatch set Link=null;")
                 Call Stream.Add("<br>Content Watch Link field cleared.")
             End If
             '
@@ -2343,7 +2343,7 @@ ErrorTrap:
                 NextTicks = 0
                 For TestPointer = 1 To TestCount
                     TestTicks = GetTickCount
-                    RS = cpCore.db.executeSql(SQL)
+                    RS = cpCore.db.executeQuery(SQL)
                     OpenTicks = OpenTicks + GetTickCount - TestTicks
                     RecordCount = 0
                     TestTicks = GetTickCount
@@ -2464,7 +2464,7 @@ ErrorTrap:
             Dim dt As DataTable
             '
             Local_GetContentID = 0
-            dt = cpCore.db.executeSql("Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName))
+            dt = cpCore.db.executeQuery("Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName))
             If dt.Rows.Count > 0 Then
                 Local_GetContentID = genericController.EncodeInteger(dt.Rows(0).Item(0))
             End If
@@ -2487,7 +2487,7 @@ ErrorTrap:
             Dim dt As DataTable
             '
             Local_GetContentNameByID = ""
-            dt = cpCore.db.executeSql("Select name from ccContent where id=" & ContentID)
+            dt = cpCore.db.executeQuery("Select name from ccContent where id=" & ContentID)
             If dt.Rows.Count > 0 Then
                 Local_GetContentNameByID = genericController.encodeText(dt.Rows(0).Item(0))
             End If
@@ -2510,7 +2510,7 @@ ErrorTrap:
             Dim RS As DataTable
             '
             Local_GetContentTableName = ""
-            RS = cpCore.db.executeSql("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" & cpCore.db.encodeSQLText(ContentName))
+            RS = cpCore.db.executeQuery("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" & cpCore.db.encodeSQLText(ContentName))
             If RS.Rows.Count > 0 Then
                 Local_GetContentTableName = genericController.encodeText(RS.Rows(0).Item(0))
             End If
@@ -2538,7 +2538,7 @@ ErrorTrap:
                     & " from ( ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID )" _
                     & " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID" _
                     & " where ccContent.name=" & cpCore.db.encodeSQLText(ContentName)
-            RS = cpCore.db.executeSql(SQL)
+            RS = cpCore.db.executeQuery(SQL)
             If isDataTableOk(RS) Then
                 Local_GetContentDataSource = genericController.encodeText(RS.Rows(0).Item("Name"))
             End If
@@ -3010,7 +3010,7 @@ ErrorTrap:
                                                                 Case Else
                                                                     SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.db.getSQLAlterColumnType(DataSourceName, fieldType) & ";"
                                                             End Select
-                                                            Call cpCore.db.executeSql(SQL, DataSourceName)
+                                                            Call cpCore.db.executeQuery(SQL, DataSourceName)
                                                         End If
                                                         SQL = "Update ccFields" _
                                                     & " Set name=" & cpCore.db.encodeSQLText(formFieldName) _
@@ -3036,7 +3036,7 @@ ErrorTrap:
                                                             SQL &= ",DeveloperOnly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." & RecordPointer))
                                                         End If
                                                         SQL &= " where ID=" & formFieldId
-                                                        Call cpCore.db.executeSql(SQL)
+                                                        Call cpCore.db.executeQuery(SQL)
                                                         ReloadCDef = True
                                                     End If
                                                 End If

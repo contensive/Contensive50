@@ -30,10 +30,10 @@
 '        Public Property DefaultSortMethodID As Integer
 '        Public Property DeveloperOnly As Boolean
 '        Public Property DropDownFieldList As String
-'        Public Property EditArchive As Boolean
-'        Public Property EditBlank As Boolean
+'        
+'        
 '        Public Property EditorGroupID As Integer
-'        Public Property EditSourceID As Integer
+'        
 '        Public Property IconHeight As Integer
 '        Public Property IconLink As String
 '        Public Property IconSprites As Integer

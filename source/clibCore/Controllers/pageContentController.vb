@@ -423,7 +423,7 @@ Namespace Contensive.Core.Controllers
                             IsInLinkForwardTable = True
                             Viewings = cpCore.db.cs_getInteger(CSPointer, "Viewings") + 1
                             Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & cpCore.db.cs_getInteger(CSPointer, "ID")
-                            Call cpCore.db.executeSql(Sql)
+                            Call cpCore.db.executeQuery(Sql)
                             tmpLink = cpCore.db.cs_getText(CSPointer, "DestinationLink")
                             If tmpLink <> "" Then
                                 '
@@ -1435,13 +1435,13 @@ ErrorTrap:
                             '
                             returnHtml = cpCore.html.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
                             returnHtml = cpCore.html.encodeContent9(returnHtml, cpCore.authContext.user.id, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, False, False, True, True, False, True, "", "http://" & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                            Call cpCore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpCore.doc.page.id)
+                            Call cpCore.db.executeQuery("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpCore.doc.page.id)
                         Else
                             '
                             ' Live content
                             returnHtml = cpCore.html.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
                             returnHtml = cpCore.html.encodeContent9(returnHtml, cpCore.authContext.user.id, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, False, False, True, True, False, True, "", "http://" & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                            Call cpCore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpCore.doc.page.id)
+                            Call cpCore.db.executeQuery("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpCore.doc.page.id)
                         End If
                         '
                         ' Page Hit Notification
@@ -1693,7 +1693,7 @@ ErrorTrap:
             Try
                 Dim allowChildListComposite As Boolean = AllowChildList And cpcore.doc.page.AllowChildListDisplay
                 Dim allowReturnLinkComposite As Boolean = AllowReturnLink And cpcore.doc.page.AllowReturnLinkDisplay
-                Dim bodyCopy As String = cpcore.doc.page.Copyfilename.content(cpcore)
+                Dim bodyCopy As String = cpcore.doc.page.Copyfilename.content
                 Dim breadCrumb As String = ""
                 Dim BreadCrumbDelimiter As String
                 Dim BreadCrumbPrefix As String

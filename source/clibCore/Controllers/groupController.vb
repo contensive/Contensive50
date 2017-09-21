@@ -41,17 +41,17 @@ Namespace Contensive.Core.Controllers
                 Dim cid As Integer
                 Dim sqlGroupName As String = cpCore.db.encodeSQLText(groupName)
                 '
-                dt = cpCore.db.executeSql("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
+                dt = cpCore.db.executeQuery("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
                 If dt.Rows.Count > 0 Then
                     returnGroupId = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                 Else
                     cid = cpCore.metaData.getContentId("groups")
                     createkey = genericController.GetRandomInteger()
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & sqlGroupName & "," & sqlGroupName & ")"
-                    Call cpCore.db.executeSql(sql)
+                    Call cpCore.db.executeQuery(sql)
                     '
                     sql = "select top 1 id from ccgroups where createkey=" & createkey & " order by id desc"
-                    dt = cpCore.db.executeSql(sql)
+                    dt = cpCore.db.executeQuery(sql)
                     If dt.Rows.Count > 0 Then
                         returnGroupId = genericController.EncodeInteger(dt.Rows(0).Item(0))
                     End If
@@ -224,7 +224,7 @@ Namespace Contensive.Core.Controllers
                 '
                 ' ----- main_Get the Group ID
                 '
-                dt = cpcore.db.executeSql("select top 1 id from ccGroups where name=" & cpcore.db.encodeSQLText(iGroupName))
+                dt = cpcore.db.executeQuery("select top 1 id from ccGroups where name=" & cpcore.db.encodeSQLText(iGroupName))
                 If dt.Rows.Count > 0 Then
                     group_GetGroupID = genericController.EncodeInteger(dt.Rows(0).Item(0))
                 End If
@@ -275,7 +275,7 @@ Namespace Contensive.Core.Controllers
             '
             group_Add = -1
             Dim dt As DataTable
-            dt = cpcore.db.executeSql("SELECT ID FROM ccgroups WHERE NAME=" & cpcore.db.encodeSQLText(iGroupName))
+            dt = cpcore.db.executeQuery("SELECT ID FROM ccgroups WHERE NAME=" & cpcore.db.encodeSQLText(iGroupName))
             If dt.Rows.Count > 0 Then
                 group_Add = genericController.EncodeInteger(dt.Rows(0).Item(0))
             Else

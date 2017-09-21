@@ -73,35 +73,22 @@ Namespace Contensive.Core.Models.Entity
         '
         Public MustInherit Class fieldCdnFile
             Public Property filename As String = ""
-            Public Property content(cpCore As coreClass) As String
+            Public Property content As String
                 Set(value As String)
                     _content = value
                 End Set
                 Get
                     If (_content Is Nothing) Then
                         _content = ""
-                        If (filename IsNot Nothing) Then
-                            _content = cpCore.cdnFiles.readFile(filename)
+                        If (filename IsNot Nothing) And (internalCpCore IsNot Nothing) Then
+                            _content = internalCpCore.cdnFiles.readFile(filename)
                         End If
                     End If
                     Return _content
                 End Get
             End Property
-            '
-            ' -- for later. move the save to this field so it is not repeated for each file type
-            'Public Sub save(cpCore As coreClass, tableName As String, fieldName As String, recordId As Integer, fieldTypeId As Integer)
-            '    If (_content IsNot Nothing) Then
-            '        '
-            '        ' -- content needs to be saved
-            '        If (filename = "") Then
-            '            '
-            '            ' -- filename needs to be created
-            '            filename = Contensive.Core.Controllers.fileController.getVirtualRecordPathFilename(tableName, fieldName, recordId, fieldTypeId)
-            '        End If
-            '        cpCore.cdnFiles.saveFile(filename, _content)
-            '    End If
-            'End Sub
             Private _content As String = Nothing
+            Public Property internalCpCore As coreClass = Nothing
         End Class
 
         '
@@ -391,7 +378,7 @@ Namespace Contensive.Core.Models.Entity
                                         Dim instanceFileType As New fieldTypeTextFile
                                         instanceFileType.filename = cs.getValue(modelProperty.Name)
                                         'If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                        '    instanceFileType.content(cpCore) = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                        '    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
                                         'End If
                                         modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case "fieldTypeJavascriptFile"
@@ -400,7 +387,7 @@ Namespace Contensive.Core.Models.Entity
                                         Dim instanceFileType As New fieldTypeJavascriptFile
                                         instanceFileType.filename = cs.getValue(modelProperty.Name)
                                         'If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                        '    instanceFileType.content(cpCore) = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                        '    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
                                         'End If
                                         modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case "fieldTypeCSSFile"
@@ -409,7 +396,7 @@ Namespace Contensive.Core.Models.Entity
                                         Dim instanceFileType As New fieldTypeCSSFile
                                         instanceFileType.filename = cs.getValue(modelProperty.Name)
                                         'If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                        '    instanceFileType.content(cpCore) = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                        '    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
                                         'End If
                                         modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case "fieldTypeHTMLFile"
@@ -418,7 +405,7 @@ Namespace Contensive.Core.Models.Entity
                                         Dim instanceFileType As New fieldTypeHTMLFile
                                         instanceFileType.filename = cs.getValue(modelProperty.Name)
                                         'If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                        '    instanceFileType.content(cpCore) = cpCore.cdnFiles.readFile(instanceFileType.filename)
+                                        '    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
                                         'End If
                                         modelProperty.SetValue(modelInstance, instanceFileType)
                                     Case Else
@@ -517,7 +504,8 @@ Namespace Contensive.Core.Models.Entity
                                         cs.setField(instanceProperty.Name, value)
                                     Case "fieldTypeTextFile"
                                         Dim textFileProperty As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeTextFile)
-                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        textFileProperty.internalCpCore = cpCore
+                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
                                         Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
                                         Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         If (String.IsNullOrEmpty(copy)) Then
@@ -537,7 +525,8 @@ Namespace Contensive.Core.Models.Entity
                                         End If
                                     Case "fieldTypeJavascriptFile"
                                         Dim textFileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeJavascriptFile)
-                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        textFileProperty.internalCpCore = cpCore
+                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
                                         Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         If (String.IsNullOrEmpty(copy)) Then
                                             '
@@ -554,7 +543,8 @@ Namespace Contensive.Core.Models.Entity
                                         End If
                                     Case "fieldTypeCSSFile"
                                         Dim textFileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeCSSFile)
-                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        textFileProperty.internalCpCore = cpCore
+                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
                                         Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         If (String.IsNullOrEmpty(copy)) Then
                                             '
@@ -571,7 +561,8 @@ Namespace Contensive.Core.Models.Entity
                                         End If
                                     Case "fieldTypeHTMLFile"
                                         Dim textFileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeHTMLFile)
-                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        textFileProperty.internalCpCore = cpCore
+                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
                                         Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
                                         If (String.IsNullOrEmpty(copy)) Then
                                             '

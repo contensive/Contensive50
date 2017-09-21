@@ -726,7 +726,7 @@ Namespace Contensive.Addons
                         If (fieldEditorFieldId <> 0) Then
                             editorOk = True
                             SQL = "select id from ccfields where (active<>0) and id=" & fieldEditorFieldId
-                            dtTest = cpCore.db.executeSql(SQL)
+                            dtTest = cpCore.db.executeQuery(SQL)
                             If dtTest.Rows.Count = 0 Then
                                 editorOk = False
                             End If
@@ -744,7 +744,7 @@ Namespace Contensive.Addons
                             'End If
                             If editorOk And (fieldEditorAddonId <> 0) Then
                                 SQL = "select id from ccaggregatefunctions where (active<>0) and id=" & fieldEditorAddonId
-                                dtTest = cpCore.db.executeSql(SQL)
+                                dtTest = cpCore.db.executeQuery(SQL)
                                 If dtTest.Rows.Count = 0 Then
                                     editorOk = False
                                 End If
@@ -1240,7 +1240,7 @@ ErrorTrap:
                                         '
                                         If editRecord.fieldsLc.ContainsKey("lastsendtestdate") Then
                                             editRecord.fieldsLc.Item("lastsendtestdate").value = cpCore.profileStartTime
-                                            Call cpCore.db.executeSql("update ccemail Set lastsendtestdate=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & " where id=" & editRecord.id)
+                                            Call cpCore.db.executeQuery("update ccemail Set lastsendtestdate=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & " where id=" & editRecord.id)
                                         End If
                                     End If
                                 End If
@@ -1348,7 +1348,7 @@ ErrorTrap:
                 & " where ccGroupRules.ID < DuplicateRules.ID" _
                 & " And ccGroupRules.GroupID=DuplicateRules.GroupID"
             SQL = "Delete from ccGroupRules where ID In (" & SQL & ")"
-            Call cpCore.db.executeSql(SQL)
+            Call cpCore.db.executeQuery(SQL)
             '
             ' --- create GroupRule records for all selected
             '
@@ -1402,7 +1402,7 @@ ErrorTrap:
             Call cpCore.db.cs_Close(CSPointer)
             If DeleteIdList <> "" Then
                 SQL = "delete from ccgrouprules where id In (" & Mid(DeleteIdList, 2) & ")"
-                Call cpCore.db.executeSql(SQL)
+                Call cpCore.db.executeQuery(SQL)
             End If
             If RecordChanged Then
                 Call cpCore.cache.invalidateContent("Group Rules")
@@ -1493,7 +1493,7 @@ ErrorTrap:
             SQL = "Delete from ccGroupRules where ID In (" _
                 & "Select distinct DuplicateRules.ID from ccgrouprules Left join ccgrouprules As DuplicateRules On DuplicateRules.GroupID=ccGroupRules.GroupID where ccGroupRules.ID < DuplicateRules.ID  And ccGroupRules.ContentID=DuplicateRules.ContentID" _
                 & ")"
-            Call cpCore.db.executeSql(SQL)
+            Call cpCore.db.executeQuery(SQL)
             '
             ' --- create GroupRule records for all selected
             '
@@ -1943,44 +1943,6 @@ ErrorTrap:
                     '
                     CSEditRecord = cpCore.db.cs_open2(adminContent.Name, editrecord.id, True, True)
                     '
-                    ' Problem with this deal is when the record is saved as with it's parent cdef, when we attempt to reload, the record can not be read bc the id is not in the parent
-                    'CSEditRecord = CSEditRecord
-                    '##### if not workflow authoring, just point them both to the same data
-                    '##### that way throughout the code, just use the appropriate CS, and the data works
-                    'CSEditRecord = -1
-                    'WorkflowAuthoring = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
-                    'If WorkflowAuthoring Then
-                    '    '
-                    '    ' 32467-852: check for duplicate edit records
-                    '    '
-                    '    SQL = "Update " & adminContent.AuthoringTableName _
-                    '    & " Set EditArchive=1" _
-                    '    & " Where ID In (" _
-                    '        & " Select B.ID" _
-                    '        & " from " & adminContent.AuthoringTableName & " As A" _
-                    '        & "," & adminContent.AuthoringTableName & " As B" _
-                    '        & " where A.EditSourceID=B.EditSourceID" _
-                    '        & " And A.EditSourceID Is Not null And B.EditSourceID Is Not null" _
-                    '        & " And A.EditArchive=0 And B.EditArchive=0" _
-                    '        & " And A.ID>B.ID" _
-                    '    & ");"
-                    '    Call cpCore.db.executeSql(SQL, adminContent.AuthoringDataSourceName)
-                    '    'Call cpCore.main_ExecuteSQL(AdminContent.AuthoringDataSourceName, SQL)
-                    '    '
-                    '    ' 202-31245: quick fix. The CS should handle this instead.
-                    '    ' Workflow authoring, also load the live record to display  Read_Only and Not_Editable records
-                    '    '
-                    '    CSEditRecord = cpCore.db.cs_open2(adminContent.Name, editrecord.id, False)
-                    '    If Not cpCore.db.cs_ok(CSEditRecord) Then
-                    '        '
-                    '        ' Special case, if live record can not open, we may be in workflow mode, and this may
-                    '        '   be a new record. If that is the case, display the edit record data, which should be
-                    '        '   the defaults for ReadOnly, or the First Values for NotEditable.
-                    '        '
-                    '        Call cpCore.db.cs_Close(CSEditRecord)
-                    '        CSEditRecord = CSEditRecord
-                    '    End If
-                    'End If
                     '
                     ' store fieldvalues in RecordValuesVariant
                     '
@@ -2077,8 +2039,6 @@ ErrorTrap:
                                         editrecord.createByMemberId = cpCore.db.cs_getInteger(CSEditRecord, .nameLc)
                                     Case "MODIFIEDBY"
                                         editrecord.modifiedByMemberID = cpCore.db.cs_getInteger(CSEditRecord, .nameLc)
-                                    Case "CONTENTCATEGORYID"
-                                        editrecord.contentCategoryID = cpCore.db.cs_getInteger(CSEditRecord, .nameLc)
                                     Case "ACTIVE"
                                         editrecord.active = cpCore.db.cs_getBoolean(CSEditRecord, .nameLc)
                                     Case "CONTENTCONTROLID"
@@ -2318,33 +2278,6 @@ ErrorTrap:
                                 '
                                 ResponseFieldValueText = cpCore.docProperties.getText(FieldName)
                                 'ResponseValueVariant = cpCore.main_ReadStreamText(FieldName)
-                                'ResponseValueText = genericController.encodeText(ResponseValueVariant)
-                                If genericController.EncodeInteger(ResponseFieldValueText) = genericController.EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
-                                    '
-                                    ' No change
-                                    '
-                                Else
-                                    '
-                                    ' new value
-                                    '
-                                    editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
-                                    ResponseFieldIsEmpty = False
-                                End If
-                            Case "CONTENTCATEGORYID"
-                                '
-                                '
-                                '
-                                InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & FieldName & ",", vbTextCompare) <> 0)
-                                InResponse = cpCore.docProperties.containsKey(FieldName)
-                                If AllowAdminFieldCheck() Then
-                                    If (Not InResponse) And (Not InEmptyFieldList) Then
-                                        Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
-                                        Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
-                                        Exit Sub
-                                    End If
-                                End If
-                                '
-                                ResponseFieldValueText = cpCore.docProperties.getText(FieldName)
                                 'ResponseValueText = genericController.encodeText(ResponseValueVariant)
                                 If genericController.EncodeInteger(ResponseFieldValueText) = genericController.EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
                                     '
@@ -2953,7 +2886,7 @@ ErrorTrap:
                     End If
                     If (linkAlias <> "") Then
                         If OverRideDuplicate Then
-                            Call cpCore.db.executeSql("update " & adminContent.ContentTableName & " set linkalias=null where ( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ") and (id<>" & editRecord.id & ")")
+                            Call cpCore.db.executeQuery("update " & adminContent.ContentTableName & " set linkalias=null where ( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ") and (id<>" & editRecord.id & ")")
                         Else
                             CS = cpCore.db.cs_open(adminContent.Name, "( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ")and(id<>" & editRecord.id & ")")
                             If cpCore.db.cs_ok(CS) Then
@@ -3148,13 +3081,6 @@ ErrorTrap:
                                     End If
                                         'RecordChanged = True
                                         'Call cpCore.app.SetCS(CSEditRecord, FieldName, FieldValueVariant)
-                                Case "CONTENTCATEGORYID"
-                                    Dim saveValue As Integer = genericController.EncodeInteger(fieldValueObject)
-                                    If cpCore.db.cs_getInteger(CSEditRecord, FieldName) <> saveValue Then
-                                        FieldChanged = True
-                                        RecordChanged = True
-                                        Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
-                                    End If
                                 Case "CONTENTCONTROLID"
                                     '
                                     ' run this after the save, so it will be blocked if the save fails
@@ -4009,7 +3935,7 @@ ErrorTrap:
                     & " where" _
                     & " f.ContentID=" & adminContent.Id _
                     & " and f.editorAddonId is not null"
-                dt = cpCore.db.executeSql(SQL)
+                dt = cpCore.db.executeQuery(SQL)
 
                 Cells = cpCore.db.convertDataTabletoArray(dt)
                 Cnt = Cells.GetLength(1)
@@ -4032,7 +3958,7 @@ ErrorTrap:
                     & " from ccAddonContentFieldTypeRules r" _
                     & " left join ccaggregatefunctions a on a.id=r.addonid" _
                     & " where (r.active<>0)and(a.active<>0)and(a.id is not null) order by r.contentFieldTypeID"
-                dt = cpCore.db.executeSql(SQL)
+                dt = cpCore.db.executeQuery(SQL)
                 Cells = cpCore.db.convertDataTabletoArray(dt)
                 fieldEditorOptionCnt = UBound(Cells, 2) + 1
                 For Ptr = 0 To fieldEditorOptionCnt - 1
@@ -4810,7 +4736,7 @@ ErrorTrap:
                             ' This control is not valid, delete it
                             '
                             SQL = "delete from ccAuthoringControls where ContentID=" & ContentID & " and RecordID=" & RecordID
-                            Call cpCore.db.executeSql(SQL)
+                            Call cpCore.db.executeQuery(SQL)
                         Else
                             TableName = cpCore.metaData.GetContentProperty(ContentName, "ContentTableName")
                             If Not (cpCore.db.cs_getBoolean(CS, "ContentAllowWorkflowAuthoring")) Then
@@ -4844,7 +4770,7 @@ ErrorTrap:
                                     ' This authoring control is not valid, delete it
                                     '
                                     SQL = "delete from ccAuthoringControls where ContentID=" & ContentID & " and RecordID=" & RecordID
-                                    Call cpCore.db.executeSql(SQL)
+                                    Call cpCore.db.executeQuery(SQL)
                                 Else
                                     RecordName = cpCore.db.cs_get(CSAuthoringRecord, "name")
                                     If RecordName = "" Then
@@ -6356,7 +6282,6 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_Control")
             '
             Dim s As String
-            Dim ContentCategoryID As Integer
             Dim AllowEID As Boolean
             Dim EID As String
             Dim IsEmptyList As Boolean
@@ -6547,16 +6472,6 @@ ErrorTrap:
                         End If
                     End If
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "GUID", FieldHelp, False, False, ""))
-                End If
-                '
-                ' ----- ContentCategoryID
-                '
-                FieldHelp = "All content on the site can be subdivided into content categories. This is the category for this record."
-                HTMLFieldString = cpCore.html.main_GetFormInputSelect2("ContentCategoryID", editRecord.contentCategoryID, "Content Categories", "", "", "", IsEmptyList)
-                If IsEmptyList Then
-                    hiddenInputs &= cpCore.html.html_GetFormInputHidden("contentcategoryid", editRecord.contentCategoryID)
-                Else
-                    Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Content Category", FieldHelp, True, False, ""))
                 End If
                 '
                 ' ----- EID (Encoded ID)
@@ -11318,7 +11233,7 @@ ErrorTrap:
                     IDList = Mid(IDList, 2)
                 End If
                 '
-                dt = cpCore.db.executeSql("select fieldid,helpdefault,helpcustom from ccfieldhelp where fieldid in (" & IDList & ") order by fieldid,id")
+                dt = cpCore.db.executeQuery("select fieldid,helpdefault,helpcustom from ccfieldhelp where fieldid in (" & IDList & ") order by fieldid,id")
                 TempVar = cpCore.db.convertDataTabletoArray(dt)
                 If TempVar.GetLength(0) > 0 Then
                     HelpCnt = UBound(TempVar, 2) + 1
@@ -12088,9 +12003,6 @@ ErrorTrap:
                                 If .ActiveOnly Then
                                     SubTitle = SubTitle & ", active records"
                                 End If
-                                If (.ContentCategoryID > 0) Then
-                                    SubTitle = SubTitle & ", in content category '" & cpCore.db.getRecordName("Content Categories", .ContentCategoryID) & "'"
-                                End If
                                 SubTitlePart = ""
                                 If .LastEditedByMe Then
                                     SubTitlePart = SubTitlePart & " by " & cpCore.authContext.user.Name
@@ -12663,19 +12575,11 @@ ErrorTrap:
                 Dim CS As Integer
                 Dim SQL As String
                 Dim Caption As String
-                Dim Id As Integer
-                Dim CurrentFolderID As Integer
                 Dim Link As String
                 Dim IsAuthoringMode As Boolean
-                Dim OpenMenuName As String
-                Dim JSCaption As String
                 Dim FirstCaption As String = ""
-                Dim EmptyDivID As String
-                Dim TagName As String
                 Dim RQS As String
                 Dim QS As String
-                Dim Copy As String
-                Dim ContentCategoryName As String
                 Dim Ptr As Integer
                 Dim SubFilterList As String
                 Dim IndexConfig As indexConfigClass
@@ -12696,7 +12600,7 @@ ErrorTrap:
                     ' Remove filters
                     '-------------------------------------------------------------------------------------
                     '
-                    If (.SubCDefID > 0) Or (.GroupListCnt <> 0) Or (.ContentCategoryID <> 0) Or (.FindWords.Count <> 0) Or .ActiveOnly Or .LastEditedByMe Or .LastEditedToday Or .LastEditedPast7Days Or .LastEditedPast30Days Then
+                    If (.SubCDefID > 0) Or (.GroupListCnt <> 0) Or (.FindWords.Count <> 0) Or .ActiveOnly Or .LastEditedByMe Or .LastEditedToday Or .LastEditedPast7Days Or .LastEditedPast30Days Then
                         '
                         ' Remove Filters
                         '
@@ -12787,18 +12691,6 @@ ErrorTrap:
                             returnContent &= "<div class=""ccFilterSubHead"">Other</div>" & SubFilterList
                         End If
                         '
-                        ' Content Categories
-                        '
-                        If .ContentCategoryID <> 0 Then
-                            ContentCategoryName = cpCore.db.getRecordName("Content Categories", .ContentCategoryID)
-                            Copy = genericController.vbReplace(ContentCategoryName, " ", "&nbsp;")
-                            returnContent &= "<div class=""ccFilterSubHead"">Content&nbsp;Category</div>"
-                            QS = RQS
-                            QS = genericController.ModifyQueryString(QS, "IndexFilterCategoryID", CStr(0), True)
-                            Link = cpCore.siteProperties.adminURL & "?" & QS
-                            returnContent &= "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">&nbsp;" & Copy & "</a></div>"
-                        End If
-                        '
                         ' FindWords
                         '
                         For Each findWordKvp In .FindWords
@@ -12835,46 +12727,6 @@ ErrorTrap:
                     '-------------------------------------------------------------------------------------
                     '
                     returnContent &= "<div class=""ccFilterHead"">Add&nbsp;Filters</div>"
-                    '
-                    ' Content Categories
-                    '
-                    SubFilterList = ""
-                    TagName = "AdminList"
-                    EmptyDivID = TagName & ".empty"
-                    SQL = cpCore.db.GetSQLSelect("default", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
-                    CS = cpCore.db.cs_openCsSql_rev("default", SQL)
-                    Dim lis As String
-                    lis = ""
-                    Do While cpCore.db.cs_ok(CS)
-                        Caption = cpCore.db.cs_getText(CS, "name")
-                        If Caption <> "" Then
-                            Id = cpCore.db.cs_getInteger(CS, "ID")
-                            CurrentFolderID = cpCore.db.cs_getInteger(CS, "ContentCategoryID")
-                            '
-                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
-                            If FirstCaption = "" Then
-                                FirstCaption = Caption
-                            End If
-                            JSCaption = genericController.EncodeJavascript(Caption)
-                            QS = RQS
-                            QS = genericController.ModifyQueryString(QS, "SetIndexFilterCategoryID", CStr(Id), True)
-                            Link = cpCore.siteProperties.adminURL & "?" & QS
-                            lis = lis & cr & "<li class=""ccAdminSmall ccPanel""><a href=""" & Link & """>" & Caption & "</a></li>"
-                            'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption)
-                        End If
-                        Call cpCore.db.cs_goNext(CS)
-                    Loop
-                    Call cpCore.db.cs_Close(CS)
-                    If .ContentCategoryID <> 0 Then
-                        OpenMenuName = CStr(.ContentCategoryID)
-                    End If
-                    returnContent &= "<div class=""ccFilterSubHead"">Content&nbsp;Categories</div>"
-                    If FirstCaption <> "" Then
-                        returnContent &= cr & "<ul class=""ccFilterList"">" & genericController.htmlIndent(lis) & cr & "</ul>"
-                        'S &="<div class=""ccFilterIndent"">" & Tree.GetTree(CStr(0), OpenMenuName) & "</div>"
-                    Else
-                        returnContent &= "<div class=""ccFilterIndent ccFilterList"">not defined</div>"
-                    End If
                     '
                     ' Last Edited
                     '
@@ -13061,20 +12913,15 @@ ErrorTrap:
                     '
                     .ContentID = adminContent.Id
                     .ActiveOnly = False
-                    .ContentCategoryID = 0
                     .LastEditedByMe = False
                     .LastEditedToday = False
                     .LastEditedPast7Days = False
                     .LastEditedPast30Days = False
-                    '.FindWords.Count = 0
-                    '.FindWordList = ""
                     .Loaded = True
                     .Open = False
                     .PageNumber = 1
                     .RecordsPerPage = RecordsPerPageDefault
                     .RecordTop = 0
-                    '.SortCnt = 0
-                    '.columns.count = 0
                     '
                     ' Setup Member Properties
                     '
@@ -13176,8 +13023,9 @@ ErrorTrap:
                                         Ptr = Ptr + 1
                                         .SubCDefID = genericController.EncodeInteger(ConfigListLines(Ptr))
                                     Case "indexfiltercategoryid"
+                                        ' -- remove deprecated value
                                         Ptr = Ptr + 1
-                                        .ContentCategoryID = genericController.EncodeInteger(ConfigListLines(Ptr))
+                                        Dim ignore As Integer = genericController.EncodeInteger(ConfigListLines(Ptr))
                                     Case "indexfilteractiveonly"
                                         .ActiveOnly = True
                                     Case "indexfilterlasteditedbyme"
@@ -13446,7 +13294,6 @@ ErrorTrap:
                     '
                     ' Remove all filters
                     '
-                    .ContentCategoryID = 0
                     .FindWords = New Dictionary(Of String, indexConfigFindWordClass)
                     .GroupListCnt = 0
                     .SubCDefID = 0
@@ -13547,19 +13394,6 @@ ErrorTrap:
                         '        End If
                         '    Next
                         'End If
-                    End If
-                    '
-                    ' Read ContentCategoryID
-                    '
-                    VarText = cpCore.docProperties.getText("IndexFilterCategoryID")
-                    If VarText <> "" Then
-                        .ContentCategoryID = genericController.EncodeInteger(VarText)
-                        .PageNumber = 1
-                    End If
-                    VarText = cpCore.docProperties.getText("SetIndexFilterCategoryID")
-                    If VarText <> "" Then
-                        .ContentCategoryID = genericController.EncodeInteger(VarText)
-                        .PageNumber = 1
                     End If
                     '
                     ' Read ActiveOnly
@@ -13846,12 +13680,6 @@ ErrorTrap:
                 '
                 ' misc filters
                 '
-                If .ContentCategoryID <> 0 Then
-                    FilterText = FilterText _
-                        & vbCrLf & "" _
-                        & vbCrLf & "IndexFilterCategoryID" _
-                        & vbCrLf & .ContentCategoryID
-                End If
                 If .ActiveOnly Then
                     FilterText = FilterText _
                         & vbCrLf & "" _
@@ -16156,7 +15984,7 @@ ErrorTrap:
                                 If Keyword <> "" Then
                                     'Dim dt As DataTable
 
-                                    dt = cpCore.db.executeSql("select top 1 ID from ccMetaKeywords where name=" & cpCore.db.encodeSQLText(Keyword))
+                                    dt = cpCore.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" & cpCore.db.encodeSQLText(Keyword))
                                     If dt.Rows.Count = 0 Then
                                         CS = cpCore.db.cs_insertRecord("Meta Keywords")
                                         If cpCore.db.cs_ok(CS) Then
@@ -16618,13 +16446,6 @@ ErrorTrap:
                         return_ContentAccessLimitMessage = "Your access to " & adminContent.Name & " is limited to Sub-content(s) " & Mid(return_ContentAccessLimitMessage, 3)
                     End If
                 End If
-                '******************
-                '
-                ' Where Clause: content category
-                '
-                If IndexConfig.ContentCategoryID <> 0 Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ContentCategoryID=" & IndexConfig.ContentCategoryID & ")"
-                End If
                 '
                 ' Where Clause: Active Only
                 '
@@ -16654,22 +16475,6 @@ ErrorTrap:
                 '
                 If IndexConfig.LastEditedPast30Days Then
                     return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date.AddDays(-30)) & ")"
-                End If
-                '
-                ' Where Clause: Workflow
-                '
-                If False Then
-                    ''
-                    '' Workflow - Either a live record or an unpublished inserted record
-                    ''
-                    'return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".EditSourceID is not null)AND(" & adminContent.ContentTableName & ".EditArchive=0)"
-                Else
-                    '
-                    ' no - if restarted without workflow, all edit records are removed
-                    ' non-Workflow - Only Live Records (in case workflow has ever been turned on)
-                    '
-                    '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                    'return_SQLWhere &=  "AND((" & AdminContent.ContentTableName & ".EditSourceID is null)or(" & AdminContent.ContentTableName & ".EditSourceID=0))"
                 End If
                 '
                 ' Where Clause: Where Pairs
@@ -17076,7 +16881,7 @@ ErrorTrap:
             Public modifiedByMemberID As Integer            '   =
             Public dateAdded As Date                        '   =
             Public createByMemberId As Integer              '   =
-            Public contentCategoryID As Integer
+
             Public RootPageID As Integer
             Public SetPageNotFoundPageID As Boolean
             Public SetLandingPageID As Boolean
@@ -17352,7 +17157,7 @@ ErrorTrap:
             Public PageNumber As Integer
             Public RecordsPerPage As Integer
             Public RecordTop As Integer
-            Public ContentCategoryID As Integer
+
             'FindWordList As String
             Public FindWords As New Dictionary(Of String, indexConfigFindWordClass)
             'Public FindWordCnt As Integer

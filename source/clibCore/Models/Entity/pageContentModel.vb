@@ -52,9 +52,9 @@ Namespace Contensive.Core.Models.Entity
         Public Property DateArchive As Date
         Public Property DateExpires As Date
         Public Property DateReviewed As Date
-        Public Property EditArchive As Boolean
-        Public Property EditBlank As Boolean
-        Public Property EditSourceID As Integer
+        
+        
+        
         Public Property Headline As String
         Public Property imageFilename As String
         Public Property IsSecure As Boolean

@@ -84,7 +84,7 @@ Namespace Contensive.Core.Models.Entity
             Get
                 If (_childIdList Is Nothing) Then
                     Dim Sql As String = "select id from cccontent where parentid=" & Id
-                    Dim dt As DataTable = cpCore.db.executeSql(Sql)
+                    Dim dt As DataTable = cpCore.db.executeQuery(Sql)
                     If dt.Rows.Count = 0 Then
                         _childIdList = New List(Of Integer)
                         For Each parentrow As DataRow In dt.Rows

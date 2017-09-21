@@ -272,12 +272,12 @@ Namespace Contensive.Core
                                         Do While cp.core.db.cs_ok(CS)
                                             ArchiveParentID = cp.core.db.cs_getInteger(CS, "ArchiveParentID")
                                             If ArchiveParentID = 0 Then
-                                                SQL = "update ccpagecontent set DateArchive=null where (id=" & RecordID & ")or((editsourceid=" & RecordID & ")and(editarchive=0))"
-                                                Call cp.core.db.executeSql(SQL)
+                                                SQL = "update ccpagecontent set DateArchive=null where (id=" & RecordID & ")"
+                                                Call cp.core.db.executeQuery(SQL)
                                             Else
                                                 RecordID = cp.core.db.cs_getInteger(CS, "ID")
-                                                SQL = "update ccpagecontent set ArchiveParentID=null,DateArchive=null,parentid=" & ArchiveParentID & " where (id=" & RecordID & ")or((editsourceid=" & RecordID & ")and(editarchive=0))"
-                                                Call cp.core.db.executeSql(SQL)
+                                                SQL = "update ccpagecontent set ArchiveParentID=null,DateArchive=null,parentid=" & ArchiveParentID & " where (id=" & RecordID & ")"
+                                                Call cp.core.db.executeQuery(SQL)
                                                 NeedToClearCache = True
                                             End If
                                             cp.core.db.cs_goNext(CS)
@@ -306,7 +306,7 @@ Namespace Contensive.Core
                                             & " and d.TimeDuration=24" _
                                             & " and f.id<d.id" _
                                             & ")"
-                                        Call cp.core.db.executeSql(SQL)
+                                        Call cp.core.db.executeQuery(SQL)
                                         '
                                         ' Find missing daily summaries, summarize that date
                                         '
@@ -343,7 +343,7 @@ Namespace Contensive.Core
                                     ' Remote Query Expiration
                                     '
                                     SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" & cp.core.db.encodeSQLDate(Now()) & ")"
-                                    Call cp.core.db.executeSql(SQL)
+                                    Call cp.core.db.executeQuery(SQL)
                                     If True Then
                                         '
                                         ' Clean Navigation
@@ -353,21 +353,21 @@ Namespace Contensive.Core
                                         Else
                                             SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null)"
                                         End If
-                                        Call cp.core.db.executeSql(SQL)
+                                        Call cp.core.db.executeQuery(SQL)
                                         '
                                         If DataSourceType = DataSourceTypeODBCMySQL Then
                                             SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null"
                                         Else
                                             SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null)"
                                         End If
-                                        Call cp.core.db.executeSql(SQL)
+                                        Call cp.core.db.executeQuery(SQL)
                                         '
                                         If DataSourceType = DataSourceTypeODBCMySQL Then
                                             SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.helpcollectionid where m.helpcollectionid<>0 and a.id is null"
                                         Else
                                             SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAddonCollections c on c.id=m.helpcollectionid Where m.helpcollectionid <> 0 And c.Id Is Null)"
                                         End If
-                                        Call cp.core.db.executeSql(SQL)
+                                        Call cp.core.db.executeQuery(SQL)
                                     End If
                                     '
                                     ' Page View Summary
@@ -628,7 +628,7 @@ ErrorTrap:
                 '
                 SQL = "update ccmembers set CreatedByVisit=0 where createdbyvisit is null"
                 On Error Resume Next
-                Call cp.core.db.executeSql(SQL)
+                Call cp.core.db.executeQuery(SQL)
                 If Err.Number <> 0 Then
                     Throw New ApplicationException("Unexpected exception")
                 End If
@@ -706,7 +706,7 @@ ErrorTrap:
                 '        End Select
                 ' if this fails, continue with the rest of the work
                 On Error Resume Next
-                Call cp.core.db.executeSql(SQL)
+                Call cp.core.db.executeQuery(SQL)
                 If Err.Number <> 0 Then
                     Throw New ApplicationException("Unexpected exception")
                 End If
@@ -735,7 +735,7 @@ ErrorTrap:
                 End Select
                 ' if this fails, continue with the rest of the work
                 On Error Resume Next
-                Call cp.core.db.executeSql(SQL)
+                Call cp.core.db.executeQuery(SQL)
                 If Err.Number <> 0 Then
                     Throw New ApplicationException("Unexpected exception")
                 End If
@@ -764,7 +764,7 @@ ErrorTrap:
                 End Select
                 ' if this fails, continue with the rest of the work
                 On Error Resume Next
-                Call cp.core.db.executeSql(SQL)
+                Call cp.core.db.executeQuery(SQL)
                 If Err.Number <> 0 Then
                     Throw New ApplicationException("Unexpected exception")
                 End If
@@ -869,7 +869,7 @@ ErrorTrap:
                         & " and(v.id is null)"
             End Select
             On Error Resume Next
-            Call cp.core.db.executeSql(SQL)
+            Call cp.core.db.executeQuery(SQL)
             If Err.Number <> 0 Then
                 Throw New ApplicationException("Unexpected exception")
             End If
@@ -918,7 +918,7 @@ ErrorTrap:
                         & " and(v.id is null)"
             End Select
             On Error Resume Next
-            Call cp.core.db.executeSql(SQL)
+            Call cp.core.db.executeQuery(SQL)
             If Err.Number <> 0 Then
                 Throw New ApplicationException("Unexpected exception")
             End If
@@ -976,7 +976,7 @@ ErrorTrap:
                         & ""
             End Select
             On Error Resume Next
-            Call cp.core.db.executeSql(SQL)
+            Call cp.core.db.executeQuery(SQL)
             If Err.Number <> 0 Then
                 Throw New ApplicationException("Unexpected Exception")
             End If
@@ -996,7 +996,7 @@ ErrorTrap:
                 FieldNew = FieldContentID & FieldCaption
                 If (FieldNew = FieldLast) Then
                     FieldRecordID = cp.core.db.cs_getInteger(CS, "ID")
-                    Call cp.core.db.executeSql("Update ccFields set active=0 where ID=" & FieldRecordID & ";")
+                    Call cp.core.db.executeQuery("Update ccFields set active=0 where ID=" & FieldRecordID & ";")
                 End If
                 FieldLast = FieldNew
                 Call cp.core.db.cs_goNext(CS)
@@ -1015,7 +1015,7 @@ ErrorTrap:
                 FieldRecordID = cp.core.db.cs_getInteger(CS, "ID")
                 FieldNew = FieldContentID & FieldName & fieldType
                 If (FieldNew = FieldLast) Then
-                    Call cp.core.db.executeSql("Update ccFields set active=0 where ID=" & FieldRecordID & ";")
+                    Call cp.core.db.executeQuery("Update ccFields set active=0 where ID=" & FieldRecordID & ";")
                 End If
                 FieldLast = FieldNew
                 Call cp.core.db.cs_goNext(CS)
@@ -1030,17 +1030,17 @@ ErrorTrap:
                     SQL = "delete ccactivitylog.*" _
                         & " From ccactivitylog LEFT JOIN " & SQLTablePeople & " on " & SQLTablePeople & ".ID=ccactivitylog.memberid" _
                         & " WHERE (" & SQLTablePeople & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case DataSourceTypeODBCSQLServer
                     SQL = "delete from ccactivitylog" _
                         & " From ccactivitylog LEFT JOIN " & SQLTablePeople & " on " & SQLTablePeople & ".ID=ccactivitylog.memberid" _
                         & " WHERE (" & SQLTablePeople & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case Else
                     SQL = "delete ccactivitylog" _
                         & " From ccactivitylog LEFT JOIN " & SQLTablePeople & " on " & SQLTablePeople & ".ID=ccactivitylog.memberid" _
                         & " WHERE (" & SQLTablePeople & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
             End Select
             '
             ' Member Properties with no member
@@ -1052,19 +1052,19 @@ ErrorTrap:
                         & " From ccProperties LEFT JOIN " & SQLTablePeople & " on " & SQLTablePeople & ".ID=ccProperties.KeyID" _
                         & " WHERE (ccProperties.TypeID=0)" _
                         & " AND (" & SQLTablePeople & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case DataSourceTypeODBCSQLServer
                     SQL = "delete From ccProperties" _
                         & " From ccProperties LEFT JOIN " & SQLTablePeople & " on " & SQLTablePeople & ".ID=ccProperties.KeyID" _
                         & " WHERE (ccProperties.TypeID=0)" _
                         & " AND (" & SQLTablePeople & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case Else
                     SQL = "delete ccProperties" _
                         & " From ccProperties LEFT JOIN " & SQLTablePeople & " on " & SQLTablePeople & ".ID=ccProperties.KeyID" _
                         & " WHERE (ccProperties.TypeID=0)" _
                         & " AND (" & SQLTablePeople & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
             End Select
             '
             ' Visit Properties with no visits
@@ -1076,19 +1076,19 @@ ErrorTrap:
                         & " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID" _
                         & " WHERE (ccProperties.TypeID=1)" _
                         & " AND (ccVisits.ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case DataSourceTypeODBCSQLServer
                     SQL = "delete From ccProperties" _
                         & " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID" _
                         & " WHERE (ccProperties.TypeID=1)" _
                         & " AND (ccVisits.ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case Else
                     SQL = "delete ccProperties" _
                         & " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID" _
                         & " WHERE (ccProperties.TypeID=1)" _
                         & " AND (ccVisits.ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
             End Select
             '
             ' Visitor Properties with no visitor
@@ -1100,19 +1100,19 @@ ErrorTrap:
                         & " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID" _
                         & " where ccproperties.typeid=2" _
                         & " and ccvisitors.id is null"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case DataSourceTypeODBCSQLServer
                     SQL = "delete From ccProperties" _
                         & " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID" _
                         & " where ccproperties.typeid=2" _
                         & " and ccvisitors.id is null"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case Else
                     SQL = "delete ccProperties" _
                         & " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID" _
                         & " where ccproperties.typeid=2" _
                         & " and ccvisitors.id is null"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
             End Select
             '
             ' MemberRules with bad MemberID
@@ -1124,19 +1124,19 @@ ErrorTrap:
                         & " From " & SQLTableMemberRules & "" _
                         & " LEFT JOIN " & SQLTablePeople & " on " & SQLTablePeople & ".ID=" & SQLTableMemberRules & ".MemberID" _
                         & " WHERE (" & SQLTablePeople & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case DataSourceTypeODBCSQLServer
                     SQL = "delete From " & SQLTableMemberRules & "" _
                         & " From " & SQLTableMemberRules & "" _
                         & " LEFT JOIN " & SQLTablePeople & " on " & SQLTablePeople & ".ID=" & SQLTableMemberRules & ".MemberID" _
                         & " WHERE (" & SQLTablePeople & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case Else
                     SQL = "delete " & SQLTableMemberRules & "" _
                         & " From " & SQLTableMemberRules & "" _
                         & " LEFT JOIN " & SQLTablePeople & " on " & SQLTablePeople & ".ID=" & SQLTableMemberRules & ".MemberID" _
                         & " WHERE (" & SQLTablePeople & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
             End Select
             '
             ' MemberRules with bad GroupID
@@ -1148,19 +1148,19 @@ ErrorTrap:
                         & " From " & SQLTableMemberRules & "" _
                         & " LEFT JOIN " & SQLTableGroups & " on " & SQLTableGroups & ".ID=" & SQLTableMemberRules & ".GroupID" _
                         & " WHERE (" & SQLTableGroups & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case DataSourceTypeODBCSQLServer
                     SQL = "delete From " & SQLTableMemberRules & "" _
                         & " From " & SQLTableMemberRules & "" _
                         & " LEFT JOIN " & SQLTableGroups & " on " & SQLTableGroups & ".ID=" & SQLTableMemberRules & ".GroupID" _
                         & " WHERE (" & SQLTableGroups & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case Else
                     SQL = "delete " & SQLTableMemberRules & "" _
                         & " From " & SQLTableMemberRules & "" _
                         & " LEFT JOIN " & SQLTableGroups & " on " & SQLTableGroups & ".ID=" & SQLTableMemberRules & ".GroupID" _
                         & " WHERE (" & SQLTableGroups & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
             End Select
             '
             ' GroupRules with bad ContentID
@@ -1186,19 +1186,19 @@ ErrorTrap:
                         & " From ccGroupRules" _
                         & " LEFT JOIN " & SQLTableGroups & " on " & SQLTableGroups & ".ID=ccGroupRules.GroupID" _
                         & " WHERE (" & SQLTableGroups & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case DataSourceTypeODBCSQLServer
                     SQL = "delete from ccGroupRules" _
                         & " From ccGroupRules" _
                         & " LEFT JOIN " & SQLTableGroups & " on " & SQLTableGroups & ".ID=ccGroupRules.GroupID" _
                         & " WHERE (" & SQLTableGroups & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case Else
                     SQL = "delete ccGroupRules" _
                         & " From ccGroupRules" _
                         & " LEFT JOIN " & SQLTableGroups & " on " & SQLTableGroups & ".ID=ccGroupRules.GroupID" _
                         & " WHERE (" & SQLTableGroups & ".ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
             End Select
             ''
             '' TopicRules with bad ContentID
@@ -1253,19 +1253,19 @@ ErrorTrap:
                             & " From ccCalendarEventRules" _
                             & " LEFT JOIN ccCalendars on ccCalendars.ID=ccCalendarEventRules.CalendarID" _
                             & " WHERE (ccCalendars.ID is null) "
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                     Case DataSourceTypeODBCSQLServer
                         SQL = "delete from ccCalendarEventRules" _
                             & " From ccCalendarEventRules" _
                             & " LEFT JOIN ccCalendars on ccCalendars.ID=ccCalendarEventRules.CalendarID" _
                             & " WHERE (ccCalendars.ID is null) "
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                     Case Else
                         SQL = "delete ccCalendarEventRules" _
                             & " From ccCalendarEventRules" _
                             & " LEFT JOIN ccCalendars on ccCalendars.ID=ccCalendarEventRules.CalendarID" _
                             & " WHERE (ccCalendars.ID is null) "
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                 End Select
                 '
                 ' CalendarEventRules with bad CalendarEventID
@@ -1277,19 +1277,19 @@ ErrorTrap:
                             & " From ccCalendarEventRules" _
                             & " LEFT JOIN ccCalendarEvents on ccCalendarEvents.ID=ccCalendarEventRules.CalendarEventID" _
                             & " WHERE (ccCalendarEvents.ID is null)"
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                     Case DataSourceTypeODBCSQLServer
                         SQL = "delete from ccCalendarEventRules" _
                             & " From ccCalendarEventRules" _
                             & " LEFT JOIN ccCalendarEvents on ccCalendarEvents.ID=ccCalendarEventRules.CalendarEventID" _
                             & " WHERE (ccCalendarEvents.ID is null)"
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                     Case Else
                         SQL = "delete ccCalendarEventRules" _
                             & " From ccCalendarEventRules" _
                             & " LEFT JOIN ccCalendarEvents on ccCalendarEvents.ID=ccCalendarEventRules.CalendarEventID" _
                             & " WHERE (ccCalendarEvents.ID is null)"
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                 End Select
             End If
             '
@@ -1316,19 +1316,19 @@ ErrorTrap:
                         & " From ccContentWatchListRules" _
                         & " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID" _
                         & " WHERE (ccContentWatch.ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case DataSourceTypeODBCSQLServer
                     SQL = "delete from ccContentWatchListRules" _
                         & " From ccContentWatchListRules" _
                         & " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID" _
                         & " WHERE (ccContentWatch.ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case Else
                     SQL = "delete ccContentWatchListRules" _
                         & " From ccContentWatchListRules" _
                         & " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID" _
                         & " WHERE (ccContentWatch.ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
             End Select
             '
             ' ContentWatchListRules with bad ContentWatchListID
@@ -1340,19 +1340,19 @@ ErrorTrap:
                         & " From ccContentWatchListRules" _
                         & " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID" _
                         & " WHERE (ccContentWatchLists.ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case DataSourceTypeODBCSQLServer
                     SQL = "delete from ccContentWatchListRules" _
                         & " From ccContentWatchListRules" _
                         & " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID" _
                         & " WHERE (ccContentWatchLists.ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
                 Case Else
                     SQL = "delete ccContentWatchListRules" _
                         & " From ccContentWatchListRules" _
                         & " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID" _
                         & " WHERE (ccContentWatchLists.ID is null)"
-                    Call cp.core.db.executeSql(SQL)
+                    Call cp.core.db.executeQuery(SQL)
             End Select
             '
             ' Field help with no field
@@ -1364,7 +1364,7 @@ ErrorTrap:
                 & " from ccfieldhelp h" _
                 & " left join ccfields f on f.id=h.fieldid where f.id is null" _
                 & ")"
-            Call cp.core.db.executeSql(SQL)
+            Call cp.core.db.executeQuery(SQL)
             '
             ' Field help duplicates - messy, but I am not sure where they are coming from, and this patchs the edit page performance problem
             '
@@ -1375,20 +1375,20 @@ ErrorTrap:
                 & " from ccfieldhelp a" _
                 & " left join ccfieldhelp b on a.fieldid=b.fieldid where a.id< b.id" _
                 & ")"
-            Call cp.core.db.executeSql(SQL)
+            Call cp.core.db.executeQuery(SQL)
             '
             'addon editor rules with no addon
             '
             SQL = "delete from ccAddonContentFieldTypeRules where id in (" _
                 & "select r.id from ccAddonContentFieldTypeRules r left join ccaggregatefunctions a on a.id=r.addonid where a.Id Is Null" _
                 & ")"
-            Call cp.core.db.executeSql(SQL)
+            Call cp.core.db.executeQuery(SQL)
             '
             ' convert FieldTypeLongText + htmlContent to FieldTypeHTML
             '
             Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "convert FieldTypeLongText + htmlContent to FieldTypeHTML.")
             SQL = "update ccfields set type=" & FieldTypeIdHTML & " where type=" & FieldTypeIdLongText & " and ( htmlcontent<>0 )"
-            Call cp.core.db.executeSql(SQL)
+            Call cp.core.db.executeQuery(SQL)
             ''
             '' convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile
             ''
@@ -1428,7 +1428,7 @@ ErrorTrap:
                     If FileList.Count > 0 Then
                         On Error Resume Next
                         SQL = "CREATE INDEX temp" & FieldName & " ON " & TableName & " (" & FieldName & ")"
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                         On Error GoTo ErrorTrap
                         For Each file As IO.FileInfo In FileList
                             Filename = file.Name
@@ -1437,7 +1437,7 @@ ErrorTrap:
                             FileSize = file.Length
                             If FileSize = 0 Then
                                 SQL = "update " & TableName & " set " & FieldName & "=null where (" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualLink) & ")"
-                                Call cp.core.db.executeSql(SQL)
+                                Call cp.core.db.executeQuery(SQL)
                                 Call cp.core.cdnFiles.deleteFile(VirtualFileName)
                             Else
                                 SQL = "SELECT ID FROM " & TableName & " WHERE (" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualLink) & ")"
@@ -1458,7 +1458,7 @@ ErrorTrap:
                             ' mysql
                             SQL = "ALTER TABLE " & TableName & " DROP INDEX temp" & FieldName
                         End If
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                         On Error GoTo ErrorTrap
                     End If
                     Call cp.core.db.cs_goNext(CS)
@@ -1635,18 +1635,18 @@ ErrorTrap:
                         SQL = "delete ccVisitors.*" _
                             & " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID" _
                             & " where ccVisits.ID is null"
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
 
                     Case DataSourceTypeODBCSQLServer
                         SQL = "delete From ccVisitors" _
                             & " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID" _
                             & " where ccVisits.ID is null"
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                     Case Else
                         SQL = "delete ccVisitors" _
                             & " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID" _
                             & " where ccVisits.ID is null"
-                        Call cp.core.db.executeSql(SQL)
+                        Call cp.core.db.executeQuery(SQL)
                 End Select
                 '        '
                 '        ' Delete People

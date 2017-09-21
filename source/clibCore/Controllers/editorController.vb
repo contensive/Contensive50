@@ -139,7 +139,7 @@ Namespace Contensive.Core.Controllers
                     & " from ccFieldTypes t" _
                     & " left join ccaggregatefunctions a on a.id=t.editorAddonId" _
                     & " where (t.active<>0)and(a.active<>0) order by t.id"
-                RS = cpCore.db.executeSql(SQL)
+                RS = cpCore.db.executeQuery(SQL)
                 For Each dr As DataRow In RS.Rows
                     fieldTypeID = genericController.EncodeInteger(dr("contentfieldtypeid"))
                     If (fieldTypeID <= FieldTypeIdMax) Then
@@ -149,7 +149,7 @@ Namespace Contensive.Core.Controllers
                 '
                 ' -- set any editors not specifically requested in fieldtype
                 SQL = "select contentfieldtypeid, max(addonId) as editorAddonId from ccAddonContentFieldTypeRules group by contentfieldtypeid"
-                RS = cpCore.db.executeSql(SQL)
+                RS = cpCore.db.executeQuery(SQL)
                 For Each dr As DataRow In RS.Rows
                     fieldTypeID = genericController.EncodeInteger(dr("contentfieldtypeid"))
                     If (fieldTypeID <= FieldTypeIdMax) Then

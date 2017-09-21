@@ -652,7 +652,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Friend Function getQuickEditingBody(ByVal ContentName As String, ByVal OrderByClause As String, ByVal AllowChildList As Boolean, ByVal Authoring As Boolean, ByVal rootPageId As Integer, ByVal readOnlyField As Boolean, ByVal AllowReturnLink As Boolean, ByVal RootPageContentName As String, ByVal ArchivePage As Boolean, ByVal contactMemberID As Integer) As String
-            Dim pageCopy As String = page.Copyfilename.content(cpcore)
+            Dim pageCopy As String = page.Copyfilename.content
             'If page.Copyfilename <> "" Then
             '    pageCopy = page.Copyfilename.copy(cpcore)
             '    'pageCopy = cpcore.cdnFiles.readFile(page.Copyfilename)
@@ -2392,7 +2392,7 @@ ErrorTrap:
                                     End If
                                     Call cpcore.db.cs_Close(CS2)
                                     If resaveLinkAlias Then
-                                        Call cpcore.db.executeSql("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
+                                        Call cpcore.db.executeQuery("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
                                         Call cpcore.db.cs_Close(CS)
                                         CS = cpcore.db.cs_insertRecord("Link Aliases", 0)
                                         If cpcore.db.cs_ok(CS) Then
@@ -2714,7 +2714,7 @@ ErrorTrap:
                     'hint = hint & ",140"
                     If RecordParentID > 0 Then
                         If Not IsDelete Then
-                            Call cpcore.db.executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
+                            Call cpcore.db.executeQuery("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
                         End If
                     End If
                     '
@@ -2733,7 +2733,7 @@ ErrorTrap:
                         '
                         ' Delete Link Alias entries with this PageID
                         '
-                        Call cpcore.db.executeSql("delete from cclinkAliases where PageID=" & RecordID)
+                        Call cpcore.db.executeQuery("delete from cclinkAliases where PageID=" & RecordID)
                     End If
                 'Case "cctemplates" ', "ccsharedstyles"
                 '    '
@@ -2918,7 +2918,7 @@ ErrorTrap:
                     End If
                     '
                     ' -- Mark the live record
-                    Call cpcore.db.executeSql(SQL & " where id=" & RecordID, DataSourceName)
+                    Call cpcore.db.executeQuery(SQL & " where id=" & RecordID, DataSourceName)
                 End If
             Catch ex As Exception
                 cpcore.handleException(ex)

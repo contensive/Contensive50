@@ -974,12 +974,12 @@ ErrorTrap:
                     '        DataSource = main_GetContentProperty(ContentName, "ContentDataSourceName")
                     '        ContentControlCriteria = main_GetContentProperty(ContentName, "ContentControlCriteria")
                     '
-                    SQL = "select count(*) as cnt from " & TableName & " where " & ContentControlCriteria & " AND(editsourceid is null)"
+                    SQL = "select count(*) as cnt from " & TableName & " where " & ContentControlCriteria
                     If LcaseCriteria <> "" Then
                         SQL &= " and " & LcaseCriteria
                     End If
                     Dim dt As DataTable
-                    dt = cpCore.db.executeSql(SQL)
+                    dt = cpCore.db.executeQuery(SQL)
                     If dt.Rows.Count > 0 Then
                         RowCnt = genericController.EncodeInteger(dt.Rows(0).Item("cnt"))
                     End If
@@ -6018,7 +6018,7 @@ ErrorTrap:
                         End If
 
                     End If
-                    Call cpCore.db.executeSql("update ccpagecontent set ChildListInstanceOptions=" & cpCore.db.encodeSQLText(addonOption_String) & " where id=" & RecordID)
+                    Call cpCore.db.executeQuery("update ccpagecontent set ChildListInstanceOptions=" & cpCore.db.encodeSQLText(addonOption_String) & " where id=" & RecordID)
                     needToClearCache = True
                     'CS = main_OpenCSContentRecord("page content", RecordID)
                     'If app.csv_IsCSOK(CS) Then
@@ -6284,7 +6284,7 @@ ErrorTrap:
                             HelpCaption = cpCore.docProperties.getText("helpcaption")
                             HelpMessage = cpCore.docProperties.getText("helptext")
                             SQL = "update ccfields set caption=" & cpCore.db.encodeSQLText(HelpCaption) & ",HelpMessage=" & cpCore.db.encodeSQLText(HelpMessage) & " where id=" & RecordID
-                            Call cpCore.db.executeSql(SQL)
+                            Call cpCore.db.executeQuery(SQL)
                             cpCore.cache.invalidateAll()
                             cpCore.metaData.clear()
                         End If
@@ -6361,15 +6361,11 @@ ErrorTrap:
                 Dim Ptr As Integer
                 Dim main_MemberShipID As Integer
                 Dim javaScriptRequired As String = ""
-                Dim ContentFolderName As String
                 Dim DivName As String
                 Dim DivCnt As Integer
-                Dim DivID As String
                 Dim OldFolderVar As String
                 Dim EndDiv As String
                 Dim OpenFolderID As Integer
-                Dim CurrentFolderID As Integer
-                Dim IsContentCategoriesSupported As Boolean
                 Dim RuleCopyCaption As String
                 Dim RuleCopy As String
                 Dim SQL As String
@@ -6397,13 +6393,6 @@ ErrorTrap:
                 Dim SingularPrefixHtmlEncoded As String
                 Dim IsRuleCopySupported As Boolean
                 Dim AllowRuleCopy As Boolean
-                '
-                ' IsContentCategoriesSupported - if true, break checkboxes out into divs for each Content Category
-                '
-                IsContentCategoriesSupported = IncludeContentFolderDivs
-                If IsContentCategoriesSupported Then
-                    IsContentCategoriesSupported = cpCore.metaData.isContentFieldSupported(SecondaryContentName, "ContentCategoryID")
-                End If
                 '
                 ' IsRuleCopySupported - if true, the rule records include an allow button, and copy
                 '   This is for a checkbox like [ ] Other [enter other copy here]
@@ -6510,44 +6499,21 @@ ErrorTrap:
                         '
                         ' ----- Gather all the Secondary Records, sorted by ContentName
                         '
-                        SQL = "SELECT " & SecondaryTablename & ".ID AS ID, AllowedContent.Name AS SectionName, " & SecondaryTablename & "." & CaptionFieldName & " AS OptionCaption, " & SecondaryTablename & ".name AS OptionName, " & SecondaryTablename & ".SortOrder"
+                        SQL = "SELECT " & SecondaryTablename & ".ID AS ID, " & SecondaryTablename & "." & CaptionFieldName & " AS OptionCaption, " & SecondaryTablename & ".name AS OptionName, " & SecondaryTablename & ".SortOrder"
                         If IsRuleCopySupported Then
                             SQL &= "," & SecondaryTablename & ".AllowRuleCopy," & SecondaryTablename & ".RuleCopyCaption"
                         Else
                             SQL &= ",0 as AllowRuleCopy,'' as RuleCopyCaption"
                         End If
-                        If IsContentCategoriesSupported Then
-                            SQL &= "" _
-                                & ",Folders.ID as ContentCategoryID,Folders.Name as ContentFolderName" _
-                                & " FROM ((" & SecondaryTablename _
-                                & " LEFT JOIN ccContent AllowedContent ON " & SecondaryTablename & ".ContentControlID = AllowedContent.ID)" _
-                                & " LEFT JOIN ccContentCategories Folders ON " & SecondaryTablename & ".ContentCategoryID = Folders.ID)" _
-                                & " Where (" & SecondaryTablename & ".Active<>" & SQLFalse & ")" _
-                                & " And (AllowedContent.Active<>" & SQLFalse & ")" _
-                                & " And (" & SecondaryTablename & ".ContentControlID IN (" & String.Join(",", ContentIDList) & "))"
-                        Else
-                            SQL &= "" _
-                                & ",0 as ContentCategoryID,'' as ContentFolderName" _
-                                & " FROM (" & SecondaryTablename _
-                                & " LEFT JOIN ccContent AllowedContent ON " & SecondaryTablename & ".ContentControlID = AllowedContent.ID)" _
-                                & " Where (" & SecondaryTablename & ".Active<>" & SQLFalse & ")" _
-                                & " And (AllowedContent.Active<>" & SQLFalse & ")" _
-                                & " And (" & SecondaryTablename & ".ContentControlID IN (" & String.Join(",", ContentIDList) & "))"
-                        End If
+                        SQL &= " from " & SecondaryTablename & " where (1=1)"
                         If SecondaryContentSelectCriteria <> "" Then
                             SQL &= "AND(" & SecondaryContentSelectCriteria & ")"
                         End If
-                        SQL &= " GROUP BY " & SecondaryTablename & ".ID, AllowedContent.Name, " & SecondaryTablename & "." & CaptionFieldName & ", " & SecondaryTablename & ".name, " & SecondaryTablename & ".SortOrder"
+                        SQL &= " GROUP BY " & SecondaryTablename & ".ID, " & SecondaryTablename & "." & CaptionFieldName & ", " & SecondaryTablename & ".name, " & SecondaryTablename & ".SortOrder"
                         If IsRuleCopySupported Then
                             SQL &= ", " & SecondaryTablename & ".AllowRuleCopy," & SecondaryTablename & ".RuleCopyCaption"
                         End If
-                        If IsContentCategoriesSupported Then
-                            SQL &= ",Folders.Name,Folders.ID"
-                        End If
                         SQL &= " ORDER BY "
-                        If IsContentCategoriesSupported Then
-                            SQL &= "Folders.Name,Folders.ID,"
-                        End If
                         SQL &= SecondaryTablename & "." & CaptionFieldName
                         CS = cpCore.db.cs_openSql(SQL)
                         If Not cpCore.db.cs_ok(CS) Then
@@ -6568,42 +6534,6 @@ ErrorTrap:
                                         '
                                         ' Current checkbox is visible
                                         '
-                                        CurrentFolderID = cpCore.db.cs_getInteger(CS, "ContentCategoryID")
-                                        If IsContentCategoriesSupported And (CurrentFolderID <> OpenFolderID) Then
-                                            '
-                                            ' Content Category mode, new folderID - end the previous div and start a new one
-                                            '
-                                            OpenFolderID = CurrentFolderID
-                                            ContentFolderName = cpCore.db.cs_getText(CS, "ContentFolderName")
-                                            DivID = TagName & ".ContentCategoryID" & CurrentFolderID
-                                            If DivCnt = 0 Then
-                                                '
-                                                ' First div - Add in javascript needed to store current visible div
-                                                '
-                                                javaScriptRequired &= OldFolderVar & "='" & DivID & "';"
-                                                's = s & cr & "<script type=""text/javascript"">" & OldFolderVar & "='" & DivID & "'</script>" & vbCrLf
-                                                'OldFolderVar = "OldFolder" & main_CheckListCnt
-                                                's = s & cr & "<script type=""text/javascript"">var " & OldFolderVar & "='" & DivID & "'</script>" & vbCrLf
-                                                '
-                                                ' Add in the empty DIV - shows when the folder is empty
-                                                '
-                                                returnHtml &= cr & "<div id=""" & TagName & ".empty"" style=""display:none;"">This category is empty</div>"
-                                            End If
-
-                                            returnHtml &= EndDiv
-                                            returnHtml &= cr & "<div ID=""" & DivID & """ style=""display:none;""><input type=hidden name=""" & DivName & """>"
-                                            If ContentFolderName <> "" Then
-                                                returnHtml &= cr & "<div>" & ContentFolderName & "</div>"
-                                                returnHtml &= cr & "<div style=""padding-left:10px;padding-bottom:10px;"">"
-                                            Else
-                                                returnHtml &= cr & "<div>Uncategorized</div>"
-                                                returnHtml &= cr & "<div style=""padding-left:10px;padding-bottom:10px;"">"
-                                            End If
-                                            EndDiv = cr & "</div></div>"
-                                            DivCnt = DivCnt + 1
-                                            DivCheckBoxCnt = 0
-                                        End If
-
                                         RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                         AllowRuleCopy = cpCore.db.cs_getBoolean(CS, "AllowRuleCopy")
                                         RuleCopyCaption = cpCore.db.cs_getText(CS, "RuleCopyCaption")
@@ -6688,128 +6618,128 @@ ErrorTrap:
             End Try
             Return returnHtml
         End Function
-        '
-        '==========================================================================================================================================
-        '   main_GetFormInputCheckList - with two panes
-        '       Content Category view on the left
-        '       Checkboxes for content on the right that match the left folder
-        '==========================================================================================================================================
-        '
-        Public Function getInputCheckListCategories(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal readOnlyField As Boolean = False, Optional ByVal RightSideHeader As String = "", Optional ByVal DefaultSecondaryIDList As String = "") As String
-            Dim result As String = ""
-            Try
-                Dim AllNode As String
-                Dim LeftPane As String
-                Dim RightPane As String
-                Dim CS As Integer
-                Dim SQL As String
-                Dim BakeName As String
-                Dim Caption As String
-                Dim Id As Integer
-                Dim CurrentFolderID As Integer
-                Dim IsAuthoringMode As Boolean
-                Dim LinkBase As String
-                Dim JSCaption As String
-                Dim JSSwitch As String
-                Dim JSSwitchFirst As String = String.Empty
-                Dim FirstCaption As String = String.Empty
-                Dim EmptyDivID As String
-                Dim JSSwitchAll As String
-                Dim IsContentCategoriesSupported As Boolean
-                '
-                IsContentCategoriesSupported = cpCore.metaData.isContentFieldSupported(SecondaryContentName, "ContentCategoryID")
-                If Not IsContentCategoriesSupported Then
-                    result = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
-                Else
-                    IsAuthoringMode = True
-                    LinkBase = cpCore.doc.refreshQueryString
-                    BakeName = "ContentFolderNav"
-                    If Not IsAuthoringMode Then
-                        '          main_GetFormInputCheckListCategories = cache.cache_readBake(BakeName)
-                    End If
+        ''
+        ''==========================================================================================================================================
+        ''   main_GetFormInputCheckList - with two panes
+        ''       Content Category view on the left
+        ''       Checkboxes for content on the right that match the left folder
+        ''==========================================================================================================================================
+        ''
+        'Public Function getInputCheckListCategories(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal readOnlyField As Boolean = False, Optional ByVal RightSideHeader As String = "", Optional ByVal DefaultSecondaryIDList As String = "") As String
+        '    Dim result As String = ""
+        '    Try
+        '        Dim AllNode As String
+        '        Dim LeftPane As String
+        '        Dim RightPane As String
+        '        Dim CS As Integer
+        '        Dim SQL As String
+        '        Dim BakeName As String
+        '        Dim Caption As String
+        '        Dim Id As Integer
+        '        Dim CurrentFolderID As Integer
+        '        Dim IsAuthoringMode As Boolean
+        '        Dim LinkBase As String
+        '        Dim JSCaption As String
+        '        Dim JSSwitch As String
+        '        Dim JSSwitchFirst As String = String.Empty
+        '        Dim FirstCaption As String = String.Empty
+        '        Dim EmptyDivID As String
+        '        Dim JSSwitchAll As String
+        '        Dim IsContentCategoriesSupported As Boolean
+        '        '
+        '        IsContentCategoriesSupported = cpCore.metaData.isContentFieldSupported(SecondaryContentName, "ContentCategoryID")
+        '        If Not IsContentCategoriesSupported Then
+        '            result = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
+        '        Else
+        '            IsAuthoringMode = True
+        '            LinkBase = cpCore.doc.refreshQueryString
+        '            BakeName = "ContentFolderNav"
+        '            If Not IsAuthoringMode Then
+        '                '          main_GetFormInputCheckListCategories = cache.cache_readBake(BakeName)
+        '            End If
 
-                    Dim s As String = String.Empty
+        '            Dim s As String = String.Empty
 
-                    If result = "" Then
-                        EmptyDivID = TagName & ".empty"
-                        SQL = cpCore.db.GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
-                        CS = cpCore.db.cs_openSql(SQL)
-                        Do While cpCore.db.cs_ok(CS)
-                            Caption = cpCore.db.cs_getText(CS, "name")
-                            Id = cpCore.db.cs_getInteger(CS, "ID")
-                            CurrentFolderID = cpCore.db.cs_getInteger(CS, "ContentCategoryID")
-                            '
-                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
-                            If FirstCaption = "" Then
-                                FirstCaption = Caption
-                            End If
-                            JSCaption = genericController.EncodeJavascript(Caption)
-                            JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & cpCore.doc.checkListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.checkListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
-                            If JSSwitchFirst = "" Then
-                                JSSwitchFirst = JSSwitch
-                            End If
-                            s = s & cr & "<li class=""ccAdminSmall ccPanel""><a href=""#"" onclick=""" & JSSwitch & """>" & Caption & "</a></li>"
-                            'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption, JSSwitch)
-                            'Call Tree.AddEntry(CStr(ID), CStr(CurrentFolderID), , , Link, Caption, "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & ID & "', OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption'," & JSCaption & "); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & ID & "';")
-                            Call cpCore.db.cs_goNext(CS)
-                        Loop
-                        Call cpCore.db.cs_Close(CS)
-                        LeftPane = cr & "<ul>" & genericController.htmlIndent(s) & cr & "</ul>"
-                        'LeftPane = Tree.GetTree(CStr(0), OpenMenuName)
-                        '
-                        ' Add the top 'All' node
-                        '
-                        JSCaption = "All"
-                        JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & cpCore.doc.checkListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.checkListCnt & "='" & TagName & ".All';"
-                        If genericController.vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
-                            AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
-                            LeftPane = cr & AllNode & LeftPane
-                        Else
-                            AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
-                            LeftPane = cr & AllNode & LeftPane
-                        End If
-                        '
-                        ' + Add Category
-                        '
-                        If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
-                            LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
-                        End If
-                        '
-                        LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.htmlIndent(LeftPane) & cr & "</div>"
-                        '
-                        ' open the current node
-                        '
-                        RightPane = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, True, DefaultSecondaryIDList)
-                        '
-                        result = "" _
-                        & "<div style=""border:1px solid #A0A0A0;"">" _
-                        & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%;"">" _
-                        & "<tr>" _
-                        & "<td class=""ccAdminTab"" style=""width:100px;padding:5px;text-align:left"">Categories<br ><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=90 height=1></td>" _
-                        & "<td class=""ccAdminTab"" style=""width:1px;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=1></td>" _
-                        & "<td class=""ccAdminTab"" style=""width:90%;padding:5px;text-align:left"" ID=""" & TagName & ".ContentCaption"">" & genericController.encodeEmptyText(RightSideHeader, "&nbsp;") & "</td>" _
-                        & "</td></tr>" _
-                        & "<tr>" _
-                        & "<td style=""width:100px;padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & LeftPane & "</td>" _
-                        & "<td class=""ccAdminTab"" style=""width:1px;""></td>" _
-                        & "<td style=""width:90%;padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & RightPane & "</td>" _
-                        & "</td></tr>" _
-                        & "</table>" _
-                        & "</div>"
-                        If Not IsAuthoringMode Then
-                            Call cpCore.cache.setObject(BakeName, result, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
-                        End If
-                        '
-                        ' initialize with all open
-                        '
-                        Call addOnLoadJavascript(JSSwitchAll, "Checklist Categories")
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return result
-        End Function
+        '            If result = "" Then
+        '                EmptyDivID = TagName & ".empty"
+        '                SQL = cpCore.db.GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
+        '                CS = cpCore.db.cs_openSql(SQL)
+        '                Do While cpCore.db.cs_ok(CS)
+        '                    Caption = cpCore.db.cs_getText(CS, "name")
+        '                    Id = cpCore.db.cs_getInteger(CS, "ID")
+        '                    CurrentFolderID = cpCore.db.cs_getInteger(CS, "ContentCategoryID")
+        '                    '
+        '                    Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
+        '                    If FirstCaption = "" Then
+        '                        FirstCaption = Caption
+        '                    End If
+        '                    JSCaption = genericController.EncodeJavascript(Caption)
+        '                    JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & cpCore.doc.checkListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.checkListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
+        '                    If JSSwitchFirst = "" Then
+        '                        JSSwitchFirst = JSSwitch
+        '                    End If
+        '                    s = s & cr & "<li class=""ccAdminSmall ccPanel""><a href=""#"" onclick=""" & JSSwitch & """>" & Caption & "</a></li>"
+        '                    'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption, JSSwitch)
+        '                    'Call Tree.AddEntry(CStr(ID), CStr(CurrentFolderID), , , Link, Caption, "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & ID & "', OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption'," & JSCaption & "); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & ID & "';")
+        '                    Call cpCore.db.cs_goNext(CS)
+        '                Loop
+        '                Call cpCore.db.cs_Close(CS)
+        '                LeftPane = cr & "<ul>" & genericController.htmlIndent(s) & cr & "</ul>"
+        '                'LeftPane = Tree.GetTree(CStr(0), OpenMenuName)
+        '                '
+        '                ' Add the top 'All' node
+        '                '
+        '                JSCaption = "All"
+        '                JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & cpCore.doc.checkListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.checkListCnt & "='" & TagName & ".All';"
+        '                If genericController.vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
+        '                    AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
+        '                    LeftPane = cr & AllNode & LeftPane
+        '                Else
+        '                    AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
+        '                    LeftPane = cr & AllNode & LeftPane
+        '                End If
+        '                '
+        '                ' + Add Category
+        '                '
+        '                If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
+        '                    LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+        '                End If
+        '                '
+        '                LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.htmlIndent(LeftPane) & cr & "</div>"
+        '                '
+        '                ' open the current node
+        '                '
+        '                RightPane = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, True, DefaultSecondaryIDList)
+        '                '
+        '                result = "" _
+        '                & "<div style=""border:1px solid #A0A0A0;"">" _
+        '                & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%;"">" _
+        '                & "<tr>" _
+        '                & "<td class=""ccAdminTab"" style=""width:100px;padding:5px;text-align:left"">Categories<br ><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=90 height=1></td>" _
+        '                & "<td class=""ccAdminTab"" style=""width:1px;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=1></td>" _
+        '                & "<td class=""ccAdminTab"" style=""width:90%;padding:5px;text-align:left"" ID=""" & TagName & ".ContentCaption"">" & genericController.encodeEmptyText(RightSideHeader, "&nbsp;") & "</td>" _
+        '                & "</td></tr>" _
+        '                & "<tr>" _
+        '                & "<td style=""width:100px;padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & LeftPane & "</td>" _
+        '                & "<td class=""ccAdminTab"" style=""width:1px;""></td>" _
+        '                & "<td style=""width:90%;padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & RightPane & "</td>" _
+        '                & "</td></tr>" _
+        '                & "</table>" _
+        '                & "</div>"
+        '                If Not IsAuthoringMode Then
+        '                    Call cpCore.cache.setObject(BakeName, result, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
+        '                End If
+        '                '
+        '                ' initialize with all open
+        '                '
+        '                Call addOnLoadJavascript(JSSwitchAll, "Checklist Categories")
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex)
+        '    End Try
+        '    Return result
+        'End Function
 
         '
         '
@@ -8474,7 +8404,7 @@ ErrorTrap:
                 rulesTablename = cpCore.metaData.getContentTablename(RulesContentName)
                 SQL = "select " & RulesSecondaryFieldName & ",id from " & rulesTablename & " where (" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(active<>0) order by " & RulesSecondaryFieldName
                 currentRulesCnt = 0
-                currentRules = cpCore.db.executeSql(SQL)
+                currentRules = cpCore.db.executeQuery(SQL)
                 currentRulesCnt = currentRules.Rows.Count
                 For GroupPtr = 0 To GroupCnt - 1
                     '
@@ -8516,7 +8446,7 @@ ErrorTrap:
                         ' Record exists and is needed, update the rule copy
                         '
                         SQL = "update " & rulesTablename & " set rulecopy=" & cpCore.db.encodeSQLText(RuleCopy) & " where id=" & RuleId
-                        Call cpCore.db.executeSql(SQL)
+                        Call cpCore.db.executeQuery(SQL)
                     ElseIf RuleNeeded And (Not RuleFound) Then
                         '
                         ' No record exists, and one is needed
@@ -8537,7 +8467,7 @@ ErrorTrap:
                         ' Record exists and it is not needed
                         '
                         SQL = "delete from " & rulesTablename & " where id=" & RuleId
-                        Call cpCore.db.executeSql(SQL)
+                        Call cpCore.db.executeQuery(SQL)
                         RuleContentChanged = True
                     End If
                 Next
@@ -8546,7 +8476,7 @@ ErrorTrap:
                 '
                 If dupRuleIdList <> "" Then
                     SQL = "delete from " & rulesTablename & " where id in (" & Mid(dupRuleIdList, 2) & ")"
-                    Call cpCore.db.executeSql(SQL)
+                    Call cpCore.db.executeQuery(SQL)
                     RuleContentChanged = True
                 End If
             End If

@@ -516,7 +516,7 @@ Namespace Contensive.Core.Controllers
                         Call cpCore.security.decodeToken(CookieDetectKey, CookieDetectVisitId, cookieDetectDate)
                         'CookieDetectVisitId = cpCore.main_DecodeKeyNumber(CookieDetectKey)
                         If CookieDetectVisitId <> 0 Then
-                            Call cpCore.db.executeSql("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
+                            Call cpCore.db.executeQuery("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
                             cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                             Return cpCore.continueProcessing
                         End If
@@ -547,7 +547,7 @@ Namespace Contensive.Core.Controllers
                         domainDetailsListText = vbCrLf
                         SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,0 as ignoreAllowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
                         Dim dt As DataTable
-                        dt = cpCore.db.executeSql(SQL)
+                        dt = cpCore.db.executeQuery(SQL)
                         If dt.Rows.Count > 0 Then
                             If Not (dt.Columns Is Nothing) Then
                                 Dim colCnt As Integer = dt.Columns.Count
@@ -624,7 +624,7 @@ Namespace Contensive.Core.Controllers
                             ' set visited true
                             '
                             SQL = "update ccdomains set visited=1 where name=" & cpCore.db.encodeSQLText(requestDomain)
-                            Call cpCore.db.executeSql(SQL)
+                            Call cpCore.db.executeQuery(SQL)
                             Call cpCore.cache.setObject("domainContentList", "", "domains")
                         End If
                         If cpCore.domainLegacyCache.domainDetails.typeId = 1 Then
@@ -1187,7 +1187,7 @@ ErrorTrap:
                         '
                         Call logController.log_appendLogPageNotFound(cpCore, requestUrlSource)
                         If ShortLink <> "" Then
-                            Call cpCore.db.executeSql("Update ccContentWatch set link=null where link=" & cpCore.db.encodeSQLText(ShortLink))
+                            Call cpCore.db.executeQuery("Update ccContentWatch set link=null where link=" & cpCore.db.encodeSQLText(ShortLink))
                         End If
                         '
                         If cpCore.testPointPrinting Then

@@ -28,9 +28,6 @@ Namespace Contensive.Core.Controllers
         ' internal storage
         '------------------------------------------------------------------------------------------------------------------------
         '
-        ' on Db success, verified set true. If error and not verified, a simple test is run. on failure, Db disabled 
-        Private dbVerified As Boolean = False                                  ' set true when configured and tested - else db calls are skipped
-        Private dbEnabled As Boolean = True                                    ' set true when configured and tested - else db calls are skipped
         '
         Private Const pageSizeDefault = 9999
         '
@@ -38,10 +35,15 @@ Namespace Contensive.Core.Controllers
         '
         Private Const allowWorkflowErrors = False
         '
+        ' on Db success, verified set true. If error and not verified, a simple test is run. on failure, Db disabled 
+        Private Property dbVerified As Boolean = False                                  ' set true when configured and tested - else db calls are skipped
+        Private Property dbEnabled As Boolean = True                                    ' set true when configured and tested - else db calls are skipped
         ' simple lazy cached values
-        Private contentSetStore() As ContentSetType2
-        Private contentSetStoreCount As Integer       ' The number of elements being used
-        Private contentSetStoreSize As Integer        ' The number of current elements in the array
+        Private Property connectionStringDict As New Dictionary(Of String, String)          ' simple lazy cache so it only calculates conn string once
+        Private Property contentSetStore As ContentSetType2()
+        Private Property contentSetStoreCount As Integer       ' The number of elements being used
+        Private Property contentSetStoreSize As Integer        ' The number of current elements in the array
+        '
         Private Const contentSetStoreChunk = 50              ' How many are added at a time
         '
         ' when true, all csOpen, etc, will be setup, but not return any data (csv_IsCSOK false)
@@ -69,11 +71,6 @@ Namespace Contensive.Core.Controllers
             Dim ContentName As String
             Dim CDef As cdefModel
             Dim OwnerMemberID As Integer               ' ID of the member who opened the csv_ContentSet
-            '
-            ' Workflow editing modes
-            'Dim WorkflowAuthoringMode As Boolean    ' if true, these records came from the AuthoringTable, else ContentTable
-            'Dim WorkflowEditingRequested As Boolean ' if true, the CS was opened requesting WorkflowEditingMode
-            'Dim WorkflowEditingMode As Boolean      ' if true, the current record can be edited, else just rendered (effects EditBlank and csv_SaveCSRecord)
             '
             ' Write Cache
             Dim writeCache As Dictionary(Of String, String)
@@ -165,32 +162,40 @@ Namespace Contensive.Core.Controllers
             Dim returnConnString As String = ""
             Try
                 '
-                ' -- lookup dataSource
-                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName)
-                If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
-                    '
-                    ' -- default datasource
-                    returnConnString = "" _
-                        & cpCore.dbServer.getConnectionStringADONET() _
-                        & "Database=" & catalogName & ";"
+                ' -- simple local cache so it does not have to be recreated each time
+                Dim cacheName As String = "catalog:" & catalogName & "/datasource:" & dataSourceName
+                If (connectionStringDict.ContainsKey(cacheName)) Then
+                    returnConnString = connectionStringDict(cacheName)
                 Else
                     '
-                    ' -- custom datasource from Db in primary datasource
-                    If (Not cpCore.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) Then
+                    ' -- lookup dataSource
+                    Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName)
+                    If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
                         '
-                        ' -- not found, this is a hard error
-                        Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
+                        ' -- default datasource
+                        returnConnString = "" _
+                        & cpCore.dbServer.getConnectionStringADONET() _
+                        & "Database=" & catalogName & ";"
                     Else
                         '
-                        ' -- found in local cache
-                        With cpCore.dataSourceDictionary(normalizedDataSourceName)
-                            returnConnString = "" _
+                        ' -- custom datasource from Db in primary datasource
+                        If (Not cpCore.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) Then
+                            '
+                            ' -- not found, this is a hard error
+                            Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
+                        Else
+                            '
+                            ' -- found in local cache
+                            With cpCore.dataSourceDictionary(normalizedDataSourceName)
+                                returnConnString = "" _
                                 & "server=" & .endPoint & ";" _
                                 & "User Id=" & .username & ";" _
                                 & "Password=" & .password & ";" _
                                 & "Database=" & catalogName & ";"
-                        End With
+                            End With
+                        End If
                     End If
+                    connectionStringDict.Add(cacheName, returnConnString)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -341,7 +346,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="startRecord"></param>
         ''' <param name="maxRecords"></param>
         ''' <returns></returns>
-        Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999, Optional ByRef recordsAffected As Integer = 0) As DataTable
+        Public Function executeQuery(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999, Optional ByRef recordsReturned As Integer = 0) As DataTable
             Dim returnData As New DataTable
             Try
                 If Not dbEnabled Then
@@ -371,7 +376,7 @@ Namespace Contensive.Core.Controllers
                             cmdSQL.CommandText = sql
                             cmdSQL.Connection = connSQL
                             Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
-                                recordsAffected = adptSQL.Fill(startRecord, maxRecords, returnData)
+                                recordsReturned = adptSQL.Fill(startRecord, maxRecords, returnData)
                             End Using
                         End Using
                     End Using
@@ -384,46 +389,6 @@ Namespace Contensive.Core.Controllers
             End Try
             Return returnData
         End Function
-        ''
-        ''====================================================================================================
-        '''' <summary>
-        '''' executeSql without handling. Used from executeSql(), and as an initial connection test.
-        '''' </summary>
-        '''' <param name="sql"></param>
-        '''' <param name="connString"></param>
-        '''' <param name="startRecord"></param>
-        '''' <param name="maxRecords"></param>
-        '''' <returns></returns>
-        'Private Function executeSql_noErrorHandling(ByVal sql As String, ByVal connString As String, ByVal startRecord As Integer, ByVal maxRecords As Integer, ByRef recordsAffected As Integer) As DataTable
-        '    '
-        '    ' REFACTOR
-        '    ' consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
-        '    ' https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldatareader.aspx
-        '    '
-        '    Dim sw As Stopwatch = Stopwatch.StartNew()
-        '    Dim returnData As New DataTable
-        '    Dim tickCountStart As Integer = GetTickCount
-        '    If dbEnabled Then
-        '        Using connSQL As New SqlConnection(connString)
-        '            connSQL.Open()
-        '            Using cmdSQL As New SqlCommand()
-        '                cmdSQL.CommandType = Data.CommandType.Text
-        '                cmdSQL.CommandText = sql
-        '                cmdSQL.Connection = connSQL
-        '                Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
-        '                    recordsAffected = adptSQL.Fill(startRecord, maxRecords, returnData)
-        '                End Using
-        '            End Using
-        '        End Using
-        '        dbVerified = True
-        '        sw.Stop()
-        '        saveTransactionLog("duration [" & sw.ElapsedMilliseconds & "], sql [" & sql & "]")
-        '        If (sw.ElapsedMilliseconds > sqlSlowThreshholdMsec) Then
-        '            saveSlowQueryLog(CInt(sw.ElapsedMilliseconds), sql)
-        '        End If
-        '    End If
-        '    Return returnData
-        'End Function
         '
         '====================================================================================================
         ''' <summary>
@@ -435,6 +400,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="maxRecords"></param>
         ''' <returns>You must close the recordset after use.</returns>
         Public Function executeSql_getRecordSet(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As ADODB.Recordset
+            '
             ' from - https://support.microsoft.com/en-us/kb/308611
             '
             ' REFACTOR 
@@ -444,7 +410,6 @@ Namespace Contensive.Core.Controllers
             'Dim cn As ADODB.Connection = New ADODB.Connection()
             Dim rs As ADODB.Recordset = New ADODB.Recordset()
             Dim connString As String = getConnectionStringOLEDB(cpCore.serverConfig.appConfig.name, dataSourceName)
-            '
             Try
                 If dbEnabled Then
                     If (maxRecords > 0) Then
@@ -456,6 +421,7 @@ Namespace Contensive.Core.Controllers
                     dbVerified = True
                 End If
             Catch ex As Exception
+                cpCore.handleException(ex) : Throw
                 Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
                 cpCore.handleException(newEx)
                 Throw newEx
@@ -465,13 +431,12 @@ Namespace Contensive.Core.Controllers
         '
         '====================================================================================================
         ''' <summary>
-        ''' execute sql on a specific datasource asynchonously. No data is returned.
+        ''' execute sql on a specific datasource. No data is returned.
         ''' </summary>
         ''' <param name="sql"></param>
         ''' <param name="dataSourceName"></param>
         '
-        Public Sub executeSqlAsync(ByVal sql As String, Optional ByVal dataSourceName As String = "")
-            Exit Sub
+        Public Sub executeNonQuery(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByRef recordsAffected As Integer = 0)
             Try
                 If dbEnabled Then
                     Dim connString As String = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName)
@@ -481,16 +446,40 @@ Namespace Contensive.Core.Controllers
                             cmdSQL.CommandType = Data.CommandType.Text
                             cmdSQL.CommandText = sql
                             cmdSQL.Connection = connSQL
-                            cmdSQL.ExecuteNonQuery()
-                            'cmdSQL.BeginExecuteNonQuery()
+                            recordsAffected = cmdSQL.ExecuteNonQuery()
                         End Using
                     End Using
                     dbVerified = True
                 End If
             Catch ex As Exception
-                Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql async [" & sql & "], datasource [" & dataSourceName & "]", ex)
-                cpCore.handleException(newEx)
-                Throw newEx
+                cpCore.handleException(ex) : Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' execute sql on a specific datasource asynchonously. No data is returned.
+        ''' </summary>
+        ''' <param name="sql"></param>
+        ''' <param name="dataSourceName"></param>
+        '
+        Public Sub executeNonQueryAsync(ByVal sql As String, Optional ByVal dataSourceName As String = "")
+            Try
+                If dbEnabled Then
+                    Dim connString As String = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName)
+                    Using connSQL As New SqlConnection(connString)
+                        connSQL.Open()
+                        Using cmdSQL As New SqlCommand()
+                            cmdSQL.CommandType = Data.CommandType.Text
+                            cmdSQL.CommandText = sql
+                            cmdSQL.Connection = connSQL
+                            cmdSQL.ExecuteNonQueryAsync()
+                        End Using
+                    End Using
+                    dbVerified = True
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         ''
@@ -526,7 +515,7 @@ Namespace Contensive.Core.Controllers
         Public Sub updateTableRecord(ByVal DataSourceName As String, ByVal TableName As String, ByVal Criteria As String, sqlList As sqlFieldListClass)
             Try
                 Dim SQL As String = "update " & TableName & " set " & sqlList.getNameValueList & " where " & Criteria & ";"
-                Dim dt As DataTable = executeSql(SQL, DataSourceName)
+                Dim dt As DataTable = executeQuery(SQL, DataSourceName)
                 dt.Dispose()
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -601,7 +590,7 @@ Namespace Contensive.Core.Controllers
             Try
                 If sqlList.count > 0 Then
                     Dim sql As String = "INSERT INTO " & TableName & "(" & sqlList.getNameList & ")values(" & sqlList.getValueList & ")"
-                    Dim dt As DataTable = executeSql(sql, DataSourceName)
+                    Dim dt As DataTable = executeQuery(sql, DataSourceName)
                     dt.Dispose()
                 End If
             Catch ex As Exception
@@ -638,7 +627,7 @@ Namespace Contensive.Core.Controllers
                     SQL &= " ORDER BY " & SortFieldList
                 End If
                 'SQL &= ";"
-                returnDataTable = executeSql(SQL, DataSourceName, (PageNumber - 1) * PageSize, PageSize)
+                returnDataTable = executeQuery(SQL, DataSourceName, (PageNumber - 1) * PageSize, PageSize)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -760,10 +749,10 @@ Namespace Contensive.Core.Controllers
                     If (cpCore.metaData.getTableSchema(TableName, DataSourceName) Is Nothing) Then
                         If Not AllowAutoIncrement Then
                             Dim SQL As String = "Create Table " & TableName & "(ID " & getSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) & ");"
-                            executeSql(SQL, DataSourceName).Dispose()
+                            executeQuery(SQL, DataSourceName).Dispose()
                         Else
                             Dim SQL As String = "Create Table " & TableName & "(ID " & getSQLAlterColumnType(DataSourceName, FieldTypeIdAutoIdIncrement) & ");"
-                            executeSql(SQL, DataSourceName).Dispose()
+                            executeQuery(SQL, DataSourceName).Dispose()
                         End If
                     End If
                     '
@@ -849,7 +838,7 @@ Namespace Contensive.Core.Controllers
                             '
                             SQL &= getSQLAlterColumnType(DataSourceName, fieldType)
                         End If
-                        Call executeSql(SQL, DataSourceName).Dispose()
+                        Call executeQuery(SQL, DataSourceName).Dispose()
                         '
                         If clearMetaCache Then
                             Call cpCore.cache.invalidateAll()
@@ -870,7 +859,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="TableName"></param>
         Public Sub deleteTable(ByVal DataSourceName As String, ByVal TableName As String)
             Try
-                Call executeSql("DROP TABLE " & TableName, DataSourceName).Dispose()
+                Call executeQuery("DROP TABLE " & TableName, DataSourceName).Dispose()
                 cpCore.cache.invalidateAll()
                 cpCore.metaData.clear()
             Catch ex As Exception
@@ -905,7 +894,7 @@ Namespace Contensive.Core.Controllers
                     '
                     '   Delete the field
                     '
-                    Call executeSql("ALTER TABLE " & TableName & " DROP COLUMN " & FieldName & ";", DataSourceName)
+                    Call executeQuery("ALTER TABLE " & TableName & " DROP COLUMN " & FieldName & ";", DataSourceName)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -928,7 +917,7 @@ Namespace Contensive.Core.Controllers
                     ts = cpCore.metaData.getTableSchema(TableName, DataSourceName)
                     If (ts IsNot Nothing) Then
                         If Not ts.indexes.Contains(IndexName.ToLower) Then
-                            Call executeSql("CREATE INDEX " & IndexName & " ON " & TableName & "( " & FieldNames & " );", DataSourceName)
+                            Call executeQuery("CREATE INDEX " & IndexName & " ON " & TableName & "( " & FieldNames & " );", DataSourceName)
                             If clearMetaCache Then
                                 cpCore.cache.invalidateAll()
                                 cpCore.metaData.clear()
@@ -1079,7 +1068,7 @@ Namespace Contensive.Core.Controllers
                             Case Else
                                 sql = "DROP INDEX " & TableName & "." & IndexName & ";"
                         End Select
-                        Call executeSql(sql, DataSourceName)
+                        Call executeQuery(sql, DataSourceName)
                         cpCore.cache.invalidateAll()
                         cpCore.metaData.clear()
                     End If
@@ -1100,7 +1089,7 @@ Namespace Contensive.Core.Controllers
         Public Function isCdefField(ByVal ContentID As Integer, ByVal FieldName As String) As Boolean
             Dim returnOk As Boolean = False
             Try
-                Dim dt As DataTable = executeSql("Select top 1 id from ccFields where name=" & encodeSQLText(FieldName) & " And contentid=" & ContentID)
+                Dim dt As DataTable = executeQuery("Select top 1 id from ccFields where name=" & encodeSQLText(FieldName) & " And contentid=" & ContentID)
                 isCdefField = genericController.isDataTableOk(dt)
                 dt.Dispose()
             Catch ex As Exception
@@ -1401,7 +1390,7 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' Run the query
                                 '
-                                contentSetStore(returnCs).dt = executeSql(SQL, DataSourceName, .PageSize * (.PageNumber - 1), .PageSize)
+                                contentSetStore(returnCs).dt = executeQuery(SQL, DataSourceName, .PageSize * (.PageNumber - 1), .PageSize)
                             End If
                         End With
                         Call cs_initData(returnCs)
@@ -1533,11 +1522,11 @@ Namespace Contensive.Core.Controllers
                 End With
                 '
                 If useCSReadCacheMultiRow Then
-                    contentSetStore(returnCs).dt = executeSql(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
+                    contentSetStore(returnCs).dt = executeQuery(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
                     Call cs_initData(returnCs)
                     'Call cs_loadCurrentRow(returnCs)
                 Else
-                    contentSetStore(returnCs).dt = executeSql(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
+                    contentSetStore(returnCs).dt = executeQuery(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
                     Call cs_initData(returnCs)
                     'Call cs_loadCurrentRow(returnCs)
                 End If
@@ -2745,7 +2734,7 @@ Namespace Contensive.Core.Controllers
                                             ContentName = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                                             DbTable = cpCore.metaData.getContentTablename(ContentName)
                                             SQL = "Select " & .ManyToManyRuleSecondaryField & " from " & DbTable & " where " & .ManyToManyRulePrimaryField & "=" & RecordID
-                                            rs = executeSql(SQL)
+                                            rs = executeQuery(SQL)
                                             If (genericController.isDataTableOk(rs)) Then
                                                 For Each dr As DataRow In rs.Rows
                                                     fieldValue &= "," & dr.Item(0).ToString
@@ -3345,7 +3334,7 @@ Namespace Contensive.Core.Controllers
                         '
                         If SQLCriteriaUnique <> "" Then
                             Dim sqlUnique As String = "SELECT ID FROM " & LiveTableName & " WHERE (ID<>" & LiveRecordID & ")AND(" & SQLCriteriaUnique & ")and(" & .CDef.ContentControlCriteria & ");"
-                            Using dt As DataTable = executeSql(sqlUnique, LiveDataSourceName)
+                            Using dt As DataTable = executeQuery(sqlUnique, LiveDataSourceName)
                                 '
                                 ' -- unique violation
                                 Throw New ApplicationException(("Can not save record to content [" & LiveRecordContentName & "] because it would create a non-unique record for one or more of the following field(s) [" & UniqueViolationFieldList & "]"))
@@ -3357,7 +3346,7 @@ Namespace Contensive.Core.Controllers
                             '
                             If (SQLLiveUpdate <> "") Then
                                 SQLUpdate = "UPDATE " & LiveTableName & " SET " & SQLLiveUpdate & " WHERE ID=" & LiveRecordID & ";"
-                                Call executeSql(SQLUpdate, LiveDataSourceName)
+                                Call executeQuery(SQLUpdate, LiveDataSourceName)
                             End If
                             '
                             ' ----- Live record has changed
@@ -3373,7 +3362,7 @@ Namespace Contensive.Core.Controllers
                                 If (LCase(LiveTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
                                     If isSQLTableField("default", "ccSpiderDocs", "PageID") Then
                                         SQL = "UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" & LiveRecordID
-                                        Call executeSql(SQL)
+                                        Call executeQuery(SQL)
                                     End If
                                 End If
                             End If
@@ -3723,7 +3712,7 @@ Namespace Contensive.Core.Controllers
         Public Function GetContentTableID(ByVal ContentName As String) As Integer
             Dim returnResult As Integer
             Try
-                Dim dt As DataTable = executeSql("select ContentTableID from ccContent where name=" & encodeSQLText(ContentName))
+                Dim dt As DataTable = executeQuery("select ContentTableID from ccContent where name=" & encodeSQLText(ContentName))
                 If Not genericController.isDataTableOk(dt) Then
                     Throw New ApplicationException("Content [" & ContentName & "] was not found in ccContent table")
                 Else
@@ -3986,7 +3975,7 @@ Namespace Contensive.Core.Controllers
                     Throw New ArgumentException("Criteria cannot be blank")
                 Else
                     Dim SQL As String = "DELETE FROM " & TableName & " WHERE " & Criteria
-                    Call executeSql(SQL, DataSourceName)
+                    Call executeQuery(SQL, DataSourceName)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -4518,7 +4507,7 @@ Namespace Contensive.Core.Controllers
         Private Function getDbContentID(ByVal ContentName As String) As Integer
             Dim returnContentId As Integer = 0
             Try
-                Dim dt As DataTable = executeSql("Select ID from ccContent where name=" & encodeSQLText(ContentName))
+                Dim dt As DataTable = executeQuery("Select ID from ccContent where name=" & encodeSQLText(ContentName))
                 If dt.Rows.Count > 0 Then
                     returnContentId = genericController.EncodeInteger(dt.Rows(0).Item("id"))
                 End If
@@ -4608,7 +4597,7 @@ Namespace Contensive.Core.Controllers
                     dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.authContext.user.id)
                     If dt.Rows.Count > 0 Then
                         RecordID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
-                        Call cpCore.db.executeSql("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSource.Name)
+                        Call cpCore.db.executeQuery("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSource.Name)
                     End If
                 End If
                 If dt.Rows.Count = 0 Then
@@ -4628,12 +4617,12 @@ Namespace Contensive.Core.Controllers
                         Call cpCore.metaData.createContent(True, DataSource, TableName, ContentName)
                         'ContentID = csv_GetContentID(ContentName)
                         SQL = "Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName)
-                        dt = cpCore.db.executeSql(SQL)
+                        dt = cpCore.db.executeQuery(SQL)
                         If dt.Rows.Count = 0 Then
                             Throw New ApplicationException("Content Definition [" & ContentName & "] could Not be selected by name after it was inserted")
                         Else
                             ContentID = genericController.EncodeInteger(dt(0).Item("ID"))
-                            Call cpCore.db.executeSql("update ccContent Set CreateKey=0 where id=" & ContentID)
+                            Call cpCore.db.executeQuery("update ccContent Set CreateKey=0 where id=" & ContentID)
                         End If
                         dt.Dispose()
                         cpCore.cache.invalidateAll()
@@ -4647,7 +4636,7 @@ Namespace Contensive.Core.Controllers
                     ' ----- locate the field in the content field table
                     '
                     SQL = "Select name from ccFields where ContentID=" & ContentID & ";"
-                    dtFields = cpCore.db.executeSql(SQL)
+                    dtFields = cpCore.db.executeQuery(SQL)
                     '
                     ' ----- verify all the table fields
                     '
@@ -4673,7 +4662,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' touch field so upgrade does not delete it
                             '
-                            Call cpCore.db.executeSql("update ccFields Set CreateKey=0 where (Contentid=" & ContentID & ") And (name = " & cpCore.db.encodeSQLText(UcaseTableColumnName) & ")")
+                            Call cpCore.db.executeQuery("update ccFields Set CreateKey=0 where (Contentid=" & ContentID & ") And (name = " & cpCore.db.encodeSQLText(UcaseTableColumnName) & ")")
                         End If
                     Next
                 End If
@@ -4681,7 +4670,7 @@ Namespace Contensive.Core.Controllers
                 ' Fill ContentControlID fields with new ContentID
                 '
                 SQL = "Update " & TableName & " Set ContentControlID=" & ContentID & " where (ContentControlID Is null);"
-                Call cpCore.db.executeSql(SQL, DataSource.Name)
+                Call cpCore.db.executeQuery(SQL, DataSource.Name)
                 '
                 ' ----- Load CDef
                 '       Load only if the previous state of autoload was true
@@ -4951,7 +4940,7 @@ Namespace Contensive.Core.Controllers
                 CurrentCount = 0
                 SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
                 Dim dt As DataTable
-                dt = executeSql(SQL)
+                dt = executeQuery(SQL)
                 If dt.Rows.Count > 0 Then
                     CurrentCount = genericController.EncodeInteger(dt.Rows(0).Item(0))
                 End If
@@ -4961,10 +4950,10 @@ Namespace Contensive.Core.Controllers
                     Else
                         SQL = "delete from " & TableName & " where id in (select top " & iChunkSize & " ID from " & TableName & " where " & Criteria & ")"
                     End If
-                    Call executeSql(SQL, DataSourceName)
+                    Call executeQuery(SQL, DataSourceName)
                     PreviousCount = CurrentCount
                     SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
-                    dt = executeSql(SQL)
+                    dt = executeQuery(SQL)
                     If dt.Rows.Count > 0 Then
                         CurrentCount = genericController.EncodeInteger(dt.Rows(0).Item(0))
                     End If

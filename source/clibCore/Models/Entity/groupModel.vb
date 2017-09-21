@@ -22,15 +22,15 @@ Namespace Contensive.Core.Models.Entity
         Public AllowBulkEmail As Boolean
         Public Caption As String
         Public ccGuid As String
-        Public ContentCategoryID As Integer
+        
         Public ContentControlID As Integer
         Public CopyFilename As String
         Public CreatedBy As Integer
         Public CreateKey As Integer
         Public DateAdded As Date
-        Public EditArchive As Boolean
-        Public EditBlank As Boolean
-        Public EditSourceID As Integer
+        
+        
+        
         Public ModifiedBy As Integer
         Public ModifiedDate As Date
         Public Name As String

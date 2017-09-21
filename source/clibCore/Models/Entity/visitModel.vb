@@ -22,15 +22,15 @@ Namespace Contensive.Core.Models.Entity
         Public Bot As Boolean
         Public Browser As String
         Public ccGuid As String
-        Public ContentCategoryID As Integer
+        
         Public ContentControlID As Integer
         Public CookieSupport As Boolean
         Public CreatedBy As Integer
         Public CreateKey As Integer
         Public DateAdded As Date
-        Public EditArchive As Boolean
-        Public EditBlank As Boolean
-        Public EditSourceID As Integer
+        
+        
+        
         Public ExcludeFromAnalytics As Boolean
         Public HTTP_FROM As String
         Public HTTP_REFERER As String

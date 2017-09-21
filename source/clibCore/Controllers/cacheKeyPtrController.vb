@@ -202,7 +202,7 @@ Namespace Contensive.Core.Controllers
                         dataStore = New dataStoreClass
                         dataStore.dataList = New List(Of String)
                         dataStore.keyPtrIndex = New keyPtrController
-                        Using dt As DataTable = cpCore.db.executeSql(sqlLoadKeyValue)
+                        Using dt As DataTable = cpCore.db.executeQuery(sqlLoadKeyValue)
                             Ptr = 0
                             For Each dr As DataRow In dt.Rows
                                 dataStore.keyPtrIndex.setPtr(dr.Item(0).ToString, Ptr)

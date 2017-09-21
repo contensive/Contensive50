@@ -180,7 +180,7 @@ Namespace Contensive.Core.Controllers
                                 & " where (c.Active<>0)" _
                                 & " and(c.id=" & contentId.ToString & ")"
                         Dim dt As DataTable
-                        dt = cpCore.db.executeSql(sql)
+                        dt = cpCore.db.executeQuery(sql)
                         If dt.Rows.Count = 0 Then
                             '
                             ' cdef not found
@@ -324,7 +324,7 @@ Namespace Contensive.Core.Controllers
                                     & " order by" _
                                     & " f.ContentID,f.EditTab,f.EditSortPriority" _
                                     & ""
-                                dt = cpCore.db.executeSql(sql)
+                                dt = cpCore.db.executeQuery(sql)
                                 If dt.Rows.Count = 0 Then
                                     '
                                 Else
@@ -889,20 +889,6 @@ Namespace Contensive.Core.Controllers
         '                                        SQL = "UPDATE " & AuthoringTableName & " set ModifiedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
         '                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
         '                                    End If
-        '                                    '
-        '                                    ' ----- Verify good EditArchive in authoring table
-        '                                    '
-        '                                    SQL = "UPDATE " & AuthoringTableName & " set EditArchive=" & SQLFalse & " where EditArchive is null;"
-        '                                    Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
-        '                                    '
-        '                                    ' ----- Verify good EditBlank
-        '                                    '
-        '                                    SQL = "UPDATE " & AuthoringTableName & " set EditBlank=" & SQLFalse & " where EditBlank is null;"
-        '                                    Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
-        '                                    If ContentTableName <> AuthoringTableName Then
-        '                                        SQL = "UPDATE " & ContentTableName & " set EditBlank=" & SQLFalse & " where EditBlank is null;"
-        '                                        Call cpCore.db.executeSql(SQL, ContentDataSourceName)
-        '                                    End If
         '                                End If
         '                                dtContent = Nothing
         '                            End If
@@ -944,7 +930,7 @@ Namespace Contensive.Core.Controllers
                     & " AND(ccGroupRules.Active<>0)" _
                     & " AND(ccContent.Active<>0)" _
                     & " AND(ccMemberRules.Active<>0)"
-                cidDataTable = cpCore.db.executeSql(SQL)
+                cidDataTable = cpCore.db.executeQuery(SQL)
                 CIDCount = cidDataTable.Rows.Count
                 For CIDPointer = 0 To CIDCount - 1
                     ContentID = genericController.EncodeInteger(cidDataTable.Rows(CIDPointer).Item(0))
@@ -1094,7 +1080,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="contentNameOrGuid"></param>
         Public Sub deleteContent(contentid As Integer)
             Try
-                cpCore.db.executeSql("delete from cccontent where (id=" & cpCore.db.encodeSQLNumber(contentid) & ")")
+                cpCore.db.executeQuery("delete from cccontent where (id=" & cpCore.db.encodeSQLNumber(contentid) & ")")
                 cpCore.cache.invalidateObject("content")
                 clear()
             Catch ex As Exception
@@ -1138,13 +1124,13 @@ Namespace Contensive.Core.Controllers
                 ' ----- check if child already exists
                 '
                 SQL = "select ID from ccContent where name=" & cpCore.db.encodeSQLText(ChildContentName) & ";"
-                rs = cpCore.db.executeSql(SQL)
+                rs = cpCore.db.executeQuery(SQL)
                 If isDataTableOk(rs) Then
                     ChildContentID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
                     '
                     ' mark the record touched so upgrade will not delete it
                     '
-                    Call cpCore.db.executeSql("update ccContent set CreateKey=0 where ID=" & ChildContentID)
+                    Call cpCore.db.executeQuery("update ccContent set CreateKey=0 where ID=" & ChildContentID)
                 End If
                 Call closeDataTable(rs)
                 If (isDataTableOk(rs)) Then
@@ -1158,13 +1144,13 @@ Namespace Contensive.Core.Controllers
                     ' Get ContentID of parent
                     '
                     SQL = "select ID from ccContent where name=" & cpCore.db.encodeSQLText(ParentContentName) & ";"
-                    rs = cpCore.db.executeSql(SQL, DataSourceName)
+                    rs = cpCore.db.executeQuery(SQL, DataSourceName)
                     If isDataTableOk(rs) Then
                         ParentContentID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
                         '
                         ' mark the record touched so upgrade will not delete it
                         '
-                        Call cpCore.db.executeSql("update ccContent set CreateKey=0 where ID=" & ParentContentID)
+                        Call cpCore.db.executeQuery("update ccContent set CreateKey=0 where ID=" & ParentContentID)
                     End If
                     Call closeDataTable(rs)
                     If (isDataTableOk(rs)) Then
@@ -1223,11 +1209,6 @@ Namespace Contensive.Core.Controllers
                             End If
                         End If
                         Call cpCore.db.cs_Close(CSContent)
-                        'SQL = "INSERT INTO ccContent ( Name, Active, DateAdded, CreatedBy, ModifiedBy, ModifiedDate, AllowAdd, DeveloperOnly, AdminOnly, CreateKey, SortOrder, ContentControlID, AllowDelete, ParentID, EditSourceID, EditArchive, EditBlank, ContentTableID, AuthoringTableID, AllowWorkflowAuthoring, DefaultSortMethodID, DropDownFieldList, EditorGroupID )" _
-                        '    & " SELECT " & encodeSQLText(ChildContentName) & " AS Name, ccContent.Active, ccContent.DateAdded, ccContent.CreatedBy, ccContent.ModifiedBy, ccContent.ModifiedDate, ccContent.AllowAdd, ccContent.DeveloperOnly, ccContent.AdminOnly, ccContent.CreateKey, ccContent.SortOrder, ccContent.ContentControlID, ccContent.AllowDelete, ccContent.ID, ccContent.EditSourceID, ccContent.EditArchive, ccContent.EditBlank, ccContent.ContentTableID, ccContent.AuthoringTableID, ccContent.AllowWorkflowAuthoring, ccContent.DefaultSortMethodID, ccContent.DropDownFieldList, ccContent.EditorGroupID" _
-                        '    & " From ccContent" _
-                        '    & " WHERE (((ccContent.ID)=" & encodeSQLNumber(ParentContentID) & "));"
-                        'Call csv_ExecuteSQL(sql,DataSourceName)
                     End If
                 End If
                 '
@@ -1459,7 +1440,7 @@ Namespace Contensive.Core.Controllers
                         ' get contentId, guid, IsBaseContent
                         '
                         SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" & cpCore.db.encodeSQLText(contentName) & ") order by id;"
-                        dt = cpCore.db.executeSql(SQL)
+                        dt = cpCore.db.executeQuery(SQL)
                         If dt.Rows.Count > 0 Then
                             returnContentId = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                             LcContentGuid = genericController.vbLCase(genericController.encodeText(dt.Rows(0).Item("ccguid")))
@@ -1474,7 +1455,7 @@ Namespace Contensive.Core.Controllers
                             ContentIDofContent = returnContentId
                         Else
                             SQL = "select ID from ccContent where (name='content') order by id;"
-                            dt = cpCore.db.executeSql(SQL)
+                            dt = cpCore.db.executeQuery(SQL)
                             If dt.Rows.Count > 0 Then
                                 ContentIDofContent = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                             End If
@@ -1485,7 +1466,7 @@ Namespace Contensive.Core.Controllers
                         '
                         If Not String.IsNullOrEmpty(ParentName) Then
                             SQL = "select id from ccContent where (name=" & cpCore.db.encodeSQLText(ParentName) & ") order by id;"
-                            dt = cpCore.db.executeSql(SQL)
+                            dt = cpCore.db.executeQuery(SQL)
                             If dt.Rows.Count > 0 Then
                                 parentId = genericController.EncodeInteger(dt.Rows(0).Item(0))
                             End If
@@ -1497,7 +1478,7 @@ Namespace Contensive.Core.Controllers
                         InstalledByCollectionID = 0
                         If (installedByCollectionGuid <> "") Then
                             SQL = "select id from ccAddonCollections where ccGuid=" & cpCore.db.encodeSQLText(installedByCollectionGuid)
-                            dt = cpCore.db.executeSql(SQL)
+                            dt = cpCore.db.executeQuery(SQL)
                             If dt.Rows.Count > 0 Then
                                 InstalledByCollectionID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                             End If
@@ -1519,7 +1500,7 @@ Namespace Contensive.Core.Controllers
                             ' ----- Get the Table Definition ID, create one if missing
                             '
                             SQL = "SELECT ID from ccTables where (active<>0) and (name=" & cpCore.db.encodeSQLText(TableName) & ");"
-                            dt = cpCore.db.executeSql(SQL)
+                            dt = cpCore.db.executeQuery(SQL)
                             If dt.Rows.Count <= 0 Then
                                 '
                                 ' ----- no table definition found, create one
@@ -1857,7 +1838,7 @@ Namespace Contensive.Core.Controllers
                 ContentID = -1
                 TableID = 0
                 SQL = "select ID,ContentTableID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName) & ";"
-                rs = cpCore.db.executeSql(SQL)
+                rs = cpCore.db.executeQuery(SQL)
                 If isDataTableOk(rs) Then
                     ContentID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
                     TableID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ContentTableID"))
@@ -1868,7 +1849,7 @@ Namespace Contensive.Core.Controllers
                 RecordID = 0
                 RecordIsBaseField = False
                 SQL = "select ID,IsBaseField from ccFields where (ContentID=" & cpCore.db.encodeSQLNumber(ContentID) & ")and(name=" & cpCore.db.encodeSQLText(field.nameLc) & ");"
-                rs = cpCore.db.executeSql(SQL)
+                rs = cpCore.db.executeQuery(SQL)
                 If isDataTableOk(rs) Then
                     isNewFieldRecord = False
                     RecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
@@ -1934,7 +1915,7 @@ Namespace Contensive.Core.Controllers
                         ' Get the TableName and DataSourceID
                         '
                         TableName = ""
-                        rs = cpCore.db.executeSql("Select Name, DataSourceID from ccTables where ID=" & cpCore.db.encodeSQLNumber(TableID) & ";")
+                        rs = cpCore.db.executeQuery("Select Name, DataSourceID from ccTables where ID=" & cpCore.db.encodeSQLNumber(TableID) & ";")
                         If Not isDataTableOk(rs) Then
                             Throw (New ApplicationException("Could Not create Field [" & field.nameLc & "] because table For tableID [" & TableID & "] was Not found."))
                         Else
@@ -1949,7 +1930,7 @@ Namespace Contensive.Core.Controllers
                             If (DataSourceID < 1) Then
                                 DataSourceName = "Default"
                             Else
-                                rs = cpCore.db.executeSql("Select Name from ccDataSources where ID=" & cpCore.db.encodeSQLNumber(DataSourceID) & ";")
+                                rs = cpCore.db.executeQuery("Select Name from ccDataSources where ID=" & cpCore.db.encodeSQLNumber(DataSourceID) & ";")
                                 If Not isDataTableOk(rs) Then
 
                                     DataSourceName = "Default"
@@ -1967,7 +1948,7 @@ Namespace Contensive.Core.Controllers
                             '
                             InstalledByCollectionID = 0
                             If (installedByCollectionGuid <> "") Then
-                                rs = cpCore.db.executeSql("Select id from ccAddonCollections where ccguid=" & cpCore.db.encodeSQLText(installedByCollectionGuid) & ";")
+                                rs = cpCore.db.executeQuery("Select id from ccAddonCollections where ccguid=" & cpCore.db.encodeSQLText(installedByCollectionGuid) & ";")
                                 If isDataTableOk(rs) Then
                                     InstalledByCollectionID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "Id"))
                                 End If
@@ -2012,8 +1993,6 @@ Namespace Contensive.Core.Controllers
                             Call sqlList.add("HTMLCONTENT", cpCore.db.encodeSQLBoolean(HTMLContent)) ' Pointer)
                             Call sqlList.add("NOTEDITABLE", cpCore.db.encodeSQLBoolean(NotEditable)) ' Pointer)
                             Call sqlList.add("AUTHORABLE", cpCore.db.encodeSQLBoolean(FieldAuthorable)) ' Pointer)
-                            Call sqlList.add("EDITARCHIVE", SQLFalse) ' Pointer)
-                            Call sqlList.add("EDITBLANK", SQLFalse) ' Pointer)
                             Call sqlList.add("INDEXCOLUMN", cpCore.db.encodeSQLNumber(field.indexColumn)) ' Pointer)
                             Call sqlList.add("INDEXWIDTH", cpCore.db.encodeSQLText(AdminIndexWidth)) ' Pointer)
                             Call sqlList.add("INDEXSORTPRIORITY", cpCore.db.encodeSQLNumber(AdminIndexSort)) ' Pointer)
@@ -2190,7 +2169,7 @@ Namespace Contensive.Core.Controllers
                     ' either Workflow on non-workflow - it changes everything
                     '
                     SQL = "update " & RecordTableName & " set ContentControlID=" & NewContentControlID & " where ID=" & RecordID
-                    Call cpCore.db.executeSql(SQL, DataSourceName)
+                    Call cpCore.db.executeQuery(SQL, DataSourceName)
                     If HasParentID Then
                         SQL = "select contentcontrolid,ID from " & RecordTableName & " where ParentID=" & RecordID
                         CS = cpCore.db.cs_openCsSql_rev(DataSourceName, SQL)
@@ -2204,7 +2183,7 @@ Namespace Contensive.Core.Controllers
                     ' fix content watch
                     '
                     SQL = "update ccContentWatch set ContentID=" & NewContentControlID & ", ContentRecordKey='" & NewContentControlID & "." & RecordID & "' where ContentID=" & ContentID & " and RecordID=" & RecordID
-                    Call cpCore.db.executeSql(SQL)
+                    Call cpCore.db.executeQuery(SQL)
                 End If
             End If
         End Sub

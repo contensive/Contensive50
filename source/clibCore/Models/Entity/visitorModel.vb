@@ -354,7 +354,6 @@ Namespace Contensive.Core.Models.Entity
                     With CDef
                         instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
                         instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
-                        'instance.ContentCategoryID = CDef.Id
                         instance.ContentControlID = genericController.EncodeInteger(.fields("ContentControlID").defaultValue)
                         instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
                         instance.CreateKey = genericController.EncodeInteger(.fields("CreateKey").defaultValue)

@@ -181,7 +181,7 @@ Namespace Contensive.Core.Controllers
                                     & vbCrLf & " BEGIN TRANSACTION" _
                                     & vbCrLf & " update cctasks set cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))" _
                                     & vbCrLf & " COMMIT TRANSACTION"
-                                    cpSite.core.db.executeSql(sql)
+                                    cpSite.core.db.executeQuery(sql)
                                     CS = cpSite.core.db.cs_open("tasks", "(cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
                                     If cpSite.core.db.cs_ok(CS) Then
                                         'Dim json As New System.Web.Script.Serialization.JavaScriptSerializer

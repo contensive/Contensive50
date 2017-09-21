@@ -28,7 +28,7 @@ Namespace Contensive.Core
         Public Const ButtonIISReset = " IIS Reset "
         Public Const ButtonCancel = " Cancel "
         '
-        Public Const protectedContentSetControlFieldList = "ID,CREATEDBY,DATEADDED,MODIFIEDBY,MODIFIEDDATE,EDITSOURCEID,EDITARCHIVE,EDITBLANK,CONTENTCONTROLID"
+        Public Const protectedContentSetControlFieldList = "ID,CREATEDBY,DATEADDED,MODIFIEDBY,MODIFIEDDATE,CONTENTCONTROLID"
         '
         Public Const HTMLEditorDefaultCopyStartMark = "<!-- cc -->"
         Public Const HTMLEditorDefaultCopyEndMark = "<!-- /cc -->"

@@ -137,7 +137,7 @@ Namespace Contensive.Core.Models.Context
                 '
                 ' save the value in the property that was found
                 '
-                Call db.executeSql("update ccProperties set FieldValue=" & db.encodeSQLText(PropertyValue) & ",ModifiedDate=" & SQLNow & " where id=" & RecordID)
+                Call db.executeQuery("update ccProperties set FieldValue=" & db.encodeSQLText(PropertyValue) & ",ModifiedDate=" & SQLNow & " where id=" & RecordID)
             End If
             '
 
@@ -406,7 +406,7 @@ ErrorTrap:
             propertyCache_nameIndex = New keyPtrController
             propertyCacheCnt = 0
             '
-            Using dt As DataTable = db.executeSql("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" & propertyTypeId & ")and(KeyID=" & keyId & ")")
+            Using dt As DataTable = db.executeQuery("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" & propertyTypeId & ")and(KeyID=" & keyId & ")")
                 If dt.Rows.Count > 0 Then
                     propertyCacheCnt = 0
                     ReDim propertyCache(2, dt.Rows.Count - 1)

@@ -279,7 +279,7 @@ ErrorTrap:
                 & " and(specificKey=" & cpcore.db.encodeSQLText(specificKey) & ")" _
                 & ""
             Dim dt As DataTable
-            dt = cpcore.db.executeSql(SQL)
+            dt = cpcore.db.executeQuery(SQL)
             If dt.Rows.Count > 0 Then
                 warningId = genericController.EncodeInteger(dt.Rows(0).Item("id"))
             End If
@@ -289,7 +289,7 @@ ErrorTrap:
                 ' increment count for matching warning
                 '
                 SQL = "update ccsitewarnings set count=count+1,DateLastReported=" & cpcore.db.encodeSQLDate(Now()) & " where id=" & warningId
-                Call cpcore.db.executeSql(SQL)
+                Call cpcore.db.executeQuery(SQL)
             Else
                 '
                 ' insert new record

@@ -339,7 +339,7 @@ Namespace Contensive.Core.Controllers
                         '
                         Dim cid As Integer
                         cid = cpcore.metaData.getContentId("people")
-                        dt = cpcore.db.executeSql("select id from ccmembers where (Developer<>0)")
+                        dt = cpcore.db.executeQuery("select id from ccmembers where (Developer<>0)")
                         If dt.Rows.Count = 0 Then
                             SQL = "" _
                                 & "insert into ccmembers" _
@@ -348,7 +348,7 @@ Namespace Contensive.Core.Controllers
                                 & "" _
                                 & "" _
                                 & ""
-                            cpcore.db.executeSql(SQL)
+                            cpcore.db.executeQuery(SQL)
                         End If
                         '
                         ' Copy default styles into Template Styles
@@ -504,7 +504,7 @@ Namespace Contensive.Core.Controllers
                             domain.save(cpcore)
                             '
                             landingPage.TemplateID = defaultTemplate.ID
-                            landingPage.Copyfilename.content(cpcore) = constants.defaultLandingPageHtml
+                            landingPage.Copyfilename.content = constants.defaultLandingPageHtml
                             landingPage.save(cpcore)
                             '
                             defaultTemplate.BodyHTML = constants.defaultTemplateHtml
@@ -611,7 +611,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 Call appendBuildLog(cpcore, "...Open site collectons, iterate through all collections")
                                                 'Dim dt As DataTable
-                                                dt = cpcore.db.executeSql("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)")
+                                                dt = cpcore.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)")
                                                 If dt.Rows.Count > 0 Then
                                                     Dim rowptr As Integer
                                                     For rowptr = 0 To dt.Rows.Count - 1
@@ -1325,14 +1325,14 @@ Namespace Contensive.Core.Controllers
                 Dim FieldLast As String
                 Dim FieldRecordID As Integer
                 'Dim dt As DataTable
-                dt = cpCore.db.executeSql("Select ID,Name,ParentID from ccMenuEntries where (active<>0) Order By ParentID,Name")
+                dt = cpCore.db.executeQuery("Select ID,Name,ParentID from ccMenuEntries where (active<>0) Order By ParentID,Name")
                 If dt.Rows.Count > 0 Then
                     FieldLast = ""
                     For rowptr = 0 To dt.Rows.Count - 1
                         FieldNew = genericController.encodeText(dt.Rows(rowptr).Item("name")) & "." & genericController.encodeText(dt.Rows(rowptr).Item("parentid"))
                         If (FieldNew = FieldLast) Then
                             FieldRecordID = genericController.EncodeInteger(dt.Rows(rowptr).Item("ID"))
-                            Call cpCore.db.executeSql("Update ccMenuEntries set active=0 where ID=" & FieldRecordID & ";")
+                            Call cpCore.db.executeQuery("Update ccMenuEntries set active=0 where ID=" & FieldRecordID & ";")
                         End If
                         FieldLast = FieldNew
                     Next
@@ -1357,7 +1357,7 @@ Namespace Contensive.Core.Controllers
                 Dim tableName As String = cdef.ContentTableName
                 Dim cid As Integer = cdef.Id
                 '
-                dt = cpcore.db.executeSql("SELECT ID FROM " & tableName & " WHERE NAME=" & cpcore.db.encodeSQLText(Name) & ";")
+                dt = cpcore.db.executeQuery("SELECT ID FROM " & tableName & " WHERE NAME=" & cpcore.db.encodeSQLText(Name) & ";")
                 If dt.Rows.Count = 0 Then
                     sql1 = "insert into " & tableName & " (contentcontrolid,createkey,active,name"
                     sql2 = ") values (" & cid & ",0," & cpcore.db.encodeSQLBoolean(Active) & "," & cpcore.db.encodeSQLText(Name)
@@ -1366,7 +1366,7 @@ Namespace Contensive.Core.Controllers
                         sql1 &= "," & CodeFieldName
                         sql2 &= "," & Code
                     End If
-                    Call cpcore.db.executeSql(sql1 & sql2 & sql3)
+                    Call cpcore.db.executeQuery(sql1 & sql2 & sql3)
                 End If
             Catch ex As Exception
                 cpcore.handleException(ex) : Throw
@@ -1395,8 +1395,8 @@ Namespace Contensive.Core.Controllers
                     '
                     CID = cpCore.metaData.getContentId(cnAddons)
                     If CID <> 0 Then
-                        Call cpCore.db.executeSql("update ccaggregatefunctions set contentcontrolid=" & CID)
-                        Call cpCore.db.executeSql("delete from cccontent where id in (select c.id from cccontent c left join cctables t on t.id=c.contenttableid where t.name='ccAggregateFunctions' and c.id<>" & CID & ")")
+                        Call cpCore.db.executeQuery("update ccaggregatefunctions set contentcontrolid=" & CID)
+                        Call cpCore.db.executeQuery("delete from cccontent where id in (select c.id from cccontent c left join cctables t on t.id=c.contenttableid where t.name='ccAggregateFunctions' and c.id<>" & CID & ")")
                     End If
                 End If
                 '
@@ -1443,7 +1443,7 @@ Namespace Contensive.Core.Controllers
                 & " FROM ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID" _
                 & " Where (((ccTables.active) <> 0))" _
                 & " ORDER BY ccDataSources.Name, ccTables.Name;"
-                dt = cpCore.db.executeSql(SQL)
+                dt = cpCore.db.executeQuery(SQL)
                 ptr = 0
                 Do While (ptr < dt.Rows.Count)
                     IDVariant = genericController.EncodeInteger(dt.Rows(ptr).Item("DataSourceID"))
@@ -1506,7 +1506,7 @@ Namespace Contensive.Core.Controllers
                 '
                 Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads")
                 '
-                dt = cpCore.db.executeSql("select id from cclibraryfiles")
+                dt = cpCore.db.executeQuery("select id from cclibraryfiles")
                 If dt.Rows.Count = 0 Then
                     Call VerifyRecord(cpCore, "Library Folders", "Images")
                     Call VerifyRecord(cpCore, "Library Folders", "Downloads")
@@ -1667,7 +1667,7 @@ Namespace Contensive.Core.Controllers
                 '
                 Dim rs As DataTable
                 '
-                rs = cpCore.db.executeSql("Select ID from " & TableName & " where name=" & cpCore.db.encodeSQLText(RecordName))
+                rs = cpCore.db.executeQuery("Select ID from " & TableName & " where name=" & cpCore.db.encodeSQLText(RecordName))
                 If isDataTableOk(rs) Then
                     GetIDBYName = genericController.EncodeInteger(rs.Rows(0).Item("ID"))
                 End If
@@ -1946,7 +1946,7 @@ Namespace Contensive.Core.Controllers
                 '
                 GroupID = groupController.group_add(cpCore, "Content Editors")
                 SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.encodeSQLNumber(GroupID) & " where EditorGroupID is null;"
-                Call cpCore.db.executeSql(SQL)
+                Call cpCore.db.executeQuery(SQL)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -2223,8 +2223,6 @@ Namespace Contensive.Core.Controllers
                     Call cpCore.db.createSQLTableField("Default", "ccSortMethods", "OrderByClause", FieldTypeIdText)
                     '
                     Call cpCore.db.createSQLTable("Default", "ccFieldTypes")
-                    '
-                    Call cpCore.db.createSQLTable("Default", "ccContentCategories")
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw

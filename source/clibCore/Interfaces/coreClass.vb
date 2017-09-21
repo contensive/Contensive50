@@ -778,7 +778,7 @@ Namespace Contensive.Core
                                         & " f.ID = " & fieldId _
                                         & ""
                                         Dim dt As DataTable
-                                        dt = db.executeSql(Sql)
+                                        dt = db.executeQuery(Sql)
                                         If dt.Rows.Count > 0 Then
                                             For Each rsDr As DataRow In dt.Rows
                                                 addonDefaultEditorName = "&nbsp;(" & genericController.encodeText(rsDr("name")) & ")"
@@ -796,7 +796,7 @@ Namespace Contensive.Core
                                         & " left join ccAggregateFunctions a on a.id=r.AddonId)" _
                                         & " where f.id=" & fieldId
 
-                                        dt = db.executeSql(Sql)
+                                        dt = db.executeQuery(Sql)
                                         If dt.Rows.Count > 0 Then
                                             For Each rsDr As DataRow In dt.Rows
                                                 Dim addonId As Integer = genericController.EncodeInteger(rsDr("addonid"))
@@ -1081,8 +1081,8 @@ Namespace Contensive.Core
                                             addonId = docProperties.getInteger("AddonID")
                                             If (addonId > 0) Then
                                                 Dim styleAddon As Models.Entity.addonModel = Models.Entity.addonModel.create(Me, addonId)
-                                                If (styleAddon.StylesFilename.content(Me) <> docProperties.getText("CustomStyles")) Then
-                                                    styleAddon.StylesFilename.content(Me) = docProperties.getText("CustomStyles")
+                                                If (styleAddon.StylesFilename.content <> docProperties.getText("CustomStyles")) Then
+                                                    styleAddon.StylesFilename.content = docProperties.getText("CustomStyles")
                                                     styleAddon.save(Me)
                                                     '
                                                     ' Clear Caches
@@ -1148,7 +1148,7 @@ Namespace Contensive.Core
                             '
                             Dim exitNow As Boolean = False
                             result &= executeRoute_hardCodedPage(HardCodedPage, exitNow)
-                            If ExitNow Then
+                            If exitNow Then
                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
                                 Return result
                             End If
@@ -1524,7 +1524,7 @@ Namespace Contensive.Core
                             Dim htmlBody As String = "" _
                                 & genericController.htmlIndent(html.main_GetPanelHeader("Contensive Site Explorer")) _
                                 & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
-                                & genericController.htmlIndent(Copy) _
+                                & genericController.htmlIndent(copy) _
                                 & cr & "</td></tr></table>" _
                                 & ""
                             result = html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
@@ -1884,7 +1884,7 @@ Namespace Contensive.Core
                                     SQL &= "," & db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
                                     SQL &= "," & db.encodeSQLText(doc.metaContent_Title)
                                     SQL &= ");"
-                                    Call db.executeSql(SQL)
+                                    Call db.executeQuery(SQL)
                                 End If
                             End If
                         End If
