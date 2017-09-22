@@ -72,45 +72,84 @@ Namespace Contensive.Core.Models.Entity
         '-- field types
         '
         Public MustInherit Class fieldCdnFile
-            Public Property filename As String = ""
+            '
+            ' -- 
+            ' during load
+            '   -- The filename is loaded into the model (blank or not). No content Is read from the file during load.
+            '   -- the internalCpCore must be set
+            '
+            ' during a cache load, the internalCpCore must be set
+            '
+            ' content property read:
+            '   -- If the filename Is blank, a blank Is returned
+            '   -- if the filename exists, the content is read into the model and returned to the consumer
+            '
+            ' content property written:
+            '   -- content is stored in the model until save(). contentUpdated is set.
+            '
+            ' filename property read: nothing special
+            '
+            ' filename property written:
+            '   -- contentUpdated set true if it was previously set (content was written), or if the content is not empty
+            '
+            ' contentLoaded property means the content in the model is valid
+            ' contentUpdated property means the content needs to be saved on the next save
+            '
+            Public Property filename As String
+                Set(value As String)
+                    _filename = value
+                    '
+                    ' -- mark content updated if the content was updated, or if the content is not blank (so old content is written to the new updated filename)
+                    contentUpdated = contentUpdated Or (Not String.IsNullOrEmpty(_content))
+                End Set
+                Get
+                    Return _filename
+                End Get
+            End Property
+            Private _filename As String = ""
+            '
+            ' -- content in the file. loaded as needed, not during model create. 
             Public Property content As String
                 Set(value As String)
                     _content = value
+                    contentUpdated = True
                 End Set
                 Get
-                    If (_content Is Nothing) Then
-                        _content = ""
-                        If (filename IsNot Nothing) And (internalCpCore IsNot Nothing) Then
+                    If (Not contentLoaded) Then
+                        If (Not String.IsNullOrEmpty(filename)) And (internalCpCore IsNot Nothing) Then
+                            contentLoaded = True
                             _content = internalCpCore.cdnFiles.readFile(filename)
                         End If
                     End If
                     Return _content
                 End Get
             End Property
-            Private _content As String = Nothing
+            '
+            ' -- internal storage for content
+            Private Property _content As String = ""
+            '
+            ' -- When field is deserialized from cache, contentLoaded flag is used to deferentiate between unloaded content and blank conent.
+            Public Property contentLoaded As Boolean = False
+            '
+            ' -- When content is updated, the model.save() writes the file
+            Public Property contentUpdated As Boolean = False
+            '
+            ' -- set by load(). Used by field to read content from filename when needed
             Public Property internalCpCore As coreClass = Nothing
         End Class
 
         '
         Public Class fieldTypeTextFile
             Inherits fieldCdnFile
-            'Public Property filename As String = ""
-            'Public Property copy As String = ""
         End Class
         Public Class fieldTypeJavascriptFile
             Inherits fieldCdnFile
-            'Public Property filename As String = ""
-            'Public Property copy As String = ""
         End Class
         Public Class fieldTypeCSSFile
             Inherits fieldCdnFile
-            'Public Property filename As String = ""
-            'Public Property copy As String = ""
         End Class
         Public Class fieldTypeHTMLFile
             Inherits fieldCdnFile
-            'Public Property filename As String = ""
-            'Public Property copy As String = ""
         End Class
         '
         '====================================================================================================
@@ -248,6 +287,27 @@ Namespace Contensive.Core.Models.Entity
                                 End If
                             End Using
                         End If
+                        '
+                        ' -- store cpCore in all extended fields that need it (file fields so content read can happen on demand instead of at load)
+                        For Each instanceProperty As PropertyInfo In result.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
+                            Select Case instanceProperty.PropertyType.Name
+                                Case "fieldTypeTextFile", "fieldTypeJavascriptFile", "fieldTypeCSSFile", "fieldTypeHTMLFile"
+                                    Select Case instanceProperty.PropertyType.Name
+                                        Case "fieldTypeJavascriptFile"
+                                            Dim fileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(result), fieldTypeJavascriptFile)
+                                            fileProperty.internalCpCore = cpCore
+                                        Case "fieldTypeCSSFile"
+                                            Dim fileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(result), fieldTypeCSSFile)
+                                            fileProperty.internalCpCore = cpCore
+                                        Case "fieldTypeHTMLFile"
+                                            Dim fileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(result), fieldTypeHTMLFile)
+                                            fileProperty.internalCpCore = cpCore
+                                        Case Else
+                                            Dim fileProperty As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(result), fieldTypeTextFile)
+                                            fileProperty.internalCpCore = cpCore
+                                    End Select
+                            End Select
+                        Next
                     End If
                 End If
             Catch ex As Exception
@@ -502,81 +562,118 @@ Namespace Contensive.Core.Models.Entity
                                         Dim value As Double
                                         Double.TryParse(instanceProperty.GetValue(Me, Nothing).ToString(), value)
                                         cs.setField(instanceProperty.Name, value)
-                                    Case "fieldTypeTextFile"
-                                        Dim textFileProperty As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeTextFile)
-                                        textFileProperty.internalCpCore = cpCore
-                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
-                                        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
-                                        Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
-                                        If (String.IsNullOrEmpty(copy)) Then
-                                            '
-                                            ' -- empty content
-                                            If (Not String.IsNullOrEmpty(filename)) Then
-                                                cs.setField(instanceProperty.Name, "")
-                                                cpCore.cdnFiles.deleteFile(filename)
+                                    Case "fieldTypeTextFile", "fieldTypeJavascriptFile", "fieldTypeCSSFile", "fieldTypeHTMLFile"
+                                        Dim fieldTypeId As Integer = 0
+                                        Dim contentProperty As PropertyInfo = Nothing
+                                        Dim contentUpdatedProperty As PropertyInfo
+                                        Dim contentUpdated As Boolean
+                                        Dim content As String = ""
+                                        Select Case instanceProperty.PropertyType.Name
+                                            Case "fieldTypeJavascriptFile"
+                                                fieldTypeId = FieldTypeIdFileJavascript
+                                                Dim fileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeJavascriptFile)
+                                                fileProperty.internalCpCore = cpCore
+                                                contentProperty = instanceProperty.PropertyType.GetProperty("content")
+                                                contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated")
+                                                contentUpdated = DirectCast(contentUpdatedProperty.GetValue(fileProperty), Boolean)
+                                                content = DirectCast(contentProperty.GetValue(fileProperty), String)
+                                            Case "fieldTypeCSSFile"
+                                                fieldTypeId = FieldTypeIdFileCSS
+                                                Dim fileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeCSSFile)
+                                                fileProperty.internalCpCore = cpCore
+                                                contentProperty = instanceProperty.PropertyType.GetProperty("content")
+                                                contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated")
+                                                contentUpdated = DirectCast(contentUpdatedProperty.GetValue(fileProperty), Boolean)
+                                                content = DirectCast(contentProperty.GetValue(fileProperty), String)
+                                            Case "fieldTypeHTMLFile"
+                                                fieldTypeId = FieldTypeIdFileHTML
+                                                Dim fileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeHTMLFile)
+                                                fileProperty.internalCpCore = cpCore
+                                                contentProperty = instanceProperty.PropertyType.GetProperty("content")
+                                                contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated")
+                                                contentUpdated = DirectCast(contentUpdatedProperty.GetValue(fileProperty), Boolean)
+                                                content = DirectCast(contentProperty.GetValue(fileProperty), String)
+                                            Case Else
+                                                fieldTypeId = FieldTypeIdFileText
+                                                Dim fileProperty As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeTextFile)
+                                                fileProperty.internalCpCore = cpCore
+                                                contentProperty = instanceProperty.PropertyType.GetProperty("content")
+                                                contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated")
+                                                contentUpdated = DirectCast(contentUpdatedProperty.GetValue(fileProperty), Boolean)
+                                                content = DirectCast(contentProperty.GetValue(fileProperty), String)
+                                        End Select
+                                        If (contentUpdated) Then
+                                            Dim filename As String = cs.getValue(instanceProperty.Name)
+                                            If (String.IsNullOrEmpty(content)) Then
+                                                '
+                                                ' -- empty content
+                                                If (Not String.IsNullOrEmpty(filename)) Then
+                                                    cs.setField(instanceProperty.Name, "")
+                                                    cpCore.cdnFiles.deleteFile(filename)
+                                                End If
+                                            Else
+                                                '
+                                                ' -- save content
+                                                If (String.IsNullOrEmpty(filename)) Then
+                                                    filename = fileController.getVirtualRecordPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, fieldTypeId)
+                                                End If
+                                                cs.setFile(instanceProperty.Name, content, contentName)
                                             End If
-                                        Else
-                                            '
-                                            ' -- save content
-                                            If (String.IsNullOrEmpty(filename)) Then
-                                                filename = fileController.getVirtualRecordPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, FieldTypeIdFileText)
-                                            End If
-                                            cs.setFile(instanceProperty.Name, copy, contentName)
                                         End If
-                                    Case "fieldTypeJavascriptFile"
-                                        Dim textFileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeJavascriptFile)
-                                        textFileProperty.internalCpCore = cpCore
-                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
-                                        Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
-                                        If (String.IsNullOrEmpty(copy)) Then
-                                            '
-                                            ' -- empty content
-                                            Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
-                                            If (Not String.IsNullOrEmpty(filename)) Then
-                                                cs.setField(instanceProperty.Name, "")
-                                                cpCore.cdnFiles.deleteFile(filename)
-                                            End If
-                                        Else
-                                            '
-                                            ' -- save content
-                                            cs.setFile(instanceProperty.Name, copy, contentName)
-                                        End If
-                                    Case "fieldTypeCSSFile"
-                                        Dim textFileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeCSSFile)
-                                        textFileProperty.internalCpCore = cpCore
-                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
-                                        Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
-                                        If (String.IsNullOrEmpty(copy)) Then
-                                            '
-                                            ' -- empty content
-                                            Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
-                                            If (Not String.IsNullOrEmpty(filename)) Then
-                                                cs.setField(instanceProperty.Name, "")
-                                                cpCore.cdnFiles.deleteFile(filename)
-                                            End If
-                                        Else
-                                            '
-                                            ' -- save content
-                                            cs.setFile(instanceProperty.Name, copy, contentName)
-                                        End If
-                                    Case "fieldTypeHTMLFile"
-                                        Dim textFileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeHTMLFile)
-                                        textFileProperty.internalCpCore = cpCore
-                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
-                                        Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
-                                        If (String.IsNullOrEmpty(copy)) Then
-                                            '
-                                            ' -- empty content
-                                            Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
-                                            If (Not String.IsNullOrEmpty(filename)) Then
-                                                cs.setField(instanceProperty.Name, "")
-                                                cpCore.cdnFiles.deleteFile(filename)
-                                            End If
-                                        Else
-                                            '
-                                            ' -- save content
-                                            cs.setFile(instanceProperty.Name, copy, contentName)
-                                        End If
+                                        'Case "fieldTypeJavascriptFile"
+                                        '    Dim textFileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeJavascriptFile)
+                                        '    textFileProperty.internalCpCore = cpCore
+                                        '    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
+                                        '    Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
+                                        '    If (String.IsNullOrEmpty(copy)) Then
+                                        '        '
+                                        '        ' -- empty content
+                                        '        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+                                        '        If (Not String.IsNullOrEmpty(filename)) Then
+                                        '            cs.setField(instanceProperty.Name, "")
+                                        '            cpCore.cdnFiles.deleteFile(filename)
+                                        '        End If
+                                        '    Else
+                                        '        '
+                                        '        ' -- save content
+                                        '        cs.setFile(instanceProperty.Name, copy, contentName)
+                                        '    End If
+                                        'Case "fieldTypeCSSFile"
+                                        '    Dim textFileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeCSSFile)
+                                        '    textFileProperty.internalCpCore = cpCore
+                                        '    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
+                                        '    Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
+                                        '    If (String.IsNullOrEmpty(copy)) Then
+                                        '        '
+                                        '        ' -- empty content
+                                        '        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+                                        '        If (Not String.IsNullOrEmpty(filename)) Then
+                                        '            cs.setField(instanceProperty.Name, "")
+                                        '            cpCore.cdnFiles.deleteFile(filename)
+                                        '        End If
+                                        '    Else
+                                        '        '
+                                        '        ' -- save content
+                                        '        cs.setFile(instanceProperty.Name, copy, contentName)
+                                        '    End If
+                                        'Case "fieldTypeHTMLFile"
+                                        '    Dim textFileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeHTMLFile)
+                                        '    textFileProperty.internalCpCore = cpCore
+                                        '    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
+                                        '    Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
+                                        '    If (String.IsNullOrEmpty(copy)) Then
+                                        '        '
+                                        '        ' -- empty content
+                                        '        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+                                        '        If (Not String.IsNullOrEmpty(filename)) Then
+                                        '            cs.setField(instanceProperty.Name, "")
+                                        '            cpCore.cdnFiles.deleteFile(filename)
+                                        '        End If
+                                        '    Else
+                                        '        '
+                                        '        ' -- save content
+                                        '        cs.setFile(instanceProperty.Name, copy, contentName)
+                                        '    End If
                                     Case Else
                                         Dim value As String
                                         value = instanceProperty.GetValue(Me, Nothing).ToString()

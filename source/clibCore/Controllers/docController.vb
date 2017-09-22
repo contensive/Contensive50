@@ -2611,7 +2611,7 @@ ErrorTrap:
                 cpcore.doc.metaContent_StyleSheetTags = String.Empty
                 '
                 ' -- head Javascript
-                result &= cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & "/ccLib/ClientSide/Core.js""></script>"
+                ' -- must be added as addon. result &= cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & "/ccLib/ClientSide/Core.js""></script>"
                 If cpcore.doc.headScripts.Count > 0 Then
                     For Ptr = 0 To cpcore.doc.headScripts.Count - 1
                         With cpcore.doc.headScripts(Ptr)
