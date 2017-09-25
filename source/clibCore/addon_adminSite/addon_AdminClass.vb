@@ -2859,24 +2859,14 @@ ErrorTrap:
         '========================================================================
         '
         Private Sub SaveLinkAlias(adminContent As cdefModel, editRecord As editRecordClass)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "SaveLinkAlias")
-            '
-            Dim isDupError As Boolean
-            Dim FieldPtr As Integer
-            Dim CS As Integer
-            Dim linkAlias As String
-            Dim OverRideDuplicate As Boolean
-            Dim DupCausesWarning As Boolean
-            '
-            ' use field ptr to test if the field is supported yet
-            '
-            isDupError = False
-            If adminContent.fields.ContainsKey("linklalias") Then
+            Try
+                '
+                ' --use field ptr to test if the field is supported yet
                 If cpCore.siteProperties.allowLinkAlias Then
-                    'If AdminContent.fields(FieldPtr).Authorable Then
-                    'If Not AdminContent.fields(FieldPtr).Authorable Then
-                    linkAlias = cpCore.docProperties.getText("linkalias")
-                    OverRideDuplicate = cpCore.docProperties.getBoolean("OverRideDuplicate")
+                    Dim isDupError As Boolean = False
+                    Dim linkAlias As String = cpCore.docProperties.getText("linkalias")
+                    Dim OverRideDuplicate As Boolean = cpCore.docProperties.getBoolean("OverRideDuplicate")
+                    Dim DupCausesWarning As Boolean = False
                     If linkAlias = "" Then
                         '
                         ' Link Alias is blank, use the record name
@@ -2888,7 +2878,7 @@ ErrorTrap:
                         If OverRideDuplicate Then
                             Call cpCore.db.executeQuery("update " & adminContent.ContentTableName & " set linkalias=null where ( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ") and (id<>" & editRecord.id & ")")
                         Else
-                            CS = cpCore.db.cs_open(adminContent.Name, "( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ")and(id<>" & editRecord.id & ")")
+                            Dim CS As Integer = cpCore.db.cs_open(adminContent.Name, "( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ")and(id<>" & editRecord.id & ")")
                             If cpCore.db.cs_ok(CS) Then
                                 isDupError = True
                                 Call errorController.error_AddUserError(cpCore, "The Link Alias you entered can not be used because another record uses this value [" & linkAlias & "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.")
@@ -2897,7 +2887,7 @@ ErrorTrap:
                         End If
                         If Not isDupError Then
                             DupCausesWarning = True
-                            CS = cpCore.db.cs_open2(adminContent.Name, editRecord.id, True, True)
+                            Dim CS As Integer = cpCore.db.cs_open2(adminContent.Name, editRecord.id, True, True)
                             If cpCore.db.cs_ok(CS) Then
                                 Call cpCore.db.cs_set(CS, "linkalias", linkAlias)
                             End If
@@ -2908,17 +2898,10 @@ ErrorTrap:
                             Call docController.app_addLinkAlias2(cpCore, linkAlias, editRecord.id, "", OverRideDuplicate, DupCausesWarning)
                         End If
                     End If
-                    'End If
                 End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("SaveLinkAlias")
-            '
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
         '========================================================================
@@ -9400,175 +9383,160 @@ ErrorTrap:
         '=============================================================================================
         '
         Private Sub ProcessActionSave(adminContent As cdefModel, editRecord As editRecordClass, UseContentWatchLink As Boolean)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("ProcessActionSave")
-            '
-            'Dim CS As Integer
-            Dim EditorStyleRulesFilename As String
-            Dim ParentID As Integer
-            Dim UpdateRecordID As Integer
-            Dim linkAlias As String
-            Dim Link As String
-            Dim SQL As String
-            Dim CS As Integer
-            Dim Ptr As Integer
-            '
-            If (True) Then
+            Try
+                Dim EditorStyleRulesFilename As String
                 '
-                '
-                '
-                If Not (cpCore.debug_iUserError <> "") Then
-                    Select Case genericController.vbUCase(adminContent.ContentTableName)
-                        Case genericController.vbUCase("ccMembers")
-                            '
-                            '
-                            '
+                If (True) Then
+                    '
+                    '
+                    '
+                    If Not (cpCore.debug_iUserError <> "") Then
+                        Select Case genericController.vbUCase(adminContent.ContentTableName)
+                            Case genericController.vbUCase("ccMembers")
+                                '
+                                '
+                                '
 
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call SaveMemberRules(editRecord.id)
+                                Call SaveEditRecord(adminContent, editRecord)
+                                Call SaveMemberRules(editRecord.id)
                             'Call SaveTopicRules
-                        Case "CCEMAIL"
-                            '
-                            '
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            ' NO - ignore wwwroot styles, and create it on the fly during send
-                            'If cpCore.main_GetSiteProperty2("BuildVersion") >= "3.3.291" Then
-                            '    Call cpCore.app.executeSql( "update ccEmail set InlineStyles=" & encodeSQLText(cpCore.main_GetStyleSheetProcessed) & " where ID=" & EditRecord.ID)
-                            'End If
-                            Call cpCore.html.main_ProcessCheckList("EmailGroups", "Group Email", genericController.encodeText(editRecord.id), "Groups", "Email Groups", "EmailID", "GroupID")
-                            Call cpCore.html.main_ProcessCheckList("EmailTopics", "Group Email", genericController.encodeText(editRecord.id), "Topics", "Email Topics", "EmailID", "TopicID")
-                        Case "CCCONTENT"
-                            '
-                            '
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call LoadAndSaveGroupRules(editRecord)
-                        Case "CCPAGECONTENT"
-                            '
-                            '
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call LoadContentTrackingDataBase(adminContent, editRecord)
-                            Call LoadContentTrackingResponse(adminContent, editRecord)
-                            'Call LoadAndSaveMetaContent()
-                            Call SaveLinkAlias(adminContent, editRecord)
-                            'Call SaveTopicRules
-                            Call SaveContentTracking(adminContent, editRecord)
-                        Case "CCLIBRARYFOLDERS"
-                            '
-                            '
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call LoadContentTrackingDataBase(adminContent, editRecord)
-                            Call LoadContentTrackingResponse(adminContent, editRecord)
-                            'Call LoadAndSaveCalendarEvents
-                            'Call LoadAndSaveMetaContent()
-                            Call cpCore.html.main_ProcessCheckList("LibraryFolderRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID")
-                            'call SaveTopicRules
-                            Call SaveContentTracking(adminContent, editRecord)
-                        Case "CCSETUP"
-                            '
-                            ' Site Properties
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            If (LCase(editRecord.nameLc) = "allowlinkalias") Then
-                                If (cpCore.siteProperties.getBoolean("AllowLinkAlias")) Then
-                                    If False Then
-                                        '
-                                        ' Must upgrade
-                                        '
-                                        Call cpCore.siteProperties.setProperty("AllowLinkAlias", "0")
-                                        Call errorController.error_AddUserError(cpCore, "Link Alias entries for your pages can not be created because your site database needs to be upgraded.")
-                                    Else
-                                        '
-                                        ' Verify all page content records have a link alias
-                                        '
-                                        Call TurnOnLinkAlias(UseContentWatchLink)
+                            Case "CCEMAIL"
+                                '
+                                '
+                                '
+                                Call SaveEditRecord(adminContent, editRecord)
+                                ' NO - ignore wwwroot styles, and create it on the fly during send
+                                'If cpCore.main_GetSiteProperty2("BuildVersion") >= "3.3.291" Then
+                                '    Call cpCore.app.executeSql( "update ccEmail set InlineStyles=" & encodeSQLText(cpCore.main_GetStyleSheetProcessed) & " where ID=" & EditRecord.ID)
+                                'End If
+                                Call cpCore.html.main_ProcessCheckList("EmailGroups", "Group Email", genericController.encodeText(editRecord.id), "Groups", "Email Groups", "EmailID", "GroupID")
+                                Call cpCore.html.main_ProcessCheckList("EmailTopics", "Group Email", genericController.encodeText(editRecord.id), "Topics", "Email Topics", "EmailID", "TopicID")
+                            Case "CCCONTENT"
+                                '
+                                '
+                                '
+                                Call SaveEditRecord(adminContent, editRecord)
+                                Call LoadAndSaveGroupRules(editRecord)
+                            Case "CCPAGECONTENT"
+                                '
+                                '
+                                '
+                                Call SaveEditRecord(adminContent, editRecord)
+                                Call LoadContentTrackingDataBase(adminContent, editRecord)
+                                Call LoadContentTrackingResponse(adminContent, editRecord)
+                                'Call LoadAndSaveMetaContent()
+                                Call SaveLinkAlias(adminContent, editRecord)
+                                'Call SaveTopicRules
+                                Call SaveContentTracking(adminContent, editRecord)
+                            Case "CCLIBRARYFOLDERS"
+                                '
+                                '
+                                '
+                                Call SaveEditRecord(adminContent, editRecord)
+                                Call LoadContentTrackingDataBase(adminContent, editRecord)
+                                Call LoadContentTrackingResponse(adminContent, editRecord)
+                                'Call LoadAndSaveCalendarEvents
+                                'Call LoadAndSaveMetaContent()
+                                Call cpCore.html.main_ProcessCheckList("LibraryFolderRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID")
+                                'call SaveTopicRules
+                                Call SaveContentTracking(adminContent, editRecord)
+                            Case "CCSETUP"
+                                '
+                                ' Site Properties
+                                '
+                                Call SaveEditRecord(adminContent, editRecord)
+                                If (LCase(editRecord.nameLc) = "allowlinkalias") Then
+                                    If (cpCore.siteProperties.getBoolean("AllowLinkAlias")) Then
+                                        If False Then
+                                            '
+                                            ' Must upgrade
+                                            '
+                                            Call cpCore.siteProperties.setProperty("AllowLinkAlias", "0")
+                                            Call errorController.error_AddUserError(cpCore, "Link Alias entries for your pages can not be created because your site database needs to be upgraded.")
+                                        Else
+                                            '
+                                            ' Verify all page content records have a link alias
+                                            '
+                                            Call TurnOnLinkAlias(UseContentWatchLink)
+                                        End If
                                     End If
                                 End If
-                            End If
-                        Case genericController.vbUCase("ccGroups")
-                            'Case "CCGROUPS"
-                            '
-                            '
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call LoadContentTrackingDataBase(adminContent, editRecord)
-                            Call LoadContentTrackingResponse(adminContent, editRecord)
-                            Call LoadAndSaveContentGroupRules(editRecord.id)
-                            'Call LoadAndSaveCalendarEvents
-                            'Call LoadAndSaveMetaContent()
-                            'call SaveTopicRules
-                            Call SaveContentTracking(adminContent, editRecord)
+                            Case genericController.vbUCase("ccGroups")
+                                'Case "CCGROUPS"
+                                '
+                                '
+                                '
+                                Call SaveEditRecord(adminContent, editRecord)
+                                Call LoadContentTrackingDataBase(adminContent, editRecord)
+                                Call LoadContentTrackingResponse(adminContent, editRecord)
+                                Call LoadAndSaveContentGroupRules(editRecord.id)
+                                'Call LoadAndSaveCalendarEvents
+                                'Call LoadAndSaveMetaContent()
+                                'call SaveTopicRules
+                                Call SaveContentTracking(adminContent, editRecord)
                             'Dim EditorStyleRulesFilename As String
-                        Case "CCTEMPLATES"
-                            '
-                            ' save and clear editorstylerules for this template
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call LoadContentTrackingDataBase(adminContent, editRecord)
-                            Call LoadContentTrackingResponse(adminContent, editRecord)
-                            'Call LoadAndSaveCalendarEvents
-                            'Call LoadAndSaveMetaContent()
-                            'call SaveTopicRules
-                            Call SaveContentTracking(adminContent, editRecord)
-                            '
-                            EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString, 1, 99, vbTextCompare)
-                            Call cpCore.privateFiles.deleteFile(EditorStyleRulesFilename)
-                            'Case "CCSHAREDSTYLES"
-                            '    '
-                            '    ' save and clear editorstylerules for any template
-                            '    '
-                            '    Call SaveEditRecord(adminContent, editRecord)
-                            '    Call LoadContentTrackingDataBase(adminContent, editRecord)
-                            '    Call LoadContentTrackingResponse(adminContent, editRecord)
-                            '    'Call LoadAndSaveCalendarEvents
-                            '    Call LoadAndSaveMetaContent()
-                            '    'call SaveTopicRules
-                            '    Call SaveContentTracking(adminContent, editRecord)
-                            '    '
-                            '    EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
-                            '    Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
-                            '    '
-                            '    CS = cpCore.db.cs_openCsSql_rev("default", "select id from cctemplates")
-                            '    Do While cpCore.db.cs_ok(CS)
-                            '        EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.db.cs_get(CS, "ID"), 1, 99, vbTextCompare)
-                            '        Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
-                            '        Call cpCore.db.cs_goNext(CS)
-                            '    Loop
-                            '    Call cpCore.db.cs_Close(CS)
+                            Case "CCTEMPLATES"
+                                '
+                                ' save and clear editorstylerules for this template
+                                '
+                                Call SaveEditRecord(adminContent, editRecord)
+                                Call LoadContentTrackingDataBase(adminContent, editRecord)
+                                Call LoadContentTrackingResponse(adminContent, editRecord)
+                                'Call LoadAndSaveCalendarEvents
+                                'Call LoadAndSaveMetaContent()
+                                'call SaveTopicRules
+                                Call SaveContentTracking(adminContent, editRecord)
+                                '
+                                EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString, 1, 99, vbTextCompare)
+                                Call cpCore.privateFiles.deleteFile(EditorStyleRulesFilename)
+                                'Case "CCSHAREDSTYLES"
+                                '    '
+                                '    ' save and clear editorstylerules for any template
+                                '    '
+                                '    Call SaveEditRecord(adminContent, editRecord)
+                                '    Call LoadContentTrackingDataBase(adminContent, editRecord)
+                                '    Call LoadContentTrackingResponse(adminContent, editRecord)
+                                '    'Call LoadAndSaveCalendarEvents
+                                '    Call LoadAndSaveMetaContent()
+                                '    'call SaveTopicRules
+                                '    Call SaveContentTracking(adminContent, editRecord)
+                                '    '
+                                '    EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
+                                '    Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
+                                '    '
+                                '    CS = cpCore.db.cs_openCsSql_rev("default", "select id from cctemplates")
+                                '    Do While cpCore.db.cs_ok(CS)
+                                '        EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.db.cs_get(CS, "ID"), 1, 99, vbTextCompare)
+                                '        Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
+                                '        Call cpCore.db.cs_goNext(CS)
+                                '    Loop
+                                '    Call cpCore.db.cs_Close(CS)
 
 
-                        Case Else
-                            '
-                            '
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call LoadContentTrackingDataBase(adminContent, editRecord)
-                            Call LoadContentTrackingResponse(adminContent, editRecord)
-                            'Call LoadAndSaveCalendarEvents
-                            'Call LoadAndSaveMetaContent()
-                            'call SaveTopicRules
-                            Call SaveContentTracking(adminContent, editRecord)
-                    End Select
+                            Case Else
+                                '
+                                '
+                                '
+                                Call SaveEditRecord(adminContent, editRecord)
+                                Call LoadContentTrackingDataBase(adminContent, editRecord)
+                                Call LoadContentTrackingResponse(adminContent, editRecord)
+                                'Call LoadAndSaveCalendarEvents
+                                'Call LoadAndSaveMetaContent()
+                                'call SaveTopicRules
+                                Call SaveContentTracking(adminContent, editRecord)
+                        End Select
+                    End If
                 End If
-            End If
-            '
-            ' If the content supports datereviewed, mark it
-            '
-            If (cpCore.debug_iUserError <> "") Then
-                AdminForm = AdminSourceForm
-            End If
-            AdminAction = AdminActionNop ' convert so action can be used in as a refresh
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError2("ProcessActionSave")
-            Call errorController.error_AddUserError(cpCore, "There was an unknown error saving the record at " & cpCore.profileStartTime & ". Please try again, or report this error to the site administrator.")
-            '
+                '
+                ' If the content supports datereviewed, mark it
+                '
+                If (cpCore.debug_iUserError <> "") Then
+                    AdminForm = AdminSourceForm
+                End If
+                AdminAction = AdminActionNop ' convert so action can be used in as a refresh
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
         '=============================================================================================

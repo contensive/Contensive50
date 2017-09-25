@@ -20,7 +20,6 @@ Public Class Global_asax
         Try
             Trace.WriteLine(getAppDescription("Application_Start"))
             Using cp As New Contensive.Core.CPClass(DefaultSite.configurationClass.getAppName())
-                DefaultSite.configurationClass.appendLog(cp, getAppDescription("Application_Start"))
                 If (cp.appOk) Then
                     DefaultSite.configurationClass.RegisterRoutes(cp, RouteTable.Routes)
                 End If

@@ -6,14 +6,17 @@ Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    ' comVisible to be activeScript compatible
+    '====================================================================================================
+    ''' <summary>
+    ''' comVisible to be activeScript compatible
+    ''' </summary>
     '
     <ComVisible(True)>
     <ComClass(CPSiteClass.ClassId, CPSiteClass.InterfaceId, CPSiteClass.EventsId)>
     Public Class CPSiteClass
         Inherits BaseClasses.CPSiteBaseClass
         Implements IDisposable
+
         '
 #Region "COM GUIDs"
         Public Const ClassId As String = "7C159DA2-6677-426B-8631-3F235F24BCF0"
@@ -25,17 +28,18 @@ Namespace Contensive.Core
         Private CP As CPClass
         Protected disposed As Boolean = False
         '
+        '====================================================================================================
+        '
         Public Sub New(ByVal cpCoreObj As Contensive.Core.coreClass, ByRef CPParent As CPClass)
             MyBase.New()
             cpCore = cpCoreObj
             CP = CPParent
         End Sub
         '
-        ' dispose
+        '====================================================================================================
         '
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
             If Not Me.disposed Then
-                Call appendDebugLog(".dispose, dereference cp, main, csv")
                 If disposing Then
                     '
                     ' call .dispose for managed objects
@@ -50,7 +54,7 @@ Namespace Contensive.Core
             Me.disposed = True
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property Name() As String 'Inherits BaseClasses.CPSiteBaseClass.Name
             Get
@@ -58,7 +62,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub SetProperty(ByVal FieldName As String, ByVal FieldValue As String) 'Inherits BaseClasses.CPSiteBaseClass.SetProperty
             Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
@@ -70,47 +74,37 @@ Namespace Contensive.Core
             Return cpCore.siteProperties.getText(FieldName, DefaultValue)
         End Function
         '
-        '=======================================================================================================
-        '
-        '=======================================================================================================
+        '====================================================================================================
         '
         Public Overrides Function GetBoolean(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As Boolean
             Return genericController.EncodeBoolean(GetProperty(PropertyName, DefaultValue))
         End Function
         '
-        '=======================================================================================================
-        '
-        '=======================================================================================================
+        '====================================================================================================
         '
         Public Overrides Function GetDate(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As Date
             Return genericController.EncodeDate(GetProperty(PropertyName, DefaultValue))
         End Function
         '
-        '=======================================================================================================
-        '
-        '=======================================================================================================
+        '====================================================================================================
         '
         Public Overrides Function GetInteger(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As Integer
             Return CP.Utils.EncodeInteger(GetProperty(PropertyName, DefaultValue))
         End Function
         '
-        '=======================================================================================================
-        '
-        '=======================================================================================================
+        '====================================================================================================
         '
         Public Overrides Function GetNumber(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As Double
             Return CP.Utils.EncodeNumber(GetProperty(PropertyName, DefaultValue))
         End Function
         '
-        '=======================================================================================================
-        '
-        '=======================================================================================================
+        '====================================================================================================
         '
         Public Overrides Function GetText(ByVal FieldName As String, Optional ByVal DefaultValue As String = "") As String
             Return GetProperty(FieldName, DefaultValue)
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property MultiDomainMode() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.MultiDomainMode
             Get
@@ -118,7 +112,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", True)>
         Public Overrides ReadOnly Property PhysicalFilePath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalFilePath
@@ -128,7 +122,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", True)>
         Public Overrides ReadOnly Property PhysicalInstallPath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalInstallPath
@@ -138,7 +132,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", True)>
         Public Overrides ReadOnly Property PhysicalWWWPath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalWWWPath
@@ -148,14 +142,16 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property TrapErrors() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.TrapErrors
             Get
                 Return genericController.EncodeBoolean(GetProperty("TrapErrors", "1"))
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property AppPath() As String 'Inherits BaseClasses.CPSiteBaseClass.AppPath
             Get
                 Return AppRootPath
@@ -163,7 +159,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property AppRootPath() As String 'Inherits BaseClasses.CPSiteBaseClass.AppRootPath
             Get
@@ -175,7 +171,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property DomainPrimary() As String 'Inherits BaseClasses.CPSiteBaseClass.DomainPrimary
             Get
@@ -187,7 +183,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property Domain() As String 'Inherits BaseClasses.CPSiteBaseClass.Domain
             Get
@@ -199,7 +195,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property DomainList() As String 'Inherits BaseClasses.CPSiteBaseClass.DomainList
             Get
@@ -207,7 +203,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property FilePath() As String 'Inherits BaseClasses.CPSiteBaseClass.FilePath
             Get
@@ -215,7 +211,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property PageDefault() As String 'Inherits BaseClasses.CPSiteBaseClass.PageDefault
             Get
@@ -227,7 +223,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property VirtualPath() As String 'Inherits BaseClasses.CPSiteBaseClass.VirtualPath
             Get
@@ -235,7 +231,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function EncodeAppRootPath(ByVal Link As String) As String 'Inherits BaseClasses.CPSiteBaseClass.EncodeAppRootPath
             If False Then
@@ -244,38 +240,39 @@ Namespace Contensive.Core
                 Return genericController.EncodeAppRootPath(genericController.encodeText(Link), cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function IsTesting() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.IsTesting
             Return False
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Sub LogActivity(ByVal Message As String, ByVal UserID As Integer, ByVal OrganizationID As Integer) 'Inherits BaseClasses.CPSiteBaseClass.LogActivity
             Call logController.logActivity(cpCore, Message, 0, UserID, OrganizationID)
         End Sub
         '
-        ' Report an alarm
-        '   This will set off the server monitor
+        '====================================================================================================
         '
         Public Overrides Sub LogWarning(ByVal name As String, ByVal description As String, ByVal typeOfWarningKey As String, ByVal instanceKey As String)
             Call logController.csv_reportWarning(cpCore, name, description, "", 0, description, typeOfWarningKey, instanceKey)
         End Sub
         '
-        ' Report an alarm
-        '   This will set off the server monitor
+        '====================================================================================================
         '
         Public Overrides Sub LogAlarm(ByVal cause As String)
             Call logController.appendLog(cpCore, cause, "Alarm")
         End Sub
         '
-        ' Report an error message
-        '   Eventually, move the cmc.main_ReportError code here so process errors get emailed, etc.
+        '====================================================================================================
         '
         Public Overrides Sub ErrorReport(ByVal Cause As String) 'Inherits BaseClasses.CPSiteBaseClass.ErrorReport
             '
-            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError8(Cause, "", True)
+            Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError8(Cause, "", True)
         End Sub
         '
-        ' Report a structured exception object event, with a message
+        '====================================================================================================
         '
         Public Overrides Sub ErrorReport(ByVal Ex As System.Exception, Optional ByVal Message As String = "") 'Inherits BaseClasses.CPSiteBaseClass.ErrorReport
             If Message = "" Then
@@ -290,26 +287,32 @@ Namespace Contensive.Core
             'End If
             'cpCore.handleLegacyError8(s, "", True)
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Sub RequestTask(ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String) 'Inherits BaseClasses.CPSiteBaseClass.RequestTask
             Call taskSchedulerController.main_RequestTask(cpCore, Command, SQL, ExportName, Filename)
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Sub TestPoint(ByVal Message As String) 'Inherits BaseClasses.CPSiteBaseClass.TestPoint
             Call debugController.testPoint(cpCore, Message)
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function LandingPageId(Optional ByVal DomainName As String = "") As Integer 'Inherits BaseClasses.CPSiteBaseClass.LandingPageId
             Return GetProperty("LandingPageID", "")
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub addLinkAlias(ByVal linkAlias As String, ByVal pageId As Integer, Optional ByVal queryStringSuffix As String = "")
             Call docController.app_addLinkAlias(cpCore, linkAlias, pageId, queryStringSuffix)
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function throwEvent(ByVal eventNameIdOrGuid As String) As String
             Dim returnString As String = ""
@@ -369,35 +372,13 @@ Namespace Contensive.Core
             End Try
             Return returnString
         End Function
-        ''
-        '' 20151121 removed to resolve issue with com compatibility
-        '' Report an unstructured Err object event, with a message
-        ''
-        'Public Overrides Sub ErrorReport(ByVal Err As Microsoft.VisualBasic.ErrObject, Optional ByVal Message As String = "") 'Inherits BaseClasses.CPSiteBaseClass.ErrorReport
-        '    Dim Ex As System.Exception
-        '    '
-        '    Ex = Err.GetException
-        '    CP.Utils.AppendLog(Message & vbCrLf & "source " & Err.Source & vbCrLf & "#" & Err.Number & vbCrLf & "line " & Err.Erl & vbCrLf & "description: " & Err.Description & "]" & vbCrLf & Ex.ToString)
-        '    If True Then
-        '        '
-        '        ' if main is available, report it out that way too
-        '        '
-        '        throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError23(Message)
-        '    End If
-        'End Sub
         '
+        '====================================================================================================
         '
-        '
-        Private Sub appendDebugLog(ByVal copy As String)
-            'My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.site, " & copy & vbCrLf, True)
-            ' 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
-        End Sub
-        '
-        ' testpoint
-        '
-        Private Sub tp(ByVal msg As String)
-            'Call appendDebugLog(msg)
-        End Sub
+        Public Overrides Function getRouteList() As List(Of routeClass)
+            Return cpCore.getRouteList()
+        End Function
+
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.
         ' Put cleanup code in Dispose(ByVal disposing As Boolean).

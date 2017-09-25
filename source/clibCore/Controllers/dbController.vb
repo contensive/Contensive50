@@ -3337,7 +3337,9 @@ Namespace Contensive.Core.Controllers
                             Using dt As DataTable = executeQuery(sqlUnique, LiveDataSourceName)
                                 '
                                 ' -- unique violation
-                                Throw New ApplicationException(("Can not save record to content [" & LiveRecordContentName & "] because it would create a non-unique record for one or more of the following field(s) [" & UniqueViolationFieldList & "]"))
+                                If (dt.Rows.Count > 0) Then
+                                    Throw New ApplicationException(("Can not save record to content [" & LiveRecordContentName & "] because it would create a non-unique record for one or more of the following field(s) [" & UniqueViolationFieldList & "]"))
+                                End If
                             End Using
                         End If
                         If (FieldFoundCount > 0) Then

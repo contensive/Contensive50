@@ -541,7 +541,19 @@ Namespace Contensive.Core
         End Sub
         '=============================================================================
         ''' <summary>
-        ''' Executes the current route (pathPage and/or querystring based). If not found, the default route (addon) is executed. Initially the default route is the page Manager.
+        ''' Executes the current route. To determine the route:
+        ''' 1) Try the argument route (pathPage), or if blank, Try the request.pathpage. If either non-blank, attempt
+        ''' -- admin
+        ''' -- hardcoded internal routes
+        ''' -- link forward
+        ''' -- remote method
+        ''' 3) Try querystring (adminRoute, remoteMethodAddon, LinkForward)
+        ''' -- note: link alias is only handled by PageManager when set as the default route
+        ''' 4) If no route is found, use the default route (addon) is executed.
+        ''' When a valid route is determined, check in this order for execution
+        ''' 1) admin (cannot be overridded)
+        ''' 2) 
+        ''' 
         ''' </summary>
         ''' <returns>The doc created by the default addon. (html, json, etc)</returns>
         Public Function executeRoute(Optional route As String = "") As String
@@ -1794,6 +1806,74 @@ Namespace Contensive.Core
             Dim myAssemblyname As AssemblyName = myAssembly.GetName()
             Dim myVersion As Version = myAssemblyname.Version
             Return Format(myVersion.Major, "0") & "." & Format(myVersion.Minor, "00") & "." & Format(myVersion.Build, "00000000")
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Function getRouteList() As List(Of CPSiteBaseClass.routeClass)
+            Dim result As New List(Of CPSiteBaseClass.routeClass)
+            Try
+                Dim physicalFile As String = "~/" & siteProperties.getText("serverpagedefault", "default.aspx")
+                Dim routesAdded As New List(Of String)
+                Dim uniqueRouteList As New List(Of String)
+                'genericController.convertToUnixSlash(route.virtualRoute.Trim())
+                '
+                ' -- admin route
+                result.Add(New CPSiteBaseClass.routeClass() With {
+                    .physicalRoute = physicalFile,
+                    .virtualRoute = genericController.convertToUnixSlash(serverConfig.appConfig.adminRoute.Trim())
+                })
+                uniqueRouteList.Add(serverConfig.appConfig.adminRoute)
+                'registerRoute(cp, cp.core.serverConfig.appConfig.adminRoute, routesAdded, routes, physicalFile)
+                '
+                ' -- remote methods
+                Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.createList_RemoteMethods(Me, New List(Of String))
+                For Each remoteMethod As Contensive.Core.Models.Entity.addonModel In remoteMethods
+                    Dim route As String = genericController.convertToUnixSlash(remoteMethod.name.Trim())
+                    If (uniqueRouteList.Contains(route)) Then
+                        handleException(New ApplicationException("Route [" & route & "] cannot be added because it is a matches the Admin Route or another Remote Method."))
+                    Else
+                        result.Add(New CPSiteBaseClass.routeClass() With {
+                            .physicalRoute = physicalFile & "?remoteMethodAddon=" & genericController.EncodeURL(remoteMethod.name),
+                            .virtualRoute = route
+                        })
+                    End If
+                    'registerRoute(cp, remoteMethod.name, routesAdded, routes, physicalFile)
+                Next
+                '
+                ' -- link forwards
+                Dim linkForwards As List(Of Models.Entity.linkForwardModel) = Models.Entity.linkForwardModel.createList(Me, "name Is Not null")
+                For Each linkForward As Models.Entity.linkForwardModel In linkForwards
+                    Dim route As String = genericController.convertToUnixSlash(linkForward.name.Trim())
+                    If (uniqueRouteList.Contains(route)) Then
+                        handleException(New ApplicationException("Link Foward Route [" & route & "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."))
+                    Else
+                        result.Add(New CPSiteBaseClass.routeClass() With {
+                            .physicalRoute = physicalFile & "?linkForward=" & genericController.EncodeURL(linkForward.name),
+                            .virtualRoute = route
+                        })
+                    End If
+                    'registerRoute(cp, linkForward.name, routesAdded, routes, physicalFile)
+                Next
+                '
+                ' -- link aliases
+                Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(Me, "name Is Not null")
+                For Each linkAlias As Models.Entity.linkAliasModel In linkAliasList
+                    Dim route As String = genericController.convertToUnixSlash(linkAlias.name.Trim())
+                    If (uniqueRouteList.Contains(route)) Then
+                        handleException(New ApplicationException("Link Alias route [" & route & "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."))
+                    Else
+                        result.Add(New CPSiteBaseClass.routeClass() With {
+                            .physicalRoute = physicalFile & "?linkAlias=" & genericController.EncodeURL(linkAlias.name),
+                            .virtualRoute = route
+                        })
+                    End If
+                    'registerRoute(cp, linkAlias.name, routesAdded, routes, physicalFile)
+                Next
+            Catch ex As Exception
+                handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '====================================================================================================
