@@ -827,12 +827,10 @@ ErrorTrap:
                 ' -- Add any left over head tags
                 If (cpCore.doc.metaContent_OtherHeadTags <> "") Then
                     headTags = headTags & cr & cpCore.doc.metaContent_OtherHeadTags
-                    'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_OtherHeadTags) & "');"
                     cpCore.doc.metaContent_OtherHeadTags = ""
                 End If
                 If (headTags <> "") Then
                     JS = JS & vbCrLf & vbTab & "cj.addHeadTag('" & genericController.EncodeJavascript(headTags) & "');"
-                    'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(headTags) & "');"
                 End If
                 '
                 ' -- Add end of body javascript
@@ -840,35 +838,14 @@ ErrorTrap:
                     JS = JS & vbCrLf & cpCore.doc.endOfBodyJavascript
                     cpCore.doc.endOfBodyJavascript = ""
                 End If
-                '
-                ' -- If javascript stream, output it all now
-                If (cpCore.webServer.outStreamDevice = htmlDoc_OutStreamJavaScript) Then
-                    '
-                    ' This is a js output stream from a <script src=url></script>
-                    ' process everything into a var=msg;document.write(var)
-                    ' any js from the page should be added to this group
-                    '
-                    Call writeAltBuffer(result)
-                    cpCore.webServer.outStreamDevice = htmlDoc_OutStreamStandard
-                    result = webServerIO_JavaStream_Text
-                    If JS <> "" Then
-                        result = result & vbCrLf & JS
-                        JS = ""
-                    End If
-                Else
-                    '
-                    ' This is a standard html write
-                    ' any javascript collected should go in a <script tag
-                    '
-                    If JS <> "" Then
-                        result = result _
+                If JS <> "" Then
+                    result = result _
                             & vbCrLf & "<script Language=""javascript"" type=""text/javascript"">" _
                             & vbCrLf & "if(cj){" _
                             & JS _
                             & vbCrLf & "}" _
                             & vbCrLf & "</script>"
-                        JS = ""
-                    End If
+                    JS = ""
                 End If
                 '
                 ' -- end-of-body string -- include it without csv because it may have error strings

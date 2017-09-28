@@ -472,52 +472,6 @@ Namespace Contensive.Core.Controllers
                             '
                             If Not IsLinkAlias Then
                                 '
-                                ' Test for favicon.ico
-                                '
-                                If (LCase(cpCore.webServer.requestPathPage) = "/favicon.ico") Then
-                                    '
-                                    ' Handle Favicon.ico when the client did not recognize the meta tag
-                                    '
-                                    Dim Filename As String = cpCore.siteProperties.getText("FaviconFilename", "")
-                                    If Filename = "" Then
-                                        '
-                                        ' no favicon, 404 the call
-                                        '
-                                        Call cpCore.webServer.setResponseStatus("404 Not Found")
-                                        Call cpCore.webServer.setResponseContentType("image/gif")
-                                        cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                        Return cpCore.doc.docBuffer
-                                    Else
-                                        Call cpCore.webServer.redirect(genericController.getCdnFileLink(cpCore, Filename), "favicon request", False)
-                                        cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                        Return cpCore.doc.docBuffer
-                                    End If
-                                End If
-                                '
-                                ' Test for robots.txt
-                                '
-                                If (LCase(LinkFullPathNoSlash) = "robots.txt") Or (LCase(LinkFullPathNoSlash) = "robots_txt") Then
-                                    '
-                                    ' Handle Robots.txt file
-                                    '
-                                    Dim Filename As String = "config/RobotsTxtBase.txt"
-                                    ' set this way because the preferences page needs a filename in a site property (enhance later)
-                                    Call cpCore.siteProperties.setProperty("RobotsTxtFilename", Filename)
-                                    Dim Content As String = cpCore.cdnFiles.readFile(Filename)
-                                    If Content = "" Then
-                                        '
-                                        ' save default robots.txt
-                                        '
-                                        Content = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
-                                        Call cpCore.appRootFiles.saveFile(Filename, Content)
-                                    End If
-                                    Content = Content & cpCore.addonCache.robotsTxt
-                                    Call cpCore.webServer.setResponseContentType("text/plain")
-                                    Call cpCore.html.writeAltBuffer(Content)
-                                    cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                    Return cpCore.doc.docBuffer
-                                End If
-                                '
                                 ' No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
                                 '
                                 If (cpCore.errorCount = 0) And cpCore.siteProperties.getBoolean("LinkForwardAutoInsert") And (Not IsInLinkForwardTable) Then

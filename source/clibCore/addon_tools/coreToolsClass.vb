@@ -3728,129 +3728,135 @@ ErrorTrap:
         '==============================================================================================
         '
         Private Function GetForm_LogFiles_Details() As String
-            Dim StartPath As String
-            Dim CurrentPath As String
-            Dim SourceFolders As String
-            Dim FolderSplit() As String
-            Dim FolderCount As Integer
-            Dim FolderPointer As Integer
-            Dim LineSplit() As String
-            Dim FolderLine As String
-            Dim FolderName As String
-            Dim ParentPath As String
-            Dim Position As Integer
-            Dim Filename As String
-            Dim RowEven As Boolean
-            Dim FileSize As String
-            Dim FileDate As String
-            Dim FileURL As String
-            Dim CellCopy As String
-            Dim QueryString As String
-            '
-            Const GetTableStart = "<table border=""1"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><TD><table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr>" _
+            Dim result As String = ""
+            Try
+
+                Dim StartPath As String
+                Dim CurrentPath As String
+                Dim SourceFolders As String
+                Dim FolderSplit() As String
+                Dim FolderCount As Integer
+                Dim FolderPointer As Integer
+                Dim LineSplit() As String
+                Dim FolderLine As String
+                Dim FolderName As String
+                Dim ParentPath As String
+                Dim Position As Integer
+                Dim Filename As String
+                Dim RowEven As Boolean
+                Dim FileSize As String
+                Dim FileDate As String
+                Dim FileURL As String
+                Dim CellCopy As String
+                Dim QueryString As String
+                '
+                Const GetTableStart = "<table border=""1"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><TD><table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr>" _
                     & "<td width=""23""><img src=""/ccLib/images/spacer.gif"" height=""1"" width=""23""></td>" _
                     & "<td width=""60%""><img src=""/ccLib/images/spacer.gif"" height=""1"" width=""1""></td>" _
                     & "<td width=""20%""><img src=""/ccLib/images/spacer.gif"" height=""1"" width=""1""></td>" _
                     & "<td width=""20%""><img src=""/ccLib/images/spacer.gif"" height=""1"" width=""1""></td>" _
                     & "</tr>"
-            Const GetTableEnd = "</table></td></tr></table>"
-            '
-            Const SpacerImage = "<img src=""/ccLib/Images/spacer.gif"" width=""23"" height=""22"" border=""0"">"
-            Const FolderOpenImage = "<img src=""/ccLib/Images/iconfolderopen.gif"" width=""23"" height=""22"" border=""0"">"
-            Const FolderClosedImage = "<img src=""/ccLib/Images/iconfolderclosed.gif"" width=""23"" height=""22"" border=""0"">"
-            '
-            ' StartPath is the root - the top of the directory, it ends in the folder name (no slash)
-            '
-            GetForm_LogFiles_Details = ""
-            StartPath = cpCore.programDataFiles.rootLocalPath & "Logs\"
-            '
-            ' CurrentPath is what is concatinated on to StartPath to get the current folder, it must start with a slash
-            '
-            CurrentPath = cpCore.docProperties.getText("SetPath")
-            If CurrentPath = "" Then
-                CurrentPath = "\"
-            ElseIf Left(CurrentPath, 1) <> "\" Then
-                CurrentPath = "\" & CurrentPath
-            End If
-            '
-            ' Parent Folder is the path to the parent of current folder, and must start with a slash
-            '
-            Position = InStrRev(CurrentPath, "\")
-            If Position = 1 Then
-                ParentPath = "\"
-            Else
-                ParentPath = Mid(CurrentPath, 1, Position - 1)
-            End If
-            '
-            '
-            If cpCore.docProperties.getText("SourceFile") <> "" Then
+                Const GetTableEnd = "</table></td></tr></table>"
                 '
-                ' Return the content of the file
+                Const SpacerImage = "<img src=""/ccLib/Images/spacer.gif"" width=""23"" height=""22"" border=""0"">"
+                Const FolderOpenImage = "<img src=""/ccLib/Images/iconfolderopen.gif"" width=""23"" height=""22"" border=""0"">"
+                Const FolderClosedImage = "<img src=""/ccLib/Images/iconfolderclosed.gif"" width=""23"" height=""22"" border=""0"">"
                 '
-                Call cpCore.webServer.setResponseContentType("text/text")
-                Call cpCore.html.writeAltBuffer(cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile")))
-                cpCore.continueProcessing = False
-            Else
-                GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetTableStart
+                ' StartPath is the root - the top of the directory, it ends in the folder name (no slash)
                 '
-                ' Parent Folder Link
+                result = ""
+                StartPath = cpCore.programDataFiles.rootLocalPath & "Logs\"
                 '
-                If CurrentPath <> ParentPath Then
-                    FileSize = ""
-                    FileDate = ""
-                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
+                ' CurrentPath is what is concatinated on to StartPath to get the current folder, it must start with a slash
+                '
+                CurrentPath = cpCore.docProperties.getText("SetPath")
+                If CurrentPath = "" Then
+                    CurrentPath = "\"
+                ElseIf Left(CurrentPath, 1) <> "\" Then
+                    CurrentPath = "\" & CurrentPath
                 End If
                 '
-                ' Sub-Folders
+                ' Parent Folder is the path to the parent of current folder, and must start with a slash
                 '
-
-                SourceFolders = cpCore.appRootFiles.getFolderNameList(StartPath & CurrentPath)
-                If SourceFolders <> "" Then
-                    FolderSplit = Split(SourceFolders, vbCrLf)
-                    FolderCount = UBound(FolderSplit) + 1
-                    For FolderPointer = 0 To FolderCount - 1
-                        FolderLine = FolderSplit(FolderPointer)
-                        If FolderLine <> "" Then
-                            LineSplit = Split(FolderLine, ",")
-                            FolderName = LineSplit(0)
-                            FileSize = LineSplit(1)
-                            FileDate = LineSplit(2)
-                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
-                        End If
-                    Next
-                End If
-                '
-                ' Files
-                '
-                SourceFolders = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(StartPath & CurrentPath))
-                If SourceFolders = "" Then
-                    FileSize = ""
-                    FileDate = ""
-                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow(SpacerImage, "no files were found in this folder", FileSize, FileDate, RowEven)
+                Position = InStrRev(CurrentPath, "\")
+                If Position = 1 Then
+                    ParentPath = "\"
                 Else
-                    FolderSplit = Split(SourceFolders, vbCrLf)
-                    FolderCount = UBound(FolderSplit) + 1
-                    For FolderPointer = 0 To FolderCount - 1
-                        FolderLine = FolderSplit(FolderPointer)
-                        If FolderLine <> "" Then
-                            LineSplit = Split(FolderLine, ",")
-                            Filename = LineSplit(0)
-                            FileSize = LineSplit(5)
-                            FileDate = LineSplit(3)
-                            FileURL = StartPath & CurrentPath & "\" & Filename
-                            QueryString = cpCore.doc.refreshQueryString
-                            QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
-                            QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
-                            QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, True)
-                            CellCopy = "<A href=""" & cpCore.webServer.requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
-                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven)
-                        End If
-                    Next
+                    ParentPath = Mid(CurrentPath, 1, Position - 1)
                 End If
                 '
-                GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetTableEnd
-            End If
-            '
+                '
+                If cpCore.docProperties.getText("SourceFile") <> "" Then
+                    '
+                    ' Return the content of the file
+                    '
+                    Call cpCore.webServer.setResponseContentType("text/text")
+                    result = cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile"))
+                    cpCore.continueProcessing = False
+                Else
+                    result = result & GetTableStart
+                    '
+                    ' Parent Folder Link
+                    '
+                    If CurrentPath <> ParentPath Then
+                        FileSize = ""
+                        FileDate = ""
+                        result = result & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
+                    End If
+                    '
+                    ' Sub-Folders
+                    '
+
+                    SourceFolders = cpCore.appRootFiles.getFolderNameList(StartPath & CurrentPath)
+                    If SourceFolders <> "" Then
+                        FolderSplit = Split(SourceFolders, vbCrLf)
+                        FolderCount = UBound(FolderSplit) + 1
+                        For FolderPointer = 0 To FolderCount - 1
+                            FolderLine = FolderSplit(FolderPointer)
+                            If FolderLine <> "" Then
+                                LineSplit = Split(FolderLine, ",")
+                                FolderName = LineSplit(0)
+                                FileSize = LineSplit(1)
+                                FileDate = LineSplit(2)
+                                result = result & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
+                            End If
+                        Next
+                    End If
+                    '
+                    ' Files
+                    '
+                    SourceFolders = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(StartPath & CurrentPath))
+                    If SourceFolders = "" Then
+                        FileSize = ""
+                        FileDate = ""
+                        result = result & GetForm_LogFiles_Details_GetRow(SpacerImage, "no files were found in this folder", FileSize, FileDate, RowEven)
+                    Else
+                        FolderSplit = Split(SourceFolders, vbCrLf)
+                        FolderCount = UBound(FolderSplit) + 1
+                        For FolderPointer = 0 To FolderCount - 1
+                            FolderLine = FolderSplit(FolderPointer)
+                            If FolderLine <> "" Then
+                                LineSplit = Split(FolderLine, ",")
+                                Filename = LineSplit(0)
+                                FileSize = LineSplit(5)
+                                FileDate = LineSplit(3)
+                                FileURL = StartPath & CurrentPath & "\" & Filename
+                                QueryString = cpCore.doc.refreshQueryString
+                                QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
+                                QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
+                                QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, True)
+                                CellCopy = "<A href=""" & cpCore.webServer.requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
+                                result = result & GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven)
+                            End If
+                        Next
+                    End If
+                    '
+                    result = result & GetTableEnd
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '=============================================================================

@@ -542,9 +542,22 @@ Namespace Contensive.Core
         '=============================================================================
         ''' <summary>
         ''' Executes the current route. To determine the route:
-        ''' 1) Try the argument route (pathPage), or if blank, Try the request.pathpage. If either non-blank, attempt
+        ''' NO NO NO -- I think we need to NOT consider the request pathpage. without 404 handling, it will ALWAYS be the default page.
+        '''     requestRoute = the route that appears in the URL, request.pathPage
+        '''     argumentRoute = the route in the argment for this method
+        '''     queryStringRoute = remoteMethod, adminRoute, linkForward, linkAlias, method
+        '''     - linkAlias testing should only happen in pageManager, but it is in routingList
+        '''     /anything?remoteMethod=addonName - remoteMethods
+        '''     /anything?remoteMethod=adminRoute - adminRoute
+        '''     /anything?method=admin - adminRoute
+        '''     /anything?linkForward=thing2 - linkForwards
+        '''     /anything?method=thing3 - hardcodedRoutes
+        '''     argumentRoute=/some/route
+        '''     
+        ''' 1) Try the argument route, if not blank
+        '''     test for adminRoute, test for remoteMethod, test for linkForward,
         ''' -- admin
-        ''' -- hardcoded internal routes
+        ''' -- hardcoded internal routes (/favicon.ico,/robots.txt,etc)
         ''' -- link forward
         ''' -- remote method
         ''' 3) Try querystring (adminRoute, remoteMethodAddon, LinkForward)
@@ -563,26 +576,66 @@ Namespace Contensive.Core
                     '
                     ' determine route from either url or querystring 
                     '
-                    Dim normalRoute As String = webServer.requestPathPage.ToLower
-                    Dim RemoteMethodFromQueryString As String = docProperties.getText(RequestNameRemoteMethodAddon)
-                    If (Not String.IsNullOrEmpty(route)) Then
+                    Dim argumentRoute As String = route
+                    Dim requestRoute As String = webServer.requestPathPage.ToLower
+                    Dim normalizedRoute As String = ""
+                    Dim queryStringRoute As String = docProperties.getText(RequestNameRemoteMethodAddon)
+                    If (Not String.IsNullOrEmpty(argumentRoute)) Then
                         '
-                        ' route privided as argument
+                        ' Argument route
                         '
-                        normalRoute = route
-                    ElseIf (Not String.IsNullOrEmpty(RemoteMethodFromQueryString)) Then
+                        normalizedRoute = genericController.normalizeRoute(argumentRoute)
+                    ElseIf (Not String.IsNullOrEmpty(queryStringRoute)) Then
                         '
                         ' route comes from a remoteMethod=route querystring argument
                         '
-                        normalRoute = "/" & RemoteMethodFromQueryString.ToLower()
+                        normalizedRoute = "/" & queryStringRoute.ToLower()
                     End If
                     '
                     ' normalize route to /path/page or /path
                     '
-                    normalRoute = genericController.normalizeRoute(normalRoute)
+                    normalizedRoute = genericController.normalizeRoute(normalizedRoute)
                     '
-                    ' call with no addon route returns admin site
-                    '
+                    If True Then
+                        If (LCase(normalizedRoute) = "/favicon.ico") Then
+                            '
+                            ' -- Favicon.ico
+                            Dim Filename As String = siteProperties.getText("FaviconFilename", "")
+                            If Filename = "" Then
+                                '
+                                ' no favicon, 404 the call
+                                '
+                                Call webServer.setResponseStatus("404 Not Found")
+                                Call webServer.setResponseContentType("image/gif")
+                                continueProcessing = False
+                                Return doc.docBuffer
+                            Else
+                                Call webServer.redirect(genericController.getCdnFileLink(Me, Filename), "favicon request", False)
+                                continueProcessing = False
+                                Return doc.docBuffer
+                            End If
+                        End If
+                        If (LCase(normalizedRoute) = "/robots.txt") Or (LCase(normalizedRoute) = "/robots_txt") Then
+                            '
+                            ' -- Robots.txt
+                            Dim Filename As String = "config/RobotsTxtBase.txt"
+                            ' 
+                            ' set this way because the preferences page needs a filename in a site property (enhance later)
+                            Call siteProperties.setProperty("RobotsTxtFilename", Filename)
+                            result = cdnFiles.readFile(Filename)
+                            If result = "" Then
+                                '
+                                ' save default robots.txt
+                                '
+                                result = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
+                                Call appRootFiles.saveFile(Filename, result)
+                            End If
+                            result = result & addonCache.robotsTxt
+                            Call webServer.setResponseContentType("text/plain")
+                            continueProcessing = False
+                            Return result
+                        End If
+                    End If
                     If True Then
                         '
                         '------------------------------------------------------------------------------------------
@@ -593,17 +646,17 @@ Namespace Contensive.Core
                         '------------------------------------------------------------------------------------------
                         '
                         ' if route is a remote method, use it
-                        Dim addonRoute As String = normalRoute
+                        Dim addonRoute As String = normalizedRoute
                         Dim addon As addonModel = addonCache.getAddonByName(addonRoute)
                         If (addon Is Nothing) Then
                             '
                             ' -- try testRoute2
-                            addonRoute = normalRoute & "/"
+                            addonRoute = normalizedRoute & "/"
                             addon = addonCache.getAddonByName(addonRoute)
                             If (addon Is Nothing) Then
                                 '
                                 ' -- try testRoute3
-                                addonRoute = normalRoute.Substring(1)
+                                addonRoute = normalizedRoute.Substring(1)
                                 addon = addonCache.getAddonByName(addonRoute)
                                 If (addon Is Nothing) Then
                                     '
@@ -690,33 +743,33 @@ Namespace Contensive.Core
                             'Call AppendLog("main_init(), 2710 - exit for remote method")
                             '
                             If True Then
-                                Dim Option_String As String = ""
-                                Dim pos As Integer
-                                Dim HostContentName As String
-                                Dim hostRecordId As Integer
-                                If docProperties.containsKey("Option_String") Then
-                                    Option_String = docProperties.getText("Option_String")
-                                Else
-                                    '
-                                    ' convert Querystring encoding to (internal) NVA
-                                    '
-                                    If webServer.requestQueryString <> "" Then
-                                        Dim pairs() As String = Split(webServer.requestQueryString, "&")
-                                        For addonPtr = 0 To UBound(pairs)
-                                            Dim pairName As String = pairs(addonPtr)
-                                            Dim pairValue As String = ""
-                                            pos = genericController.vbInstr(1, pairName, "=")
-                                            If pos > 0 Then
-                                                pairValue = genericController.DecodeResponseVariable(Mid(pairName, pos + 1))
-                                                pairName = genericController.DecodeResponseVariable(Mid(pairName, 1, pos - 1))
-                                            End If
-                                            Option_String = Option_String & "&" & genericController.encodeNvaArgument(pairName) & "=" & genericController.encodeNvaArgument(pairValue)
-                                        Next
-                                        Option_String = Mid(Option_String, 2)
-                                    End If
-                                End If
-                                HostContentName = docProperties.getText("hostcontentname")
-                                hostRecordId = docProperties.getInteger("HostRecordID")
+                                'Dim Option_String As String = ""
+                                'Dim pos As Integer
+                                'Dim HostContentName As String
+                                'Dim hostRecordId As Integer
+                                'If docProperties.containsKey("Option_String") Then
+                                '    'Option_String = docProperties.getText("Option_String")
+                                'Else
+                                '    '
+                                '    ' convert Querystring encoding to (internal) NVA
+                                '    '
+                                '    If webServer.requestQueryString <> "" Then
+                                '        Dim pairs() As String = Split(webServer.requestQueryString, "&")
+                                '        For addonPtr = 0 To UBound(pairs)
+                                '            Dim pairName As String = pairs(addonPtr)
+                                '            Dim pairValue As String = ""
+                                '            pos = genericController.vbInstr(1, pairName, "=")
+                                '            If pos > 0 Then
+                                '                pairValue = genericController.DecodeResponseVariable(Mid(pairName, pos + 1))
+                                '                pairName = genericController.DecodeResponseVariable(Mid(pairName, 1, pos - 1))
+                                '            End If
+                                '            Option_String = Option_String & "&" & genericController.encodeNvaArgument(pairName) & "=" & genericController.encodeNvaArgument(pairValue)
+                                '        Next
+                                '        Option_String = Mid(Option_String, 2)
+                                '    End If
+                                'End If
+                                'HostContentName = docProperties.getText("hostcontentname")
+                                'hostRecordId = docProperties.getInteger("HostRecordID")
                                 '
                                 ' remote methods are add-ons
                                 Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
@@ -724,9 +777,9 @@ Namespace Contensive.Core
                                     .cssContainerClass = "",
                                     .cssContainerId = "",
                                     .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
-                                        .contentName = HostContentName,
+                                        .contentName = docProperties.getText("hostcontentname"),
                                         .fieldName = "",
-                                        .recordId = hostRecordId
+                                        .recordId = docProperties.getInteger("HostRecordID")
                                     },
                                     .personalizationAuthenticated = authContext.isAuthenticated,
                                     .personalizationPeopleId = authContext.user.id
@@ -1170,7 +1223,7 @@ Namespace Contensive.Core
                         ' normalize adminRoute and test for hit
                         '--------------------------------------------------------------------------
                         '
-                        If (normalRoute = genericController.normalizeRoute(serverConfig.appConfig.adminRoute.ToLower)) Then
+                        If (normalizedRoute = genericController.normalizeRoute(serverConfig.appConfig.adminRoute.ToLower)) Then
                             '
                             ' route is admin
                             '   If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
