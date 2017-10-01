@@ -147,7 +147,7 @@ Namespace Contensive.Core.Controllers
                                     'Call AppendLog("main_init(), 3210 - exit for rc/ri redirect ")
                                     '
                                     cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                    Return cpCore.doc.docBuffer
+                                    Return String.Empty
                                 Else
                                     cpCore.doc.adminWarning = "<p>The site attempted to automatically jump to another page, but there was a problem with the page that included the link.<p>"
                                     cpCore.doc.adminWarningPageID = cpCore.doc.redirectRecordID

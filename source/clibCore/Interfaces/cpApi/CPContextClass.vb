@@ -330,9 +330,10 @@ Namespace Contensive.Core
         '
         '==========================================================================================
         '
+        <Obsolete("responseBuffer is deprecated. Each method returns its content.")>
         Public ReadOnly Property responseBuffer() As String
             Get
-                Return cp.core.doc.docBuffer
+                Return String.Empty
             End Get
         End Property
         '

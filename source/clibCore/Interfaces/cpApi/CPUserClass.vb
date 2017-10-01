@@ -272,7 +272,10 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property Language() As String 'Inherits BaseClasses.CPUserBaseClass.Language
             Get
-                Return CP.core.authContext.user.language
+                If (CP.core.authContext.userLanguage IsNot Nothing) Then
+                    Return CP.core.authContext.userLanguage.name
+                End If
+                Return String.Empty
             End Get
         End Property
         '
@@ -309,7 +312,7 @@ Namespace Contensive.Core
             Return CP.core.authContext.authenticateById(cpCore, RecordID, CP.core.authContext)
             If Not CP.core.authContext.user.AutoLogin Then
                 CP.core.authContext.user.AutoLogin = True
-                CP.core.authContext.user.saveObject(cpCore)
+                CP.core.authContext.user.save(cpCore)
             End If
         End Function
         '

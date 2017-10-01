@@ -196,7 +196,14 @@ Namespace Contensive.Core
 
         Public Overrides ReadOnly Property Language() As String
             Get
-                Return cpCore.authContext.user.language
+                If (cpCore.authContext.userLanguage Is Nothing) Then
+                    Return ""
+                End If
+                Dim userLanguage As Models.Entity.LanguageModel = Models.Entity.LanguageModel.create(cpCore, cpCore.authContext.user.LanguageID, New List(Of String))
+                If (userLanguage IsNot Nothing) Then
+                    Return userLanguage.Name
+                End If
+                Return "English"
             End Get
         End Property
 

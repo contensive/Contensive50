@@ -428,7 +428,7 @@ Namespace Contensive.Core.Controllers
                     ' This field is default true, and non-authorable
                     ' It will be true in all cases, except a possible unforseen exception
                     '
-                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML("http://" & cpcore.serverConfig.appConfig.domainList(0) & "/" & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML("http://" & cpcore.serverConfig.appConfig.domainList(0) & "/" & cpcore.siteProperties.serverPageDefault & "?" & rnEmailBlockRecipientEmail & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                 End If
                 '
                 ' --- Send message to the additional member
@@ -637,7 +637,7 @@ ErrorTrap:
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML(cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & requestAppRootPath & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML(cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & requestAppRootPath & cpcore.siteProperties.serverPageDefault & "?" & rnEmailBlockRecipientEmail & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '

@@ -16,16 +16,65 @@ Namespace Contensive.Core.Models.Context
     Public Class authContextModel
         '
         ' -- this class stores state, so it can hold a pointer to the cpCore instance
-        Private cpCore As coreClass
+        Private Property cpCore As coreClass
         '
         ' -- the visit is the collection of pages, constructor creates default non-authenticated instance
-        Public visit As Models.Entity.visitModel
+        Public Property visit As Models.Entity.visitModel
         '
         ' -- visitor represents the browser, constructor creates default non-authenticated instance
-        Public visitor As Models.Entity.visitorModel
+        Public Property visitor As Models.Entity.visitorModel
         '
         ' -- user is the person at the keyboad, constructor creates default non-authenticated instance
-        Public user As Models.Entity.personModel
+        Public Property user As Models.Entity.personModel
+        ''' <summary>
+        ''' userLanguage will return a valid populated language object
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property userLanguage As LanguageModel
+            Get
+                If (_language Is Nothing) And (user IsNot Nothing) Then
+                    If (user.LanguageID > 0) Then
+                        '
+                        ' -- get user language
+                        _language = languageModel.create(cpCore, user.LanguageID)
+                    End If
+                    If (_language Is Nothing) Then
+                        '
+                        ' -- try browser language if available
+                        Dim HTTP_Accept_Language As String = Controllers.iisController.getBrowserAcceptLanguage(cpCore)
+                        If (Not String.IsNullOrEmpty(HTTP_Accept_Language)) Then
+                            Dim languageList As List(Of languageModel) = languageModel.createList(cpCore, "(HTTP_Accept_Language='" & HTTP_Accept_Language & "')")
+                            If (languageList.Count > 0) Then
+                                _language = languageList(0)
+                            End If
+                        End If
+                    End If
+                    If (_language Is Nothing) Then
+                        '
+                        ' -- try default language
+                        Dim defaultLanguageName As String = cpCore.siteProperties.getText("Language", "English")
+                        _language = languageModel.createByName(cpCore, defaultLanguageName)
+                    End If
+                    If (_language Is Nothing) Then
+                        '
+                        ' -- try english
+                        _language = languageModel.createByName(cpCore, "English")
+                    End If
+                    If (_language Is Nothing) Then
+                        '
+                        ' -- add english to the table
+                        _language = languageModel.add(cpCore)
+                        _language.name = "English"
+                        _language.HTTP_Accept_Language = "en"
+                        _language.save(cpCore)
+                        user.LanguageID = _language.id
+                        user.save(cpCore)
+                    End If
+                End If
+                Return _language
+            End Get
+        End Property
+        Private _language As LanguageModel = Nothing
         '
         ' -- legacy user object -- will be refactored out, constructor creates default non-authenticated instance
         'Public authContextUser As authContextUserModel
@@ -503,55 +552,6 @@ Namespace Contensive.Core.Models.Context
                                 End If
                             End If
                             '
-                            ' -- establish language for the member, if they do not have one
-                            If (resultAuthContext.visit.PageVisits = 0) And (resultAuthContext.user.id > 0) Then
-                                '
-                                ' -- First page of this visit, verify the member language
-                                If (resultAuthContext.user.LanguageID < 1) Then
-                                    '
-                                    ' -- No member language, set member language from browser language
-                                    Call cpCore.db.web_GetBrowserLanguage(resultAuthContext.user.LanguageID, resultAuthContext.user.language)
-                                    If resultAuthContext.user.LanguageID > 0 Then
-                                        '
-                                        ' -- Browser Language worked
-                                        user_changes = True
-                                    Else
-                                        '
-                                        ' -- Still no match, main_Get the default language
-                                        resultAuthContext.user.language = cpCore.siteProperties.getText("Language", "English")
-                                        If resultAuthContext.user.language <> "English" Then
-                                            '
-                                            ' Handle the non-English case first, so if there is a problem, fall back is English
-                                            '
-                                            resultAuthContext.user.LanguageID = cpCore.db.getRecordID("languages", resultAuthContext.user.language)
-                                            If resultAuthContext.user.LanguageID = 0 Then
-                                                '
-                                                ' -- non-English Language is not in Language Table, set default to english
-                                                resultAuthContext.user.language = "English"
-                                                Call cpCore.siteProperties.setProperty("Language", resultAuthContext.user.language)
-                                            End If
-                                            user_changes = True
-                                        End If
-                                        If resultAuthContext.user.language = "English" Then
-                                            resultAuthContext.user.LanguageID = cpCore.db.getRecordID("languages", resultAuthContext.user.language)
-                                            If resultAuthContext.user.LanguageID < 1 Then
-                                                '
-                                                ' -- English is not in Language table, add it, and set it in Member
-                                                Dim language As Models.Entity.LanguageModel = Models.Entity.LanguageModel.add(cpCore, New List(Of String))
-                                                If (language IsNot Nothing) Then
-                                                    language.Name = "English"
-                                                    language.HTTP_Accept_Language = "en"
-                                                    language.saveObject(cpCore)
-                                                    resultAuthContext.user.LanguageID = language.ID
-                                                    resultAuthContext.user.language = language.Name
-                                                    user_changes = True
-                                                End If
-                                            End If
-                                        End If
-                                    End If
-                                End If
-                            End If
-                            '
                             ' -- check for changes in interrelationships
                             If (resultAuthContext.visitor.MemberID <> resultAuthContext.user.id) Then
                                 resultAuthContext.visitor.MemberID = resultAuthContext.user.id
@@ -575,7 +575,7 @@ Namespace Contensive.Core.Models.Context
                             resultAuthContext.visit_initialized = True
                             If visit_changes Then resultAuthContext.visit.saveObject(cpCore)
                             If visitor_changes Then Call resultAuthContext.visitor.saveObject(cpCore)
-                            If user_changes Then Call resultAuthContext.user.saveObject(cpCore)
+                            If user_changes Then Call resultAuthContext.user.save(cpCore)
                             visitCookieNew = cpCore.security.encodeToken(resultAuthContext.visit.id, resultAuthContext.visit.LastVisitTime)
                             If visitInit_allowVisitTracking And (visitCookie <> visitCookieNew) Then
                                 visitCookie = visitCookieNew
@@ -1152,7 +1152,7 @@ Namespace Contensive.Core.Models.Context
                 authContext.visit.ExcludeFromAnalytics = visit.ExcludeFromAnalytics Or authContext.visit.Bot Or authContext.user.ExcludeFromAnalytics Or authContext.user.Admin Or authContext.user.Developer
                 Call authContext.visit.saveObject(cpCore)
                 Call authContext.visitor.saveObject(cpCore)
-                Call authContext.user.saveObject(cpCore)
+                Call authContext.user.save(cpCore)
                 returnResult = True
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw

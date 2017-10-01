@@ -143,10 +143,8 @@ Namespace Contensive.Core
             End If
         End Sub
 
-        Public Overrides Sub Write(ByVal message As String)
-            If True Then
-                Call cpCore.html.writeAltBuffer(message)
-            End If
+        <Obsolete("The write buffer is deprecated")> Public Overrides Sub Write(ByVal message As String)
+            '
         End Sub
         '
         '

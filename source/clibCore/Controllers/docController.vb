@@ -40,9 +40,9 @@ Namespace Contensive.Core.Controllers
         Public Property javascriptStreamHolder As String() = {}
         Public Property javascriptStreamSize As Integer = 0
         Public Property javascriptStreamCount As Integer = 0
-        Public Property isStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
+        'Public Property isStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
         Public Property outputBufferEnabled As Boolean = True          ' when true (default), stream is buffered until page is done
-        Public Property docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
+        ' Public Property docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
         Public Property metaContent_Title As String = ""
         Public Property metaContent_Description As String = ""
         Public Property metaContent_OtherHeadTags As String = ""

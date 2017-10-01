@@ -1044,12 +1044,12 @@ Namespace Contensive.Core
         '
         Public Const RequestNameFolderID = "FolderID"
         '
-        Public Const RequestNameEmailMemberID = "emi8s9Kj"
-        Public Const RequestNameEmailOpenFlag = "eof9as88"
+        Public Const rnEmailMemberID = "emi8s9Kj"
+        Public Const rnEmailOpenFlag = "eof9as88"
         Public Const RequestNameEmailOpenCssFlag = "8aa41pM3"
-        Public Const RequestNameEmailClickFlag = "ecf34Msi"
-        Public Const RequestNameEmailSpamFlag = "9dq8Nh61"
-        Public Const RequestNameEmailBlockRequestDropID = "BlockEmailRequest"
+        Public Const rnEmailClickFlag = "ecf34Msi"
+        Public Const rnEmailBlockRecipientEmail = "9dq8Nh61"
+        Public Const rnEmailBlockRequestDropID = "BlockEmailRequest"
         Public Const RequestNameVisitTracking = "s9lD1088"
         Public Const RequestNameBlockContentTracking = "BlockContentTracking"
         Public Const RequestNameCookieDetectVisitID = "f92vo2a8d"
@@ -1877,9 +1877,9 @@ Namespace Contensive.Core
                             & "Please use your back button to return to the previous page. <br>"
         Public Const NewPage_Msg = ""
         '
-        Public Const htmlDoc_JavaStreamChunk = 100
-        Public Const htmlDoc_OutStreamStandard = 0
-        Public Const htmlDoc_OutStreamJavaScript = 1
+        'Public Const htmlDoc_JavaStreamChunk = 100
+        'Public Const htmlDoc_OutStreamStandard = 0
+        'Public Const htmlDoc_OutStreamJavaScript = 1
         Public Const main_BakeHeadDelimiter = "#####MultilineFlag#####"
         Public Const navStruc_Descriptor = 1           ' Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page
         Public Const navStruc_Descriptor_CurrentPage = 2

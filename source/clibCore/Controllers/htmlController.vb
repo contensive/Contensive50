@@ -1651,50 +1651,50 @@ ErrorTrap:
         '        cpCore.handleExceptionAndContinue(ex) : Throw
         '    End Try
         'End Function
-        '
-        '========================================================================
-        '   Write to the HTML stream
-        '========================================================================
-        ' refactor -- if this conversion goes correctly, all writeStream will mvoe to teh executeRoute which returns the string 
-        Public Sub writeAltBuffer(ByVal Message As Object)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("WriteStream")
-            '
-            If cpCore.continueProcessing Then
-                Select Case cpCore.webServer.outStreamDevice
-                    Case htmlDoc_OutStreamJavaScript
-                        Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
-                    Case Else
+        '        '
+        '        '========================================================================
+        '        '   Write to the HTML stream
+        '        '========================================================================
+        '        ' refactor -- if this conversion goes correctly, all writeStream will mvoe to teh executeRoute which returns the string 
+        '        Public Sub writeAltBuffer(ByVal Message As Object)
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("WriteStream")
+        '            '
+        '            If cpCore.continueProcessing Then
+        '                Select Case cpCore.webServer.outStreamDevice
+        '                    Case htmlDoc_OutStreamJavaScript
+        '                        Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
+        '                    Case Else
 
-                        If (cpCore.webServer.iisContext IsNot Nothing) Then
-                            cpCore.doc.isStreamWritten = True
-                            Call cpCore.webServer.iisContext.Response.Write(genericController.encodeText(Message))
-                        Else
-                            cpCore.doc.docBuffer = cpCore.doc.docBuffer & genericController.encodeText(Message)
-                        End If
-                End Select
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("writeAltBuffer")
-        End Sub
+        '                        If (cpCore.webServer.iisContext IsNot Nothing) Then
+        '                            cpCore.doc.isStreamWritten = True
+        '                            Call cpCore.webServer.iisContext.Response.Write(genericController.encodeText(Message))
+        '                        Else
+        '                            cpCore.doc.docBuffer = cpCore.doc.docBuffer & genericController.encodeText(Message)
+        '                        End If
+        '                End Select
+        '            End If
+        '            '
+        '            Exit Sub
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("writeAltBuffer")
+        '        End Sub
 
-        '
-        '
-        Private Sub webServerIO_JavaStream_Add(ByVal NewString As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00375")
-            '
-            If cpCore.doc.javascriptStreamCount >= cpCore.doc.javascriptStreamSize Then
-                cpCore.doc.javascriptStreamSize = cpCore.doc.javascriptStreamSize + htmlDoc_JavaStreamChunk
-                ReDim Preserve cpCore.doc.javascriptStreamHolder(cpCore.doc.javascriptStreamSize)
-            End If
-            cpCore.doc.javascriptStreamHolder(cpCore.doc.javascriptStreamCount) = NewString
-            cpCore.doc.javascriptStreamCount = cpCore.doc.javascriptStreamCount + 1
-            Exit Sub
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_JavaStream_Add")
-        End Sub
+        '        '
+        '        '
+        '        Private Sub webServerIO_JavaStream_Add(ByVal NewString As String)
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00375")
+        '            '
+        '            If cpCore.doc.javascriptStreamCount >= cpCore.doc.javascriptStreamSize Then
+        '                cpCore.doc.javascriptStreamSize = cpCore.doc.javascriptStreamSize + htmlDoc_JavaStreamChunk
+        '                ReDim Preserve cpCore.doc.javascriptStreamHolder(cpCore.doc.javascriptStreamSize)
+        '            End If
+        '            cpCore.doc.javascriptStreamHolder(cpCore.doc.javascriptStreamCount) = NewString
+        '            cpCore.doc.javascriptStreamCount = cpCore.doc.javascriptStreamCount + 1
+        '            Exit Sub
+        '            '
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_JavaStream_Add")
+        '        End Sub
         '
         '
         '
@@ -9021,7 +9021,7 @@ ErrorTrap:
             Return result
         End Function
         Public Sub main_ClearStream()
-            cpCore.doc.docBuffer = ""
+            'cpCore.doc.docBuffer = ""
             cpCore.webServer.bufferRedirect = ""
             cpCore.webServer.bufferResponseHeader = ""
         End Sub
