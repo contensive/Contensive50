@@ -428,6 +428,8 @@
     <Compile Include="addonCollection_core\processRedirectMethod.vb" />
     <Compile Include="addonCollection_core\processExportAsciiMethod.vb" />
     <Compile Include="addonCollection_core\processPayPalConformMethod.vb" />
+    <Compile Include="addonCollection_core\faviconIco.vb" />
+    <Compile Include="addonCollection_core\robotsTxt.vb" />
     <Compile Include="addonCollection_emailProcess\processEmailClass.vb" />
     <Compile Include="addonCollection_adminSite\getFieldEditorPreference.vb" />
     <Compile Include="addonCollection_housekeeping\houseKeepClass.vb" />
@@ -435,7 +437,7 @@
     <Compile Include="Controllers\loginController.vb" />
     <Compile Include="addonCollection_login\loginPageClass.vb" />
     <Compile Include="addonCollection_pageManager\childPageResortClass.vb" />
-    <Compile Include="addonCollection_pageManager\pageManager.vb" />
+    <Compile Include="addonCollection_pageManager\getPageManager.vb" />
     <Compile Include="constants.vb" />
     <Compile Include="Controllers\logController.vb" />
     <Compile Include="Controllers\emailController.vb" />

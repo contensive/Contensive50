@@ -541,134 +541,54 @@ Namespace Contensive.Core
         '=============================================================================
         ''' <summary>
         ''' Executes the current route. To determine the route:
-        ''' NO NO NO -- I think we need to NOT consider the request pathpage. without 404 handling, it will ALWAYS be the default page.
-        '''     requestRoute = the route that appears in the URL, request.pathPage
-        '''     argumentRoute = the route in the argment for this method
-        '''     queryStringRoute = remoteMethod, adminRoute, linkForward, linkAlias, method
-        '''     - linkAlias testing should only happen in pageManager, but it is in routingList
-        '''     /anything?remoteMethod=addonName - remoteMethods
-        '''     /anything?remoteMethod=adminRoute - adminRoute
-        '''     /anything?method=admin - adminRoute
-        '''     /anything?linkForward=thing2 - linkForwards
-        '''     /anything?method=thing3 - hardcodedRoutes
-        '''     argumentRoute=/some/route
-        '''     
-        ''' 1) Try the argument route, if not blank
-        '''     test for adminRoute, test for remoteMethod, test for linkForward,
-        ''' -- admin
-        ''' -- hardcoded internal routes (/favicon.ico,/robots.txt,etc)
-        ''' -- link forward
-        ''' -- remote method
-        ''' 3) Try querystring (adminRoute, remoteMethodAddon, LinkForward)
-        ''' -- note: link alias is only handled by PageManager when set as the default route
-        ''' 4) If no route is found, use the default route (addon) is executed.
-        ''' When a valid route is determined, check in this order for execution
-        ''' 1) admin (cannot be overridded)
-        ''' 2) 
+        ''' route can be from URL, or from routeOverride
+        ''' how to process route
+        ''' -- urlParameters - /urlParameter(0)/urlParameter(1)/etc.
+        ''' -- first try full url, then remove them from the left and test until last, try just urlParameter(0)
+        ''' ---- so url /a/b/c, with addon /a and addon /a/b -> would run addon /a/b
         ''' 
         ''' </summary>
         ''' <returns>The doc created by the default addon. (html, json, etc)</returns>
-        Public Function executeRoute(Optional route As String = "") As String
+        Public Function executeRoute(Optional routeOverride As String = "") As String
             Dim result As String = ""
             Try
                 If (serverConfig.appConfig IsNot Nothing) Then
                     '
-                    ' determine route from either url or querystring 
-                    '
-                    Dim argumentRoute As String = genericController.normalizeRoute(route)
-                    Dim requestRoute As String = genericController.normalizeRoute(webServer.requestPathPage.ToLower)
-                    Dim normalizedRoute As String = ""
-                    Dim queryStringRoute As String = docProperties.getText(RequestNameRemoteMethodAddon)
-                    If (Not String.IsNullOrEmpty(argumentRoute)) Then
+                    ' -- determine the route: try routeOverride
+                    Dim normalizedRoute As String = genericController.normalizeRoute(routeOverride)
+                    If (String.IsNullOrEmpty(normalizedRoute)) Then
                         '
-                        ' Argument route
-                        '
-                        normalizedRoute = genericController.normalizeRoute(argumentRoute)
-                    ElseIf (Not String.IsNullOrEmpty(queryStringRoute)) Then
-                        '
-                        ' route comes from a remoteMethod=route querystring argument
-                        '
-                        normalizedRoute = "/" & queryStringRoute.ToLower()
-                    End If
-                    '
-                    ' normalize route to /path/page or /path
-                    '
-                    normalizedRoute = genericController.normalizeRoute(normalizedRoute)
-                    '
-                    If (LCase(normalizedRoute) = "/favicon.ico") Then
-                        '
-                        ' -- Favicon.ico
-                        Dim Filename As String = siteProperties.getText("FaviconFilename", "")
-                        If Filename = "" Then
+                        ' -- no override, try argument route (remoteMethodAddon=)
+                        normalizedRoute = genericController.normalizeRoute(docProperties.getText(RequestNameRemoteMethodAddon))
+                        If String.IsNullOrEmpty(normalizedRoute) Then
                             '
-                            ' no favicon, 404 the call
-                            '
-                            Call webServer.setResponseStatus("404 Not Found")
-                            Call webServer.setResponseContentType("image/gif")
-                            continueProcessing = False
-                            Return String.Empty
-                        Else
-                            Call webServer.redirect(genericController.getCdnFileLink(Me, Filename), "favicon request", False)
-                            continueProcessing = False
-                            Return String.Empty
+                            ' -- no override or argument, use the url as the route
+                            normalizedRoute = genericController.normalizeRoute(webServer.requestPathPage.ToLower)
                         End If
                     End If
                     '
-                    ' -- hardcoded route robots.txt
-                    If (LCase(normalizedRoute) = "/robots.txt") Or (LCase(normalizedRoute) = "/robots_txt") Then
-                        '
-                        ' -- Robots.txt
-                        Dim Filename As String = "config/RobotsTxtBase.txt"
-                        ' 
-                        ' set this way because the preferences page needs a filename in a site property (enhance later)
-                        Call siteProperties.setProperty("RobotsTxtFilename", Filename)
-                        result = cdnFiles.readFile(Filename)
-                        If result = "" Then
-                            '
-                            ' save default robots.txt
-                            '
-                            result = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
-                            Call appRootFiles.saveFile(Filename, result)
-                        End If
-                        result = result & addonCache.robotsTxt
-                        Call webServer.setResponseContentType("text/plain")
-                        continueProcessing = False
-                        Return result
-                    End If
-                    '
-                    Dim addonRoute As String = normalizedRoute
-                    Dim addon As addonModel = addonCache.getAddonByName(addonRoute)
+                    ' -- try remote methods 
+                    Dim addonRouteTest As String = normalizedRoute
+                    Dim addon As addonModel = addonCache.getAddonByName(addonRouteTest)
                     If (addon Is Nothing) Then
                         '
                         ' -- try testRoute2
-                        addonRoute = normalizedRoute & "/"
-                        addon = addonCache.getAddonByName(addonRoute)
+                        addonRouteTest = "/" & normalizedRoute
+                        addon = addonCache.getAddonByName(addonRouteTest)
                         If (addon Is Nothing) Then
                             '
                             ' -- try testRoute3
-                            addonRoute = normalizedRoute.Substring(1)
-                            addon = addonCache.getAddonByName(addonRoute)
+                            addonRouteTest = normalizedRoute & "/"
+                            addon = addonCache.getAddonByName(addonRouteTest)
                             If (addon Is Nothing) Then
                                 '
                                 ' -- try testRoute4
-                                addonRoute &= "/"
-                                addon = addonCache.getAddonByName(addonRoute)
-                                If (addon Is Nothing) Then
-                                    '
-                                    ' -- not found
-                                    addonRoute = ""
-                                End If
+                                addonRouteTest = "/" & normalizedRoute & "/"
+                                addon = addonCache.getAddonByName(addonRouteTest)
                             End If
                         End If
                     End If
-                    If addonRoute = "" Then
-                        '
-                        ' -- if remote method is not in route, get nameGuid from querystring
-                        addonRoute = docProperties.getText(RequestNameRemoteMethodAddon)
-                    End If
-                    If addonRoute <> "" Then
-                        '
-                        ' -- remote methods are add-ons
+                    If (addon IsNot Nothing) Then
                         Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
                                     .addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson,
                                     .cssContainerClass = "",
@@ -681,98 +601,112 @@ Namespace Contensive.Core
                                     .personalizationAuthenticated = authContext.isAuthenticated,
                                     .personalizationPeopleId = authContext.user.id
                                 }
-                        result = Me.addon.execute(Models.Entity.addonModel.createByName(Me, addonRoute), executeContext)
-                        Return result
+                        Return Me.addon.execute(Models.Entity.addonModel.createByName(Me, addonRouteTest), executeContext)
+                    End If
+                    '
+                    ' -- not remoteMethod, handle link forward
+                    '
+                    ' -- not remoteMethod, liniForward, handle linkAlias
+                    '
+                    ' -- not remoteMethod, liniForward, or linkAlia, attempt hardcoded routes
+                    If (normalizedRoute.Equals("favicon.ico")) Then
+                        '
+                        ' -- Favicon.ico
+                        continueProcessing = False
+                        Return (New Addons.Core.faviconIcoClass).execute(cp_forAddonExecutionOnly).ToString()
+                    End If
+                    If (normalizedRoute.Equals("robots.txt")) Then
+                        '
+                        ' -- Favicon.ico
+                        continueProcessing = False
+                        Return (New Addons.Core.robotsTxtClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
                     If AjaxFunction <> "" Then
+                        '
+                        ' -- Need to be converted to Url parameter addons
                         result = ""
                         Select Case AjaxFunction
                             Case ajaxGetFieldEditorPreferenceForm
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.getFieldEditorPreference).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.getFieldEditorPreference).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxGetDefaultAddonOptionString
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.getAjaxDefaultAddonOptionStringClass).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.getAjaxDefaultAddonOptionStringClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxSetVisitProperty
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.setAjaxVisitPropertyClass).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.setAjaxVisitPropertyClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxGetVisitProperty
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.getAjaxVisitPropertyClass).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.getAjaxVisitPropertyClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxData
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.processAjaxDataClass).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.processAjaxDataClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxPing
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.getOKClass).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.getOKClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxOpenIndexFilter
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.openAjaxIndexFilterClass).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.openAjaxIndexFilterClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxOpenIndexFilterGetContent
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.openAjaxIndexFilterGetContentClass).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.openAjaxIndexFilterGetContentClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxCloseIndexFilter
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.closeAjaxIndexFilterClass).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.closeAjaxIndexFilterClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxOpenAdminNav
                                 '
                                 ' moved to Addons.AdminSite
-                                result = (New Addons.AdminSite.openAjaxAdminNavClass).execute(cp_forAddonExecutionOnly).ToString()
                                 continueProcessing = False
-                                Return result
+                                Return (New Addons.AdminSite.openAjaxAdminNavClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case Else
                                 '
                                 ' -- unknown method, log warning
                                 continueProcessing = False
-                                Return result
+                                Return String.Empty
                         End Select
                     End If
-                    '
-                    ' -- Process Email Open and Click Intercepts
-                    '
                     If docProperties.getInteger(rnEmailOpenFlag) > 0 Then
-                        result = (New Addons.Core.openEmailClass).execute(cp_forAddonExecutionOnly).ToString()
+                        '
+                        ' -- Process Email Open
+                        continueProcessing = False
+                        Return (New Addons.Core.openEmailClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     If docProperties.getInteger(rnEmailClickFlag) > 0 Then
-                        result = (New Addons.Core.clickEmailClass).execute(cp_forAddonExecutionOnly).ToString()
+                        '
+                        ' -- Process Email click
+                        continueProcessing = False
+                        Return (New Addons.Core.clickEmailClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     If docProperties.getInteger(rnEmailBlockRecipientEmail) > 0 Then
-                        result = (New Addons.Core.blockEmailClass).execute(cp_forAddonExecutionOnly).ToString()
+                        '
+                        ' -- Process Email block
+                        continueProcessing = False
+                        Return (New Addons.Core.blockEmailClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     '
                     Dim formType As String = docProperties.getText(docProperties.getText("ccformsn") & "type")
-                    If (String.IsNullOrEmpty(formType)) Then
+                    If (Not String.IsNullOrEmpty(formType)) Then
                         '
                         ' set the meta content flag to show it is not needed for the head tag
-                        Call doc.setMetaContent(0, 0)
                         Select Case formType
                             Case FormTypeAddonStyleEditor
                                 '
@@ -806,12 +740,8 @@ Namespace Contensive.Core
                                 result = (New Addons.Core.processJoinFormClass).execute(cp_forAddonExecutionOnly).ToString()
                         End Select
                     End If
-                    '
                     Dim HardCodedPage As String = docProperties.getText(RequestNameHardCodedPage)
                     If (HardCodedPage <> "") Then
-                        '
-                        'Call AppendLog("main_init(), 3110 - exit for hardcodedpage hook")
-
                         Select Case genericController.vbLCase(HardCodedPage)
                             Case HardCodedPageSendPassword
                                 '
@@ -851,14 +781,14 @@ Namespace Contensive.Core
                     '
                     If (normalizedRoute = genericController.normalizeRoute(serverConfig.appConfig.adminRoute.ToLower)) Then
                         '
-                        ' -- admin
-                        result = Me.addon.execute(addonModel.create(Me, addonGuidAdminSite), New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextAdmin})
-                    Else
-                        Dim defaultAddonId As Integer = siteProperties.getinteger(spDefaultRouteAddonId)
-                        If (defaultAddonId > 0) Then
-                            '
-                            ' -- default route 
-                            Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                        ' -- admin route
+                        Return Me.addon.execute(addonModel.create(Me, addonGuidAdminSite), New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextAdmin})
+                    End If
+                    Dim defaultAddonId As Integer = siteProperties.getinteger(spDefaultRouteAddonId)
+                    If (defaultAddonId > 0) Then
+                        '
+                        ' -- default route is run if no other route is found, which includes the route=defaultPage (default.aspx)
+                        Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
                                     .addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                     .cssContainerClass = "",
                                     .cssContainerId = "",
@@ -870,13 +800,11 @@ Namespace Contensive.Core
                                     .personalizationAuthenticated = authContext.visit.VisitAuthenticated,
                                     .personalizationPeopleId = authContext.user.id
                                 }
-                            result = Me.addon.execute(Models.Entity.addonModel.create(Me, defaultAddonId), executeContext)
-                        Else
-                            '
-                            ' -- no route
-                            result = "<p>This site is not configured for website traffic. Please set the default route.</p>"
-                        End If
+                        Return Me.addon.execute(Models.Entity.addonModel.create(Me, defaultAddonId), executeContext)
                     End If
+                    '
+                    ' -- no route
+                    result = "<p>This site is not configured for website traffic. Please set the default route.</p>"
                 End If
             Catch ex As Exception
                 Call handleException(ex)

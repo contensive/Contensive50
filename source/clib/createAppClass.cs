@@ -56,7 +56,38 @@ namespace  Contensive.CLI {
                     Console.Write("\n\r\t3 Local Mode, cdn as second iis site as cdn." + appName);
                     Console.Write("\n\r\t4 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
                     appArchitecture = cliController.promptForReply("Enter 1,2,3, or 4", "1");
-                    appConfig.adminRoute = cliController.promptForReply("Admin Route", "/admin/");
+                    appConfig.adminRoute = string.Empty;
+                    do
+                    {
+                        appConfig.adminRoute = cliController.promptForReply("Admin Route (non-blank, no leading or trailing slash)", "admin");
+                        appConfig.adminRoute = Contensive.Core.Controllers.genericController.convertToUnixSlash(appConfig.adminRoute);
+                        if (!string.IsNullOrEmpty(appConfig.adminRoute))
+                        {
+                            if (appConfig.adminRoute.Equals("/"))
+                            {
+                                appConfig.adminRoute = string.Empty;
+                            } else {
+                                if (appConfig.adminRoute.Substring(0,1).Equals("/"))
+                                {
+                                    appConfig.adminRoute = appConfig.adminRoute.Substring(1);
+                                }
+                            }
+                            if (appConfig.adminRoute.Equals("/"))
+                            {
+                                appConfig.adminRoute = string.Empty;
+                            }
+                            else
+                            {
+                                if (appConfig.adminRoute.Substring(appConfig.adminRoute.Length-1,1).Equals("/"))
+                                {
+                                    appConfig.adminRoute = appConfig.adminRoute.Substring(0, appConfig.adminRoute.Length - 1);
+                                }
+                            }
+                        }
+
+                    } while (string.IsNullOrEmpty(appConfig.adminRoute));
+
+                    
                     appConfig.allowSiteMonitor = false;
                     domainName = cliController.promptForReply("Primary Domain Name", "www." + appName + ".com");
                     appConfig.domainList.Add(domainName);

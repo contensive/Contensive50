@@ -3612,7 +3612,7 @@ else if(browser.version > 5) {
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass><![CDATA[Contensive.Addons.addon_AdminSiteClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.Addons.AdminSite.getAdminSiteClass]]></DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
@@ -3826,7 +3826,7 @@ End Function]]></Code>
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass><![CDATA[Contensive.Addons.PageManager.PageManagerClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.Addons.PageManager.getPageManagerClass]]></DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
