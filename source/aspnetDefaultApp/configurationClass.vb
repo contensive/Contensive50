@@ -65,45 +65,5 @@ Public Class configurationClass
         End Try
         Return serverConfig
     End Function
-    '
-    '====================================================================================================
-    ''' <summary>
-    ''' Register Contensive routes with IIS
-    ''' </summary>
-    ''' <param name="cp"></param>
-    ''' <param name="routes"></param>
-    Public Shared Sub RegisterRoutes(cp As Contensive.Core.CPClass, ByVal routes As RouteCollection)
-        Try
-            Dim routesAdded As New List(Of String)
-            For Each route As Contensive.BaseClasses.CPSiteBaseClass.routeClass In cp.Site.getRouteList()
-                Dim virtualRoute As String = route.virtualRoute
-                If (virtualRoute.Substring(0, 1).Equals("/")) Then
-                    virtualRoute = virtualRoute.Substring(1)
-                End If
-                If (Not String.IsNullOrEmpty(virtualRoute)) Then
-                    If (virtualRoute.Substring(virtualRoute.Length - 1, 1).Equals("/")) Then
-                        virtualRoute = virtualRoute.Substring(0, virtualRoute.Length - 1)
-                    End If
-                    If (Not String.IsNullOrEmpty(virtualRoute)) Then
-                        Try
-                            If (Not routesAdded.Contains(virtualRoute)) Then
-                                routes.MapPageRoute(virtualRoute, virtualRoute, route.physicalRoute)
-                                routesAdded.Add(virtualRoute)
-                            End If
-                            virtualRoute &= "/"
-                            If (Not routesAdded.Contains(virtualRoute)) Then
-                                routes.MapPageRoute(virtualRoute, virtualRoute, route.physicalRoute)
-                                routesAdded.Add(virtualRoute)
-                            End If
-                        Catch ex As Exception
-                            cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & virtualRoute & "], physicalRoute [" & route.physicalRoute & "]")
-                        End Try
-                    End If
-                End If
-            Next
-        Catch ex As Exception
-            Logger.appendProgramDataLog(ex.ToString())
-        End Try
-    End Sub
 End Class
 

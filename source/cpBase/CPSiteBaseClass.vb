@@ -151,14 +151,25 @@ Namespace Contensive.BaseClasses
         ''' Returns a list of routes used to configure endpoints, always in Unix slash format without a leading slash
         ''' </summary>
         ''' <returns></returns>
-        Public MustOverride Function getRouteList() As List(Of routeClass)
+        Public MustOverride Function getRouteDictionary() As Dictionary(Of String, routeClass)
         '
         '====================================================================================================
         '
         Public Class routeClass
             Public virtualRoute As String
             Public physicalRoute As String
+            Public routeType As routeTypeEnum
+            Public remoteMethodAddonId As Integer
+            Public linkAliasId As Integer
+            Public linkForwardId As Integer
         End Class
+        '
+        Public Enum routeTypeEnum
+            admin
+            remoteMethod
+            linkAlias
+            linkForward
+        End Enum
 
     End Class
 

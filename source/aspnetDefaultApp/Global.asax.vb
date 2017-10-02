@@ -20,9 +20,14 @@ Public Class Global_asax
         Try
             Trace.WriteLine(getAppDescription("Application_Start"))
             Using cp As New Contensive.Core.CPClass(DefaultSite.configurationClass.getAppName())
-                If (cp.appOk) Then
-                    DefaultSite.configurationClass.RegisterRoutes(cp, RouteTable.Routes)
-                End If
+                For Each kvp In cp.Site.getRouteDictionary()
+                    Dim Route As Contensive.BaseClasses.CPSiteBaseClass.routeClass = kvp.Value
+                    Try
+                        RouteTable.Routes.MapPageRoute(Route.virtualRoute, Route.virtualRoute, Route.physicalRoute)
+                    Catch ex As Exception
+                        cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & Route.virtualRoute & "], physicalRoute [" & Route.physicalRoute & "]")
+                    End Try
+                Next
             End Using
         Catch ex As Exception
             Trace.WriteLine(getAppDescription("Application_Start ERROR exit"))

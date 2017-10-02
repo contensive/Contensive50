@@ -45,6 +45,7 @@ Namespace Contensive.Core
         Friend Property addonsRunOnThisPageIdList As New List(Of Integer)
         Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
         Public Property pageAddonCnt As Integer = 0
+
         '
         '===================================================================================================
         ''' <summary>
@@ -554,6 +555,9 @@ Namespace Contensive.Core
             Try
                 If (serverConfig.appConfig IsNot Nothing) Then
                     '
+                    ' -- execute intercept methods first, like login, that run before the route that returns the page
+                    ' -- intercept routes should be addons alos
+                    '
                     ' -- determine the route: try routeOverride
                     Dim normalizedRoute As String = genericController.normalizeRoute(routeOverride)
                     If (String.IsNullOrEmpty(normalizedRoute)) Then
@@ -567,60 +571,7 @@ Namespace Contensive.Core
                         End If
                     End If
                     '
-                    ' -- try remote methods 
-                    Dim addonRouteTest As String = normalizedRoute
-                    Dim addon As addonModel = addonCache.getAddonByName(addonRouteTest)
-                    If (addon Is Nothing) Then
-                        '
-                        ' -- try testRoute2
-                        addonRouteTest = "/" & normalizedRoute
-                        addon = addonCache.getAddonByName(addonRouteTest)
-                        If (addon Is Nothing) Then
-                            '
-                            ' -- try testRoute3
-                            addonRouteTest = normalizedRoute & "/"
-                            addon = addonCache.getAddonByName(addonRouteTest)
-                            If (addon Is Nothing) Then
-                                '
-                                ' -- try testRoute4
-                                addonRouteTest = "/" & normalizedRoute & "/"
-                                addon = addonCache.getAddonByName(addonRouteTest)
-                            End If
-                        End If
-                    End If
-                    If (addon IsNot Nothing) Then
-                        Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
-                                    .addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson,
-                                    .cssContainerClass = "",
-                                    .cssContainerId = "",
-                                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
-                                        .contentName = docProperties.getText("hostcontentname"),
-                                        .fieldName = "",
-                                        .recordId = docProperties.getInteger("HostRecordID")
-                                    },
-                                    .personalizationAuthenticated = authContext.isAuthenticated,
-                                    .personalizationPeopleId = authContext.user.id
-                                }
-                        Return Me.addon.execute(Models.Entity.addonModel.createByName(Me, addonRouteTest), executeContext)
-                    End If
-                    '
-                    ' -- not remoteMethod, handle link forward
-                    '
-                    ' -- not remoteMethod, liniForward, handle linkAlias
-                    '
-                    ' -- not remoteMethod, liniForward, or linkAlia, attempt hardcoded routes
-                    If (normalizedRoute.Equals("favicon.ico")) Then
-                        '
-                        ' -- Favicon.ico
-                        continueProcessing = False
-                        Return (New Addons.Core.faviconIcoClass).execute(cp_forAddonExecutionOnly).ToString()
-                    End If
-                    If (normalizedRoute.Equals("robots.txt")) Then
-                        '
-                        ' -- Favicon.ico
-                        continueProcessing = False
-                        Return (New Addons.Core.robotsTxtClass).execute(cp_forAddonExecutionOnly).ToString()
-                    End If
+                    ' -- legacy ajaxfn methods
                     Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
                     If AjaxFunction <> "" Then
                         '
@@ -684,6 +635,8 @@ Namespace Contensive.Core
                                 Return String.Empty
                         End Select
                     End If
+                    '
+                    ' -- legacy email intercept methods
                     If docProperties.getInteger(rnEmailOpenFlag) > 0 Then
                         '
                         ' -- Process Email Open
@@ -703,6 +656,7 @@ Namespace Contensive.Core
                         Return (New Addons.Core.blockEmailClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     '
+                    ' -- legacy form process methods 
                     Dim formType As String = docProperties.getText(docProperties.getText("ccformsn") & "type")
                     If (Not String.IsNullOrEmpty(formType)) Then
                         '
@@ -740,6 +694,8 @@ Namespace Contensive.Core
                                 result = (New Addons.Core.processJoinFormClass).execute(cp_forAddonExecutionOnly).ToString()
                         End Select
                     End If
+                    '
+                    ' -- legacy methods=
                     Dim HardCodedPage As String = docProperties.getText(RequestNameHardCodedPage)
                     If (HardCodedPage <> "") Then
                         Select Case genericController.vbLCase(HardCodedPage)
@@ -779,27 +735,93 @@ Namespace Contensive.Core
                         End Select
                     End If
                     '
-                    If (normalizedRoute = genericController.normalizeRoute(serverConfig.appConfig.adminRoute.ToLower)) Then
-                        '
-                        ' -- admin route
-                        Return Me.addon.execute(addonModel.create(Me, addonGuidAdminSite), New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextAdmin})
+                    ' -- execute route
+                    If (routeDict.ContainsKey(normalizedRoute)) Then
+                        Dim route As CPSiteBaseClass.routeClass = routeDict(normalizedRoute)
+                        Select Case route.routeType
+                            Case CPSiteBaseClass.routeTypeEnum.admin
+                                '
+                                ' -- admin site
+                                '
+                                Return Me.addon.execute(addonModel.create(Me, addonGuidAdminSite), New CPUtilsBaseClass.addonExecuteContext() With {.addonType = CPUtilsBaseClass.addonContext.ContextAdmin})
+                            Case CPSiteBaseClass.routeTypeEnum.remoteMethod
+                                '
+                                ' -- remote method
+                                Dim addon As addonModel = addonCache.getAddonById(route.remoteMethodAddonId)
+                                If (addon IsNot Nothing) Then
+                                    Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                        .addonType = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson,
+                                        .cssContainerClass = "",
+                                        .cssContainerId = "",
+                                        .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                            .contentName = docProperties.getText("hostcontentname"),
+                                            .fieldName = "",
+                                            .recordId = docProperties.getInteger("HostRecordID")
+                                        },
+                                        .personalizationAuthenticated = authContext.isAuthenticated,
+                                        .personalizationPeopleId = authContext.user.id
+                                    }
+                                    Return Me.addon.execute(addon, executeContext)
+                                End If
+                            Case CPSiteBaseClass.routeTypeEnum.linkAlias
+                                '
+                                ' - link alias
+                                Dim linkAlias As linkAliasModel = linkAliasModel.create(Me, route.linkAliasId)
+                                If (linkAlias IsNot Nothing) Then
+                                    docProperties.setProperty("bid", linkAlias.PageID)
+                                    If (Not String.IsNullOrEmpty(linkAlias.QueryStringSuffix)) Then
+                                        Dim nvp As String() = linkAlias.QueryStringSuffix.Split("&"c)
+                                        For Each nv In nvp
+                                            Dim keyValue As String() = nv.Split("="c)
+                                            If (Not String.IsNullOrEmpty(keyValue(0))) Then
+                                                If (keyValue.Length > 1) Then
+                                                    siteProperties.setProperty(keyValue(0), keyValue(1))
+                                                Else
+                                                    siteProperties.setProperty(keyValue(0), String.Empty)
+                                                End If
+                                            End If
+                                        Next
+                                    End If
+
+                                End If
+                            Case CPSiteBaseClass.routeTypeEnum.linkForward
+                                '
+                                ' -- link forward
+                                Dim linkForward As Models.Entity.linkForwardModel = Models.Entity.linkForwardModel.create(Me, route.linkForwardId)
+                                Call webServer.redirect(linkForward.DestinationLink, "Link Forward #" & linkForward.id & ", " & linkForward.name)
+                                Return String.Empty
+                        End Select
                     End If
+                    If (normalizedRoute.Equals("favicon.ico")) Then
+                        '
+                        ' -- Favicon.ico
+                        continueProcessing = False
+                        Return (New Addons.Core.faviconIcoClass).execute(cp_forAddonExecutionOnly).ToString()
+                    End If
+                    If (normalizedRoute.Equals("robots.txt")) Then
+                        '
+                        ' -- Favicon.ico
+                        continueProcessing = False
+                        Return (New Addons.Core.robotsTxtClass).execute(cp_forAddonExecutionOnly).ToString()
+                    End If
+                    '
+                    ' -- default route
                     Dim defaultAddonId As Integer = siteProperties.getinteger(spDefaultRouteAddonId)
                     If (defaultAddonId > 0) Then
                         '
                         ' -- default route is run if no other route is found, which includes the route=defaultPage (default.aspx)
                         Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
-                                    .addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                                    .cssContainerClass = "",
-                                    .cssContainerId = "",
-                                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
-                                        .contentName = "",
-                                        .fieldName = "",
-                                        .recordId = 0
-                                    },
-                                    .personalizationAuthenticated = authContext.visit.VisitAuthenticated,
-                                    .personalizationPeopleId = authContext.user.id
-                                }
+                            .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                            .cssContainerClass = "",
+                            .cssContainerId = "",
+                            .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                .contentName = "",
+                                .fieldName = "",
+                                .recordId = 0
+                            },
+                            .personalizationAuthenticated = authContext.visit.VisitAuthenticated,
+                            .personalizationPeopleId = authContext.user.id
+                        }
                         Return Me.addon.execute(Models.Entity.addonModel.create(Me, defaultAddonId), executeContext)
                     End If
                     '
@@ -1127,73 +1149,89 @@ Namespace Contensive.Core
             Return Format(myVersion.Major, "0") & "." & Format(myVersion.Minor, "00") & "." & Format(myVersion.Build, "00000000")
         End Function
         '
-        '====================================================================================================
-        '
-        Public Function getRouteList() As List(Of CPSiteBaseClass.routeClass)
-            Dim result As New List(Of CPSiteBaseClass.routeClass)
-            Try
-                Dim physicalFile As String = "~/" & siteProperties.getText("serverpagedefault", "default.aspx")
-                Dim routesAdded As New List(Of String)
-                Dim uniqueRouteList As New List(Of String)
-                'genericController.convertToUnixSlash(route.virtualRoute.Trim())
-                '
-                ' -- admin route
-                result.Add(New CPSiteBaseClass.routeClass() With {
-                    .physicalRoute = physicalFile,
-                    .virtualRoute = genericController.convertToUnixSlash(serverConfig.appConfig.adminRoute.Trim())
-                })
-                uniqueRouteList.Add(serverConfig.appConfig.adminRoute)
-                'registerRoute(cp, cp.core.serverConfig.appConfig.adminRoute, routesAdded, routes, physicalFile)
-                '
-                ' -- remote methods
-                Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.createList_RemoteMethods(Me, New List(Of String))
-                For Each remoteMethod As Contensive.Core.Models.Entity.addonModel In remoteMethods
-                    Dim route As String = genericController.convertToUnixSlash(remoteMethod.name.Trim())
-                    If (uniqueRouteList.Contains(route)) Then
-                        handleException(New ApplicationException("Route [" & route & "] cannot be added because it is a matches the Admin Route or another Remote Method."))
-                    Else
-                        result.Add(New CPSiteBaseClass.routeClass() With {
-                            .physicalRoute = physicalFile & "?remoteMethodAddon=" & genericController.EncodeURL(remoteMethod.name),
-                            .virtualRoute = route
-                        })
+        '===================================================================================================
+        Public ReadOnly Property routeDict As Dictionary(Of String, CPSiteBaseClass.routeClass)
+            Get
+                If (_routeListCache Is Nothing) Then
+                    Const cacheName As String = "routeDictionary"
+                    _routeListCache = cache.getObject(Of Dictionary(Of String, CPSiteBaseClass.routeClass))(cacheName)
+                    If (_routeListCache Is Nothing) Then
+                        _routeListCache = New Dictionary(Of String, CPSiteBaseClass.routeClass)
+                        Dim physicalFile As String = "~/" & siteProperties.getText("serverpagedefault", "default.aspx")
+                        Dim routesAdded As New List(Of String)
+                        Dim uniqueRouteList As New List(Of String)
+                        '
+                        ' -- admin route
+                        Dim adminRoute As String = genericController.normalizeRoute(serverConfig.appConfig.adminRoute)
+                        If (Not String.IsNullOrEmpty(adminRoute)) Then
+                            _routeListCache.Add(adminRoute, New CPSiteBaseClass.routeClass() With {
+                                .physicalRoute = physicalFile,
+                                .virtualRoute = adminRoute,
+                                .routeType = CPSiteBaseClass.routeTypeEnum.admin
+                            })
+                            uniqueRouteList.Add(adminRoute)
+                        End If
+                        '
+                        ' -- remote methods
+                        Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.createList_RemoteMethods(Me, New List(Of String))
+                        For Each remoteMethod As Contensive.Core.Models.Entity.addonModel In remoteMethods
+                            Dim route As String = genericController.normalizeRoute(remoteMethod.name)
+                            If (Not String.IsNullOrEmpty(route)) Then
+                                If (uniqueRouteList.Contains(route)) Then
+                                    handleException(New ApplicationException("Route [" & route & "] cannot be added because it is a matches the Admin Route or another Remote Method."))
+                                Else
+                                    _routeListCache.Add(route, New CPSiteBaseClass.routeClass() With {
+                                        .physicalRoute = physicalFile,' & "?remoteMethodAddon=" & genericController.EncodeURL(remoteMethod.name),
+                                        .virtualRoute = route,
+                                        .routeType = CPSiteBaseClass.routeTypeEnum.remoteMethod,
+                                        .remoteMethodAddonId = remoteMethod.id
+                                    })
+                                End If
+                            End If
+                        Next
+                        '
+                        ' -- link forwards
+                        Dim linkForwards As List(Of Models.Entity.linkForwardModel) = Models.Entity.linkForwardModel.createList(Me, "name Is Not null")
+                        For Each linkForward As Models.Entity.linkForwardModel In linkForwards
+                            Dim route As String = genericController.normalizeRoute(linkForward.name)
+                            If (Not String.IsNullOrEmpty(route)) Then
+                                If (uniqueRouteList.Contains(route)) Then
+                                    handleException(New ApplicationException("Link Foward Route [" & route & "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."))
+                                Else
+                                    _routeListCache.Add(route, New CPSiteBaseClass.routeClass() With {
+                                        .physicalRoute = physicalFile,' & "?linkForward=" & genericController.EncodeURL(linkForward.name),
+                                        .virtualRoute = route,
+                                        .routeType = CPSiteBaseClass.routeTypeEnum.linkForward,
+                                        .linkForwardId = linkForward.id
+                                    })
+                                End If
+                            End If
+                        Next
+                        '
+                        ' -- link aliases
+                        Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(Me, "name Is Not null")
+                        For Each linkAlias As Models.Entity.linkAliasModel In linkAliasList
+                            Dim route As String = genericController.normalizeRoute(linkAlias.name)
+                            If (Not String.IsNullOrEmpty(route)) Then
+                                If (uniqueRouteList.Contains(route)) Then
+                                    handleException(New ApplicationException("Link Alias route [" & route & "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."))
+                                Else
+                                    _routeListCache.Add(route, New CPSiteBaseClass.routeClass() With {
+                                        .physicalRoute = physicalFile,' & "?linkAlias=" & genericController.EncodeURL(linkAlias.name),
+                                        .virtualRoute = route,
+                                        .routeType = CPSiteBaseClass.routeTypeEnum.linkAlias,
+                                        .linkAliasId = linkAlias.id
+                                    })
+                                End If
+                            End If
+                        Next
+                        Call cache.setObject(cacheName, _routeListCache)
                     End If
-                    'registerRoute(cp, remoteMethod.name, routesAdded, routes, physicalFile)
-                Next
-                '
-                ' -- link forwards
-                Dim linkForwards As List(Of Models.Entity.linkForwardModel) = Models.Entity.linkForwardModel.createList(Me, "name Is Not null")
-                For Each linkForward As Models.Entity.linkForwardModel In linkForwards
-                    Dim route As String = genericController.convertToUnixSlash(linkForward.name.Trim())
-                    If (uniqueRouteList.Contains(route)) Then
-                        handleException(New ApplicationException("Link Foward Route [" & route & "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."))
-                    Else
-                        result.Add(New CPSiteBaseClass.routeClass() With {
-                            .physicalRoute = physicalFile & "?linkForward=" & genericController.EncodeURL(linkForward.name),
-                            .virtualRoute = route
-                        })
-                    End If
-                    'registerRoute(cp, linkForward.name, routesAdded, routes, physicalFile)
-                Next
-                '
-                ' -- link aliases
-                Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(Me, "name Is Not null")
-                For Each linkAlias As Models.Entity.linkAliasModel In linkAliasList
-                    Dim route As String = genericController.convertToUnixSlash(linkAlias.name.Trim())
-                    If (uniqueRouteList.Contains(route)) Then
-                        handleException(New ApplicationException("Link Alias route [" & route & "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."))
-                    Else
-                        result.Add(New CPSiteBaseClass.routeClass() With {
-                            .physicalRoute = physicalFile & "?linkAlias=" & genericController.EncodeURL(linkAlias.name),
-                            .virtualRoute = route
-                        })
-                    End If
-                    'registerRoute(cp, linkAlias.name, routesAdded, routes, physicalFile)
-                Next
-            Catch ex As Exception
-                handleException(ex)
-            End Try
-            Return result
-        End Function
+                End If
+                Return _routeListCache
+            End Get
+        End Property
+        Private _routeListCache As Dictionary(Of String, CPSiteBaseClass.routeClass) = Nothing
         '
         '====================================================================================================
 #Region " IDisposable Support "

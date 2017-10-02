@@ -375,8 +375,8 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Function getRouteList() As List(Of routeClass)
-            Return cpCore.getRouteList()
+        Public Overrides Function getRouteDictionary() As Dictionary(Of String, routeClass)
+            Return cpCore.routeDict
         End Function
 
 #Region " IDisposable Support "

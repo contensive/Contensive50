@@ -4618,7 +4618,7 @@ ErrorTrap:
         ''' <param name="route"></param>
         ''' <returns></returns>
         Public Shared Function normalizeRoute(route As String) As String
-            Dim normalizedRoute As String = route.ToLower()
+            Dim normalizedRoute As String = route.ToLower().Trim()
             Try
                 If String.IsNullOrEmpty(normalizedRoute) Then
                     normalizedRoute = String.Empty
