@@ -23,7 +23,8 @@ Public Class Global_asax
                 For Each kvp In cp.Site.getRouteDictionary()
                     Dim Route As Contensive.BaseClasses.CPSiteBaseClass.routeClass = kvp.Value
                     Try
-                        RouteTable.Routes.MapPageRoute(Route.virtualRoute, Route.virtualRoute, Route.physicalRoute)
+                        Dim iisRouter As String = Route.virtualRoute.Substring(1)
+                        RouteTable.Routes.MapPageRoute(iisRouter, iisRouter, Route.physicalRoute)
                     Catch ex As Exception
                         cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & Route.virtualRoute & "], physicalRoute [" & Route.physicalRoute & "]")
                     End Try

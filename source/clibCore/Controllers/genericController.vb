@@ -4627,8 +4627,8 @@ ErrorTrap:
                     Do While normalizedRoute.IndexOf("//") >= 0
                         normalizedRoute = normalizedRoute.Replace("//", "/")
                     Loop
-                    If (normalizedRoute.Substring(0, 1).Equals("/")) Then
-                        normalizedRoute = normalizedRoute.Substring(1)
+                    If (Not normalizedRoute.Substring(0, 1).Equals("/")) Then
+                        normalizedRoute = "/" & normalizedRoute
                     End If
                     If (normalizedRoute.Substring(normalizedRoute.Length - 1, 1) = "/") Then
                         normalizedRoute = normalizedRoute.Substring(0, normalizedRoute.Length - 1)

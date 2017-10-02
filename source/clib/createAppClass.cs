@@ -59,26 +59,17 @@ namespace  Contensive.CLI {
                     appConfig.adminRoute = string.Empty;
                     do
                     {
-                        appConfig.adminRoute = cliController.promptForReply("Admin Route (non-blank, no leading or trailing slash)", "admin");
+                        appConfig.adminRoute = cliController.promptForReply("Admin Route (non-blank, leading or trailing slash)", "/admin");
                         appConfig.adminRoute = Contensive.Core.Controllers.genericController.convertToUnixSlash(appConfig.adminRoute);
                         if (!string.IsNullOrEmpty(appConfig.adminRoute))
                         {
-                            if (appConfig.adminRoute.Equals("/"))
+                            if (!appConfig.adminRoute.Substring(0, 1).Equals("/"))
                             {
-                                appConfig.adminRoute = string.Empty;
-                            } else {
-                                if (appConfig.adminRoute.Substring(0,1).Equals("/"))
-                                {
-                                    appConfig.adminRoute = appConfig.adminRoute.Substring(1);
-                                }
+                                appConfig.adminRoute = "/" + appConfig.adminRoute;
                             }
-                            if (appConfig.adminRoute.Equals("/"))
+                            if (!appConfig.adminRoute.Equals("/"))
                             {
-                                appConfig.adminRoute = string.Empty;
-                            }
-                            else
-                            {
-                                if (appConfig.adminRoute.Substring(appConfig.adminRoute.Length-1,1).Equals("/"))
+                                if (appConfig.adminRoute.Substring(appConfig.adminRoute.Length - 1, 1).Equals("/"))
                                 {
                                     appConfig.adminRoute = appConfig.adminRoute.Substring(0, appConfig.adminRoute.Length - 1);
                                 }
