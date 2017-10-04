@@ -6227,7 +6227,7 @@ ErrorTrap:
                 ' Clear Caches
                 '
                 If ContentName <> "" Then
-                    Call cpCore.cache.invalidateContent(ContentName)
+                    Call cpCore.cache.invalidateObject_Content(ContentName)
                 End If
             End If
         End Sub
@@ -8458,7 +8458,7 @@ ErrorTrap:
                 End If
             End If
             If RuleContentChanged Then
-                Call cpCore.cache.invalidateContent(RulesContentName)
+                Call cpCore.cache.invalidateObject_Content(RulesContentName)
             End If
         End Sub
 

@@ -4613,7 +4613,7 @@ ErrorTrap:
         '
         '====================================================================================================
         ''' <summary>
-        ''' Convert a route to the anticipated format (no leading /, lowercase, no trailing slash)
+        ''' Convert a route to the anticipated format (lowercase,no leading /, no trailing /)
         ''' </summary>
         ''' <param name="route"></param>
         ''' <returns></returns>
@@ -4627,8 +4627,8 @@ ErrorTrap:
                     Do While normalizedRoute.IndexOf("//") >= 0
                         normalizedRoute = normalizedRoute.Replace("//", "/")
                     Loop
-                    If (Not normalizedRoute.Substring(0, 1).Equals("/")) Then
-                        normalizedRoute = "/" & normalizedRoute
+                    If (normalizedRoute.Substring(0, 1).Equals("/")) Then
+                        normalizedRoute = normalizedRoute.Substring(1)
                     End If
                     If (normalizedRoute.Substring(normalizedRoute.Length - 1, 1) = "/") Then
                         normalizedRoute = normalizedRoute.Substring(0, normalizedRoute.Length - 1)

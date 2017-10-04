@@ -279,7 +279,7 @@ Namespace Contensive.Core.Models.Entity
                     If recordId > 0 Then
                         Dim instanceType As Type = GetType(T)
                         Dim contentName As String = derivedContentName(instanceType)
-                        result = readModelCache(Of T)(cpCore, "id", recordId.ToString())
+                        result = readModelCache(Of T)(cpCore, "id", recordId.ToString)
                         If (result Is Nothing) Then
                             Using cs As New csController(cpCore)
                                 If cs.open(contentName, "(id=" & recordId.ToString() & ")") Then
@@ -480,11 +480,11 @@ Namespace Contensive.Core.Models.Entity
                         ' -- add all cachenames to the injected cachenamelist
                         Dim baseInstance As baseModel = TryCast(modelInstance, baseModel)
                         If (baseInstance IsNot Nothing) Then
-                            Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(tableName, "id", baseInstance.id.ToString())
+                            Dim cacheName0 As String = Controllers.cacheController.getCacheName_Entity(tableName, "id", baseInstance.id.ToString())
                             callersCacheNameList.Add(cacheName0)
                             cpCore.cache.setObject(cacheName0, modelInstance)
                             '
-                            Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(tableName, "ccguid", baseInstance.ccguid)
+                            Dim cacheName1 As String = Controllers.cacheController.getCacheName_Entity(tableName, "ccguid", baseInstance.ccguid)
                             callersCacheNameList.Add(cacheName1)
                             cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
                         End If
@@ -690,7 +690,7 @@ Namespace Contensive.Core.Models.Entity
                     'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                     '
                     ' -- object is here, but the cache was invalidated, setting
-                    cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", Me.id.ToString()), Me)
+                    cpCore.cache.setObject(Controllers.cacheController.getCacheName_Entity(tableName, "id", Me.id.ToString()), Me)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -721,7 +721,7 @@ Namespace Contensive.Core.Models.Entity
                         Dim contentName As String = derivedContentName(instanceType)
                         Dim tableName As String = derivedContentTableName(instanceType)
                         cpCore.db.deleteContentRecords(contentName, "id=" & recordId.ToString)
-                        cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", recordId.ToString))
+                        cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(tableName, recordId))
                     End If
                 End If
             Catch ex As Exception
@@ -836,10 +836,10 @@ Namespace Contensive.Core.Models.Entity
                 Else
                     Dim instanceType = GetType(T)
                     Dim tableName As String = derivedContentTableName(instanceType)
-                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", recordId.ToString))
+                    cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(tableName, recordId))
                     '
                     ' -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", "0"))
+                    cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(tableName, "id", "0"))
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -1003,7 +1003,7 @@ Namespace Contensive.Core.Models.Entity
         Private Shared Function readModelCache(Of T As baseModel)(cpCore As coreClass, fieldName As String, fieldValue As String) As T
             Dim instanceType As Type = GetType(T)
             Dim tableName As String = derivedContentTableName(instanceType)
-            Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(tableName, fieldName, fieldValue)
+            Dim cacheName As String = Controllers.cacheController.getCacheName_Entity(tableName, fieldName, fieldValue)
             Return cpCore.cache.getObject(Of T)(cacheName)
         End Function
         '

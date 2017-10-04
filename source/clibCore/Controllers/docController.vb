@@ -794,7 +794,7 @@ Namespace Contensive.Core.Controllers
                                 Call cpcore.db.cs_set(CSBlock, "name", RecordName)
                                 SaveButNoChanges = False
                             End If
-                            Call docController.app_addLinkAlias2(cpcore, RecordName, RecordID, "")
+                            Call docController.addLinkAlias(cpcore, RecordName, RecordID, "")
                             If (cpcore.docProperties.getText("headline") <> cpcore.db.cs_get(CSBlock, "headline")) Then
                                 Call cpcore.db.cs_set(CSBlock, "headline", cpcore.docProperties.getText("headline"))
                                 SaveButNoChanges = False
@@ -807,7 +807,7 @@ Namespace Contensive.Core.Controllers
                         '
                         If Not SaveButNoChanges Then
                             Call cpcore.doc.processAfterSave(False, pageContentModel.contentName, RecordID, RecordName, RecordParentID, False)
-                            Call cpcore.cache.invalidateContent(pageContentModel.contentName)
+                            Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
                         End If
                     End If
                 End If
@@ -820,7 +820,7 @@ Namespace Contensive.Core.Controllers
                         Call cpcore.db.cs_set(CSBlock, "active", True)
                         Call cpcore.db.cs_set(CSBlock, "ParentID", RecordID)
                         Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.id)
-                        Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.Name)
+                        Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.name)
                         Call cpcore.db.cs_set(CSBlock, "copyFilename", "")
                         RecordID = cpcore.db.cs_getInteger(CSBlock, "ID")
                         Call cpcore.db.cs_save2(CSBlock)
@@ -837,7 +837,7 @@ Namespace Contensive.Core.Controllers
                     End If
                     Call cpcore.db.cs_Close(CSBlock)
                     '
-                    Call cpcore.cache.invalidateContent(pageContentModel.contentName)
+                    Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
                 End If
                 If (Button = ButtonAddSiblingPage) Then
                     '
@@ -854,7 +854,7 @@ Namespace Contensive.Core.Controllers
                             Call cpcore.db.cs_set(CSBlock, "active", True)
                             Call cpcore.db.cs_set(CSBlock, "ParentID", ParentID)
                             Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.id)
-                            Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.Name)
+                            Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.name)
                             Call cpcore.db.cs_set(CSBlock, "copyFilename", "")
                             RecordID = cpcore.db.cs_getInteger(CSBlock, "ID")
                             Call cpcore.db.cs_save2(CSBlock)
@@ -871,7 +871,7 @@ Namespace Contensive.Core.Controllers
                         End If
                         Call cpcore.db.cs_Close(CSBlock)
                     End If
-                    Call cpcore.cache.invalidateContent(pageContentModel.contentName)
+                    Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
                 End If
                 If (Button = ButtonDelete) Then
                     CSBlock = cpcore.db.csOpenRecord(pageContentModel.contentName, RecordID)
@@ -884,7 +884,7 @@ Namespace Contensive.Core.Controllers
                     Call cpcore.db.deleteContentRecord(pageContentModel.contentName, RecordID)
                     '
                     If Not False Then
-                        Call cpcore.cache.invalidateContent(pageContentModel.contentName)
+                        Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
                     End If
                     '
                     If Not False Then
@@ -1476,7 +1476,7 @@ ErrorTrap:
             Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName)
             Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString)
             Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", cpcore.profileStartTime.ToString)
-            Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpcore.authContext.user.Name)
+            Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpcore.authContext.user.name)
             '
             Call cpcore.email.sendGroup(cpcore.siteProperties.getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
             '
@@ -1557,6 +1557,11 @@ ErrorTrap:
                 '
                 If AllowLinkAliasIfEnabled And cpcore.siteProperties.allowLinkAlias Then
                     Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")and(QueryStringSuffix=" & cpcore.db.encodeSQLText(QueryStringSuffix) & ")", "id desc")
+                    If (String.IsNullOrEmpty(QueryStringSuffix)) Then
+                        linkAliasList = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")", "id desc")
+                    Else
+                        linkAliasList = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")and(QueryStringSuffix=" & cpcore.db.encodeSQLText(QueryStringSuffix) & ")", "id desc")
+                    End If
                     If linkAliasList.Count > 0 Then
                         linkAlias = linkAliasList.First.name
                         If Mid(linkAlias, 1, 1) <> "/" Then
@@ -1573,7 +1578,7 @@ ErrorTrap:
                 '
                 ' domain (fake for now)
                 '
-                Dim SqlCriteria As String = "(domainId=" & domain.ID & ")"
+                Dim SqlCriteria As String = "(domainId=" & domain.id & ")"
                 Dim allowTemplateRuleList As List(Of Models.Entity.TemplateDomainRuleModel) = Models.Entity.TemplateDomainRuleModel.createList(cpcore, SqlCriteria)
                 Dim templateAllowed As Boolean = False
                 For Each rule As TemplateDomainRuleModel In allowTemplateRuleList
@@ -2254,20 +2259,20 @@ ErrorTrap:
         '       When you make the menus, look up the most recent Link Alias entry with the pageID, and a blank QueryStringSuffix
         '
         '   The Link Alias table no longer needs the Link field.
-        '
-        '=================================================================================================================================================
+        ''
+        ''=================================================================================================================================================
+        ''
+        '' +++++ 9/8/2011 4.1.482, added csv_addLinkAlias to csv and changed main to call
+        ''
+        'Public Shared Sub app_addLinkAlias(cpcore As coreClass, linkAlias As String, PageID As Integer, QueryStringSuffix As String)
+        '    Dim return_ignoreError As String = ""
+        '    Call app_addLinkAlias2(cpcore, linkAlias, PageID, QueryStringSuffix, True, False, return_ignoreError)
+        'End Sub
         '
         ' +++++ 9/8/2011 4.1.482, added csv_addLinkAlias to csv and changed main to call
         '
-        Public Shared Sub app_addLinkAlias(cpcore As coreClass, linkAlias As String, PageID As Integer, QueryStringSuffix As String)
-            Dim return_ignoreError As String = ""
-            Call app_addLinkAlias2(cpcore, linkAlias, PageID, QueryStringSuffix, True, False, return_ignoreError)
-        End Sub
-        '
-        ' +++++ 9/8/2011 4.1.482, added csv_addLinkAlias to csv and changed main to call
-        '
-        Public Shared Sub app_addLinkAlias2(cpcore As coreClass, linkAlias As String, PageID As Integer, QueryStringSuffix As String, Optional OverRideDuplicate As Boolean = False, Optional DupCausesWarning As Boolean = False, Optional ByRef return_WarningMessage As String = "")
-            Const SafeString = "0123456789abcdefghijklmnopqrstuvwxyz-_/."
+        Public Shared Sub addLinkAlias(cpcore As coreClass, linkAlias As String, PageID As Integer, QueryStringSuffix As String, Optional OverRideDuplicate As Boolean = False, Optional DupCausesWarning As Boolean = False, Optional ByRef return_WarningMessage As String = "")
+            Const SafeString = "0123456789abcdefghijklmnopqrstuvwxyz-_/"
             Dim Ptr As Integer
             Dim TestChr As String
             Dim Src As String
@@ -2436,7 +2441,9 @@ ErrorTrap:
                                     End If
                                 End If
                             End If
+                            Dim linkAliasId As Integer = cpcore.db.cs_getInteger(CS, "id")
                             Call cpcore.db.cs_Close(CS)
+                            cpcore.cache.invalidateObject_Entity(linkAliasModel.contentTableName, linkAliasId)
                         End If
                     End If
                 End If
@@ -2656,20 +2663,21 @@ ErrorTrap:
             '
             ContentID = cpcore.metaData.getContentId(ContentName)
             TableName = cpcore.metaData.getContentTablename(ContentName)
-            Call markRecordReviewed(ContentName, RecordID)
+            markRecordReviewed(ContentName, RecordID)
             '
-            ' Test for parentid=id loop
+            cpcore.cache.invalidateObject_Entity(TableName, RecordID)
             '
-            ' needs to be finished
-            '
-            '    If (RecordParentID <> 0) And metaData.IsContentFieldSupported(ContentName, "parentid") Then
-            '
-            '    End If
-            'hint = hint & ",100"
             Select Case genericController.vbLCase(TableName)
-                Case "linkaliases"
-                    'Call cache_linkAlias_clear
-                Case "ccmembers"
+                Case linkForwardModel.contentTableName
+                    '
+                    cpcore.cache.invalidateObject_RouteDictionary()
+                Case linkAliasModel.contentTableName
+                    '
+                    cpcore.cache.invalidateObject_RouteDictionary()
+                Case addonModel.contentTableName
+                    '
+                    cpcore.cache.invalidateObject_RouteDictionary()
+                Case personModel.contentTableName
                     '
                     ' Log Activity for changes to people and organizattions
                     '
@@ -2701,11 +2709,11 @@ ErrorTrap:
                     'hint = hint & ",130"
                     Select Case genericController.vbLCase(RecordName)
                         Case "allowlinkalias"
-                            Call cpcore.cache.invalidateContent("Page Content")
+                            Call cpcore.cache.invalidateObject_Content("Page Content")
                         Case "sectionlandinglink"
-                            Call cpcore.cache.invalidateContent("Page Content")
+                            Call cpcore.cache.invalidateObject_Content("Page Content")
                         Case siteproperty_serverPageDefault_name
-                            Call cpcore.cache.invalidateContent("Page Content")
+                            Call cpcore.cache.invalidateObject_Content("Page Content")
                     End Select
                 Case "ccpagecontent"
                     '

@@ -736,8 +736,8 @@ Namespace Contensive.Core
                     End If
                     '
                     ' -- execute route
-                    If (routeDict.ContainsKey(normalizedRoute)) Then
-                        Dim route As CPSiteBaseClass.routeClass = routeDict(normalizedRoute)
+                    If (routeDictionary.ContainsKey(normalizedRoute)) Then
+                        Dim route As CPSiteBaseClass.routeClass = routeDictionary(normalizedRoute)
                         Select Case route.routeType
                             Case CPSiteBaseClass.routeTypeEnum.admin
                                 '
@@ -1150,11 +1150,10 @@ Namespace Contensive.Core
         End Function
         '
         '===================================================================================================
-        Public ReadOnly Property routeDict As Dictionary(Of String, CPSiteBaseClass.routeClass)
+        Public ReadOnly Property routeDictionary As Dictionary(Of String, CPSiteBaseClass.routeClass)
             Get
                 If (_routeListCache Is Nothing) Then
-                    Const cacheName As String = "routeDictionary"
-                    _routeListCache = cache.getObject(Of Dictionary(Of String, CPSiteBaseClass.routeClass))(cacheName)
+                    _routeListCache = cache.getObject_RouteDictionary()
                     If (_routeListCache Is Nothing) Then
                         _routeListCache = New Dictionary(Of String, CPSiteBaseClass.routeClass)
                         Dim physicalFile As String = "~/" & siteProperties.getText("serverpagedefault", "default.aspx")
@@ -1225,7 +1224,7 @@ Namespace Contensive.Core
                                 End If
                             End If
                         Next
-                        Call cache.setObject(cacheName, _routeListCache)
+                        Call cache.setObject_RouteDictionary(_routeListCache)
                     End If
                 End If
                 Return _routeListCache

@@ -69,7 +69,7 @@
 '            Dim result As sitePropertyModel = Nothing
 '            Try
 '                If recordId > 0 Then
-'                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString())
+'                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, recordId)
 '                    result = cpCore.cache.getObject(Of sitePropertyModel)(cacheName)
 '                    If (result Is Nothing) Then
 '                        result = loadObject(cpCore, "id=" & recordId.ToString(), callersCacheNameList)
@@ -255,7 +255,7 @@
 '            Try
 '                If (recordId > 0) Then
 '                    cpCore.db.deleteContentRecords(primaryContentName, "id=" & recordId.ToString)
-'                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
+'                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, recordId))
 '                End If
 '            Catch ex As Exception
 '                cpCore.handleExceptionAndContinue(ex) : Throw
@@ -344,7 +344,7 @@
 '        ''' <param name="cpCore"></param>
 '        ''' <param name="recordId"></param>
 '        Public Shared Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
-'            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
+'            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, recordId))
 '            '
 '            ' -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
 '            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", "0"))

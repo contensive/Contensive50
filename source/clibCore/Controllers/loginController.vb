@@ -423,7 +423,7 @@ Namespace Contensive.Core.Controllers
                         End If
                     End If
                 End If
-                Call cpcore.cache.invalidateContent("People")
+                Call cpcore.cache.invalidateObject_Content("People")
             Catch ex As Exception
                 cpcore.handleException(ex) : Throw
             End Try

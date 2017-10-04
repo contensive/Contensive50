@@ -634,9 +634,9 @@ Namespace Contensive.Core.Controllers
         ''' update the dbTablename cache entry. Do this anytime any record is updated in the table
         ''' </summary>
         ''' <param name="ContentName"></param>
-        Public Sub invalidateContent(ByVal ContentName As String)
+        Public Sub invalidateObject_Content(ByVal ContentName As String)
             Try
-                invalidateDbTable(cpCore.metaData.getContentTablename(ContentName))
+                invalidateObject_Table(cpCore.metaData.getContentTablename(ContentName))
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -648,7 +648,7 @@ Namespace Contensive.Core.Controllers
         ''' when any cache is saved, it should include a dependancy on a cachename=dbtablename
         ''' </summary>
         ''' <param name="dbTableName"></param>
-        Public Sub invalidateDbTable(ByVal dbTableName As String)
+        Public Sub invalidateObject_Table(ByVal dbTableName As String)
             Try
                 invalidateObject(dbTableName.ToLower().Replace(" ", "_"))
             Catch ex As Exception
@@ -718,11 +718,14 @@ Namespace Contensive.Core.Controllers
         ''' <param name="fieldName"></param>
         ''' <param name="fieldValue"></param>
         ''' <returns></returns>
-        Public Shared Function getDbRecordCacheName(tableName As String, fieldName As String, fieldValue As String) As String
+        Public Shared Function getCacheName_Entity(tableName As String, fieldName As String, fieldValue As String) As String
             Return (tableName & "-" & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         End Function
+        Public Shared Function getCacheName_Entity(tableName As String, recordId As Integer) As String
+            Return (tableName & "-id." & recordId.ToString().Replace(" ", "_"))
+        End Function
         '
-        Public Shared Function getDbRecordCacheName(tableName As String, field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
+        Public Shared Function getCacheName_Entity(tableName As String, field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
             Return (tableName & "-" & field1Name & "." & field1Value & "-" & field2Name & "." & field2Value).ToLower().Replace(" ", "_")
         End Function
         '
@@ -733,9 +736,44 @@ Namespace Contensive.Core.Controllers
         ''' <param name="objectName"></param>
         ''' <param name="uniqueObjectIdentifier"></param>
         ''' <returns></returns>
-        Public Shared Function getComplexObjectCacheName(objectName As String, uniqueObjectIdentifier As String) As String
+        Public Shared Function getCacheName_ComplexObject(objectName As String, uniqueObjectIdentifier As String) As String
             Return ("complexobject-" & objectName & "-" & uniqueObjectIdentifier).ToLower().Replace(" ", "_")
         End Function
+        '
+        '====================================================================================================
+        '
+        Private Const cacheNameRouteDictionary As String = "routeDictionary"
+        '
+        '====================================================================================================
+        Public Sub setObject_RouteDictionary(routeDictionary As Dictionary(Of String, Contensive.BaseClasses.CPSiteBaseClass.routeClass))
+            Call setObject(cacheNameRouteDictionary, routeDictionary)
+        End Sub
+        '
+        '====================================================================================================
+        Public Function getObject_RouteDictionary() As Dictionary(Of String, Contensive.BaseClasses.CPSiteBaseClass.routeClass)
+            Return getObject(Of Dictionary(Of String, Contensive.BaseClasses.CPSiteBaseClass.routeClass))(cacheNameRouteDictionary)
+        End Function
+        '
+        '====================================================================================================
+        Public Sub invalidateObject_RouteDictionary()
+            invalidateObject(cacheNameRouteDictionary)
+        End Sub
+        '
+        Public Sub invalidateObject_Entity(tableName As String, recordId As Integer)
+            '
+            invalidateObject(getCacheName_Entity(tableName, recordId))
+            Select Case tableName.ToLower
+                Case Models.Entity.linkAliasModel.contentTableName.ToLower
+                    '
+                    invalidateObject_RouteDictionary()
+                Case Models.Entity.linkForwardModel.contentTableName.ToLower
+                    '
+                    invalidateObject_RouteDictionary()
+                Case Models.Entity.addonModel.contentTableName.ToLower
+                    '
+                    invalidateObject_RouteDictionary()
+            End Select
+        End Sub
         '
         '====================================================================================================
 #Region " IDisposable Support "

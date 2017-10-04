@@ -56,7 +56,7 @@ Namespace Contensive.Core
         Public Overrides Sub Clear(ByVal ContentNameList As String)
             If (String.IsNullOrEmpty(ContentNameList)) Then
                 For Each contentName In New List(Of String)(ContentNameList.Split(","c))
-                    cpCore.cache.invalidateContent(contentName)
+                    cpCore.cache.invalidateObject_Content(contentName)
                 Next
             End If
         End Sub
@@ -198,14 +198,18 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Sub setKey(key As String, Value As Object, tag As String)
-            cpCore.cache.setObject(key, Value, tag)
+        Public Overrides Sub setKey(key As String, value As Object, tag As String)
+            cpCore.cache.setObject(key, value, tag)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Sub setKey(key As String, Value As Object, invalidationDate As Date, tag As String)
             cpCore.cache.setObject(key, Value, invalidationDate, tag)
+        End Sub
+        '
+        Public Overrides Sub InvalidateContentRecord(ByVal contentName As String, recordId As Integer)
+            cpCore.cache.invalidateObject_Entity(contentName, recordId)
         End Sub
 #Region " IDisposable Support "
         '

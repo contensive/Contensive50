@@ -1473,7 +1473,7 @@ Namespace Contensive.Core.Controllers
                         '
                         Call deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName)
                         If workflowController.csv_AllowAutocsv_ClearContentTimeStamp Then
-                            Call cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(ContentTableName, "id", LiveRecordID.ToString()))
+                            Call cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(ContentTableName, "id", LiveRecordID.ToString()))
                             'Call cpCore.cache.invalidateObject(ContentName)
                         End If
                         Call deleteContentRules(ContentID, LiveRecordID)
@@ -2347,7 +2347,7 @@ Namespace Contensive.Core.Controllers
                         Dim invaldiateObjectList As New List(Of String)
                         CSPointer = cs_open(ContentName, Criteria, , False, MemberID, True, True, "ID")
                         Do While cs_ok(CSPointer)
-                            invaldiateObjectList.Add(Controllers.cacheController.getDbRecordCacheName(CDef.ContentTableName, "id", cs_getInteger(CSPointer, "id").ToString()))
+                            invaldiateObjectList.Add(Controllers.cacheController.getCacheName_Entity(CDef.ContentTableName, "id", cs_getInteger(CSPointer, "id").ToString()))
                             Call cs_deleteRecord(CSPointer)
                             Call cs_goNext(CSPointer)
                         Loop
@@ -3357,7 +3357,7 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' ----- reset the ContentTimeStamp to csv_ClearBake
                                 '
-                                Call cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(LiveTableName, "id", LiveRecordID.ToString()))
+                                Call cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(LiveTableName, "id", LiveRecordID.ToString()))
                                 '
                                 ' ----- mark the record NOT UpToDate for SpiderDocs
                                 '

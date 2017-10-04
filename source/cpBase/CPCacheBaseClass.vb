@@ -51,6 +51,7 @@ Namespace Contensive.BaseClasses
         Public MustOverride Sub InvalidateTag(ByVal tag As String)
         Public MustOverride Sub InvalidateAll()
         Public MustOverride Sub InvalidateTagList(ByVal tagList As List(Of String))
+        Public MustOverride Sub InvalidateContentRecord(ByVal contentName As String, recordId As Integer)
     End Class
 
 End Namespace

@@ -57,27 +57,22 @@ namespace  Contensive.CLI {
                     Console.Write("\n\r\t4 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
                     appArchitecture = cliController.promptForReply("Enter 1,2,3, or 4", "1");
                     appConfig.adminRoute = string.Empty;
+                    bool routeOk = false;
                     do
                     {
-                        appConfig.adminRoute = cliController.promptForReply("Admin Route (non-blank, leading or trailing slash)", "/admin");
+                        appConfig.adminRoute = cliController.promptForReply("Admin Route (non-blank, no leading or trailing slash)", "admin");
                         appConfig.adminRoute = Contensive.Core.Controllers.genericController.convertToUnixSlash(appConfig.adminRoute);
                         if (!string.IsNullOrEmpty(appConfig.adminRoute))
                         {
                             if (!appConfig.adminRoute.Substring(0, 1).Equals("/"))
                             {
-                                appConfig.adminRoute = "/" + appConfig.adminRoute;
-                            }
-                            if (!appConfig.adminRoute.Equals("/"))
-                            {
                                 if (appConfig.adminRoute.Substring(appConfig.adminRoute.Length - 1, 1).Equals("/"))
                                 {
-                                    appConfig.adminRoute = appConfig.adminRoute.Substring(0, appConfig.adminRoute.Length - 1);
+                                    routeOk = true;
                                 }
                             }
                         }
-
-                    } while (string.IsNullOrEmpty(appConfig.adminRoute));
-
+                    } while (!routeOk);
                     
                     appConfig.allowSiteMonitor = false;
                     domainName = cliController.promptForReply("Primary Domain Name", "www." + appName + ".com");

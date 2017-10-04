@@ -65,5 +65,18 @@ Public Class configurationClass
         End Try
         Return serverConfig
     End Function
+    '
+    Public Shared Sub loadRouteMap(cp As Contensive.BaseClasses.CPBaseClass)
+        For Each kvp In cp.Site.getRouteDictionary()
+            Try
+                Dim newRouteName As String = kvp.Key
+                Dim newRoute As Contensive.BaseClasses.CPSiteBaseClass.routeClass = kvp.Value
+                RouteTable.Routes.Remove(RouteTable.Routes(newRouteName))
+                RouteTable.Routes.MapPageRoute(newRoute.virtualRoute, newRoute.virtualRoute, newRoute.physicalRoute)
+            Catch ex As Exception
+                cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & kvp.Key & "]")
+            End Try
+        Next
+    End Sub
 End Class
 

@@ -313,8 +313,8 @@ Namespace Contensive.Core.Controllers
                                                     '
                                                     ' Live Editing
                                                     '
-                                                    Call cpCore.cache.invalidateContent(ClipChildContentName)
-                                                    Call cpCore.cache.invalidateContent(ClipParentContentName)
+                                                    Call cpCore.cache.invalidateObject_Content(ClipChildContentName)
+                                                    Call cpCore.cache.invalidateObject_Content(ClipParentContentName)
                                                 End If
                                             End If
                                         End If

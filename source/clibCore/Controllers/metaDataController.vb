@@ -133,7 +133,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' load cache version
                     '
-                    Dim cacheName As String = Controllers.cacheController.getComplexObjectCacheName("cdef", contentId.ToString)
+                    Dim cacheName As String = Controllers.cacheController.getCacheName_ComplexObject("cdef", contentId.ToString)
                     Dim dependantCacheNameList As New List(Of String)
                     If (Not forceDbLoad) Then
                         Try
@@ -1752,8 +1752,8 @@ Namespace Contensive.Core.Controllers
                             ' ----- Load CDef
                             '
                             If clearMetaCache Then
-                                cpCore.cache.invalidateContent("content")
-                                cpCore.cache.invalidateContent("content fields")
+                                cpCore.cache.invalidateObject_Content("content")
+                                cpCore.cache.invalidateObject_Content("content fields")
                                 cpCore.metaData.clear()
                             End If
                         End If

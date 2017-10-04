@@ -84,7 +84,7 @@ Namespace Contensive.Core.Models.Entity
                 If recordId <= 0 Then
                     result = getDefaultDatasource(cpCore)
                 Else
-                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString())
+                    Dim cacheName As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, recordId)
                     result = cpCore.cache.getObject(Of dataSourceModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "id=" & recordId.ToString(), callersCacheNameList)
@@ -110,7 +110,7 @@ Namespace Contensive.Core.Models.Entity
                 If String.IsNullOrEmpty(recordGuid) Then
                     result = getDefaultDatasource(cpCore)
                 Else
-                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", recordGuid)
+                    Dim cacheName As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "ccguid", recordGuid)
                     result = cpCore.cache.getObject(Of dataSourceModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid), callersCacheNameList)
@@ -133,7 +133,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As dataSourceModel = Nothing
             Try
                 If ((foreignKey1Id > 0) And (foreignKey2Id > 0)) Then
-                    result = cpCore.cache.getObject(Of dataSourceModel)(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
+                    result = cpCore.cache.getObject(Of dataSourceModel)(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "(foreignKey1=" & foreignKey1Id.ToString() & ")and(foreignKey1=" & foreignKey1Id.ToString() & ")", callersCacheNameList)
                     End If
@@ -186,11 +186,11 @@ Namespace Contensive.Core.Models.Entity
                         ' -- set primary cache to the object created
                         ' -- set secondary caches to the primary cache
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.ID.ToString())
+                        Dim cacheName0 As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", result.ID.ToString())
                         callersCacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccGuid)
+                        Dim cacheName1 As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "ccguid", result.ccGuid)
                         callersCacheNameList.Add(cacheName1)
                         cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
                     End If
@@ -259,7 +259,7 @@ Namespace Contensive.Core.Models.Entity
                 'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                 '
                 ' -- object is here, but the cache was invalidated, setting
-                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.ID.ToString()), Me)
+                cpCore.cache.setObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", Me.ID.ToString()), Me)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
                 Throw
@@ -277,7 +277,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 If (recordId > 0) Then
                     cpCore.db.deleteContentRecords(primaryContentName, "id=" & recordId.ToString)
-                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
+                    cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, recordId))
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -364,10 +364,10 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="recordId"></param>
         Public Shared Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
-            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
+            cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, recordId))
             '
             ' -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", "0"))
+            cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", "0"))
         End Sub
         ''
         ''====================================================================================================
@@ -466,7 +466,7 @@ Namespace Contensive.Core.Models.Entity
                 If (String.IsNullOrEmpty(recordName.Trim()) Or (recordName.Trim.ToLower() = "default")) Then
                     result = getDefaultDatasource(cpCore)
                 Else
-                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", recordName)
+                    Dim cacheName As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "ccguid", recordName)
                     result = cpCore.cache.getObject(Of dataSourceModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "name=" & cpCore.db.encodeSQLText(recordName), callersCacheNameList)

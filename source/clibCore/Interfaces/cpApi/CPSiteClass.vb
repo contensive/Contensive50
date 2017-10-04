@@ -309,7 +309,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub addLinkAlias(ByVal linkAlias As String, ByVal pageId As Integer, Optional ByVal queryStringSuffix As String = "")
-            Call docController.app_addLinkAlias(cpCore, linkAlias, pageId, queryStringSuffix)
+            Call docController.addLinkAlias(cpCore, linkAlias, pageId, queryStringSuffix)
         End Sub
         '
         '====================================================================================================
@@ -376,7 +376,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function getRouteDictionary() As Dictionary(Of String, routeClass)
-            Return cpCore.routeDict
+            Return cpCore.routeDictionary
         End Function
 
 #Region " IDisposable Support "
