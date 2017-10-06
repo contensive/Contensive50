@@ -595,9 +595,9 @@ namespace integrationTests
             testuserId = 0;
             if (cs.Open("people", "id=" + cp.Db.EncodeSQLNumber(newuserId))) {
                 Assert.AreEqual(newuserId, cs.GetInteger("id"));
-                Assert.AreEqual(true, cs.OK());
+                Assert.AreEqual(true, cs.Ok());
                 cs.GoNext();
-                Assert.AreEqual(false, cs.OK());
+                Assert.AreEqual(false, cs.Ok());
             }
             cs.Close();
             //

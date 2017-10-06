@@ -174,19 +174,19 @@ Namespace Contensive.Core.Controllers
                     ' ----- Log the send
                     '
                     If True Then
-                        CSLog = cpcore.db.cs_insertRecord("Email Log", 0)
-                        If cpcore.db.cs_ok(CSLog) Then
-                            Call cpcore.db.cs_set(CSLog, "Name", "System Email Send " & CStr(Now()))
-                            Call cpcore.db.cs_set(CSLog, "LogType", EmailLogTypeImmediateSend)
-                            Call cpcore.db.cs_set(CSLog, "SendStatus", returnStatus)
-                            Call cpcore.db.cs_set(CSLog, "toaddress", ToAddress)
-                            Call cpcore.db.cs_set(CSLog, "fromaddress", FromAddress)
-                            Call cpcore.db.cs_set(CSLog, "Subject", SubjectMessage)
+                        CSLog = cpcore.db.csInsertRecord("Email Log", 0)
+                        If cpcore.db.csOk(CSLog) Then
+                            Call cpcore.db.csSet(CSLog, "Name", "System Email Send " & CStr(Now()))
+                            Call cpcore.db.csSet(CSLog, "LogType", EmailLogTypeImmediateSend)
+                            Call cpcore.db.csSet(CSLog, "SendStatus", returnStatus)
+                            Call cpcore.db.csSet(CSLog, "toaddress", ToAddress)
+                            Call cpcore.db.csSet(CSLog, "fromaddress", FromAddress)
+                            Call cpcore.db.csSet(CSLog, "Subject", SubjectMessage)
                             If emailIdOrZeroForLog <> 0 Then
-                                Call cpcore.db.cs_set(CSLog, "emailid", emailIdOrZeroForLog)
+                                Call cpcore.db.csSet(CSLog, "emailid", emailIdOrZeroForLog)
                             End If
                         End If
-                        Call cpcore.db.cs_Close(CSLog)
+                        Call cpcore.db.csClose(CSLog)
                     End If
                 End If
             Catch ex As Exception
@@ -243,8 +243,8 @@ Namespace Contensive.Core.Controllers
                 templateEncoded = template
                 '
                 CS = cpcore.db.cs_openContentRecord("People", personId, , , , "email")
-                If cpcore.db.cs_ok(CS) Then
-                    ToAddress = Trim(cpcore.db.cs_getText(CS, "email"))
+                If cpcore.db.csOk(CS) Then
+                    ToAddress = Trim(cpcore.db.csGetText(CS, "email"))
                     If ToAddress = "" Then
                         returnStatus = "The email was not sent because the to-address was blank."
                     ElseIf (InStr(1, ToAddress, "@") = 0) Or (InStr(1, ToAddress, ".") = 0) Then
@@ -283,7 +283,7 @@ Namespace Contensive.Core.Controllers
                         returnStatus = send(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog)
                     End If
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -374,43 +374,43 @@ Namespace Contensive.Core.Controllers
             Else
                 SelectList = "ID,TestMemberID,FromAddress,Subject,copyfilename,AddLinkEID,AllowSpamFooter,0 as EmailTemplateID"
             End If
-            CSEmail = cpcore.db.cs_open("System Email", "name=" & cpcore.db.encodeSQLText(EMailName), "ID", , , , , SelectList)
-            If Not cpcore.db.cs_ok(CSEmail) Then
+            CSEmail = cpcore.db.csOpen("System Email", "name=" & cpcore.db.encodeSQLText(EMailName), "ID", , , , , SelectList)
+            If Not cpcore.db.csOk(CSEmail) Then
                 '
                 ' ----- Email was not found
                 '
-                Call cpcore.db.cs_Close(CSEmail)
-                CSEmail = cpcore.db.cs_insertRecord("System Email")
-                Call cpcore.db.cs_set(CSEmail, "name", EMailName)
-                Call cpcore.db.cs_set(CSEmail, "Subject", EMailName)
-                Call cpcore.db.cs_set(CSEmail, "FromAddress", cpcore.siteProperties.getText("EmailAdmin", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0)))
+                Call cpcore.db.csClose(CSEmail)
+                CSEmail = cpcore.db.csInsertRecord("System Email")
+                Call cpcore.db.csSet(CSEmail, "name", EMailName)
+                Call cpcore.db.csSet(CSEmail, "Subject", EMailName)
+                Call cpcore.db.csSet(CSEmail, "FromAddress", cpcore.siteProperties.getText("EmailAdmin", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0)))
                 'Call app.csv_SetCS(CSEmail, "caption", EmailName)
-                Call cpcore.db.cs_Close(CSEmail)
+                Call cpcore.db.csClose(CSEmail)
                 cpcore.handleException(New ApplicationException("No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent."))
             Else
                 '
                 ' --- collect values needed for send
                 '
-                EmailRecordID = cpcore.db.cs_getInteger(CSEmail, "ID")
-                EmailToConfirmationMemberID = cpcore.db.cs_getInteger(CSEmail, "testmemberid")
-                EmailFrom = cpcore.db.cs_getText(CSEmail, "FromAddress")
-                EmailSubjectSource = cpcore.db.cs_getText(CSEmail, "Subject")
-                EmailBodySource = cpcore.db.cs_get(CSEmail, "copyfilename") & AdditionalCopy
-                EmailAllowLinkEID = cpcore.db.cs_getBoolean(CSEmail, "AddLinkEID")
+                EmailRecordID = cpcore.db.csGetInteger(CSEmail, "ID")
+                EmailToConfirmationMemberID = cpcore.db.csGetInteger(CSEmail, "testmemberid")
+                EmailFrom = cpcore.db.csGetText(CSEmail, "FromAddress")
+                EmailSubjectSource = cpcore.db.csGetText(CSEmail, "Subject")
+                EmailBodySource = cpcore.db.csGet(CSEmail, "copyfilename") & AdditionalCopy
+                EmailAllowLinkEID = cpcore.db.csGetBoolean(CSEmail, "AddLinkEID")
                 BounceAddress = cpcore.siteProperties.getText("EmailBounceAddress", "")
                 If BounceAddress = "" Then
                     BounceAddress = EmailFrom
                 End If
-                EMailTemplateID = cpcore.db.cs_getInteger(CSEmail, "EmailTemplateID")
+                EMailTemplateID = cpcore.db.csGetInteger(CSEmail, "EmailTemplateID")
                 '
                 ' Get the Email Template
                 '
                 If EMailTemplateID <> 0 Then
                     CS = cpcore.db.cs_openContentRecord("Email Templates", EMailTemplateID)
-                    If cpcore.db.cs_ok(CS) Then
-                        EmailTemplateSource = cpcore.db.cs_get(CS, "BodyHTML")
+                    If cpcore.db.csOk(CS) Then
+                        EmailTemplateSource = cpcore.db.csGet(CS, "BodyHTML")
                     End If
-                    Call cpcore.db.cs_Close(CS)
+                    Call cpcore.db.csClose(CS)
                 End If
                 If EmailTemplateSource = "" Then
                     EmailTemplateSource = "<div style=""padding:10px""><ac type=content></div>"
@@ -423,7 +423,7 @@ Namespace Contensive.Core.Controllers
                 '
                 ' Spam Footer
                 '
-                If cpcore.db.cs_getBoolean(CSEmail, "AllowSpamFooter") Then
+                If cpcore.db.csGetBoolean(CSEmail, "AllowSpamFooter") Then
                     '
                     ' This field is default true, and non-authorable
                     ' It will be true in all cases, except a possible unforseen exception
@@ -436,10 +436,10 @@ Namespace Contensive.Core.Controllers
                 If iAdditionalMemberID <> 0 Then
                     EmailStatusMessage = EmailStatusMessage & BR & "Primary Recipient:" & BR
                     CSPeople = cpcore.db.cs_openContentRecord("People", iAdditionalMemberID, , , , "ID,Name,Email")
-                    If cpcore.db.cs_ok(CSPeople) Then
-                        EMailToMemberID = cpcore.db.cs_getInteger(CSPeople, "ID")
-                        EmailToName = cpcore.db.cs_getText(CSPeople, "name")
-                        EmailToAddress = cpcore.db.cs_getText(CSPeople, "email")
+                    If cpcore.db.csOk(CSPeople) Then
+                        EMailToMemberID = cpcore.db.csGetInteger(CSPeople, "ID")
+                        EmailToName = cpcore.db.csGetText(CSPeople, "name")
+                        EmailToAddress = cpcore.db.csGetText(CSPeople, "email")
                         If EmailToAddress = "" Then
                             EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Error: Not Sent to " & EmailToName & " (people #" & EMailToMemberID & ") because their email address was blank." & BR
                         Else
@@ -450,18 +450,18 @@ Namespace Contensive.Core.Controllers
                             EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Sent to " & EmailToName & " at " & EmailToAddress & ", Status = " & EmailStatus & BR
                         End If
                     End If
-                    Call cpcore.db.cs_Close(CSPeople)
+                    Call cpcore.db.csClose(CSPeople)
                 End If
                 '
                 ' --- Send message to everyone selected
                 '
                 EmailStatusMessage = EmailStatusMessage & BR & "Recipients in selected System Email groups:" & BR
                 SQL = getGroupSql(EmailRecordID)
-                CSPeople = cpcore.db.cs_openCsSql_rev("default", SQL)
-                Do While cpcore.db.cs_ok(CSPeople)
-                    EMailToMemberID = cpcore.db.cs_getInteger(CSPeople, "ID")
-                    EmailToName = cpcore.db.cs_getText(CSPeople, "name")
-                    EmailToAddress = cpcore.db.cs_getText(CSPeople, "email")
+                CSPeople = cpcore.db.csOpenSql_rev("default", SQL)
+                Do While cpcore.db.csOk(CSPeople)
+                    EMailToMemberID = cpcore.db.csGetInteger(CSPeople, "ID")
+                    EmailToName = cpcore.db.csGetText(CSPeople, "name")
+                    EmailToAddress = cpcore.db.csGetText(CSPeople, "email")
                     If EmailToAddress = "" Then
                         EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Not Sent to " & EmailToName & ", people #" & EMailToMemberID & " because their email address was blank." & BR
                     Else
@@ -470,10 +470,10 @@ Namespace Contensive.Core.Controllers
                             EmailStatus = "ok"
                         End If
                         EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Sent to " & EmailToName & " at " & EmailToAddress & ", Status = " & EmailStatus & BR
-                        Call cpcore.db.cs_goNext(CSPeople)
+                        Call cpcore.db.csGoNext(CSPeople)
                     End If
                 Loop
-                Call cpcore.db.cs_Close(CSPeople)
+                Call cpcore.db.csClose(CSPeople)
                 '
                 ' --- Send the completion message to the administrator
                 '
@@ -485,14 +485,14 @@ Namespace Contensive.Core.Controllers
                     '
                     isValid = False
                     CSPeople = cpcore.db.cs_openContentRecord("people", EmailToConfirmationMemberID)
-                    If cpcore.db.cs_ok(CSPeople) Then
-                        isValid = cpcore.db.cs_getBoolean(CSPeople, "active")
-                        EMailToMemberID = cpcore.db.cs_getInteger(CSPeople, "ID")
-                        EmailToName = cpcore.db.cs_getText(CSPeople, "name")
-                        EmailToAddress = cpcore.db.cs_getText(CSPeople, "email")
-                        isAdmin = cpcore.db.cs_getBoolean(CSPeople, "admin")
+                    If cpcore.db.csOk(CSPeople) Then
+                        isValid = cpcore.db.csGetBoolean(CSPeople, "active")
+                        EMailToMemberID = cpcore.db.csGetInteger(CSPeople, "ID")
+                        EmailToName = cpcore.db.csGetText(CSPeople, "name")
+                        EmailToAddress = cpcore.db.csGetText(CSPeople, "email")
+                        isAdmin = cpcore.db.csGetBoolean(CSPeople, "admin")
                     End If
-                    Call cpcore.db.cs_Close(CSPeople)
+                    Call cpcore.db.csClose(CSPeople)
                     '
                     If Not isValid Then
                         'returnString = "Administrator: The confirmation email was not sent because the confirmation email person is not selected or inactive, " & EmailStatus
@@ -534,9 +534,9 @@ Namespace Contensive.Core.Controllers
                 '
                 ' ----- Done
                 '
-                Call cpcore.db.cs_Close(CSPeople)
+                Call cpcore.db.csClose(CSPeople)
             End If
-            Call cpcore.db.cs_Close(CSEmail)
+            Call cpcore.db.csClose(CSEmail)
             '
             sendSystem = returnString
             '
@@ -607,22 +607,22 @@ ErrorTrap:
                 ' Dim emailstyles As String
                 '
                 CS = cpcore.db.csOpenRecord("email", EmailID)
-                If Not cpcore.db.cs_ok(CS) Then
+                If Not cpcore.db.csOk(CS) Then
                     Call errorController.error_AddUserError(cpcore,"There was a problem sending the email confirmation. The email record could not be found.")
                 Else
-                    EmailSubject = cpcore.db.cs_get(CS, "Subject")
-                    EmailBody = cpcore.db.cs_get(CS, "copyFilename")
+                    EmailSubject = cpcore.db.csGet(CS, "Subject")
+                    EmailBody = cpcore.db.csGet(CS, "copyFilename")
                     '
                     ' merge in template
                     '
                     EmailTemplate = ""
-                    EMailTemplateID = cpcore.db.cs_getInteger(CS, "EmailTemplateID")
+                    EMailTemplateID = cpcore.db.csGetInteger(CS, "EmailTemplateID")
                     If EMailTemplateID <> 0 Then
                         CSTemplate = cpcore.db.csOpenRecord("Email Templates", EMailTemplateID, , , "BodyHTML")
-                        If cpcore.db.cs_ok(CSTemplate) Then
-                            EmailTemplate = cpcore.db.cs_get(CSTemplate, "BodyHTML")
+                        If cpcore.db.csOk(CSTemplate) Then
+                            EmailTemplate = cpcore.db.csGet(CSTemplate, "BodyHTML")
                         End If
-                        Call cpcore.db.cs_Close(CSTemplate)
+                        Call cpcore.db.csClose(CSTemplate)
                     End If
                     '
                     ' styles
@@ -632,7 +632,7 @@ ErrorTrap:
                     '
                     ' spam footer
                     '
-                    If cpcore.db.cs_getBoolean(CS, "AllowSpamFooter") Then
+                    If cpcore.db.csGetBoolean(CS, "AllowSpamFooter") Then
                         '
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
@@ -644,16 +644,16 @@ ErrorTrap:
                     ' Confirm footer
                     '
                     SQL = getGroupSql(EmailID)
-                    CSPeople = cpcore.db.cs_openSql(SQL)
-                    If Not cpcore.db.cs_ok(CSPeople) Then
+                    CSPeople = cpcore.db.csOpenSql(SQL)
+                    If Not cpcore.db.csOk(CSPeople) Then
                         errorController.error_AddUserError(cpcore,"There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.")
                     Else
                         'TotalList = TotalList & "--- all recipients ---" & BR
                         LastEmail = "empty"
-                        Do While cpcore.db.cs_ok(CSPeople)
-                            Emailtext = cpcore.db.cs_get(CSPeople, "email")
-                            EMailName = cpcore.db.cs_get(CSPeople, "name")
-                            EmailMemberID = cpcore.db.cs_getInteger(CSPeople, "ID")
+                        Do While cpcore.db.csOk(CSPeople)
+                            Emailtext = cpcore.db.csGet(CSPeople, "email")
+                            EMailName = cpcore.db.csGet(CSPeople, "name")
+                            EmailMemberID = cpcore.db.csGetInteger(CSPeople, "ID")
                             If EMailName = "" Then
                                 EMailName = "no name (member id " & EmailMemberID & ")"
                             End If
@@ -685,11 +685,11 @@ ErrorTrap:
                             TotalList = TotalList & EmailLine & BR
                             LastEmail = Emailtext
                             TotalCnt = TotalCnt + 1
-                            Call cpcore.db.cs_goNext(CSPeople)
+                            Call cpcore.db.csGoNext(CSPeople)
                         Loop
                         'TotalList = TotalList & "--- end all recipients ---" & BR
                     End If
-                    Call cpcore.db.cs_Close(CSPeople)
+                    Call cpcore.db.csClose(CSPeople)
                     '
                     If DupCnt = 1 Then
                         Call errorController.error_AddUserError(cpcore,"There is 1 duplicate email address. See the test email for details.")
@@ -727,13 +727,13 @@ ErrorTrap:
                         errorController.error_AddUserError(cpcore,"No confirmation email was send because a Confirmation member is not selected")
                     Else
                         EmailBody = EmailBody & "<div style=""clear:both;padding:10px;margin:10px;border:1px dashed #888;"">Administrator<br><br>" & ConfirmFooter & "</div>"
-                        EmailStatus = sendPerson(ConfirmationMemberID, cpcore.db.cs_getText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
+                        EmailStatus = sendPerson(ConfirmationMemberID, cpcore.db.csGetText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
                         If EmailStatus <> "ok" Then
                             errorController.error_AddUserError(cpcore,EmailStatus)
                         End If
                     End If
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -857,9 +857,9 @@ ErrorTrap:
                     End If
                 Next
                 SQL &= "));"
-                CSPointer = cpcore.db.cs_openSql(SQL)
-                Do While cpcore.db.cs_ok(CSPointer)
-                    ToMemberID = genericController.EncodeInteger(cpcore.db.cs_getInteger(CSPointer, "ID"))
+                CSPointer = cpcore.db.csOpenSql(SQL)
+                Do While cpcore.db.csOk(CSPointer)
+                    ToMemberID = genericController.EncodeInteger(cpcore.db.csGetInteger(CSPointer, "ID"))
                     iSubject = iSubjectSource
                     iBody = iBodySource
                     '
@@ -868,7 +868,7 @@ ErrorTrap:
                     ' send
                     '
                     Call sendPerson(ToMemberID, iFromAddress, iSubject, iBody, iImmediate, iHTML, 0, "", False)
-                    Call cpcore.db.cs_goNext(CSPointer)
+                    Call cpcore.db.csGoNext(CSPointer)
                 Loop
             End If
             '
@@ -950,8 +950,8 @@ ErrorTrap:
                         If True Then
                             sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & cpcore.db.encodeSQLDate(DateTime.Now) & "))"
                         End If
-                        CS = cpcore.db.cs_open("People", sqlCriteria, "ID", SelectFieldList:="username,password", PageSize:=1)
-                        If Not cpcore.db.cs_ok(CS) Then
+                        CS = cpcore.db.csOpen("People", sqlCriteria, "ID", SelectFieldList:="username,password", PageSize:=1)
+                        If Not cpcore.db.csOk(CS) Then
                             '
                             ' valid login account for this email not found
                             '
@@ -959,41 +959,41 @@ ErrorTrap:
                                 '
                                 ' look for expired account to renew
                                 '
-                                Call cpcore.db.cs_Close(CS)
-                                CS = cpcore.db.cs_open("People", "((email=" & cpcore.db.encodeSQLText(workingEmail) & "))", "ID", PageSize:=1)
-                                If cpcore.db.cs_ok(CS) Then
+                                Call cpcore.db.csClose(CS)
+                                CS = cpcore.db.csOpen("People", "((email=" & cpcore.db.encodeSQLText(workingEmail) & "))", "ID", PageSize:=1)
+                                If cpcore.db.csOk(CS) Then
                                     '
                                     ' renew this old record
                                     '
                                     'hint = "150"
-                                    Call cpcore.db.cs_set(CS, "developer", "1")
-                                    Call cpcore.db.cs_set(CS, "admin", "1")
-                                    Call cpcore.db.cs_set(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
+                                    Call cpcore.db.csSet(CS, "developer", "1")
+                                    Call cpcore.db.csSet(CS, "admin", "1")
+                                    Call cpcore.db.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
                                 Else
                                     '
                                     ' inject support record
                                     '
                                     'hint = "150"
-                                    Call cpcore.db.cs_Close(CS)
-                                    CS = cpcore.db.cs_insertRecord("people")
-                                    Call cpcore.db.cs_set(CS, "name", "Contensive Support")
-                                    Call cpcore.db.cs_set(CS, "email", workingEmail)
-                                    Call cpcore.db.cs_set(CS, "developer", "1")
-                                    Call cpcore.db.cs_set(CS, "admin", "1")
-                                    Call cpcore.db.cs_set(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
+                                    Call cpcore.db.csClose(CS)
+                                    CS = cpcore.db.csInsertRecord("people")
+                                    Call cpcore.db.csSet(CS, "name", "Contensive Support")
+                                    Call cpcore.db.csSet(CS, "email", workingEmail)
+                                    Call cpcore.db.csSet(CS, "developer", "1")
+                                    Call cpcore.db.csSet(CS, "admin", "1")
+                                    Call cpcore.db.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
                                 End If
-                                Call cpcore.db.cs_save2(CS)
+                                Call cpcore.db.csSave2(CS)
                             Else
                                 'hint = "155"
                                 errorController.error_AddUserError(cpcore, "No current user was found matching this email address. Please try again. ")
                             End If
                         End If
-                        If cpcore.db.cs_ok(CS) Then
+                        If cpcore.db.csOk(CS) Then
                             'hint = "160"
                             FromAddress = cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.requestDomain)
                             subject = "Password Request at " & cpcore.webServer.requestDomain
                             Message = ""
-                            Do While cpcore.db.cs_ok(CS)
+                            Do While cpcore.db.csOk(CS)
                                 'hint = "170"
                                 updateUser = False
                                 If Message = "" Then
@@ -1010,7 +1010,7 @@ ErrorTrap:
                                 ' username
                                 '
                                 'hint = "200"
-                                Username = cpcore.db.cs_getText(CS, "Username")
+                                Username = cpcore.db.csGetText(CS, "Username")
                                 usernameOK = True
                                 If Not allowEmailLogin Then
                                     'hint = "210"
@@ -1044,7 +1044,7 @@ ErrorTrap:
                                     ' password
                                     '
                                     'hint = "280"
-                                    Password = cpcore.db.cs_getText(CS, "Password")
+                                    Password = cpcore.db.csGetText(CS, "Password")
                                     If Password.Trim() <> Password Then
                                         'hint = "290"
                                         Password = Password.Trim()
@@ -1066,12 +1066,12 @@ ErrorTrap:
                                     returnREsult = True
                                     If updateUser Then
                                         'hint = "350"
-                                        Call cpcore.db.cs_set(CS, "username", Username)
-                                        Call cpcore.db.cs_set(CS, "password", Password)
+                                        Call cpcore.db.csSet(CS, "username", Username)
+                                        Call cpcore.db.csSet(CS, "password", Password)
                                     End If
                                     recordCnt = recordCnt + 1
                                 End If
-                                cpcore.db.cs_goNext(CS)
+                                cpcore.db.csGoNext(CS)
                             Loop
                         End If
                     End If

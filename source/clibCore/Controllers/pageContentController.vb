@@ -104,9 +104,9 @@ Namespace Contensive.Core.Controllers
                     If cpCore.docProperties.getInteger("ContensiveUserForm") = 1 Then
                         Dim FromAddress As String = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServer.requestDomain)
                         Call cpCore.email.sendForm(cpCore.siteProperties.emailAdmin, FromAddress, "Form Submitted on " & cpCore.webServer.requestReferer)
-                        Dim cs As Integer = cpCore.db.cs_insertRecord("User Form Response")
-                        If cpCore.db.cs_ok(cs) Then
-                            Call cpCore.db.cs_set(cs, "name", "Form " & cpCore.webServer.requestReferrer)
+                        Dim cs As Integer = cpCore.db.csInsertRecord("User Form Response")
+                        If cpCore.db.csOk(cs) Then
+                            Call cpCore.db.csSet(cs, "name", "Form " & cpCore.webServer.requestReferrer)
                             Dim Copy As String = ""
 
                             For Each key As String In cpCore.docProperties.getKeyList()
@@ -115,10 +115,10 @@ Namespace Contensive.Core.Controllers
                                     Copy &= docProperty.Name & "=" & docProperty.Value & vbCrLf
                                 End If
                             Next
-                            Call cpCore.db.cs_set(cs, "copy", Copy)
-                            Call cpCore.db.cs_set(cs, "VisitId", cpCore.authContext.visit.id)
+                            Call cpCore.db.csSet(cs, "copy", Copy)
+                            Call cpCore.db.csSet(cs, "VisitId", cpCore.authContext.visit.id)
                         End If
-                        Call cpCore.db.cs_Close(cs)
+                        Call cpCore.db.csClose(cs)
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -253,13 +253,13 @@ Namespace Contensive.Core.Controllers
                                                     '
                                                     ClipChildRecordName = "record " & ClipChildRecordID
                                                     CSClip = cpCore.db.cs_open2(ClipChildContentName, ClipChildRecordID, True, True)
-                                                    If Not cpCore.db.cs_ok(CSClip) Then
+                                                    If Not cpCore.db.csOk(CSClip) Then
                                                         Call errorController.error_AddUserError(cpCore, "The paste operation failed because the data record referenced by the clipboard could not found.")
                                                     Else
                                                         '
                                                         ' Paste the edit record record
                                                         '
-                                                        ClipChildRecordName = cpCore.db.cs_getText(CSClip, "name")
+                                                        ClipChildRecordName = cpCore.db.csGetText(CSClip, "name")
                                                         If ClipParentFieldList = "" Then
                                                             '
                                                             ' Legacy paste - go right to the parent id
@@ -267,7 +267,7 @@ Namespace Contensive.Core.Controllers
                                                             If Not cpCore.db.cs_isFieldSupported(CSClip, "ParentID") Then
                                                                 Call errorController.error_AddUserError(cpCore, "The paste operation failed because the record you are pasting does not   support the necessary parenting feature.")
                                                             Else
-                                                                Call cpCore.db.cs_set(CSClip, "ParentID", ClipParentRecordID)
+                                                                Call cpCore.db.csSet(CSClip, "ParentID", ClipParentRecordID)
                                                             End If
                                                         Else
                                                             '
@@ -288,7 +288,7 @@ Namespace Contensive.Core.Controllers
                                                                     If Not cpCore.db.cs_isFieldSupported(CSClip, CStr(NameValues(0))) Then
                                                                         Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data Field [" & CStr(NameValues(0)) & "] is not supported by the location data.")
                                                                     Else
-                                                                        Call cpCore.db.cs_set(CSClip, CStr(NameValues(0)), CStr(NameValues(1)))
+                                                                        Call cpCore.db.csSet(CSClip, CStr(NameValues(0)), CStr(NameValues(1)))
                                                                     End If
                                                                 End If
                                                             Next
@@ -301,15 +301,15 @@ Namespace Contensive.Core.Controllers
                                                         'ShortLink = genericController.modifyLinkQuery(ShortLink, rnPageId, CStr(ClipChildRecordID), True)
                                                         'Call main_TrackContentSet(CSClip, ShortLink)
                                                     End If
-                                                    Call cpCore.db.cs_Close(CSClip)
+                                                    Call cpCore.db.csClose(CSClip)
                                                     '
                                                     ' Set Child Pages Found and clear caches
                                                     '
                                                     CSClip = cpCore.db.csOpenRecord(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
-                                                    If cpCore.db.cs_ok(CSClip) Then
-                                                        Call cpCore.db.cs_set(CSClip, "ChildPagesFound", True.ToString)
+                                                    If cpCore.db.csOk(CSClip) Then
+                                                        Call cpCore.db.csSet(CSClip, "ChildPagesFound", True.ToString)
                                                     End If
-                                                    Call cpCore.db.cs_Close(CSClip)
+                                                    Call cpCore.db.csClose(CSClip)
                                                     '
                                                     ' Live Editing
                                                     '
@@ -411,8 +411,8 @@ Namespace Contensive.Core.Controllers
                             & ")"
                         isLinkForward = False
                         Sql = cpCore.db.GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", , 1)
-                        CSPointer = cpCore.db.cs_openSql(Sql)
-                        If cpCore.db.cs_ok(CSPointer) Then
+                        CSPointer = cpCore.db.csOpenSql(Sql)
+                        If cpCore.db.csOk(CSPointer) Then
                             '
                             ' Link Forward found - update count
                             '
@@ -421,17 +421,17 @@ Namespace Contensive.Core.Controllers
                             Dim groupName As String
                             '
                             IsInLinkForwardTable = True
-                            Viewings = cpCore.db.cs_getInteger(CSPointer, "Viewings") + 1
-                            Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & cpCore.db.cs_getInteger(CSPointer, "ID")
+                            Viewings = cpCore.db.csGetInteger(CSPointer, "Viewings") + 1
+                            Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & cpCore.db.csGetInteger(CSPointer, "ID")
                             Call cpCore.db.executeQuery(Sql)
-                            tmpLink = cpCore.db.cs_getText(CSPointer, "DestinationLink")
+                            tmpLink = cpCore.db.csGetText(CSPointer, "DestinationLink")
                             If tmpLink <> "" Then
                                 '
                                 ' Valid Link Forward (without link it is just a record created by the autocreate function
                                 '
                                 isLinkForward = True
-                                tmpLink = cpCore.db.cs_getText(CSPointer, "DestinationLink")
-                                GroupID = cpCore.db.cs_getInteger(CSPointer, "GroupID")
+                                tmpLink = cpCore.db.csGetText(CSPointer, "DestinationLink")
+                                GroupID = cpCore.db.csGetInteger(CSPointer, "GroupID")
                                 If GroupID <> 0 Then
                                     groupName = groupController.group_GetGroupName(cpCore, GroupID)
                                     If groupName <> "" Then
@@ -444,7 +444,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                             End If
                         End If
-                        Call cpCore.db.cs_Close(CSPointer)
+                        Call cpCore.db.csClose(CSPointer)
                         '
                         If (RedirectLink = "") And Not isLinkForward Then
                             '
@@ -478,13 +478,13 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' Add a new Link Forward entry
                                     '
-                                    CSPointer = cpCore.db.cs_insertRecord("Link Forwards")
-                                    If cpCore.db.cs_ok(CSPointer) Then
-                                        Call cpCore.db.cs_set(CSPointer, "Name", cpCore.webServer.requestPathPage)
-                                        Call cpCore.db.cs_set(CSPointer, "sourcelink", cpCore.webServer.requestPathPage)
-                                        Call cpCore.db.cs_set(CSPointer, "Viewings", 1)
+                                    CSPointer = cpCore.db.csInsertRecord("Link Forwards")
+                                    If cpCore.db.csOk(CSPointer) Then
+                                        Call cpCore.db.csSet(CSPointer, "Name", cpCore.webServer.requestPathPage)
+                                        Call cpCore.db.csSet(CSPointer, "sourcelink", cpCore.webServer.requestPathPage)
+                                        Call cpCore.db.csSet(CSPointer, "Viewings", 1)
                                     End If
-                                    Call cpCore.db.cs_Close(CSPointer)
+                                    Call cpCore.db.csClose(CSPointer)
                                 End If
                                 ''
                                 '' real 404
@@ -771,11 +771,11 @@ Namespace Contensive.Core.Controllers
                 ' main_Get the instructions from the record
                 '
                 CS = cpcore.db.csOpenRecord("Form Pages", FormPageID)
-                If cpcore.db.cs_ok(CS) Then
-                    Formhtml = cpcore.db.cs_getText(CS, "Body")
-                    FormInstructions = cpcore.db.cs_getText(CS, "Instructions")
+                If cpcore.db.csOk(CS) Then
+                    Formhtml = cpcore.db.csGetText(CS, "Body")
+                    FormInstructions = cpcore.db.csGetText(CS, "Instructions")
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
                 If FormInstructions <> "" Then
                     '
                     ' Load the instructions
@@ -799,11 +799,11 @@ Namespace Contensive.Core.Controllers
                                     FormValue = cpcore.docProperties.getText(.PeopleField)
                                     If (FormValue <> "") And genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
                                         SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & cpcore.db.encodeSQLText(FormValue)
-                                        CS = cpcore.db.cs_openSql(SQL)
-                                        If cpcore.db.cs_ok(CS) Then
-                                            Success = cpcore.db.cs_getInteger(CS, "cnt") = 0
+                                        CS = cpcore.db.csOpenSql(SQL)
+                                        If cpcore.db.csOk(CS) Then
+                                            Success = cpcore.db.csGetInteger(CS, "cnt") = 0
                                         End If
-                                        Call cpcore.db.cs_Close(CS)
+                                        Call cpcore.db.csClose(CS)
                                         If Not Success Then
                                             errorController.error_AddUserError(cpcore, "The field [" & .Caption & "] must be unique, and the value [" & genericController.encodeHTML(FormValue) & "] has already been used.")
                                         End If
@@ -812,31 +812,31 @@ Namespace Contensive.Core.Controllers
                                         Success = False
                                         errorController.error_AddUserError(cpcore, "The field [" & genericController.encodeHTML(.Caption) & "] is required.")
                                     Else
-                                        If Not cpcore.db.cs_ok(CSPeople) Then
+                                        If Not cpcore.db.csOk(CSPeople) Then
                                             CSPeople = cpcore.db.csOpenRecord("people", cpcore.authContext.user.id)
                                         End If
-                                        If cpcore.db.cs_ok(CSPeople) Then
+                                        If cpcore.db.csOk(CSPeople) Then
                                             Select Case genericController.vbUCase(.PeopleField)
                                                 Case "NAME"
                                                     PeopleName = FormValue
-                                                    Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
+                                                    Call cpcore.db.csSet(CSPeople, .PeopleField, FormValue)
                                                 Case "FIRSTNAME"
                                                     PeopleFirstName = FormValue
-                                                    Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
+                                                    Call cpcore.db.csSet(CSPeople, .PeopleField, FormValue)
                                                 Case "LASTNAME"
                                                     PeopleLastName = FormValue
-                                                    Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
+                                                    Call cpcore.db.csSet(CSPeople, .PeopleField, FormValue)
                                                 Case "EMAIL"
                                                     PeopleEmail = FormValue
-                                                    Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
+                                                    Call cpcore.db.csSet(CSPeople, .PeopleField, FormValue)
                                                 Case "USERNAME"
                                                     PeopleUsername = FormValue
-                                                    Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
+                                                    Call cpcore.db.csSet(CSPeople, .PeopleField, FormValue)
                                                 Case "PASSWORD"
                                                     PeoplePassword = FormValue
-                                                    Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
+                                                    Call cpcore.db.csSet(CSPeople, .PeopleField, FormValue)
                                                 Case Else
-                                                    Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
+                                                    Call cpcore.db.csSet(CSPeople, .PeopleField, FormValue)
                                             End Select
                                         End If
                                     End If
@@ -858,11 +858,11 @@ Namespace Contensive.Core.Controllers
                     ' Create People Name
                     '
                     If PeopleName = "" And PeopleFirstName <> "" And PeopleLastName <> "" Then
-                        If cpcore.db.cs_ok(CSPeople) Then
-                            Call cpcore.db.cs_set(CSPeople, "name", PeopleFirstName & " " & PeopleLastName)
+                        If cpcore.db.csOk(CSPeople) Then
+                            Call cpcore.db.csSet(CSPeople, "name", PeopleFirstName & " " & PeopleLastName)
                         End If
                     End If
-                    Call cpcore.db.cs_Close(CSPeople)
+                    Call cpcore.db.csClose(CSPeople)
                     '
                     ' AuthenticationOnFormProcess requires Username/Password and must be valid
                     '
@@ -1037,13 +1037,13 @@ Namespace Contensive.Core.Controllers
             '
             IsRetry = (cpcore.docProperties.getInteger("ContensiveFormPageID") <> 0)
             '
-            CS = cpcore.db.cs_open("Form Pages", "name=" & cpcore.db.encodeSQLText(FormPageName))
-            If cpcore.db.cs_ok(CS) Then
-                FormPageID = cpcore.db.cs_getInteger(CS, "ID")
-                Formhtml = cpcore.db.cs_getText(CS, "Body")
-                FormInstructions = cpcore.db.cs_getText(CS, "Instructions")
+            CS = cpcore.db.csOpen("Form Pages", "name=" & cpcore.db.encodeSQLText(FormPageName))
+            If cpcore.db.csOk(CS) Then
+                FormPageID = cpcore.db.csGetInteger(CS, "ID")
+                Formhtml = cpcore.db.csGetText(CS, "Body")
+                FormInstructions = cpcore.db.csGetText(CS, "Instructions")
             End If
-            Call cpcore.db.cs_Close(CS)
+            Call cpcore.db.csClose(CS)
             f = loadFormPageInstructions(cpcore, FormInstructions, Formhtml)
             '
             '
@@ -1062,14 +1062,14 @@ Namespace Contensive.Core.Controllers
                             Else
                                 CaptionSpan = "<span>"
                             End If
-                            If Not cpcore.db.cs_ok(CSPeople) Then
+                            If Not cpcore.db.csOk(CSPeople) Then
                                 CSPeople = cpcore.db.csOpenRecord("people", cpcore.authContext.user.id)
                             End If
                             Caption = .Caption
                             If .REquired Or genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("People", .PeopleField, "Required")) Then
                                 Caption = "*" & Caption
                             End If
-                            If cpcore.db.cs_ok(CSPeople) Then
+                            If cpcore.db.csOk(CSPeople) Then
                                 Body = f.RepeatCell
                                 Body = genericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan & Caption & "</span>", 1, 99, vbTextCompare)
                                 Body = genericController.vbReplace(Body, "{{FIELD}}", cpcore.html.html_GetFormInputCS(CSPeople, "People", .PeopleField), 1, 99, vbTextCompare)
@@ -1090,7 +1090,7 @@ Namespace Contensive.Core.Controllers
                     End Select
                 End With
             Next
-            Call cpcore.db.cs_Close(CSPeople)
+            Call cpcore.db.csClose(CSPeople)
             If HasRequiredFields Then
                 Body = f.RepeatCell
                 Body = genericController.vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, vbTextCompare)
@@ -1197,13 +1197,13 @@ ErrorTrap:
                             & " AND ((ccgroups.Active)<>0)" _
                             & " AND ((ccMemberRules.Active)<>0)" _
                             & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "));"
-                        CS = cpCore.db.cs_openSql(SQL)
+                        CS = cpCore.db.csOpenSql(SQL)
                         BlockedRecordIDList = "," & BlockedRecordIDList
-                        Do While cpCore.db.cs_ok(CS)
-                            BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpCore.db.cs_getText(CS, "RecordID"), "")
-                            cpCore.db.cs_goNext(CS)
+                        Do While cpCore.db.csOk(CS)
+                            BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpCore.db.csGetText(CS, "RecordID"), "")
+                            cpCore.db.csGoNext(CS)
                         Loop
-                        Call cpCore.db.cs_Close(CS)
+                        Call cpCore.db.csClose(CS)
                         If BlockedRecordIDList <> "" Then
                             '
                             ' ##### remove the leading comma
@@ -1221,17 +1221,17 @@ ErrorTrap:
                                 & " AND ((ManagementMemberRules.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & ")" _
                                 & " AND ((ManagementMemberRules.MemberID)=" & cpCore.authContext.user.id & " ));"
-                            CS = cpCore.db.cs_openSql(SQL)
-                            Do While cpCore.db.cs_ok(CS)
-                                BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpCore.db.cs_getText(CS, "RecordID"), "")
-                                cpCore.db.cs_goNext(CS)
+                            CS = cpCore.db.csOpenSql(SQL)
+                            Do While cpCore.db.csOk(CS)
+                                BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpCore.db.csGetText(CS, "RecordID"), "")
+                                cpCore.db.csGoNext(CS)
                             Loop
-                            Call cpCore.db.cs_Close(CS)
+                            Call cpCore.db.csClose(CS)
                         End If
                         If BlockedRecordIDList <> "" Then
                             ContentBlocked = True
                         End If
-                        Call cpCore.db.cs_Close(CS)
+                        Call cpCore.db.csClose(CS)
                     End If
                 End If
                 '
@@ -1245,13 +1245,13 @@ ErrorTrap:
                     BlockedPageRecordID = genericController.EncodeInteger(BlockedPages(UBound(BlockedPages)))
                     If BlockedPageRecordID <> 0 Then
                         CS = cpCore.db.csOpenRecord("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
-                        If cpCore.db.cs_ok(CS) Then
-                            BlockSourceID = cpCore.db.cs_getInteger(CS, "BlockSourceID")
-                            ContentPadding = cpCore.db.cs_getInteger(CS, "ContentPadding")
-                            CustomBlockMessageFilename = cpCore.db.cs_getText(CS, "CustomBlockMessage")
-                            RegistrationGroupID = cpCore.db.cs_getInteger(CS, "RegistrationGroupID")
+                        If cpCore.db.csOk(CS) Then
+                            BlockSourceID = cpCore.db.csGetInteger(CS, "BlockSourceID")
+                            ContentPadding = cpCore.db.csGetInteger(CS, "ContentPadding")
+                            CustomBlockMessageFilename = cpCore.db.csGetText(CS, "CustomBlockMessage")
+                            RegistrationGroupID = cpCore.db.csGetInteger(CS, "RegistrationGroupID")
                         End If
-                        Call cpCore.db.cs_Close(CS)
+                        Call cpCore.db.csClose(CS)
                     End If
                     '
                     ' Block Appropriately
@@ -1870,28 +1870,28 @@ ErrorTrap:
                     End If
                     If (ContentID > 0) Then
                         '
-                        CS = cpcore.db.cs_open("See Also", "((active<>0)AND(ContentID=" & ContentID & ")AND(RecordID=" & iRecordID & "))")
-                        Do While (cpcore.db.cs_ok(CS))
-                            SeeAlsoLink = (cpcore.db.cs_getText(CS, "Link"))
+                        CS = cpcore.db.csOpen("See Also", "((active<>0)AND(ContentID=" & ContentID & ")AND(RecordID=" & iRecordID & "))")
+                        Do While (cpcore.db.csOk(CS))
+                            SeeAlsoLink = (cpcore.db.csGetText(CS, "Link"))
                             If SeeAlsoLink <> "" Then
                                 result = result & cr & "<li class=""ccListItem"">"
                                 If genericController.vbInstr(1, SeeAlsoLink, "://") = 0 Then
                                     SeeAlsoLink = cpcore.webServer.requestProtocol & SeeAlsoLink
                                 End If
                                 If IsEditingLocal Then
-                                    result = result & cpcore.html.main_GetRecordEditLink2("See Also", (cpcore.db.cs_getInteger(CS, "ID")), False, "", cpcore.authContext.isEditing("See Also"))
+                                    result = result & cpcore.html.main_GetRecordEditLink2("See Also", (cpcore.db.csGetInteger(CS, "ID")), False, "", cpcore.authContext.isEditing("See Also"))
                                 End If
-                                result = result & "<a href=""" & genericController.encodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.cs_getText(CS, "Name")) & "</A>"
-                                Copy = (cpcore.db.cs_getText(CS, "Brief"))
+                                result = result & "<a href=""" & genericController.encodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.csGetText(CS, "Name")) & "</A>"
+                                Copy = (cpcore.db.csGetText(CS, "Brief"))
                                 If Copy <> "" Then
                                     result = result & "<br >" & genericController.AddSpan(Copy, "ccListCopy")
                                 End If
                                 SeeAlsoCount = SeeAlsoCount + 1
                                 result = result & "</li>"
                             End If
-                            cpcore.db.cs_goNext(CS)
+                            cpcore.db.csGoNext(CS)
                         Loop
-                        cpcore.db.cs_Close(CS)
+                        cpcore.db.csClose(CS)
                         '
                         If IsEditingLocal Then
                             SeeAlsoCount = SeeAlsoCount + 1
@@ -1986,14 +1986,14 @@ ErrorTrap:
                         NoteCopy = NoteCopy & BR
                         NoteCopy = NoteCopy & "<b>Content on which the comments are based</b>" & BR
                         '
-                        CS = cpcore.db.cs_open(iContentName, "ID=" & iRecordID)
+                        CS = cpcore.db.csOpen(iContentName, "ID=" & iRecordID)
                         Copy = "[the content of this page is not available]" & BR
-                        If cpcore.db.cs_ok(CS) Then
-                            Copy = (cpcore.db.cs_get(CS, "copyFilename"))
+                        If cpcore.db.csOk(CS) Then
+                            Copy = (cpcore.db.csGet(CS, "copyFilename"))
                             'Copy = main_EncodeContent5(Copy, c.authcontext.user.userid, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
                         End If
                         NoteCopy = NoteCopy & Copy & BR
-                        Call cpcore.db.cs_Close(CS)
+                        Call cpcore.db.csClose(CS)
                         '
                         Call cpcore.email.sendPerson(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, False, True, 0, "", False)
                         '
@@ -2371,11 +2371,11 @@ ErrorTrap:
             Dim CS As Integer
             Dim PageID As Integer
             '
-            CS = cpcore.db.cs_open("Copy Content", "name=" & cpcore.db.encodeSQLText(ContentBlockCopyName), "ID", , , , , "Copy,ID")
-            If cpcore.db.cs_ok(CS) Then
-                getDefaultBlockMessage = cpcore.db.cs_get(CS, "Copy")
+            CS = cpcore.db.csOpen("Copy Content", "name=" & cpcore.db.encodeSQLText(ContentBlockCopyName), "ID", , , , , "Copy,ID")
+            If cpcore.db.csOk(CS) Then
+                getDefaultBlockMessage = cpcore.db.csGet(CS, "Copy")
             End If
-            Call cpcore.db.cs_Close(CS)
+            Call cpcore.db.csClose(CS)
             '
             ' ----- Do not allow blank message - if still nothing, create default
             '
@@ -2385,11 +2385,11 @@ ErrorTrap:
             '
             ' ----- Create Copy Content Record for future
             '
-            CS = cpcore.db.cs_insertRecord("Copy Content")
-            If cpcore.db.cs_ok(CS) Then
-                Call cpcore.db.cs_set(CS, "Name", ContentBlockCopyName)
-                Call cpcore.db.cs_set(CS, "Copy", getDefaultBlockMessage)
-                Call cpcore.db.cs_save2(CS)
+            CS = cpcore.db.csInsertRecord("Copy Content")
+            If cpcore.db.csOk(CS) Then
+                Call cpcore.db.csSet(CS, "Name", ContentBlockCopyName)
+                Call cpcore.db.csSet(CS, "Copy", getDefaultBlockMessage)
+                Call cpcore.db.csSave2(CS)
                 'Call cpcore.workflow.publishEdit("Copy Content", genericController.EncodeInteger(cpcore.db.cs_get(CS, "ID")))
             End If
             '
@@ -2415,10 +2415,10 @@ ErrorTrap:
                 '
                 Copy = ""
                 CS = cpCore.db.cs_openContentRecord("People", PeopleID, , , , "Name,Phone,Email")
-                If cpCore.db.cs_ok(CS) Then
-                    ContactName = (cpCore.db.cs_getText(CS, "Name"))
-                    ContactPhone = (cpCore.db.cs_getText(CS, "Phone"))
-                    ContactEmail = (cpCore.db.cs_getText(CS, "Email"))
+                If cpCore.db.csOk(CS) Then
+                    ContactName = (cpCore.db.csGetText(CS, "Name"))
+                    ContactPhone = (cpCore.db.csGetText(CS, "Phone"))
+                    ContactEmail = (cpCore.db.csGetText(CS, "Email"))
                     If ContactName <> "" Then
                         Copy = Copy & "For more information, please contact " & ContactName
                         If ContactEmail = "" Then
@@ -2446,7 +2446,7 @@ ErrorTrap:
                         End If
                     End If
                 End If
-                Call cpCore.db.cs_Close(CS)
+                Call cpCore.db.csClose(CS)
                 '
                 result = Copy
             Catch ex As Exception

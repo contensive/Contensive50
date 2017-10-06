@@ -321,20 +321,20 @@ Namespace Contensive.Core.Controllers
                     & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & Me.cpcore.db.encodeSQLDate(cpcore.profileStartTime) & "))" _
                     & ")" _
                 & " ORDER BY " & iSortFieldList & ";"
-                result = Me.cpcore.db.cs_openSql(SQL, , PageSize, PageNumber)
-                If Not Me.cpcore.db.cs_ok(result) Then
+                result = Me.cpcore.db.csOpenSql(SQL, , PageSize, PageNumber)
+                If Not Me.cpcore.db.csOk(result) Then
                     '
                     ' Check if listname exists
                     '
-                    CS = Me.cpcore.db.cs_open("Content Watch Lists", "name=" & Me.cpcore.db.encodeSQLText(ListName), "ID", , , , , "ID")
-                    If Not Me.cpcore.db.cs_ok(CS) Then
-                        Call Me.cpcore.db.cs_Close(CS)
-                        CS = Me.cpcore.db.cs_insertRecord("Content Watch Lists")
-                        If Me.cpcore.db.cs_ok(CS) Then
-                            Call Me.cpcore.db.cs_set(CS, "name", ListName)
+                    CS = Me.cpcore.db.csOpen("Content Watch Lists", "name=" & Me.cpcore.db.encodeSQLText(ListName), "ID", , , , , "ID")
+                    If Not Me.cpcore.db.csOk(CS) Then
+                        Call Me.cpcore.db.csClose(CS)
+                        CS = Me.cpcore.db.csInsertRecord("Content Watch Lists")
+                        If Me.cpcore.db.csOk(CS) Then
+                            Call Me.cpcore.db.csSet(CS, "name", ListName)
                         End If
                     End If
-                    Call Me.cpcore.db.cs_Close(CS)
+                    Call Me.cpcore.db.csClose(CS)
                 End If
             Catch ex As Exception
                 Me.cpcore.handleException(ex)
@@ -358,12 +358,12 @@ Namespace Contensive.Core.Controllers
                 '
                 CSPointer = main_OpenCSWhatsNew(cpcore, SortFieldList)
                 '
-                If Me.cpcore.db.cs_ok(CSPointer) Then
+                If Me.cpcore.db.csOk(CSPointer) Then
                     ContentID = Me.cpcore.metaData.getContentId("Content Watch")
-                    Do While Me.cpcore.db.cs_ok(CSPointer)
-                        Link = Me.cpcore.db.cs_getText(CSPointer, "link")
-                        LinkLabel = Me.cpcore.db.cs_getText(CSPointer, "LinkLabel")
-                        RecordID = Me.cpcore.db.cs_getInteger(CSPointer, "ID")
+                    Do While Me.cpcore.db.csOk(CSPointer)
+                        Link = Me.cpcore.db.csGetText(CSPointer, "link")
+                        LinkLabel = Me.cpcore.db.csGetText(CSPointer, "LinkLabel")
+                        RecordID = Me.cpcore.db.csGetInteger(CSPointer, "ID")
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li class=""ccListItem"">"
                             If (Link <> "") Then
@@ -373,11 +373,11 @@ Namespace Contensive.Core.Controllers
                             End If
                             result = result & "</li>"
                         End If
-                        Call Me.cpcore.db.cs_goNext(CSPointer)
+                        Call Me.cpcore.db.csGoNext(CSPointer)
                     Loop
                     result = cr & "<ul class=""ccWatchList"">" & htmlIndent(result) & cr & "</ul>"
                 End If
-                Call Me.cpcore.db.cs_Close(CSPointer)
+                Call Me.cpcore.db.csClose(CSPointer)
             Catch ex As Exception
                 Me.cpcore.handleException(ex)
             End Try
@@ -401,12 +401,12 @@ Namespace Contensive.Core.Controllers
                     CS = main_OpenCSContentWatchList(cpCore, ListName, SortField, True)
                 End If
                 '
-                If Me.cpcore.db.cs_ok(CS) Then
+                If Me.cpcore.db.csOk(CS) Then
                     ContentID = Me.cpcore.metaData.getContentId("Content Watch")
-                    Do While Me.cpcore.db.cs_ok(CS)
-                        Link = Me.cpcore.db.cs_getText(CS, "link")
-                        LinkLabel = Me.cpcore.db.cs_getText(CS, "LinkLabel")
-                        RecordID = Me.cpcore.db.cs_getInteger(CS, "ID")
+                    Do While Me.cpcore.db.csOk(CS)
+                        Link = Me.cpcore.db.csGetText(CS, "link")
+                        LinkLabel = Me.cpcore.db.csGetText(CS, "LinkLabel")
+                        RecordID = Me.cpcore.db.csGetInteger(CS, "ID")
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li id=""main_ContentWatch" & RecordID & """ class=""ccListItem"">"
                             If (Link <> "") Then
@@ -416,13 +416,13 @@ Namespace Contensive.Core.Controllers
                             End If
                             result = result & "</li>"
                         End If
-                        Call Me.cpcore.db.cs_goNext(CS)
+                        Call Me.cpcore.db.csGoNext(CS)
                     Loop
                     If result <> "" Then
                         result = Me.cpcore.html.html_GetContentCopy("Watch List Caption: " & ListName, ListName, Me.cpcore.authContext.user.id, True, Me.cpcore.authContext.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & htmlIndent(result) & cr & "</ul>"
                     End If
                 End If
-                Call Me.cpcore.db.cs_Close(CS)
+                Call Me.cpcore.db.csClose(CS)
                 '
                 If Me.cpcore.visitProperty.getBoolean("AllowAdvancedEditor") Then
                     result = Me.cpcore.html.main_GetEditWrapper("Watch List [" & ListName & "]", result)
@@ -460,190 +460,191 @@ Namespace Contensive.Core.Controllers
         '
         Friend Function getQuickEditing(rootPageId As Integer, OrderByClause As String, AllowPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, contactMemberID As Integer, childListSortMethodId As Integer, main_AllowChildListComposite As Boolean, ArchivePage As Boolean) As String
             Dim result As String = String.Empty
-            '
-            Dim RootPageContentName As String = Models.Entity.pageContentModel.contentName
-            Dim LiveRecordContentName As String = Models.Entity.pageContentModel.contentName
-            Dim Link As String
-            Dim page_ParentID As Integer
-            Dim PageList As String
-            Dim OptionsPanelAuthoringStatus As String
-            Dim ButtonList As String
-            Dim AllowInsert As Boolean
-            Dim AllowCancel As Boolean
-            Dim allowSave As Boolean
-            Dim AllowDelete As Boolean
-            Dim AllowMarkReviewed As Boolean
-            Dim CDef As cdefModel
-            Dim readOnlyField As Boolean
-            Dim IsEditLocked As Boolean
-            Dim main_EditLockMemberName As String = String.Empty
-            Dim main_EditLockDateExpires As Date
-            Dim SubmittedDate As Date
-            Dim ApprovedDate As Date
-            Dim ModifiedDate As Date
-            '
-            Call cpcore.html.addStyleLink("/quickEditor/styles.css", "Quick Editor")
-            '
-            ' ----- First Active Record - Output Quick Editor form
-            '
-            CDef = cpcore.metaData.getCdef(LiveRecordContentName)
-            '
-            ' main_Get Authoring Status and permissions
-            '
-            IsEditLocked = cpcore.workflow.GetEditLockStatus(LiveRecordContentName, page.id)
-            If IsEditLocked Then
-                main_EditLockMemberName = cpcore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id)
-                main_EditLockDateExpires = genericController.EncodeDate(cpcore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id))
-            End If
-            Dim IsModified As Boolean = False
-            Dim IsSubmitted As Boolean = False
-            Dim IsApproved As Boolean = False
-            Dim SubmittedMemberName As String = ""
-            Dim ApprovedMemberName As String = ""
-            Dim ModifiedMemberName As String = ""
-            Dim IsDeleted As Boolean = False
-            Dim IsInserted As Boolean = False
-            Dim IsRootPage As Boolean = False
-            Call getAuthoringStatus(LiveRecordContentName, page.id, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
-            Call getAuthoringPermissions(LiveRecordContentName, page.id, AllowInsert, AllowCancel, allowSave, AllowDelete, False, False, False, False, readOnlyField)
-            AllowMarkReviewed = cpcore.metaData.isContentFieldSupported(Models.Entity.pageContentModel.contentName, "DateReviewed")
-            OptionsPanelAuthoringStatus = cpcore.authContext.main_GetAuthoringStatusMessage(cpcore, False, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
-            '
-            ' Set Editing Authoring Control
-            '
-            Call cpcore.workflow.SetEditLock(LiveRecordContentName, page.id)
-            '
-            ' SubPanel: Authoring Status
-            '
-            ButtonList = ""
-            If AllowCancel Then
-                ButtonList = ButtonList & "," & ButtonCancel
-            End If
-            If allowSave Then
-                ButtonList = ButtonList & "," & ButtonSave & "," & ButtonOK
-            End If
-            If AllowDelete And Not IsRootPage Then
-                ButtonList = ButtonList & "," & ButtonDelete
-            End If
-            If AllowInsert Then
-                ButtonList = ButtonList & "," & ButtonAddChildPage
-            End If
-            If (page_ParentID <> 0) And AllowInsert Then
-                ButtonList = ButtonList & "," & ButtonAddSiblingPage
-            End If
-            If AllowMarkReviewed Then
-                ButtonList = ButtonList & "," & ButtonMarkReviewed
-            End If
-            If ButtonList <> "" Then
-                ButtonList = Mid(ButtonList, 2)
-                ButtonList = cpcore.html.main_GetPanelButtons(ButtonList, "Button")
-            End If
-            If OptionsPanelAuthoringStatus <> "" Then
-                result = result & "" _
-            & cr & "<tr>" _
-            & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
-            & cr & "</tr>"
-            End If
-            If (cpcore.debug_iUserError <> "") Then
-                result = result & "" _
-            & cr & "<tr>" _
-            & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & errorController.error_GetUserError(cpcore) & "</div></td>" _
-            & cr & "</tr>"
-            End If
-            result = result _
-            & cr & "<tr>" _
-            & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Name</td>" _
-            & cr2 & "<td class=""qeRow qeRight"">" & cpcore.html.html_GetFormInputText2("name", page.name, 1, , , , readOnlyField) & "</td>" _
-            & cr & "</tr>" _
-            & cr & "<tr>" _
-            & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Headline</td>" _
-            & cr2 & "<td class=""qeRow qeRight"">" & cpcore.html.html_GetFormInputText2("headline", page.Headline, 1, , , , readOnlyField) & "</td>" _
-            & cr & "</tr>" _
-            & ""
-            If readOnlyField Then
-                result = result & "" _
+            Try
+                Dim RootPageContentName As String = Models.Entity.pageContentModel.contentName
+                Dim LiveRecordContentName As String = Models.Entity.pageContentModel.contentName
+                Dim Link As String
+                Dim page_ParentID As Integer
+                Dim PageList As String
+                Dim OptionsPanelAuthoringStatus As String
+                Dim ButtonList As String
+                Dim AllowInsert As Boolean
+                Dim AllowCancel As Boolean
+                Dim allowSave As Boolean
+                Dim AllowDelete As Boolean
+                Dim AllowMarkReviewed As Boolean
+                Dim CDef As cdefModel
+                Dim readOnlyField As Boolean
+                Dim IsEditLocked As Boolean
+                Dim main_EditLockMemberName As String = String.Empty
+                Dim main_EditLockDateExpires As Date
+                Dim SubmittedDate As Date
+                Dim ApprovedDate As Date
+                Dim ModifiedDate As Date
+                '
+                Call cpcore.html.addStyleLink("/quickEditor/styles.css", "Quick Editor")
+                '
+                ' ----- First Active Record - Output Quick Editor form
+                '
+                CDef = cpcore.metaData.getCdef(LiveRecordContentName)
+                '
+                ' main_Get Authoring Status and permissions
+                '
+                IsEditLocked = cpcore.workflow.GetEditLockStatus(LiveRecordContentName, page.id)
+                If IsEditLocked Then
+                    main_EditLockMemberName = cpcore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id)
+                    main_EditLockDateExpires = genericController.EncodeDate(cpcore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id))
+                End If
+                Dim IsModified As Boolean = False
+                Dim IsSubmitted As Boolean = False
+                Dim IsApproved As Boolean = False
+                Dim SubmittedMemberName As String = ""
+                Dim ApprovedMemberName As String = ""
+                Dim ModifiedMemberName As String = ""
+                Dim IsDeleted As Boolean = False
+                Dim IsInserted As Boolean = False
+                Dim IsRootPage As Boolean = False
+                Call getAuthoringStatus(LiveRecordContentName, page.id, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
+                Call getAuthoringPermissions(LiveRecordContentName, page.id, AllowInsert, AllowCancel, allowSave, AllowDelete, False, False, False, False, readOnlyField)
+                AllowMarkReviewed = cpcore.metaData.isContentFieldSupported(Models.Entity.pageContentModel.contentName, "DateReviewed")
+                OptionsPanelAuthoringStatus = cpcore.authContext.main_GetAuthoringStatusMessage(cpcore, False, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
+                '
+                ' Set Editing Authoring Control
+                '
+                Call cpcore.workflow.SetEditLock(LiveRecordContentName, page.id)
+                '
+                ' SubPanel: Authoring Status
+                '
+                ButtonList = ""
+                If AllowCancel Then
+                    ButtonList = ButtonList & "," & ButtonCancel
+                End If
+                If allowSave Then
+                    ButtonList = ButtonList & "," & ButtonSave & "," & ButtonOK
+                End If
+                If AllowDelete And Not IsRootPage Then
+                    ButtonList = ButtonList & "," & ButtonDelete
+                End If
+                If AllowInsert Then
+                    ButtonList = ButtonList & "," & ButtonAddChildPage
+                End If
+                If (page_ParentID <> 0) And AllowInsert Then
+                    ButtonList = ButtonList & "," & ButtonAddSiblingPage
+                End If
+                If AllowMarkReviewed Then
+                    ButtonList = ButtonList & "," & ButtonMarkReviewed
+                End If
+                If ButtonList <> "" Then
+                    ButtonList = Mid(ButtonList, 2)
+                    ButtonList = cpcore.html.main_GetPanelButtons(ButtonList, "Button")
+                End If
+                If OptionsPanelAuthoringStatus <> "" Then
+                    result = result & "" _
+                        & cr & "<tr>" _
+                        & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
+                        & cr & "</tr>"
+                End If
+                If (cpcore.debug_iUserError <> "") Then
+                    result = result & "" _
+                        & cr & "<tr>" _
+                        & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & errorController.error_GetUserError(cpcore) & "</div></td>" _
+                        & cr & "</tr>"
+                End If
+                result = result _
+                    & cr & "<tr>" _
+                    & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Name</td>" _
+                    & cr2 & "<td class=""qeRow qeRight"">" & cpcore.html.html_GetFormInputText2("name", page.name, 1, , , , readOnlyField) & "</td>" _
+                    & cr & "</tr>" _
+                    & cr & "<tr>" _
+                    & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Headline</td>" _
+                    & cr2 & "<td class=""qeRow qeRight"">" & cpcore.html.html_GetFormInputText2("headline", page.Headline, 1, , , , readOnlyField) & "</td>" _
+                    & cr & "</tr>" _
+                    & ""
+                If readOnlyField Then
+                    result = result & "" _
                     & cr & "<tr>" _
                     & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:34px;"">Body</td>" _
                     & cr2 & "<td class=""qeRow qeRight"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
                     & cr & "</tr>"
-            Else
-                result = result & "" _
+                Else
+                    result = result & "" _
                     & cr & "<tr>" _
                     & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:111px;"">Body</td>" _
                     & cr2 & "<td class=""qeRow qeRight"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
                     & cr & "</tr>"
-            End If
-            '
-            ' ----- Parent pages
-            '
-            If pageToRootList.Count = 1 Then
-                PageList = "&nbsp;(there are no parent pages)"
-            Else
-                PageList = "<ul class=""qeListUL""><li class=""qeListLI"">Current Page</li></ul>"
-                For Each testPage As pageContentModel In Enumerable.Reverse(pageToRootList)
-                    Link = testPage.name
-                    If Link = "" Then
-                        Link = "no name #" & genericController.encodeText(testPage.id)
-                    End If
-                    Link = "<a href=""" & testPage.PageLink & """>" & Link & "</a>"
-                    PageList = "<ul class=""qeListUL""><li class=""qeListLI"">" & Link & PageList & "</li></ul>"
-                Next
-            End If
-            result = result & "" _
-            & cr & "<tr>" _
-            & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:26px;"">Parent Pages</td>" _
-            & cr2 & "<td class=""qeRow qeRight""><div class=""qeListCon"">" & PageList & "</div></td>" _
-            & cr & "</tr>"
-            '
-            ' ----- Child pages
-            '
-            Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, cpcore.siteProperties.childListAddonID)
-            Dim executeContext As New CPUtilsBaseClass.addonExecuteContext With {
-                .addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
-                    .contentName = Models.Entity.pageContentModel.contentName,
-                    .fieldName = "",
-                    .recordId = page.id
-                },
-                .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpcore, page.ChildListInstanceOptions),
-                .instanceGuid = PageChildListInstanceID
-            }
-            PageList = cpcore.addon.execute(addon, executeContext)
-            'PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
-            If genericController.vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
-                PageList = "(there are no child pages)"
-            End If
-            result = result _
-            & cr & "<tr>" _
-            & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:36px;"">Child Pages</td>" _
-            & cr2 & "<td class=""qeRow qeRight""><div class=""qeListCon"">" & PageList & "</div></td>" _
-            & cr & "</tr>"
-            result = "" _
-            & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
-            & genericController.htmlIndent(result) _
-            & cr & "</table>"
-            result = "" _
-            & ButtonList _
-            & result _
-            & ButtonList
-            result = cpcore.html.main_GetPanel(result)
-
-            '
-            ' Form Wrapper
-            '
-            result = "" _
-            & cr & cpcore.html.html_GetUploadFormStart(cpcore.webServer.requestQueryString) _
-            & cr & cpcore.html.html_GetFormInputHidden("Type", FormTypePageAuthoring) _
-            & cr & cpcore.html.html_GetFormInputHidden("ID", page.id) _
-            & cr & cpcore.html.html_GetFormInputHidden("ContentName", LiveRecordContentName) _
-            & cr & cpcore.html.main_GetPanelHeader("Contensive Quick Editor") _
-            & cr & result _
-            & cr & cpcore.html.html_GetUploadFormEnd()
-
-            result = "" _
-            & cr & "<div class=""ccCon"">" _
-            & genericController.htmlIndent(result) _
-            & cr & "</div>"
+                End If
+                '
+                ' ----- Parent pages
+                '
+                If pageToRootList.Count = 1 Then
+                    PageList = "&nbsp;(there are no parent pages)"
+                Else
+                    PageList = "<ul class=""qeListUL""><li class=""qeListLI"">Current Page</li></ul>"
+                    For Each testPage As pageContentModel In Enumerable.Reverse(pageToRootList)
+                        Link = testPage.name
+                        If Link = "" Then
+                            Link = "no name #" & genericController.encodeText(testPage.id)
+                        End If
+                        Link = "<a href=""" & testPage.PageLink & """>" & Link & "</a>"
+                        PageList = "<ul class=""qeListUL""><li class=""qeListLI"">" & Link & PageList & "</li></ul>"
+                    Next
+                End If
+                result = result & "" _
+                & cr & "<tr>" _
+                & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:26px;"">Parent Pages</td>" _
+                & cr2 & "<td class=""qeRow qeRight""><div class=""qeListCon"">" & PageList & "</div></td>" _
+                & cr & "</tr>"
+                '
+                ' ----- Child pages
+                '
+                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, cpcore.siteProperties.childListAddonID)
+                Dim executeContext As New CPUtilsBaseClass.addonExecuteContext With {
+                    .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                        .contentName = Models.Entity.pageContentModel.contentName,
+                        .fieldName = "",
+                        .recordId = page.id
+                    },
+                        .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpcore, page.ChildListInstanceOptions),
+                        .instanceGuid = PageChildListInstanceID
+                    }
+                PageList = cpcore.addon.execute(addon, executeContext)
+                'PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+                If genericController.vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
+                    PageList = "(there are no child pages)"
+                End If
+                result = result _
+                    & cr & "<tr>" _
+                    & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:36px;"">Child Pages</td>" _
+                    & cr2 & "<td class=""qeRow qeRight""><div class=""qeListCon"">" & PageList & "</div></td>" _
+                    & cr & "</tr>"
+                result = "" _
+                    & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
+                    & genericController.htmlIndent(result) _
+                    & cr & "</table>"
+                result = "" _
+                    & ButtonList _
+                    & result _
+                    & ButtonList
+                result = cpcore.html.main_GetPanel(result)
+                '
+                ' Form Wrapper
+                '
+                result = "" _
+                    & cr & cpcore.html.html_GetUploadFormStart(cpcore.webServer.requestQueryString) _
+                    & cr & cpcore.html.html_GetFormInputHidden("Type", FormTypePageAuthoring) _
+                    & cr & cpcore.html.html_GetFormInputHidden("ID", page.id) _
+                    & cr & cpcore.html.html_GetFormInputHidden("ContentName", LiveRecordContentName) _
+                    & cr & cpcore.html.main_GetPanelHeader("Contensive Quick Editor") _
+                    & cr & result _
+                    & cr & cpcore.html.html_GetUploadFormEnd()
+                result = "" _
+                    & cr & "<div class=""ccCon"">" _
+                    & genericController.htmlIndent(result) _
+                    & cr & "</div>"
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
             Return result
         End Function
         '
@@ -781,27 +782,27 @@ Namespace Contensive.Core.Controllers
                         Call errorController.error_AddUserError(cpcore, "A name is required to save this page")
                     Else
                         CSBlock = cpcore.db.cs_open2(pageContentModel.contentName, RecordID, True, True)
-                        If cpcore.db.cs_ok(CSBlock) Then
+                        If cpcore.db.csOk(CSBlock) Then
                             FieldName = "copyFilename"
                             Copy = cpcore.docProperties.getText(FieldName)
                             Copy = cpcore.html.decodeContent(Copy)
-                            If Copy <> cpcore.db.cs_get(CSBlock, "copyFilename") Then
-                                Call cpcore.db.cs_set(CSBlock, "copyFilename", Copy)
+                            If Copy <> cpcore.db.csGet(CSBlock, "copyFilename") Then
+                                Call cpcore.db.csSet(CSBlock, "copyFilename", Copy)
                                 SaveButNoChanges = False
                             End If
                             RecordName = cpcore.docProperties.getText("name")
-                            If RecordName <> cpcore.db.cs_get(CSBlock, "name") Then
-                                Call cpcore.db.cs_set(CSBlock, "name", RecordName)
+                            If RecordName <> cpcore.db.csGet(CSBlock, "name") Then
+                                Call cpcore.db.csSet(CSBlock, "name", RecordName)
                                 SaveButNoChanges = False
                             End If
                             Call docController.addLinkAlias(cpcore, RecordName, RecordID, "")
-                            If (cpcore.docProperties.getText("headline") <> cpcore.db.cs_get(CSBlock, "headline")) Then
-                                Call cpcore.db.cs_set(CSBlock, "headline", cpcore.docProperties.getText("headline"))
+                            If (cpcore.docProperties.getText("headline") <> cpcore.db.csGet(CSBlock, "headline")) Then
+                                Call cpcore.db.csSet(CSBlock, "headline", cpcore.docProperties.getText("headline"))
                                 SaveButNoChanges = False
                             End If
-                            RecordParentID = cpcore.db.cs_getInteger(CSBlock, "parentid")
+                            RecordParentID = cpcore.db.csGetInteger(CSBlock, "parentid")
                         End If
-                        Call cpcore.db.cs_Close(CSBlock)
+                        Call cpcore.db.csClose(CSBlock)
                         '
                         Call cpcore.workflow.SetEditLock(pageContentModel.contentName, RecordID)
                         '
@@ -815,15 +816,15 @@ Namespace Contensive.Core.Controllers
                     '
                     '
                     '
-                    CSBlock = cpcore.db.cs_insertRecord(pageContentModel.contentName)
-                    If cpcore.db.cs_ok(CSBlock) Then
-                        Call cpcore.db.cs_set(CSBlock, "active", True)
-                        Call cpcore.db.cs_set(CSBlock, "ParentID", RecordID)
-                        Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.id)
-                        Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.name)
-                        Call cpcore.db.cs_set(CSBlock, "copyFilename", "")
-                        RecordID = cpcore.db.cs_getInteger(CSBlock, "ID")
-                        Call cpcore.db.cs_save2(CSBlock)
+                    CSBlock = cpcore.db.csInsertRecord(pageContentModel.contentName)
+                    If cpcore.db.csOk(CSBlock) Then
+                        Call cpcore.db.csSet(CSBlock, "active", True)
+                        Call cpcore.db.csSet(CSBlock, "ParentID", RecordID)
+                        Call cpcore.db.csSet(CSBlock, "contactmemberid", cpcore.authContext.user.id)
+                        Call cpcore.db.csSet(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.name)
+                        Call cpcore.db.csSet(CSBlock, "copyFilename", "")
+                        RecordID = cpcore.db.csGetInteger(CSBlock, "ID")
+                        Call cpcore.db.csSave2(CSBlock)
                         '
                         Link = getPageLink(RecordID, "", True, False)
                         'Link = main_GetPageLink(RecordID)
@@ -835,7 +836,7 @@ Namespace Contensive.Core.Controllers
                         'End If
                         Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", False)
                     End If
-                    Call cpcore.db.cs_Close(CSBlock)
+                    Call cpcore.db.csClose(CSBlock)
                     '
                     Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
                 End If
@@ -844,20 +845,20 @@ Namespace Contensive.Core.Controllers
                     '
                     '
                     CSBlock = cpcore.db.csOpenRecord(pageContentModel.contentName, RecordID, , , "ParentID")
-                    If cpcore.db.cs_ok(CSBlock) Then
-                        ParentID = cpcore.db.cs_getInteger(CSBlock, "ParentID")
+                    If cpcore.db.csOk(CSBlock) Then
+                        ParentID = cpcore.db.csGetInteger(CSBlock, "ParentID")
                     End If
-                    Call cpcore.db.cs_Close(CSBlock)
+                    Call cpcore.db.csClose(CSBlock)
                     If ParentID <> 0 Then
-                        CSBlock = cpcore.db.cs_insertRecord(pageContentModel.contentName)
-                        If cpcore.db.cs_ok(CSBlock) Then
-                            Call cpcore.db.cs_set(CSBlock, "active", True)
-                            Call cpcore.db.cs_set(CSBlock, "ParentID", ParentID)
-                            Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.id)
-                            Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.name)
-                            Call cpcore.db.cs_set(CSBlock, "copyFilename", "")
-                            RecordID = cpcore.db.cs_getInteger(CSBlock, "ID")
-                            Call cpcore.db.cs_save2(CSBlock)
+                        CSBlock = cpcore.db.csInsertRecord(pageContentModel.contentName)
+                        If cpcore.db.csOk(CSBlock) Then
+                            Call cpcore.db.csSet(CSBlock, "active", True)
+                            Call cpcore.db.csSet(CSBlock, "ParentID", ParentID)
+                            Call cpcore.db.csSet(CSBlock, "contactmemberid", cpcore.authContext.user.id)
+                            Call cpcore.db.csSet(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.name)
+                            Call cpcore.db.csSet(CSBlock, "copyFilename", "")
+                            RecordID = cpcore.db.csGetInteger(CSBlock, "ID")
+                            Call cpcore.db.csSave2(CSBlock)
                             '
                             Link = getPageLink(RecordID, "", True, False)
                             'Link = main_GetPageLink(RecordID)
@@ -869,16 +870,16 @@ Namespace Contensive.Core.Controllers
                             'End If
                             Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", False)
                         End If
-                        Call cpcore.db.cs_Close(CSBlock)
+                        Call cpcore.db.csClose(CSBlock)
                     End If
                     Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
                 End If
                 If (Button = ButtonDelete) Then
                     CSBlock = cpcore.db.csOpenRecord(pageContentModel.contentName, RecordID)
-                    If cpcore.db.cs_ok(CSBlock) Then
-                        ParentID = cpcore.db.cs_getInteger(CSBlock, "parentid")
+                    If cpcore.db.csOk(CSBlock) Then
+                        ParentID = cpcore.db.csGetInteger(CSBlock, "parentid")
                     End If
-                    Call cpcore.db.cs_Close(CSBlock)
+                    Call cpcore.db.csClose(CSBlock)
                     '
                     Call deleteChildRecords(pageContentModel.contentName, RecordID, False)
                     Call cpcore.db.deleteContentRecord(pageContentModel.contentName, RecordID)
@@ -1140,9 +1141,9 @@ Namespace Contensive.Core.Controllers
                     & " AND ((ccMemberRules.Active)<>0)" _
                     & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.profileStartTime) & ")" _
                     & " AND ((ccMemberRules.MemberID)=" & cpcore.authContext.user.id & "));"
-                CS = cpcore.db.cs_openSql(SQL)
-                bypassContentBlock = cpcore.db.cs_ok(CS)
-                Call cpcore.db.cs_Close(CS)
+                CS = cpcore.db.csOpenSql(SQL)
+                bypassContentBlock = cpcore.db.csOk(CS)
+                Call cpcore.db.csClose(CS)
             End If
             '
             Exit Function
@@ -1180,12 +1181,12 @@ ErrorTrap:
                 '
                 ' For now, the child delete only works in non-workflow
                 '
-                CS = cpcore.db.cs_open(ContentName, "parentid=" & RecordID, , , , ,, "ID")
-                Do While cpcore.db.cs_ok(CS)
-                    result = result & "," & cpcore.db.cs_getInteger(CS, "ID")
-                    cpcore.db.cs_goNext(CS)
+                CS = cpcore.db.csOpen(ContentName, "parentid=" & RecordID, , , , ,, "ID")
+                Do While cpcore.db.csOk(CS)
+                    result = result & "," & cpcore.db.csGetInteger(CS, "ID")
+                    cpcore.db.csGoNext(CS)
                 Loop
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
                 If result <> "" Then
                     result = Mid(result, 2)
                     '
@@ -1795,11 +1796,11 @@ ErrorTrap:
                 Dim ChildRecordParentID As Integer
                 '
                 SQL = "select ParentID from " & TableName & " where id=" & ChildRecordID
-                CS = cpcore.db.cs_openSql(SQL)
-                If cpcore.db.cs_ok(CS) Then
-                    ChildRecordParentID = cpcore.db.cs_getInteger(CS, "ParentID")
+                CS = cpcore.db.csOpenSql(SQL)
+                If cpcore.db.csOk(CS) Then
+                    ChildRecordParentID = cpcore.db.csGetInteger(CS, "ParentID")
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
                 If (ChildRecordParentID <> 0) And (Not genericController.IsInDelimitedString(History, CStr(ChildRecordID), ",")) Then
                     result = (ParentRecordID = ChildRecordParentID)
                     If Not result Then
@@ -1977,16 +1978,16 @@ ErrorTrap:
             '
             ' Lookup link in main_ContentWatch
             '
-            CSPointer = cpcore.db.cs_open("Content Watch", "ContentRecordKey=" & cpcore.db.encodeSQLText(ContentRecordKey), , , , , , "Link,Clicks")
-            If cpcore.db.cs_ok(CSPointer) Then
-                getContentWatchLinkByKey = cpcore.db.cs_getText(CSPointer, "Link")
+            CSPointer = cpcore.db.csOpen("Content Watch", "ContentRecordKey=" & cpcore.db.encodeSQLText(ContentRecordKey), , , , , , "Link,Clicks")
+            If cpcore.db.csOk(CSPointer) Then
+                getContentWatchLinkByKey = cpcore.db.csGetText(CSPointer, "Link")
                 If genericController.EncodeBoolean(IncrementClicks) Then
-                    Call cpcore.db.cs_set(CSPointer, "Clicks", cpcore.db.cs_getInteger(CSPointer, "clicks") + 1)
+                    Call cpcore.db.csSet(CSPointer, "Clicks", cpcore.db.csGetInteger(CSPointer, "clicks") + 1)
                 End If
             Else
                 getContentWatchLinkByKey = genericController.encodeText(DefaultLink)
             End If
-            Call cpcore.db.cs_Close(CSPointer)
+            Call cpcore.db.csClose(CSPointer)
             '
             getContentWatchLinkByKey = genericController.EncodeAppRootPath(getContentWatchLinkByKey, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
             '
@@ -2038,11 +2039,11 @@ ErrorTrap:
             '
             '
             CS = cpcore.db.csOpenRecord("Page Content", PageID, , , "TemplateID,ParentID")
-            If cpcore.db.cs_ok(CS) Then
-                templateId = cpcore.db.cs_getInteger(CS, "TemplateID")
-                ParentID = cpcore.db.cs_getInteger(CS, "ParentID")
+            If cpcore.db.csOk(CS) Then
+                templateId = cpcore.db.csGetInteger(CS, "TemplateID")
+                ParentID = cpcore.db.csGetInteger(CS, "ParentID")
             End If
-            Call cpcore.db.cs_Close(CS)
+            Call cpcore.db.csClose(CS)
             '
             ' Chase page tree to main_Get templateid
             '
@@ -2169,23 +2170,23 @@ ErrorTrap:
                 Dim Copy As String
                 '
                 Call cpcore.db.deleteContentRecords("Form Pages", "name=" & cpcore.db.encodeSQLText("Registration Form"))
-                CS = cpcore.db.cs_open("Form Pages", "name=" & cpcore.db.encodeSQLText("Registration Form"))
-                If Not cpcore.db.cs_ok(CS) Then
+                CS = cpcore.db.csOpen("Form Pages", "name=" & cpcore.db.encodeSQLText("Registration Form"))
+                If Not cpcore.db.csOk(CS) Then
                     '
                     ' create Version 1 template - just to main_Get it started
                     '
-                    Call cpcore.db.cs_Close(CS)
+                    Call cpcore.db.csClose(CS)
                     GroupNameList = "Registered"
-                    CS = cpcore.db.cs_insertRecord("Form Pages")
-                    If cpcore.db.cs_ok(CS) Then
-                        Call cpcore.db.cs_set(CS, "name", "Registration Form")
+                    CS = cpcore.db.csInsertRecord("Form Pages")
+                    If cpcore.db.csOk(CS) Then
+                        Call cpcore.db.csSet(CS, "name", "Registration Form")
                         Copy = "" _
                         & vbCrLf & "<table border=""0"" cellpadding=""2"" cellspacing=""0"" width=""100%"">" _
                         & vbCrLf & "{{REPEATSTART}}<tr><td align=right style=""height:22px;"">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}" _
                         & vbCrLf & "<tr><td align=right><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=135 height=1></td><td width=""100%"">&nbsp;</td></tr>" _
                         & vbCrLf & "<tr><td colspan=2>&nbsp;<br>" & cpcore.html.main_GetPanelButtons(ButtonRegister, "Button") & "</td></tr>" _
                         & vbCrLf & "</table>"
-                        Call cpcore.db.cs_set(CS, "Body", Copy)
+                        Call cpcore.db.csSet(CS, "Body", Copy)
                         Copy = "" _
                         & "1" _
                         & vbCrLf & GroupNameList _
@@ -2196,10 +2197,10 @@ ErrorTrap:
                         & vbCrLf & "1,Phone,true,Phone" _
                         & vbCrLf & "2,Please keep me informed of news and events,false,Subscribers" _
                         & ""
-                        Call cpcore.db.cs_set(CS, "Instructions", Copy)
+                        Call cpcore.db.csSet(CS, "Instructions", Copy)
                     End If
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
             Catch ex As Exception
                 cpcore.handleException(ex)
             End Try
@@ -2212,18 +2213,18 @@ ErrorTrap:
         Public Function createPageGetID(ByVal PageName As String, ByVal ContentName As String, ByVal CreatedBy As Integer, ByVal pageGuid As String) As Integer
             Dim Id As Integer = 0
             '
-            Dim CS As Integer = cpcore.db.cs_insertRecord(ContentName, CreatedBy)
-            If cpcore.db.cs_ok(CS) Then
-                Id = cpcore.db.cs_getInteger(CS, "ID")
-                Call cpcore.db.cs_set(CS, "name", PageName)
-                Call cpcore.db.cs_set(CS, "active", "1")
+            Dim CS As Integer = cpcore.db.csInsertRecord(ContentName, CreatedBy)
+            If cpcore.db.csOk(CS) Then
+                Id = cpcore.db.csGetInteger(CS, "ID")
+                Call cpcore.db.csSet(CS, "name", PageName)
+                Call cpcore.db.csSet(CS, "active", "1")
                 If True Then
-                    Call cpcore.db.cs_set(CS, "ccGuid", pageGuid)
+                    Call cpcore.db.csSet(CS, "ccGuid", pageGuid)
                 End If
-                Call cpcore.db.cs_save2(CS)
+                Call cpcore.db.csSave2(CS)
                 '   Call cpcore.workflow.publishEdit("Page Content", Id)
             End If
-            Call cpcore.db.cs_Close(CS)
+            Call cpcore.db.csClose(CS)
             '
             createPageGetID = Id
         End Function
@@ -2362,19 +2363,19 @@ ErrorTrap:
                                 '
                                 FieldList = "Name,PageID,'' as QueryStringSuffix"
                             End If
-                            CS = cpcore.db.cs_open("Link Aliases", "name=" & cpcore.db.encodeSQLText(WorkingLinkAlias), , , , , , FieldList)
-                            If Not cpcore.db.cs_ok(CS) Then
+                            CS = cpcore.db.csOpen("Link Aliases", "name=" & cpcore.db.encodeSQLText(WorkingLinkAlias), , , , , , FieldList)
+                            If Not cpcore.db.csOk(CS) Then
                                 '
                                 ' Alias not found, create a Link Aliases
                                 '
-                                Call cpcore.db.cs_Close(CS)
-                                CS = cpcore.db.cs_insertRecord("Link Aliases", 0)
-                                If cpcore.db.cs_ok(CS) Then
-                                    Call cpcore.db.cs_set(CS, "Name", WorkingLinkAlias)
+                                Call cpcore.db.csClose(CS)
+                                CS = cpcore.db.csInsertRecord("Link Aliases", 0)
+                                If cpcore.db.csOk(CS) Then
+                                    Call cpcore.db.csSet(CS, "Name", WorkingLinkAlias)
                                     'Call app.csv_SetCS(CS, "Link", Link)
-                                    Call cpcore.db.cs_set(CS, "Pageid", PageID)
+                                    Call cpcore.db.csSet(CS, "Pageid", PageID)
                                     If True Then
-                                        Call cpcore.db.cs_set(CS, "QueryStringSuffix", QueryStringSuffix)
+                                        Call cpcore.db.csSet(CS, "QueryStringSuffix", QueryStringSuffix)
                                     End If
                                 End If
                             Else
@@ -2384,27 +2385,27 @@ ErrorTrap:
                                 Dim CurrentLinkAliasID As Integer
                                 Dim resaveLinkAlias As Boolean
                                 Dim CS2 As Integer
-                                LinkAliasPageID = cpcore.db.cs_getInteger(CS, "pageID")
-                                If (cpcore.db.cs_getText(CS, "QueryStringSuffix").ToLower = QueryStringSuffix.ToLower) And (PageID = LinkAliasPageID) Then
+                                LinkAliasPageID = cpcore.db.csGetInteger(CS, "pageID")
+                                If (cpcore.db.csGetText(CS, "QueryStringSuffix").ToLower = QueryStringSuffix.ToLower) And (PageID = LinkAliasPageID) Then
                                     '
                                     ' it maches a current entry for this link alias, if the current entry is not the highest number id,
                                     '   remove it and add this one
                                     '
-                                    CurrentLinkAliasID = cpcore.db.cs_getInteger(CS, "id")
-                                    CS2 = cpcore.db.cs_openCsSql_rev("default", "select top 1 id from ccLinkAliases where pageid=" & LinkAliasPageID & " order by id desc")
-                                    If cpcore.db.cs_ok(CS2) Then
-                                        resaveLinkAlias = (CurrentLinkAliasID <> cpcore.db.cs_getInteger(CS2, "id"))
+                                    CurrentLinkAliasID = cpcore.db.csGetInteger(CS, "id")
+                                    CS2 = cpcore.db.csOpenSql_rev("default", "select top 1 id from ccLinkAliases where pageid=" & LinkAliasPageID & " order by id desc")
+                                    If cpcore.db.csOk(CS2) Then
+                                        resaveLinkAlias = (CurrentLinkAliasID <> cpcore.db.csGetInteger(CS2, "id"))
                                     End If
-                                    Call cpcore.db.cs_Close(CS2)
+                                    Call cpcore.db.csClose(CS2)
                                     If resaveLinkAlias Then
                                         Call cpcore.db.executeQuery("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
-                                        Call cpcore.db.cs_Close(CS)
-                                        CS = cpcore.db.cs_insertRecord("Link Aliases", 0)
-                                        If cpcore.db.cs_ok(CS) Then
-                                            Call cpcore.db.cs_set(CS, "Name", WorkingLinkAlias)
-                                            Call cpcore.db.cs_set(CS, "Pageid", PageID)
+                                        Call cpcore.db.csClose(CS)
+                                        CS = cpcore.db.csInsertRecord("Link Aliases", 0)
+                                        If cpcore.db.csOk(CS) Then
+                                            Call cpcore.db.csSet(CS, "Name", WorkingLinkAlias)
+                                            Call cpcore.db.csSet(CS, "Pageid", PageID)
                                             If True Then
-                                                Call cpcore.db.cs_set(CS, "QueryStringSuffix", QueryStringSuffix)
+                                                Call cpcore.db.csSet(CS, "QueryStringSuffix", QueryStringSuffix)
                                             End If
                                         End If
                                     End If
@@ -2417,9 +2418,9 @@ ErrorTrap:
                                         ' change the Link Alias to the new link
                                         '
                                         'Call app.csv_SetCS(CS, "Link", Link)
-                                        Call cpcore.db.cs_set(CS, "Pageid", PageID)
+                                        Call cpcore.db.csSet(CS, "Pageid", PageID)
                                         If True Then
-                                            Call cpcore.db.cs_set(CS, "QueryStringSuffix", QueryStringSuffix)
+                                            Call cpcore.db.csSet(CS, "QueryStringSuffix", QueryStringSuffix)
                                         End If
                                     ElseIf AllowLinkAlias Then
                                         '
@@ -2441,8 +2442,8 @@ ErrorTrap:
                                     End If
                                 End If
                             End If
-                            Dim linkAliasId As Integer = cpcore.db.cs_getInteger(CS, "id")
-                            Call cpcore.db.cs_Close(CS)
+                            Dim linkAliasId As Integer = cpcore.db.csGetInteger(CS, "id")
+                            Call cpcore.db.csClose(CS)
                             cpcore.cache.invalidateObject_Entity(linkAliasModel.contentTableName, linkAliasId)
                         End If
                     End If
@@ -2683,10 +2684,10 @@ ErrorTrap:
                     '
                     'hint = hint & ",110"
                     CS = cpcore.db.cs_open2("people", RecordID, , , "Name,OrganizationID")
-                    If cpcore.db.cs_ok(CS) Then
-                        ActivityLogOrganizationID = cpcore.db.cs_getInteger(CS, "OrganizationID")
+                    If cpcore.db.csOk(CS) Then
+                        ActivityLogOrganizationID = cpcore.db.csGetInteger(CS, "OrganizationID")
                     End If
-                    Call cpcore.db.cs_Close(CS)
+                    Call cpcore.db.csClose(CS)
                     If IsDelete Then
                         Call logController.logActivity2(cpcore, "deleting user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
                     Else
@@ -2764,14 +2765,14 @@ ErrorTrap:
                     If (cpcore.siteProperties.getBoolean("ImageAllowSFResize", True)) Then
                         If Not IsDelete Then
                             CS = cpcore.db.csOpenRecord("library files", RecordID)
-                            If cpcore.db.cs_ok(CS) Then
-                                Filename = cpcore.db.cs_get(CS, "filename")
+                            If cpcore.db.csOk(CS) Then
+                                Filename = cpcore.db.csGet(CS, "filename")
                                 Pos = InStrRev(Filename, "/")
                                 If Pos > 0 Then
                                     FilePath = Mid(Filename, 1, Pos)
                                     Filename = Mid(Filename, Pos + 1)
                                 End If
-                                Call cpcore.db.cs_set(CS, "filesize", cpcore.appRootFiles.main_GetFileSize(FilePath & Filename))
+                                Call cpcore.db.csSet(CS, "filesize", cpcore.appRootFiles.main_GetFileSize(FilePath & Filename))
                                 Pos = InStrRev(Filename, ".")
                                 If Pos > 0 Then
                                     FilenameExt = Mid(Filename, Pos + 1)
@@ -2782,9 +2783,9 @@ ErrorTrap:
                                             '
                                             '
                                             '
-                                            Call cpcore.db.cs_set(CS, "height", sf.height)
-                                            Call cpcore.db.cs_set(CS, "width", sf.width)
-                                            AltSizeList = cpcore.db.cs_getText(CS, "AltSizeList")
+                                            Call cpcore.db.csSet(CS, "height", sf.height)
+                                            Call cpcore.db.csSet(CS, "width", sf.width)
+                                            AltSizeList = cpcore.db.csGetText(CS, "AltSizeList")
                                             RebuildSizes = (AltSizeList = "")
                                             If RebuildSizes Then
                                                 AltSizeList = ""
@@ -2825,7 +2826,7 @@ ErrorTrap:
                                                     Call sf.save(cpcore.appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "80x" & sf.height
                                                 End If
-                                                Call cpcore.db.cs_set(CS, "AltSizeList", AltSizeList)
+                                                Call cpcore.db.csSet(CS, "AltSizeList", AltSizeList)
                                             End If
                                             Call sf.Dispose()
                                             sf = Nothing
@@ -2885,7 +2886,7 @@ ErrorTrap:
                                     End If
                                 End If
                             End If
-                            Call cpcore.db.cs_Close(CS)
+                            Call cpcore.db.csClose(CS)
                         End If
                     End If
                 Case Else
@@ -2899,19 +2900,19 @@ ErrorTrap:
             'hint = hint & ",190"
             If True Then
                 'hint = hint & ",200 content=[" & ContentID & "]"
-                CS = cpcore.db.cs_open("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
+                CS = cpcore.db.csOpen("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
                 Option_String = "" _
                     & vbCrLf & "action=contentchange" _
                     & vbCrLf & "contentid=" & ContentID _
                     & vbCrLf & "recordid=" & RecordID _
                     & ""
-                Do While cpcore.db.cs_ok(CS)
-                    addonId = cpcore.db.cs_getInteger(CS, "Addonid")
+                Do While cpcore.db.csOk(CS)
+                    addonId = cpcore.db.csGetInteger(CS, "Addonid")
                     'hint = hint & ",210 addonid=[" & addonId & "]"
                     Call cpcore.addon.executeAddonAsProcess(CStr(addonId), Option_String)
-                    Call cpcore.db.cs_goNext(CS)
+                    Call cpcore.db.csGoNext(CS)
                 Loop
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
             End If
         End Sub
         '
@@ -2962,20 +2963,20 @@ ErrorTrap:
                 Else
                     FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList"
                 End If
-                CS = cpcore.db.cs_open("Meta Content", Criteria, , , , ,, FieldList)
-                If cpcore.db.cs_ok(CS) Then
-                    MetaContentID = cpcore.db.cs_getInteger(CS, "ID")
-                    Call cpcore.html.doc_AddPagetitle2(genericController.encodeHTML(cpcore.db.cs_getText(CS, "Name")), "page content")
-                    Call cpcore.html.doc_addMetaDescription2(genericController.encodeHTML(cpcore.db.cs_getText(CS, "MetaDescription")), "page content")
-                    Call cpcore.html.doc_AddHeadTag2(cpcore.db.cs_getText(CS, "OtherHeadTags"), "page content")
+                CS = cpcore.db.csOpen("Meta Content", Criteria, , , , ,, FieldList)
+                If cpcore.db.csOk(CS) Then
+                    MetaContentID = cpcore.db.csGetInteger(CS, "ID")
+                    Call cpcore.html.doc_AddPagetitle2(genericController.encodeHTML(cpcore.db.csGetText(CS, "Name")), "page content")
+                    Call cpcore.html.doc_addMetaDescription2(genericController.encodeHTML(cpcore.db.csGetText(CS, "MetaDescription")), "page content")
+                    Call cpcore.html.doc_AddHeadTag2(cpcore.db.csGetText(CS, "OtherHeadTags"), "page content")
                     If True Then
-                        KeywordList = genericController.vbReplace(cpcore.db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
+                        KeywordList = genericController.vbReplace(cpcore.db.csGetText(CS, "MetaKeywordList"), vbCrLf, ",")
                     End If
                     'main_MetaContent_Title = encodeHTML(app.csv_cs_getText(CS, "Name"))
                     'htmldoc.main_MetaContent_Description = encodeHTML(app.csv_cs_getText(CS, "MetaDescription"))
                     'main_MetaContent_OtherHeadTags = app.csv_cs_getText(CS, "OtherHeadTags")
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
                 '
                 ' main_Get Keyword List
                 '
@@ -2983,10 +2984,10 @@ ErrorTrap:
                     & " From ccMetaKeywords" _
                     & " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID" _
                     & " Where ccMetaKeywordRules.MetaContentID=" & MetaContentID
-                CS = cpcore.db.cs_openSql(SQL)
-                Do While cpcore.db.cs_ok(CS)
-                    KeywordList = KeywordList & "," & cpcore.db.cs_getText(CS, "Name")
-                    Call cpcore.db.cs_goNext(CS)
+                CS = cpcore.db.csOpenSql(SQL)
+                Do While cpcore.db.csOk(CS)
+                    KeywordList = KeywordList & "," & cpcore.db.csGetText(CS, "Name")
+                    Call cpcore.db.csGoNext(CS)
                 Loop
                 If KeywordList <> "" Then
                     If Left(KeywordList, 1) = "," Then
@@ -2996,7 +2997,7 @@ ErrorTrap:
                     KeywordList = genericController.encodeHTML(KeywordList)
                     Call cpcore.html.doc_addMetaKeywordList2(KeywordList, "page content")
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
             End If
         End Sub
 

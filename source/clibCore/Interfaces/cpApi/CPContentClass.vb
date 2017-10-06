@@ -50,7 +50,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub SetCopy(ByVal CopyName As String, ByVal Content As String)
-            Call cpCore.db.content_SetContentCopy(CopyName, Content)
+            Call cpCore.db.SetContentCopy(CopyName, Content)
         End Sub
         '
         '====================================================================================================

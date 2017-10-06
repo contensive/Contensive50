@@ -155,7 +155,6 @@ Namespace Contensive.Core.Controllers
             Dim SQL As String
             Dim FoundMenuTable As Boolean
             'Dim FoundAFTable As Boolean
-            Dim tickStart As Integer
             Dim Ptr As Integer
             Dim Tables As String(,)
             Dim TableCnt As Integer
@@ -172,11 +171,7 @@ Namespace Contensive.Core.Controllers
             Dim CFieldCnt As Integer
             Dim CFieldPtr As Integer
             Dim appName As String
-            'Dim sb As System.Text.StringBuilder
-
             '
-            'cpCore.AppendLog("getXmlContentDefinition, entry")
-            tickStart = GetTickCount
             appName = cpCore.serverConfig.appConfig.name
             iContentName = ContentName
             If iContentName <> "" Then
@@ -712,10 +707,10 @@ ErrorTrap:
             SQL = "select D.name as DataSourceName,T.name as TableName" _
                 & " from cctables T left join ccDataSources d on D.ID=T.DataSourceID" _
                 & " where t.active<>0"
-            CS = cpCore.db.cs_openCsSql_rev("default", SQL)
-            Do While cpCore.db.cs_ok(CS)
-                DataSourceName = cpCore.db.cs_getText(CS, "DataSourceName")
-                TableName = cpCore.db.cs_getText(CS, "TableName")
+            CS = cpCore.db.csOpenSql_rev("default", SQL)
+            Do While cpCore.db.csOk(CS)
+                DataSourceName = cpCore.db.csGetText(CS, "DataSourceName")
+                TableName = cpCore.db.csGetText(CS, "TableName")
                 IndexList = cpCore.db.getSQLIndexList(DataSourceName, TableName)
                 '
                 ' name1,index1
@@ -773,9 +768,9 @@ ErrorTrap:
                         End If
                     Next
                 End If
-                cpCore.db.cs_goNext(CS)
+                cpCore.db.csGoNext(CS)
             Loop
-            Call cpCore.db.cs_Close(CS)
+            Call cpCore.db.csClose(CS)
             GetXMLContentDefinition_SQLIndexes = sb.ToString
             '
             Exit Function

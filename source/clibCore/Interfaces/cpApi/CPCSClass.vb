@@ -19,7 +19,7 @@ Namespace Contensive.Core
 #End Region
         '
         Private cpCore As Contensive.Core.coreClass
-        Private CSPointer As Integer
+        Private cs As Integer
         Private OpeningMemberID As Integer
         Private cp As CPClass
         Protected disposed As Boolean = False
@@ -30,7 +30,7 @@ Namespace Contensive.Core
             MyBase.New()
             cp = cpParent
             cpCore = cp.core
-            CSPointer = -1
+            cs = -1
             OpeningMemberID = cpCore.authContext.user.id
         End Sub
         '
@@ -43,8 +43,8 @@ Namespace Contensive.Core
                     ' call .dispose for managed objects
                     '
                     Try
-                        If CSPointer <> -1 And True Then
-                            Call cpCore.db.cs_Close(CSPointer)
+                        If cs <> -1 And True Then
+                            Call cpCore.db.csClose(cs)
                         End If
                         'If Not (False) Then
                         '    Call cmc.asv.csv_CloseCS(CSPointer)
@@ -68,11 +68,11 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             '
             Try
-                If CSPointer <> -1 Then
-                    Call cpCore.db.cs_Close(CSPointer)
+                If cs <> -1 Then
+                    Call cpCore.db.csClose(cs)
                 End If
-                CSPointer = cpCore.db.cs_insertRecord(ContentName, OpeningMemberID)
-                success = cpCore.db.cs_ok(CSPointer)
+                cs = cpCore.db.csInsertRecord(ContentName, OpeningMemberID)
+                success = cpCore.db.csOk(cs)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.insert")
             End Try
@@ -85,11 +85,11 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             '
             Try
-                If CSPointer <> -1 Then
-                    Call cpCore.db.cs_Close(CSPointer)
+                If cs <> -1 Then
+                    Call cpCore.db.csClose(cs)
                 End If
-                CSPointer = cpCore.db.cs_open(ContentName, "id=" & recordId, , ActiveOnly, , , , SelectFieldList, 1, 1)
-                success = cpCore.db.cs_ok(CSPointer)
+                cs = cpCore.db.csOpen(ContentName, "id=" & recordId, , ActiveOnly, , , , SelectFieldList, 1, 1)
+                success = cpCore.db.csOk(cs)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenRecord")
             End Try
@@ -103,11 +103,11 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             '
             Try
-                If CSPointer <> -1 Then
-                    Call cpCore.db.cs_Close(CSPointer)
+                If cs <> -1 Then
+                    Call cpCore.db.csClose(cs)
                 End If
-                CSPointer = cpCore.db.cs_open(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
-                success = cpCore.db.cs_ok(CSPointer)
+                cs = cpCore.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
+                success = cpCore.db.csOk(cs)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Open") : Throw
             End Try
@@ -120,11 +120,11 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             '
             Try
-                If CSPointer <> -1 Then
-                    Call cpCore.db.cs_Close(CSPointer)
+                If cs <> -1 Then
+                    Call cpCore.db.csClose(cs)
                 End If
-                CSPointer = cpCore.db.cs_openGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
-                success = OK()
+                cs = cpCore.db.csOpenGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
+                success = Ok()
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenGroupUsers")
             End Try
@@ -139,11 +139,11 @@ Namespace Contensive.Core
             Try
                 Dim groupList As New List(Of String)
                 groupList.Add(GroupName)
-                If CSPointer <> -1 Then
-                    Call cpCore.db.cs_Close(CSPointer)
+                If cs <> -1 Then
+                    Call cpCore.db.csClose(cs)
                 End If
-                CSPointer = cpCore.db.cs_openGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
-                success = OK()
+                cs = cpCore.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
+                success = Ok()
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenGroupUsers")
             End Try
@@ -165,11 +165,11 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             '
             Try
-                If CSPointer <> -1 Then
-                    Call cpCore.db.cs_Close(CSPointer)
+                If cs <> -1 Then
+                    Call cpCore.db.csClose(cs)
                 End If
-                CSPointer = cpCore.db.cs_openCsSql_rev("default", sql)
-                success = cpCore.db.cs_ok(CSPointer)
+                cs = cpCore.db.csOpenSql_rev("default", sql)
+                success = cpCore.db.csOk(cs)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenSQL")
             End Try
@@ -183,18 +183,18 @@ Namespace Contensive.Core
             'Dim swap As String
             '
             Try
-                If CSPointer <> -1 Then
-                    Call cpCore.db.cs_Close(CSPointer)
+                If cs <> -1 Then
+                    Call cpCore.db.csClose(cs)
                 End If
                 If ((sql = "") Or (sql.ToLower = "default")) And (DataSourcename <> "") And (DataSourcename.ToLower <> "default") Then
                     '
                     ' support legacy calls were the arguments were was backwards (datasourcename is sql and vise-versa)
                     '
-                    CSPointer = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
+                    cs = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber)
                 Else
-                    CSPointer = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
+                    cs = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber)
                 End If
-                success = cpCore.db.cs_ok(CSPointer)
+                success = cpCore.db.csOk(cs)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenSQL")
             End Try
@@ -208,18 +208,18 @@ Namespace Contensive.Core
             'Dim swap As String
             '
             Try
-                If CSPointer <> -1 Then
-                    Call cpCore.db.cs_Close(CSPointer)
+                If cs <> -1 Then
+                    Call cpCore.db.csClose(cs)
                 End If
                 If ((sql = "") Or (sql.ToLower = "default")) And (DataSourcename <> "") And (DataSourcename.ToLower <> "default") Then
                     '
                     ' support legacy calls were the arguments were was backwards (datasourcename is sql and vise-versa)
                     '
-                    CSPointer = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
+                    cs = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber)
                 Else
-                    CSPointer = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
+                    cs = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber)
                 End If
-                success = cpCore.db.cs_ok(CSPointer)
+                success = cpCore.db.csOk(cs)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenSQL")
             End Try
@@ -230,9 +230,9 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Close()
             Try
-                If CSPointer <> -1 Then
-                    Call cpCore.db.cs_Close(CSPointer)
-                    CSPointer = -1
+                If cs <> -1 Then
+                    Call cpCore.db.csClose(cs)
+                    cs = -1
                 End If
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Close")
@@ -243,7 +243,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function GetFormInput(ByVal ContentName As String, ByVal FieldName As String, Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlId As String = "") As Object
             If True Then
-                Return cpCore.html.html_GetFormInputCS(CSPointer, ContentName, FieldName, Height, Width, HtmlId)
+                Return cpCore.html.html_GetFormInputCS(cs, ContentName, FieldName, Height, Width, HtmlId)
             Else
                 Return ""
             End If
@@ -253,7 +253,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Delete()
             Try
-                Call cpCore.db.cs_deleteRecord(CSPointer)
+                Call cpCore.db.csDeleteRecord(cs)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Delete")
             End Try
@@ -265,7 +265,7 @@ Namespace Contensive.Core
             Dim result As Boolean = False
             '
             Try
-                result = cpCore.db.cs_isFieldSupported(CSPointer, FieldName)
+                result = cpCore.db.cs_isFieldSupported(cs, FieldName)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.FieldOK")
             End Try
@@ -276,7 +276,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub GoFirst()
             Try
-                Call cpCore.db.cs_goFirst(CSPointer, False)
+                Call cpCore.db.cs_goFirst(cs, False)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Delete")
             End Try
@@ -288,7 +288,7 @@ Namespace Contensive.Core
             Dim result As Object
             '
             Try
-                result = cpCore.html.main_cs_getRecordAddLink(CSPointer, PresetNameValueList, AllowPaste)
+                result = cpCore.html.main_cs_getRecordAddLink(cs, PresetNameValueList, AllowPaste)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -305,7 +305,7 @@ Namespace Contensive.Core
             Dim result As Boolean = False
             '
             Try
-                result = cpCore.db.cs_getBoolean(CSPointer, FieldName)
+                result = cpCore.db.csGetBoolean(cs, FieldName)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetBoolean")
             End Try
@@ -315,193 +315,153 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetDate(ByVal FieldName As String) As Date
-            Dim result As Date = #12:00:00 AM#
-            '
             Try
-                result = cpCore.db.cs_getDate(CSPointer, FieldName)
+                Return cpCore.db.csGetDate(cs, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetDate")
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return Date.MinValue
         End Function
         '
         '====================================================================================================
         '
-        Public Overrides Function GetEditLink(Optional ByVal AllowCut As Boolean = False) As String
-            Dim result As Object
+        Public Overrides Function GetEditLink(Optional ByVal allowCut As Boolean = False) As String
             Try
-                result = cpCore.html.cs_cs_getRecordEditLink(CSPointer, AllowCut)
-                If result Is Nothing Then
-                    result = String.Empty
-                End If
+                Return cpCore.db.csGetRecordEditLink(cs, allowCut)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetEditLink")
-                result = String.Empty
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return String.Empty
         End Function
         '
         '====================================================================================================
         '
-        Public Overrides Function GetFilename(ByVal FieldName As String, Optional ByVal OriginalFilename As String = "", Optional ByVal ContentName As String = "") As String
-            Dim result As Object
-            '
-            result = String.Empty
+        Public Overrides Function GetFilename(ByVal fieldName As String, Optional ByVal OriginalFilename As String = "", Optional ByVal ContentName As String = "") As String
             Try
-                result = cpCore.db.cs_getFilename(CSPointer, FieldName, OriginalFilename, ContentName)
-                If result Is Nothing Then
-                    result = String.Empty
-                End If
+                Return cpCore.db.csGetFilename(cs, fieldName, OriginalFilename, ContentName)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetFilename")
-                result = String.Empty
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return String.Empty
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetInteger(ByVal FieldName As String) As Integer
-            Dim result As Integer = 0
-            '
             Try
-                result = cpCore.db.cs_getInteger(CSPointer, FieldName)
+                Return cpCore.db.csGetInteger(cs, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetInteger")
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return String.Empty
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetNumber(ByVal FieldName As String) As Double
-            Dim result As Double = 0
-            '
             Try
-                result = cpCore.db.cs_getNumber(CSPointer, FieldName)
+                Return cpCore.db.csGetNumber(cs, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetNumber")
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return String.Empty
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetRowCount() As Integer
-            Dim result As Integer = 0
-            '
             Try
-                result = cpCore.db.cs_getRowCount(CSPointer)
+                Return cpCore.db.csGetRowCount(cs)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetRowCount")
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return String.Empty
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetSQL() As String
-            Dim result As Object
-            '
-            result = String.Empty
             Try
-                result = cpCore.db.cs_getSource(CSPointer)
-                If result Is Nothing Then
-                    result = String.Empty
-                End If
+                Return cpCore.db.csGetSource(cs)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetSQL")
-                result = String.Empty
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return String.Empty
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetText(ByVal FieldName As String) As String
-            Dim result As Object
-            '
-            result = String.Empty
             Try
-                result = cpCore.db.cs_get(CSPointer, FieldName)
-                If result Is Nothing Then
-                    result = String.Empty
-                End If
+                Return cpCore.db.csGet(cs, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetText")
-                result = String.Empty
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return String.Empty
         End Function
         '
         '====================================================================================================
-        ' Needs to be implemented (refactor to check the field type. if not fieldTypeHtml, encodeHtml)
         '
         Public Overrides Function GetHtml(ByVal FieldName As String) As String
-            Dim result As Object
-            result = GetText(FieldName)
-            Return result
+            Try
+                Return cpCore.db.csGet(cs, FieldName)
+            Catch ex As Exception
+                Call cpCore.handleException(ex) : Throw
+            End Try
+            Return String.Empty
         End Function
         '
         '====================================================================================================
         '
         <Obsolete("Use getText for copy. getFilename for filename", False)> Public Overrides Function GetTextFile(ByVal FieldName As String) As String
-            Dim result As String = String.Empty
             Try
-                result = cpCore.db.cs_getText(CSPointer, FieldName)
-                'result = cpCore.db.cs_getTextFile(CSPointer, FieldName)
-                If result Is Nothing Then
-                    result = String.Empty
-                End If
+                Return cpCore.db.csGetText(cs, FieldName)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GetTextFile")
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return String.Empty
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Sub GoNext()
             Try
-                Call cpCore.db.cs_goNext(CSPointer)
+                cpCore.db.csGoNext(cs)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.GoNext")
+                Call cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Function NextOK() As Boolean
-            Dim result As Boolean = False
             Try
-                Call cpCore.db.cs_goNext(CSPointer)
-                result = cpCore.db.cs_ok(CSPointer)
+                Call cpCore.db.csGoNext(cs)
+                Return cpCore.db.csOk(cs)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.NextOK")
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return False
         End Function
         '
         '====================================================================================================
         '
-        Public Overrides Function OK() As Boolean
-            Dim result As Boolean = False
-            '
+        Public Overrides Function Ok() As Boolean
             Try
-                result = cpCore.db.cs_ok(CSPointer)
+                Return cpCore.db.csOk(cs)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OK")
+                Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return False
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Sub Save()
             Try
-                Call cpCore.db.cs_save2(CSPointer)
+                cpCore.db.csSave2(cs)
             Catch ex As Exception
-                Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.Save")
+                Call cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -509,7 +469,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub SetField(ByVal FieldName As String, ByVal FieldValue As Object)
             Try
-                Call cpCore.db.cs_set(CSPointer, FieldName, FieldValue)
+                Call cpCore.db.csSet(cs, FieldName, CDate(FieldValue))
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetField")
             End Try
@@ -519,7 +479,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub SetField(ByVal FieldName As String, ByVal FieldValue As String)
             Try
-                Call cpCore.db.cs_set(CSPointer, FieldName, FieldValue)
+                Call cpCore.db.csSet(cs, FieldName, FieldValue)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetField")
             End Try
@@ -529,7 +489,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub SetFile(ByVal FieldName As String, ByVal Copy As String, ByVal ContentName As String)
             Try
-                Call cpCore.db.SetCSTextFile(CSPointer, FieldName, Copy, ContentName)
+                Call cpCore.db.csSetTextFile(cs, FieldName, Copy, ContentName)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetFile")
             End Try
@@ -540,7 +500,7 @@ Namespace Contensive.Core
         Public Overrides Sub SetFormInput(ByVal FieldName As String, Optional ByVal RequestName As String = "")
             Dim success As Boolean = False
             Try
-                Call csController.cs_setFormInput(cpCore, CSPointer, FieldName, RequestName)
+                Call csController.cs_setFormInput(cpCore, cs, FieldName, RequestName)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.SetFormInput")
             End Try
@@ -553,7 +513,7 @@ Namespace Contensive.Core
         ''' <param name="fieldName"></param>
         ''' <returns></returns>
         Public Overrides Function GetValue(fieldName As String) As String
-            Return cpCore.db.cs_getValue(CSPointer, fieldName)
+            Return cpCore.db.cs_getValue(cs, fieldName)
         End Function
 
 #Region " IDisposable Support "

@@ -237,7 +237,7 @@ Namespace Contensive.Core.Models.Entity
                 Else
                     Dim instanceType As Type = GetType(T)
                     Dim contentName As String = derivedContentName(instanceType)
-                    result = create(Of T)(cpCore, cpCore.db.metaData_InsertContentRecordGetID(contentName, cpCore.authContext.user.id), callersCacheNameList)
+                    result = create(Of T)(cpCore, cpCore.db.insertContentRecordGetID(contentName, cpCore.authContext.user.id), callersCacheNameList)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw

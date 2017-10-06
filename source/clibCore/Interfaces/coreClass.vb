@@ -32,7 +32,7 @@ Namespace Contensive.Core
         Public Property testPointMessage As String = ""                         '
         Public Property testPointPrinting As Boolean = False                         ' if true, send main_TestPoint messages to the stream
         Public Property authContext As authContextModel
-        Private Property appStopWatch As Stopwatch = Stopwatch.StartNew()
+        Friend Property appStopWatch As Stopwatch = Stopwatch.StartNew()
         Public Property profileStartTime As Date                                        ' set in constructor
         Public Property profileStartTickCount As Integer = 0
         Public Property allowDebugLog As Boolean = False                       ' turn on in script -- use to write /debug.log in content files for whatever is needed
@@ -42,7 +42,7 @@ Namespace Contensive.Core
         Public Property continueProcessing As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
         Public Property upgradeInProgress() As Boolean
         Public Property docGuid As String                        ' Random number (semi) unique to this hit
-        Friend Property addonsRunOnThisPageIdList As New List(Of Integer)
+        Friend Property addonIdListRunInThisDoc As New List(Of Integer)
         Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
         Public Property pageAddonCnt As Integer = 0
 
@@ -901,20 +901,20 @@ Namespace Contensive.Core
                     Dim SortFieldList As String = ""
                     Dim AllowInactiveRecords2 As Boolean = False
                     Dim SelectFieldList As String = ""
-                    Dim CS As Integer = db.cs_open("Remote Queries", "((VisitId=" & authContext.visit.id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
-                    If db.cs_ok(CS) Then
+                    Dim CS As Integer = db.csOpen("Remote Queries", "((VisitId=" & authContext.visit.id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
+                    If db.csOk(CS) Then
                         '
                         ' Use user definied query
                         '
-                        Dim SQLQuery As String = db.cs_getText(CS, "sqlquery")
+                        Dim SQLQuery As String = db.csGetText(CS, "sqlquery")
                         'DataSource = Models.Entity.dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
-                        maxRows = db.cs_getInteger(CS, "maxrows")
-                        QueryType = db.cs_getInteger(CS, "QueryTypeID")
-                        ContentName = db.cs_get(CS, "ContentID")
-                        Criteria = db.cs_getText(CS, "Criteria")
-                        SortFieldList = db.cs_getText(CS, "SortFieldList")
-                        AllowInactiveRecords2 = db.cs_getBoolean(CS, "AllowInactiveRecords")
-                        SelectFieldList = db.cs_getText(CS, "SelectFieldList")
+                        maxRows = db.csGetInteger(CS, "maxrows")
+                        QueryType = db.csGetInteger(CS, "QueryTypeID")
+                        ContentName = db.csGet(CS, "ContentID")
+                        Criteria = db.csGetText(CS, "Criteria")
+                        SortFieldList = db.csGetText(CS, "SortFieldList")
+                        AllowInactiveRecords2 = db.csGetBoolean(CS, "AllowInactiveRecords")
+                        SelectFieldList = db.csGetText(CS, "SelectFieldList")
                     Else
                         '
                         ' Try Hardcoded queries
@@ -952,7 +952,7 @@ Namespace Contensive.Core
                                 '    gv.errors(Ptr) = "query not found"
                         End Select
                     End If
-                    Call db.cs_Close(CS)
+                    Call db.csClose(CS)
                     '
                     If gv.status = GoogleVisualizationStatusEnum.OK Then
                         Select Case QueryType
@@ -976,8 +976,8 @@ Namespace Contensive.Core
                                 '
                                 ' Open the content and cycle through each setPair
                                 '
-                                CS = db.cs_open(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , ,, SelectFieldList)
-                                If db.cs_ok(CS) Then
+                                CS = db.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , ,, SelectFieldList)
+                                If db.csOk(CS) Then
                                     '
                                     ' update by looping through the args and setting name=values
                                     '
@@ -992,13 +992,13 @@ Namespace Contensive.Core
                                                     Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
                                                     Throw (New ApplicationException(errorMessage))
                                                 Else
-                                                    Call db.cs_set(CS, FieldName, FieldValue)
+                                                    Call db.csSet(CS, FieldName, FieldValue)
                                                 End If
                                             End If
                                         End If
                                     Next
                                 End If
-                                Call db.cs_Close(CS)
+                                Call db.csClose(CS)
                                 'Case QueryTypeInsertContent
                                 '    '
                                 '    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
@@ -1105,9 +1105,6 @@ Namespace Contensive.Core
             Try
                 '
                 docGuid = genericController.createGuid()
-                profileStartTickCount = GetTickCount
-                CPTickCountBase = GetTickCount
-                'closePageCounter = 0
                 allowDebugLog = True
                 profileStartTime = DateTime.Now()
                 testPointPrinting = True

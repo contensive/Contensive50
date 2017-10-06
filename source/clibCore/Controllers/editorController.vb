@@ -51,11 +51,11 @@ Namespace Contensive.Core.Controllers
                     '
                     ContentName = cpCore.metaData.getContentNameByID(ContentID)
                     If ContentName <> "" Then
-                        CS = cpCore.db.cs_open(ContentName, "ID=" & cpCore.db.encodeSQLNumber(RecordID), , False)
-                        If cpCore.db.cs_ok(CS) Then
-                            Call cpCore.db.cs_set(CS, FieldName, ContentCopy)
+                        CS = cpCore.db.csOpen(ContentName, "ID=" & cpCore.db.encodeSQLNumber(RecordID), , False)
+                        If cpCore.db.csOk(CS) Then
+                            Call cpCore.db.csSet(CS, FieldName, ContentCopy)
                         End If
-                        Call cpCore.db.cs_Close(CS)
+                        Call cpCore.db.csClose(CS)
                     End If
             End Select
         End Sub
@@ -90,12 +90,12 @@ Namespace Contensive.Core.Controllers
             Else
                 intContentName = cpcore.metaData.getContentNameByID(ContentID)
                 If intContentName <> "" Then
-                    CSPointer = cpcore.db.cs_open(intContentName, "ID=" & intRecordId)
-                    If Not cpcore.db.cs_ok(CSPointer) Then
+                    CSPointer = cpcore.db.csOpen(intContentName, "ID=" & intRecordId)
+                    If Not cpcore.db.csOk(CSPointer) Then
                         PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
                         EditorPanel = EditorPanel & cpcore.html.main_GetPanel(PanelCopy)
                     Else
-                        Copy = cpcore.db.cs_get(CSPointer, strFieldName)
+                        Copy = cpcore.db.csGet(CSPointer, strFieldName)
                         EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHidden("Type", FormTypeActiveEditor)
                         EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHidden("cid", ContentID)
                         EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHidden("ID", intRecordId)
@@ -106,7 +106,7 @@ Namespace Contensive.Core.Controllers
                         ButtonPanel = cpcore.html.main_GetPanelButtons(ButtonCancel & "," & ButtonSave, "button")
                         EditorPanel = EditorPanel & ButtonPanel
                     End If
-                    cpcore.db.cs_Close(CSPointer)
+                    cpcore.db.csClose(CSPointer)
                 End If
             End If
             Stream = Stream & cpcore.html.main_GetPanelHeader("Contensive Active Content Editor")

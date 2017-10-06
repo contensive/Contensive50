@@ -64,11 +64,11 @@ Namespace Contensive.Core.Controllers
                         If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                             Call sb.Append("Warning: You must be a site administrator to export this information.")
                         Else
-                            CSPointer = cpCore.db.cs_open(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
+                            CSPointer = cpCore.db.csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
                             '
                             ' ----- print out the field names
                             '
-                            If cpCore.db.cs_ok(CSPointer) Then
+                            If cpCore.db.csOk(CSPointer) Then
                                 Call sb.Append("""EID""")
                                 Delimiter = ","
                                 FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer)
@@ -86,9 +86,9 @@ Namespace Contensive.Core.Controllers
                             '
                             ' ----- print out the values
                             '
-                            Do While cpCore.db.cs_ok(CSPointer)
-                                If Not (cpCore.db.cs_getBoolean(CSPointer, "Developer")) Then
-                                    Copy = cpCore.security.encodeToken((cpCore.db.cs_getInteger(CSPointer, "ID")), cpCore.profileStartTime)
+                            Do While cpCore.db.csOk(CSPointer)
+                                If Not (cpCore.db.csGetBoolean(CSPointer, "Developer")) Then
+                                    Copy = cpCore.security.encodeToken((cpCore.db.csGetInteger(CSPointer, "ID")), cpCore.profileStartTime)
                                     Call sb.Append("""" & Copy & """")
                                     Delimiter = ","
                                     FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer)
@@ -96,7 +96,7 @@ Namespace Contensive.Core.Controllers
                                         FieldName = genericController.encodeText(FieldNameVariant)
                                         UcaseFieldName = genericController.vbUCase(FieldName)
                                         If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
-                                            Copy = cpCore.db.cs_get(CSPointer, FieldName)
+                                            Copy = cpCore.db.csGet(CSPointer, FieldName)
                                             If Copy <> "" Then
                                                 Copy = genericController.vbReplace(Copy, """", "'")
                                                 Copy = genericController.vbReplace(Copy, vbCrLf, " ")
@@ -110,7 +110,7 @@ Namespace Contensive.Core.Controllers
                                     Loop
                                     Call sb.Append(vbCrLf)
                                 End If
-                                Call cpCore.db.cs_goNext(CSPointer)
+                                Call cpCore.db.csGoNext(CSPointer)
                                 '''DoEvents
                             Loop
                         End If
@@ -122,11 +122,11 @@ Namespace Contensive.Core.Controllers
                         If Not cpCore.authContext.isAuthenticatedContentManager(cpCore, iContentName) Then
                             Call sb.Append("Error: You must be a content manager to export this data.")
                         Else
-                            CSPointer = cpCore.db.cs_open(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
+                            CSPointer = cpCore.db.csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
                             '
                             ' ----- print out the field names
                             '
-                            If cpCore.db.cs_ok(CSPointer) Then
+                            If cpCore.db.csOk(CSPointer) Then
                                 Delimiter = ""
                                 FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer)
                                 Do While (FieldNameVariant <> "")
@@ -140,7 +140,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' ----- print out the values
                             '
-                            Do While cpCore.db.cs_ok(CSPointer)
+                            Do While cpCore.db.csOk(CSPointer)
                                 Delimiter = ""
                                 FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer)
                                 Do While (FieldNameVariant <> "")
@@ -148,10 +148,10 @@ Namespace Contensive.Core.Controllers
                                         Case FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTML
                                             Copy = csController.main_cs_getEncodedField(cpCore, CSPointer, genericController.encodeText(FieldNameVariant))
                                         Case FieldTypeIdLookup
-                                            Copy = cpCore.db.cs_getLookup(CSPointer, genericController.encodeText(FieldNameVariant))
+                                            Copy = cpCore.db.csGetLookup(CSPointer, genericController.encodeText(FieldNameVariant))
                                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                         Case Else
-                                            Copy = cpCore.db.cs_getText(CSPointer, genericController.encodeText(FieldNameVariant))
+                                            Copy = cpCore.db.csGetText(CSPointer, genericController.encodeText(FieldNameVariant))
                                     End Select
                                     If Copy <> "" Then
                                         Copy = genericController.vbReplace(Copy, """", "'")
@@ -165,7 +165,7 @@ Namespace Contensive.Core.Controllers
                                     '''DoEvents
                                 Loop
                                 Call cpCore.appRootFiles.appendFile(TestFilename, vbCrLf)
-                                Call cpCore.db.cs_goNext(CSPointer)
+                                Call cpCore.db.csGoNext(CSPointer)
                                 '''DoEvents
                             Loop
                         End If

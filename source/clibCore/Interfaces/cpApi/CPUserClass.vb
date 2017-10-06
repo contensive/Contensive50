@@ -85,7 +85,7 @@ Namespace Contensive.Core
                 If True Then
                     localId = CP.core.authContext.user.id
                     If (localId = 0) Then
-                        localId = CP.core.db.metaData_InsertContentRecordGetID("people", 0)
+                        localId = CP.core.db.insertContentRecordGetID("people", 0)
                         Call CP.core.authContext.recognizeById(cpCore, localId, CP.core.authContext)
                     End If
                 End If

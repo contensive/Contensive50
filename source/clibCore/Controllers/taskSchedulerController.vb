@@ -200,14 +200,14 @@ Namespace Contensive.Core.Controllers
                                     & "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))" _
                                     & "  or(ProcessNextRun<" & SQLNow & ")" _
                                     & " )"
-                                CS = cpSite.core.db.cs_open(cnAddons, sqlAddonsCriteria)
-                                Do While cpSite.core.db.cs_ok(CS)
-                                    addonProcessInterval = cpSite.core.db.cs_getInteger(CS, "ProcessInterval")
-                                    addonId = cpSite.core.db.cs_getInteger(CS, "ID")
-                                    addonName = cpSite.core.db.cs_getText(CS, "name")
-                                    addonArguments = cpSite.core.db.cs_getText(CS, "argumentlist")
-                                    addonProcessRunOnce = cpSite.core.db.cs_getBoolean(CS, "ProcessRunOnce")
-                                    addonProcessNextRun = cpSite.core.db.cs_getDate(CS, "ProcessNextRun")
+                                CS = cpSite.core.db.csOpen(cnAddons, sqlAddonsCriteria)
+                                Do While cpSite.core.db.csOk(CS)
+                                    addonProcessInterval = cpSite.core.db.csGetInteger(CS, "ProcessInterval")
+                                    addonId = cpSite.core.db.csGetInteger(CS, "ID")
+                                    addonName = cpSite.core.db.csGetText(CS, "name")
+                                    addonArguments = cpSite.core.db.csGetText(CS, "argumentlist")
+                                    addonProcessRunOnce = cpSite.core.db.csGetBoolean(CS, "ProcessRunOnce")
+                                    addonProcessNextRun = cpSite.core.db.csGetDate(CS, "ProcessNextRun")
                                     NextRun = Date.MinValue
                                     hint &= ",run addon " & addonName
                                     If addonProcessInterval > 0 Then
@@ -217,27 +217,27 @@ Namespace Contensive.Core.Controllers
                                         '
                                         ' Run Once
                                         '
-                                        Call cpSite.core.db.cs_set(CS, "ProcessRunOnce", False)
-                                        Call cpSite.core.db.cs_set(CS, "ProcessNextRun", "")
-                                        Call cpSite.core.db.cs_save2(CS)
+                                        Call cpSite.core.db.csSet(CS, "ProcessRunOnce", False)
+                                        Call cpSite.core.db.csSet(CS, "ProcessNextRun", "")
+                                        Call cpSite.core.db.csSave2(CS)
                                         '
                                         cmdDetail = New cmdDetailClass
                                         cmdDetail.addonId = addonId
                                         cmdDetail.addonName = addonName
                                         cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
                                         Call addTaskToQueue(cpSite.core, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
-                                    ElseIf cpSite.core.db.cs_getDate(CS, "ProcessNextRun") = Date.MinValue Then
+                                    ElseIf cpSite.core.db.csGetDate(CS, "ProcessNextRun") = Date.MinValue Then
                                         '
                                         ' Interval is OK but NextRun is 0, just set next run
                                         '
-                                        Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
-                                        Call cpSite.core.db.cs_save2(CS)
+                                        Call cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun)
+                                        Call cpSite.core.db.csSave2(CS)
                                     ElseIf addonProcessNextRun < RightNow Then
                                         '
                                         ' All is OK, triggered on NextRun, Cycle RightNow
                                         '
-                                        Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
-                                        Call cpSite.core.db.cs_save2(CS)
+                                        Call cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun)
+                                        Call cpSite.core.db.csSave2(CS)
                                         '
                                         cmdDetail = New cmdDetailClass
                                         cmdDetail.addonId = addonId
@@ -245,9 +245,9 @@ Namespace Contensive.Core.Controllers
                                         cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
                                         Call addTaskToQueue(cpSite.core, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
                                     End If
-                                    Call cpSite.core.db.cs_goNext(CS)
+                                    Call cpSite.core.db.csGoNext(CS)
                                 Loop
-                                Call cpSite.core.db.cs_Close(CS)
+                                Call cpSite.core.db.csClose(CS)
                             Catch ex As Exception
                                 cpClusterCore.handleException(ex)
                             End Try
@@ -286,24 +286,24 @@ Namespace Contensive.Core.Controllers
                     ' Search for a duplicate
                     '
                     sql = "select top 1 id from cctasks where ((command=" & cpSiteCore.db.encodeSQLText(Command) & ")and(cmdDetail=" & cmdDetailJson & "))"
-                    cs = cpSiteCore.db.cs_openSql(sql)
-                    If cpSiteCore.db.cs_ok(cs) Then
+                    cs = cpSiteCore.db.csOpenSql(sql)
+                    If cpSiteCore.db.csOk(cs) Then
                         returnTaskAdded = False
                     End If
-                    Call cpSiteCore.db.cs_Close(cs)
+                    Call cpSiteCore.db.csClose(cs)
                 End If
                 '
                 ' Add it to the queue and shell out to the command
                 '
                 If returnTaskAdded Then
-                    cs = cpSiteCore.db.cs_insertRecord("tasks")
-                    If cpSiteCore.db.cs_ok(cs) Then
-                        cpSiteCore.db.cs_set(cs, "name", "")
-                        cpSiteCore.db.cs_set(cs, "command", Command)
-                        cpSiteCore.db.cs_set(cs, "cmdDetail", cmdDetailJson)
+                    cs = cpSiteCore.db.csInsertRecord("tasks")
+                    If cpSiteCore.db.csOk(cs) Then
+                        cpSiteCore.db.csSet(cs, "name", "")
+                        cpSiteCore.db.csSet(cs, "command", Command)
+                        cpSiteCore.db.csSet(cs, "cmdDetail", cmdDetailJson)
                         returnTaskAdded = True
                     End If
-                    Call cpSiteCore.db.cs_Close(cs)
+                    Call cpSiteCore.db.csClose(cs)
                 End If
             Catch ex As Exception
                 cpSiteCore.handleException(ex)
@@ -332,14 +332,14 @@ Namespace Contensive.Core.Controllers
             Else
                 TaskName = CStr(Now()) & " snapshot of " & genericController.vbLCase(ExportName)
             End If
-            CS = cpCore.db.cs_insertRecord("Tasks", RequestedByMemberID)
-            If cpCore.db.cs_ok(CS) Then
-                Call cpCore.db.cs_getFilename(CS, "Filename", Filename)
-                Call cpCore.db.cs_set(CS, "Name", TaskName)
-                Call cpCore.db.cs_set(CS, "Command", Command)
-                Call cpCore.db.cs_set(CS, "SQLQuery", SQL)
+            CS = cpCore.db.csInsertRecord("Tasks", RequestedByMemberID)
+            If cpCore.db.csOk(CS) Then
+                Call cpCore.db.csGetFilename(CS, "Filename", Filename)
+                Call cpCore.db.csSet(CS, "Name", TaskName)
+                Call cpCore.db.csSet(CS, "Command", Command)
+                Call cpCore.db.csSet(CS, "SQLQuery", SQL)
             End If
-            Call cpCore.db.cs_Close(CS)
+            Call cpCore.db.csClose(CS)
         End Sub
         Public Shared Sub main_RequestTask(cpCore As coreClass, ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String)
             Call tasks_RequestTask(cpCore, genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(cpCore.authContext.user.id))

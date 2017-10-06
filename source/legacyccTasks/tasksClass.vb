@@ -175,8 +175,8 @@ Namespace Contensive.Core
             Dim appName As String
             '
             appName = cpCore.serverconfig.appConfig.name
-            CS = cpCore.db.cs_openCsSql_rev(DataSource, SQL)
-            If cpCore.db.cs_ok(CS) Then
+            CS = cpCore.db.csOpenSql_rev(DataSource, SQL)
+            If cpCore.db.csOk(CS) Then
                 '
                 ' ----- print out the field names
                 '
@@ -202,11 +202,11 @@ Namespace Contensive.Core
                     '
                     ' ----- print out the values
                     '
-                    Do While cpCore.db.cs_ok(CS)
+                    Do While cpCore.db.csOk(CS)
                         Delimiter = ""
                         RowBuffer = ""
                         For FieldNamePtr = 0 To FieldNameCnt - 1
-                            Copy = cpCore.db.cs_get(CS, FieldNames(FieldNamePtr))
+                            Copy = cpCore.db.csGet(CS, FieldNames(FieldNamePtr))
                             Copy = genericController.vbReplace(Copy, """", """""")
                             ' if propertly quoted, line breaks can be preserved
                             'Copy = genericController.vbReplace(Copy, vbCrLf, " ")
@@ -216,13 +216,13 @@ Namespace Contensive.Core
                             'DoEvents()
                         Next
                         Call cpCore.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
-                        Call cpCore.db.cs_goNext(CS)
+                        Call cpCore.db.csGoNext(CS)
                         'DoEvents()
                     Loop
                 End If
             End If
             '
-            Call cpCore.db.cs_Close(CS)
+            Call cpCore.db.csClose(CS)
             '
             Exit Function
 ErrorTrap:
@@ -252,8 +252,8 @@ ErrorTrap:
             Dim appName As String
             '
             appName = cpCore.serverconfig.appConfig.name
-            CS = cpCore.db.cs_openCsSql_rev(DataSource, SQL)
-            If cpCore.db.cs_ok(CS) Then
+            CS = cpCore.db.csOpenSql_rev(DataSource, SQL)
+            If cpCore.db.csOk(CS) Then
                 '
                 ' ----- setup the field names
                 '
@@ -278,13 +278,13 @@ ErrorTrap:
                     '
                     ' ----- print out the values
                     '
-                    Do While cpCore.db.cs_ok(CS)
+                    Do While cpCore.db.csOk(CS)
                         Delimiter = ""
                         RowBuffer = "<Record>"
                         For FieldNamePtr = 0 To FieldNameCnt - 1
                             FieldName = FieldNames(FieldNamePtr)
                             If FieldName <> "" Then
-                                Copy = cpCore.db.cs_get(CS, FieldNames(FieldNamePtr))
+                                Copy = cpCore.db.csGet(CS, FieldNames(FieldNamePtr))
                                 Copy = genericController.encodeHTML(Copy)
                                 If Copy = "" Then
                                     RowBuffer = RowBuffer & "<" & FieldName & " />"
@@ -296,14 +296,14 @@ ErrorTrap:
                         Next
                         RowBuffer = RowBuffer & "</Record>"
                         Call cpCore.cdnFiles.appendFile(Filename, RowBuffer & vbCrLf)
-                        Call cpCore.db.cs_goNext(CS)
+                        Call cpCore.db.csGoNext(CS)
                         'DoEvents()
                     Loop
                     Call cpCore.cdnFiles.appendFile(Filename, "</Content>" & vbCrLf)
                 End If
             End If
             '
-            Call cpCore.db.cs_Close(CS)
+            Call cpCore.db.csClose(CS)
             'FS = Nothing
             '
             Exit Function

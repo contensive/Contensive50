@@ -282,7 +282,6 @@ Namespace Contensive.Core.Controllers
                 Dim IISResetRequired As Boolean
                 Dim ErrorMessage As String
                 Dim XMLTools As New xmlController(cpcore)
-                Dim addonInstall As New addonInstallClass(cpcore)
                 Dim StyleSN As Integer
                 Dim Doc As XmlDocument
                 Dim DataBuildVersion As String
@@ -326,7 +325,7 @@ Namespace Contensive.Core.Controllers
                     ' Update the Db Content from CDef Files
                     '
                     Call appendBuildLog(cpcore, "UpgradeCDef...")
-                    Call addonInstall.installBaseCollection(isNewBuild, nonCriticalErrorList)
+                    Call addonInstallClass.installBaseCollection(cpcore, isNewBuild, nonCriticalErrorList)
                     '
                     '---------------------------------------------------------------------
                     ' ----- Convert Database fields for new Db
@@ -540,7 +539,7 @@ Namespace Contensive.Core.Controllers
                             ErrorMessage = ""
                             'RegisterList = ""
                             Call appendBuildLog(cpcore, "Upgrading All Local Collections to new server build.")
-                            UpgradeOK = addonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, "", IISResetRequired, isNewBuild, nonCriticalErrorList)
+                            UpgradeOK = addonInstallClass.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ErrorMessage, "", IISResetRequired, isNewBuild, nonCriticalErrorList)
                             If ErrorMessage <> "" Then
                                 throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             ElseIf Not UpgradeOK Then
@@ -599,7 +598,7 @@ Namespace Contensive.Core.Controllers
                             Call appendBuildLog(cpcore, "...Open collectons.xml")
                             Try
                                 Doc = New XmlDocument
-                                Call Doc.LoadXml(addonInstall.getCollectionListFile)
+                                Call Doc.LoadXml(addonInstallClass.getCollectionListFile(cpcore))
                                 If True Then
                                     If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                                         throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
@@ -669,7 +668,7 @@ Namespace Contensive.Core.Controllers
                                                             ErrorMessage = ""
                                                             If Not localCollectionFound Then
                                                                 Call appendBuildLog(cpcore, "...site collection [" & Collectionname & "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.")
-                                                                addonInstallOk = addonInstall.installCollectionFromRemoteRepo(CollectionGuid, ErrorMessage, "", isNewBuild, nonCriticalErrorList)
+                                                                addonInstallOk = addonInstallClass.installCollectionFromRemoteRepo(cpcore, CollectionGuid, ErrorMessage, "", isNewBuild, nonCriticalErrorList)
                                                                 If Not addonInstallOk Then
                                                                     '
                                                                     ' this may be OK so log, but do not call it an error
@@ -679,7 +678,7 @@ Namespace Contensive.Core.Controllers
                                                             Else
                                                                 If upgradeCollection Then
                                                                     Call appendBuildLog(cpcore, "...upgrading collection")
-                                                                    Call addonInstall.installCollectionFromLocalRepo(CollectionGuid, cpcore.codeVersion, ErrorMessage, "", isNewBuild, nonCriticalErrorList)
+                                                                    Call addonInstallClass.installCollectionFromLocalRepo(cpcore, CollectionGuid, cpcore.codeVersion, ErrorMessage, "", isNewBuild, nonCriticalErrorList)
                                                                 End If
                                                             End If
                                                         End If
@@ -1771,26 +1770,26 @@ Namespace Contensive.Core.Controllers
                 Dim CS As Integer
                 Const ContentName = "States"
                 '
-                CS = cpcore.db.cs_open(ContentName, "name=" & cpcore.db.encodeSQLText(Name), , False)
-                If Not cpcore.db.cs_ok(CS) Then
+                CS = cpcore.db.csOpen(ContentName, "name=" & cpcore.db.encodeSQLText(Name), , False)
+                If Not cpcore.db.csOk(CS) Then
                     '
                     ' create new record
                     '
-                    Call cpcore.db.cs_Close(CS)
-                    CS = cpcore.db.cs_insertRecord(ContentName, SystemMemberID)
-                    Call cpcore.db.cs_set(CS, "NAME", Name)
-                    Call cpcore.db.cs_set(CS, "ACTIVE", True)
-                    Call cpcore.db.cs_set(CS, "Abbreviation", Abbreviation)
-                    Call cpcore.db.cs_set(CS, "CountryID", CountryID)
-                    Call cpcore.db.cs_set(CS, "FIPSState", FIPSState)
+                    Call cpcore.db.csClose(CS)
+                    CS = cpcore.db.csInsertRecord(ContentName, SystemMemberID)
+                    Call cpcore.db.csSet(CS, "NAME", Name)
+                    Call cpcore.db.csSet(CS, "ACTIVE", True)
+                    Call cpcore.db.csSet(CS, "Abbreviation", Abbreviation)
+                    Call cpcore.db.csSet(CS, "CountryID", CountryID)
+                    Call cpcore.db.csSet(CS, "FIPSState", FIPSState)
                 Else
                     '
                     ' verify only fields needed for contensive
                     '
-                    Call cpcore.db.cs_set(CS, "CountryID", CountryID)
-                    Call cpcore.db.cs_set(CS, "Abbreviation", Abbreviation)
+                    Call cpcore.db.csSet(CS, "CountryID", CountryID)
+                    Call cpcore.db.csSet(CS, "Abbreviation", Abbreviation)
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
             Catch ex As Exception
                 cpcore.handleException(ex) : Throw
             End Try
@@ -1876,22 +1875,22 @@ Namespace Contensive.Core.Controllers
             Try
                 Dim CS As Integer
                 '
-                CS = cpCore.db.cs_open("Countries", "name=" & cpCore.db.encodeSQLText(Name))
-                If Not cpCore.db.cs_ok(CS) Then
-                    Call cpCore.db.cs_Close(CS)
-                    CS = cpCore.db.cs_insertRecord("Countries", SystemMemberID)
-                    If cpCore.db.cs_ok(CS) Then
-                        Call cpCore.db.cs_set(CS, "ACTIVE", True)
+                CS = cpCore.db.csOpen("Countries", "name=" & cpCore.db.encodeSQLText(Name))
+                If Not cpCore.db.csOk(CS) Then
+                    Call cpCore.db.csClose(CS)
+                    CS = cpCore.db.csInsertRecord("Countries", SystemMemberID)
+                    If cpCore.db.csOk(CS) Then
+                        Call cpCore.db.csSet(CS, "ACTIVE", True)
                     End If
                 End If
-                If cpCore.db.cs_ok(CS) Then
-                    Call cpCore.db.cs_set(CS, "NAME", Name)
-                    Call cpCore.db.cs_set(CS, "Abbreviation", Abbreviation)
+                If cpCore.db.csOk(CS) Then
+                    Call cpCore.db.csSet(CS, "NAME", Name)
+                    Call cpCore.db.csSet(CS, "Abbreviation", Abbreviation)
                     If genericController.vbLCase(Name) = "united states" Then
-                        Call cpCore.db.cs_set(CS, "DomesticShipping", "1")
+                        Call cpCore.db.csSet(CS, "DomesticShipping", "1")
                     End If
                 End If
-                Call cpCore.db.cs_Close(CS)
+                Call cpCore.db.csClose(CS)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -2673,19 +2672,19 @@ Namespace Contensive.Core.Controllers
                                 Criteria &= "and(Parentid=" & ParentID & ")"
                             End If
                             Dim RecordID As Integer = 0
-                            Dim CS As Integer = cpCore.db.cs_open(cnNavigatorEntries, Criteria, "ID", True, , , , "ID", 1)
-                            If cpCore.db.cs_ok(CS) Then
-                                RecordID = (cpCore.db.cs_getInteger(CS, "ID"))
+                            Dim CS As Integer = cpCore.db.csOpen(cnNavigatorEntries, Criteria, "ID", True, , , , "ID", 1)
+                            If cpCore.db.csOk(CS) Then
+                                RecordID = (cpCore.db.csGetInteger(CS, "ID"))
                             End If
-                            Call cpCore.db.cs_Close(CS)
+                            Call cpCore.db.csClose(CS)
                             If RecordID = 0 Then
-                                CS = cpCore.db.cs_insertRecord(cnNavigatorEntries, SystemMemberID)
-                                If cpCore.db.cs_ok(CS) Then
-                                    RecordID = cpCore.db.cs_getInteger(CS, "ID")
-                                    Call cpCore.db.cs_set(CS, "name", RecordName)
-                                    Call cpCore.db.cs_set(CS, "parentID", ParentID)
+                                CS = cpCore.db.csInsertRecord(cnNavigatorEntries, SystemMemberID)
+                                If cpCore.db.csOk(CS) Then
+                                    RecordID = cpCore.db.csGetInteger(CS, "ID")
+                                    Call cpCore.db.csSet(CS, "name", RecordName)
+                                    Call cpCore.db.csSet(CS, "parentID", ParentID)
                                 End If
-                                Call cpCore.db.cs_Close(CS)
+                                Call cpCore.db.csClose(CS)
                             End If
                             ParentID = RecordID
                         End If

@@ -1257,13 +1257,13 @@ Namespace Contensive
                                     & " or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))" _
                                     & " or(ProcessNextRun<" & SQLNow & ")" _
                                     & ")"
-                            CS = cpSite.core.db.cs_open(cnAddons, SQL)
-                            Do While cpSite.core.db.cs_ok(CS)
-                                ProcessInterval = cpSite.core.db.cs_getInteger(CS, "ProcessInterval")
-                                ProcessID = cpSite.core.db.cs_getInteger(CS, "ID")
-                                processName = cpSite.core.db.cs_getText(CS, "name")
-                                ProcessRunOnce = cpSite.core.db.cs_getBoolean(CS, "ProcessRunOnce")
-                                ProcessNextRun = cpSite.core.db.cs_getDate(CS, "ProcessNextRun")
+                            CS = cpSite.core.db.csOpen(cnAddons, SQL)
+                            Do While cpSite.core.db.csOk(CS)
+                                ProcessInterval = cpSite.core.db.csGetInteger(CS, "ProcessInterval")
+                                ProcessID = cpSite.core.db.csGetInteger(CS, "ID")
+                                processName = cpSite.core.db.csGetText(CS, "name")
+                                ProcessRunOnce = cpSite.core.db.csGetBoolean(CS, "ProcessRunOnce")
+                                ProcessNextRun = cpSite.core.db.csGetDate(CS, "ProcessNextRun")
                                 NextRun = Date.MinValue
                                 hint &= ",run addon " & processName
                                 If ProcessInterval > 0 Then
@@ -1275,31 +1275,31 @@ Namespace Contensive
                                     ' Server has been restarted, reset next run
                                     '
                                     'Call cpSite.core.app.cpSite.core.app.csv_SetCS(CS, "ProcessServerKey", HostProcessID)
-                                    Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun)
                                 ElseIf ProcessRunOnce Then
                                     '
                                     ' Run Once
                                     '
-                                    Call cpSite.core.db.cs_set(CS, "ProcessRunOnce", False)
-                                    Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.csSet(CS, "ProcessRunOnce", False)
+                                    Call cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun)
                                     Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.serverConfig.appConfig.name & """ addonid=""" & ProcessID & """", True)
                                     'Call addAsyncCmd(cp,"runprocess appname=""" & cpSite.core.appEnvironment.name & """ addonname=""" & ProcessName & """", True)
-                                ElseIf cpSite.core.db.cs_getDate(CS, "ProcessNextRun") = Date.MinValue Then
+                                ElseIf cpSite.core.db.csGetDate(CS, "ProcessNextRun") = Date.MinValue Then
                                     '
                                     ' Interval is OK but NextRun is 0, just set next run
                                     '
-                                    Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun)
                                 ElseIf ProcessNextRun < RightNow Then
                                     '
                                     ' All is OK, triggered on NextRun, Cycle RightNow
                                     '
                                     Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.serverConfig.appConfig.name & """ addonid=""" & ProcessID & """", True)
-                                    Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun)
                                 End If
-                                Call cpSite.core.db.cs_goNext(CS)
+                                Call cpSite.core.db.csGoNext(CS)
                                 cpSite.Dispose()
                             Loop
-                            Call cpSite.core.db.cs_Close(CS)
+                            Call cpSite.core.db.csClose(CS)
                         Catch ex As Exception
                             '
                             ' error on this site, skip to next

@@ -357,7 +357,7 @@ Namespace Contensive.Core
                         Call cs.SetField("name", eventNameIdOrGuid)
                     End If
                 Else
-                    Do While cs.OK
+                    Do While cs.Ok
                         addonid = cs.GetInteger("addonid")
                         If addonid <> 0 Then
                             returnString &= CP.Utils.ExecuteAddon(addonid)

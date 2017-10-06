@@ -95,7 +95,6 @@ Namespace Contensive.Core
         Private HTTPResponseCode As String              ' HTTP response Code (200, etc)
         Private HTTPResponseContentType As String       ' HTTP response header value
         Private HTTPResponseTime As Double              ' time to fetch this page
-        Private HTTPResponseTickCountStart As Integer
         Const HTTPResponseHeaderCountMax As Integer = 100
         Private HTTPResponseContentLength As Integer       ' length of the body (from header)
         Private HTTPBodyText As String                  ' all the text only body copy
@@ -154,6 +153,7 @@ Namespace Contensive.Core
             Dim ResponseHeader As String
             Dim ResponseLines() As String
             Dim ResponseStatus As String
+            Dim stopWatch As New Stopwatch()
             '
             Call PrintDebugMessage("Requesting [" & Link & "]", AppName)
             '
@@ -161,8 +161,6 @@ Namespace Contensive.Core
             '
             return_needsErrorRecovery = False
             kmaHTTP.userAgent = "Contensive Monitor"
-            'hint = "Getting Document"
-            HTTPResponseTickCountStart = CInt(GetTickCount)
             HTTPInProcess = True
             HTTPLastError = 0
             URLWorking = Controllers.genericController.EncodeURL(Link)
@@ -216,7 +214,7 @@ Namespace Contensive.Core
                 End If
             End If
             HTTPInProcess = False
-            HTTPResponseTime = GetTickCount - HTTPResponseTickCountStart
+            HTTPResponseTime = stopWatch.ElapsedMilliseconds / 1000
             '
             'hint = "Done"
             '

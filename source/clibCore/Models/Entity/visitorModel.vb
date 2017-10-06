@@ -63,7 +63,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function add(cpCore As coreClass, ByRef cacheNameList As List(Of String)) As visitorModel
             Dim result As visitorModel = Nothing
             Try
-                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, 0), cacheNameList)
+                result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, 0), cacheNameList)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
                 Throw

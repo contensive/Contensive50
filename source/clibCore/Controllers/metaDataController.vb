@@ -1168,15 +1168,15 @@ Namespace Contensive.Core.Controllers
                         '
                         DataSourceName = "Default"
                         CSContent = cpCore.db.cs_openContentRecord("Content", ParentContentID)
-                        If Not cpCore.db.cs_ok(CSContent) Then
+                        If Not cpCore.db.csOk(CSContent) Then
                             Throw (New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] was not found."))
                         Else
                             SelectFieldList = cpCore.db.cs_getSelectFieldList(CSContent)
                             If SelectFieldList = "" Then
                                 Throw (New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] record has not fields."))
                             Else
-                                CSNew = cpCore.db.cs_insertRecord("Content", 0)
-                                If Not cpCore.db.cs_ok(CSNew) Then
+                                CSNew = cpCore.db.csInsertRecord("Content", 0)
+                                If Not cpCore.db.csOk(CSNew) Then
                                     Throw (New ApplicationException("Can not create Child Content [" & ChildContentName & "] because there was an error creating a new record in ccContent."))
                                 Else
                                     Fields = Split(SelectFieldList, ",")
@@ -1187,28 +1187,28 @@ Namespace Contensive.Core.Controllers
                                             Case "ID"
                                             ' do nothing
                                             Case "NAME"
-                                                Call cpCore.db.cs_set(CSNew, FieldName, ChildContentName)
+                                                Call cpCore.db.csSet(CSNew, FieldName, ChildContentName)
                                             Case "PARENTID"
-                                                Call cpCore.db.cs_set(CSNew, FieldName, cpCore.db.cs_getText(CSContent, "ID"))
+                                                Call cpCore.db.csSet(CSNew, FieldName, cpCore.db.csGetText(CSContent, "ID"))
                                             Case "CREATEDBY", "MODIFIEDBY"
-                                                Call cpCore.db.cs_set(CSNew, FieldName, MemberID)
+                                                Call cpCore.db.csSet(CSNew, FieldName, MemberID)
                                             Case "DATEADDED", "MODIFIEDDATE"
-                                                Call cpCore.db.cs_set(CSNew, FieldName, DateNow)
+                                                Call cpCore.db.csSet(CSNew, FieldName, DateNow)
                                             Case "CCGUID"
 
                                                 '
                                                 ' new, non-blank guid so if this cdef is exported, it will be updateable
                                                 '
-                                                Call cpCore.db.cs_set(CSNew, FieldName, Guid.NewGuid.ToString())
+                                                Call cpCore.db.csSet(CSNew, FieldName, Guid.NewGuid.ToString())
                                             Case Else
-                                                Call cpCore.db.cs_set(CSNew, FieldName, cpCore.db.cs_getText(CSContent, FieldName))
+                                                Call cpCore.db.csSet(CSNew, FieldName, cpCore.db.csGetText(CSContent, FieldName))
                                         End Select
                                     Next
                                 End If
-                                Call cpCore.db.cs_Close(CSNew)
+                                Call cpCore.db.csClose(CSNew)
                             End If
                         End If
-                        Call cpCore.db.cs_Close(CSContent)
+                        Call cpCore.db.csClose(CSContent)
                     End If
                 End If
                 '
@@ -2118,11 +2118,11 @@ Namespace Contensive.Core.Controllers
             GetContentIDByTablename = -1
             If TableName <> "" Then
                 SQL = "select ContentControlID from " & TableName & " where contentcontrolid is not null order by contentcontrolid;"
-                CS = cpCore.db.cs_openCsSql_rev("Default", SQL, 1, 1)
-                If cpCore.db.cs_ok(CS) Then
-                    GetContentIDByTablename = cpCore.db.cs_getInteger(CS, "ContentControlID")
+                CS = cpCore.db.csOpenSql_rev("Default", SQL, 1, 1)
+                If cpCore.db.csOk(CS) Then
+                    GetContentIDByTablename = cpCore.db.csGetInteger(CS, "ContentControlID")
                 End If
-                Call cpCore.db.cs_Close(CS)
+                Call cpCore.db.csClose(CS)
             End If
         End Function
         '
@@ -2153,12 +2153,12 @@ Namespace Contensive.Core.Controllers
             If Not genericController.IsInDelimitedString(UsedIDString, CStr(RecordID), ",") Then
                 ContentName = getContentNameByID(ContentID)
                 CS = cpCore.db.csOpenRecord(ContentName, RecordID, False, False)
-                If cpCore.db.cs_ok(CS) Then
+                If cpCore.db.csOk(CS) Then
                     HasParentID = cpCore.db.cs_isFieldSupported(CS, "ParentID")
-                    RecordContentID = cpCore.db.cs_getInteger(CS, "ContentControlID")
+                    RecordContentID = cpCore.db.csGetInteger(CS, "ContentControlID")
                     RecordContentName = getContentNameByID(RecordContentID)
                 End If
-                Call cpCore.db.cs_Close(CS)
+                Call cpCore.db.csClose(CS)
                 If RecordContentName <> "" Then
                     '
                     '
@@ -2172,12 +2172,12 @@ Namespace Contensive.Core.Controllers
                     Call cpCore.db.executeQuery(SQL, DataSourceName)
                     If HasParentID Then
                         SQL = "select contentcontrolid,ID from " & RecordTableName & " where ParentID=" & RecordID
-                        CS = cpCore.db.cs_openCsSql_rev(DataSourceName, SQL)
-                        Do While cpCore.db.cs_ok(CS)
-                            Call content_SetContentControl(cpCore.db.cs_getInteger(CS, "contentcontrolid"), cpCore.db.cs_getInteger(CS, "ID"), NewContentControlID, UsedIDString & "," & RecordID)
-                            cpCore.db.cs_goNext(CS)
+                        CS = cpCore.db.csOpenSql_rev(DataSourceName, SQL)
+                        Do While cpCore.db.csOk(CS)
+                            Call content_SetContentControl(cpCore.db.csGetInteger(CS, "contentcontrolid"), cpCore.db.csGetInteger(CS, "ID"), NewContentControlID, UsedIDString & "," & RecordID)
+                            cpCore.db.csGoNext(CS)
                         Loop
-                        Call cpCore.db.cs_Close(CS)
+                        Call cpCore.db.csClose(CS)
                     End If
                     '
                     ' fix content watch
@@ -2192,10 +2192,10 @@ Namespace Contensive.Core.Controllers
             Dim CS As Integer
             If SortMethodID > 0 Then
                 CS = cpCore.db.cs_open2("Sort Methods", SortMethodID)
-                If cpCore.db.cs_ok(CS) Then
-                    GetSortMethodByID = cpCore.db.cs_getText(CS, "OrderByClause")
+                If cpCore.db.csOk(CS) Then
+                    GetSortMethodByID = cpCore.db.csGetText(CS, "OrderByClause")
                 End If
-                Call cpCore.db.cs_Close(CS)
+                Call cpCore.db.csClose(CS)
             End If
             Return result
         End Function

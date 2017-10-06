@@ -251,10 +251,10 @@ Namespace Contensive.Core.Controllers
                 ' ----- main_Get the Group name
                 '
                 CS = cpcore.db.cs_open2("Groups", iGroupID)
-                If cpcore.db.cs_ok(CS) Then
+                If cpcore.db.csOk(CS) Then
                     group_GetGroupName = genericController.encodeText(cpcore.db.cs_getValue(CS, "Name"))
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
             End If
         End Function
         '
@@ -279,14 +279,14 @@ Namespace Contensive.Core.Controllers
             If dt.Rows.Count > 0 Then
                 group_Add = genericController.EncodeInteger(dt.Rows(0).Item(0))
             Else
-                CS = cpcore.db.cs_insertRecord("Groups", SystemMemberID)
-                If cpcore.db.cs_ok(CS) Then
+                CS = cpcore.db.csInsertRecord("Groups", SystemMemberID)
+                If cpcore.db.csOk(CS) Then
                     group_Add = genericController.EncodeInteger(cpcore.db.cs_getValue(CS, "ID"))
-                    Call cpcore.db.cs_set(CS, "name", iGroupName)
-                    Call cpcore.db.cs_set(CS, "caption", iGroupCaption)
-                    Call cpcore.db.cs_set(CS, "active", True)
+                    Call cpcore.db.csSet(CS, "name", iGroupName)
+                    Call cpcore.db.csSet(CS, "caption", iGroupCaption)
+                    Call cpcore.db.csSet(CS, "active", True)
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
             End If
         End Function
 
@@ -324,24 +324,24 @@ Namespace Contensive.Core.Controllers
                 If (GroupID < 1) Then
                     Throw (New ApplicationException("main_AddGroupMember could not find or add Group [" & GroupName & "]")) ' handleLegacyError14(MethodName, "")
                 Else
-                    CS = cpcore.db.cs_open("Member Rules", "(MemberID=" & cpcore.db.encodeSQLNumber(NewMemberID) & ")and(GroupID=" & cpcore.db.encodeSQLNumber(GroupID) & ")", , False)
-                    If Not cpcore.db.cs_ok(CS) Then
-                        Call cpcore.db.cs_Close(CS)
-                        CS = cpcore.db.cs_insertRecord("Member Rules")
+                    CS = cpcore.db.csOpen("Member Rules", "(MemberID=" & cpcore.db.encodeSQLNumber(NewMemberID) & ")and(GroupID=" & cpcore.db.encodeSQLNumber(GroupID) & ")", , False)
+                    If Not cpcore.db.csOk(CS) Then
+                        Call cpcore.db.csClose(CS)
+                        CS = cpcore.db.csInsertRecord("Member Rules")
                     End If
-                    If Not cpcore.db.cs_ok(CS) Then
+                    If Not cpcore.db.csOk(CS) Then
                         Throw (New ApplicationException("main_AddGroupMember could not add this member to the Group [" & GroupName & "]")) ' handleLegacyError14(MethodName, "")
                     Else
-                        Call cpcore.db.cs_set(CS, "active", True)
-                        Call cpcore.db.cs_set(CS, "memberid", NewMemberID)
-                        Call cpcore.db.cs_set(CS, "groupid", GroupID)
+                        Call cpcore.db.csSet(CS, "active", True)
+                        Call cpcore.db.csSet(CS, "memberid", NewMemberID)
+                        Call cpcore.db.csSet(CS, "groupid", GroupID)
                         If iDateExpires <> Date.MinValue Then
-                            Call cpcore.db.cs_set(CS, "DateExpires", iDateExpires)
+                            Call cpcore.db.csSet(CS, "DateExpires", iDateExpires)
                         Else
-                            Call cpcore.db.cs_set(CS, "DateExpires", "")
+                            Call cpcore.db.csSet(CS, "DateExpires", "")
                         End If
                     End If
-                    Call cpcore.db.cs_Close(CS)
+                    Call cpcore.db.csClose(CS)
                 End If
             End If
         End Sub

@@ -121,15 +121,15 @@ Namespace Contensive.Core.Models.Context
                 '
                 ' insert a new property record, get the ID back and save it in cache
                 '
-                CS = db.cs_insertRecord("Properties", SystemMemberID)
-                If db.cs_ok(CS) Then
-                    propertyCache(2, Ptr) = db.cs_getText(CS, "ID")
-                    Call db.cs_set(CS, "name", propertyName)
-                    Call db.cs_set(CS, "FieldValue", PropertyValue)
-                    Call db.cs_set(CS, "TypeID", propertyTypeId)
-                    Call db.cs_set(CS, "KeyID", CStr(keyId))
+                CS = db.csInsertRecord("Properties", SystemMemberID)
+                If db.csOk(CS) Then
+                    propertyCache(2, Ptr) = db.csGetText(CS, "ID")
+                    Call db.csSet(CS, "name", propertyName)
+                    Call db.csSet(CS, "FieldValue", PropertyValue)
+                    Call db.csSet(CS, "TypeID", propertyTypeId)
+                    Call db.csSet(CS, "KeyID", CStr(keyId))
                 End If
-                Call db.cs_Close(CS)
+                Call db.csClose(CS)
             ElseIf propertyCache(1, Ptr) <> PropertyValue Then
                 propertyCache(1, Ptr) = PropertyValue
                 RecordID = genericController.EncodeInteger(propertyCache(2, Ptr))

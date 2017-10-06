@@ -120,10 +120,10 @@ Namespace Contensive.Core.Controllers
                     If main_EditLockMemberName_Local = "" Then
                         If main_EditLockMemberID_Local <> 0 Then
                             CS = cpCore.db.cs_open2("people", main_EditLockMemberID_Local)
-                            If cpCore.db.cs_ok(CS) Then
-                                main_EditLockMemberName_Local = cpCore.db.cs_getText(CS, "name")
+                            If cpCore.db.csOk(CS) Then
+                                main_EditLockMemberName_Local = cpCore.db.csGetText(CS, "name")
                             End If
-                            Call cpCore.db.cs_Close(CS)
+                            Call cpCore.db.csClose(CS)
                         End If
                         If main_EditLockMemberName_Local = "" Then
                             main_EditLockMemberName_Local = "unknown"
@@ -728,9 +728,9 @@ Namespace Contensive.Core.Controllers
                 Dim CS As Integer
                 '
                 Criteria = getAuthoringControlCriteria(ContentName, RecordID) & "and(CreatedBy<>" & cpCore.db.encodeSQLNumber(MemberID) & ")"
-                CS = cpCore.db.cs_open("Authoring Controls", Criteria, , , MemberID)
-                result = cpCore.db.cs_ok(CS)
-                Call cpCore.db.cs_Close(CS)
+                CS = cpCore.db.csOpen("Authoring Controls", Criteria, , , MemberID)
+                result = cpCore.db.csOk(CS)
+                Call cpCore.db.csClose(CS)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -754,13 +754,13 @@ Namespace Contensive.Core.Controllers
                 ' Authoring Control records are referenced by ContentID
                 '
                 ContentCnt = 0
-                CS = cpCore.db.cs_open("Content", "(contenttableid=" & TableID & ")")
-                Do While cpCore.db.cs_ok(CS)
-                    Criteria = Criteria & "," & cpCore.db.cs_getInteger(CS, "ID")
+                CS = cpCore.db.csOpen("Content", "(contenttableid=" & TableID & ")")
+                Do While cpCore.db.csOk(CS)
+                    Criteria = Criteria & "," & cpCore.db.csGetInteger(CS, "ID")
                     ContentCnt = ContentCnt + 1
-                    Call cpCore.db.cs_goNext(CS)
+                    Call cpCore.db.csGoNext(CS)
                 Loop
-                Call cpCore.db.cs_Close(CS)
+                Call cpCore.db.csClose(CS)
                 If ContentCnt < 1 Then
                     '
                     ' No references to this table
@@ -842,29 +842,29 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' Select any lock left, only the newest counts
                                 '
-                                CSCurrentLock = cpCore.db.cs_open("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
-                                If Not cpCore.db.cs_ok(CSCurrentLock) Then
+                                CSCurrentLock = cpCore.db.csOpen("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
+                                If Not cpCore.db.csOk(CSCurrentLock) Then
                                     '
                                     ' No lock, create one
                                     '
-                                    CSNewLock = cpCore.db.cs_insertRecord("Authoring Controls", MemberID)
-                                    If cpCore.db.cs_ok(CSNewLock) Then
-                                        Call cpCore.db.cs_set(CSNewLock, "RecordID", RecordID)
-                                        Call cpCore.db.cs_set(CSNewLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
-                                        Call cpCore.db.cs_set(CSNewLock, "ControlType", AuthoringControlsEditing)
-                                        Call cpCore.db.cs_set(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
-                                        Call cpCore.db.cs_set(CSNewLock, "ContentID", ContentID)
+                                    CSNewLock = cpCore.db.csInsertRecord("Authoring Controls", MemberID)
+                                    If cpCore.db.csOk(CSNewLock) Then
+                                        Call cpCore.db.csSet(CSNewLock, "RecordID", RecordID)
+                                        Call cpCore.db.csSet(CSNewLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
+                                        Call cpCore.db.csSet(CSNewLock, "ControlType", AuthoringControlsEditing)
+                                        Call cpCore.db.csSet(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
+                                        Call cpCore.db.csSet(CSNewLock, "ContentID", ContentID)
                                     End If
-                                    Call cpCore.db.cs_Close(CSNewLock)
+                                    Call cpCore.db.csClose(CSNewLock)
                                 Else
-                                    If (cpCore.db.cs_getInteger(CSCurrentLock, "CreatedBy") = MemberID) Then
+                                    If (cpCore.db.csGetInteger(CSCurrentLock, "CreatedBy") = MemberID) Then
                                         '
                                         ' Record Locked by Member, update DateExpire
                                         '
-                                        Call cpCore.db.cs_set(CSCurrentLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
+                                        Call cpCore.db.csSet(CSCurrentLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
                                     End If
                                 End If
-                                Call cpCore.db.cs_Close(CSCurrentLock)
+                                Call cpCore.db.csClose(CSCurrentLock)
                             End If
                             'Case AuthoringControlsSubmitted, AuthoringControlsApproved, AuthoringControlsModified
                             '    If False And cpCore.siteProperties.allowWorkflowAuthoring Then

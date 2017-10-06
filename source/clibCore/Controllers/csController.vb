@@ -32,7 +32,7 @@ Namespace Contensive.Core
                     '
                     ' -- call .dispose for managed objects
                     If csPtr > -1 Then
-                        Call cpCore.db.cs_Close(csPtr)
+                        Call cpCore.db.csClose(csPtr)
                     End If
                 End If
                 '
@@ -51,10 +51,10 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             Try
                 If csPtr <> -1 Then
-                    Call cpCore.db.cs_Close(csPtr)
+                    Call cpCore.db.csClose(csPtr)
                 End If
-                csPtr = cpCore.db.cs_insertRecord(ContentName, OpeningMemberID)
-                success = cpCore.db.cs_ok(csPtr)
+                csPtr = cpCore.db.csInsertRecord(ContentName, OpeningMemberID)
+                success = cpCore.db.csOk(csPtr)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -66,10 +66,10 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             Try
                 If csPtr <> -1 Then
-                    Call cpCore.db.cs_Close(csPtr)
+                    Call cpCore.db.csClose(csPtr)
                 End If
-                csPtr = cpCore.db.cs_open(ContentName, "id=" & recordId, , ActiveOnly, , , , SelectFieldList, 1, 1)
-                success = cpCore.db.cs_ok(csPtr)
+                csPtr = cpCore.db.csOpen(ContentName, "id=" & recordId, , ActiveOnly, , , , SelectFieldList, 1, 1)
+                success = cpCore.db.csOk(csPtr)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -81,10 +81,10 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             Try
                 If csPtr <> -1 Then
-                    Call cpCore.db.cs_Close(csPtr)
+                    Call cpCore.db.csClose(csPtr)
                 End If
-                csPtr = cpCore.db.cs_open(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
-                success = cpCore.db.cs_ok(csPtr)
+                csPtr = cpCore.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
+                success = cpCore.db.csOk(csPtr)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -96,9 +96,9 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             Try
                 If csPtr <> -1 Then
-                    Call cpCore.db.cs_Close(csPtr)
+                    Call cpCore.db.csClose(csPtr)
                 End If
-                csPtr = cpCore.db.cs_openGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
+                csPtr = cpCore.db.csOpenGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
                 success = ok()
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
@@ -113,9 +113,9 @@ Namespace Contensive.Core
                 Dim groupList As New List(Of String)
                 groupList.Add(GroupName)
                 If csPtr <> -1 Then
-                    Call cpCore.db.cs_Close(csPtr)
+                    Call cpCore.db.csClose(csPtr)
                 End If
-                csPtr = cpCore.db.cs_openGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
+                csPtr = cpCore.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
                 success = ok()
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
@@ -141,10 +141,10 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             Try
                 If csPtr <> -1 Then
-                    Call cpCore.db.cs_Close(csPtr)
+                    Call cpCore.db.csClose(csPtr)
                 End If
-                csPtr = cpCore.db.cs_openCsSql_rev("default", sql)
-                success = cpCore.db.cs_ok(csPtr)
+                csPtr = cpCore.db.csOpenSql_rev("default", sql)
+                success = cpCore.db.csOk(csPtr)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -156,10 +156,10 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             Try
                 If csPtr <> -1 Then
-                    Call cpCore.db.cs_Close(csPtr)
+                    Call cpCore.db.csClose(csPtr)
                 End If
-                csPtr = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
-                success = cpCore.db.cs_ok(csPtr)
+                csPtr = cpCore.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber)
+                success = cpCore.db.csOk(csPtr)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -170,7 +170,7 @@ Namespace Contensive.Core
         Public Sub Close()
             Try
                 If csPtr <> -1 Then
-                    Call cpCore.db.cs_Close(csPtr)
+                    Call cpCore.db.csClose(csPtr)
                     csPtr = -1
                 End If
             Catch ex As Exception
@@ -185,7 +185,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         Public Sub delete()
-            Call cpCore.db.cs_deleteRecord(csPtr)
+            Call cpCore.db.csDeleteRecord(csPtr)
         End Sub
         '
         '====================================================================================================
@@ -214,19 +214,19 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         Public Function getBoolean(ByVal FieldName As String) As Boolean
-            Return cpCore.db.cs_getBoolean(csPtr, FieldName)
+            Return cpCore.db.csGetBoolean(csPtr, FieldName)
         End Function
         '
         '====================================================================================================
         Public Function getDate(ByVal FieldName As String) As Date
-            Return cpCore.db.cs_getDate(csPtr, FieldName)
+            Return cpCore.db.csGetDate(csPtr, FieldName)
         End Function
         '
         '====================================================================================================
         Public Function getEditLink(Optional ByVal AllowCut As Boolean = False) As String
             Dim result As String = String.Empty
             Try
-                result = cpCore.html.cs_cs_getRecordEditLink(csPtr, AllowCut)
+                result = cpCore.db.csGetRecordEditLink(csPtr, AllowCut)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -240,7 +240,7 @@ Namespace Contensive.Core
         Public Function getFilename(ByVal FieldName As String, Optional ByVal OriginalFilename As String = "", Optional ByVal ContentName As String = "", Optional fieldTypeId As Integer = 0) As String
             Dim result As String = String.Empty
             Try
-                result = cpCore.db.cs_getFilename(csPtr, FieldName, OriginalFilename, ContentName, fieldTypeId)
+                result = cpCore.db.csGetFilename(csPtr, FieldName, OriginalFilename, ContentName, fieldTypeId)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -252,24 +252,24 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         Public Function getInteger(ByVal FieldName As String) As Integer
-            Return cpCore.db.cs_getInteger(csPtr, FieldName)
+            Return cpCore.db.csGetInteger(csPtr, FieldName)
         End Function
         '
         '====================================================================================================
         Public Function getNumber(ByVal FieldName As String) As Double
-            Return cpCore.db.cs_getNumber(csPtr, FieldName)
+            Return cpCore.db.csGetNumber(csPtr, FieldName)
         End Function
         '
         '====================================================================================================
         Public Function getRowCount() As Integer
-            Return cpCore.db.cs_getRowCount(csPtr)
+            Return cpCore.db.csGetRowCount(csPtr)
         End Function
         '
         '====================================================================================================
         Public Function getSql() As String
             Dim result As String = String.Empty
             Try
-                result = cpCore.db.cs_getSource(csPtr)
+                result = cpCore.db.csGetSource(csPtr)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -289,7 +289,7 @@ Namespace Contensive.Core
         Public Function getText(ByVal FieldName As String) As String
             Dim result As String = String.Empty
             Try
-                result = cpCore.db.cs_get(csPtr, FieldName)
+                result = cpCore.db.csGet(csPtr, FieldName)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -326,15 +326,15 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         Public Sub goNext()
-            Call cpCore.db.cs_goNext(csPtr)
+            Call cpCore.db.csGoNext(csPtr)
         End Sub
         '
         '====================================================================================================
         Public Function nextOK() As Boolean
             Dim result As Boolean = False
             Try
-                Call cpCore.db.cs_goNext(csPtr)
-                result = cpCore.db.cs_ok(csPtr)
+                Call cpCore.db.csGoNext(csPtr)
+                result = cpCore.db.csOk(csPtr)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -343,35 +343,35 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         Public Function ok() As Boolean
-            Return cpCore.db.cs_ok(csPtr)
+            Return cpCore.db.csOk(csPtr)
         End Function
         '
         '====================================================================================================
         Public Sub save()
-            Call cpCore.db.cs_save2(csPtr)
+            Call cpCore.db.csSave2(csPtr)
         End Sub
         '
         '====================================================================================================
         '
         Public Sub setField(ByVal FieldName As String, ByVal FieldValue As Date)
-            Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
+            Call cpCore.db.csSet(csPtr, FieldName, FieldValue)
         End Sub
         Public Sub setField(ByVal FieldName As String, ByVal FieldValue As Boolean)
-            Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
+            Call cpCore.db.csSet(csPtr, FieldName, FieldValue)
         End Sub
         Public Sub setField(ByVal FieldName As String, ByVal FieldValue As String)
-            Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
+            Call cpCore.db.csSet(csPtr, FieldName, FieldValue)
         End Sub
         Public Sub setField(ByVal FieldName As String, ByVal FieldValue As Double)
-            Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
+            Call cpCore.db.csSet(csPtr, FieldName, FieldValue)
         End Sub
         Public Sub setField(ByVal FieldName As String, ByVal FieldValue As Integer)
-            Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
+            Call cpCore.db.csSet(csPtr, FieldName, FieldValue)
         End Sub
         '
         '====================================================================================================
         Public Sub setFile(ByVal FieldName As String, ByVal Copy As String, ByVal ContentName As String)
-            Call cpCore.db.SetCSTextFile(csPtr, FieldName, Copy, ContentName)
+            Call cpCore.db.csSetTextFile(csPtr, FieldName, Copy, ContentName)
         End Sub
         '
         '====================================================================================================
@@ -388,7 +388,7 @@ Namespace Contensive.Core
             '
             'If Not (true) Then Exit Sub
             '
-            If Not cpcore.db.cs_ok(CSPointer) Then
+            If Not cpcore.db.csOk(CSPointer) Then
                 Throw New ApplicationException("ContentSetPointer is invalid, empty, or end-of-file")
             ElseIf Trim(FieldName) = "" Then
                 Throw New ApplicationException("FieldName is invalid or blank")
@@ -402,25 +402,25 @@ Namespace Contensive.Core
                         '
                         ' Boolean
                         '
-                        Call cpcore.db.cs_set(CSPointer, FieldName, cpcore.docProperties.getBoolean(LocalRequestName))
+                        Call cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getBoolean(LocalRequestName))
                     Case FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdManyToMany
                         '
                         ' Numbers
                         '
-                        Call cpcore.db.cs_set(CSPointer, FieldName, cpcore.docProperties.getNumber(LocalRequestName))
+                        Call cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getNumber(LocalRequestName))
                     Case FieldTypeIdDate
                         '
                         ' Date
                         '
-                        Call cpcore.db.cs_set(CSPointer, FieldName, cpcore.docProperties.getDate(LocalRequestName))
+                        Call cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getDate(LocalRequestName))
                     Case FieldTypeIdFile, FieldTypeIdFileImage
                         '
                         '
                         '
                         Filename = cpcore.docProperties.getText(LocalRequestName)
                         If Filename <> "" Then
-                            Path = cpcore.db.cs_getFilename(CSPointer, FieldName, Filename,, cpcore.db.cs_getFieldTypeId(CSPointer, FieldName))
-                            Call cpcore.db.cs_set(CSPointer, FieldName, Path)
+                            Path = cpcore.db.csGetFilename(CSPointer, FieldName, Filename,, cpcore.db.cs_getFieldTypeId(CSPointer, FieldName))
+                            Call cpcore.db.csSet(CSPointer, FieldName, Path)
                             Path = genericController.vbReplace(Path, "\", "/")
                             Path = genericController.vbReplace(Path, "/" & Filename, "")
                             Call cpcore.appRootFiles.upload(LocalRequestName, Path, Filename)
@@ -429,7 +429,7 @@ Namespace Contensive.Core
                         '
                         ' text files
                         '
-                        Call cpcore.db.cs_set(CSPointer, FieldName, cpcore.docProperties.getText(LocalRequestName))
+                        Call cpcore.db.csSet(CSPointer, FieldName, cpcore.docProperties.getText(LocalRequestName))
                 End Select
             End If
         End Sub
@@ -444,10 +444,10 @@ Namespace Contensive.Core
             Dim RecordID As Integer
             '
             If cpcore.db.cs_isFieldSupported(CSPointer, "id") And cpcore.db.cs_isFieldSupported(CSPointer, "contentcontrolId") Then
-                RecordID = cpcore.db.cs_getInteger(CSPointer, "id")
-                ContentName = cpcore.metaData.getContentNameByID(cpcore.db.cs_getInteger(CSPointer, "contentcontrolId"))
+                RecordID = cpcore.db.csGetInteger(CSPointer, "id")
+                ContentName = cpcore.metaData.getContentNameByID(cpcore.db.csGetInteger(CSPointer, "contentcontrolId"))
             End If
-            result = cpcore.html.encodeContent10(cpcore.db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything())
+            result = cpcore.html.encodeContent10(cpcore.db.csGet(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything())
             Return result
         End Function
         '

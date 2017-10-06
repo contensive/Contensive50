@@ -1546,7 +1546,7 @@ Namespace Contensive.Core
         '
         '========================================================================
         '
-        Declare Function GetTickCount Lib "kernel32" () As Integer
+        'Declare Function GetTickCount Lib "kernel32" () As Integer
         Declare Function GetCurrentProcessId Lib "kernel32" () As Integer
         'Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Integer)
         '

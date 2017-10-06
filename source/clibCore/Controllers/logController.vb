@@ -212,16 +212,16 @@ Namespace Contensive.Core.Controllers
             '
             Dim CS As Integer
             '
-            CS = cpcore.db.cs_insertRecord("Activity Log", ByMemberID)
-            If cpcore.db.cs_ok(CS) Then
-                Call cpcore.db.cs_set(CS, "MemberID", SubjectMemberID)
-                Call cpcore.db.cs_set(CS, "OrganizationID", SubjectOrganizationID)
-                Call cpcore.db.cs_set(CS, "Message", Message)
-                Call cpcore.db.cs_set(CS, "Link", Link)
-                Call cpcore.db.cs_set(CS, "VisitorID", VisitorID)
-                Call cpcore.db.cs_set(CS, "VisitID", VisitID)
+            CS = cpcore.db.csInsertRecord("Activity Log", ByMemberID)
+            If cpcore.db.csOk(CS) Then
+                Call cpcore.db.csSet(CS, "MemberID", SubjectMemberID)
+                Call cpcore.db.csSet(CS, "OrganizationID", SubjectOrganizationID)
+                Call cpcore.db.csSet(CS, "Message", Message)
+                Call cpcore.db.csSet(CS, "Link", Link)
+                Call cpcore.db.csSet(CS, "VisitorID", VisitorID)
+                Call cpcore.db.csSet(CS, "VisitID", VisitID)
             End If
-            Call cpcore.db.cs_Close(CS)
+            Call cpcore.db.csClose(CS)
             '
             Exit Sub
             '
@@ -294,21 +294,21 @@ ErrorTrap:
                 '
                 ' insert new record
                 '
-                CS = cpcore.db.cs_insertRecord("Site Warnings", 0)
-                If cpcore.db.cs_ok(CS) Then
-                    Call cpcore.db.cs_set(CS, "name", Name)
-                    Call cpcore.db.cs_set(CS, "description", Description)
-                    Call cpcore.db.cs_set(CS, "generalKey", generalKey)
-                    Call cpcore.db.cs_set(CS, "specificKey", specificKey)
-                    Call cpcore.db.cs_set(CS, "count", 1)
-                    Call cpcore.db.cs_set(CS, "DateLastReported", Now())
+                CS = cpcore.db.csInsertRecord("Site Warnings", 0)
+                If cpcore.db.csOk(CS) Then
+                    Call cpcore.db.csSet(CS, "name", Name)
+                    Call cpcore.db.csSet(CS, "description", Description)
+                    Call cpcore.db.csSet(CS, "generalKey", generalKey)
+                    Call cpcore.db.csSet(CS, "specificKey", specificKey)
+                    Call cpcore.db.csSet(CS, "count", 1)
+                    Call cpcore.db.csSet(CS, "DateLastReported", Now())
                     If True Then
-                        Call cpcore.db.cs_set(CS, "shortDescription", shortDescription)
-                        Call cpcore.db.cs_set(CS, "location", location)
-                        Call cpcore.db.cs_set(CS, "pageId", PageID)
+                        Call cpcore.db.csSet(CS, "shortDescription", shortDescription)
+                        Call cpcore.db.csSet(CS, "location", location)
+                        Call cpcore.db.csSet(CS, "pageId", PageID)
                     End If
                 End If
-                Call cpcore.db.cs_Close(CS)
+                Call cpcore.db.csClose(CS)
             End If
             '
         End Sub

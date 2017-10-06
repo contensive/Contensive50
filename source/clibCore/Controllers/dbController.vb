@@ -15,19 +15,11 @@ Namespace Contensive.Core.Controllers
     Public Class dbController
         Implements IDisposable
         '
-        ' refactor -- replace all err.raise and handleLegacy... errors with throw new exception
-
-        '
-        '------------------------------------------------------------------------------------------------------------------------
-        ' objects passed in that are not disposed
-        '------------------------------------------------------------------------------------------------------------------------
+        '========================================================================
         '
         Private cpCore As coreClass
         '
-        '------------------------------------------------------------------------------------------------------------------------
-        ' internal storage
-        '------------------------------------------------------------------------------------------------------------------------
-        '
+        '========================================================================
         '
         Private Const pageSizeDefault = 9999
         '
@@ -113,34 +105,6 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleException(ex) : Throw
             End Try
         End Sub
-        ''
-        ''====================================================================================================
-        '''' <summary>
-        '''' get the database id for a given datasource name. If not found, -1 is returned
-        '''' </summary>
-        '''' <param name="DataSourceName"></param>
-        '''' <returns></returns>
-        'Public Function getDataSourceId(ByVal DataSourceName As String) As Integer
-        '    Dim returnDataSourceId As Integer = -1
-        '    Try
-        '        Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(DataSourceName)
-        '        If (dataSources.ContainsKey(normalizedDataSourceName)) Then
-        '            returnDataSourceId = dataSources(normalizedDataSourceName).id
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleExceptionAndContinue(ex) : Throw
-        '    End Try
-        '    Return returnDataSourceId
-        'End Function
-        ''
-        ''====================================================================================================
-        '''' <summary>
-        '''' return the correctly formated connection string for a connection to the cluster's database (default connection no catalog) -- used to create new catalogs (appication databases) in the database
-        '''' </summary>
-        '''' <returns></returns>
-        'Public Function dbEngine_getMasterADONETConnectionString() As String
-        '    Return getConnectionStringADONET("", "")
-        'End Function
         '
         '====================================================================================================
         ''' <summary>
@@ -266,76 +230,6 @@ Namespace Contensive.Core.Controllers
             End Try
             Return returnConnString
         End Function
-        ''
-        ''====================================================================================================
-        '''' <summary>
-        '''' Create a new catalog in the database
-        '''' </summary>
-        '''' <param name="catalogName"></param>
-        'Public Sub dbEngine_createCatalog(catalogName As String)
-        '    Try
-        '        dbEngine_executeMasterSql("create database " + catalogName)
-        '    Catch ex As Exception
-        '        cpCore.handleExceptionAndContinue(ex) : Throw
-        '    End Try
-        'End Sub
-        ''
-        ''====================================================================================================
-        '''' <summary>
-        '''' Check if the database exists
-        '''' </summary>
-        '''' <param name="catalog"></param>
-        '''' <returns></returns>
-        'Public Function dbEngine_checkCatalogExists(catalog As String) As Boolean
-        '    Dim returnOk As Boolean = False
-        '    Try
-        '        Dim sql As String
-        '        Dim databaseId As Integer = 0
-        '        Dim dt As DataTable
-        '        '
-        '        sql = String.Format("SELECT database_id FROM sys.databases WHERE Name = '{0}'", catalog)
-        '        dt = dbEngine_executeMasterSql(sql)
-        '        returnOk = (dt.Rows.Count > 0)
-        '        dt.Dispose()
-        '    Catch ex As Exception
-        '        cpCore.handleExceptionAndContinue(ex) : Throw
-        '    End Try
-        '    Return returnOk
-        'End Function
-        ''
-        ''====================================================================================================
-        '''' <summary>
-        '''' Execute a command (sql statemwent) and return a dataTable object
-        '''' </summary>
-        '''' <param name="sql"></param>
-        '''' <param name="dataSourceName"></param>
-        '''' <param name="startRecord"></param>
-        '''' <param name="maxRecords"></param>
-        '''' <returns></returns>
-        'Public Function dbEngine_executeMasterSql(ByVal sql As String) As DataTable
-        '    Dim returnData As New DataTable
-        '    Try
-        '        Dim connString As String = dbEngine_getMasterADONETConnectionString()
-        '        If dbEnabled Then
-        '            Using connSQL As New SqlConnection(connString)
-        '                connSQL.Open()
-        '                Using cmdSQL As New SqlCommand()
-        '                    cmdSQL.CommandType = Data.CommandType.Text
-        '                    cmdSQL.CommandText = sql
-        '                    cmdSQL.Connection = connSQL
-        '                    Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
-        '                        adptSQL.Fill(returnData)
-        '                    End Using
-        '                End Using
-        '            End Using
-        '            dbVerified = True
-        '        End If
-        '    Catch ex As Exception
-        '        Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing master sql [" & sql & "]", ex)
-        '        cpCore.handleExceptionAndContinue(newEx)
-        '    End Try
-        '    Return returnData
-        'End Function
         '
         '====================================================================================================
         ''' <summary>
@@ -435,7 +329,6 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="sql"></param>
         ''' <param name="dataSourceName"></param>
-        '
         Public Sub executeNonQuery(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByRef recordsAffected As Integer = 0)
             Try
                 If dbEnabled Then
@@ -462,7 +355,6 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="sql"></param>
         ''' <param name="dataSourceName"></param>
-        '
         Public Sub executeNonQueryAsync(ByVal sql As String, Optional ByVal dataSourceName As String = "")
             Try
                 If dbEnabled Then
@@ -482,27 +374,6 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleException(ex) : Throw
             End Try
         End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' Get a Contents ID from the ContentName, Returns -1 if not found
-        '''' </summary>
-        '''' <param name="ContentName"></param>
-        '''' <returns></returns>
-        'Public Function getContentId(ByVal ContentName As String) As Integer
-        '    Dim returnId As Integer = -1
-        '    Try
-        '        If (Not String.IsNullOrEmpty(ContentName.Trim())) Then
-        '            Dim cdef As cdefModel = cpCore.metaData.getCdef(ContentName)
-        '            If (cdef IsNot Nothing) Then
-        '                returnId = cdef.Id
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex) : Throw
-        '    End Try
-        '    Return returnId
-        'End Function
         '
         '========================================================================
         ''' <summary>
@@ -515,8 +386,7 @@ Namespace Contensive.Core.Controllers
         Public Sub updateTableRecord(ByVal DataSourceName As String, ByVal TableName As String, ByVal Criteria As String, sqlList As sqlFieldListClass)
             Try
                 Dim SQL As String = "update " & TableName & " set " & sqlList.getNameValueList & " where " & Criteria & ";"
-                Dim dt As DataTable = executeQuery(SQL, DataSourceName)
-                dt.Dispose()
+                executeNonQuery(SQL, DataSourceName)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -941,10 +811,10 @@ Namespace Contensive.Core.Controllers
             Dim returnRecordName As String = ""
             Try
                 Dim CS As Integer = cs_openContentRecord(ContentName, RecordID, , , , "Name")
-                If cs_ok(CS) Then
-                    returnRecordName = cs_get(CS, "Name")
+                If csOk(CS) Then
+                    returnRecordName = csGet(CS, "Name")
                 End If
-                Call cs_Close(CS)
+                Call csClose(CS)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -962,11 +832,11 @@ Namespace Contensive.Core.Controllers
             Dim returnValue As Integer = 0
             Try
                 If (Not String.IsNullOrEmpty(ContentName.Trim())) And (Not String.IsNullOrEmpty(RecordName.Trim())) Then
-                    Dim cs As Integer = cs_open(ContentName, "name=" & encodeSQLText(RecordName), "ID", , , , , "ID")
-                    If cs_ok(cs) Then
-                        returnValue = cs_getInteger(cs, "ID")
+                    Dim cs As Integer = csOpen(ContentName, "name=" & encodeSQLText(RecordName), "ID", , , , , "ID")
+                    If csOk(cs) Then
+                        returnValue = csGetInteger(cs, "ID")
                     End If
-                    Call cs_Close(cs)
+                    Call csClose(cs)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -1234,7 +1104,7 @@ Namespace Contensive.Core.Controllers
         ''' <returns></returns>
         '========================================================================
         '
-        Public Function cs_open(ByVal ContentName As String, Optional ByVal Criteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal MemberID As Integer = 0, Optional ByVal ignorefalse2 As Boolean = False, Optional ByVal ignorefalse As Boolean = False, Optional ByVal SelectFieldList As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
+        Public Function csOpen(ByVal ContentName As String, Optional ByVal Criteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal MemberID As Integer = 0, Optional ByVal ignorefalse2 As Boolean = False, Optional ByVal ignorefalse As Boolean = False, Optional ByVal SelectFieldList As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
             Dim returnCs As Integer = -1
             Try
                 Dim SortFields() As String
@@ -1407,7 +1277,7 @@ Namespace Contensive.Core.Controllers
         ''' csv_DeleteCSRecord
         ''' </summary>
         ''' <param name="CSPointer"></param>
-        Public Sub cs_deleteRecord(ByVal CSPointer As Integer)
+        Public Sub csDeleteRecord(ByVal CSPointer As Integer)
             Try
                 '
                 Dim LiveRecordID As Integer
@@ -1419,7 +1289,7 @@ Namespace Contensive.Core.Controllers
                 Dim SQLValue(5) As String
                 Dim Filename As String
                 '
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     '
                     Throw New ArgumentException("csv_ContentSet Is empty Or at End-Of-file")
                 ElseIf Not contentSetStore(CSPointer).Updateable Then
@@ -1435,7 +1305,7 @@ Namespace Contensive.Core.Controllers
                     If (ContentName = "") Then
                         Throw New ArgumentException("csv_ContentSet Is Not based On a Content Definition")
                     Else
-                        LiveRecordID = cs_getInteger(CSPointer, "ID")
+                        LiveRecordID = csGetInteger(CSPointer, "ID")
                         '
                         ' delete any files
                         '
@@ -1451,7 +1321,7 @@ Namespace Contensive.Core.Controllers
                                             '
                                             ' public content files
                                             '
-                                            Filename = cs_getText(CSPointer, fieldName)
+                                            Filename = csGetText(CSPointer, fieldName)
                                             If Filename <> "" Then
                                                 Call cpCore.cdnFiles.deleteFile(Filename)
                                                 'Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
@@ -1460,7 +1330,7 @@ Namespace Contensive.Core.Controllers
                                             '
                                             ' private files
                                             '
-                                            Filename = cs_getText(CSPointer, fieldName)
+                                            Filename = csGetText(CSPointer, fieldName)
                                             If Filename <> "" Then
                                                 Call cpCore.cdnFiles.deleteFile(Filename)
                                             End If
@@ -1495,8 +1365,8 @@ Namespace Contensive.Core.Controllers
         ''' <param name="PageSize"></param>
         ''' <param name="PageNumber"></param>
         ''' <returns></returns>
-        Public Function cs_openCsSql_rev(ByVal DataSourceName As String, ByVal SQL As String, Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
-            Return cs_openSql(SQL, DataSourceName, PageSize, PageNumber)
+        Public Function csOpenSql_rev(ByVal DataSourceName As String, ByVal SQL As String, Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
+            Return csOpenSql(SQL, DataSourceName, PageSize, PageNumber)
         End Function
         '
         '========================================================================
@@ -1508,7 +1378,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="PageSize"></param>
         ''' <param name="PageNumber"></param>
         ''' <returns></returns>
-        Public Function cs_openSql(ByVal SQL As String, Optional ByVal DataSourceName As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
+        Public Function csOpenSql(ByVal SQL As String, Optional ByVal DataSourceName As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
             Dim returnCs As Integer = -1
             Try
                 returnCs = cs_init(cpCore.authContext.user.id)
@@ -1594,12 +1464,12 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="CSPointer"></param>
         ''' <param name="AsyncSave"></param>
-        Public Sub cs_Close(ByRef CSPointer As Integer, Optional ByVal AsyncSave As Boolean = False)
+        Public Sub csClose(ByRef CSPointer As Integer, Optional ByVal AsyncSave As Boolean = False)
             Try
                 If (CSPointer > 0) And (CSPointer <= contentSetStoreCount) Then
                     With contentSetStore(CSPointer)
                         If .IsOpen Then
-                            Call cs_save2(CSPointer, AsyncSave)
+                            Call csSave2(CSPointer, AsyncSave)
                             ReDim .readCache(0, 0)
                             ReDim .fieldNames(0)
                             .ResultColumnCount = 0
@@ -1623,17 +1493,17 @@ Namespace Contensive.Core.Controllers
         ' Move the csv_ContentSet to the next row
         '========================================================================
         '
-        Public Sub cs_goNext(ByVal CSPointer As Integer, Optional ByVal AsyncSave As Boolean = False)
+        Public Sub csGoNext(ByVal CSPointer As Integer, Optional ByVal AsyncSave As Boolean = False)
             Try
                 '
                 Dim ContentName As String
                 Dim RecordID As Integer
                 '
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     '
                     Throw New ApplicationException("CSPointer Not csv_IsCSOK.")
                 Else
-                    Call cs_save2(CSPointer, AsyncSave)
+                    Call csSave2(CSPointer, AsyncSave)
                     'contentSetStore(CSPointer).WorkflowEditingMode = False
                     '
                     ' Move to next row
@@ -1649,7 +1519,7 @@ Namespace Contensive.Core.Controllers
                         '
                         If (Not cs_IsEOF(CSPointer)) Then
                             ContentName = contentSetStore(CSPointer).ContentName
-                            RecordID = cs_getInteger(CSPointer, "ID")
+                            RecordID = csGetInteger(CSPointer, "ID")
                             If Not cpCore.workflow.isRecordLocked(ContentName, RecordID, contentSetStore(CSPointer).OwnerMemberID) Then
                                 Call cpCore.workflow.setEditLock(ContentName, RecordID, contentSetStore(CSPointer).OwnerMemberID)
                             End If
@@ -1667,10 +1537,10 @@ Namespace Contensive.Core.Controllers
         '
         Public Sub cs_goFirst(ByVal CSPointer As Integer, Optional ByVal AsyncSave As Boolean = False)
             Try
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ApplicationException("data set is not valid")
                 Else
-                    Call cs_save2(CSPointer, AsyncSave)
+                    Call csSave2(CSPointer, AsyncSave)
                     contentSetStore(CSPointer).readCacheRowPtr = 0
                 End If
             Catch ex As Exception
@@ -1695,7 +1565,7 @@ Namespace Contensive.Core.Controllers
                 '
                 fieldNameTrim = FieldName.Trim()
                 fieldNameTrimUpper = genericController.vbUCase(fieldNameTrim)
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ApplicationException("Attempt To GetValue fieldname[" & FieldName & "], but the dataset Is empty Or does Not point To a valid row")
                 Else
                     With contentSetStore(CSPointer)
@@ -1765,7 +1635,7 @@ Namespace Contensive.Core.Controllers
         Function cs_getFirstFieldName(ByVal CSPointer As Integer) As String
             Dim returnFieldName As String = ""
             Try
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ApplicationException("data set is not valid")
                 Else
                     contentSetStore(CSPointer).fieldPointer = 0
@@ -1786,7 +1656,7 @@ Namespace Contensive.Core.Controllers
         Function cs_getNextFieldName(ByVal CSPointer As Integer) As String
             Dim returnFieldName As String = ""
             Try
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ApplicationException("data set is not valid")
                 Else
                     With contentSetStore(CSPointer)
@@ -1819,7 +1689,7 @@ Namespace Contensive.Core.Controllers
         Public Function cs_getFieldTypeId(ByVal CSPointer As Integer, ByVal FieldName As String) As Integer
             Dim returnFieldTypeid As Integer = 0
             Try
-                If cs_ok(CSPointer) Then
+                If csOk(CSPointer) Then
                     If contentSetStore(CSPointer).Updateable Then
                         With contentSetStore(CSPointer).CDef
                             If .Name <> "" Then
@@ -1844,7 +1714,7 @@ Namespace Contensive.Core.Controllers
         Public Function cs_getFieldCaption(ByVal CSPointer As Integer, ByVal FieldName As String) As String
             Dim returnResult As String = ""
             Try
-                If cs_ok(CSPointer) Then
+                If csOk(CSPointer) Then
                     If contentSetStore(CSPointer).Updateable Then
                         With contentSetStore(CSPointer).CDef
                             If .Name <> "" Then
@@ -1871,7 +1741,7 @@ Namespace Contensive.Core.Controllers
         Public Function cs_getSelectFieldList(ByVal CSPointer As Integer) As String
             Dim returnResult As String = ""
             Try
-                If cs_ok(CSPointer) Then
+                If csOk(CSPointer) Then
                     If useCSReadCacheMultiRow Then
                         returnResult = Join(contentSetStore(CSPointer).fieldNames, ",")
                     Else
@@ -1908,7 +1778,7 @@ Namespace Contensive.Core.Controllers
             Try
                 If String.IsNullOrEmpty(FieldName) Then
                     Throw New ArgumentException("Field name cannot be blank")
-                ElseIf Not cs_ok(CSPointer) Then
+                ElseIf Not csOk(CSPointer) Then
                     Throw New ArgumentException("dataset is not valid")
                 Else
                     Dim CSSelectFieldList As String = cs_getSelectFieldList(CSPointer)
@@ -1932,7 +1802,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="OriginalFilename"></param>
         ''' <param name="ContentName"></param>
         ''' <returns></returns>
-        Public Function cs_getFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "", Optional fieldTypeId As Integer = 0) As String
+        Public Function csGetFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "", Optional fieldTypeId As Integer = 0) As String
             Dim returnFilename As String = ""
             Try
                 Dim TableName As String
@@ -1942,7 +1812,7 @@ Namespace Contensive.Core.Controllers
                 Dim LenFilename As Integer
                 Dim Pos As Integer
                 '
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ArgumentException("CSPointer does Not point To a valid dataset, it Is empty, Or it Is Not pointing To a valid row.")
                 ElseIf FieldName = "" Then
                     Throw New ArgumentException("Fieldname Is blank")
@@ -1981,7 +1851,7 @@ Namespace Contensive.Core.Controllers
                             If .ResultColumnCount > 0 Then
                                 For FieldPointer = 0 To .ResultColumnCount - 1
                                     If genericController.vbUCase(.fieldNames(FieldPointer)) = "ID" Then
-                                        RecordID = cs_getInteger(CSPointer, "ID")
+                                        RecordID = csGetInteger(CSPointer, "ID")
                                         Exit For
                                     End If
                                 Next
@@ -2048,38 +1918,38 @@ Namespace Contensive.Core.Controllers
         '
         '   csv_cs_getText
         '
-        Public Function cs_getText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            cs_getText = genericController.encodeText(cs_getValue(CSPointer, FieldName))
+        Public Function csGetText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+            csGetText = genericController.encodeText(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '   genericController.EncodeInteger( csv_cs_getField )
         '
-        Public Function cs_getInteger(ByVal CSPointer As Integer, ByVal FieldName As String) As Integer
-            cs_getInteger = genericController.EncodeInteger(cs_getValue(CSPointer, FieldName))
+        Public Function csGetInteger(ByVal CSPointer As Integer, ByVal FieldName As String) As Integer
+            csGetInteger = genericController.EncodeInteger(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '   encodeNumber( csv_cs_getField )
         '
-        Public Function cs_getNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
-            cs_getNumber = genericController.EncodeNumber(cs_getValue(CSPointer, FieldName))
+        Public Function csGetNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
+            csGetNumber = genericController.EncodeNumber(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '    genericController.EncodeDate( csv_cs_getField )
         '
-        Public Function cs_getDate(ByVal CSPointer As Integer, ByVal FieldName As String) As Date
-            cs_getDate = genericController.EncodeDate(cs_getValue(CSPointer, FieldName))
+        Public Function csGetDate(ByVal CSPointer As Integer, ByVal FieldName As String) As Date
+            csGetDate = genericController.EncodeDate(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '   genericController.EncodeBoolean( csv_cs_getField )
         '
-        Public Function cs_getBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
-            cs_getBoolean = genericController.EncodeBoolean(cs_getValue(CSPointer, FieldName))
+        Public Function csGetBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
+            csGetBoolean = genericController.EncodeBoolean(cs_getValue(CSPointer, FieldName))
         End Function
         '
         '   genericController.EncodeBoolean( csv_cs_getField )
         '
-        Public Function cs_getLookup(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            cs_getLookup = cs_get(CSPointer, FieldName)
+        Public Function csGetLookup(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+            csGetLookup = csGet(CSPointer, FieldName)
         End Function
         '
         '====================================================================================
@@ -2092,9 +1962,9 @@ Namespace Contensive.Core.Controllers
         '   ContentName Contentname for the field to be saved
         '====================================================================================
         '
-        Public Sub SetCSTextFile(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal Copy As String, ByVal ContentName As String)
+        Public Sub csSetTextFile(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal Copy As String, ByVal ContentName As String)
             Try
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ArgumentException("dataset is not valid")
                 ElseIf String.IsNullOrEmpty(FieldName) Then
                     Throw New ArgumentException("fieldName cannot be blank")
@@ -2105,14 +1975,14 @@ Namespace Contensive.Core.Controllers
                         If Not .Updateable Then
                             Throw New ApplicationException("Attempting To update an unupdateable data set")
                         Else
-                            Dim OldFilename As String = cs_getText(CSPointer, FieldName)
-                            Dim Filename As String = cs_getFilename(CSPointer, FieldName, "", ContentName, FieldTypeIdFileText)
+                            Dim OldFilename As String = csGetText(CSPointer, FieldName)
+                            Dim Filename As String = csGetFilename(CSPointer, FieldName, "", ContentName, FieldTypeIdFileText)
                             If OldFilename <> Filename Then
                                 '
                                 ' Filename changed, mark record changed
                                 '
                                 Call cpCore.cdnFiles.saveFile(Filename, Copy)
-                                Call cs_set(CSPointer, FieldName, Filename)
+                                Call csSet(CSPointer, FieldName, Filename)
                             Else
                                 Dim OldCopy As String = cpCore.cdnFiles.readFile(Filename)
                                 If OldCopy <> Copy Then
@@ -2120,7 +1990,7 @@ Namespace Contensive.Core.Controllers
                                     ' copy changed, mark record changed
                                     '
                                     Call cpCore.cdnFiles.saveFile(Filename, Copy)
-                                    Call cs_set(CSPointer, FieldName, Filename)
+                                    Call csSet(CSPointer, FieldName, Filename)
                                 End If
                             End If
                         End If
@@ -2130,112 +2000,6 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleException(ex) : Throw
             End Try
         End Sub
-        ''
-        ''====================================================================================
-        '''' <summary>
-        '''' Get the value of a a csv_ContentSet Field for a TextFile fieldtype
-        '''' (returns the content of the filename stored in the field)
-        '''' 
-        '''' </summary>
-        '''' <param name="CSPointer"></param>
-        '''' <param name="FieldName"></param>
-        '''' <returns></returns>
-        '<Obsolete("Use getText for copy, getFilename for filename", True)> Public Function cs_getTextFile(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-        '    Dim result As String = ""
-        '    Try
-        '        If Not cs_ok(CSPointer) Then
-        '            Throw New ArgumentException("dataset must be valid")
-        '        ElseIf String.IsNullOrEmpty(FieldName) Then
-        '            Throw New ArgumentException("fieldname cannot be blank")
-        '        Else
-        '            Dim Filename As String = cs_getText(CSPointer, FieldName)
-        '            If Not String.IsNullOrEmpty(Filename) Then
-        '                result = cpCore.cdnFiles.readFile(Filename)
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex) : Throw
-        '    End Try
-        '    Return result
-        'End Function
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' set the value of a field within a csv_ContentSet
-        '''' </summary>
-        '''' <param name="CSPointer"></param>
-        '''' <param name="FieldName"></param>
-        '''' <param name="FieldValue"></param>
-        'Public Sub cs_setFieldx(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Object)
-        '    Try
-        '        cs_set(CSPointer, FieldName, FieldValue)
-        '        'Dim FieldNameLocal As String
-        '        'Dim FieldNameLocalUcase As String
-        '        'Dim SetNeeded As Boolean
-        '        'Dim field As coreMetaDataClass.CDefFieldClass
-        '        ''
-        '        'If Not cs_ok(CSPointer) Then
-        '        '    Throw New ArgumentException("dataset must be valid")
-        '        'Else
-        '        '    With contentSetStore(CSPointer)
-        '        '        If Not .Updateable Then
-        '        '            Throw New ApplicationException("Attempting To update an unupdateable Content Set")
-        '        '        Else
-        '        '            FieldNameLocal = Trim(FieldName)
-        '        '            FieldNameLocalUcase = genericController.vbUCase(FieldNameLocal)
-        '        '            With .CDef
-        '        '                If String.IsNullOrEmpty(.Name) Then
-        '        '                    Throw New ApplicationException("Dataset must specify the content to update and cannot be created from a query.")
-        '        '                ElseIf Not .fields.ContainsKey(FieldName.ToLower()) Then
-        '        '                    Throw New ApplicationException("setField failed because field [" & FieldName.ToLower & "] was Not found In content [" & .Name & "]")
-        '        '                Else
-        '        '                    field = .fields(FieldName.ToLower)
-        '        '                    Select Case field.fieldTypeId
-        '        '                        Case FieldTypeIdAutoIdIncrement, FieldTypeIdRedirect, FieldTypeIdManyToMany
-        '        '                        '
-        '        '                        ' Never set
-        '        '                        '
-        '        '                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileHTMLPrivate
-        '        '                            '
-        '        '                            ' Always set
-        '        '                            ' TextFile, assume this call is only made if a change was made to the copy.
-        '        '                            ' Use the csv_SetCSTextFile to manage the modified name and date correctly.
-        '        '                            ' csv_SetCSTextFile uses this method to set the row changed, so leave this here.
-        '        '                            '
-        '        '                            SetNeeded = True
-        '        '                        Case FieldTypeIdBoolean
-        '        '                            '
-        '        '                            ' Boolean - sepcial case, block on typed GetAlways set
-        '        '                            If genericController.EncodeBoolean(FieldValue) <> cs_getBoolean(CSPointer, FieldName) Then
-        '        '                                SetNeeded = True
-        '        '                            End If
-        '        '                        Case Else
-        '        '                            '
-        '        '                            ' Set if text of value changes
-        '        '                            '
-        '        '                            If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldName) Then
-        '        '                                SetNeeded = True
-        '        '                            End If
-        '        '                    End Select
-        '        '                End If
-        '        '            End With
-        '        '            If Not SetNeeded Then
-        '        '                SetNeeded = SetNeeded
-        '        '            Else
-        '        '                If .writeCache.ContainsKey(FieldName.ToLower) Then
-        '        '                    .writeCache.Item(FieldName.ToLower) = genericController.encodeText(FieldValue)
-        '        '                Else
-        '        '                    .writeCache.Add(FieldName.ToLower, genericController.encodeText(FieldValue))
-        '        '                End If
-        '        '                .LastUsed = DateTime.Now
-        '        '            End If
-        '        '        End If
-        '        '    End With
-        '        'End If
-        '    Catch ex As Exception
-        '        cpCore.handleExceptionAndContinue(ex) : Throw
-        '    End Try
-        'End Sub
         '
         '========================================================================
         ''' <summary>
@@ -2268,19 +2032,17 @@ Namespace Contensive.Core.Controllers
         ''' <param name="MemberID"></param>
         ''' <returns></returns>
         '''
-        '
-        ' refactor -- this should not be metaData
-        Public Function metaData_InsertContentRecordGetID(ByVal ContentName As String, ByVal MemberID As Integer) As Integer
+        Public Function insertContentRecordGetID(ByVal ContentName As String, ByVal MemberID As Integer) As Integer
             Dim result As Integer = -1
             Try
-                Dim CS As Integer = cs_insertRecord(ContentName, MemberID)
-                If Not cs_ok(CS) Then
-                    Call cs_Close(CS)
+                Dim CS As Integer = csInsertRecord(ContentName, MemberID)
+                If Not csOk(CS) Then
+                    Call csClose(CS)
                     Throw New ApplicationException("could not insert record in content [" & ContentName & "]")
                 Else
-                    result = cs_getInteger(CS, "ID")
+                    result = csGetInteger(CS, "ID")
                 End If
-                Call cs_Close(CS)
+                Call csClose(CS)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -2303,12 +2065,12 @@ Namespace Contensive.Core.Controllers
                     Throw New ArgumentException("recordId must be positive value")
                 Else
                     Dim CSPointer As Integer = cs_openContentRecord(ContentName, RecordID, MemberID, True, True)
-                    If Not cs_ok(CSPointer) Then
+                    If Not csOk(CSPointer) Then
                         Throw New ApplicationException("Could not open record [" & RecordID.ToString() & "] in content [" & ContentName & "]")
                     Else
-                        Call cs_deleteRecord(CSPointer)
+                        Call csDeleteRecord(CSPointer)
                     End If
-                    Call cs_Close(CSPointer)
+                    Call csClose(CSPointer)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -2345,13 +2107,13 @@ Namespace Contensive.Core.Controllers
                         ' another option is invalidate the entire table (tablename-invalidate), but this also has performance problems
                         '
                         Dim invaldiateObjectList As New List(Of String)
-                        CSPointer = cs_open(ContentName, Criteria, , False, MemberID, True, True, "ID")
-                        Do While cs_ok(CSPointer)
-                            invaldiateObjectList.Add(Controllers.cacheController.getCacheName_Entity(CDef.ContentTableName, "id", cs_getInteger(CSPointer, "id").ToString()))
-                            Call cs_deleteRecord(CSPointer)
-                            Call cs_goNext(CSPointer)
+                        CSPointer = csOpen(ContentName, Criteria, , False, MemberID, True, True, "ID")
+                        Do While csOk(CSPointer)
+                            invaldiateObjectList.Add(Controllers.cacheController.getCacheName_Entity(CDef.ContentTableName, "id", csGetInteger(CSPointer, "id").ToString()))
+                            Call csDeleteRecord(CSPointer)
+                            Call csGoNext(CSPointer)
                         Loop
-                        Call cs_Close(CSPointer)
+                        Call csClose(CSPointer)
                         Call cpCore.cache.invalidateObjectList(invaldiateObjectList)
 
                         '    ElseIf cpCore.siteProperties.allowWorkflowAuthoring And (false) Then
@@ -2387,7 +2149,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="ContentName"></param>
         ''' <param name="MemberID"></param>
         ''' <returns></returns>
-        Public Function cs_insertRecord(ByVal ContentName As String, Optional ByVal MemberID As Integer = -1) As Integer
+        Public Function csInsertRecord(ByVal ContentName As String, Optional ByVal MemberID As Integer = -1) As Integer
             Dim returnCs As Integer = -1
             Try
                 Dim DateAddedString As String
@@ -2505,7 +2267,7 @@ Namespace Contensive.Core.Controllers
                             ' ----- Get the record back so we can use the ID
                             '
                             Criteria = "((createkey=" & CreateKeyString & ")And(DateAdded=" & DateAddedString & "))"
-                            returnCs = cs_open(ContentName, Criteria, "ID DESC", False, MemberID, False, True)
+                            returnCs = csOpen(ContentName, Criteria, "ID DESC", False, MemberID, False, True)
                             ''
                             '' ----- Clear Time Stamp because a record changed
                             ''
@@ -2533,7 +2295,7 @@ Namespace Contensive.Core.Controllers
                 If (RecordID <= 0) Then
                     ' no error, return -1 - Throw New ArgumentException("recordId is not valid [" & RecordID & "]")
                 Else
-                    returnResult = cs_open(ContentName, "(ID=" & encodeSQLNumber(RecordID) & ")", , False, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+                    returnResult = csOpen(ContentName, "(ID=" & encodeSQLNumber(RecordID) & ")", , False, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -2547,7 +2309,7 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="CSPointer"></param>
         ''' <returns></returns>
-        Function cs_ok(ByVal CSPointer As Integer) As Boolean
+        Function csOk(ByVal CSPointer As Integer) As Boolean
             Dim returnResult As Boolean = False
             Try
                 If CSPointer < 0 Then
@@ -2573,7 +2335,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="CSDestination"></param>
         '========================================================================
         '
-        Public Sub cs_copyRecord(ByVal CSSource As Integer, ByVal CSDestination As Integer)
+        Public Sub csCopyRecord(ByVal CSSource As Integer, ByVal CSDestination As Integer)
             Try
                 Dim FieldName As String
                 Dim DestContentName As String
@@ -2582,16 +2344,16 @@ Namespace Contensive.Core.Controllers
                 Dim SourceFilename As String
                 Dim DestCDef As cdefModel
                 '
-                If Not cs_ok(CSSource) Then
+                If Not csOk(CSSource) Then
                     Throw New ArgumentException("source dataset is not valid")
-                ElseIf Not cs_ok(CSDestination) Then
+                ElseIf Not csOk(CSDestination) Then
                     Throw New ArgumentException("destination dataset is not valid")
                 ElseIf (contentSetStore(CSDestination).CDef Is Nothing) Then
                     Throw New ArgumentException("copyRecord requires the destination dataset to be created from a cs Open or Insert, not a query.")
                 Else
                     DestCDef = contentSetStore(CSDestination).CDef
                     DestContentName = DestCDef.Name
-                    DestRecordID = cs_getInteger(CSDestination, "ID")
+                    DestRecordID = csGetInteger(CSDestination, "ID")
                     FieldName = cs_getFirstFieldName(CSSource)
                     Do While (Not String.IsNullOrEmpty(FieldName))
                         Select Case genericController.vbUCase(FieldName)
@@ -2607,36 +2369,36 @@ Namespace Contensive.Core.Controllers
                                         '
                                         ' ----- cdn file
                                         '
-                                        SourceFilename = cs_getFilename(CSSource, FieldName, "", contentSetStore(CSDestination).CDef.Name, sourceFieldTypeId)
+                                        SourceFilename = csGetFilename(CSSource, FieldName, "", contentSetStore(CSDestination).CDef.Name, sourceFieldTypeId)
                                         'SourceFilename = (csv_cs_getText(CSSource, FieldName))
                                         If (SourceFilename <> "") Then
-                                            DestFilename = cs_getFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId)
+                                            DestFilename = csGetFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId)
                                             'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
-                                            Call cs_set(CSDestination, FieldName, DestFilename)
+                                            Call csSet(CSDestination, FieldName, DestFilename)
                                             Call cpCore.cdnFiles.copyFile(SourceFilename, DestFilename)
                                         End If
                                     Case FieldTypeIdFileText, FieldTypeIdFileHTML
                                         '
                                         ' ----- private file
                                         '
-                                        SourceFilename = cs_getFilename(CSSource, FieldName, "", DestContentName, sourceFieldTypeId)
+                                        SourceFilename = csGetFilename(CSSource, FieldName, "", DestContentName, sourceFieldTypeId)
                                         'SourceFilename = (csv_cs_getText(CSSource, FieldName))
                                         If (SourceFilename <> "") Then
-                                            DestFilename = cs_getFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId)
+                                            DestFilename = csGetFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId)
                                             'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
-                                            Call cs_set(CSDestination, FieldName, DestFilename)
+                                            Call csSet(CSDestination, FieldName, DestFilename)
                                             Call cpCore.cdnFiles.copyFile(SourceFilename, DestFilename)
                                         End If
                                     Case Else
                                         '
                                         ' ----- value
                                         '
-                                        Call cs_set(CSDestination, FieldName, cs_getValue(CSSource, FieldName))
+                                        Call csSet(CSDestination, FieldName, cs_getValue(CSSource, FieldName))
                                 End Select
                         End Select
                         FieldName = cs_getNextFieldName(CSSource)
                     Loop
-                    Call cs_save2(CSDestination)
+                    Call csSave2(CSDestination)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -2649,10 +2411,10 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="CSPointer"></param>
         ''' <returns></returns>
-        Public Function cs_getSource(ByVal CSPointer As Integer) As String
+        Public Function csGetSource(ByVal CSPointer As Integer) As String
             Dim returnResult As String = ""
             Try
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ArgumentException("the dataset is not valid")
                 Else
                     returnResult = contentSetStore(CSPointer).Source
@@ -2671,7 +2433,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="FieldName"></param>
         ''' <returns></returns>
         '
-        Public Function cs_get(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+        Public Function csGet(ByVal CSPointer As Integer, ByVal FieldName As String) As String
             Dim fieldValue As String = ""
             Try
                 Dim FieldValueInteger As Integer
@@ -2686,7 +2448,7 @@ Namespace Contensive.Core.Controllers
                 ' ----- needs work. Go to fields table and get field definition
                 '       then print accordingly
                 '
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ArgumentException("the dataset is not valid")
                 ElseIf String.IsNullOrEmpty(FieldName.Trim()) Then
                     Throw New ArgumentException("fieldname cannot be blank")
@@ -2787,11 +2549,11 @@ Namespace Contensive.Core.Controllers
                                                         '
                                                         ' First try Lookup Content
                                                         '
-                                                        CSLookup = cs_open(LookupContentName, "ID=" & encodeSQLNumber(genericController.EncodeInteger(FieldValueVariant)), , , , , , "name", 1)
-                                                        If cs_ok(CSLookup) Then
-                                                            fieldValue = cs_getText(CSLookup, "name")
+                                                        CSLookup = csOpen(LookupContentName, "ID=" & encodeSQLNumber(genericController.EncodeInteger(FieldValueVariant)), , , , , , "name", 1)
+                                                        If csOk(CSLookup) Then
+                                                            fieldValue = csGetText(CSLookup, "name")
                                                         End If
-                                                        Call cs_Close(CSLookup)
+                                                        Call csClose(CSLookup)
                                                     ElseIf LookupList <> "" Then
                                                         '
                                                         ' Next try lookup list
@@ -2871,7 +2633,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="FieldName"></param>
         ''' <param name="FieldValue"></param>
         '
-        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As String)
+        Public Sub csSet(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As String)
             Try
                 Dim BlankTest As String
                 Dim FieldNameLc As String
@@ -2881,7 +2643,7 @@ Namespace Contensive.Core.Controllers
                 Dim fileName As String
                 Dim pathFilenameOriginal As String
                 '
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ArgumentException("dataset is not valid or End-Of-file.")
                 ElseIf String.IsNullOrEmpty(FieldName.Trim()) Then
                     Throw New ArgumentException("fieldName cannnot be blank")
@@ -2928,7 +2690,7 @@ Namespace Contensive.Core.Controllers
                                                 ' Use the csv_SetCSTextFile to manage the modified name and date correctly.
                                                 ' csv_SetCSTextFile uses this method to set the row changed, so leave this here.
                                                 '
-                                                fileNameNoExt = cs_getText(CSPointer, FieldNameLc)
+                                                fileNameNoExt = csGetText(CSPointer, FieldNameLc)
                                                 'FieldValue = genericController.encodeText(FieldValueVariantLocal)
                                                 If FieldValue = "" Then
                                                     If fileNameNoExt <> "" Then
@@ -2938,7 +2700,7 @@ Namespace Contensive.Core.Controllers
                                                     End If
                                                 Else
                                                     If fileNameNoExt = "" Then
-                                                        fileNameNoExt = cs_getFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId)
+                                                        fileNameNoExt = csGetFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId)
                                                     End If
                                                     Call cpCore.cdnFiles.saveFile(fileNameNoExt, FieldValue)
                                                     'Call publicFiles.SaveFile(fileNameNoExt, FieldValue)
@@ -2954,7 +2716,7 @@ Namespace Contensive.Core.Controllers
                                                 Dim FilenameRev As Integer
                                                 Dim path As String
                                                 Dim Pos As Integer
-                                                pathFilenameOriginal = cs_getText(CSPointer, FieldNameLc)
+                                                pathFilenameOriginal = csGetText(CSPointer, FieldNameLc)
                                                 PathFilename = pathFilenameOriginal
                                                 BlankTest = FieldValue
                                                 BlankTest = genericController.vbReplace(BlankTest, " ", "")
@@ -2968,7 +2730,7 @@ Namespace Contensive.Core.Controllers
                                                     End If
                                                 Else
                                                     If PathFilename = "" Then
-                                                        PathFilename = cs_getFilename(CSPointer, FieldNameLc, "", ContentName, field.fieldTypeId)
+                                                        PathFilename = csGetFilename(CSPointer, FieldNameLc, "", ContentName, field.fieldTypeId)
                                                     End If
                                                     If Left(PathFilename, 1) = "/" Then
                                                         '
@@ -3017,7 +2779,7 @@ Namespace Contensive.Core.Controllers
                                             Case FieldTypeIdBoolean
                                                 '
                                                 ' Boolean - sepcial case, block on typed GetAlways set
-                                                If genericController.EncodeBoolean(FieldValue) <> cs_getBoolean(CSPointer, FieldNameLc) Then
+                                                If genericController.EncodeBoolean(FieldValue) <> csGetBoolean(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                             Case FieldTypeIdText
@@ -3027,7 +2789,7 @@ Namespace Contensive.Core.Controllers
                                                 If (FieldValue.Length > 255) Then
                                                     cpCore.handleException(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for Text field is 255. Save will be attempted"))
                                                 Else
-                                                    If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldNameLc) Then
+                                                    If genericController.encodeText(FieldValue) <> csGetText(CSPointer, FieldNameLc) Then
                                                         SetNeeded = True
                                                     End If
                                                 End If
@@ -3038,7 +2800,7 @@ Namespace Contensive.Core.Controllers
                                                 If (FieldValue.Length > 65535) Then
                                                     cpCore.handleException(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for LongText and Html is 65535. Save will be attempted"))
                                                 Else
-                                                    If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldNameLc) Then
+                                                    If genericController.encodeText(FieldValue) <> csGetText(CSPointer, FieldNameLc) Then
                                                         SetNeeded = True
                                                     End If
                                                 End If
@@ -3046,7 +2808,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldNameLc) Then
+                                                If genericController.encodeText(FieldValue) <> csGetText(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                         End Select
@@ -3073,17 +2835,17 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleException(ex) : Throw
             End Try
         End Sub
-        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Date)
-            cs_set(CSPointer, FieldName, FieldValue.ToString())
+        Public Sub csSet(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Date)
+            csSet(CSPointer, FieldName, FieldValue.ToString())
         End Sub
-        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Boolean)
-            cs_set(CSPointer, FieldName, FieldValue.ToString())
+        Public Sub csSet(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Boolean)
+            csSet(CSPointer, FieldName, FieldValue.ToString())
         End Sub
-        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Integer)
-            cs_set(CSPointer, FieldName, FieldValue.ToString())
+        Public Sub csSet(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Integer)
+            csSet(CSPointer, FieldName, FieldValue.ToString())
         End Sub
-        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Double)
-            cs_set(CSPointer, FieldName, FieldValue.ToString())
+        Public Sub csSet(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Double)
+            csSet(CSPointer, FieldName, FieldValue.ToString())
         End Sub
         '
         '========================================================================
@@ -3091,9 +2853,9 @@ Namespace Contensive.Core.Controllers
         ''' rollback, or undo the changes to the current row
         ''' </summary>
         ''' <param name="CSPointer"></param>
-        Public Sub cs_rollBack(ByVal CSPointer As Integer)
+        Public Sub csRollBack(ByVal CSPointer As Integer)
             Try
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ArgumentException("dataset is not valid")
                 Else
                     contentSetStore(CSPointer).writeCache.Clear()
@@ -3126,7 +2888,7 @@ Namespace Contensive.Core.Controllers
         '
         '========================================================================
         '
-        Public Sub cs_save2(ByVal CSPointer As Integer, Optional ByVal AsyncSave As Boolean = False, Optional ByVal Blockcsv_ClearBake As Boolean = False)
+        Public Sub csSave2(ByVal CSPointer As Integer, Optional ByVal AsyncSave As Boolean = False, Optional ByVal Blockcsv_ClearBake As Boolean = False)
             Try
                 Dim sqlModifiedDate As Date
                 Dim sqlModifiedBy As Integer
@@ -3165,7 +2927,7 @@ Namespace Contensive.Core.Controllers
                 Dim ColumnPtr As Integer
 
                 '
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     '
                     ' already closed or not opened or not on a current row. No error so you can always call save(), it skips if nothing to save
                     '
@@ -3186,10 +2948,10 @@ Namespace Contensive.Core.Controllers
                             ContentID = .Id
                         End With
                         '
-                        LiveRecordID = cs_getInteger(CSPointer, "ID")
-                        LiveRecordContentControlID = cs_getInteger(CSPointer, "CONTENTCONTROLID")
+                        LiveRecordID = csGetInteger(CSPointer, "ID")
+                        LiveRecordContentControlID = csGetInteger(CSPointer, "CONTENTCONTROLID")
                         LiveRecordContentName = cpCore.metaData.getContentNameByID(LiveRecordContentControlID)
-                        LiveRecordInactive = Not cs_getBoolean(CSPointer, "ACTIVE")
+                        LiveRecordInactive = Not csGetBoolean(CSPointer, "ACTIVE")
                         '
                         '
                         SQLLiveDelimiter = ""
@@ -3636,41 +3398,31 @@ Namespace Contensive.Core.Controllers
         ''' <param name="PageSize"></param>
         ''' <param name="PageNumber"></param>
         ''' <returns></returns>
-        Public Function cs_openGroupUsers(ByVal groupList As List(Of String), Optional ByVal sqlCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
-            Dim returnResult As Integer
+        Public Function csOpenGroupUsers(ByVal groupList As List(Of String), Optional ByVal sqlCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
+            Dim returnResult As Integer = -1
             Try
+                Dim rightNow As Date = DateTime.Now
+                Dim sqlRightNow As String = encodeSQLDate(rightNow)
                 '
-                Dim rightNow As Date
-                Dim sqlRightNow As String
-                Dim SQL As String
-                '
-                rightNow = DateTime.Now
-                sqlRightNow = encodeSQLDate(rightNow)
                 If PageNumber = 0 Then
                     PageNumber = 1
                 End If
                 If PageSize = 0 Then
                     PageSize = pageSizeDefault
                 End If
-                '
-                returnResult = -1
                 If groupList.Count > 0 Then
                     '
                     ' Build Inner Query to select distinct id needed
                     '
-                    SQL = "SELECT DISTINCT ccMembers.id" _
-                    & " FROM (ccMembers" _
-                    & " LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID)" _
-                    & " LEFT JOIN ccGroups ON ccMemberRules.GroupID = ccGroups.ID" _
-                    & " WHERE (ccMemberRules.Active<>0)AND(ccGroups.Active<>0)"
-                    '
-                    ' active members
+                    Dim SQL As String = "SELECT DISTINCT ccMembers.id" _
+                        & " FROM (ccMembers" _
+                        & " LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID)" _
+                        & " LEFT JOIN ccGroups ON ccMemberRules.GroupID = ccGroups.ID" _
+                        & " WHERE (ccMemberRules.Active<>0)AND(ccGroups.Active<>0)"
                     '
                     If ActiveOnly Then
                         SQL &= "AND(ccMembers.Active<>0)"
                     End If
-                    '
-                    ' list of groups
                     '
                     Dim subQuery As String = ""
                     For Each groupName As String In groupList
@@ -3682,8 +3434,7 @@ Namespace Contensive.Core.Controllers
                         SQL &= "and(" & subQuery.Substring(2) & ")"
                     End If
                     '
-                    ' group expiration
-                    '
+                    ' -- group expiration
                     SQL &= "and((ccMemberRules.DateExpires Is Null)or(ccMemberRules.DateExpires>" & sqlRightNow & "))"
                     '
                     ' Build outer query to get all ccmember fields
@@ -3696,7 +3447,7 @@ Namespace Contensive.Core.Controllers
                     If SortFieldList <> "" Then
                         SQL &= " Order by " & SortFieldList
                     End If
-                    returnResult = cs_openCsSql_rev("default", SQL, PageSize, PageNumber)
+                    returnResult = csOpenSql_rev("default", SQL, PageSize, PageNumber)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -3924,10 +3675,10 @@ Namespace Contensive.Core.Controllers
         ''' <param name="CSPointer"></param>
         ''' <returns></returns>
         '
-        Public Function cs_getRowCount(ByVal CSPointer As Integer) As Integer
+        Public Function csGetRowCount(ByVal CSPointer As Integer) As Integer
             Dim returnResult As Integer
             Try
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ArgumentException("dataset is not valid")
                 Else
                     returnResult = contentSetStore(CSPointer).readCacheRowCnt
@@ -3948,7 +3699,7 @@ Namespace Contensive.Core.Controllers
         Public Function cs_getRowFields(ByVal CSPointer As Integer) As String()
             Dim returnResult As String() = {}
             Try
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ArgumentException("dataset is not valid")
                 Else
                     returnResult = contentSetStore(CSPointer).fieldNames
@@ -3994,7 +3745,7 @@ Namespace Contensive.Core.Controllers
         Public Function cs_getContentName(ByVal CSPointer As Integer) As String
             Dim returnResult As String = ""
             Try
-                If Not cs_ok(CSPointer) Then
+                If Not csOk(CSPointer) Then
                     Throw New ArgumentException("dataset is not valid")
                 Else
                     returnResult = contentSetStore(CSPointer).ContentName
@@ -4183,11 +3934,11 @@ Namespace Contensive.Core.Controllers
                 ElseIf String.IsNullOrEmpty(RecordGuid) Then
                     Throw New ArgumentException("RecordGuid cannot be blank")
                 Else
-                    Dim CS As Integer = cs_open(ContentName, "ccguid=" & encodeSQLText(RecordGuid), "ID", , , , , "ID")
-                    If cs_ok(CS) Then
-                        returnResult = cs_getInteger(CS, "ID")
+                    Dim CS As Integer = csOpen(ContentName, "ccguid=" & encodeSQLText(RecordGuid), "ID", , , , , "ID")
+                    If csOk(CS) Then
+                        returnResult = csGetInteger(CS, "ID")
                     End If
-                    Call cs_Close(CS)
+                    Call csClose(CS)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -4203,11 +3954,11 @@ Namespace Contensive.Core.Controllers
             Dim returnRows As String(,) = {}
             Try
                 '
-                Dim CS As Integer = cs_open(ContentName, Criteria, SortFieldList, ActiveOnly, MemberID, WorkflowRenderingMode, WorkflowEditingMode, SelectFieldList, PageSize, PageNumber)
-                If cs_ok(CS) Then
+                Dim CS As Integer = csOpen(ContentName, Criteria, SortFieldList, ActiveOnly, MemberID, WorkflowRenderingMode, WorkflowEditingMode, SelectFieldList, PageSize, PageNumber)
+                If csOk(CS) Then
                     returnRows = contentSetStore(CS).readCache
                 End If
-                Call cs_Close(CS)
+                Call csClose(CS)
                 '
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -4229,7 +3980,7 @@ Namespace Contensive.Core.Controllers
                 Dim FieldName As String
                 Dim DefaultValueText As String
                 '
-                If Not cs_ok(CS) Then
+                If Not csOk(CS) Then
                     Throw New ArgumentException("dataset is not valid")
                 Else
                     For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In contentSetStore(CS).CDef.fields
@@ -4255,19 +4006,19 @@ Namespace Contensive.Core.Controllers
                                                 ' *******************************
                                                 '
                                                 DefaultValueText = genericController.encodeText(.defaultValue)
-                                                Call cs_set(CS, FieldName, "null")
+                                                Call csSet(CS, FieldName, "null")
                                                 If DefaultValueText <> "" Then
                                                     If .lookupContentID <> 0 Then
                                                         LookupContentName = cpCore.metaData.getContentNameByID(.lookupContentID)
                                                         If LookupContentName <> "" Then
-                                                            Call cs_set(CS, FieldName, getRecordID(LookupContentName, DefaultValueText))
+                                                            Call csSet(CS, FieldName, getRecordID(LookupContentName, DefaultValueText))
                                                         End If
                                                     ElseIf .lookupList <> "" Then
                                                         UCaseDefaultValueText = genericController.vbUCase(DefaultValueText)
                                                         lookups = Split(.lookupList, ",")
                                                         For Ptr = 0 To UBound(lookups)
                                                             If UCaseDefaultValueText = genericController.vbUCase(lookups(Ptr)) Then
-                                                                Call cs_set(CS, FieldName, Ptr + 1)
+                                                                Call csSet(CS, FieldName, Ptr + 1)
                                                                 Exit For
                                                             End If
                                                         Next
@@ -4277,7 +4028,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 ' else text
                                                 '
-                                                Call cs_set(CS, FieldName, .defaultValue)
+                                                Call csSet(CS, FieldName, .defaultValue)
                                         End Select
                                 End Select
                             End If
@@ -5000,11 +4751,11 @@ Namespace Contensive.Core.Controllers
                     '
                     ' First try main_ContentWatch table for a link
                     '
-                    CSPointer = cs_open("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
-                    If cs_ok(CSPointer) Then
-                        result = cpCore.db.cs_getText(CSPointer, "Link")
+                    CSPointer = csOpen("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
+                    If csOk(CSPointer) Then
+                        result = cpCore.db.csGetText(CSPointer, "Link")
                     End If
-                    Call cpCore.db.cs_Close(CSPointer)
+                    Call cpCore.db.csClose(CSPointer)
                     '
                     If result = "" Then
                         '
@@ -5019,12 +4770,12 @@ Namespace Contensive.Core.Controllers
                                 If ContentName <> "" And RecordID <> 0 Then
                                     If cpCore.metaData.getContentTablename(ContentName) = "ccPageContent" Then
                                         CSPointer = cpCore.db.csOpenRecord(ContentName, RecordID, , , "TemplateID,ParentID")
-                                        If cs_ok(CSPointer) Then
+                                        If csOk(CSPointer) Then
                                             recordfound = True
-                                            templateId = cs_getInteger(CSPointer, "TemplateID")
-                                            ParentID = cs_getInteger(CSPointer, "ParentID")
+                                            templateId = csGetInteger(CSPointer, "TemplateID")
+                                            ParentID = csGetInteger(CSPointer, "ParentID")
                                         End If
-                                        Call cs_Close(CSPointer)
+                                        Call csClose(CSPointer)
                                         If Not recordfound Then
                                             '
                                             ' This content record does not exist - remove any records with this ContentRecordKey pointer
@@ -5035,19 +4786,19 @@ Namespace Contensive.Core.Controllers
 
                                             If templateId <> 0 Then
                                                 CSPointer = cpCore.db.csOpenRecord("Page Templates", templateId, , , "Link")
-                                                If cs_ok(CSPointer) Then
-                                                    result = cs_getText(CSPointer, "Link")
+                                                If csOk(CSPointer) Then
+                                                    result = csGetText(CSPointer, "Link")
                                                 End If
-                                                Call cs_Close(CSPointer)
+                                                Call csClose(CSPointer)
                                             End If
                                             If result = "" And ParentID <> 0 Then
                                                 TableName = cpCore.metaData.getContentTablename(ContentName)
                                                 DataSource = cpCore.metaData.getContentDataSource(ContentName)
-                                                CSPointer = cs_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
-                                                If cs_ok(CSPointer) Then
-                                                    ParentContentID = genericController.EncodeInteger(cs_getText(CSPointer, "ContentControlID"))
+                                                CSPointer = csOpenSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
+                                                If csOk(CSPointer) Then
+                                                    ParentContentID = genericController.EncodeInteger(csGetText(CSPointer, "ContentControlID"))
                                                 End If
-                                                Call cs_Close(CSPointer)
+                                                Call csClose(CSPointer)
                                                 If ParentContentID <> 0 Then
                                                     result = main_GetLinkByContentRecordKey(CStr(ParentContentID & "." & ParentID), "")
                                                 End If
@@ -5122,11 +4873,11 @@ Namespace Contensive.Core.Controllers
             Dim result As Integer = 0
             Dim CS As Integer
             GetTableID = -1
-            CS = cpCore.db.cs_openSql("Select ID from ccTables where name=" & cpCore.db.encodeSQLText(TableName), , 1)
-            If cpCore.db.cs_ok(CS) Then
-                result = cpCore.db.cs_getInteger(CS, "ID")
+            CS = cpCore.db.csOpenSql("Select ID from ccTables where name=" & cpCore.db.encodeSQLText(TableName), , 1)
+            If cpCore.db.csOk(CS) Then
+                result = cpCore.db.csGetInteger(CS, "ID")
             End If
-            Call cpCore.db.cs_Close(CS)
+            Call cpCore.db.csClose(CS)
             Return result
         End Function
         '
@@ -5141,15 +4892,18 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Function csOpenRecord(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
-            Return cs_open(genericController.encodeText(ContentName), "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            Return csOpen(genericController.encodeText(ContentName), "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
         End Function
         '
         '========================================================================
         '
         Public Function cs_open2(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
-            Return cs_open(ContentName, "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            Return csOpen(ContentName, "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
         End Function
-        Public Sub content_SetContentCopy(ByVal CopyName As String, ByVal Content As String)
+        '
+        '========================================================================
+        '
+        Public Sub SetContentCopy(ByVal CopyName As String, ByVal Content As String)
             '
             Dim CS As Integer
             Dim iCopyName As String
@@ -5162,18 +4916,48 @@ Namespace Contensive.Core.Controllers
             Else
                 iCopyName = genericController.encodeText(CopyName)
                 iContent = genericController.encodeText(Content)
-                CS = cs_open(ContentName, "name=" & encodeSQLText(iCopyName))
-                If Not cs_ok(CS) Then
-                    Call cs_Close(CS)
-                    CS = cs_insertRecord(ContentName)
+                CS = csOpen(ContentName, "name=" & encodeSQLText(iCopyName))
+                If Not csOk(CS) Then
+                    Call csClose(CS)
+                    CS = csInsertRecord(ContentName)
                 End If
-                If cs_ok(CS) Then
-                    Call cs_set(CS, "name", iCopyName)
-                    Call cs_set(CS, "Copy", iContent)
+                If csOk(CS) Then
+                    Call csSet(CS, "name", iCopyName)
+                    Call csSet(CS, "Copy", iContent)
                 End If
-                Call cs_Close(CS)
+                Call csClose(CS)
             End If
         End Sub
+        Public Function csGetRecordEditLink(ByVal CSPointer As Integer, Optional ByVal AllowCut As Object = False) As String
+            Dim result As String = ""
+
+            Dim RecordName As String
+            Dim ContentName As String
+            Dim RecordID As Integer
+            Dim ContentControlID As Integer
+            Dim iCSPointer As Integer
+            '
+            iCSPointer = genericController.EncodeInteger(CSPointer)
+            If iCSPointer = -1 Then
+                Throw (New ApplicationException("main_cs_getRecordEditLink called with invalid iCSPointer")) ' handleLegacyError14(MethodName, "")
+            Else
+                If Not cpCore.db.csOk(iCSPointer) Then
+                    Throw (New ApplicationException("main_cs_getRecordEditLink called with Not main_CSOK")) ' handleLegacyError14(MethodName, "")
+                Else
+                    '
+                    ' Print an edit link for the records Content (may not be iCSPointer content)
+                    '
+                    RecordID = (cpCore.db.csGetInteger(iCSPointer, "ID"))
+                    RecordName = cpCore.db.csGetText(iCSPointer, "Name")
+                    ContentControlID = (cpCore.db.csGetInteger(iCSPointer, "contentcontrolid"))
+                    ContentName = cpCore.metaData.getContentNameByID(ContentControlID)
+                    If ContentName <> "" Then
+                        result = cpCore.html.main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), RecordName, cpCore.authContext.isEditing(ContentName))
+                    End If
+                End If
+            End If
+            Return result
+        End Function
 
 
 #Region " IDisposable Support "
@@ -5198,7 +4982,7 @@ Namespace Contensive.Core.Controllers
                         Dim CSPointer As Integer
                         For CSPointer = 1 To contentSetStoreCount
                             If contentSetStore(CSPointer).IsOpen Then
-                                Call cs_Close(CSPointer)
+                                Call csClose(CSPointer)
                             End If
                         Next
                     End If

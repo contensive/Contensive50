@@ -398,11 +398,11 @@ Namespace Contensive.Core.Controllers
                         Call errorController.error_AddUserError(cpcore, ErrorMessage)
                     Else
                         If Not (cpcore.debug_iUserError <> "") Then
-                            CS = cpcore.db.cs_open("people", "ID=" & cpcore.db.encodeSQLNumber(cpcore.authContext.user.id))
-                            If Not cpcore.db.cs_ok(CS) Then
+                            CS = cpcore.db.csOpen("people", "ID=" & cpcore.db.encodeSQLNumber(cpcore.authContext.user.id))
+                            If Not cpcore.db.csOk(CS) Then
                                 cpcore.handleException(New Exception("Could not open the current members account to set the username and password."))
                             Else
-                                If (cpcore.db.cs_getText(CS, "username") <> "") Or (cpcore.db.cs_getText(CS, "password") <> "") Or (cpcore.db.cs_getBoolean(CS, "admin")) Or (cpcore.db.cs_getBoolean(CS, "developer")) Then
+                                If (cpcore.db.csGetText(CS, "username") <> "") Or (cpcore.db.csGetText(CS, "password") <> "") Or (cpcore.db.csGetBoolean(CS, "admin")) Or (cpcore.db.csGetBoolean(CS, "developer")) Then
                                     '
                                     ' if the current account can be logged into, you can not join 'into' it
                                     '
@@ -412,14 +412,14 @@ Namespace Contensive.Core.Controllers
                                 LastName = cpcore.docProperties.getText("firstname")
                                 FullName = FirstName & " " & LastName
                                 Email = cpcore.docProperties.getText("email")
-                                Call cpcore.db.cs_set(CS, "FirstName", FirstName)
-                                Call cpcore.db.cs_set(CS, "LastName", LastName)
-                                Call cpcore.db.cs_set(CS, "Name", FullName)
-                                Call cpcore.db.cs_set(CS, "username", loginForm_Username)
-                                Call cpcore.db.cs_set(CS, "password", loginForm_Password)
+                                Call cpcore.db.csSet(CS, "FirstName", FirstName)
+                                Call cpcore.db.csSet(CS, "LastName", LastName)
+                                Call cpcore.db.csSet(CS, "Name", FullName)
+                                Call cpcore.db.csSet(CS, "username", loginForm_Username)
+                                Call cpcore.db.csSet(CS, "password", loginForm_Password)
                                 Call cpcore.authContext.authenticateById(cpcore, cpcore.authContext.user.id, cpcore.authContext)
                             End If
-                            Call cpcore.db.cs_Close(CS)
+                            Call cpcore.db.csClose(CS)
                         End If
                     End If
                 End If

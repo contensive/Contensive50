@@ -687,9 +687,9 @@ Namespace Contensive.Core.Models.Context
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
                                         & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "))" _
                                         & ")"
-                                CS = cpCore.db.cs_openSql(SQL)
-                                _isAuthenticatedContentManagerAnything = cpCore.db.cs_ok(CS)
-                                cpCore.db.cs_Close(CS)
+                                CS = cpCore.db.csOpenSql(SQL)
+                                _isAuthenticatedContentManagerAnything = cpCore.db.csOk(CS)
+                                cpCore.db.csClose(CS)
                                 '
                                 _isAuthenticatedContentManagerAnything_userId = user.id
                                 _isAuthenticatedContentManagerAnything_loaded = True
@@ -800,13 +800,13 @@ Namespace Contensive.Core.Models.Context
                     If True Then
                         Criteria = Criteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(DateTime.Now) & "))"
                     End If
-                    CS = cpCore.db.cs_open("People", Criteria, "id", SelectFieldList:="ID ,password,admin,developer", PageSize:=2)
-                    If Not cpCore.db.cs_ok(CS) Then
+                    CS = cpCore.db.csOpen("People", Criteria, "id", SelectFieldList:="ID ,password,admin,developer", PageSize:=2)
+                    If Not cpCore.db.csOk(CS) Then
                         '
                         ' ----- loginFieldValue not found, stop here
                         '
                         Call errorController.error_AddUserError(cpCore, badLoginUserError)
-                    ElseIf (Not genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", False))) And (cpCore.db.cs_getRowCount(CS) > 1) Then
+                    ElseIf (Not genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", False))) And (cpCore.db.csGetRowCount(CS) > 1) Then
                         '
                         ' ----- AllowDuplicates is false, and there are more then one record
                         '
@@ -815,7 +815,7 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' ----- search all found records for the correct password
                         '
-                        Do While cpCore.db.cs_ok(CS)
+                        Do While cpCore.db.csOk(CS)
                             returnUserId = 0
                             '
                             ' main_Get Id if password good
@@ -824,10 +824,10 @@ Namespace Contensive.Core.Models.Context
                                 '
                                 ' no-password-login -- allowNoPassword + no password given + account has no password + account not admin/dev/cm
                                 '
-                                recordIsAdmin = cpCore.db.cs_getBoolean(CS, "admin")
-                                recordIsDeveloper = Not cpCore.db.cs_getBoolean(CS, "admin")
-                                If allowNoPasswordLogin And (cpCore.db.cs_getText(CS, "password") = "") And (Not recordIsAdmin) And (recordIsDeveloper) Then
-                                    returnUserId = cpCore.db.cs_getInteger(CS, "ID")
+                                recordIsAdmin = cpCore.db.csGetBoolean(CS, "admin")
+                                recordIsDeveloper = Not cpCore.db.csGetBoolean(CS, "admin")
+                                If allowNoPasswordLogin And (cpCore.db.csGetText(CS, "password") = "") And (Not recordIsAdmin) And (recordIsDeveloper) Then
+                                    returnUserId = cpCore.db.csGetInteger(CS, "ID")
                                     '
                                     ' verify they are in no content manager groups
                                     '
@@ -840,30 +840,30 @@ Namespace Contensive.Core.Models.Context
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
                                         & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "))" _
                                         & ");"
-                                    CS = cpCore.db.cs_openSql(SQL)
-                                    If cpCore.db.cs_ok(CS) Then
+                                    CS = cpCore.db.csOpenSql(SQL)
+                                    If cpCore.db.csOk(CS) Then
                                         returnUserId = 0
                                     End If
-                                    Call cpCore.db.cs_Close(CS)
+                                    Call cpCore.db.csClose(CS)
                                 End If
                             Else
                                 '
                                 ' password login
                                 '
-                                If genericController.vbLCase(cpCore.db.cs_getText(CS, "password")) = genericController.vbLCase(iPassword) Then
-                                    returnUserId = cpCore.db.cs_getInteger(CS, "ID")
+                                If genericController.vbLCase(cpCore.db.csGetText(CS, "password")) = genericController.vbLCase(iPassword) Then
+                                    returnUserId = cpCore.db.csGetInteger(CS, "ID")
                                 End If
                             End If
                             If returnUserId <> 0 Then
                                 Exit Do
                             End If
-                            Call cpCore.db.cs_goNext(CS)
+                            Call cpCore.db.csGoNext(CS)
                         Loop
                         If returnUserId = 0 Then
                             Call errorController.error_AddUserError(cpCore, badLoginUserError)
                         End If
                     End If
-                    Call cpCore.db.cs_Close(CS)
+                    Call cpCore.db.csClose(CS)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -902,8 +902,8 @@ Namespace Contensive.Core.Models.Context
                     '        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
                 Else
 
-                    CSPointer = cpCore.db.cs_open("People", "username=" & cpCore.db.encodeSQLText(Username), "", False, SelectFieldList:="ID", PageSize:=2)
-                    If cpCore.db.cs_ok(CSPointer) Then
+                    CSPointer = cpCore.db.csOpen("People", "username=" & cpCore.db.encodeSQLText(Username), "", False, SelectFieldList:="ID", PageSize:=2)
+                    If cpCore.db.csOk(CSPointer) Then
                         '
                         ' ----- username was found, stop here
                         '
@@ -912,7 +912,7 @@ Namespace Contensive.Core.Models.Context
                     Else
                         returnOk = True
                     End If
-                    Call cpCore.db.cs_Close(CSPointer)
+                    Call cpCore.db.csClose(CSPointer)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -1023,13 +1023,13 @@ Namespace Contensive.Core.Models.Context
                         & " AND(ccGroupRules.ContentID=" & ContentID & ")" _
                         & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "))" _
                         & ");"
-                    CSPointer = cpCore.db.cs_openSql(SQL)
-                    If cpCore.db.cs_ok(CSPointer) Then
+                    CSPointer = cpCore.db.csOpenSql(SQL)
+                    If cpCore.db.csOk(CSPointer) Then
                         returnAllowEdit = True
-                        returnAllowAdd = cpCore.db.cs_getBoolean(CSPointer, "allowAdd")
-                        returnAllowDelete = cpCore.db.cs_getBoolean(CSPointer, "allowDelete")
+                        returnAllowAdd = cpCore.db.csGetBoolean(CSPointer, "allowAdd")
+                        returnAllowDelete = cpCore.db.csGetBoolean(CSPointer, "allowDelete")
                     End If
-                    cpCore.db.cs_Close(CSPointer)
+                    cpCore.db.csClose(CSPointer)
                     '
                     If Not returnAllowEdit Then
                         '
@@ -1300,9 +1300,9 @@ Namespace Contensive.Core.Models.Context
                                 & " or(m.developer<>0)" _
                                 & " )" _
                                 & " "
-                            CS = cpCore.db.cs_openCsSql_rev("default", SQL)
-                            returnREsult = cpCore.db.cs_ok(CS)
-                            Call cpCore.db.cs_Close(CS)
+                            CS = cpCore.db.csOpenSql_rev("default", SQL)
+                            returnREsult = cpCore.db.csOk(CS)
+                            Call cpCore.db.csClose(CS)
                         End If
                     Else
                         '
@@ -1330,9 +1330,9 @@ Namespace Contensive.Core.Models.Context
                             & " from ccmembers m" _
                             & " left join ccMemberRules r on r.Memberid=m.id" _
                             & " where" & Criteria
-                        CS = cpCore.db.cs_openCsSql_rev("default", SQL)
-                        returnREsult = cpCore.db.cs_ok(CS)
-                        Call cpCore.db.cs_Close(CS)
+                        CS = cpCore.db.csOpenSql_rev("default", SQL)
+                        returnREsult = cpCore.db.csOk(CS)
+                        Call cpCore.db.csClose(CS)
                     End If
                 End If
 

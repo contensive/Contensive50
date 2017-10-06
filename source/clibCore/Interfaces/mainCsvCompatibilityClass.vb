@@ -9,8 +9,8 @@ Namespace Contensive.Core
     ''' This class provides a compatibility api for legacy active-script addons that use the "cclib" object for main class nad "csv" for the csv object
     ''' </summary>
     <ComVisible(True)>
-    <ComClass(mainCsvCompatibilityClass.ClassId, mainCsvCompatibilityClass.InterfaceId, mainCsvCompatibilityClass.EventsId)>
-    Public Class mainCsvCompatibilityClass
+    <ComClass(mainCsvScriptCompatibilityClass.ClassId, mainCsvScriptCompatibilityClass.InterfaceId, mainCsvScriptCompatibilityClass.EventsId)>
+    Public Class mainCsvScriptCompatibilityClass
         '
 #Region "COM GUIDs"
         Public Const ClassId As String = "D9099AAE-3FCB-4398-B94C-19EE7FA97B2B"

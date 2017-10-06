@@ -141,7 +141,7 @@ Namespace Contensive.Core
                 accum = ""
                 If copyRecordNameOrGuid <> "" Then
                     Call cs.Open("copy content", "(name=" & cp.Db.EncodeSQLText(copyRecordNameOrGuid) & ")or(ccGuid=" & cp.Db.EncodeSQLText(copyRecordNameOrGuid) & ")", "id", , "copy")
-                    If cs.OK Then
+                    If cs.Ok Then
                         accum = cs.GetText("copy")
                     End If
                     Call cs.Close()
@@ -172,7 +172,7 @@ Namespace Contensive.Core
                 accum = ""
                 If layoutRecordNameOrGuid <> "" Then
                     Call cs.Open("layouts", "(name=" & cp.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")or(ccGuid=" & cp.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")", "id", , "layout")
-                    If cs.OK Then
+                    If cs.Ok Then
                         accum = cs.GetText("layout")
                     End If
                     Call cs.Close()

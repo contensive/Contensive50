@@ -21,14 +21,14 @@ Namespace Contensive.Core.Controllers
         '
         Public Shared Sub testPoint(cpcore As coreClass, Message As String)
             '
-            Dim ElapsedTime As Single
+            Dim ElapsedTime As Double
             Dim iMessage As String
             '
             If cpcore.testPointPrinting Then
                 '
                 ' write to stream
                 '
-                ElapsedTime = CSng(GetTickCount - cpcore.profileStartTickCount) / 1000
+                ElapsedTime = CSng(cpcore.appStopWatch.ElapsedMilliseconds) / 1000
                 iMessage = genericController.encodeText(Message)
                 iMessage = Format((ElapsedTime), "00.000") & " - " & iMessage
                 cpcore.testPointMessage = cpcore.testPointMessage & "<nobr>" & iMessage & "</nobr><br >"

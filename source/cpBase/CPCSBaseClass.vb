@@ -236,7 +236,7 @@ Namespace Contensive.BaseClasses
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride Function OK() As Boolean
+        Public MustOverride Function Ok() As Boolean
         ''' <summary>
         ''' Forces a save of any changes made to the current row. A save occurs automatically when the content set is closed or when it moves to another row.
         ''' </summary>

@@ -222,28 +222,28 @@ Namespace Contensive.Core.Controllers
                         If _childListAddonID_Local = 0 Then
                             BuildSupportsGuid = True
                             If BuildSupportsGuid Then
-                                CS = cpCore.db.cs_open(cnAddons, "ccguid='" & addonGuidChildList & "'", , , ,,  , "ID")
+                                CS = cpCore.db.csOpen(cnAddons, "ccguid='" & addonGuidChildList & "'", , , ,,  , "ID")
                             Else
-                                CS = cpCore.db.cs_open(cnAddons, "name='Child Page List'", , , , ,, "ID")
+                                CS = cpCore.db.csOpen(cnAddons, "name='Child Page List'", , , , ,, "ID")
                             End If
-                            If cpCore.db.cs_ok(CS) Then
-                                _childListAddonID_Local = cpCore.db.cs_getInteger(CS, "ID")
+                            If cpCore.db.csOk(CS) Then
+                                _childListAddonID_Local = cpCore.db.csGetInteger(CS, "ID")
                             End If
-                            Call cpCore.db.cs_Close(CS)
+                            Call cpCore.db.csClose(CS)
                             If _childListAddonID_Local = 0 Then
-                                CS = cpCore.db.cs_insertRecord(cnAddons)
-                                If cpCore.db.cs_ok(CS) Then
-                                    _childListAddonID_Local = cpCore.db.cs_getInteger(CS, "ID")
-                                    Call cpCore.db.cs_set(CS, "name", "Child Page List")
-                                    Call cpCore.db.cs_set(CS, "ArgumentList", "Name")
-                                    Call cpCore.db.cs_set(CS, "CopyText", "<ac type=""childlist"" name=""$name$"">")
-                                    Call cpCore.db.cs_set(CS, "Content", "1")
-                                    Call cpCore.db.cs_set(CS, "StylesFilename", "")
+                                CS = cpCore.db.csInsertRecord(cnAddons)
+                                If cpCore.db.csOk(CS) Then
+                                    _childListAddonID_Local = cpCore.db.csGetInteger(CS, "ID")
+                                    Call cpCore.db.csSet(CS, "name", "Child Page List")
+                                    Call cpCore.db.csSet(CS, "ArgumentList", "Name")
+                                    Call cpCore.db.csSet(CS, "CopyText", "<ac type=""childlist"" name=""$name$"">")
+                                    Call cpCore.db.csSet(CS, "Content", "1")
+                                    Call cpCore.db.csSet(CS, "StylesFilename", "")
                                     If BuildSupportsGuid Then
-                                        Call cpCore.db.cs_set(CS, "ccguid", addonGuidChildList)
+                                        Call cpCore.db.csSet(CS, "ccguid", addonGuidChildList)
                                     End If
                                 End If
-                                Call cpCore.db.cs_Close(CS)
+                                Call cpCore.db.csClose(CS)
                             End If
                             Call setProperty("ChildListAddonID", CStr(_childListAddonID_Local))
                         End If
