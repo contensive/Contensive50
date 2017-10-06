@@ -119,5 +119,14 @@ Namespace Contensive.Core.Models.Entity
         Public Overloads Shared Function createDefault(cpcore As coreClass) As linkAliasModel
             Return createDefault(Of linkAliasModel)(cpcore)
         End Function
+        '
+        '====================================================================================================
+        Public Overloads Shared Function createList(cpCore As coreClass, pageId As Integer, queryStringSuffix As String) As List(Of linkAliasModel)
+            If (String.IsNullOrEmpty(queryStringSuffix)) Then
+                Return createList(Of linkAliasModel)(cpCore, "(pageId=" & pageId & ")", "id desc")
+            Else
+                Return createList(Of linkAliasModel)(cpCore, "(pageId=" & pageId & ")and(QueryStringSuffix=" & cpCore.db.encodeSQLText(queryStringSuffix) & ")", "id desc")
+            End If
+        End Function
     End Class
 End Namespace

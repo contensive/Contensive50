@@ -2236,7 +2236,7 @@ ErrorTrap:
         '
         Public Shared Function getLinkAlias(cpcore As coreClass, PageID As Integer, QueryStringSuffix As String, DefaultLink As String) As String
             Dim linkAlias As String = DefaultLink
-            Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")and(QueryStringSuffix=" & cpcore.db.encodeSQLText(QueryStringSuffix) & ")", "id desc")
+            Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpcore, PageID, QueryStringSuffix)
             If linkAliasList.Count > 0 Then
                 linkAlias = linkAliasList.First.name
                 If Mid(linkAlias, 1, 1) <> "/" Then

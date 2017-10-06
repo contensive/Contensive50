@@ -124,7 +124,7 @@ Namespace Contensive.Core
                     Call cpCore.db.csClose(cs)
                 End If
                 cs = cpCore.db.csOpenGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
-                success = Ok()
+                success = OK()
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenGroupUsers")
             End Try
@@ -143,7 +143,7 @@ Namespace Contensive.Core
                     Call cpCore.db.csClose(cs)
                 End If
                 cs = cpCore.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
-                success = Ok()
+                success = OK()
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw ' "Unexpected error in cs.OpenGroupUsers")
             End Try
@@ -446,7 +446,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Function Ok() As Boolean
+        Public Overrides Function OK() As Boolean
             Try
                 Return cpCore.db.csOk(cs)
             Catch ex As Exception
