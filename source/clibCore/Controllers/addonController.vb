@@ -408,6 +408,9 @@ Namespace Contensive.Core.Controllers
                             Call cpCore.html.doc_AddHeadTag2(addon.OtherHeadTags, AddedByName)
                             Call cpCore.html.addOnLoadJavascript(addon.JavaScriptOnLoad, AddedByName)
                             Call cpCore.html.addBodyJavascriptCode(addon.JavaScriptBodyEnd, AddedByName)
+                            If addon.JSHeadLink <> "" Then
+                                Call cpCore.html.addJavaScriptLinkHead(addon.JSHeadLink, AddedByName)
+                            End If
                             If addon.JSFilename.filename <> "" Then
                                 Call cpCore.html.addJavaScriptLinkHead(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.JSFilename.filename), AddedByName)
                             End If
@@ -473,7 +476,7 @@ Namespace Contensive.Core.Controllers
                                 If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
                                     Dim addonArgumentListPassToBubbleEditor As String = "" ' comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
                                     Dim AddonEditIcon As String = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & addon.name & " Add-on", "Edit the " & addon.name & " Add-on", "", True, "")
-                                    AddonEditIcon = "<a href=""" & cpCore.siteProperties.adminURL & "?cid=" & cpCore.metaData.getContentId(cnAddons) & "&id=" & addon.id & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
+                                    AddonEditIcon = "<a href=""" & "/" & cpCore.serverConfig.appConfig.adminRoute & "?cid=" & cpCore.metaData.getContentId(cnAddons) & "&id=" & addon.id & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
                                     Dim InstanceSettingsEditIcon As String = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, DialogList)
                                     Dim HTMLViewerEditIcon As String = getHTMLViewerBubble(addon.id, "editWrapper" & cpCore.doc.editWrapperCnt, DialogList)
                                     Dim SiteStylesEditIcon As String = String.Empty ' ?????
@@ -620,9 +623,9 @@ Namespace Contensive.Core.Controllers
                                                         Select Case genericController.vbLCase(TabNode.Name)
                                                             Case "siteproperty"
                                                                 '
-                                                                FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
                                                                 FieldValue = cpCore.docProperties.getText(FieldName)
-                                                                fieldType = csv_GetXMLAttribute(IsFound, TabNode, "type", "")
+                                                                fieldType = xml_GetAttribute(IsFound, TabNode, "type", "")
                                                                 Select Case genericController.vbLCase(fieldType)
                                                                     Case "integer"
                                                                         '
@@ -702,10 +705,10 @@ Namespace Contensive.Core.Controllers
                                                                 '
                                                                 ' A Copy Content block
                                                                 '
-                                                                FieldReadOnly = genericController.EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
                                                                 If Not FieldReadOnly Then
-                                                                    FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                    FieldHTML = genericController.EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "html", "false"))
+                                                                    FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
+                                                                    FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"))
                                                                     If FieldHTML Then
                                                                         '
                                                                         ' treat html as active content for now.
@@ -742,10 +745,10 @@ Namespace Contensive.Core.Controllers
                                                                 '
                                                                 ' A File Content block
                                                                 '
-                                                                FieldReadOnly = genericController.EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
                                                                 If Not FieldReadOnly Then
-                                                                    FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                    fieldfilename = csv_GetXMLAttribute(IsFound, TabNode, "filename", "")
+                                                                    FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
+                                                                    fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "")
                                                                     FieldValue = cpCore.docProperties.getText(FieldName)
                                                                     Call cpCore.appRootFiles.saveFile(fieldfilename, FieldValue)
                                                                 End If
@@ -771,7 +774,7 @@ Namespace Contensive.Core.Controllers
                                 ' ----- Display Form
                                 '
                                 Content.Add(Adminui.EditTableOpen)
-                                Name = csv_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
+                                Name = xml_GetAttribute(IsFound, Doc.DocumentElement, "name", "")
                                 With Doc.DocumentElement
                                     For Each SettingNode In .ChildNodes
                                         Select Case genericController.vbLCase(SettingNode.Name)
@@ -779,9 +782,9 @@ Namespace Contensive.Core.Controllers
                                                 Description = SettingNode.InnerText
                                             Case "tab"
                                                 TabCnt = TabCnt + 1
-                                                TabName = csv_GetXMLAttribute(IsFound, SettingNode, "name", "")
-                                                TabDescription = csv_GetXMLAttribute(IsFound, SettingNode, "description", "")
-                                                TabHeading = csv_GetXMLAttribute(IsFound, SettingNode, "heading", "")
+                                                TabName = xml_GetAttribute(IsFound, SettingNode, "name", "")
+                                                TabDescription = xml_GetAttribute(IsFound, SettingNode, "description", "")
+                                                TabHeading = xml_GetAttribute(IsFound, SettingNode, "heading", "")
                                                 If TabHeading = "Debug and Trace Settings" Then
                                                     TabHeading = TabHeading
                                                 End If
@@ -792,24 +795,24 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             ' Heading
                                                             '
-                                                            FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                            FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
                                                             Call TabCell.Add(Adminui.GetEditSubheadRow(FieldCaption))
                                                         Case "siteproperty"
                                                             '
                                                             ' Site property
                                                             '
-                                                            FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                            FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
                                                             If FieldName <> "" Then
-                                                                FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
                                                                 If FieldCaption = "" Then
                                                                     FieldCaption = FieldName
                                                                 End If
-                                                                FieldReadOnly = genericController.EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                                FieldHTML = genericController.EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
-                                                                fieldType = csv_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                                FieldSelector = csv_GetXMLAttribute(IsFound, TabNode, "selector", "")
-                                                                FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                                FieldAddon = csv_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
+                                                                FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""))
+                                                                fieldType = xml_GetAttribute(IsFound, TabNode, "type", "")
+                                                                FieldSelector = xml_GetAttribute(IsFound, TabNode, "selector", "")
+                                                                FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "")
+                                                                FieldAddon = xml_GetAttribute(IsFound, TabNode, "EditorAddon", "")
                                                                 FieldDefaultValue = TabNode.InnerText
                                                                 FieldValue = cpCore.siteProperties.getText(FieldName, FieldDefaultValue)
                                                                 If FieldAddon <> "" Then
@@ -949,15 +952,15 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             ' Content Copy field
                                                             '
-                                                            FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                            FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
                                                             If FieldName <> "" Then
-                                                                FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
                                                                 If FieldCaption = "" Then
                                                                     FieldCaption = FieldName
                                                                 End If
-                                                                FieldReadOnly = genericController.EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                                FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                                FieldHTML = genericController.EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
+                                                                FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "")
+                                                                FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""))
                                                                 '
                                                                 CS = cpCore.db.csOpen("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
                                                                 If Not cpCore.db.csOk(CS) Then
@@ -997,11 +1000,11 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             ' Content from a flat file
                                                             '
-                                                            FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                            FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            fieldfilename = csv_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                            FieldReadOnly = genericController.EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
+                                                            FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
+                                                            FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
+                                                            fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "")
+                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "")
                                                             FieldDefaultValue = TabNode.InnerText
                                                             Copy = ""
                                                             If fieldfilename <> "" Then
@@ -1020,11 +1023,11 @@ Namespace Contensive.Core.Controllers
                                                             ' Display the output of a query
                                                             '
                                                             Copy = ""
-                                                            FieldDataSource = csv_GetXMLAttribute(IsFound, TabNode, "DataSourceName", "")
+                                                            FieldDataSource = xml_GetAttribute(IsFound, TabNode, "DataSourceName", "")
                                                             FieldSQL = TabNode.InnerText
-                                                            FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            SQLPageSize = genericController.EncodeInteger(csv_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
+                                                            FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
+                                                            FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "")
+                                                            SQLPageSize = genericController.EncodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""))
                                                             If SQLPageSize = 0 Then
                                                                 SQLPageSize = 100
                                                             End If
@@ -2476,9 +2479,9 @@ ErrorTrap:
                                                         Select Case genericController.vbLCase(TabNode.Name)
                                                             Case "siteproperty"
                                                                 '
-                                                                FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
                                                                 FieldValue = cpCore.docProperties.getText(FieldName)
-                                                                fieldType = main_GetXMLAttribute(IsFound, TabNode, "type", "")
+                                                                fieldType = xml_GetAttribute(IsFound, TabNode, "type", "")
                                                                 Select Case genericController.vbLCase(fieldType)
                                                                     Case "integer"
                                                                         '
@@ -2558,10 +2561,10 @@ ErrorTrap:
                                                                 '
                                                                 ' A Copy Content block
                                                                 '
-                                                                FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
                                                                 If Not FieldReadOnly Then
-                                                                    FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                    FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", "false"))
+                                                                    FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
+                                                                    FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"))
                                                                     If FieldHTML Then
                                                                         '
                                                                         ' treat html as active content for now.
@@ -2598,10 +2601,10 @@ ErrorTrap:
                                                                 '
                                                                 ' A File Content block
                                                                 '
-                                                                FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
                                                                 If Not FieldReadOnly Then
-                                                                    FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                    fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
+                                                                    FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
+                                                                    fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "")
                                                                     FieldValue = cpCore.docProperties.getText(FieldName)
                                                                     Call cpCore.appRootFiles.saveFile(fieldfilename, FieldValue)
                                                                 End If
@@ -2627,7 +2630,7 @@ ErrorTrap:
                                 ' ----- Display Form
                                 '
                                 Content.Add(Adminui.EditTableOpen)
-                                Name = main_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
+                                Name = xml_GetAttribute(IsFound, Doc.DocumentElement, "name", "")
                                 With Doc.DocumentElement
                                     For Each SettingNode In .ChildNodes
                                         Select Case genericController.vbLCase(SettingNode.Name)
@@ -2635,9 +2638,9 @@ ErrorTrap:
                                                 Description = SettingNode.InnerText
                                             Case "tab"
                                                 TabCnt = TabCnt + 1
-                                                TabName = main_GetXMLAttribute(IsFound, SettingNode, "name", "")
-                                                TabDescription = main_GetXMLAttribute(IsFound, SettingNode, "description", "")
-                                                TabHeading = main_GetXMLAttribute(IsFound, SettingNode, "heading", "")
+                                                TabName = xml_GetAttribute(IsFound, SettingNode, "name", "")
+                                                TabDescription = xml_GetAttribute(IsFound, SettingNode, "description", "")
+                                                TabHeading = xml_GetAttribute(IsFound, SettingNode, "heading", "")
                                                 TabCell = New stringBuilderLegacyController
                                                 For Each TabNode In SettingNode.ChildNodes
                                                     Select Case genericController.vbLCase(TabNode.Name)
@@ -2645,24 +2648,24 @@ ErrorTrap:
                                                             '
                                                             ' Heading
                                                             '
-                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                            FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
                                                             Call TabCell.Add(Adminui.GetEditSubheadRow(FieldCaption))
                                                         Case "siteproperty"
                                                             '
                                                             ' Site property
                                                             '
-                                                            FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                            FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
                                                             If FieldName <> "" Then
-                                                                FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
                                                                 If FieldCaption = "" Then
                                                                     FieldCaption = FieldName
                                                                 End If
-                                                                FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                                FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
-                                                                fieldType = main_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                                FieldSelector = main_GetXMLAttribute(IsFound, TabNode, "selector", "")
-                                                                FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                                FieldAddon = main_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
+                                                                FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""))
+                                                                fieldType = xml_GetAttribute(IsFound, TabNode, "type", "")
+                                                                FieldSelector = xml_GetAttribute(IsFound, TabNode, "selector", "")
+                                                                FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "")
+                                                                FieldAddon = xml_GetAttribute(IsFound, TabNode, "EditorAddon", "")
                                                                 FieldDefaultValue = TabNode.InnerText
                                                                 FieldValue = cpCore.siteProperties.getText(FieldName, FieldDefaultValue)
                                                                 '                                                    If FieldReadOnly Then
@@ -2805,15 +2808,15 @@ ErrorTrap:
                                                             '
                                                             ' Content Copy field
                                                             '
-                                                            FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
+                                                            FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
                                                             If FieldName <> "" Then
-                                                                FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
+                                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
                                                                 If FieldCaption = "" Then
                                                                     FieldCaption = FieldName
                                                                 End If
-                                                                FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                                FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                                FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
+                                                                FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
+                                                                FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "")
+                                                                FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""))
                                                                 '
                                                                 CS = cpCore.db.csOpen("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "Copy")
                                                                 If Not cpCore.db.csOk(CS) Then
@@ -2853,11 +2856,11 @@ ErrorTrap:
                                                             '
                                                             ' Content from a flat file
                                                             '
-                                                            FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                            FieldReadOnly = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
+                                                            FieldName = xml_GetAttribute(IsFound, TabNode, "name", "")
+                                                            FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
+                                                            fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "")
+                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "")
                                                             FieldDefaultValue = TabNode.InnerText
                                                             Copy = ""
                                                             If fieldfilename <> "" Then
@@ -2876,11 +2879,11 @@ ErrorTrap:
                                                             ' Display the output of a query
                                                             '
                                                             Copy = ""
-                                                            FieldDataSource = main_GetXMLAttribute(IsFound, TabNode, "DataSourceName", "")
+                                                            FieldDataSource = xml_GetAttribute(IsFound, TabNode, "DataSourceName", "")
                                                             FieldSQL = TabNode.InnerText
-                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            SQLPageSize = genericController.EncodeInteger(main_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
+                                                            FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "")
+                                                            FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "")
+                                                            SQLPageSize = genericController.EncodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""))
                                                             If SQLPageSize = 0 Then
                                                                 SQLPageSize = 100
                                                             End If
@@ -3416,42 +3419,10 @@ ErrorTrap:
         End Function        '
         '
         '========================================================================
-        ' ----- Get an XML nodes attribute based on its name
-        '========================================================================
-        '
-        Public Function csv_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
-            Dim result As String = ""
-            '
-            Dim NodeAttribute As XmlAttribute
-            Dim ResultNode As XmlNode
-            Dim UcaseName As String
-            '
-            Found = False
-            ResultNode = Node.Attributes.GetNamedItem(Name)
-            If (ResultNode Is Nothing) Then
-                UcaseName = genericController.vbUCase(Name)
-                For Each NodeAttribute In Node.Attributes
-                    If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
-                        result = NodeAttribute.Value
-                        Found = True
-                        Exit For
-                    End If
-                Next
-            Else
-                result = ResultNode.Value
-                Found = True
-            End If
-            If Not Found Then
-                result = DefaultIfNotFound
-            End If
-            Return result
-        End Function
-        '
-        '========================================================================
         ' ----- main_Get an XML nodes attribute based on its name
         '========================================================================
         '
-        Public Function main_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
+        Public Function xml_GetAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
             Dim result As String = String.Empty
             Try
                 '

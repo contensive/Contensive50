@@ -44,6 +44,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property IsInline As Boolean
         Public Property JavaScriptBodyEnd As String
         Public Property JavaScriptOnLoad As String
+        Public Property JSHeadLink As String
         Public Property JSFilename As fieldTypeJavascriptFile
         Public Property Link As String
         Public Property MetaDescription As String

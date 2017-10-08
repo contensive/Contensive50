@@ -1593,7 +1593,7 @@ ErrorTrap:
                     result = result & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
                     result = result & "<tr><td align=""right"">"
                     If cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
-                        result = result & "<a href=""" & encodeHTML(cpCore.siteProperties.adminURL) & """ target=""_blank"">"
+                        result = result & "<a href=""" & encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute) & """ target=""_blank"">"
                     Else
                         Link = cpCore.webServer.requestPage & "?" & cpCore.doc.refreshQueryString
                         Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
@@ -3112,7 +3112,7 @@ ErrorTrap:
                     ' AC StartBlockText
                     '
                     IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text,"
-                    IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
+                    IconImg = genericController.GetAddonIconImg("/" & cpCore.serverConfig.appConfig.adminRoute, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
                     IconImg = genericController.EncodeJavascript(IconImg)
                     Items(ItemsCnt) = "['Block Text','" & IconImg & "']"
                     Call Index.setPtr("Block Text", ItemsCnt)
@@ -3121,7 +3121,7 @@ ErrorTrap:
                     ' AC EndBlockText
                     '
                     IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text End,"
-                    IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
+                    IconImg = genericController.GetAddonIconImg("/" & cpCore.serverConfig.appConfig.adminRoute, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
                     IconImg = genericController.EncodeJavascript(IconImg)
                     Items(ItemsCnt) = "['Block Text End','" & IconImg & "']"
                     Call Index.setPtr("Block Text", ItemsCnt)
@@ -3138,7 +3138,7 @@ ErrorTrap:
                         FieldList = cpCore.metaData.GetContentProperty("people", "SelectFieldList")
                         FieldList = genericController.vbReplace(FieldList, ",", "|")
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
-                        IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
+                        IconImg = genericController.GetAddonIconImg("/" & cpCore.serverConfig.appConfig.adminRoute, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
                         IconImg = genericController.EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Personalization','" & IconImg & "']"
                         Call Index.setPtr("Personalization", ItemsCnt)
@@ -3153,7 +3153,7 @@ ErrorTrap:
                             '   Need a more consistant solution later
                             '
                             IconIDControlString = "AC," & ACTypeTemplateContent & ",0,Template Content,"
-                            IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
+                            IconImg = genericController.GetAddonIconImg("/" & cpCore.serverConfig.appConfig.adminRoute, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
                             IconImg = genericController.EncodeJavascript(IconImg)
                             Items(ItemsCnt) = "['Content Box','" & IconImg & "']"
                             'Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
@@ -3161,7 +3161,7 @@ ErrorTrap:
                             ItemsCnt = ItemsCnt + 1
                             '
                             IconIDControlString = "AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"
-                            IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
+                            IconImg = genericController.GetAddonIconImg("/" & cpCore.serverConfig.appConfig.adminRoute, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
                             IconImg = genericController.EncodeJavascript(IconImg)
                             Items(ItemsCnt) = "['Template Text','" & IconImg & "']"
                             'Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
@@ -3181,7 +3181,7 @@ ErrorTrap:
                                 If FieldName <> "" Then
                                     FieldCaption = "Watch List [" & FieldName & "]"
                                     IconIDControlString = "AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"
-                                    IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
+                                    IconImg = genericController.GetAddonIconImg("/" & cpCore.serverConfig.appConfig.adminRoute, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
                                     IconImg = genericController.EncodeJavascript(IconImg)
                                     FieldCaption = genericController.EncodeJavascript(FieldCaption)
                                     Items(ItemsCnt) = "['" & FieldCaption & "','" & IconImg & "']"
@@ -3277,7 +3277,7 @@ ErrorTrap:
                                         '
                                         LastAddonName = AddonName
                                         IconIDControlString = "AC,AGGREGATEFUNCTION,0," & AddonName & "," & DefaultAddonOption_String & "," & AddonGuid
-                                        IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, cpCore.serverConfig.appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
+                                        IconImg = genericController.GetAddonIconImg("/" & cpCore.serverConfig.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, cpCore.serverConfig.appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
                                         Items(ItemsCnt) = "['" & genericController.EncodeJavascript(AddonName) & "','" & genericController.EncodeJavascript(IconImg) & "']"
                                         Call Index.setPtr(AddonName, ItemsCnt)
                                         ItemsCnt = ItemsCnt + 1
@@ -6678,7 +6678,7 @@ ErrorTrap:
         '                ' + Add Category
         '                '
         '                If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
-        '                    LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+        '                    LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & "/" & cpCore.serverconfig.appconfig.adminRoute & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
         '                End If
         '                '
         '                LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.htmlIndent(LeftPane) & cr & "</div>"
@@ -7145,7 +7145,7 @@ ErrorTrap:
             returnValue = Source
             'hint = "csv_EncodeContent9 enter"
             If returnValue <> "" Then
-                AdminURL = cpCore.siteProperties.adminURL
+                AdminURL = "/" & cpCore.serverConfig.appConfig.adminRoute
                 '
                 '--------
                 ' cut-paste from csv_EncodeContent8
@@ -8544,7 +8544,7 @@ ErrorTrap:
                             & "<a" _
                             & " class=""ccRecordEditLink"" " _
                             & " TabIndex=-1" _
-                            & " href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
+                            & " href=""" & genericController.encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
                         If Not cpCore.html.main_ReturnAfterEdit Then
                             main_GetRecordEditLink2 = main_GetRecordEditLink2 & " target=""_blank"""
                         End If
@@ -8730,7 +8730,7 @@ ErrorTrap:
                     Call cpCore.db.csClose(csChildContent)
                     '
                     If Not useFlyout Then
-                        Link = cpCore.siteProperties.adminURL & "?cid=" & iContentID & "&af=4&aa=2&ad=1"
+                        Link = "/" & cpCore.serverConfig.appConfig.adminRoute & "?cid=" & iContentID & "&af=4&aa=2&ad=1"
                         If PresetNameValueList <> "" Then
                             Link = Link & "&wc=" & cpCore.html.main_EncodeRequestVariable(PresetNameValueList)
                         End If
@@ -8974,7 +8974,7 @@ ErrorTrap:
                         ButtonCaption = ContentName
                         result = MenuName
                         If ContentAllowAdd And GroupRulesAllowAdd And MemberRulesAllow Then
-                            Link = cpCore.siteProperties.adminURL & "?cid=" & ContentID & "&af=4&aa=2&ad=1"
+                            Link = "/" & cpCore.serverConfig.appConfig.adminRoute & "?cid=" & ContentID & "&af=4&aa=2&ad=1"
                             If PresetNameValueList <> "" Then
                                 Dim NameValueList As String
                                 NameValueList = PresetNameValueList
@@ -9293,9 +9293,9 @@ ErrorTrap:
                     LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
                     LinkPanel.Add(FormatDateTime(cpCore.profileStartTime) & " | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute) & """>Admin Home</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("http://" & cpCore.webServer.requestDomain) & """>Public Home</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & genericController.encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                     If cpCore.siteProperties.getBoolean("AllowMobileTemplates", False) Then
                         If cpCore.authContext.visit.Mobile Then
                             QS = cpCore.doc.refreshQueryString
@@ -9419,7 +9419,7 @@ ErrorTrap:
                             '            '
                             '            ' Path is blocked
                             '            '
-                            '            Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                            '            Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML("/" & cpCore.serverconfig.appconfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                             '        Else
                             '            '
                             '            ' Path is not blocked
@@ -9540,9 +9540,9 @@ ErrorTrap:
                         LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
                         LinkPanel.Add(FormatDateTime(cpCore.profileStartTime) & " | ")
                         LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
-                        LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
+                        LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute) & """>Admin Home</A> | ")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("http://" & cpCore.webServer.requestDomain) & """>Public Home</A> | ")
-                        LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                        LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & genericController.encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                         LinkPanel.Add("</span>")
                         '
                         '

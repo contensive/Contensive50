@@ -433,23 +433,15 @@ Namespace Contensive.Core.Controllers
         Private _Language_LocalLoaded As Boolean = False
         '
         '====================================================================================================
-        '
+        ''' <summary>
+        ''' For compatibility only - always use "/" & serverconfig.appconfig.adminroute
+        ''' </summary>
+        ''' <returns></returns>
         Public ReadOnly Property adminURL() As String
             Get
-                Dim Position As Integer
-                If Not _AdminURL_LocalLoaded Then
-                    _AdminURL_Local = getText("AdminURL", cpCore.serverConfig.appConfig.adminRoute)
-                    Position = genericController.vbInstr(1, _AdminURL_Local, "?")
-                    If Position <> 0 Then
-                        _AdminURL_Local = Mid(_AdminURL_Local, 1, Position - 1)
-                    End If
-                    _AdminURL_LocalLoaded = True
-                End If
-                Return _AdminURL_Local
+                Return "/" & cpCore.serverConfig.appConfig.adminRoute
             End Get
         End Property
-        Private _AdminURL_Local As String
-        Private _AdminURL_LocalLoaded As Boolean = False
         '
         '====================================================================================================
         '
@@ -516,14 +508,18 @@ Namespace Contensive.Core.Controllers
         Public Sub setProperty(ByVal propertyName As String, ByVal Value As String)
             Try
                 If (Not String.IsNullOrEmpty(propertyName.Trim())) Then
-                    '
-                    ' -- set value in Db
-                    Dim SQLNow As String = cpCore.db.encodeSQLDate(Now)
-                    Dim SQL As String = "UPDATE ccSetup Set FieldValue=" & cpCore.db.encodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE name=" & cpCore.db.encodeSQLText(propertyName)
-                    Dim recordsAffected As Integer = 0
-                    Call cpCore.db.executeNonQuery(SQL,, recordsAffected)
-                    If (recordsAffected = 0) Then
-                        SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" _
+                    If (propertyName.ToLower.Equals("adminurl")) Then
+                        '
+                        ' -- intercept adminUrl for compatibility, always use admin route instead
+                    Else
+                        '
+                        ' -- set value in Db
+                        Dim SQLNow As String = cpCore.db.encodeSQLDate(Now)
+                        Dim SQL As String = "UPDATE ccSetup Set FieldValue=" & cpCore.db.encodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE name=" & cpCore.db.encodeSQLText(propertyName)
+                        Dim recordsAffected As Integer = 0
+                        Call cpCore.db.executeNonQuery(SQL,, recordsAffected)
+                        If (recordsAffected = 0) Then
+                            SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" _
                             & SQLTrue _
                             & "," & cpCore.db.encodeSQLNumber(sitePropertyContentId) _
                             & "," & cpCore.db.encodeSQLText(UCase(propertyName)) _
@@ -531,18 +527,19 @@ Namespace Contensive.Core.Controllers
                             & "," & SQLNow _
                             & "," & SQLNow _
                             & ");"
-                        Call cpCore.db.executeQuery(SQL)
+                            Call cpCore.db.executeQuery(SQL)
+                        End If
+                        '
+                        ' -- set simple lazy cache
+                        Dim cacheName As String = "siteproperty" & propertyName.Trim().ToLower()
+                        If nameValueDict.ContainsKey(cacheName) Then
+                            nameValueDict.Remove(cacheName)
+                        End If
+                        nameValueDict.Add(cacheName, Value)
+                        '
+                        ' -- set cache, no memory cache not used, instead load all into local cache on load
+                        'cpCore.cache.setObject(cacheName, Value)
                     End If
-                    '
-                    ' -- set simple lazy cache
-                    Dim cacheName As String = "siteproperty" & propertyName.Trim().ToLower()
-                    If nameValueDict.ContainsKey(cacheName) Then
-                        nameValueDict.Remove(cacheName)
-                    End If
-                    nameValueDict.Add(cacheName, Value)
-                    '
-                    ' -- set cache, no memory cache not used, instead load all into local cache on load
-                    'cpCore.cache.setObject(cacheName, Value)
                 End If
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
@@ -617,59 +614,63 @@ Namespace Contensive.Core.Controllers
         Public Function getText(ByVal PropertyName As String, ByVal DefaultValue As String) As String
             Dim returnString As String = ""
             Try
-                Dim cacheName As String = "siteproperty" & PropertyName.Trim().ToLower()
-                If (String.IsNullOrEmpty(PropertyName.Trim())) Then
-                    '
-                    ' -- bad property name 
-                    returnString = DefaultValue
+                If (PropertyName.ToLower.Equals("adminurl")) Then
+                    returnString = "/" & cpCore.serverConfig.appConfig.adminRoute
                 Else
-                    '
-                    ' -- test simple lazy cache to keep from reading the same property mulitple times on one doc
-                    If nameValueDict.ContainsKey(cacheName) Then
+                    Dim cacheName As String = "siteproperty" & PropertyName.Trim().ToLower()
+                    If (String.IsNullOrEmpty(PropertyName.Trim())) Then
                         '
-                        ' -- property in memory cache
-                        returnString = nameValueDict(cacheName)
+                        ' -- bad property name 
+                        returnString = DefaultValue
                     Else
                         '
-                        ' -- read property from cache, no, with preloaded local cache, this will never be used
-                        If False Then
-                            'Dim returnObj As Object = cpCore.cache.getObject(Of String)(cacheName)
-                            'If (returnObj IsNot Nothing) Then
-                            ''
-                            '' -- found in cache, save in simple cache and return
-                            'returnString = encodeText(returnObj)
-                            'nameValueDict.Add(cacheName, returnString)
+                        ' -- test simple lazy cache to keep from reading the same property mulitple times on one doc
+                        If nameValueDict.ContainsKey(cacheName) Then
+                            '
+                            ' -- property in memory cache
+                            returnString = nameValueDict(cacheName)
                         Else
                             '
-                            ' -- not found in cache, read property from Db
-                            Dim propertyFound As Boolean = False
-                            returnString = getTextFromDb(PropertyName, DefaultValue, propertyFound)
-                            If (propertyFound) Then
-                                '
-                                ' -- found in Db, already saved in local cache, memory cache not used
-                                ' nameValueDict.Add(cacheName, returnString)
-                                'cpCore.cache.setObject(cacheName, returnString)
+                            ' -- read property from cache, no, with preloaded local cache, this will never be used
+                            If False Then
+                                'Dim returnObj As Object = cpCore.cache.getObject(Of String)(cacheName)
+                                'If (returnObj IsNot Nothing) Then
+                                ''
+                                '' -- found in cache, save in simple cache and return
+                                'returnString = encodeText(returnObj)
+                                'nameValueDict.Add(cacheName, returnString)
                             Else
                                 '
-                                ' -- property not found in db, if default is not blank, write it and set cache
-                                returnString = DefaultValue
-                                nameValueDict.Add(cacheName, returnString)
-                                If (returnString <> "") Then
-                                    Call setProperty(cacheName, DefaultValue)
+                                ' -- not found in cache, read property from Db
+                                Dim propertyFound As Boolean = False
+                                returnString = getTextFromDb(PropertyName, DefaultValue, propertyFound)
+                                If (propertyFound) Then
+                                    '
+                                    ' -- found in Db, already saved in local cache, memory cache not used
+                                    ' nameValueDict.Add(cacheName, returnString)
+                                    'cpCore.cache.setObject(cacheName, returnString)
+                                Else
+                                    '
+                                    ' -- property not found in db, if default is not blank, write it and set cache
+                                    returnString = DefaultValue
+                                    nameValueDict.Add(cacheName, returnString)
+                                    If (returnString <> "") Then
+                                        Call setProperty(cacheName, DefaultValue)
+                                    End If
                                 End If
                             End If
                         End If
                     End If
+                    'Dim cacheName As String = "siteProperty-" & PropertyName
+                    'returnString = cpCore.cache.getObject(Of String)(cacheName)
+                    'If String.IsNullOrEmpty(returnString) Then
+                    '    Dim propertyFound As Boolean = False
+                    '    returnString = getTextFromDb(PropertyName, DefaultValue, propertyFound)
+                    '    If (propertyFound) And (returnString <> "") Then
+                    '        Call cpCore.cache.setObject(cacheName, returnString)
+                    '    End If
+                    'End If
                 End If
-                'Dim cacheName As String = "siteProperty-" & PropertyName
-                'returnString = cpCore.cache.getObject(Of String)(cacheName)
-                'If String.IsNullOrEmpty(returnString) Then
-                '    Dim propertyFound As Boolean = False
-                '    returnString = getTextFromDb(PropertyName, DefaultValue, propertyFound)
-                '    If (propertyFound) And (returnString <> "") Then
-                '        Call cpCore.cache.setObject(cacheName, returnString)
-                '    End If
-                'End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try

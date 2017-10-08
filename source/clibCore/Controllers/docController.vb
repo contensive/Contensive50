@@ -1470,7 +1470,7 @@ ErrorTrap:
             '
             FromAddress = cpcore.siteProperties.getText("EmailPublishSubmitFrom", cpcore.siteProperties.emailAdmin)
             CDef = cpcore.metaData.getCdef(ContentName)
-            Link = cpcore.siteProperties.adminURL & "?af=" & AdminFormPublishing
+            Link = "/" & cpcore.serverConfig.appConfig.adminRoute & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
             Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & genericController.encodeHTML(Link) & """>" & cpcore.webServer.requestDomain & "</a>")
             Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName)

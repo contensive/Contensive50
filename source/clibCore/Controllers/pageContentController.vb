@@ -499,7 +499,7 @@ Namespace Contensive.Core.Controllers
                     ' ----- do anonymous access blocking
                     '
                     If Not cpCore.authContext.isAuthenticated() Then
-                        If (cpCore.webServer.requestPath <> "/") And genericController.vbInstr(1, cpCore.siteProperties.adminURL, cpCore.webServer.requestPath, vbTextCompare) <> 0 Then
+                        If (cpCore.webServer.requestPath <> "/") And genericController.vbInstr(1, "/" & cpCore.serverConfig.appConfig.adminRoute, cpCore.webServer.requestPath, vbTextCompare) <> 0 Then
                             '
                             ' admin page is excluded from custom blocking
                             '
@@ -592,28 +592,7 @@ Namespace Contensive.Core.Controllers
                             Return ""
                         End If
                     End If
-                    returnHtml = htmlDocBody
-                    'If cpCore.continueProcessing Then
-                    '    '
-                    '    ' Build Body Tag
-                    '    '
-                    '    htmlDocHead = cpCore.doc.getHtmlDocHead(False)
-                    '    bodyTag = TemplateDefaultBodyTag
-                    '    'If cpCore.doc.template.BodyTag <> "" Then
-                    '    '    bodyTag = cpCore.doc.template.BodyTag
-                    '    'Else
-                    '    '    bodyTag = TemplateDefaultBodyTag
-                    '    'End If
-                    '    '
-                    '    ' Add tools panel to body
-                    '    '
-                    '    htmlDocBody = htmlDocBody & cr & "<div>" & genericController.htmlIndent(cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False)) & cr & "</div>"
-                    '    '
-                    '    ' build doc
-                    '    '
-                    '    returnHtml = cpCore.html.getHtmlDoc(cpCore.doc.docBuffer & htmlDocBody, bodyTag, True, True, False, False)
-                    '    'returnHtml = cpCore.html.assembleHtmlDoc(htmlDocHead, bodyTag, cpCore.doc.docBuffer & htmlDocBody)
-                    'End If
+                    returnHtml &= htmlDocBody
                 End If
                 '
                 ' all other routes should be handled here.
