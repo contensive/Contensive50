@@ -751,8 +751,6 @@ ErrorTrap:
             Dim result As String = ""
             Try
                 Dim Ptr As Integer
-                Dim JSCodeAsString As String
-                Dim JS As String
                 '
                 ' -- content extras like tool panel
                 If (Not BlockNonContentExtras) Then
@@ -780,37 +778,31 @@ ErrorTrap:
                 If Not (cpCore.menuFlyout Is Nothing) Then
                     result &= cpCore.menuFlyout.menu_GetClose()
                 End If
-                '
-                ' -- Add Script Code to Head
-                JS = ""
-                If cpCore.doc.headScripts.Count > 0 Then
-                    For Ptr = 0 To cpCore.doc.headScripts.Count - 1
-                        With cpCore.doc.headScripts(Ptr)
-                            If .addedByMessage <> "" Then
-                                JS = JS & vbCrLf & "/* from " & .addedByMessage & " */ "
-                            End If
-                            If Not .IsLink Then
-                                JSCodeAsString = .Text
-                                JSCodeAsString = genericController.vbReplace(JSCodeAsString, "'", "'+""'""+'")
-                                JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCrLf, "\n")
-                                JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCr, "\n")
-                                JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbLf, "\n")
-                                JS = JS & vbCrLf & "cj.addHeadScriptCode('" & JSCodeAsString & "');"
-                                'JS = JS & vbCrLf & "cjAddHeadScriptCode('" & JSCodeAsString & "');"
-                            Else
-                                JS = JS & vbCrLf & "cj.addHeadScriptLink('" & .Text & "');"
-                                'JS = JS & vbCrLf & "cjAddHeadScriptLink('" & .Text & "');"
-                            End If
-                        End With
-                    Next
-                    cpCore.doc.headScripts = {}
-                End If
-                '
-                ' ----- Add onload javascript
-                '
-                If (cpCore.doc.onLoadJavascript <> "") Then
-                    JS = JS & vbCrLf & vbTab & "cj.addLoadEvent(function(){" & cpCore.doc.onLoadJavascript & "});"
-                End If
+                ''
+                '' -- Add Script Code
+                'JS = ""
+                'If cpCore.doc.jsHead.Count > 0 Then
+                '    For Ptr = 0 To cpCore.doc.jsHead.Count - 1
+                '        With cpCore.doc.jsHead(Ptr)
+                '            If .addedByMessage <> "" Then
+                '                JS = JS & vbCrLf & "/* from " & .addedByMessage & " */ "
+                '            End If
+                '            If Not .IsLink Then
+                '                JSCodeAsString = .Text
+                '                JSCodeAsString = genericController.vbReplace(JSCodeAsString, "'", "'+""'""+'")
+                '                JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCrLf, "\n")
+                '                JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCr, "\n")
+                '                JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbLf, "\n")
+                '                JS = JS & vbCrLf & "cj.addHeadScriptCode('" & JSCodeAsString & "');"
+                '                'JS = JS & vbCrLf & "cjAddHeadScriptCode('" & JSCodeAsString & "');"
+                '            Else
+                '                JS = JS & vbCrLf & "cj.addHeadScriptLink('" & .Text & "');"
+                '                'JS = JS & vbCrLf & "cjAddHeadScriptLink('" & .Text & "');"
+                '            End If
+                '        End With
+                '    Next
+                '    cpCore.doc.jsHead = {}
+                'End If
                 '
                 ' ----- Add any left over style links
                 '
@@ -821,6 +813,13 @@ ErrorTrap:
                     headTags = headTags & cr & cpCore.doc.metaContent_StyleSheetTags
                     'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_StyleSheetTags) & "');"
                     cpCore.doc.metaContent_StyleSheetTags = ""
+                End If
+                '
+                ' ----- Add onload javascript
+                Dim JS As String = ""
+                If (cpCore.doc.onLoadJavascript <> "") Then
+                    JS = JS & vbCrLf & vbTab & "window.addEventListener('load', function(){" & cpCore.doc.onLoadJavascript & "});"
+                    ' JS = JS & vbCrLf & vbTab & "cj.addLoadEvent(function(){" & cpCore.doc.onLoadJavascript & "});" 'object.addEventListener("load", myScript);
                 End If
                 '
                 ' -- Add any left over head tags
@@ -851,6 +850,21 @@ ErrorTrap:
                 If (Not BlockNonContentExtras) And (cpCore.doc.endOfBodyString <> "") Then
                     result = result & cpCore.doc.endOfBodyString
                 End If
+                '
+                ' -- body Javascript
+                Dim allowDebugging As Boolean = cpCore.visitProperty.getBoolean("AllowDebugging")
+                For Each jsBody In cpCore.doc.jsBodyList
+                    With jsBody
+                        If (.addedByMessage <> "") And allowDebugging Then
+                            result &= cr & "<!-- from " & .addedByMessage & " -->"
+                        End If
+                        If Not .IsLink Then
+                            result &= cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
+                        Else
+                            result &= cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
+                        End If
+                    End With
+                Next
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -2115,7 +2129,7 @@ ErrorTrap:
                     & vbCrLf & "var cal = new CalendarPopup();" _
                     & vbCrLf & "cal.showNavigationDropdowns();" _
                     & vbCrLf & "</SCRIPT>"
-                    Call addJavaScriptLinkHead("/ccLib/mktree/CalendarPopup.js", "Calendar Popup")
+                    Call addHeadJsLink("/ccLib/mktree/CalendarPopup.js", "Calendar Popup")
                     Call addHeadJavascriptCode("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup")
                 End If
 
@@ -2781,7 +2795,7 @@ ErrorTrap:
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbLf, "\n")
             JSCodeAsString = "'" & JSCodeAsString & "'"
             '
-            Call addOnLoadJavascript("" _
+            Call addOnLoadJs("" _
                 & "cj.addListener(" _
                     & "document.getElementById('" & HtmlId & "')" _
                     & ",'" & DOMEvent & "'" _
@@ -6720,7 +6734,7 @@ ErrorTrap:
         '
         '
         '
-        Public Sub addOnLoadJavascript(NewCode As String, addedByMessage As String)
+        Public Sub addOnLoadJs(NewCode As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
             Dim s As String
@@ -6798,10 +6812,10 @@ ErrorTrap:
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf, cr2)
-                ReDim Preserve cpCore.doc.headScripts(cpCore.doc.headScripts.Count)
-                cpCore.doc.headScripts(cpCore.doc.headScripts.Count - 1).IsLink = False
-                cpCore.doc.headScripts(cpCore.doc.headScripts.Count - 1).Text = NewCode
-                cpCore.doc.headScripts(cpCore.doc.headScripts.Count - 1).addedByMessage = genericController.vbLCase(addedByMessage)
+                ReDim Preserve cpCore.doc.jsHead(cpCore.doc.jsHead.Count)
+                cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).IsLink = False
+                cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).Text = NewCode
+                cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).addedByMessage = genericController.vbLCase(addedByMessage)
                 'cpCore.doc.headScriptCnt = cpCore.doc.headScriptCnt + 1
             End If
             '    If NewCode <> "" And genericController.vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
@@ -6835,26 +6849,31 @@ ErrorTrap:
         '
         '
         '
-        Public Sub addJavaScriptLinkHead(Filename As String, addedByMessage As String)
-            On Error GoTo ErrorTrap
-            '
-            Dim s As String
-            '
-            If Filename <> "" Then
-                ReDim Preserve cpCore.doc.headScripts(cpCore.doc.headScripts.Count)
-                cpCore.doc.headScripts(cpCore.doc.headScripts.Count - 1).IsLink = True
-                cpCore.doc.headScripts(cpCore.doc.headScripts.Count - 1).Text = Filename
-                cpCore.doc.headScripts(cpCore.doc.headScripts.Count - 1).addedByMessage = addedByMessage
-                'cpCore.doc.headScriptCnt = cpCore.doc.headScriptCnt + 1
-            End If
-            '    If Filename <> "" And genericController.vbInstr(1, s, Filename, vbTextCompare) = 0 Then
-            '
-            '        main_HeadScriptLinkList = main_HeadScriptLinkList & vbCrLf & Filename & vbTab & AddedByMessage
-            '    End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadScriptLink")
+        Public Sub addHeadJsLink(Filename As String, addedByMessage As String)
+            Try
+                If Filename <> "" Then
+                    ReDim Preserve cpCore.doc.jsHead(cpCore.doc.jsHead.Count)
+                    cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).IsLink = True
+                    cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).Text = Filename
+                    cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).addedByMessage = addedByMessage
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+        End Sub
+        '
+        Public Sub addBodyJsLink(Filename As String, addedByMessage As String)
+            Try
+                If Filename <> "" Then
+                    cpCore.doc.jsBodyList.Add(New jsBufferClass With {
+                        .addedByMessage = addedByMessage,
+                        .IsLink = True,
+                        .Text = Filename
+                    })
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
         '=========================================================================================================
@@ -6915,7 +6934,7 @@ ErrorTrap:
         '
         '
         '
-        Public Sub addStyleLink(StyleSheetLink As String, addedByMessage As String)
+        Public Sub addHeadStyleLink(StyleSheetLink As String, addedByMessage As String)
             Try
                 If StyleSheetLink <> "" Then
                     cpCore.doc.metaContent_StyleSheetTags = cpCore.doc.metaContent_StyleSheetTags & cr
@@ -7462,15 +7481,15 @@ ErrorTrap:
                         Else
                             Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
                         End If
-                        Call addJavaScriptLinkHead(Copy, "embedded content")
+                        Call addHeadJsLink(Copy, "embedded content")
                         Copy = cpCore.doc.getNextJSFilename()
                     Loop
-                    '
-                    Copy = cpCore.doc.getJavascriptOnLoad()
-                    Do While Copy <> ""
-                        Call addOnLoadJavascript(Copy, "")
-                        Copy = cpCore.doc.getJavascriptOnLoad()
-                    Loop
+                    ''
+                    'Copy = cpCore.doc.getJavascriptOnLoad()
+                    'Do While Copy <> ""
+                    '    Call addOnLoadJs(Copy, "")
+                    '    Copy = cpCore.doc.getJavascriptOnLoad()
+                    'Loop
                     '
                     Copy = cpCore.doc.getNextStyleFilenames()
                     Do While Copy <> ""
@@ -7479,7 +7498,7 @@ ErrorTrap:
                         Else
                             Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
                         End If
-                        Call addStyleLink(Copy, "")
+                        Call addHeadStyleLink(Copy, "")
                         Copy = cpCore.doc.getNextStyleFilenames()
                     Loop
                 End If
@@ -9656,6 +9675,16 @@ ErrorTrap:
         End Function
         '
         '====================================================================================================
+        ''' <summary>
+        ''' Create the full html doc from the accumulated elements
+        ''' </summary>
+        ''' <param name="htmlBody"></param>
+        ''' <param name="htmlBodyTag"></param>
+        ''' <param name="allowLogin"></param>
+        ''' <param name="allowTools"></param>
+        ''' <param name="blockNonContentExtras"></param>
+        ''' <param name="isAdminSite"></param>
+        ''' <returns></returns>
         Public Function getHtmlDoc(htmlBody As String, htmlBodyTag As String, Optional allowLogin As Boolean = True, Optional allowTools As Boolean = True, Optional blockNonContentExtras As Boolean = False, Optional isAdminSite As Boolean = True) As String
             Dim result As String = ""
             Try

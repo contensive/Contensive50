@@ -1927,7 +1927,7 @@ Namespace Contensive.Core
         '
         ' block of js code that goes into a script tag
         '
-        Public Structure main_HeadScriptType
+        Public Structure jsBufferClass
             Dim IsLink As Boolean
             Dim Text As String
             Dim addedByMessage As String

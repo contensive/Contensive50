@@ -96,7 +96,7 @@ Namespace Contensive.Core.Controllers
                     '
                     Call cpcore.doc.addRefreshQueryString("method", "")
                     loginForm = ""
-                    Call cpcore.html.addOnLoadJavascript("document.getElementById('LoginUsernameInput').focus()", "login")
+                    Call cpcore.html.addOnLoadJs("document.getElementById('LoginUsernameInput').focus()", "login")
                     '
                     ' ----- Error Messages
                     '

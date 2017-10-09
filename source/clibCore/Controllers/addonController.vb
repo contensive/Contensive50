@@ -406,17 +406,32 @@ Namespace Contensive.Core.Controllers
                             Call cpCore.html.doc_addMetaDescription2(addon.MetaDescription, AddedByName)
                             Call cpCore.html.doc_addMetaKeywordList2(addon.MetaKeywordList, AddedByName)
                             Call cpCore.html.doc_AddHeadTag2(addon.OtherHeadTags, AddedByName)
-                            Call cpCore.html.addOnLoadJavascript(addon.JavaScriptOnLoad, AddedByName)
-                            Call cpCore.html.addBodyJavascriptCode(addon.JavaScriptBodyEnd, AddedByName)
+                            '
+                            ' -- js head links
                             If addon.JSHeadLink <> "" Then
-                                Call cpCore.html.addJavaScriptLinkHead(addon.JSHeadLink, AddedByName)
+                                Call cpCore.html.addHeadJsLink(addon.JSHeadLink, AddedByName)
                             End If
+                            '
+                            ' -- js head code
                             If addon.JSFilename.filename <> "" Then
-                                Call cpCore.html.addJavaScriptLinkHead(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.JSFilename.filename), AddedByName)
+                                Call cpCore.html.addHeadJsLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.JSFilename.filename), AddedByName)
                             End If
+                            '
+                            ' -- js body links
+                            If addon.JSBodyLink <> "" Then
+                                Call cpCore.html.addBodyJsLink(addon.JSBodyLink, AddedByName)
+                            End If
+                            '
+                            ' -- js body code
+                            Call cpCore.html.addBodyJavascriptCode(addon.JavaScriptBodyEnd, AddedByName)
+                            '
+                            ' -- styles
                             If addon.StylesFilename.filename <> "" Then
-                                Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.StylesFilename.filename), addon.name & " default")
+                                Call cpCore.html.addHeadStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.StylesFilename.filename), addon.name & " default")
                             End If
+                            ''
+                            '' -- legacy onload
+                            'Call cpCore.html.addOnLoadJs(addon.JavaScriptOnLoad, AddedByName)
                         End If
                         '
                         ' -- Add Css containers
@@ -2094,7 +2109,7 @@ Namespace Contensive.Core.Controllers
                     cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.addOnLoadJavascript("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addOnLoadJs("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                 End If
@@ -2263,7 +2278,7 @@ ErrorTrap:
                     cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.addOnLoadJavascript("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addOnLoadJs("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                     result = "" _
@@ -2353,7 +2368,7 @@ ErrorTrap:
                     'SiteStylesBubbleCache = "x"
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.addOnLoadJavascript("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addOnLoadJs("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                     getHTMLViewerBubble = "" _
@@ -3375,14 +3390,14 @@ ErrorTrap:
                 If WrapperSourceForComment <> "" Then
                     SourceComment = SourceComment & " for " & WrapperSourceForComment
                 End If
-                Call cpCore.html.addOnLoadJavascript(cpCore.db.csGetText(CS, "javascriptonload"), SourceComment)
+                Call cpCore.html.addOnLoadJs(cpCore.db.csGetText(CS, "javascriptonload"), SourceComment)
                 Call cpCore.html.addBodyJavascriptCode(cpCore.db.csGetText(CS, "javascriptbodyend"), SourceComment)
                 Call cpCore.html.doc_AddHeadTag2(cpCore.db.csGetText(CS, "OtherHeadTags"), SourceComment)
                 '
                 JSFilename = cpCore.db.csGetText(CS, "jsfilename")
                 If JSFilename <> "" Then
                     JSFilename = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
-                    Call cpCore.html.addJavaScriptLinkHead(JSFilename, SourceComment)
+                    Call cpCore.html.addHeadJsLink(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.csGetText(CS, "stylesfilename")
                 If Copy <> "" Then
@@ -3391,7 +3406,7 @@ ErrorTrap:
                     Else
                         Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
                     End If
-                    Call cpCore.html.addStyleLink(Copy, SourceComment)
+                    Call cpCore.html.addHeadStyleLink(Copy, SourceComment)
                 End If
                 '
                 If Wrapper <> "" Then

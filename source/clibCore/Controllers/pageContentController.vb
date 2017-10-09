@@ -93,7 +93,7 @@ Namespace Contensive.Core.Controllers
                     Dim AllowCookieTest As Boolean
                     AllowCookieTest = cpCore.siteProperties.allowVisitTracking And (cpCore.authContext.visit.PageVisits = 1)
                     If AllowCookieTest Then
-                        Call cpCore.html.addOnLoadJavascript("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.authContext.visit.id, cpCore.profileStartTime) & "')};", "Cookie Test")
+                        Call cpCore.html.addOnLoadJs("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.authContext.visit.id, cpCore.profileStartTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -521,7 +521,7 @@ Namespace Contensive.Core.Controllers
                                     ' -- block with custom content
                                     cpCore.continueProcessing = False
                                     Call cpCore.doc.setMetaContent(0, 0)
-                                    Call cpCore.html.addOnLoadJavascript("document.body.style.overflow='scroll'", "Anonymous User Block")
+                                    Call cpCore.html.addOnLoadJs("document.body.style.overflow='scroll'", "Anonymous User Block")
                                     Return cpCore.html.getHtmlDoc(
                                         cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated),
                                         TemplateDefaultBodyTag,
@@ -570,7 +570,7 @@ Namespace Contensive.Core.Controllers
                     ' -- if endpoint is just domain -> the template is automatically compatible by default (domain determined the landing page)
                     ' -- if endpoint is domain + route (link alias), the route determines the page, which may determine the cpCore.doc.template. If this template is not allowed for this domain, redirect to the domain's landingcpCore.doc.page.
                     '
-                    Sql = "(domainId=" & cpCore.doc.domain.ID & ")"
+                    Sql = "(domainId=" & cpCore.doc.domain.id & ")"
                     Dim allowTemplateRuleList As List(Of Models.Entity.TemplateDomainRuleModel) = Models.Entity.TemplateDomainRuleModel.createList(cpCore, Sql)
                     If (allowTemplateRuleList.Count = 0) Then
                         '
@@ -586,7 +586,7 @@ Namespace Contensive.Core.Controllers
                         If (Not allowTemplate) Then
                             '
                             ' -- must redirect to a domain's landing page
-                            RedirectLink = cpCore.webServer.requestProtocol & cpCore.doc.domain.Name
+                            RedirectLink = cpCore.webServer.requestProtocol & cpCore.doc.domain.name
                             cpCore.doc.redirectBecausePageNotFound = False
                             cpCore.doc.redirectReason = "Redirecting because this domain has template requiements set, and this template is not configured [" & cpCore.doc.template.Name & "]."
                             Return ""
@@ -1258,7 +1258,7 @@ ErrorTrap:
                                     '
                                     ' -- recognized, not authenticated
                                     BlockForm = "" _
-                                        & "<p>This content has limited access. You were recognized as ""<b>" & cpCore.authContext.user.Name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
+                                        & "<p>This content has limited access. You were recognized as ""<b>" & cpCore.authContext.user.name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
                                         & cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), New CPUtilsBaseClass.addonExecuteContext With {.addonType = CPUtilsBaseClass.addonContext.ContextPage}) _
                                         & ""
                                 End If
@@ -1266,7 +1266,7 @@ ErrorTrap:
                                 '
                                 ' -- authenticated
                                 BlockForm = "" _
-                                    & "<p>You are currently logged in as ""<b>" & cpCore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                    & "<p>You are currently logged in as ""<b>" & cpCore.authContext.user.name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
                                     & cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), New CPUtilsBaseClass.addonExecuteContext With {.addonType = CPUtilsBaseClass.addonContext.ContextPage}) _
                                     & ""
@@ -1312,7 +1312,7 @@ ErrorTrap:
                                     ' -- Authenticated
                                     Call cpCore.doc.verifyRegistrationFormPage(cpCore)
                                     BlockCopy = "" _
-                                        & "<p>You are currently logged in as ""<b>" & cpCore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                        & "<p>You are currently logged in as ""<b>" & cpCore.authContext.user.name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                         & "<p>This account does not have access to this content. To view this content, please complete this form.</p>" _
                                         & getFormPage(cpCore, "Registration Form", RegistrationGroupID) _
                                         & ""
@@ -1399,7 +1399,7 @@ ErrorTrap:
                                 Body = Body & getTableRow("Domain", cpCore.webServer.requestDomain, True)
                                 Body = Body & getTableRow("Link", cpCore.webServer.requestUrl, False)
                                 Body = Body & getTableRow("Page Name", PageName, True)
-                                Body = Body & getTableRow("Member Name", cpCore.authContext.user.Name, False)
+                                Body = Body & getTableRow("Member Name", cpCore.authContext.user.name, False)
                                 Body = Body & getTableRow("Member #", CStr(cpCore.authContext.user.id), True)
                                 Body = Body & getTableRow("Visit Start Time", CStr(cpCore.authContext.visit.StartTime), False)
                                 Body = Body & getTableRow("Visit #", CStr(cpCore.authContext.visit.id), True)
@@ -1490,10 +1490,10 @@ ErrorTrap:
                     ' ----- Store page javascript
                     '---------------------------------------------------------------------------------
                     '
-                    Call cpCore.html.addOnLoadJavascript(cpCore.doc.page.JSOnLoad, "page content")
+                    Call cpCore.html.addOnLoadJs(cpCore.doc.page.JSOnLoad, "page content")
                     Call cpCore.html.addHeadJavascriptCode(cpCore.doc.page.JSHead, "page content")
                     If cpCore.doc.page.JSFilename <> "" Then
-                        Call cpCore.html.addJavaScriptLinkHead(genericController.getCdnFileLink(cpCore, cpCore.doc.page.JSFilename), "page content")
+                        Call cpCore.html.addHeadJsLink(genericController.getCdnFileLink(cpCore, cpCore.doc.page.JSFilename), "page content")
                     End If
                     Call cpCore.html.addBodyJavascriptCode(cpCore.doc.page.JSEndBody, "page content")
                     '

@@ -269,7 +269,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides ReadOnly Property JavaScriptOnLoad() As String
+        <Obsolete("Create onready or onload events within your javascript. This method will be deprecated.", False)> Public Overrides ReadOnly Property JavaScriptOnLoad() As String
             Get
                 Return ""
 

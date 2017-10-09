@@ -5897,7 +5897,6 @@ public IconWidth as Integer
 public InFrame as Boolean
 public IsInline as Boolean
 public JavaScriptBodyEnd as String
-public JavaScriptOnLoad as String
 public JSFilename as String
 public Link as String
 public MetaDescription as String
@@ -5961,7 +5960,6 @@ public Template as Boolean
 .InFrame = cs.getBoolean("InFrame")
 .IsInline = cs.getBoolean("IsInline")
 .JavaScriptBodyEnd = cs.getText("JavaScriptBodyEnd")
-.JavaScriptOnLoad = cs.getText("JavaScriptOnLoad")
 .JSFilename = cs.getText("JSFilename")
 .Link = cs.getText("Link")
 .MetaDescription = cs.getText("MetaDescription")
@@ -6024,7 +6022,6 @@ cs.SetField("IconWidth", IconWidth.ToString())
 cs.SetField("InFrame", InFrame.ToString())
 cs.SetField("IsInline", IsInline.ToString())
 cs.SetField("JavaScriptBodyEnd", JavaScriptBodyEnd)
-cs.SetField("JavaScriptOnLoad", JavaScriptOnLoad)
 cs.SetField("JSFilename", JSFilename)
 cs.SetField("Link", Link)
 cs.SetField("MetaDescription", MetaDescription)
@@ -6088,7 +6085,6 @@ instance.IconWidth = genericController.EncodeInteger(.fields("IconWidth").defaul
 instance.InFrame = genericController.EncodeBoolean(.fields("InFrame").defaultValue)
 instance.IsInline = genericController.EncodeBoolean(.fields("IsInline").defaultValue)
 instance.JavaScriptBodyEnd = genericController.EncodeText(.fields("JavaScriptBodyEnd").defaultValue)
-instance.JavaScriptOnLoad = genericController.EncodeText(.fields("JavaScriptOnLoad").defaultValue)
 instance.JSFilename = genericController.EncodeText(.fields("JSFilename").defaultValue)
 instance.Link = genericController.EncodeText(.fields("Link").defaultValue)
 instance.MetaDescription = genericController.EncodeText(.fields("MetaDescription").defaultValue)
@@ -8231,7 +8227,6 @@ public Depth as Integer
 
 public FlyoutDirection as Integer
 public FlyoutOnHover as Boolean
-public JavaScriptOnLoad as String
 public JSFilename as String
 public Layout as Integer
 public listStylesFilename as String
@@ -8268,7 +8263,6 @@ public useJsFlyoutCode as Boolean
 
 .FlyoutDirection = cs.getInteger("FlyoutDirection")
 .FlyoutOnHover = cs.getBoolean("FlyoutOnHover")
-.JavaScriptOnLoad = cs.getText("JavaScriptOnLoad")
 .JSFilename = cs.getText("JSFilename")
 .Layout = cs.getInteger("Layout")
 .listStylesFilename = cs.getText("listStylesFilename")
@@ -8304,7 +8298,6 @@ cs.SetField("Depth", Depth.ToString())
 
 cs.SetField("FlyoutDirection", FlyoutDirection.ToString())
 cs.SetField("FlyoutOnHover", FlyoutOnHover.ToString())
-cs.SetField("JavaScriptOnLoad", JavaScriptOnLoad)
 cs.SetField("JSFilename", JSFilename)
 cs.SetField("Layout", Layout.ToString())
 cs.SetField("listStylesFilename", listStylesFilename)
@@ -8341,7 +8334,6 @@ instance.Depth = genericController.EncodeInteger(.fields("Depth").defaultValue)
 
 instance.FlyoutDirection = genericController.EncodeInteger(.fields("FlyoutDirection").defaultValue)
 instance.FlyoutOnHover = genericController.EncodeBoolean(.fields("FlyoutOnHover").defaultValue)
-instance.JavaScriptOnLoad = genericController.EncodeText(.fields("JavaScriptOnLoad").defaultValue)
 instance.JSFilename = genericController.EncodeText(.fields("JSFilename").defaultValue)
 instance.Layout = genericController.EncodeInteger(.fields("Layout").defaultValue)
 instance.listStylesFilename = genericController.EncodeText(.fields("listStylesFilename").defaultValue)
@@ -8702,7 +8694,6 @@ public DateAdded as Date
 
 public javascriptbodyend as String
 public javascriptinhead as String
-public javascriptonload as String
 public JSFilename as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
@@ -8726,7 +8717,6 @@ public targetstring as String
 
 .javascriptbodyend = cs.getText("javascriptbodyend")
 .javascriptinhead = cs.getText("javascriptinhead")
-.javascriptonload = cs.getText("javascriptonload")
 .JSFilename = cs.getText("JSFilename")
 .ModifiedBy = cs.getInteger("ModifiedBy")
 .ModifiedDate = cs.getDate("ModifiedDate")
@@ -8749,7 +8739,6 @@ cs.SetField("DateAdded", DateAdded.ToString())
 
 cs.SetField("javascriptbodyend", javascriptbodyend)
 cs.SetField("javascriptinhead", javascriptinhead)
-cs.SetField("javascriptonload", javascriptonload)
 cs.SetField("JSFilename", JSFilename)
 cs.SetField("ModifiedBy", ModifiedBy.ToString())
 cs.SetField("ModifiedDate", ModifiedDate.ToString())
@@ -8773,7 +8762,6 @@ instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultVa
 
 instance.javascriptbodyend = genericController.EncodeText(.fields("javascriptbodyend").defaultValue)
 instance.javascriptinhead = genericController.EncodeText(.fields("javascriptinhead").defaultValue)
-instance.javascriptonload = genericController.EncodeText(.fields("javascriptonload").defaultValue)
 instance.JSFilename = genericController.EncodeText(.fields("JSFilename").defaultValue)
 instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)
 instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").defaultValue)

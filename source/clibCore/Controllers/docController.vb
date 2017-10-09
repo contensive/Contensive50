@@ -59,7 +59,8 @@ Namespace Contensive.Core.Controllers
         Public Property onLoadJavascript As String = ""
         Public Property endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
         Public Property endOfBodyString As String = ""
-        Public Property headScripts As main_HeadScriptType() = {}
+        Public Property jsBodyList As New List(Of jsBufferClass)
+        Public Property jsHead As jsBufferClass() = {}
         Public Property inputDateCnt As Integer = 0
         Public Property inputSelectCacheCnt As Integer = 0
         Public Property inputSelectCache As main_InputSelectCacheType()
@@ -482,7 +483,7 @@ Namespace Contensive.Core.Controllers
                 Dim ApprovedDate As Date
                 Dim ModifiedDate As Date
                 '
-                Call cpcore.html.addStyleLink("/quickEditor/styles.css", "Quick Editor")
+                Call cpcore.html.addHeadStyleLink("/quickEditor/styles.css", "Quick Editor")
                 '
                 ' ----- First Active Record - Output Quick Editor form
                 '
@@ -2467,23 +2468,23 @@ ErrorTrap:
             End If
             Return result
         End Function
-        '
-        '   Returns the next entry in the array, empty when there are no more
-        '
-        Public Function getJavascriptOnLoad() As String
-            Dim result As String = ""
-            Dim Ptr As Integer
-            If javascriptOnLoad.Count >= 0 Then
-                For Ptr = 0 To javascriptOnLoad.Count - 1
-                    If javascriptOnLoad(Ptr) <> "" Then
-                        result = javascriptOnLoad(Ptr)
-                        javascriptOnLoad(Ptr) = ""
-                        Exit For
-                    End If
-                Next
-            End If
-            Return result
-        End Function
+        ''
+        ''   Returns the next entry in the array, empty when there are no more
+        ''
+        'Public Function getJavascriptOnLoad() As String
+        '    Dim result As String = ""
+        '    Dim Ptr As Integer
+        '    If javascriptOnLoad.Count >= 0 Then
+        '        For Ptr = 0 To javascriptOnLoad.Count - 1
+        '            If javascriptOnLoad(Ptr) <> "" Then
+        '                result = javascriptOnLoad(Ptr)
+        '                javascriptOnLoad(Ptr) = ""
+        '                Exit For
+        '            End If
+        '        Next
+        '    End If
+        '    Return result
+        'End Function
         '
         '   Returns the next entry in the array, empty when there are no more
         '
@@ -2620,9 +2621,9 @@ ErrorTrap:
                 '
                 ' -- head Javascript
                 ' -- must be added as addon. result &= cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & "/ccLib/ClientSide/Core.js""></script>"
-                If cpcore.doc.headScripts.Count > 0 Then
-                    For Ptr = 0 To cpcore.doc.headScripts.Count - 1
-                        With cpcore.doc.headScripts(Ptr)
+                If cpcore.doc.jsHead.Count > 0 Then
+                    For Ptr = 0 To cpcore.doc.jsHead.Count - 1
+                        With cpcore.doc.jsHead(Ptr)
                             If (.addedByMessage <> "") And cpcore.visitProperty.getBoolean("AllowDebugging") Then
                                 result &= cr & "<!-- from " & .addedByMessage & " -->"
                             End If
@@ -2633,7 +2634,7 @@ ErrorTrap:
                             End If
                         End With
                     Next
-                    cpcore.doc.headScripts = {}
+                    cpcore.doc.jsHead = {}
                 End If
             Catch ex As Exception
                 cpcore.handleException(ex)

@@ -252,7 +252,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addOnLoadJavascript(ByVal NewCode As String)
             If True Then
-                Call cpCore.html.addOnLoadJavascript(NewCode, "")
+                Call cpCore.html.addOnLoadJs(NewCode, "")
             End If
         End Sub
         '
@@ -283,7 +283,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub addHeadStyleLink(ByVal StyleSheetLink As String)
-            Call cpCore.html.addStyleLink(StyleSheetLink, "")
+            Call cpCore.html.addHeadStyleLink(StyleSheetLink, "")
         End Sub
         '
         '====================================================================================================
