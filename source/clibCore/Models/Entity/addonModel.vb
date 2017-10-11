@@ -44,8 +44,8 @@ Namespace Contensive.Core.Models.Entity
         Public Property IsInline As Boolean
         Public Property JavaScriptBodyEnd As String
         'Public Property JavaScriptOnLoad As String
-        Public Property JSHeadLink As String
-        Public Property JSBodyLink As String
+        Public Property JSHeadScriptSrc As String
+        Public Property JSBodyScriptSrc As String
         Public Property JSFilename As fieldTypeJavascriptFile
         Public Property Link As String
         Public Property MetaDescription As String
@@ -71,6 +71,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property ScriptingLanguageID As Integer
         Public Property ScriptingTimeout As String
         Public Property StylesFilename As fieldTypeCSSFile
+        Public Property StylesLinkHref As String
         Public Property Template As Boolean        '
         '====================================================================================================
         Public Overloads Shared Function add(cpCore As coreClass) As addonModel

@@ -4654,7 +4654,9 @@ Namespace Contensive.Core
                     RequireReload = False
                     For Each keypairvalue In .CDef
                         With keypairvalue.Value
-                            If .dataChanged Or .includesAFieldChange Then
+                            '
+                            ' todo tmp fix, changes to field caption in base.xml do not set fieldChange
+                            If (True) Then ' If .dataChanged Or .includesAFieldChange Then
                                 If (.Name.ToLower() <> "content") Then
                                     Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
                                     Call installCollection_BuildDbFromCollection_AddCDefToDb(cpCore, keypairvalue.Value, BuildVersion)

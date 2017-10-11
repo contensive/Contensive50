@@ -408,30 +408,32 @@ Namespace Contensive.Core.Controllers
                             Call cpCore.html.doc_AddHeadTag2(addon.OtherHeadTags, AddedByName)
                             '
                             ' -- js head links
-                            If addon.JSHeadLink <> "" Then
-                                Call cpCore.html.addHeadJsLink(addon.JSHeadLink, AddedByName)
+                            If addon.JSHeadScriptSrc <> "" Then
+                                Call cpCore.html.addHeadJsLink(addon.JSHeadScriptSrc, AddedByName & " Javascript Head Src")
                             End If
                             '
                             ' -- js head code
                             If addon.JSFilename.filename <> "" Then
-                                Call cpCore.html.addHeadJsLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.JSFilename.filename), AddedByName)
+                                Call cpCore.html.addHeadJsLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.JSFilename.filename), AddedByName & " Javascript Head Code")
                             End If
                             '
                             ' -- js body links
-                            If addon.JSBodyLink <> "" Then
-                                Call cpCore.html.addBodyJsLink(addon.JSBodyLink, AddedByName)
+                            If addon.JSBodyScriptSrc <> "" Then
+                                Call cpCore.html.addBodyJsLink(addon.JSBodyScriptSrc, AddedByName & " Javascript Body Src")
                             End If
                             '
                             ' -- js body code
-                            Call cpCore.html.addBodyJavascriptCode(addon.JavaScriptBodyEnd, AddedByName)
+                            Call cpCore.html.addBodyJavascriptCode(addon.JavaScriptBodyEnd, AddedByName & " Javascript Body Code")
                             '
                             ' -- styles
                             If addon.StylesFilename.filename <> "" Then
-                                Call cpCore.html.addHeadStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.StylesFilename.filename), addon.name & " default")
+                                Call cpCore.html.addHeadStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.StylesFilename.filename), addon.name & " Stylesheet")
                             End If
-                            ''
-                            '' -- legacy onload
-                            'Call cpCore.html.addOnLoadJs(addon.JavaScriptOnLoad, AddedByName)
+                            '
+                            ' -- link to stylesheet
+                            If addon.StylesLinkHref <> "" Then
+                                Call cpCore.html.addHeadStyleLink(addon.StylesLinkHref, addon.name & " Stylesheet Link")
+                            End If
                         End If
                         '
                         ' -- Add Css containers

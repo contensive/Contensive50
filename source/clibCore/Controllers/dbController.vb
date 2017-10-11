@@ -1301,53 +1301,53 @@ Namespace Contensive.Core.Controllers
                         ContentName = .Name
                         ContentTableName = .ContentTableName
                         ContentDataSourceName = .ContentDataSourceName
-                    End With
-                    If (ContentName = "") Then
-                        Throw New ArgumentException("csv_ContentSet Is Not based On a Content Definition")
-                    Else
-                        LiveRecordID = csGetInteger(CSPointer, "ID")
-                        '
-                        ' delete any files
-                        '
-                        Dim fieldName As String
-                        Dim field As CDefFieldModel
-                        With contentSetStore(CSPointer).CDef
-                            For Each keyValue In .fields
-                                field = keyValue.Value
-                                With field
-                                    fieldName = .nameLc
-                                    Select Case .fieldTypeId
-                                        Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileCSS, FieldTypeIdFileJavascript, FieldTypeIdFileXML
-                                            '
-                                            ' public content files
-                                            '
-                                            Filename = csGetText(CSPointer, fieldName)
-                                            If Filename <> "" Then
-                                                Call cpCore.cdnFiles.deleteFile(Filename)
-                                                'Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
-                                            End If
-                                        Case FieldTypeIdFileText, FieldTypeIdFileHTML
-                                            '
-                                            ' private files
-                                            '
-                                            Filename = csGetText(CSPointer, fieldName)
-                                            If Filename <> "" Then
-                                                Call cpCore.cdnFiles.deleteFile(Filename)
-                                            End If
-                                    End Select
-                                End With
+                        If (ContentName = "") Then
+                            Throw New ArgumentException("csv_ContentSet Is Not based On a Content Definition")
+                        Else
+                            LiveRecordID = csGetInteger(CSPointer, "ID")
+                            '
+                            ' delete any files (only if filename is part of select)
+                            '
+                            Dim fieldName As String
+                            Dim field As CDefFieldModel
+                            For Each selectedFieldName In .selectList
+                                If (.fields.ContainsKey(selectedFieldName.ToLower())) Then
+                                    field = .fields(selectedFieldName.ToLower())
+                                    With field
+                                        fieldName = .nameLc
+                                        Select Case .fieldTypeId
+                                            Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileCSS, FieldTypeIdFileJavascript, FieldTypeIdFileXML
+                                                '
+                                                ' public content files
+                                                '
+                                                Filename = csGetText(CSPointer, fieldName)
+                                                If Filename <> "" Then
+                                                    Call cpCore.cdnFiles.deleteFile(Filename)
+                                                    'Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
+                                                End If
+                                            Case FieldTypeIdFileText, FieldTypeIdFileHTML
+                                                '
+                                                ' private files
+                                                '
+                                                Filename = csGetText(CSPointer, fieldName)
+                                                If Filename <> "" Then
+                                                    Call cpCore.cdnFiles.deleteFile(Filename)
+                                                End If
+                                        End Select
+                                    End With
+                                End If
                             Next
-                        End With
-                        '
-                        ' non-workflow mode, delete the live record
-                        '
-                        Call deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName)
-                        If workflowController.csv_AllowAutocsv_ClearContentTimeStamp Then
-                            Call cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(ContentTableName, "id", LiveRecordID.ToString()))
-                            'Call cpCore.cache.invalidateObject(ContentName)
+                            '
+                            ' non-workflow mode, delete the live record
+                            '
+                            Call deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName)
+                            If workflowController.csv_AllowAutocsv_ClearContentTimeStamp Then
+                                Call cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(ContentTableName, "id", LiveRecordID.ToString()))
+                                'Call cpCore.cache.invalidateObject(ContentName)
+                            End If
+                            Call deleteContentRules(ContentID, LiveRecordID)
                         End If
-                        Call deleteContentRules(ContentID, LiveRecordID)
-                    End If
+                    End With
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -1588,7 +1588,7 @@ Namespace Contensive.Core.Controllers
                             If useCSReadCacheMultiRow Then
                                 If Not .dt.Columns.Contains(FieldName.ToLower) Then
                                     If (.Updateable) Then
-                                        Throw New ApplicationException("Field [" & fieldNameTrim & "] was Not found in [" & .ContentName & "]")
+                                        Throw New ApplicationException("Field [" & fieldNameTrim & "] was Not found in [" & .ContentName & "] with selected fields [" & .SelectTableFieldList & "]")
                                     Else
                                         Throw New ApplicationException("Field [" & fieldNameTrim & "] was Not found in sql [" & .Source & "]")
                                     End If
@@ -2065,9 +2065,7 @@ Namespace Contensive.Core.Controllers
                     Throw New ArgumentException("recordId must be positive value")
                 Else
                     Dim CSPointer As Integer = cs_openContentRecord(ContentName, RecordID, MemberID, True, True)
-                    If Not csOk(CSPointer) Then
-                        Throw New ApplicationException("Could not open record [" & RecordID.ToString() & "] in content [" & ContentName & "]")
-                    Else
+                    If csOk(CSPointer) Then
                         Call csDeleteRecord(CSPointer)
                     End If
                     Call csClose(CSPointer)
@@ -2107,7 +2105,7 @@ Namespace Contensive.Core.Controllers
                         ' another option is invalidate the entire table (tablename-invalidate), but this also has performance problems
                         '
                         Dim invaldiateObjectList As New List(Of String)
-                        CSPointer = csOpen(ContentName, Criteria, , False, MemberID, True, True, "ID")
+                        CSPointer = csOpen(ContentName, Criteria, , False, MemberID, True, True)
                         Do While csOk(CSPointer)
                             invaldiateObjectList.Add(Controllers.cacheController.getCacheName_Entity(CDef.ContentTableName, "id", csGetInteger(CSPointer, "id").ToString()))
                             Call csDeleteRecord(CSPointer)
