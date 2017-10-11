@@ -539,41 +539,35 @@ Namespace Contensive.Core.Controllers
                     ButtonList = Mid(ButtonList, 2)
                     ButtonList = cpcore.html.main_GetPanelButtons(ButtonList, "Button")
                 End If
-                If OptionsPanelAuthoringStatus <> "" Then
-                    result = result & "" _
-                        & cr & "<tr>" _
-                        & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
-                        & cr & "</tr>"
-                End If
+                'If OptionsPanelAuthoringStatus <> "" Then
+                '    result = result & "" _
+                '        & cr & "<tr>" _
+                '        & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
+                '        & cr & "</tr>"
+                'End If
                 If (cpcore.debug_iUserError <> "") Then
                     result = result & "" _
                         & cr & "<tr>" _
                         & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & errorController.error_GetUserError(cpcore) & "</div></td>" _
                         & cr & "</tr>"
                 End If
+                If readOnlyField Then
+                    result = result & "" _
+                    & cr & "<tr>" _
+                    & cr2 & "<td colspan=""2"" class=""qeRow"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
+                    & cr & "</tr>"
+                Else
+                    result = result & "" _
+                    & cr & "<tr>" _
+                    & cr2 & "<td colspan=""2"" class=""qeRow"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
+                    & cr & "</tr>"
+                End If
                 result = result _
                     & cr & "<tr>" _
                     & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Name</td>" _
                     & cr2 & "<td class=""qeRow qeRight"">" & cpcore.html.html_GetFormInputText2("name", page.name, 1, , , , readOnlyField) & "</td>" _
                     & cr & "</tr>" _
-                    & cr & "<tr>" _
-                    & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Headline</td>" _
-                    & cr2 & "<td class=""qeRow qeRight"">" & cpcore.html.html_GetFormInputText2("headline", page.Headline, 1, , , , readOnlyField) & "</td>" _
-                    & cr & "</tr>" _
                     & ""
-                If readOnlyField Then
-                    result = result & "" _
-                    & cr & "<tr>" _
-                    & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:34px;"">Body</td>" _
-                    & cr2 & "<td class=""qeRow qeRight"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
-                    & cr & "</tr>"
-                Else
-                    result = result & "" _
-                    & cr & "<tr>" _
-                    & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:111px;"">Body</td>" _
-                    & cr2 & "<td class=""qeRow qeRight"">" & getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, True, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) & "</td>" _
-                    & cr & "</tr>"
-                End If
                 '
                 ' ----- Parent pages
                 '
@@ -636,9 +630,11 @@ Namespace Contensive.Core.Controllers
                     & cr & cpcore.html.html_GetFormInputHidden("Type", FormTypePageAuthoring) _
                     & cr & cpcore.html.html_GetFormInputHidden("ID", page.id) _
                     & cr & cpcore.html.html_GetFormInputHidden("ContentName", LiveRecordContentName) _
-                    & cr & cpcore.html.main_GetPanelHeader("Contensive Quick Editor") _
                     & cr & result _
                     & cr & cpcore.html.html_GetUploadFormEnd()
+
+                '& cr & cpcore.html.main_GetPanelHeader("Contensive Quick Editor") _
+
                 result = "" _
                     & cr & "<div class=""ccCon"">" _
                     & genericController.htmlIndent(result) _

@@ -70,7 +70,7 @@ Namespace Contensive.Core.Controllers
 
                     '
                     ' -- execute template Dependencies
-                    Dim templateAddonList As List(Of Models.Entity.addonModel) = addonModel.createList_templateDependencies(cpCore, cpCore.doc.page.id)
+                    Dim templateAddonList As List(Of Models.Entity.addonModel) = addonModel.createList_templateDependencies(cpCore, cpCore.doc.template.ID)
                     For Each addon As addonModel In templateAddonList
                         Dim AddonStatusOK As Boolean = True
                         returnHtml &= cpCore.addon.executeDependency(addon, executeContext)
