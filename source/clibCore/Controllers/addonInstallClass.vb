@@ -3077,6 +3077,7 @@ Namespace Contensive.Core
                                         '
                                         FieldName = "jsfilename"
                                         Call cpCore.db.csSet(CS, FieldName, PageInterface.InnerText)
+
                                     Case "iniframe"
                                         '
                                         ' typo - field is inframe
@@ -3093,7 +3094,7 @@ Namespace Contensive.Core
                                             '
                                             ' Bad field name - need to report it somehow
                                             '
-                                            Throw New ApplicationException("bad field found [" & FieldName & "], in addon node [" & addonName & "], of collection [" & cpCore.db.getRecordName("add-on collections", CollectionID) & "]")
+                                            cpCore.handleException(New ApplicationException("bad field found [" & FieldName & "], in addon node [" & addonName & "], of collection [" & cpCore.db.getRecordName("add-on collections", CollectionID) & "]"))
                                         Else
                                             Call cpCore.db.csSet(CS, FieldName, FieldValue)
                                         End If

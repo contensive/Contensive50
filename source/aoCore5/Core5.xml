@@ -3668,7 +3668,16 @@ else if(browser.version > 5) {
 		<FormXML></FormXML>
 		<IsInline>No</IsInline>
 		<JavascriptOnLoad></JavascriptOnLoad>
-		<JavascriptInHead></JavascriptInHead>
+		<JavascriptInHead><![CDATA[function saveSortable(listId){
+		var e,c,s;
+		s=listId;
+		e=document.getElementById(listId);
+		for (i=0;i<e.childNodes.length;i++){
+			c=e.childNodes[i];
+			if(c.id) {s+=','+c.id }
+		}
+		cj.ajax.addon('ChildListResort','sortlist='+s)
+}]]></JavascriptInHead>
 		<JavascriptBodyEnd></JavascriptBodyEnd>
 		<MetaDescription></MetaDescription>
 		<OtherHeadTags></OtherHeadTags>
@@ -3686,56 +3695,6 @@ else if(browser.version > 5) {
 		<PageTitle></PageTitle>
 		<RemoteAssetLink></RemoteAssetLink>
 		<Styles></Styles>
-		<Scripting Language="" EntryPoint="" Timeout="5000"/>
-	</Addon>
-	<Addon name="Child Page Sorting" guid="{281CABBC-3FCA-4B6F-A0F2-4A792500D152}" type="Add-on">
-		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-		<IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
-		<IncludeAddon name="Contensive Base Javascript" guid="{fbc091aa-45c6-4bde-92f1-87ea77721240}"/>
-		<IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
-		<Copy></Copy>
-		<CopyText></CopyText>
-		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass></DotNetClass>
-		<ArgumentList></ArgumentList>
-		<AsAjax>No</AsAjax>
-		<Filter>No</Filter>
-		<Help></Help>
-		<HelpLink></HelpLink>
-		<Icon Link="" width="0" height="0" sprites="0" />
-		<InIframe>No</InIframe>
-		<BlockEditTools>Yes</BlockEditTools>
-		<FormXML></FormXML>
-		<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
-		<IsInline>No</IsInline>
-		<JavascriptOnLoad></JavascriptOnLoad>
-		<JavascriptInHead><![CDATA[function saveSortable(listId){
-		var e,c,s;
-		s=listId;
-		e=document.getElementById(listId);
-		for (i=0;i<e.childNodes.length;i++){
-			c=e.childNodes[i];
-			if(c.id) {s+=','+c.id }
-		}
-		cj.ajax.addon('ChildListResort','sortlist='+s)
-}]]></JavascriptInHead>
-		<JavascriptBodyEnd></JavascriptBodyEnd>
-		<MetaDescription></MetaDescription>
-		<OtherHeadTags></OtherHeadTags>
-		<Content>No</Content>
-		<Template>No</Template>
-		<Email>No</Email>
-		<Admin>No</Admin>
-		<OnPageEndEvent>Yes</OnPageEndEvent>
-		<OnPageStartEvent>No</OnPageStartEvent>
-		<OnBodyStart>No</OnBodyStart>
-		<OnBodyEnd>No</OnBodyEnd>
-		<RemoteMethod>No</RemoteMethod>
-		<ProcessRunOnce>No</ProcessRunOnce>
-		<ProcessInterval>0</ProcessInterval>
-		<PageTitle></PageTitle>
-		<RemoteAssetLink></RemoteAssetLink>
-		<Styles><![CDATA[1]]></Styles>
 		<Scripting Language="" EntryPoint="" Timeout="5000">
 			<Code><![CDATA[Function AddSortable()
 	if cp.user.isediting("Page Content") then

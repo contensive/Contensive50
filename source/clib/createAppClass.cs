@@ -66,7 +66,7 @@ namespace  Contensive.CLI {
                         {
                             if (!appConfig.adminRoute.Substring(0, 1).Equals("/"))
                             {
-                                if (appConfig.adminRoute.Substring(appConfig.adminRoute.Length - 1, 1).Equals("/"))
+                                if (!appConfig.adminRoute.Substring(appConfig.adminRoute.Length - 1, 1).Equals("/"))
                                 {
                                     routeOk = true;
                                 }

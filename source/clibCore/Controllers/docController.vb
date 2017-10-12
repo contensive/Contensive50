@@ -698,7 +698,6 @@ Namespace Contensive.Core.Controllers
             '
             Dim RecordParentID As Integer
             Dim SaveButNoChanges As Boolean
-            Dim RequestName As String
             Dim ParentID As Integer
             Dim Link As String
             Dim FieldName As String
@@ -772,39 +771,28 @@ Namespace Contensive.Core.Controllers
                 If allowSave Then
                     '
                     ' ----- Save Changes
-                    '
                     SaveButNoChanges = True
-                    RequestName = cpcore.docProperties.getText("name")
-                    If Trim(RequestName) = "" Then
-                        Call errorController.error_AddUserError(cpcore, "A name is required to save this page")
-                    Else
-                        CSBlock = cpcore.db.cs_open2(pageContentModel.contentName, RecordID, True, True)
-                        If cpcore.db.csOk(CSBlock) Then
-                            FieldName = "copyFilename"
-                            Copy = cpcore.docProperties.getText(FieldName)
-                            Copy = cpcore.html.decodeContent(Copy)
-                            If Copy <> cpcore.db.csGet(CSBlock, "copyFilename") Then
-                                Call cpcore.db.csSet(CSBlock, "copyFilename", Copy)
-                                SaveButNoChanges = False
-                            End If
-                            RecordName = cpcore.docProperties.getText("name")
-                            If RecordName <> cpcore.db.csGet(CSBlock, "name") Then
-                                Call cpcore.db.csSet(CSBlock, "name", RecordName)
-                                SaveButNoChanges = False
-                            End If
-                            Call docController.addLinkAlias(cpcore, RecordName, RecordID, "")
-                            If (cpcore.docProperties.getText("headline") <> cpcore.db.csGet(CSBlock, "headline")) Then
-                                Call cpcore.db.csSet(CSBlock, "headline", cpcore.docProperties.getText("headline"))
-                                SaveButNoChanges = False
-                            End If
-                            RecordParentID = cpcore.db.csGetInteger(CSBlock, "parentid")
+                    Dim page As pageContentModel = pageContentModel.create(cpcore, RecordID)
+                    If (page IsNot Nothing) Then
+                        Copy = cpcore.docProperties.getText("copyFilename")
+                        Copy = cpcore.html.decodeContent(Copy)
+                        If Copy <> page.Copyfilename.content Then
+                            page.Copyfilename.content = Copy
+                            SaveButNoChanges = False
                         End If
-                        Call cpcore.db.csClose(CSBlock)
+                        RecordName = cpcore.docProperties.getText("name")
+                        If RecordName <> page.name Then
+                            page.name = RecordName
+                            Call docController.addLinkAlias(cpcore, RecordName, RecordID, "")
+                            SaveButNoChanges = False
+                        End If
+                        RecordParentID = page.ParentID
+                        page.save(cpcore)
                         '
-                        Call cpcore.workflow.SetEditLock(pageContentModel.contentName, RecordID)
+                        Call cpcore.workflow.SetEditLock(pageContentModel.contentName, page.id)
                         '
                         If Not SaveButNoChanges Then
-                            Call cpcore.doc.processAfterSave(False, pageContentModel.contentName, RecordID, RecordName, RecordParentID, False)
+                            Call cpcore.doc.processAfterSave(False, pageContentModel.contentName, page.id, page.name, page.ParentID, False)
                             Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
                         End If
                     End If

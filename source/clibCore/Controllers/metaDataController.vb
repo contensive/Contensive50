@@ -1863,7 +1863,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' This update is not allowed
                     '
-                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("cpCoreClass", "csv_VerifyCDefField_ReturnID", cpCore.serverConfig.appConfig.name & ", Warning, a Base field Is being updated To non-base. This should only happen When a base field Is removed from the base collection. Content [" & ContentName & "], field [" & field.nameLc & "].")
+                    cpCore.handleException(New ApplicationException("Warning, updating non-base field with base field, content [" & ContentName & "], field [" & field.nameLc & "]"))
                 End If
                 If True Then
                     'FieldAdminOnly = field.adminOnly
