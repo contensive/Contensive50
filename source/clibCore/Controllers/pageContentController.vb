@@ -527,7 +527,6 @@ Namespace Contensive.Core.Controllers
                                         TemplateDefaultBodyTag,
                                         True,
                                         True,
-                                        False,
                                         False
                                     )
                             End Select
@@ -1530,11 +1529,11 @@ ErrorTrap:
                     returnHtml = cpCore.doc.bodyContent
                     '
                 End If
-                If cpCore.doc.metaContent_Title = "" Then
+                If cpCore.doc.htmlMetaContent_Title = "" Then
                     '
                     ' Set default page title
                     '
-                    cpCore.doc.metaContent_Title = cpCore.doc.page.name
+                    cpCore.doc.htmlMetaContent_Title = cpCore.doc.page.name
                 End If
                 '
                 ' add contentid and sectionid

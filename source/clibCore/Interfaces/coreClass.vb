@@ -1315,7 +1315,7 @@ Namespace Contensive.Core
                                         & "," & db.encodeSQLNumber(0) _
                                         & "," & db.encodeSQLNumber(PageID)
                                     SQL &= "," & db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
-                                    SQL &= "," & db.encodeSQLText(doc.metaContent_Title)
+                                    SQL &= "," & db.encodeSQLText(doc.htmlMetaContent_Title)
                                     SQL &= ");"
                                     Call db.executeQuery(SQL)
                                 End If

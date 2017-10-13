@@ -58,7 +58,7 @@ Namespace Contensive.Core.Controllers
                 Call cpcore.doc.setMetaContent(0, 0)
                 Call cpcore.html.doc_AddPagetitle2("Login", "loginPage")
                 bodyTag = TemplateDefaultBodyTag
-                returnREsult = cpcore.html.getHtmlDoc(Body, bodyTag, True, True, False, True)
+                returnREsult = cpcore.html.getHtmlDoc(Body, bodyTag, True, True, False)
             Catch ex As Exception
                 cpcore.handleException(ex) : Throw
             End Try

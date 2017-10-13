@@ -45,12 +45,12 @@ Namespace Contensive.Addons.Core
                         & genericController.htmlIndent(Copy) _
                         & cr & "</td></tr>" _
                         & cr & "<tr><td>" _
-                        & genericController.htmlIndent(cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)) _
+                        & genericController.htmlIndent(cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False)) _
                         & cr & "</td></tr></table>" _
                         & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
                         & ""
                     Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
-                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
+                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False)
                     cpCore.continueProcessing = False
                 ElseIf LinkObjectName <> "" Then
                     '
@@ -67,7 +67,7 @@ Namespace Contensive.Addons.Core
                         & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
                         & ""
                     Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
-                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
+                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False)
                     cpCore.continueProcessing = False
                 End If
             Catch ex As Exception

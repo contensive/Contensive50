@@ -43,11 +43,11 @@ Namespace Contensive.Core.Controllers
         'Public Property isStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
         Public Property outputBufferEnabled As Boolean = True          ' when true (default), stream is buffered until page is done
         ' Public Property docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
-        Public Property metaContent_Title As String = ""
-        Public Property metaContent_Description As String = ""
-        Public Property metaContent_OtherHeadTags As String = ""
-        Public Property metaContent_KeyWordList As String = ""
-        Public Property metaContent_StyleSheetTags As String = ""
+        Public Property htmlMetaContent_Title As String = ""
+        Public Property htmlMetaContent_Description As String = ""
+        Public Property htmlMetaContent_OtherHeadTags As String = ""
+        Public Property htmlMetaContent_KeyWordList As String = ""
+        Public Property htmlMetaContent_StyleSheetTags As String = ""
         'Public Property metaContent_TemplateStyleSheetTag As String = ""
         Public Property metaContent_SharedStyleIDList As String = ""
         Public Property menuComboTab As menuComboTabController
@@ -60,7 +60,7 @@ Namespace Contensive.Core.Controllers
         Public Property endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
         Public Property endOfBodyString As String = ""
         Public Property jsBodyList As New List(Of jsBufferClass)
-        Public Property jsHead As jsBufferClass() = {}
+        Public Property htmlMetaContent_jsHead As jsBufferClass() = {}
         Public Property inputDateCnt As Integer = 0
         Public Property inputSelectCacheCnt As Integer = 0
         Public Property inputSelectCache As main_InputSelectCacheType()
@@ -700,7 +700,6 @@ Namespace Contensive.Core.Controllers
             Dim SaveButNoChanges As Boolean
             Dim ParentID As Integer
             Dim Link As String
-            Dim FieldName As String
             Dim CSBlock As Integer
             Dim Copy As String
             Dim Button As String
@@ -1085,10 +1084,10 @@ Namespace Contensive.Core.Controllers
                 '
                 result = ""
                 If ActiveList <> "" Then
-                    result = result & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & genericController.htmlIndent(ActiveList) & cr & "</ul>"
+                    result = result & cr & "<ul id=""childPageList_" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & genericController.htmlIndent(ActiveList) & cr & "</ul>"
                 End If
                 If InactiveList <> "" Then
-                    result = result & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & genericController.htmlIndent(InactiveList) & cr & "</ul>"
+                    result = result & cr & "<ul id=""childPageList_" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & genericController.htmlIndent(InactiveList) & cr & "</ul>"
                 End If
                 '
                 ' ----- if non-orphan list, authoring and none found, print none message
@@ -2538,17 +2537,17 @@ ErrorTrap:
 
         ' main_Get the Head innerHTML for any page
         '
-        Public Function getHtmlHead(ByVal main_IsAdminSite As Boolean) As String
+        Public Function getHtmlHead() As String
             Dim result As String = ""
             Try
                 '
                 ' -- meta content
-                result &= cr & "<title>" & cpcore.doc.metaContent_Title & "</title>"
-                If cpcore.doc.metaContent_KeyWordList <> "" Then
-                    result &= cr & "<meta name=""keywords"" content=""" & cpcore.doc.metaContent_KeyWordList & """ >"
+                result &= cr & "<title>" & cpcore.doc.htmlMetaContent_Title & "</title>"
+                If cpcore.doc.htmlMetaContent_KeyWordList <> "" Then
+                    result &= cr & "<meta name=""keywords"" content=""" & cpcore.doc.htmlMetaContent_KeyWordList & """ >"
                 End If
-                If cpcore.doc.metaContent_Description <> "" Then
-                    result &= cr & "<meta name=""description"" content=""" & cpcore.doc.metaContent_Description & """ >"
+                If cpcore.doc.htmlMetaContent_Description <> "" Then
+                    result &= cr & "<meta name=""description"" content=""" & cpcore.doc.htmlMetaContent_Description & """ >"
                 End If
                 '
                 ' -- favicon
@@ -2587,7 +2586,8 @@ ErrorTrap:
                 End If
                 '
                 ' -- base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
-                If (Not main_IsAdminSite) And (Not String.IsNullOrEmpty(cpcore.webServer.serverFormActionURL)) Then
+                If (Not String.IsNullOrEmpty(cpcore.webServer.serverFormActionURL)) Then
+                    'If (Not main_IsAdminSite) And (Not String.IsNullOrEmpty(cpcore.webServer.serverFormActionURL)) Then
                     Dim BaseHref As String = cpcore.webServer.serverFormActionURL
                     If cpcore.doc.refreshQueryString <> "" Then
                         BaseHref &= "?" & cpcore.doc.refreshQueryString
@@ -2595,19 +2595,15 @@ ErrorTrap:
                     result &= cr & "<base href=""" & BaseHref & """ >"
                 End If
                 '
-                ' -- other head tags - always last
-                result &= cpcore.doc.metaContent_OtherHeadTags
-                cpcore.doc.metaContent_OtherHeadTags = String.Empty
-                '
                 ' -- Styles
-                result &= cpcore.doc.metaContent_StyleSheetTags
-                cpcore.doc.metaContent_StyleSheetTags = String.Empty
+                result &= cpcore.doc.htmlMetaContent_StyleSheetTags
+                cpcore.doc.htmlMetaContent_StyleSheetTags = String.Empty
                 '
                 ' -- head Javascript
                 ' -- must be added as addon. result &= cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & "/ccLib/ClientSide/Core.js""></script>"
-                If cpcore.doc.jsHead.Count > 0 Then
-                    For Ptr = 0 To cpcore.doc.jsHead.Count - 1
-                        With cpcore.doc.jsHead(Ptr)
+                If cpcore.doc.htmlMetaContent_jsHead.Count > 0 Then
+                    For Ptr = 0 To cpcore.doc.htmlMetaContent_jsHead.Count - 1
+                        With cpcore.doc.htmlMetaContent_jsHead(Ptr)
                             If (.addedByMessage <> "") And cpcore.visitProperty.getBoolean("AllowDebugging") Then
                                 result &= cr & "<!-- from " & .addedByMessage & " -->"
                             End If
@@ -2618,8 +2614,12 @@ ErrorTrap:
                             End If
                         End With
                     Next
-                    cpcore.doc.jsHead = {}
+                    cpcore.doc.htmlMetaContent_jsHead = {}
                 End If
+                '
+                ' -- other head tags - always last
+                result &= cpcore.doc.htmlMetaContent_OtherHeadTags
+                cpcore.doc.htmlMetaContent_OtherHeadTags = String.Empty
             Catch ex As Exception
                 cpcore.handleException(ex)
             End Try

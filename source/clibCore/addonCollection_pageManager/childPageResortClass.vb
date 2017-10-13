@@ -9,7 +9,7 @@ Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Addons.PageManager
-    Public Class childPageResortClass
+    Public Class savePageManagerChildListSortClass
         Inherits AddonBaseClass
         '
         '====================================================================================================
@@ -21,24 +21,20 @@ Namespace Contensive.Addons.PageManager
         Public Overrides Function execute(cp As Contensive.BaseClasses.CPBaseClass) As Object
             Dim returnHtml As String = ""
             Try
-                '
-                ' -- allowed only for addons included in this project
                 Dim cpCore As coreClass = DirectCast(cp, CPClass).core
+                '
+                ' decode: "sortlist=childPageList_{parentId}_{listName},page{idOfChild},page{idOfChild},etc"
                 '
                 Dim pageCommaList As String = cp.Doc.GetText("sortlist")
                 Dim pageList As List(Of String) = New List(Of String)(Split(pageCommaList, ","))
                 Dim ParentPageValues As String()
                 If pageList.Count > 1 Then
-                    '
-                    ' -- first element is parent page (listName_id)
                     ParentPageValues = Split(pageList(0), "_")
-                    If (ParentPageValues.Count < 2) Then
+                    If (ParentPageValues.Count < 3) Then
                         '
                         ' -- parent page is not valid
                         cp.Site.ErrorReport(New ArgumentException("pageResort requires first value to identify the parent page"))
                     Else
-
-                        Dim parentPageList As String = ParentPageValues(0)
                         Dim parentPageId As Integer = EncodeInteger(ParentPageValues(1))
                         If (parentPageId = 0) Then
                             '
@@ -46,7 +42,16 @@ Namespace Contensive.Addons.PageManager
                             cp.Site.ErrorReport(New ArgumentException("pageResort requires a parent page id"))
                         Else
                             '
-                            ' -- verify parent page sort method is set correctly
+                            ' -- create childPageIdList
+                            'Dim childListName As String = ParentPageValues(2)
+                            Dim childPageIdList As New List(Of Integer)
+                            For Each PageIDText As String In pageList
+                                Dim pageId As Integer = EncodeInteger(PageIDText.Replace("page", ""))
+                                If (pageId > 0) Then
+                                    childPageIdList.Add(pageId)
+                                End If
+                            Next
+                            '
                             Dim parentPage As Models.Entity.pageContentModel = pageContentModel.create(cpCore, parentPageId, New List(Of String))
                             If (parentPage Is Nothing) Then
                                 '
@@ -74,22 +79,17 @@ Namespace Contensive.Addons.PageManager
                                     parentPage.save(cpCore)
                                 End If
                                 Dim pagePtr As Integer = 0
-                                For Each PageIDText As String In pageList
-                                    If pagePtr > 0 Then
+                                For Each childPageId In childPageIdList
+                                    If childPageId = 0 Then
                                         '
-                                        ' -- non-first elementa are a list of page Ids
-                                        Dim pageId As Integer = EncodeInteger(PageIDText)
-                                        If pageId = 0 Then
-                                            '
-                                            ' -- invalid child page
-                                            cp.Site.ErrorReport(New ApplicationException("child page id is invalid from remote request [" & pageCommaList & "]"))
-                                        Else
-                                            Dim SortOrder As String = CStr(100000 + (pagePtr * 10))
-                                            Dim childPage As Models.Entity.pageContentModel = pageContentModel.create(cpCore, pageId, New List(Of String))
-                                            If (childPage.SortOrder <> SortOrder) Then
-                                                childPage.SortOrder = SortOrder
-                                                childPage.save(cpCore)
-                                            End If
+                                        ' -- invalid child page
+                                        cp.Site.ErrorReport(New ApplicationException("child page id is invalid from remote request [" & pageCommaList & "]"))
+                                    Else
+                                        Dim SortOrder As String = CStr(100000 + (pagePtr * 10))
+                                        Dim childPage As Models.Entity.pageContentModel = pageContentModel.create(cpCore, childPageId, New List(Of String))
+                                        If (childPage.SortOrder <> SortOrder) Then
+                                            childPage.SortOrder = SortOrder
+                                            childPage.save(cpCore)
                                         End If
                                     End If
                                     pagePtr += 1

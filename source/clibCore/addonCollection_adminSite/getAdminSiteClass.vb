@@ -97,13 +97,13 @@ Namespace Contensive.Addons.AdminSite
                     '
                     Call cpCore.doc.setMetaContent(0, 0)
                     Call cpCore.html.doc_AddPagetitle2("Unauthorized Access", "adminSite")
-                    returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False, True)
+                    returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False)
                 Else
                     '
                     ' get admin content
                     '
                     adminBody = getAdminBody()
-                    returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False, True)
+                    returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False)
                 End If
                 '
                 ' Log response
@@ -13191,52 +13191,40 @@ ErrorTrap:
                                 ColumnCnt = cpCore.docProperties.getInteger("ColumnCnt")
                                 If (ColumnCnt > 0) Then
                                     For ColumnPtr = 0 To ColumnCnt - 1
-                                        FindValue = Trim(cpCore.docProperties.getText("FindValue" & ColumnPtr))
-                                        FindName = genericController.vbLCase(cpCore.docProperties.getText("FindName" & ColumnPtr))
-                                        If (Not String.IsNullOrEmpty(FindValue)) And (Not String.IsNullOrEmpty(FindName)) Then
-                                            If Not .FindWords.ContainsKey(FindName) Then
-                                                Dim findWord As New indexConfigFindWordClass
-                                                findWord.Name = FindName
-                                                findWord.Value = FindValue
-                                                findWord.MatchOption = FindWordMatchEnum.matchincludes
-                                                .FindWords.Add(FindName, findWord)
-                                            Else
-                                                .FindWords.Item(FindName).Value = FindValue
-                                                .FindWords.Item(FindName).MatchOption = FindWordMatchEnum.matchincludes
+                                        FindName = cpCore.docProperties.getText("FindName" & ColumnPtr).ToLower
+                                        If (Not String.IsNullOrEmpty(FindName)) Then
+                                            If (adminContent.fields.ContainsKey(FindName.ToLower)) Then
+                                                FindValue = Trim(cpCore.docProperties.getText("FindValue" & ColumnPtr))
+                                                If (String.IsNullOrEmpty(FindValue)) Then
+                                                    '
+                                                    ' -- find blank, if name in list, remove it
+                                                    If (.FindWords.ContainsKey(FindName)) Then
+                                                        .FindWords.Remove(FindName)
+                                                    End If
+                                                Else
+                                                    '
+                                                    ' -- nonblank find, store it
+                                                    If (.FindWords.ContainsKey(FindName)) Then
+                                                        .FindWords.Item(FindName).Value = FindValue
+                                                    Else
+                                                        Dim field As CDefFieldModel = adminContent.fields(FindName.ToLower)
+                                                        Dim findWord As New indexConfigFindWordClass
+                                                        findWord.Name = FindName
+                                                        findWord.Value = FindValue
+                                                        Select Case field.fieldTypeId
+                                                            Case FieldTypeIdAutoIdIncrement, FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdMemberSelect
+                                                                findWord.MatchOption = FindWordMatchEnum.MatchEquals
+                                                            Case FieldTypeIdDate
+                                                                findWord.MatchOption = FindWordMatchEnum.MatchEquals
+                                                            Case FieldTypeIdBoolean
+                                                                findWord.MatchOption = FindWordMatchEnum.MatchEquals
+                                                            Case Else
+                                                                findWord.MatchOption = FindWordMatchEnum.matchincludes
+                                                        End Select
+                                                        .FindWords.Add(FindName, findWord)
+                                                    End If
+                                                End If
                                             End If
-                                            'If .FindWords.Count > 0 Then
-                                            '    For Ptr = 0 To .FindWords.Count - 1
-                                            '        If .FindWords(Ptr).Name = FindName Then
-                                            '            Exit For
-                                            '        End If
-                                            '    Next
-                                            'End If
-                                            'If Ptr = .FindWords.Count Then
-                                            '    '
-                                            '    ' Findword was not found in the list, add it if the value is not empty
-                                            '    '
-                                            '    If FindValue <> "" Then
-                                            '        ReDim Preserve .FindWords(Ptr)
-                                            '        .FindWords(Ptr).Name = FindName
-                                            '        .FindWords(Ptr).Value = FindValue
-                                            '        .FindWords(Ptr).MatchOption = FindWordMatchEnum.matchincludes
-                                            '        .FindWords.Count = Ptr + 1
-                                            '    End If
-                                            'Else
-                                            '    '
-                                            '    ' Findword was found, set config to the result
-                                            '    '
-                                            '    If FindValue = "" Then
-                                            '        .FindWords(Ptr).Name = ""
-                                            '    Else
-                                            '        .FindWords(Ptr).Value = FindValue
-                                            '        If .FindWords(Ptr).Type = FieldTypeInteger Then
-                                            '            '.FindWords(Ptr).MatchOption = FindWordMatchEnum.MatchEquals
-                                            '        Else
-                                            '            .FindWords(Ptr).MatchOption = FindWordMatchEnum.matchincludes
-                                            '        End If
-                                            '    End If
-                                            'End If
                                         End If
                                     Next
                                 End If

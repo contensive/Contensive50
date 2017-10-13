@@ -47,7 +47,7 @@ Namespace Contensive.Addons.Core
                         & genericController.htmlIndent(copy) _
                         & cr & "</td></tr></table>" _
                         & ""
-                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False, False)
+                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False)
                     cpCore.continueProcessing = False
                 End If
             Catch ex As Exception

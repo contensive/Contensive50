@@ -455,7 +455,7 @@ Namespace Contensive.Core.Controllers
                             & cpCore.siteProperties.docTypeDeclaration() _
                             & vbCrLf & "<html>" _
                             & cr & "<head>" _
-                            & vbCrLf & htmlIndent(cpCore.doc.getHtmlHead(False)) _
+                            & vbCrLf & htmlIndent(cpCore.doc.getHtmlHead()) _
                             & cr & "</head>" _
                             & cr & TemplateDefaultBodyTag _
                             & cr & "</body>" _

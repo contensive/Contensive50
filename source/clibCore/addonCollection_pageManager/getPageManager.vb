@@ -25,7 +25,7 @@ Namespace Contensive.Addons.PageManager
                 Dim processor As CPClass = DirectCast(cp, CPClass)
                 Dim cpCore As coreClass = processor.core
                 Dim htmlBody As String = pageContentController.getHtmlBody(cpCore)
-                returnHtml = cpCore.html.getHtmlDoc(htmlBody, TemplateDefaultBodyTag, True, True, False, False)
+                returnHtml = cpCore.html.getHtmlDoc(htmlBody, TemplateDefaultBodyTag, True, True, False)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try

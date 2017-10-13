@@ -747,10 +747,9 @@ ErrorTrap:
         '
         '====================================================================================================
         '
-        Public Function getHtmlDoc_beforeEndOfBodyHtml(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, main_IsAdminSite As Boolean) As String
+        Public Function getHtmlDoc_beforeEndOfBodyHtml(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean) As String
             Dim result As String = ""
             Try
-                Dim Ptr As Integer
                 '
                 ' -- content extras like tool panel
                 If (Not BlockNonContentExtras) Then
@@ -809,10 +808,10 @@ ErrorTrap:
                 Dim headTags As String
                 headTags = ""
                 '
-                If (cpCore.doc.metaContent_StyleSheetTags <> "") Then
-                    headTags = headTags & cr & cpCore.doc.metaContent_StyleSheetTags
+                If (cpCore.doc.htmlMetaContent_StyleSheetTags <> "") Then
+                    headTags = headTags & cr & cpCore.doc.htmlMetaContent_StyleSheetTags
                     'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_StyleSheetTags) & "');"
-                    cpCore.doc.metaContent_StyleSheetTags = ""
+                    cpCore.doc.htmlMetaContent_StyleSheetTags = ""
                 End If
                 '
                 ' ----- Add onload javascript
@@ -823,9 +822,9 @@ ErrorTrap:
                 End If
                 '
                 ' -- Add any left over head tags
-                If (cpCore.doc.metaContent_OtherHeadTags <> "") Then
-                    headTags = headTags & cr & cpCore.doc.metaContent_OtherHeadTags
-                    cpCore.doc.metaContent_OtherHeadTags = ""
+                If (cpCore.doc.htmlMetaContent_OtherHeadTags <> "") Then
+                    headTags = headTags & cr & cpCore.doc.htmlMetaContent_OtherHeadTags
+                    cpCore.doc.htmlMetaContent_OtherHeadTags = ""
                 End If
                 If (headTags <> "") Then
                     JS = JS & vbCrLf & vbTab & "cj.addHeadTag('" & genericController.EncodeJavascript(headTags) & "');"
@@ -6812,10 +6811,10 @@ ErrorTrap:
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf, cr2)
-                ReDim Preserve cpCore.doc.jsHead(cpCore.doc.jsHead.Count)
-                cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).IsLink = False
-                cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).Text = NewCode
-                cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).addedByMessage = genericController.vbLCase(addedByMessage)
+                ReDim Preserve cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count)
+                cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).IsLink = False
+                cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).Text = NewCode
+                cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).addedByMessage = genericController.vbLCase(addedByMessage)
                 'cpCore.doc.headScriptCnt = cpCore.doc.headScriptCnt + 1
             End If
             '    If NewCode <> "" And genericController.vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
@@ -6852,10 +6851,10 @@ ErrorTrap:
         Public Sub addHeadJsLink(Filename As String, addedByMessage As String)
             Try
                 If Filename <> "" Then
-                    ReDim Preserve cpCore.doc.jsHead(cpCore.doc.jsHead.Count)
-                    cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).IsLink = True
-                    cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).Text = Filename
-                    cpCore.doc.jsHead(cpCore.doc.jsHead.Count - 1).addedByMessage = addedByMessage
+                    ReDim Preserve cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count)
+                    cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).IsLink = True
+                    cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).Text = Filename
+                    cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).addedByMessage = addedByMessage
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -6888,14 +6887,14 @@ ErrorTrap:
         '
         Public Sub doc_AddPagetitle2(PageTitle As String, addedByMessage As String)
             Try
-                If PageTitle <> "" And genericController.vbInstr(1, cpCore.doc.metaContent_Title, PageTitle, vbTextCompare) = 0 Then
+                If PageTitle <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_Title, PageTitle, vbTextCompare) = 0 Then
                     If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                         Call doc_AddHeadTag2("<!-- title from " & addedByMessage & " -->", "")
                     End If
-                    If cpCore.doc.metaContent_Title <> "" Then
-                        cpCore.doc.metaContent_Title = cpCore.doc.metaContent_Title & ", "
+                    If cpCore.doc.htmlMetaContent_Title <> "" Then
+                        cpCore.doc.htmlMetaContent_Title = cpCore.doc.htmlMetaContent_Title & ", "
                     End If
-                    cpCore.doc.metaContent_Title = cpCore.doc.metaContent_Title & PageTitle
+                    cpCore.doc.htmlMetaContent_Title = cpCore.doc.htmlMetaContent_Title & PageTitle
                     'main_MetaContent_Title_ToBeAdded = True
                 End If
             Catch ex As Exception
@@ -6916,14 +6915,14 @@ ErrorTrap:
         Public Sub doc_addMetaDescription2(MetaDescription As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If MetaDescription <> "" And genericController.vbInstr(1, cpCore.doc.metaContent_Description, MetaDescription, vbTextCompare) = 0 Then
+            If MetaDescription <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call doc_AddHeadTag2("<!-- meta description from " & addedByMessage & " -->", "")
                 End If
-                If cpCore.doc.metaContent_Description <> "" Then
-                    cpCore.doc.metaContent_Description = cpCore.doc.metaContent_Description & ", "
+                If cpCore.doc.htmlMetaContent_Description <> "" Then
+                    cpCore.doc.htmlMetaContent_Description = cpCore.doc.htmlMetaContent_Description & ", "
                 End If
-                cpCore.doc.metaContent_Description = cpCore.doc.metaContent_Description & MetaDescription
+                cpCore.doc.htmlMetaContent_Description = cpCore.doc.htmlMetaContent_Description & MetaDescription
             End If
             '
             Exit Sub
@@ -6937,11 +6936,11 @@ ErrorTrap:
         Public Sub addHeadStyleLink(StyleSheetLink As String, addedByMessage As String)
             Try
                 If StyleSheetLink <> "" Then
-                    cpCore.doc.metaContent_StyleSheetTags = cpCore.doc.metaContent_StyleSheetTags & cr
+                    cpCore.doc.htmlMetaContent_StyleSheetTags = cpCore.doc.htmlMetaContent_StyleSheetTags & cr
                     If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                        cpCore.doc.metaContent_StyleSheetTags = cpCore.doc.metaContent_StyleSheetTags & "<!-- from " & addedByMessage & " -->"
+                        cpCore.doc.htmlMetaContent_StyleSheetTags = cpCore.doc.htmlMetaContent_StyleSheetTags & "<!-- from " & addedByMessage & " -->"
                     End If
-                    cpCore.doc.metaContent_StyleSheetTags = cpCore.doc.metaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
+                    cpCore.doc.htmlMetaContent_StyleSheetTags = cpCore.doc.htmlMetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -6979,14 +6978,14 @@ ErrorTrap:
         Public Sub doc_addMetaKeywordList2(MetaKeywordList As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If MetaKeywordList <> "" And genericController.vbInstr(1, cpCore.doc.metaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
+            If MetaKeywordList <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call doc_AddHeadTag2("<!-- meta keyword list from " & addedByMessage & " -->", "")
                 End If
-                If cpCore.doc.metaContent_KeyWordList <> "" Then
-                    cpCore.doc.metaContent_KeyWordList = cpCore.doc.metaContent_KeyWordList & ", "
+                If cpCore.doc.htmlMetaContent_KeyWordList <> "" Then
+                    cpCore.doc.htmlMetaContent_KeyWordList = cpCore.doc.htmlMetaContent_KeyWordList & ", "
                 End If
-                cpCore.doc.metaContent_KeyWordList = cpCore.doc.metaContent_KeyWordList & MetaKeywordList
+                cpCore.doc.htmlMetaContent_KeyWordList = cpCore.doc.htmlMetaContent_KeyWordList & MetaKeywordList
             End If
             '
             Exit Sub
@@ -7007,14 +7006,14 @@ ErrorTrap:
         Public Sub doc_AddHeadTag2(HeadTag As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If HeadTag <> "" And genericController.vbInstr(1, cpCore.doc.metaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
-                If cpCore.doc.metaContent_OtherHeadTags <> "" Then
-                    cpCore.doc.metaContent_OtherHeadTags = cpCore.doc.metaContent_OtherHeadTags & vbCrLf
+            If HeadTag <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
+                If cpCore.doc.htmlMetaContent_OtherHeadTags <> "" Then
+                    cpCore.doc.htmlMetaContent_OtherHeadTags = cpCore.doc.htmlMetaContent_OtherHeadTags & vbCrLf
                 End If
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    cpCore.doc.metaContent_OtherHeadTags = cpCore.doc.metaContent_OtherHeadTags & "<!-- from " & addedByMessage & " -->" & vbCrLf
+                    cpCore.doc.htmlMetaContent_OtherHeadTags = cpCore.doc.htmlMetaContent_OtherHeadTags & "<!-- from " & addedByMessage & " -->" & vbCrLf
                 End If
-                cpCore.doc.metaContent_OtherHeadTags = cpCore.doc.metaContent_OtherHeadTags & HeadTag
+                cpCore.doc.htmlMetaContent_OtherHeadTags = cpCore.doc.htmlMetaContent_OtherHeadTags & HeadTag
             End If
             '
             Exit Sub
@@ -9685,11 +9684,11 @@ ErrorTrap:
         ''' <param name="blockNonContentExtras"></param>
         ''' <param name="isAdminSite"></param>
         ''' <returns></returns>
-        Public Function getHtmlDoc(htmlBody As String, htmlBodyTag As String, Optional allowLogin As Boolean = True, Optional allowTools As Boolean = True, Optional blockNonContentExtras As Boolean = False, Optional isAdminSite As Boolean = True) As String
+        Public Function getHtmlDoc(htmlBody As String, htmlBodyTag As String, Optional allowLogin As Boolean = True, Optional allowTools As Boolean = True, Optional blockNonContentExtras As Boolean = False) As String
             Dim result As String = ""
             Try
-                Dim htmlHead As String = cpCore.doc.getHtmlHead(isAdminSite)
-                Dim htmlBeforeEndOfBody As String = getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools, blockNonContentExtras, isAdminSite)
+                Dim htmlHead As String = cpCore.doc.getHtmlHead()
+                Dim htmlBeforeEndOfBody As String = getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools, blockNonContentExtras)
 
                 result = "" _
                     & cpCore.siteProperties.docTypeDeclarationAdmin _
