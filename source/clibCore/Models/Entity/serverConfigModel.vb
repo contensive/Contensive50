@@ -73,7 +73,7 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         Public Class appConfigModel
             Public name As String = ""
-            Public appStatus As appStatusEnum = appStatusEnum.errorAppConfigNotFound
+            Public appStatus As appStatusEnum = appStatusEnum.building
             Public appMode As appModeEnum = appModeEnum.maintainence                    ' must be set to normal after setup
             Public enabled As Boolean = False
             Public privateKey As String = ""                                            ' rename hashKey
@@ -102,24 +102,24 @@ Namespace Contensive.Core.Models.Entity
         ''' status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
         ''' </summary>
         Public Enum appStatusEnum
-            notFound = 0
-            notEnabled = 1
-            ready = 2
-            loading = 3
-            errorKernelFailure = 6     ' can not create Kernel
-            errorNoHostService = 7     ' host service process ID not set
-            errorLicenseFailure = 8    ' failed to start because of License failure
-            errorDbNotFound = 9         ' failed to start because ccSetup table not found
-            errorFailedToInitialize = 10   ' failed to start because of unknown error, see trace log
-            errorDbBad = 11            ' ccContent,ccFields no records found
-            errorConnectionObjectFailure = 12 ' Connection Object FAiled
-            errorConnectionStringFailure = 13 ' Connection String FAiled to open the ODBC connection
-            errorDataSourceFailure = 14 ' DataSource failed to open
-            errorDuplicateDomains = 15 ' Can not locate application because there are 1+ apps that match the domain
-            paused = 16           ' Running, but all activity is blocked (for backup)
-            errorAppConfigNotFound = 17
-            errorAppConfigNotValid = 18
-            errorDbFoundButContentMetaMissing = 19
+            'notFound = 0
+            'notEnabled = 1
+            OK = 2
+            building = 3
+            'errorKernelFailure = 6     ' can not create Kernel
+            'errorNoHostService = 7     ' host service process ID not set
+            'errorLicenseFailure = 8    ' failed to start because of License failure
+            'errorDbNotFound = 9         ' failed to start because ccSetup table not found
+            'errorFailedToInitialize = 10   ' failed to start because of unknown error, see trace log
+            'errorDbBad = 11            ' ccContent,ccFields no records found
+            'errorConnectionObjectFailure = 12 ' Connection Object FAiled
+            'errorConnectionStringFailure = 13 ' Connection String FAiled to open the ODBC connection
+            'errorDataSourceFailure = 14 ' DataSource failed to open
+            'errorDuplicateDomains = 15 ' Can not locate application because there are 1+ apps that match the domain
+            'paused = 16           ' Running, but all activity is blocked (for backup)
+            'errorAppConfigNotFound = 17
+            'errorAppConfigNotValid = 18
+            'errorDbFoundButContentMetaMissing = 19
         End Enum
         '
         '====================================================================================================
@@ -178,12 +178,15 @@ Namespace Contensive.Core.Models.Entity
                 If (Not String.IsNullOrEmpty(appName)) Then
                     If (Not returnModel.apps.ContainsKey(appName.ToLower())) Then
                         '
-                        ' -- application now configured
+                        ' -- application not configured
                         returnModel.appConfig = Nothing
                         Throw New Exception("application [" & appName & "] was not found in this server group.")
                     Else
                         returnModel.appConfig = returnModel.apps(appName.ToLower())
-                        returnModel.appConfig.appStatus = appStatusEnum.ready
+                        '
+                        ' -- no, leave the status setup with the last status saved -- there is not status that describes how it is running, because there is not server. This is the status of the configuration, OK or building
+                        ' -- build is set when the app is created, and OK is set at the end of upgrade
+                        'returnModel.appConfig.appStatus = appStatusEnum.OK
                     End If
                 End If
             Catch ex As Exception

@@ -313,8 +313,8 @@ Namespace Contensive.Core.Controllers
                     '   Then other basic system ops work, like site properties
                     '---------------------------------------------------------------------
                     '
-                    Call appendBuildLog(cpcore, "VerifyCoreTables...")
-                    Call VerifyCoreTables(cpcore)
+                    Call appendBuildLog(cpcore, "VerifyBasicTables...")
+                    Call VerifyBasicTables(cpcore)
                     DataBuildVersion = cpcore.siteProperties.dataBuildVersion
                     Call appendBuildLog(cpcore, "Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpcore.codeVersion & "]")
                     '
@@ -326,6 +326,12 @@ Namespace Contensive.Core.Controllers
                     '
                     Call appendBuildLog(cpcore, "UpgradeCDef...")
                     Call addonInstallClass.installBaseCollection(cpcore, isNewBuild, nonCriticalErrorList)
+                    '
+                    Call appendBuildLog(cpcore, "base collection installed, verify app status is ok.")
+                    If (Not cpcore.serverConfig.appConfig.appStatus.Equals(serverConfigModel.appStatusEnum.OK)) Then
+                        cpcore.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK
+                        cpcore.serverConfig.saveObject(cpcore)
+                    End If
                     '
                     '---------------------------------------------------------------------
                     ' ----- Convert Database fields for new Db
@@ -357,8 +363,7 @@ Namespace Contensive.Core.Controllers
                         ' set build version so a scratch build will not go through data conversion
                         '
                         DataBuildVersion = cpcore.codeVersion()
-                        Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.codeVersion)
-                        cpcore.siteProperties._dataBuildVersion_Loaded = False
+                        cpcore.siteProperties.dataBuildVersion = cpcore.codeVersion
                     End If
                     '
                     '---------------------------------------------------------------------
@@ -478,14 +483,14 @@ Namespace Contensive.Core.Controllers
                             Dim domain As Models.Entity.domainModel = Models.Entity.domainModel.createByName(cpcore, primaryDomain, New List(Of String))
                             If (domain Is Nothing) Then
                                 domain = Models.Entity.domainModel.add(cpcore, New List(Of String))
-                                domain.Name = primaryDomain
+                                domain.name = primaryDomain
                             End If
                             '
                             ' -- Landing Page
                             Dim landingPage As Models.Entity.pageContentModel = pageContentModel.create(cpcore, DefaultLandingPageGuid, New List(Of String))
                             If (landingPage Is Nothing) Then
                                 landingPage = pageContentModel.add(cpcore, New List(Of String))
-                                landingPage.ccGuid = DefaultLandingPageGuid
+                                landingPage.ccguid = DefaultLandingPageGuid
                             End If
                             '
                             ' -- default template
@@ -495,9 +500,9 @@ Namespace Contensive.Core.Controllers
                                 defaultTemplate.Name = "Default"
                             End If
                             domain.DefaultTemplateId = defaultTemplate.ID
-                            domain.Name = primaryDomain
-                            domain.PageNotFoundPageID = landingPage.ID
-                            domain.RootPageID = landingPage.ID
+                            domain.name = primaryDomain
+                            domain.PageNotFoundPageID = landingPage.id
+                            domain.RootPageID = landingPage.id
                             domain.TypeID = domainModel.domainTypeEnum.Normal
                             domain.Visited = False
                             domain.save(cpcore)
@@ -509,8 +514,8 @@ Namespace Contensive.Core.Controllers
                             defaultTemplate.BodyHTML = constants.defaultTemplateHtml
                             defaultTemplate.save(cpcore)
                             '
-                            If cpcore.siteProperties.getinteger("LandingPageID", landingPage.ID) = 0 Then
-                                cpcore.siteProperties.setProperty("LandingPageID", landingPage.ID)
+                            If cpcore.siteProperties.getinteger("LandingPageID", landingPage.id) = 0 Then
+                                cpcore.siteProperties.setProperty("LandingPageID", landingPage.id)
                             End If
                         End With
                     End If
@@ -522,7 +527,6 @@ Namespace Contensive.Core.Controllers
                     If True Then
                         Call appendBuildLog(cpcore, "Internal upgrade complete, set Buildversion to " & cpcore.codeVersion)
                         Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.codeVersion)
-                        cpcore.siteProperties._dataBuildVersion_Loaded = False
                         '
                         '---------------------------------------------------------------------
                         ' ----- Upgrade local collections
@@ -541,9 +545,9 @@ Namespace Contensive.Core.Controllers
                             Call appendBuildLog(cpcore, "Upgrading All Local Collections to new server build.")
                             UpgradeOK = addonInstallClass.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ErrorMessage, "", IISResetRequired, isNewBuild, nonCriticalErrorList)
                             If ErrorMessage <> "" Then
-                                throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             ElseIf Not UpgradeOK Then
-                                throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             End If
                             ''
                             ''---------------------------------------------------------------------
@@ -601,7 +605,7 @@ Namespace Contensive.Core.Controllers
                                 Call Doc.LoadXml(addonInstallClass.getCollectionListFile(cpcore))
                                 If True Then
                                     If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
-                                        throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
+                                        Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     Else
                                         With Doc.DocumentElement
                                             If genericController.vbLCase(.Name) = "collectionlist" Then
@@ -625,7 +629,7 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             localCollectionFound = False
                                                             upgradeCollection = False
-                                                            LastChangeDate =  genericController.EncodeDate(dt.Rows(rowptr).Item("LastChangeDate"))
+                                                            LastChangeDate = genericController.EncodeDate(dt.Rows(rowptr).Item("LastChangeDate"))
                                                             If LastChangeDate = Date.MinValue Then
                                                                 '
                                                                 ' app version has no lastchangedate
@@ -648,7 +652,7 @@ Namespace Contensive.Core.Controllers
                                                                                         LocalGuid = genericController.vbLCase(CollectionNode.InnerText)
                                                                                     Case "lastchangedate"
                                                                                         '
-                                                                                        LocalLastChangeDate =  genericController.EncodeDate(CollectionNode.InnerText)
+                                                                                        LocalLastChangeDate = genericController.EncodeDate(CollectionNode.InnerText)
                                                                                 End Select
                                                                             Next
                                                                     End Select
@@ -2127,7 +2131,7 @@ Namespace Contensive.Core.Controllers
         '       it will fail if they are not up to date.
         '===================================================================================================================
         '
-        Private Shared Sub VerifyCoreTables(cpCore As coreClass)
+        Friend Shared Sub VerifyBasicTables(cpCore As coreClass)
             Try
                 '
                 If Not False Then

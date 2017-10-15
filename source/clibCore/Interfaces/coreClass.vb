@@ -472,7 +472,7 @@ Namespace Contensive.Core
             '
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready
+            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK
             webServer.iisContext = Nothing
             constructorInitialize()
         End Sub
@@ -492,7 +492,7 @@ Namespace Contensive.Core
             '
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready
+            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK
             webServer.initWebContext(httpContext)
             constructorInitialize()
         End Sub
@@ -1114,7 +1114,7 @@ Namespace Contensive.Core
                     '
                     ' -- server mode, there is no application
                     authContext = Models.Context.authContextModel.create(Me, False)
-                ElseIf ((serverConfig.appConfig.appMode <> Models.Entity.serverConfigModel.appModeEnum.normal) Or (serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.appStatusEnum.ready)) Then
+                ElseIf ((serverConfig.appConfig.appMode <> Models.Entity.serverConfigModel.appModeEnum.normal) Or (serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.appStatusEnum.OK)) Then
                     '
                     ' -- application is not ready, might be error, or in maintainence mode
                     authContext = Models.Context.authContextModel.create(Me, False)
@@ -1280,7 +1280,7 @@ Namespace Contensive.Core
                     '
                     If (serverConfig IsNot Nothing) Then
                         If (serverConfig.appConfig IsNot Nothing) Then
-                            If (serverConfig.appConfig.appMode = serverConfigModel.appModeEnum.normal) And (serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.ready) Then
+                            If (serverConfig.appConfig.appMode = serverConfigModel.appModeEnum.normal) And (serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK) Then
                                 If siteProperties.allowVisitTracking Then
                                     '
                                     ' If visit tracking, save the viewing record

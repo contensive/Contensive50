@@ -4553,17 +4553,11 @@ Namespace Contensive.Core
                 '
                 Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_BuildDbFromCollection")
                 '
-                ' save current value of AllowContentAutoLoad and set it false (handled seperately here )
-                '
-                Dim AllowContentAutoLoad As Boolean
-                AllowContentAutoLoad = (cpCore.siteProperties.getBoolean("allowcontentautoload", True))
-                Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", False)
-                '
                 '----------------------------------------------------------------------------------------------------------------------
                 Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 0.5: verify core sql tables")
                 '----------------------------------------------------------------------------------------------------------------------
                 '
-                'Call VerifyCoreTables()
+                Call appBuilderController.VerifyBasicTables(cpCore)
                 '
                 '----------------------------------------------------------------------------------------------------------------------
                 Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 1: create SQL tables in default datasource")
@@ -4938,10 +4932,6 @@ Namespace Contensive.Core
                     '-------------------------------------------------------------------------------------------------
                     '
                 End With
-                '
-                ' Pop value back into property
-                '
-                Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", CStr(AllowContentAutoLoad))
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try

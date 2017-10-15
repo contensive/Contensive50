@@ -171,7 +171,7 @@ Namespace Contensive.Core.Controllers
                     ' query tasks that need to be run
                     '
                     Using cpSite As New CPClass(AppName)
-                        If (cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready) And (cpSite.core.serverConfig.appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
+                        If (cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK) And (cpSite.core.serverConfig.appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
                             Try
                                 Do
                                     '

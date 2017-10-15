@@ -511,7 +511,7 @@
     <Field Name="JSFilename" active="1" AdminOnly="0" Authorable="1" Caption="In Head (Legacy)" DeveloperOnly="true" EditSortPriority="9999" FieldType="JavascriptFile" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Legacy" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
     <Field Name="JSEndBody" active="1" AdminOnly="0" Authorable="1" Caption="Before End of Body (Legacy)" DeveloperOnly="true" EditSortPriority="9999" FieldType="LongText" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="Legacy" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
   </CDef>
-  <!--
+    <!--
   <CDef Name="Meta Content" ActiveOnly="1" AdminOnly="0" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccMetaContent" ContentDataSourceName="DEFAULT" ContentTableName="ccMetaContent" DefaultSortMethod="By Alpha Sort Order Field" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{42FC4D0C-4099-47E0-8FC3-48F476B6BAC6}">
     <Field Name="Name" active="1" AdminOnly="0" Authorable="1" Caption="Meta Title" DeveloperOnly="0" EditSortPriority="100" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="100" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
     <Field Name="MetaDescription" active="1" AdminOnly="0" Authorable="1" Caption="Meta Description" DeveloperOnly="0" EditSortPriority="1000" FieldType="LongText" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
@@ -528,8 +528,7 @@
     <Field Name="MetaKeywordID" active="1" AdminOnly="0" Authorable="1" Caption="Meta Keyword" DeveloperOnly="0" EditSortPriority="1010" FieldType="Lookup" HTMLContent="0" IndexColumn="1" IndexSortDirection="0" IndexSortOrder="2" IndexWidth="40" LookupContent="Meta Keywords" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
   </CDef>
   -->
-
-  <CDef Name="Page Content Block Rules" ActiveOnly="1" AdminOnly="0" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccPageContentBlockRules" ContentDataSourceName="DEFAULT" ContentTableName="ccPageContentBlockRules" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="GROUPID RECORDID" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{78B28231-9C0B-4753-B69B-F586EE44DA9F}">
+    <CDef Name="Page Content Block Rules" ActiveOnly="1" AdminOnly="0" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccPageContentBlockRules" ContentDataSourceName="DEFAULT" ContentTableName="ccPageContentBlockRules" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="GROUPID RECORDID" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{78B28231-9C0B-4753-B69B-F586EE44DA9F}">
 		<Field Name="GroupID" active="1" AdminOnly="0" Authorable="1" Caption="Group" DeveloperOnly="0" EditSortPriority="1000" FieldType="Lookup" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="50" LookupContent="Groups" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="RecordID" active="1" AdminOnly="0" Authorable="1" Caption="Page Content Record" DeveloperOnly="0" EditSortPriority="1010" FieldType="Lookup" HTMLContent="0" IndexColumn="1" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="50" LookupContent="Page Content" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 	</CDef>
@@ -734,7 +733,7 @@
 		<Field Name="KeyID" active="1" AdminOnly="0" Authorable="1" Caption="KeyID" DeveloperOnly="0" EditSortPriority="1020" FieldType="Integer" HTMLContent="0" IndexColumn="1" IndexSortDirection="0" IndexSortOrder="1" IndexWidth="10" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="FieldValue" active="1" AdminOnly="0" Authorable="1" Caption="FieldValue" DeveloperOnly="0" EditSortPriority="1030" FieldType="Text" HTMLContent="0" IndexColumn="2" IndexSortDirection="0" IndexSortOrder="2" IndexWidth="50" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 	</CDef>
-<!-- move to add-on
+    <!-- move to add-on
 	<CDef Name="Alerts" ActiveOnly="1" AdminOnly="0" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccAlerts" ContentDataSourceName="DEFAULT" ContentTableName="ccAlerts" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{280BE5CF-A7F5-45F4-92C9-5C9982A31188}">
 		<Field Name="Name" active="1" AdminOnly="0" Authorable="1" Caption="Name" DeveloperOnly="0" EditSortPriority="110" FieldType="Text" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="Active" active="1" AdminOnly="0" Authorable="1" Caption="Active" DeveloperOnly="0" EditSortPriority="200" FieldType="Boolean" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="1" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
@@ -753,7 +752,7 @@
 		<Field Name="DateExpires" active="1" AdminOnly="0" Authorable="0" Caption="Expires" DeveloperOnly="0" EditSortPriority="1030" FieldType="Date" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="ContentRecordKey" active="1" AdminOnly="0" Authorable="0" Caption="Content Record Key" DeveloperOnly="0" EditSortPriority="1040" FieldType="Text" HTMLContent="0" IndexColumn="99" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 	</CDef>
-<!-- move to add-on
+    <!-- move to add-on
 	<CDef Name="Search Keywords" ActiveOnly="1" AdminOnly="0" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccSearchKeywords" ContentDataSourceName="DEFAULT" ContentTableName="ccSearchKeywords" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="NAME" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{5AE022BF-40AD-4EBE-97F5-ED2365F5159F}">
 		<Field Name="Name" active="1" AdminOnly="0" Authorable="1" Caption="Name" DeveloperOnly="0" EditSortPriority="110" FieldType="Text" HTMLContent="0" IndexColumn="1" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="80" LookupContent="" NotEditable="0" Password="0" ReadOnly="1" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="Count" active="1" AdminOnly="0" Authorable="1" Caption="Count" DeveloperOnly="0" EditSortPriority="200" FieldType="Integer" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="20" LookupContent="" NotEditable="0" Password="0" ReadOnly="1" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
@@ -791,12 +790,12 @@
   -->
 	<CDef Name="Scripting Languages" Active="1" AdminOnly="0" AllowAdd="1"  AllowContentChildTool="0" NavIconType="Content" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="ccScriptingLanguages" ContentDataSourceName="Default" ContentTableName="ccScriptingLanguages" DefaultSortMethod="By Name" DeveloperOnly="1" DropDownFieldList="Name" EditorGroupName="" Parent="" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{D1EB4C69-0F05-40C5-9B0C-CE4423217AED}">
 	</CDef>
-		<!--
+	<!--
 	<CDef Name="Add-on Scripting Module Rules" Active="1" AdminOnly="0" AllowAdd="1"  AllowContentChildTool="0" NavIconType="Content" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="ccAddonScriptingModuleRules" ContentDataSourceName="Default" ContentTableName="ccAddonScriptingModuleRules" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="Name" EditorGroupName="" Parent="" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{C6C7D0A9-AD29-4605-8E78-A257E86A94F7}">
 		<Field Name="AddonID" active="1" AdminOnly="0" Authorable="1" Caption="Add-on" DeveloperOnly="0" EditSortPriority="1000" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Add-ons" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="ScriptingModuleID" active="1" AdminOnly="0" Authorable="1" Caption="Scripting Module" DeveloperOnly="0" EditSortPriority="1100" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Scripting Modules" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 	</CDef>
-  -->
+     -->
 	<CDef Name="Add-on Include Rules" Active="1" AdminOnly="0" AllowAdd="1"  AllowContentChildTool="0" NavIconType="Content" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="ccAddonIncludeRules" ContentDataSourceName="Default" ContentTableName="ccAddonIncludeRules" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="Name" EditorGroupName="" Parent="" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{19A827DE-7007-4B5C-AAAE-6847E0B4F5BE}">
 		<Field Name="AddonID" active="1" AdminOnly="0" Authorable="1" Caption="Add-on" DeveloperOnly="0" EditSortPriority="1000" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Add-ons" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="IncludedAddonID" active="1" AdminOnly="0" Authorable="1" Caption="Includes Add-on" DeveloperOnly="0" EditSortPriority="1100" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Add-ons" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
@@ -944,7 +943,7 @@
 		<Field Name="DataRecordList" active="True" AdminOnly="False" Authorable="1" Caption="Data Record List (ContentName&amp;#44; NameOrGuid)" DeveloperOnly="False" EditSortPriority="1000" FieldType="LongText" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="" NotEditable="0" Password="False" ReadOnly="False" RedirectContent="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="Data Records" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="Events" active="True" AdminOnly="False" Authorable="True" Caption="Events Thrown" DeveloperOnly="False" EditSortPriority="1000" FieldType="ManyToMany" HTMLContent="False" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="" EditTab="Events" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="collectionId" ManyToManyRuleSecondaryField="eventId" LookupContent="" RedirectContent="" ManyToManyContent="Add-on Events" ManyToManyRuleContent="Add-on Event Throwers" ></Field>
 	</CDef>
-<!-- 
+    <!-- 
 	<CDef Name="Portals" ActiveOnly="1" AdminOnly="1" AliasID="ID" AliasName="NAME" AllowAdd="1"  AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="DEFAULT" AuthoringTableName="ccPortals" ContentDataSourceName="DEFAULT" ContentTableName="ccPortals" DefaultSortMethod="By Name" DeveloperOnly="1" DropDownFieldList="NAME" EditorGroupName="" IgnoreContentControl="0" Parent="" AllowContentChildTool="0" NavIconType="Content" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{E4065BE4-5519-4F3B-9A0E-B98FB45CC06A}">
 		<Field Name="Name" active="1" AdminOnly="0" Authorable="1" Caption="Name" DeveloperOnly="0" EditSortPriority="110" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="10" LookupContent="" NotEditable="0" Password="0" ReadOnly="1" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="ccGuid" active="1" AdminOnly="0" Authorable="0" Caption="Portal GUID" DeveloperOnly="0" EditSortPriority="3000" FieldType="Text" HTMLContent="0" IndexColumn="0" IndexSortDirection="0" IndexSortOrder="0" IndexWidth="0" LookupContent="" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitle="" RSSDescription="" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
@@ -1143,7 +1142,7 @@
     -->
 		<Field Name="ccGuid" active="True" AdminOnly="False" Authorable="True" Caption="guid" DeveloperOnly="False" EditSortPriority="3000" FieldType="Text" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" LookupContent="" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
 	</CDef>
-  <!--
+    <!--
 	<CDef Name="Shared Styles Layout Rules" Active="1" AdminOnly="0" AllowAdd="1"  AllowContentChildTool="0" NavIconType="Content" AllowContentTracking="0" AllowDelete="1" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="ccSharedStylesLayoutRules" ContentDataSourceName="Default" ContentTableName="ccSharedStylesLayoutRules" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="Name" EditorGroupName="" Parent="" IconLink="" IconWidth="" IconHeight="" IconSprites="" guid="{D33DC92F-52BC-43E4-9B83-4FFF420D2EFC}">
 		<Field Name="LayoutID" active="1" AdminOnly="0" Authorable="1" Caption="Layout" DeveloperOnly="0" EditSortPriority="1000" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Add-ons" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
 		<Field Name="StyleID" active="1" AdminOnly="0" Authorable="1" Caption="Style" DeveloperOnly="0" EditSortPriority="1100" FieldType="Lookup" HTMLContent="0" IndexColumn="" IndexSortDirection="" IndexSortOrder="" IndexWidth="" LookupContent="Shared Styles" NotEditable="0" Password="0" ReadOnly="0" RedirectContent="" RedirectID="" RedirectPath="" Required="0" TextBuffered="0" UniqueName="0" DefaultValue="" RSSTitleField="0" RSSDescriptionField="0" MemberSelectGroupID="" EditTab="" Scramble="0" LookupList="" ManyToManyContent="" ManyToManyRuleContent="" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" />
@@ -1183,8 +1182,3940 @@
 		<Field Name="menuId" active="True" AdminOnly="False" Authorable="True" Caption="Menu" DeveloperOnly="False" EditSortPriority="1000" FieldType="Lookup" HTMLContent="False" IndexColumn="0" IndexSortDirection="1" IndexSortOrder="99" IndexWidth="40" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="True" LookupContent="Menus" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
 		<Field Name="pageId" active="True" AdminOnly="False" Authorable="True" Caption="Page" DeveloperOnly="False" EditSortPriority="1010" FieldType="Lookup" HTMLContent="False" IndexColumn="10" IndexSortDirection="1" IndexSortOrder="99" IndexWidth="40" RedirectID="" RedirectPath="" Required="False" TextBuffered="False" UniqueName="False" DefaultValue="" RSSTitle="False" RSSDescription="False" MemberSelectGroupID="" EditTab="" Scramble="False" LookupList="" NotEditable="False" Password="False" ReadOnly="False" ManyToManyRulePrimaryField="" ManyToManyRuleSecondaryField="" IsModified="True" LookupContent="Page Content" RedirectContent="" ManyToManyContent="" ManyToManyRuleContent="" ></Field>
 	</CDef>
+	<Addon name="Admin Site" guid="{c2de2acf-ca39-4668-b417-aa491e7d8460}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass><![CDATA[Contensive.Addons.AdminSite.getAdminSiteClass]]></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+		<IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
+		<IncludeAddon name="Contensive Base Javascript" guid="{fbc091aa-45c6-4bde-92f1-87ea77721240}"/>
+		<IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+		<IsInline>No</IsInline>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<JavascriptInHead></JavascriptInHead>
+		<JSBodyScriptSrc></JSBodyScriptSrc>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<StylesLinkHref></StylesLinkHref>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="Child Page List" guid="{D291F133-AB50-4640-9A9A-18DB68FF363B}" type="Add-on">
+		<Copy></Copy>
+		<CopyText><![CDATA[<ac type="childlist" name="$list name$">]]></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList><![CDATA[List Name]]></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML></FormXML>
+		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+		<IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
+		<IncludeAddon name="Contensive Base Javascript" guid="{fbc091aa-45c6-4bde-92f1-87ea77721240}"/>
+		<IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+		<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
+		<IsInline>No</IsInline>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<JavascriptInHead><![CDATA[function saveSortable(listId){
+	var e,c,s;
+	s=listId;
+	e=document.getElementById(listId);
+	for (i=0;i<e.childNodes.length;i++){
+		c=e.childNodes[i];
+		if(c.id) {s+=','+c.id }
+	}
+	cj.ajax.addon('savePageManagerChildListSort','sortlist='+s)
+}
+jQuery(document).ready(function() {
+	jQuery(".ccEditWrapper .ccChildList").sortable({
+			stop: function(event, ui) {
+				saveSortable(jQuery(this).attr('id')); 
+			}
+	});
+})
+]]></JavascriptInHead>
+		<JSBodyScriptSrc></JSBodyScriptSrc>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>Yes</Content>
+		<Template>Yes</Template>
+		<Email>No</Email>
+		<Admin>Yes</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles><![CDATA[.ccEditWrapper .ccChildList li {
+	min-height:30px;
+	vertical-align:middle;
+	border:1px dashed #262;
+	padding-right:40px !important;background:white url(/childPageSort/arrowUpDown.png) no-repeat right;
+}	
+]]></Styles>
+		<StylesLinkHref></StylesLinkHref>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="Contensive Base Javascript" guid="{fbc091aa-45c6-4bde-92f1-87ea77721240}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+		<IsInline>No</IsInline>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<JavascriptInHead><![CDATA[
 
-	<SQLIndex IndexName="ccContentContentTableID" DataSourceName="Default" TableName="ccContent" FieldNameList="ContentTableID"  />
+//
+//----------
+// Globals
+//	Please do no use any functions that are not in the cj object. They will all be migrated into cj in future builds.
+//----------
+//
+var ImagePropertyEditorObject;
+var DialogObject;
+var ACPropertyEditorObject;
+var ACPropertyObject;
+var TableCellPropertyObject;
+var TableRowPropertyObject;
+var TablePropertyObject;
+var TableBodyPropertyObject;
+var tableDialogEditor;
+var currentRow;
+var currentCol;
+var rtNumRows;
+var rtNumCols;
+var rtTblAlign;
+var rtTblWidth;
+var outOfContext;
+//
+// FlyoutMenu Globals
+//
+var activeButton = null;
+var selectsHidden = false;
+var menuClicks = 0;
+var width;
+var height;
+var flag = 0;
+var updated = 0;
+var clickButton;
+var lastClipCheck = false;
+var lastSelCheck = false;
+var currentPanel;
+//
+var ButtonObjectCount = 0;
+var MenuObjectCount = 0;
+var MenuHideBlock = false;
+var isNS = (navigator.appName == "Netscape");
+var isMacIE = ( (navigator.userAgent.indexOf("IE 4") > -1) && (navigator.userAgent.indexOf("Mac") > -1) );
+var browser = new BrowserType();
+var RLMediaType = '';
+//
+//	build admin site workspace
+//
+var AFinnerHTML;
+//
+//
+// cross browser window size function
+//
+window.size = function()
+{
+	var w = 0;
+	var h = 0;
+
+	//IE
+	if(!window.innerWidth)
+	{
+		//strict mode
+		if(!(document.documentElement.clientWidth == 0))
+		{
+			w = document.documentElement.clientWidth;
+			h = document.documentElement.clientHeight;
+		}
+		//quirks mode
+		else
+		{
+			w = document.body.clientWidth;
+			h = document.body.clientHeight;
+		}
+	}
+	//w3c
+	else
+	{
+		w = window.innerWidth;
+		h = window.innerHeight;
+	}
+	return {width:w,height:h};
+}
+//
+//----------
+//
+function DeleteCheck() {
+	return confirm( "This action will delete this record.\n\nAre you sure you would like to delete this record?\n\n" )
+}
+//
+//----------
+//
+function DeleteCheckWithChildren() {
+	return confirm( "This action will delete this record and its child records.\n\nAre you sure you would like to delete this record?\n\n" )
+}
+//
+//----------
+//
+function DeletePageCheck() {
+	return confirm( "This action will delete this page and its child pages.\n\nAre you sure you would like to delete this page?\n\n" )
+}
+//
+//----------
+//
+function CheckInputs(TargetID,SetValue){
+  var e,ptr;
+  e=document.getElementsByTagName('input');
+  for (ptr=0;ptr<e.length;ptr++){
+    if(e[ptr].id==TargetID){e[ptr].checked=SetValue}
+  }
+}
+//
+//----------
+//
+function SetFieldName( FieldName ) { document.all[ 'fn' ].value = FieldName; return true; }
+//
+// ----- hide select menus
+//
+function hideselect(hiddenIn) {						
+	var i, j, index, objs, wmode, paramName
+	//
+	if (hiddenIn) {
+		menuClicks++;
+	}
+	//
+	if (!hiddenIn && menuClicks == 0 && !selectsHidden) {
+		return;
+	}
+	// Hide MS Selects
+	if (browser.isIE) {
+		//alert('ie');
+		objs = document.getElementsByTagName("SELECT");
+		for (i = 0; i < objs.length; i++) {
+			if (selectsHidden && menuClicks == 0) {
+				objs[i].style.visibility = "";
+			} else {
+				objs[i].style.visibility = "hidden";
+			}
+		}
+		// Hide Objects if no <Param name=wmode> for ie
+		objs = document.getElementsByTagName("OBJECT");
+		for (i = 0; i < objs.length; i++) {
+			if (selectsHidden && menuClicks == 0) {
+				objs[i].style.visibility = "";
+			} else {
+				//var wmodeSet=false;
+				var p=objs[i].getElementsByTagName("param");
+				for (pi = 0; pi < p.length; pi++){
+					paramName=p[pi].name.toLowerCase();
+					if (paramName=='wmode') {
+						wmode=p[pi].value;
+						if(wmode) {
+							wmode = wmode.toLowerCase();
+							if (wmode=='opaque') {
+								// it hides itself
+							} else if (wmode=='transparent') {
+								// it hides itself
+							} else if (wmode=='window') {
+								// it hides itself
+								objs[i].style.visibility = "hidden";
+							} else {
+								objs[i].style.visibility = "hidden";
+							}
+						}
+					}
+				}
+			}
+		}
+	} else {
+		// Hide MS Embeds for Mozilla
+		objs = document.getElementsByTagName("EMBED");
+		for (i = 0; i < objs.length; i++) {
+			if (selectsHidden && menuClicks == 0) {
+				objs[i].style.visibility = "";
+			} else {
+				wmode=objs[i].getAttribute("wmode")
+				if(wmode) {
+					wmode = wmode.toLowerCase();
+				}
+				if (wmode=='opaque') {
+					// it hides itself
+				} else if (wmode=='transparent') {
+					// it hides itself
+				} else if (wmode=='window') {
+					// it hides itself
+				} else {
+					objs[i].style.visibility = "hidden";
+				}
+			}
+		}
+	}
+	//
+	if (selectsHidden && menuClicks == 0) {
+		selectsHidden = false;
+	}
+	//
+	else if (selectsHidden && menuClicks != 0 && clickButton != 2) {
+		menuClicks--;
+	}
+	//
+	else {
+		selectsHidden = true;
+	}
+}
+//
+// ----- Browser Detect
+//
+function BrowserType() {
+	var ua, s, i;
+	this.isIE    = false;  // Internet Explorer
+	this.isNS    = false;  // Netscape
+	//this.version = null;
+	this.isMac = false;
+	ua = navigator.userAgent;
+	s = "MSIE";
+	this.version = 0.0;
+	if (navigator.appVersion.indexOf("Mac")!=-1) {
+		this.isMac = true;
+		}
+	if ((i = ua.indexOf(s)) >= 0) {
+		this.isIE = true;
+		this.version = parseFloat(ua.substr(i + s.length));
+		return;
+		}
+	s = "Netscape6/";
+	if ((i = ua.indexOf(s)) >= 0) {
+		this.isNS = true;
+		this.version = parseFloat(ua.substr(i + s.length));
+		return;
+		}
+	s = "Gecko";
+	if ((i = ua.indexOf(s)) >= 0) {
+		this.isNS = true;
+		this.version = 6.1;
+		return;
+		}
+	}
+//
+// ----- Code for handling the menu bar and active button.
+//
+function PageClick(event) {
+	
+	var el;
+
+	if (activeButton == null) return;
+	if (browser.isIE)
+		el = window.event.srcElement;
+	else
+		el = (event.target.tagName ? event.target : event.target.parentNode);
+
+	if (el == activeButton)
+		return;
+	if (getContainerWith(el, "DIV", "kmaMenu") == null) {
+		resetButton(activeButton);
+		activeButton = null;
+	}
+}
+//
+// ----- Clear the menu
+//
+function ClearMenu() {
+	if (activeButton == null) return;
+	resetButton(activeButton);
+	activeButton = null;
+	}
+//
+// -----
+//
+function ccFlyoutHoverMode(val) {
+	flag = val;
+	if (val == 0) {
+		setTimeout(timerEvent, 1000);
+	}
+	if (val == 1) {
+		updated = 1;
+	}
+	return;
+}
+//
+// -----
+//
+function timerEvent() {
+
+	if (flag == 0) {
+		resetFlag = 1;
+		resetButton(activeButton);
+		menuClicks = 0;
+		hideselect(0);
+		updated = 1;
+	}
+
+}
+//
+// -----
+//
+function setAnchorTagsToColor(classToFind, colorToSet) {
+	var i;
+	var aTags = document.getElementsByTagName("A");
+
+	for(i = 0; i < aTags.length; i++) {
+		if (hasClassName(aTags[i], classToFind)) {
+			aTags[i].style.color = colorToSet;
+		}
+	}
+}
+//
+// -----
+//
+function ccFlyoutButtonClick(event, menuId, position, StyleSheetPrefix, OpenOnHover) {
+	var button;
+	var x, y;
+	var offY;
+	//
+	if ((!(clickButton == 2 && outOfContext))) {
+	//if ((!(clickButton == 2 && outOfContext)) && browser.isIE) {
+		hideselect(true);
+	}
+	if (browser.isIE) {
+		offY = event.offsetY;
+		button = event.srcElement;
+	} else {
+		button = event.currentTarget;
+	}
+	if(button.tagName!='A') {
+		button = getContainer( button, 'A' )
+		if (button == null) return false;
+	}
+	if (menuId == '') return false;
+	width=document.body.scrollWidth;
+	height=document.body.scrollHeight;
+	button.blur();
+	if (button.menu == null) {
+		button.menu = document.getElementById(menuId);
+		if (button.menu.title == "")
+			menuInit(button.menu);
+	}
+	if (activeButton != null)
+		resetButton(activeButton);
+	if (button != activeButton || updated == 1) {
+		updated = 0;
+		// Update the button's style so it looks down
+		if (clickButton != 2) {
+			button.className += " kmaMenuDown "+StyleSheetPrefix+"ButtonDown";
+		}
+		//button.className += " ccFlyoutButtonDown";
+		// put menu under button
+		if (position==1) {
+			// Flyout to the right
+			x = getPageOffsetLeft(button) + button.offsetWidth;
+			y = getPageOffsetTop(button);
+		} else if (position==2) {
+			// Flyout up
+			x = getPageOffsetLeft(button);
+			y = getPageOffsetTop(button) - button.menu.offsetHeight;
+		} else if (position==3) {
+			// Flyout to the left
+			x = getPageOffsetLeft(button) - button.menu.offsetWidth;
+			y = getPageOffsetTop(button);
+		} else {
+			// Flyout down
+			x = getPageOffsetLeft(button);
+			y = getPageOffsetTop(button) + button.offsetHeight;
+
+		}
+
+		if (clickButton == 2) {
+			x = event.clientX;
+			y = event.clientY;
+			if (document.body) {
+				x += document.body.scrollLeft;
+				y += document.body.scrollTop;
+			}
+		}
+
+		if ((x + button.menu.scrollWidth) > width) {
+			x = width - button.menu.scrollWidth;
+		}
+
+		button.menu.style.left = x + "px";
+		button.menu.style.top  = y + "px";
+		// turn it on
+		button.menu.style.visibility = "visible";
+		activeButton = button;
+	}
+	else {
+		if (!OpenOnHover) {
+			activeButton = null;
+			}
+	}
+	clickButton=1;
+	return false;
+}
+//
+// -----
+//
+function ccFlyoutButtonHover(event, menuId, position) {
+	var button;
+	if (browser.isIE)
+		button = window.event.srcElement;
+	else
+		button = event.currentTarget;
+	if (activeButton != null && activeButton != button)
+		ccFlyoutButtonClick(event, menuId, position);
+	}
+//
+// -----
+//
+function resetButton(button) {
+	if (button) {
+	removeClassNameAfter(button, "kmaMenuDown");
+	if (button.menu != null) {
+		closeSubMenu(button.menu);
+		button.menu.style.visibility = "hidden";
+		}
+	}
+}
+//
+// -----
+//
+function activateButton(button) {
+	if (button.menu != null) {
+		button.menu.style.visibility = "visible";
+	}
+}
+//
+// -----
+//
+function ccFlyoutPanelHover(event, StyleSheetPrefix) {
+	var menu;
+	if (browser.isIE)
+		menu = getContainerWith(window.event.srcElement, "DIV", StyleSheetPrefix+"Panel");
+		//menu = getContainerWith(window.event.srcElement, "DIV", "ccFlyoutPanel");
+	else
+		menu = event.currentTarget;
+	if (menu.title != "") {
+		if (menu.activeItem == null) {
+			// do nothing
+		} else {
+			closeSubMenu(menu);
+			}
+		}
+	}
+//
+// -----
+//
+function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
+	var item, menu, x, y;
+	var maxX, maxY;
+	if (browser.isIE)
+		item = getContainerWith(window.event.srcElement, "A", StyleSheetPrefix+"PanelButton");
+		//item = getContainerWith(window.event.srcElement, "A", "ccFlyoutPanelButton");
+	else
+		item = event.currentTarget;
+	menu = getContainerWith(item, "DIV", StyleSheetPrefix+"Panel");
+	if (menu.activeItem == null) {
+		// nothing
+	} else {
+		closeSubMenu(menu);
+		}
+	if (!(menuId)) return false
+	if (menuId == '') return false;
+	menu.activeItem = item;
+	item.className += " kmaMenuDown "+StyleSheetPrefix+"PanelButtonDown";
+	if (item.subMenu == null) {
+		item.subMenu = document.getElementById(menuId);
+		if (item.subMenu.title == "")
+		//if (item.subMenu.isInitialized == null)
+			menuInit(item.subMenu);
+		}
+	x = getPageOffsetLeft(item) + item.offsetWidth;
+	y = getPageOffsetTop(item);
+	if (browser.isNS) {
+		maxX = window.scrollX + window.innerWidth;
+		maxY = window.scrollY + window.innerHeight;
+		}
+	if (browser.isIE) {
+		maxX = (document.documentElement.scrollLeft != 0 ? document.documentElement.scrollLeft   : document.body.scrollLeft)
+			+ (document.documentElement.clientWidth  != 0 ? document.documentElement.clientWidth  : document.body.clientWidth);
+		maxY = (document.documentElement.scrollTop    != 0 ? document.documentElement.scrollTop    : document.body.scrollTop)
+			+ (document.documentElement.clientHeight != 0 ? document.documentElement.clientHeight : document.body.clientHeight);
+		}
+	maxX -= item.subMenu.offsetWidth;
+	maxY -= item.subMenu.offsetHeight;
+	if (x > maxX) 
+		x = Math.max(0, x - item.offsetWidth - item.subMenu.offsetWidth + (menu.offsetWidth - item.offsetWidth));
+	y = Math.max(0, Math.min(y, maxY));
+	item.subMenu.style.left = x + "px";
+	if (browser.isMac) {
+		if (browser.version>5.1) {
+			item.subMenu.style.top  = y + "px";
+			}
+	} else {
+		item.subMenu.style.top  = y + "px";
+		}
+	item.subMenu.style.visibility = "visible";
+	if (browser.isIE)
+		window.event.cancelBubble = true;
+	else
+		event.stopPropagation();
+	}
+//
+// -----
+//
+function closeSubMenu(menu) {
+	if (!menu)
+		return;
+	if (menu.activeItem == null)
+		return;
+	if (menu.activeItem.subMenu) {
+		closeSubMenu(menu.activeItem.subMenu);
+		menu.activeItem.subMenu.style.visibility = "hidden";
+		menu.activeItem.subMenu = null;
+		}
+	removeClassNameAfter(menu.activeItem, "kmaMenuDown");
+	//removeClassName(menu.activeItem, "ccFlyoutPanelButtonDown");
+	menu.activeItem = null;
+	}
+//
+// -----
+//
+function menuInit(menu) {
+	var itemList, spanList;
+	var textEl, arrowEl;
+	var itemWidth;
+	var w, dw;
+	var i, j;
+	itemList = menu.getElementsByTagName("A");
+	if (itemList.length == 0) {
+		//menu.title = 'Select One';
+		menu.activeItem = null
+		return false;
+	}
+	if (browser.isIE) {
+		w = itemList[0].offsetWidth;
+		itemList[0].style.width = w + "px";
+		dw = itemList[0].offsetWidth - w;
+		w -= dw;
+		itemList[0].style.width = w + "px";
+		}
+	//menu.title = 'Select One';
+	menu.activeItem = null
+	}
+//
+// -----
+//
+function getContainerWith(node, tagName, className) {
+	while (node != null) {
+		if (node.tagName != null && node.tagName == tagName &&
+				hasClassName(node, className))
+			return node;
+		node = node.parentNode;
+		}
+	return node;
+	}
+//
+// -----
+//
+function getContainer(node, tagName) {
+	while (node != null) {
+		if (node.tagName != null && node.tagName == tagName )
+			return node;
+		node = node.parentNode;
+		}
+	return node;
+	}
+//
+// -----
+//
+function hasClassName(el, name) {
+	var i, list;
+	list = el.className.split(" ");
+	for (i = 0; i < list.length; i++)
+		if (list[i] == name) return true;
+	return false;
+	}
+//
+// -----
+//
+function removeClassName(el, name) {
+	var i, curList, newList;
+	if (el.className == null) return;
+	//newList = new Array();
+	curList = el.className.split(" ");
+	for (i = 0; i < curList.length; i++)
+		if (curList[i] != name) {
+			newList=newList+' '+curList[i];
+		} else {
+			//newList=newList+' '+curList[i];
+			el.className = newList;
+			return;
+			}
+	}
+//
+// -----
+//
+function removeClassNameAfter(el, name) {
+	var i, curList, newList;
+	if (el.className == null) return;
+	curList = el.className.split(" ");
+	newList = '';
+	for (i = 0; i < curList.length; i++)
+		if (curList[i] != name) {
+			newList=newList+' '+curList[i];
+		} else {
+			// newList=newList+' '+curList[i];
+			el.className = newList;
+			return;
+		}
+	}
+//
+//----------
+//
+function getPageOffsetLeft(el) {
+	var offset = jQuery(el).position();
+	return offset.left;
+//   var x, p, pos, offset;
+//   p = el.offsetParent;
+//   x = el.offsetLeft;
+//   pos = '';
+//   while (p !=null){
+//       if (typeof($) != "undefined") { pos = jQuery(p).css('position') }
+//       if((pos=='absolute')||(pos=='relative')) {
+//           p=null;
+//       }else{
+//           x+=p.offsetLeft;
+//           p=p.offsetParent;
+//       }
+//   }
+//   return x;
+}
+//
+//----------
+//
+function getPageOffsetTop(el) {
+	var offset = jQuery(el).position();
+	return offset.top;
+//   var y, p, pos;
+//   p = el.offsetParent;
+//   y = el.offsetTop;
+//   pos = '';
+//   //msg = ''+y;
+//   while (p !=null){
+//       if (typeof($) != "undefined") { pos = jQuery(p).css('position') }
+//       if((pos=='absolute')||(pos=='relative')) {
+//       //if((p.style.position=='absolute')||(p.style.position=='relative')) {
+//           p=null;
+//       }else{
+//           y+=p.offsetTop;
+//           p=p.offsetParent;
+//       }
+//   }
+//   return y;
+}
+//
+//----------
+//
+function updateClipboardLinks() {
+	if (!browser.isIE) {
+		return;
+	}
+	var SelectedObject;
+	var TextRange;
+	setAnchorTagsToColor("ccPaste", "#000000");
+	lastClipCheck=true;
+	SelectedObject = document.selection;
+	TextRange = SelectedObject.createRange();
+	if (TextRange.text) {
+		if (TextRange.text.length != 0) {
+			if (!lastSelCheck) {
+				setAnchorTagsToColor("ccSelect", "#000000");
+				lastSelCheck=true;
+			}
+		}
+		else {
+			if (lastSelCheck) {
+				setAnchorTagsToColor("ccSelect", "#FFFFFF");
+				lastSelCheck=false;
+			}
+		}
+	}
+
+}
+//
+//----------
+//
+function updateClipboardLinksInit() {
+
+	if (!browser.isIE) {
+		return;
+	}
+
+	setAnchorTagsToColor("ccPaste", "#000000");
+	lastClipCheck=true;
+	setAnchorTagsToColor("ccSelect", "#FFFFFF");
+}
+//
+//----------
+//
+function SaveFieldPlus( ObjectName ) {
+	var RefreshTemp;
+	RefreshTemp = document.all.tags('div')[ObjectName].innerHTML;
+	document.all[ObjectName+'Field'].value = RefreshTemp;
+	}
+//
+//----------
+//
+function OpenImagePropertyWindow( EditorObject, ImageObject ) { 
+     DialogObject = ImageObject; 
+     showModalDialog("/cclib/Popup/ActiveEditorImageProperties.htm",window,"status:false;dialogWidth:32em;dialogHeight:25em");
+     } 
+//
+//----------
+//
+function OpenACPropertyWindow( EditorObject, ACObject ) { 
+     ACPropertyObject = ACObject; 
+     showModalDialog("/cclib/Popup/ActiveEditorACProperties.htm",window,"status:false;dialogWidth:18em;dialogHeight:14em");
+     }
+//
+//----------
+//
+function OpenSiteExplorerWindow( TargetInputID ) {
+	window.open ('?ccIPage=kdif3318sd&LinkObjectName='+TargetInputID, 'PageSelector','menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable')
+}
+//
+//----------
+//
+function OpenResourceLinkWindow( TargetInputID ) {
+	window.open ('/admin/index.asp?ccIPage=s033l8dm15&SourceMode=0&LinkObjectName='+TargetInputID, 'ResourceSelector','menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable')
+}
+//
+//----------
+//
+function OpenTablePropertyWindow( EditorObject, TableObject, TableBodyObject ) { 
+	TablePropertyObject = TableObject;
+	TableBodyPropertyObject = TableBodyObject;
+	ClearMenu();
+	var h = new Object();
+	h.win = window;
+	h.fieldName = EditorObject;
+	showModalDialog("/cclib/Popup/tablepop.htm",h,"status:false;dialogWidth:315px;dialogHeight:380px;");
+     }
+//
+//----------
+//
+var globalAddonIconObj;
+//
+function OpenAddonPropertyWindow( AddonIconObj, AdminURL ) {
+	var RawString,SplitString,addonOptionString,addonGuid;
+	//
+	globalAddonIconObj = AddonIconObj;
+	ACPropertyObject = AddonIconObj;
+	RawString = new String( globalAddonIconObj.id );
+	SplitString = RawString.split(",");
+	try {
+    	addonOptionString = SplitString[4];
+    	addonGuid = SplitString[5];
+    } catch(err) {
+	}
+	if((!addonOptionString)&&(addonGuid)){
+		cj.ajax.qsCallback('ajaxfn=ccGetDefaultAddonOptionString&guid='+addonGuid,OpenAPWithOptionString,AdminURL)
+	} else {
+		return OpenAPWithOptionString( addonOptionString, AdminURL );
+	}
+}
+//
+//----------
+//
+function OpenAPWithOptionString( addonOptionString, AdminURL ) {
+	var RawString,SplitString;
+	var PairPointer;
+	var PairSplit;
+	var Spacer;
+	var NameVar;
+	var ValueVar;
+	var NVPair;
+	var s;
+	var RowPtr;
+	var OptionStart;
+	var OptionEnd;
+	var FormInput;
+	var Options;
+	var OptionSplit;
+	var OptionPtr;
+	var CurrentValue;
+	var OptionValue;
+	var OptionCaption;
+	var buttonRow='';
+    var args='';
+	RawString = new String( globalAddonIconObj.id );
+	SplitString = RawString.split(",")
+	Spacer='<img src=/ccLib/Images/Spacer.gif width=1 height=20>'
+	s='';
+	s+='<table border=0 cellpadding="5" cellspacing="0" width="100%">';
+	PairPointer=0
+	NVPair = addonOptionString.split( '&' );
+	RowPtr=0;
+	while (NVPair[PairPointer]){
+		PairSplit = NVPair[PairPointer].split('=');
+		if (PairSplit[0]) {
+			NameVar = PairSplit[0];
+			NameVar = DecodeAddonOptionArgument( NameVar );
+			ValueVar = '';
+			Options='';
+			if (PairSplit[1]){
+				PairSplit[0]='';
+				ValueVar = PairSplit.join('=');
+				ValueVar=ValueVar.substr(1);
+			}
+			OptionStart=ValueVar.indexOf('[');
+			OptionEnd=ValueVar.indexOf(']');
+			FormInput='';
+			if ((OptionStart!=-1)&&(OptionEnd!=-1)) {
+				// selector in format: name=value[caption:option|caption:option]type
+				var Type=ValueVar.substr(OptionEnd+1).toLowerCase()
+				CurrentValue='';
+				if (OptionStart>0) {
+					CurrentValue=ValueVar.slice(0,OptionStart);
+					CurrentValue=DecodeAddonOptionArgument( CurrentValue );
+				}
+				var CurrentValueList=','+CurrentValue+','
+				CurrentValueList=CurrentValueList.toLowerCase();
+				Options = ValueVar.slice(OptionStart+1,OptionEnd);
+				OptionSplit=Options.split('|');
+				OptionPtr=0;
+				while (OptionSplit[OptionPtr]) {
+					OptionValue=OptionSplit[OptionPtr]
+					Pos=OptionValue.indexOf(':')
+					if(Pos>-1){
+						OptionCaption = OptionValue.substr(0,Pos);
+						OptionCaption = DecodeAddonOptionArgument( OptionCaption )
+						OptionValue = OptionValue.substr(Pos+1);
+						OptionValue = DecodeAddonOptionArgument( OptionValue )
+					} else {
+						OptionValue=DecodeAddonOptionArgument( OptionValue );
+						OptionCaption=OptionValue;
+					}
+					switch(Type) {
+						case 'checkbox':
+							if (CurrentValueList.indexOf(','+OptionValue.toLowerCase()+',')>=0) {
+								FormInput+='<div style="white-space:nowrap"><input type="checkbox" name="'+NameVar+'" value="'+OptionValue+'" checked="checked"/>'+OptionCaption+'</div>';
+							} else {
+								FormInput+='<div style="white-space:nowrap"><input type="checkbox" name="'+NameVar+'" value="'+OptionValue+'" />'+OptionCaption+'</div>';
+							}
+							break;
+						case 'radio':
+							if (CurrentValueList.indexOf(','+OptionValue.toLowerCase()+',')>=0) {
+								FormInput+='<div style="white-space:nowrap"><input type="radio" name="'+NameVar+'" value="'+OptionValue+'" checked="checked"/>'+OptionCaption+'</div>';
+							} else {
+								FormInput+='<div style="white-space:nowrap"><input type="radio" name="'+NameVar+'" value="'+OptionValue+'" />'+OptionCaption+'</div>';
+							}
+							break;
+						default:
+							if (CurrentValue==OptionValue) {
+								FormInput+='<option value="'+OptionValue+'" selected>'+OptionCaption+'</option>';
+							} else {
+								FormInput+='<option value="'+OptionValue+'">'+OptionCaption+'</option>';
+							}
+					}
+					OptionPtr++;
+				}
+				switch(Type) {
+					case 'checkbox':
+						FormInput+='<INPUT ID="NVType'+PairPointer+'" name="'+NameVar+'" Type=Hidden Value="checkbox">';
+						FormInput+='<INPUT ID="NV'+PairPointer+'" name="'+NameVar+'" Type=Hidden Value="checkbox">';
+						break;
+					case 'radio':
+						FormInput+='<INPUT ID="NVType'+PairPointer+'" name="'+NameVar+'" Type=Hidden Value="radio">';
+						FormInput+='<INPUT ID="NV'+PairPointer+'" name="'+NameVar+'" Type=Hidden Value="radio">';
+						break;
+					case 'resourcelink':
+						ValueVar = DecodeAddonOptionArgument( ValueVar )
+						FormInput+='<INPUT ID="NVType'+PairPointer+'" name="'+NameVar+'" Type=Hidden Value="resourcelink">';
+						FormInput+= '<INPUT Name="'+NameVar+'" Type=Text ID="NV'+PairPointer+'" Value="'+CurrentValue+'" Size=20>';
+						FormInput+='&nbsp;<a href="#" onClick="'
+						FormInput+="window.open('"+AdminURL+"?ccIPage=s033l8dm15&SourceMode=0&LinkObjectName=NV"+PairPointer+"','ResourceSelector','menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable');"
+						FormInput+='return false;"><img src="/cclib/images/ResourceLink1616.gif" width=16 height=16 border=0 alt="Link to a resource" title="Link to a resource"></a>'
+						break;
+					default:
+						FormInput+='<INPUT ID="NVType'+PairPointer+'" name="'+NameVar+'" Type=Hidden Value="select">';
+						FormInput='<select ID="NV'+PairPointer+'" name="'+NameVar+'" size=1 />'+FormInput+'</select>';
+				}
+				FormInput+='<INPUT Name="NVO'+PairPointer+'" Type=Hidden ID="NVO'+PairPointer+'" Value="['+Options+']'+Type+'">';
+
+			} else {
+				ValueVar = DecodeAddonOptionArgument( ValueVar )
+				FormInput+='<INPUT ID="NVType'+PairPointer+'" name="'+NameVar+'" Type=Hidden Value="text">';
+				FormInput+= '<INPUT Name="'+NameVar+'" Type=Text ID="NV'+PairPointer+'" Value="'+ValueVar+'" Size=20>';
+			}
+			s+='<tr>';
+			s+='<td class="left">'+NameVar+'</td>'
+			s+='<td class="right">'+FormInput+'</td>'
+			s+='</tr>';
+			RowPtr++
+		}
+		PairPointer++
+	}
+	if (RowPtr==0) {
+		s+='<tr><td class=ccPanelNormal align="center" colspan="2">This object has no properties.</td></tr>';
+	}
+	s+='</table>';
+	copyButton = ''
+    if (RowPtr!=0) {
+        copyButton+='<INPUT Type=Button Value="Update" onClick="SaveForm(); window.close();">';
+    }
+    s = '\n<div class="ccCon">' +
+        '\n<table border=0 cellpadding=0 cellspacing=0 class="ccDialogCon">' +
+        '\n<tr><td class="ccButtonCon">' + copyButton + '</td></tr>' +
+        '\n<tr><td class="ccContentCon">' + s + '</td></tr>' +
+        '\n</table>'  +
+        '\n</div>';
+	var obj=document.createElement('div');
+	obj.style.position='absolute';
+	obj.style.visibility='hidden';
+	obj.innerHTML=s;
+	var b = document.getElementsByTagName("body")[0];
+	b.appendChild(obj);
+	AFinnerHTML = s;
+    args = 'scroll:no;status:false;help:no;dialogWidth:'+(obj.scrollWidth)+'px;dialogHeight:'+(obj.scrollHeight)+'px'
+	showModalDialog('/cclib/Popup/AFTest.htm',window,args);
+}
+//
+//----------
+//
+function InsertTag(OpenTag,CloseTag) {
+	var SelectionObject; 
+	var SelectionObjectType; 
+	var ControlRangeCollection; 
+	var ParentElementObject; 
+	var Pointer; 
+	var ControlRange; 
+	//
+	SelectionObject = document.selection; 
+	SelectionObjectType = SelectionObject.type; 
+	if (SelectionObjectType=="Control") { 
+		ControlRangeCollection = SelectionObject.createRange(); 
+		for (Pointer = 0; Pointer < ControlRangeCollection.length; Pointer++) {             
+			ControlRange = ControlRangeCollection(Pointer); 
+			ControlRange.outerHTML = OpenTag+ControlRange.outerHTML+CloseTag;
+		} 
+	} else {
+		var TextRange = SelectionObject.createRange();
+		var text = TextRange.text;
+		if (text) {
+			TextRange.pasteHTML( OpenTag+text+CloseTag );
+		} else {
+			TextRange.pasteHTML( OpenTag+CloseTag );
+		}
+	ClearMenu();
+	}
+}
+//
+//----------
+//
+function PrintElement( ElementIdentifier ) {
+	var ElementObject=document.all( ElementIdentifier );
+	var tr=ElementObject.createTextRange();
+	var msgWind = window.open('', '_blank', 'scrollbars=yes,toolbar=no,status=no,resizable=yes');
+	msgWind.document.body.innerHTML=tr.text;
+	msgWind.print();
+	msgWind.close();
+	}
+//
+//----------
+//
+function RemoveStyle( ElementIdentifier ) {
+	var ElementObject;
+	var SelectedObject;
+	var TextRange;
+	ElementObject=document.all( ElementIdentifier );
+	ElementObject.focus;
+	SelectedObject = document.selection;
+	TextRange = SelectedObject.createRange();
+	TextRange.pasteHTML( TextRange.text );
+	ClearMenu();
+	}
+
+//
+//----------
+//
+function ExecCmdPlus(cmd,ui,opt,ObjectName) {
+	var CommandPassed, editor;
+	editor = document.all[ObjectName]
+	if (!editor.document.queryCommandSupported(cmd)) {
+		alert('This function is not supported. Your browser may not support this command, or you may need to make a text selection before using this function.')
+	}else{
+		document.body.all.tags('div')[ObjectName].focus();
+		CommandPassed = editor.document.execCommand(cmd,ui,opt);
+		if (CommandPassed) {
+			// removed to allow formating undo -- onblur covers the save case
+			//SaveFieldPlus(ObjectName);
+			document.body.all.tags('div')[ObjectName].focus();
+		} else {
+			alert('This function failed. Your browser may not support this command, or you may need to make a text selection before using this function.')
+                }
+            }
+	ClearMenu();
+	}
+//
+//----------
+//
+function OpenResourceLibrary( EditorObjectName ) {
+        window.open ('?ccIPage=s033l8dm15&EditorObjectName='+EditorObjectName, 'ImageSelector','menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable')    
+	}
+//
+//----------
+//
+function InsertImage( Name, Src, Alt, Width, Height, ObjectName ) {
+	var tag
+	tag = '<IMG SRC="'+Src+'"'
+	tag += 'name="'+Name+'" ID="'+Name+'"'
+	if (Width != 0) tag+=' WIDTH="'+Width+'"'
+	if (Height != 0) tag+=' HEIGHT="'+Height+'"'
+	tag+=' BORDER=0>'
+	oUtil.obj.insertHTML( tag );
+}
+//
+//----------
+//
+function InsertDownload( RecordID, ObjectName, ImageLink ) {
+	var tag;
+	tag = '<a href="?downloadid='+RecordID+'" target="_blank"><img src="'+ImageLink+'" border=0 width=16 height=16 alt="Download" ></a>';
+	oUtil.obj.insertHTML( tag );
+
+}
+//
+//----------
+//
+function InsertActiveContentPlus(ACType,ACSubType,ACArg1, ObjectName  ) {
+	var SelectionObject; 
+	var SelectionObjectType; 
+	var ControlRangeObject; 
+	var ParentElementObject; 
+	var Pointer; 
+	var ImageObject; 
+	ExecCmdPlus('InsertImage',false,'/cclib/images/AC'+ACType+ACSubType+'.gif', ObjectName );
+	SelectionObject = document.selection; 
+	SelectionObjectType = SelectionObject.type; 
+	if (SelectionObjectType!="Control"){ 
+		// 
+	}else{
+		ControlRangeObject = SelectionObject.createRange(); 
+		for (Pointer = 0; Pointer < ControlRangeObject.length; Pointer++) {
+			ImageObject = ControlRangeObject(Pointer); 
+			if (ImageObject.tagName == "IMG") {
+				ImageObject.id = 'AC,'+ACType+','+ACSubType+','+ACArg1; 
+			} else { 
+				// Non-Image found in Control Object
+				} 
+			} 
+		}
+	ClearMenu();
+	}
+//
+//----------
+//
+function InsertActiveChildList(ACType, ObjectName  ) {
+	var RandomNumber;
+	RandomNumber = Math.floor( Math.random()*1000000 );
+	InsertActiveContentPlus( ACType, '', RandomNumber, ObjectName );
+	}
+//
+//----------
+//
+function OpenPropertiesWindowPlus( ObjectName ) { 
+	var EditorObject; 
+	var SelectionObject; 
+	var TextRangeObject; 
+	var ControlRangeObject; 
+	var Message; 
+	var ElementObject; 
+	var Pointer;
+	var t; 
+	// Locate the object being clicked 
+	SelectionObject = document.selection;
+
+	if (SelectionObject.type=="Text"){ 
+		// Text Object Found
+	} else if (SelectionObject.type=="Control") { 
+		ControlRangeObject = SelectionObject.createRange(); 
+		for (Pointer = 0; Pointer < ControlRangeObject.length; Pointer++) {
+			ElementObject = ControlRangeObject(Pointer); 
+			if (ElementObject.tagName == "IMG") {
+				if (ElementObject.id.substring( 0, 3 ) == "AC,") {
+					if (ElementObject.id.substring( 0, 8 ) == "AC,IMAGE"){ 
+						OpenImagePropertyWindow( document.all[ObjectName],ElementObject );
+					} else if (ElementObject.id.substring( 0, 20 ) == "AC,AGGREGATEFUNCTION"){
+						OpenAggregateFunctionPropertyWindow( document.all[ObjectName],ElementObject );
+					} else {
+						OpenACPropertyWindow( document.all[ObjectName],ElementObject );
+					} 
+				} else {
+					OpenImagePropertyWindow( document.all[ObjectName],ElementObject );
+				}
+			} 
+			else if (ElementObject.tagName == "TABLE") {
+				var tBody = ElementObject.getElementsByTagName("TBODY");
+				OpenTablePropertyWindow(ObjectName,ElementObject, tBody[0]);
+			}
+			else {
+				// Non-Image found in Control Object
+			} 
+		} 
+	} else { 
+		// SelectObject is not Control or Text
+	} 
+} 
+//
+//----------
+//
+function tableDialog( ObjectName ){
+   ClearMenu();
+   var rtNumRows = null;
+   var rtNumCols = null;
+   var rtTblAlign = null;
+   var rtTblWidth = null;
+   tableDialogEditor = ObjectName;
+   showModalDialog("/ccLib/popup/tablepop.htm",window,"status:false;dialogWidth:275px;");
+}
+//
+//----------
+//
+function tdDialog(tabIndex, fieldName){
+	ClearMenu();
+	var h = new Object();
+	h.win = window;
+	h.tab = tabIndex;
+	h.fieldName = fieldName;
+	showModalDialog("/ccLib/popup/tdpopup.htm",h,"scroll:off;status:false;dialogWidth:274px;dialogHeight:400px;");
+}
+//
+//----------
+//
+function createTable( ){
+   var HTMLEditor=document.all[tableDialogEditor]
+   var CellWidth;
+   if (rtNumRows == "" || rtNumRows == "0"){
+      rtNumRows = "1";}
+   if (rtNumCols == "" || rtNumCols == "0"){
+      rtNumCols = "1";}
+   var rttrnum=1;
+   var rttdnum=1;
+   var rtNewTable = "<P><table border='1' align='" + rtTblAlign + "' cellpadding='0' cellspacing='0' width='" + rtTblWidth + "'>"
+   CellWidth=(100/rtNumCols);
+   while (rttrnum <= rtNumRows){
+      rttrnum=rttrnum+1
+      rtNewTable = rtNewTable + "<tr>"
+      while (rttdnum <= rtNumCols){
+         rtNewTable = rtNewTable + '<td width="'+CellWidth+'%">&nbsp;</td>'
+         rttdnum=rttdnum+1}
+      rttdnum=1
+      rtNewTable = rtNewTable + "</tr>"}
+   rtNewTable = rtNewTable + "</table></P>"
+   HTMLEditor.focus();
+   InsertTag( rtNewTable, '' );
+}
+//
+//----------
+//
+function clickIE() {
+	return false;
+}
+//
+//----------
+//
+function createTableNew() {
+	rtNumRows = currentRow;
+	rtNumCols = currentCol;
+	rtTblAlign = "";
+	rtTblWidth = "100%";
+	createTable();
+	rtNumRows = null;
+	rtNumCols = null;
+	rtTblAlign = null;
+	rtTblWidth = null;
+}
+//
+//----------
+//
+function hideTableIF(ObjectName) {
+	var tableDiv = document.all[ObjectName];
+	tableDiv.style.visibility = "hidden";
+	var tableCreateIF = tableDiv.getElementsByTagName("TABLE");
+	var tableCells = tableCreateIF[0].getElementsByTagName("TD");
+	for (i = 0; i < tableCells.length; i++) {
+		tableCells[i].style.backgroundColor="#FFFFFF";
+	}
+}
+//
+//----------
+//
+function highlightTDs(ObjectName, num, CellDataHolder) {
+	var tableCreateIF = document.all[ObjectName];
+	var tableCells = tableCreateIF.getElementsByTagName("TD");
+	var tableRows = tableCreateIF.getElementsByTagName("TR");
+	var tableWidth = tableCells.length / tableRows.length;
+	var col;
+	var row;
+	var i;
+	if ( num == 0) {
+		col = 1;
+	}
+	else {
+		col = (num + 1) % tableWidth;
+		if (col == 0) {
+			col = tableWidth;
+		}
+	}
+	row = Math.floor((num + tableWidth) / tableWidth);
+	currentCol = col;
+	currentRow = row;
+	for (i = 0; i < tableCells.length; i++) {
+		if (colVal(i, tableWidth) <= col && rowVal(i, tableWidth) <= row) {
+			tableCells[i].style.backgroundColor="#185A98";
+		}
+		else {
+			tableCells[i].style.backgroundColor="#FFFFFF";
+		}
+	}
+	var TableSize = document.all[CellDataHolder];
+	TableSize.value = row + " x " + col;
+}
+//
+//----------
+//
+function rowVal(num, tableWidth) {
+	return Math.floor((num + tableWidth) / tableWidth);
+}
+//
+//----------
+//
+function colVal (num, tableWidth) {
+	var retVal;
+	if ( num == 0) {
+		retVal = 1;
+	}
+	else {
+		retVal = (num + 1) % tableWidth;
+		if (retVal == 0) {
+			retVal = tableWidth;
+		}
+	}
+	return retVal;
+}
+//
+//----------
+//
+function setEditor(objectName) {
+	tableDialogEditor = objectName;
+}
+//
+//----------
+//
+function editorRightClick(prefix, divName) {
+	var possibleTableElement;
+	if (parseInt(navigator.appVersion)>3) {
+		var clickType=1;
+		if (navigator.appName=="Netscape") clickType=e.which;
+		else clickType=event.button;
+		if (clickType!=1)  {
+			var SelectedObject;
+			var tRange;
+			SelectedObject = document.selection;
+			tRange = SelectedObject.createRange();
+		
+			if (SelectedObject.type == "Control") {
+				if (tRange.length >= 1) {
+					var selectedEl = tRange(0);
+				}
+			}
+			else {
+				var selectedEl = tRange.parentElement();
+			}
+			if (selectedEl.tagName != "TD") {
+				selectedEl = document.elementFromPoint(event.x, event.y);
+			}			
+			
+			if (selectedEl.tagName != "TD") {
+				possibleTableElement = findTagAmongstParents(selectedEl, "TD", divName);
+			}
+
+			if (possibleTableElement != null) {
+				selectedEl = possibleTableElement;
+			}
+			if (selectedEl.tagName == "TD") {
+				var tempEl2 = selectedEl.parentElement;
+				do {
+					if (tempEl2.tagName == "TR") {
+						TableRowPropertyObject = tempEl2;
+					}
+					tempEl2 = tempEl2.parentElement;
+				} while (tempEl2.tagName != "TBODY");
+				
+				TableCellPropertyObject = selectedEl;
+				TableBodyPropertyObject = tempEl2;
+				TablePropertyObject = tempEl2.parentElement;
+
+				outOfContext = false;
+				return prefix + 'TableMenu';			
+			
+			} // if (selectedEl.tagName == "TD")
+			else {
+				outOfContext = true;
+				return '';
+			}
+		} // if (clickType!=1)
+	} // if (parseInt(navigator.appVersion)>3)
+}
+//
+//----------
+//
+function findTagAmongstParents(startingElement, tagName, divName) {
+	var found;
+	var currEl;
+	found = false;
+	if ((startingElement.tagName == "DIV") && (startingElement.name == divName)) {
+		return null;
+	}
+	currEl = startingElement.parentElement;
+	while (currEl != null && !found){
+		if ((currEl.tagName == "DIV") && (currEl.name == divName)) {
+			return null;
+		}
+		if (currEl.tagName == tagName) {
+			found = true;
+		}
+		else {
+			currEl = currEl.parentElement;
+		}
+	}
+	return currEl;
+}
+//
+//----------
+//
+function hideRightMenu(ObjectName) {
+	var i;
+	var tableMenu = document.all[ObjectName];
+	for (i = 0; i < tableMenu.childNodes.length; i++) {
+		if (tableMenu.childNodes[i].tagName == "DIV") {
+			tableMenu.childNodes[i].style.visibility="hidden";
+		}
+	}
+	tableMenu.style.visibility="hidden";
+}
+//
+//----------
+//
+function insertRowBefore() {
+	var tRows = TablePropertyObject.getElementsByTagName("TR");
+	var tCells = TablePropertyObject.getElementsByTagName("TD");
+	var tCols = Math.round(tCells.length/tRows.length);
+	trElement = document.createElement("TR");
+	TableBodyPropertyObject.insertBefore(trElement, TableRowPropertyObject);
+	var i;
+	for (i = 0; i < tCols; i++) {
+		var nc = trElement.insertCell();
+		nc.insertAdjacentText("afterBegin"," ");
+	}
+	ClearMenu();
+}
+//
+//----------
+//
+function insertRowAfter() {
+	var tRows = TablePropertyObject.getElementsByTagName("TR");
+	var tCells = TablePropertyObject.getElementsByTagName("TD");
+	var tCols = Math.round(tCells.length/tRows.length);
+	trElement = document.createElement("TR");
+	TableBodyPropertyObject.insertBefore(trElement, TableRowPropertyObject);
+	TableRowPropertyObject.removeNode(true);
+	TableBodyPropertyObject.insertBefore(TableRowPropertyObject, trElement);
+	var i;
+	for (i = 0; i < tCols; i++) {
+		var nc = trElement.insertCell();
+		nc.insertAdjacentText("afterBegin"," ");
+	}
+	ClearMenu();
+}
+//
+//----------
+//
+function findColumn() {
+	var i;
+	for (i = 0; i < TableRowPropertyObject.childNodes.length; i++) {
+		if (TableRowPropertyObject.childNodes[i] == TableCellPropertyObject) {
+			return i;
+		}
+	}
+}	
+//
+//----------
+//
+function insertColLeft() {
+	var colIndex = findColumn();
+	var tRows = TableBodyPropertyObject.getElementsByTagName("TR");
+	for (i = 0; i < tRows.length; i++) {
+		if (tRows[i].childNodes[colIndex]) {
+			if (tRows[i].childNodes[colIndex].tagName == "TD") {
+				var newTD = tRows[i].insertCell(colIndex);
+				newTD.insertAdjacentText("afterBegin"," ");
+				newTD.style.width = Math.round(50/tRows[i].childNodes.length) + "%";
+			}
+		}
+	}
+	ClearMenu();
+}
+//
+//----------
+//
+function deleteColumn() {
+	var colIndex = findColumn();
+	var tRows = TableBodyPropertyObject.getElementsByTagName("TR");
+	for (i = 0; i < tRows.length; i++) {
+		if (tRows[i].childNodes[colIndex]) {
+			if (tRows[i].childNodes[colIndex].tagName == "TD") {
+				tRows[i].childNodes[colIndex].removeNode(true);
+			}
+		}
+	}
+	ClearMenu();
+}
+//
+//----------
+//
+function insertColRight() {
+	var colIndex = findColumn();
+	var tRows = TableBodyPropertyObject.getElementsByTagName("TR");
+	for (i = 0; i < tRows.length; i++) {
+		if (tRows[i].childNodes[colIndex]) {
+			if (tRows[i].childNodes[colIndex].tagName == "TD") {
+				var newTD = tRows[i].insertCell(colIndex + 1);
+				newTD.insertAdjacentText("afterBegin"," ");
+				newTD.style.width = Math.round(50/tRows[i].childNodes.length) + "%";
+			}
+		}
+	}
+	ClearMenu();
+}
+//
+//----------
+//
+function deleteRow() {
+	TableRowPropertyObject.removeNode(true);
+	ClearMenu();
+}
+//
+//----------
+//
+function showPanel(panelNum){
+              if (currentPanel != null) {
+		hidePanel();
+	}
+	document.getElementById('panel'+panelNum).style.visibility = 'visible';
+	currentPanel = panelNum;
+	setState(panelNum);
+}
+//
+//----------
+//
+function hidePanel(){
+	document.getElementById('panel'+currentPanel).style.visibility = 'hidden';
+	document.getElementById('tab'+currentPanel).style.backgroundColor = '#ffffff';
+	document.getElementById('tab'+currentPanel).style.color = 'navy';
+}
+//
+//----------
+//
+function setState(tabNum){
+	if(tabNum==currentPanel){
+		document.getElementById('tab'+tabNum).style.backgroundColor = '#ddddff';
+		document.getElementById('tab'+tabNum).style.color = 'red';
+	}else{
+		document.getElementById('tab'+tabNum).style.backgroundColor = '#ffffff';
+		document.getElementById('tab'+tabNum).style.color = 'navy';
+	}
+}
+//
+//----------
+//
+function hover(tab){
+	tab.style.backgroundColor = 'ddddff';
+}
+//
+//----------
+//
+function showTab(tabnum)
+  {
+  var tabsDef = new Array(4)
+   for (i=1;i<=tabsDef.length;i++)
+    {
+     tabName='tabContent' + i;
+     eval(tabName + '.style.display="none"');
+     tabName='tabLabel' + i;
+     eval(tabName + '.style.backgroundColor="lightgrey"');
+     eval(tabName + '.style.fontWeight="normal"');
+     undName='tabUnderline' + i;
+     eval(undName + '.style.backgroundColor="white"');
+    }
+   tabName='tabContent' + tabnum;
+   eval(tabName + '.style.display="block"');
+   tabName='tabLabel' + tabnum;
+   eval(tabName + '.style.backgroundColor="lightgrey"');
+   eval(tabName + '.style.fontWeight="bold"');
+   undName='tabUnderline' + tabnum;
+   eval(undName + '.style.backgroundColor="lightgrey"');
+  }
+//
+//----------
+//
+function ImagePreview( ImageURL, ImageHeight, ImageWidth ) {
+	var Options
+	Options='menubar=no,toolbar=no,location=no,status=no,scrollbars=no,resizable,directories=no'
+	if ( ImageWidth ) { 
+		Options+=',width='+ImageWidth;
+		}
+	if ( ImageHeight ) { 
+		Options+=',height='+ImageHeight;
+		}
+	var MsgWin=window.open ('', '_blank',Options)
+	var MsgText='<HTML><body bgcolor="white" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">'+ImageURL+'</BODY></HTML>'
+	MsgWin.document.write( MsgText );
+	}
+//
+//----------
+//
+var LastBubbleID;
+function HelpBubbleOn( BubbleID, Source ) {
+	var DivTarget,DivLeft,DivTop,pageYOffset;
+	//
+	HelpBubbleOff( LastBubbleID );
+	DivTarget = document.getElementById( BubbleID );
+	if ( DivTarget ) {
+		if (navigator.appName == "Microsoft Internet Explorer") {
+			pageYOffset = window.document.body.scrollTop;
+		} else {
+			pageYOffset = window.pageYOffset;
+		}
+		DivLeft = getPageOffsetLeft( Source )+Source.offsetWidth;
+		if ( DivLeft > document.body.scrollWidth ) {
+			DivLeft = document.body.scrollWidth - DivTarget.offsetWidth;
+		}
+		DivTop = getPageOffsetTop( Source )-DivTarget.offsetHeight+15;
+		if ( DivTop < pageYOffset ) {
+			DivTop = pageYOffset;
+		}
+		// convert to inline
+		//DivTarget.style.left = DivLeft + "px";
+		//DivTarget.style.top = DivTop + "px";
+		DivTarget.style.visibility = 'visible';
+		DivTarget.style.display = 'block'; //move to inline, not end of body
+		LastBubbleID = BubbleID;
+	}
+}
+//
+//----------
+//
+function HelpBubbleOff( BubbleID ) {
+	var DivTarget = document.getElementById( BubbleID );
+	if ( DivTarget ) {
+		DivTarget.style.visibility = 'hidden';
+		DivTarget.style.display = 'none'; //move to inline, not end of body
+		}
+	}
+//
+//----------
+//
+function HelpBubbleHover( BubbleID, Source ) {
+	var DivTarget;
+	var DivLeft, DivTop;
+	//
+	DivTarget = document.getElementById( BubbleID );
+	if ( DivTarget ) {
+		DivTarget.style.visibility = 'visible';
+	}
+}
+//
+//----------
+//
+function HelpBubbleAjaxOn( BubbleID, Source, ContentName, FieldName ) {
+	var DivTarget;
+	var DivLeft, DivTop;
+	//
+	HelpBubbleOff( LastBubbleID );
+	DivTarget = document.getElementById( BubbleID );
+	if ( DivTarget ) {
+		DivLeft = getPageOffsetLeft( Source )+Source.offsetWidth;
+		if ( DivLeft > document.body.scrollWidth ) {
+			DivLeft = document.body.scrollWidth - DivTarget.offsetWidth;
+		}
+		DivTop = getPageOffsetTop( Source )-DivTarget.offsetHeight+15;
+		if ( DivTop < 0 ) {
+			DivTop = 0;
+		}
+		DivTarget.style.left = DivLeft + "px";
+		DivTarget.style.top = DivTop + "px";
+		DivTarget.style.visibility = 'visible';
+		LastBubbleID = BubbleID;
+		if (DivTarget.innerHTML='Loading...') {
+//			GetRemoteAjax( 'http://support.contensive.com/index.asp','GetFieldHelp','name='+ContentName+'.'+FieldName,'',BubbleID)
+		}
+	}
+}
+
+//
+//------------------------------------------------------------------------------------------------------
+//	Update the help message
+//------------------------------------------------------------------------------------------------------
+//
+function updateFieldHelp(fieldId,helpEditorId,helpClosedContentId) {
+	var eDst=document.getElementById(helpClosedContentId);
+	var eSrc=document.getElementById(helpEditorId);
+	var txt=eSrc.value;
+	var txtShort=txt;
+	var criteria,setPairs;
+	if(txtShort.length>100)txtShort=txtShort.substr(0,100)+'...';
+	eDst.innerHTML=txtShort;
+	criteria='(fieldid='+fieldId+')';
+	setPairs=new Array();
+	setPairs=[['helpcustom',eSrc.value]];
+	cj.ajax.update('','ccFieldHelpUpdate',criteria,setPairs);
+}
+//
+//----------
+//
+function InsertFolderRow() {
+	var RLTable = document.getElementById('AddFolderTable' );
+	var CountElement = document.getElementById('AddFolderCount' );
+	var tCols,tRows,NewRowNumber;
+	var NewRow,NewCell1,NewCell2,NewCell3,NewCell4;
+	var RowCnt = RLTable.rows.length;
+	if ( RLTable ) {
+		NewRowNumber = parseInt( CountElement.value )+1;
+		CountElement.value = NewRowNumber;
+		tRows = RLTable.getElementsByTagName("TR");
+		NewRow = RLTable.insertRow(RowCnt);
+		NewCell1 = NewRow.insertCell(0);
+		NewCell1.align = 'right';
+		NewCell1.innerHTML= NewRowNumber+'&nbsp;';
+		NewCell3 = NewRow.insertCell(1);
+		NewCell3.innerHTML='<INPUT TYPE="Text" NAME="FolderName.'+NewRowNumber+'" SIZE="30">';
+		NewCell4 = NewRow.insertCell(2);
+		NewCell4.innerHTML='<INPUT TYPE="Text" NAME="FolderDescription.'+NewRowNumber+'" SIZE="40">';
+	}
+}
+//
+//----------
+//
+function InsertUploadRow() {
+	var RLTable = document.getElementById('UploadInsert' );
+	var CountElement = document.getElementById('LibraryUploadCount' );
+	var tCols,tRows,NewRowNumber;
+	var RowCnt = RLTable.rows.length;
+	var NewRow,NewCell1,NewCell2,NewCell3,NewCell4;
+	if ( RLTable ) {
+		NewRowNumber = parseInt( CountElement.value )+1;
+		CountElement.value = NewRowNumber;
+		tRows = RLTable.getElementsByTagName("TR");
+		NewRow = RLTable.insertRow(RowCnt);
+		NewCell1 = NewRow.insertCell(0);
+		NewCell1.align = 'right';
+		NewCell1.innerHTML= NewRowNumber+'&nbsp;';
+		NewCell2 = NewRow.insertCell(1);
+		NewCell2.innerHTML='<INPUT TYPE="file" name="LibraryUpload.'+NewRowNumber+'">';
+		NewCell3 = NewRow.insertCell(2);
+		NewCell3.innerHTML='<INPUT TYPE="Text" NAME="LibraryName.'+NewRowNumber+'" SIZE="30">';
+		NewCell4 = NewRow.insertCell(3);
+		NewCell4.innerHTML='<INPUT TYPE="Text" NAME="LibraryDescription.'+NewRowNumber+'" SIZE="40">';
+	}
+}
+//
+//----------
+//
+function InsertUpload() {
+	var RLTable = document.getElementById('UploadInsert' );
+	var CountElement = document.getElementById('UploadCount' );
+	var tCols,tRows,NewRowNumber;
+	var RowCnt = RLTable.rows.length;
+	var NewRow,NewCell1,NewCell2,NewCell3,NewCell4;
+	if ( RLTable ) {
+		NewRowNumber = parseInt( CountElement.value );
+		CountElement.value = NewRowNumber+1;
+		tRows = RLTable.getElementsByTagName("TR");
+		NewRow = RLTable.insertRow(RowCnt);
+		NewCell2 = NewRow.insertCell(0);
+		NewCell2.innerHTML='<INPUT TYPE="file" name="Upload'+NewRowNumber+'">';
+	}
+}
+//
+//----------
+//
+function RLRowClick(IsChecked,RowID) {
+	var RLRow = document.getElementById(RowID);
+	if (IsChecked) {
+		RLRow.style.backgroundColor="#F0F0F0";
+	} else {
+		RLRow.style.backgroundColor="";
+	}
+}
+//
+//----------
+//
+var DPanel='0';
+function ToggleToolPanelDev() {
+    if (DPanel=='0') {
+        DPanel='1';
+        document.all['ToolPanelDev'].style.visibility='visible';
+    } else {
+        DPanel='0';
+        document.all['ToolPanelDev'].style.visibility='hidden';
+    }
+    return false;
+}
+//
+//----------
+//
+function SubmitToolsPanel() {
+    var SelectedObject;
+    var TextRange;
+    SelectedObject = document.selection;
+    TextRange = SelectedObject.createRange();
+    if (TextRange.text) {
+        if (TextRange.text.length != 0) {
+            document.all['ToolsPanelSelection'].value=TextRange.htmlText;
+        }
+    }
+    return true;
+}
+//
+//----------
+//
+function InsertTemplateIcon(ImageLink, ObjectName  ) {
+	ExecCmdPlus('InsertImage',false,ImageLink, ObjectName );
+	ClearMenu();
+	}
+//
+//----------
+//
+function switchContentFolderDiv( ShowID,HideID,ContentCaptionDivID,ContentCaption,EmptyDivID ) {
+	var ShowDiv,HideDiv,CaptionDiv,EmptyDiv,ptr;
+	var HiddenInput,Hit;
+	//
+	if (ShowID==HideID) {return false;}
+	//
+	// hide old content
+	//
+	Hit=false;
+	HideDiv=document.getElementById(HideID);
+	if ( HideDiv ) {
+		if ( HideDiv.id==HideID ) {
+			HideDiv.style.display="none";
+			Hit=true;
+		}
+	}
+	if (!Hit) {
+		HiddenInput=document.getElementsByName(HideID);
+		if (HiddenInput.length>0) {
+			for (ptr=0;ptr<HiddenInput.length;ptr++){
+				HiddenInput[ptr].parentNode.style.display="none";
+			}
+		}
+	}
+	if (!Hit) {
+		EmptyDiv = document.getElementById(EmptyDivID)
+		if ( EmptyDiv ) {
+			EmptyDiv.style.display="none";
+		}
+	}
+	//
+	// show new content
+	//
+	Hit=false;
+	ShowDiv = document.getElementById(ShowID);
+	if ( ShowDiv ) {
+		if ( ShowDiv.id==ShowID ) {
+			//ShowDiv.style.visibility = "hidden";
+			ShowDiv.style.display="block";
+			//ShowDiv.style.visibility = "visible";
+			Hit=true;
+		}
+	}
+	if (!Hit) {
+		HiddenInput=document.getElementsByName(ShowID);
+		if (HiddenInput.length>0) {
+			Hit=true
+			for (ptr=0;ptr<HiddenInput.length;ptr++){
+				//HiddenInput[ptr].parentNode.style.visibility = "hidden";
+				HiddenInput[ptr].parentNode.style.display="block";
+				//HiddenInput[ptr].parentNode.style.visibility = "visible";
+			}
+		}
+	}
+	if (!Hit) {
+		EmptyDiv = document.getElementById(EmptyDivID)
+		if ( EmptyDiv ) {
+			EmptyDiv.style.display="block";
+		}
+	}
+
+	//
+	// convert new content to block
+	//
+	//CaptionDiv=document.getElementById(ContentCaptionDivID);
+	//if (CaptionDiv) {
+	//	CaptionDiv.innerHTML=ContentCaption;
+	//}
+	
+}
+//
+//----------
+//
+function SetDisplay( Id,Value ) {
+	document.getElementById(Id).style.display=Value;
+}
+//
+// Close TextAreaExpandable
+//
+function CloseTextArea( TextAreaID ){
+	var tc=document.getElementById(TextAreaID);
+	var to=document.getElementById(TextAreaID+'Opened');
+	var hc=document.getElementById(TextAreaID+'Head')
+	var ho=document.getElementById(TextAreaID+'HeadOpened')
+	var HeadHeight=24;
+	scroll(0,0);
+	tc.value=to.value;
+	ho.style.display='none';
+	to.style.display='none';
+	hc.style.display='block';
+	tc.style.display='block';
+	document.body.style.overflow="";
+	tc.focus();
+}
+
+//
+// Open TextAreaExpandable
+//
+function OpenTextArea( TextAreaID ){
+	window.scroll(0,0);
+	var tc=document.getElementById(TextAreaID);
+	var to=document.getElementById(TextAreaID+'Opened');
+	var hc=document.getElementById(TextAreaID+'Head');
+	var ho=document.getElementById(TextAreaID+'HeadOpened');
+	var HeadHeight = hc.offsetHeight;
+	var h;
+	to.value=tc.value;
+	document.body.style.overflow="hidden";
+	if (document.compatMode && document.compatMode!="BackCompat")
+		{
+		//using doctype
+		document.body.style.height="100%";
+		h=window.size().height;
+		w=window.size().width;
+		document.body.style.height="";
+	} else {
+		if(document.body.style.overflow=="hidden") {
+			w=document.body.offsetWidth;
+		} else {
+			w=document.body.offsetWidth-22;
+		}
+		h=document.body.offsetHeight-4;
+	}
+	if (!browser.isIE) {
+		//alert('moz');
+        //h=window.innerHeight-HeadHeight;
+		ho.style.width="100%";
+		to.style.width="100%";
+		to.style.top=HeadHeight+'px';
+		to.style.height=h+'px';
+		to.style.overflow="auto";
+		to.style.zIndex="9999";
+	} else {
+		//alert('ie 8');
+		ho.style.width=w+'px';
+		to.style.width=w+'px';
+		to.style.top=HeadHeight+'px';
+		to.style.height=(h-HeadHeight)+"px";
+		to.style.overflow="auto";
+		to.style.zIndex="9999";
+	}
+	ho.style.display='block';
+	to.style.display='block';
+	to.focus()
+}
+//
+// Disable all buttons on the page
+//
+function processSubmit(e) {
+	if (typeof(docLoaded)!="undefined") {
+		if(!docLoaded){
+			alert('This page has not loaded completed. Please wait for the page to load before submitting the form. If the page has loaded, there may have been an error. Please refresh the page.');
+			return false;
+		}
+	}
+	var x=document.getElementsByTagName("input");
+	for(var i=0;i<x.length;i++) {
+		if((x[i].type=='submit')&&(x[i]!=e)) {
+			x[i].disabled=true;
+		}
+	}
+}
+//
+//
+//
+function EncodeAddonOptionArgument( EncodedArg ) {
+	var a = EncodedArg;	
+	a=a.replace(/&/g,"#0038#");
+	a=a.replace(/=/g,"#0061#");
+	a=a.replace(/,/g,"#0044#");
+	a=a.replace(/\\/g,"#0034#");
+	a=a.replace(/'/g,"#0039#");
+	a=a.replace(/\|/g,"#0124#");
+	a=a.replace(/\[/g,"#0091#");
+	a=a.replace(/]/g,"#0093#");
+	a=a.replace(/:/g,"#0058#");
+	return a;
+}
+//
+//
+//
+function DecodeAddonOptionArgument( EncodedArg ) {
+	var a = EncodedArg;	
+	a=a.replace(/#0058#/g,":");
+	a=a.replace(/#0093#/g,"]");
+	a=a.replace(/#0091#/g,"[");
+	a=a.replace(/#0124#/g,"|");
+	a=a.replace(/#0039#/g,"'");
+	a=a.replace(/#0034#/g,"\"");
+	a=a.replace(/#0044#/g,",");
+	a=a.replace(/#0061#/g,"=");
+	a=a.replace(/#0038#/g,"&");
+	return a;
+}
+//
+//----------
+//
+function BodyOnClick() {
+	var el;
+	hideselect(false);
+}
+//
+//-------------------------------------------------------------------------
+// Add an onLoad event
+// source webreference.com, SimonWilson.net
+//-------------------------------------------------------------------------
+//
+function cjAddLoadEvent(func) { 
+	var oldonload = window.onload; 
+	if (typeof window.onload != 'function') { 
+		window.onload = func; 
+	} else { 
+		window.onload = function() { 
+			if (oldonload) { 
+				oldonload(); 
+			} 
+			func(); 
+		} 
+	} 
+}
+//
+//-------------------------------------------------------------------------
+// Add head script code
+// adding to the head after load has no effect. Instead, add it to the document
+// with eval.
+//-------------------------------------------------------------------------
+//
+function cjAddHeadScriptCode(codeAsString) {
+	eval(codeAsString)
+//	var st=document.createElement('script');
+//	st.type = 'text/javascript';
+//	st.text='eval(\''+codeAsString+'\')';
+//	var ht = document.getElementsByTagName("head")[0];
+//	ht.appendChild(st);
+}
+//
+//-------------------------------------------------------------------------
+// Add head script link
+//-------------------------------------------------------------------------
+//
+function cjAddHeadScriptLink(link) {
+	var st=document.createElement('script');
+	st.type = 'text/javascript';
+	st.src=link;
+	var ht = document.getElementsByTagName("head")[0];
+	ht.appendChild(st);
+}
+//
+//-------------------------------------------------------------------------
+// Add head style link tag
+//-------------------------------------------------------------------------
+//
+function cjAddHeadStyleLink(linkHref) {
+	var st=document.createElement('link');
+	st.rel = 'stylesheet';
+	st.type = 'text/css';
+	st.href=Source;
+	var ht = document.getElementsByTagName("head")[0];
+	ht.appendChild(st);
+}
+//
+//-------------------------------------------------------------------------
+// Add head style tag
+//-------------------------------------------------------------------------
+//
+function cjAddHeadStyle(styles) {
+	var st=document.createElement('style');
+	st.type = 'text/css';
+	if (st.styleSheet) {
+		st.styleSheet.cssText=styles;
+	} else {
+		st.appendChild(document.createTextNode(styles));
+	}
+	//st.innerHTML=styles;
+	var ht = document.getElementsByTagName("head")[0];
+	ht.appendChild(st);
+}
+//
+//-------------------------------------------------------------------------
+// Set iFrame height to size of div container
+//	width is 100% of its container
+//	height is the height of the content
+//
+//  <iframe src="whatever.html" id="ID" onLoad="setFrameHeight('the_iframe');" style="width:100%;height:200px"></iframe>
+//-------------------------------------------------------------------------
+//
+
+function cjSetFrameHeight(frameId) {
+	var e,h,f;
+	e=document.getElementById(frameId);
+	if (e) {
+		h=e.contentWindow.document.body.offsetHeight;
+		//e.style.height=h+'px';
+		e.style.height=(h+16)+'px';
+	}
+}
+//
+//-------------------------------------------------------------------------
+// convert textarea tab key to a tab character
+//-------------------------------------------------------------------------
+//
+
+function cjEncodeTextAreaKey(sender, e){
+	if (e.keyCode == 9){
+		if (e.srcElement){
+			sender.selection = document.selection.createRange(); 
+			sender.selection.text = "\t";
+		} else if (e.target) {
+			var start = sender.value.substring(0, sender.selectionStart);
+			var end = sender.value.substring(sender.selectionEnd, sender.value.length);
+			var newRange = sender.selectionEnd + 1;
+			var scrollPos = sender.scrollTop;
+			sender.value = String.concat(start, "\t", end);
+			sender.setSelectionRange(newRange, newRange);
+			sender.scrollTop = scrollPos;
+		}
+		return false;
+	} else {
+		return true;
+	}
+}
+//
+//----------
+// Do NOT call directly, call as cj.ajax.url()
+//
+// should be cjAjaxURL()
+//
+// Perform an Ajax call to a URL, and push the results into the object with ID=DestinationID
+// LocalURL is a URL on this site (/index.asp or index.asp?a=1 for instance)
+// FormID is the ID of a form on this page that should be submitted with the call
+// DestinationID is the ID of the DIV tag where the returned content will go
+// onEmptyHideID is the ID of a DIV to hide if the ajax call returns nothing
+// onEmptyShowID is the ID of a DIV to show if the ajax call returns nothing
+//----------
+//
+function cjAjaxURL(LocalURL,FormID,DestinationID,onEmptyHideID,onEmptyShowID) {
+	//alert('cjAjaxURL');	
+	var xmlHttp,fo,i,url,serverResponse,el1,pos,ret,e;
+	var eSelected = new Array();
+	try {
+		// Firefox, Opera 8.0+, Safari
+		xmlHttp=new XMLHttpRequest();
+	} catch (e) {
+		// Internet Explorer
+		try{
+			xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
+	    	} catch (e) {
+			try {
+				xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+			} catch (e) {
+				alert("Your browser does not support this function");
+				return false;
+			}
+		}
+	}
+	xmlHttp.onreadystatechange=function() {
+		if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+			serverResponse = xmlHttp.responseText;
+			if ((serverResponse!='')&&(DestinationID!='')) {
+				if (document.getElementById) {
+					var el1 = document.getElementById(DestinationID);
+				} else if (document.all) {
+					var el1 = document.All [DestinationID];
+				} else if (document.layers) {
+					var el1 = document.layers[DestinationID];
+				}
+				if(el1){
+					el1.innerHTML = serverResponse
+					// run embedded scripts
+					var oldOnLoad = window.onload;
+					window.onload='';
+					var scripts=el1.getElementsByTagName('script');
+					for (var i = 0; i < scripts.length; i++) { 
+						if(scripts[i].src) {
+							var s=document.createElement("script");
+							s.src = scripts[i].src;
+							s.type="text/javascript";
+							document.getElementsByTagName("head")[0].appendChild(s);
+						}else{
+							eval(scripts[i].innerHTML);
+						}
+					}
+					if(window.onload){
+						window.onload();
+					}
+				}
+			}
+			if (serverResponse=='') {
+				if (document.getElementById(onEmptyHideID)) {document.getElementById(onEmptyHideID).style.display='none'}
+				//if (onEmptyHideID!='') {document.getElementById(onEmptyHideID).style.display='none'}
+				if (document.getElementById(onEmptyShowID)) {document.getElementById(onEmptyShowID).style.display='block'}
+				//if (onEmptyShowID!='') {document.getElementById(onEmptyShowID).style.display='block'}
+			}
+		}
+	}
+	// get host from document url
+	url=document.URL;
+	pos=url.indexOf("#");
+	if(pos!=-1){url=url.substr(0,pos)}
+	pos=url.indexOf("?");
+	if(pos!=-1){url=url.substr(0,pos)}
+	pos = url.indexOf("://");
+	if(pos!=-1){pos=url.indexOf("/",pos+3);
+	if(pos!=-1){url=url.substr(0,pos)}}
+	url+=LocalURL;
+	pos=url.indexOf("?")
+	if(pos==-1){url+='?'}else{url+='&'}
+	url+='nocache='+Math.random();
+	fo=document.getElementById(FormID);
+	if(fo){
+		if(fo.elements) {
+			for(i=0;i<fo.elements.length;i++){
+				e = fo.elements[i];
+				ret='';
+				if(e.type=='select-multiple') {
+					while (e.selectedIndex != -1) {
+						eSelected.push(e.selectedIndex);
+						if(ret) ret+=',';
+						ret+=e.options[e.selectedIndex].value; 
+						e.options[e.selectedIndex].selected = false; 
+					}
+					while (eSelected.length>0) {
+						e.options[eSelected.pop()].selected = true; 
+					}
+					url+='&'+escape(e.name)+'='+escape(ret)
+				} else if (e.type=='radio') {
+					if (e.checked){
+						ret=e.value;
+						url+='&'+escape(e.name)+'='+escape(ret)
+					}
+				} else if (e.type=='checkbox') {
+					if (e.checked){
+						ret=e.value;
+						url+='&'+escape(e.name)+'='+escape(ret)
+					}
+				} else {
+					ret=e.value
+					url+='&'+escape(e.name)+'='+escape(ret)
+				}
+			}
+		}
+	}
+	//alert('cjAjaxURL, done, url='+url);	
+	xmlHttp.open("GET", url,true);
+	xmlHttp.send(null);
+}
+//
+//----------
+// deprecated
+//----------
+//
+function GetURLAjax(LocalURL,FormID,DestinationID,onEmptyHideID,onEmptyShowID) {
+	cjAjaxURL(LocalURL,FormID,DestinationID,onEmptyHideID,onEmptyShowID);
+}
+//
+//----------
+// Do NOT call directly, call as cj.ajax.addon()
+//
+// should be cjAjaxAddon() -- will be renamed
+//
+// Perform an Ajax call, and push the results into the object with ID=DestinationID
+// AddonName is the name of the Ajax Addon to call serverside
+// QueryString is to be added to the current URL -- less its querystring
+// FormID is the ID of a form on this page that should be submitted with the call
+// DestinationID is the ID of the DIV tag where the returned content will go
+// onEmptyHideID is the ID of a DIV to hide if the ajax call returns nothing
+// onEmptyShowID is the ID of a DIV to show if the ajax call returns nothing
+//----------
+//
+function cjAjaxAddon(AddonName,QueryString,FormID,DestinationID,onEmptyHideID,onEmptyShowID) {
+	//
+	// compatibility mode
+	//
+	var url,pos;
+	url=document.URL;
+	pos=url.indexOf("#");
+	if(pos!=-1){url=url.substr(0,pos)}
+	pos=url.indexOf("?");
+	if(pos!=-1){url=url.substr(0,pos)}
+	pos = url.indexOf("://");
+	if(pos!=-1){
+		pos=url.indexOf("/",pos+3);
+		if(pos!=-1){url=url.substr(pos)}
+	}
+	url+='?nocache=0';
+	if (AddonName!=''){url+='&remotemethodaddon='+AddonName}
+	if (QueryString!="") {url+='&'+QueryString}
+	cjAjaxURL(url,FormID,DestinationID,onEmptyHideID,onEmptyShowID);
+}
+//
+//----------
+// deprecated
+//----------
+//
+function GetAjax(AddonName,QueryString,FormID,DestinationID,onEmptyHideID,onEmptyShowID) {
+    cjAjaxAddon(AddonName,QueryString,FormID,DestinationID,onEmptyHideID,onEmptyShowID);
+}
+//
+//----------
+// Do NOT call directly, call as cj.ajax.addonCallback()
+//
+// cjAjaxAddonCallback()
+//
+// Perform an Ajax call, and call a callback with the results
+// AddonName is the name of the Ajax Addon to call serverside
+// QueryString is to be added to the current URL -- less its querystring
+// Callback is a javascript function to be called when the data returns. The
+//    function must accept two arguments, the ajax return and an argument CallbackArg
+//    that can be passed in to the ajax call. Use this second argument to pass
+//    status etc to the callback (like what id the response goes in)
+//----------
+//
+function cjAjaxAddonCallback(AddonName,QueryString,Callback,CallbackArg) {
+	var xmlHttp,url,pos;
+	try {
+		// Firefox, Opera 8.0+, Safari
+		xmlHttp=new XMLHttpRequest();
+	} catch (e) {
+		// Internet Explorer
+		try{
+			xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
+	    	} catch (e) {
+			try {
+				xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+			} catch (e) {
+				alert("Your browser does not support this function");
+				return false;
+			}
+		}
+	}
+	xmlHttp.onreadystatechange=function() {
+		var serverResponse,sLen,i,scripts,sLen,srcArray,codeArray;
+		if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+			serverResponse = xmlHttp.responseText;
+			var isSrcArray=new Array();
+			var codeArray=new Array();
+			var oldOnLoad = window.onload;
+			if (serverResponse!='') {
+				// remove embedded scripts
+				var e=document.createElement('div');
+				if(e){
+					// create array of scripts to add
+					// this is a workaround for an issue with ie
+					// where the scripts collection is 0ed after the first eval
+					window.onload='';
+					e.innerHTML = serverResponse;
+					scripts=e.getElementsByTagName('script');
+					sLen=scripts.length;
+					if(sLen>0){
+					    for (i = 0; i < sLen; i++) { 
+						    if(scripts[i].src) {
+							    isSrcArray.push(true);
+							    codeArray.push(scripts[i].src);
+								scripts[i].parentNode.removeChild(scripts[i]);
+							    //scripts[i].src='';
+						    }else{
+							    isSrcArray.push(false);
+							    codeArray.push(scripts[i].innerHTML);
+								scripts[i].parentNode.removeChild(scripts[i]);
+							    //scripts[i].innerHTML='';
+						    }
+					    }
+					    serverResponse = e.innerHTML;
+				    }
+				}
+			}
+			// execute the callback which may save the response
+			if(Callback){
+				Callback(serverResponse,CallbackArg);
+			}
+			// execute any scripts found if response
+			for (i = 0; i < codeArray.length; i++) { 
+				if (isSrcArray[i]) {
+					var s=document.createElement("script");
+					s.src = codeArray[i];
+					s.type="text/javascript";
+					document.getElementsByTagName("head")[0].appendChild(s);
+				} else {
+					eval(codeArray[i]);
+				}
+				
+			}
+			if(window.onload){
+				window.onload();
+			}
+
+		}
+	}
+	// create LocalURL
+	url=document.URL;
+	pos=url.indexOf("#");
+	if(pos!=-1){url=url.substr(0,pos)}
+	pos=url.indexOf("?");
+	if(pos!=-1){url=url.substr(0,pos)}
+	pos = url.indexOf("://");
+	if(pos!=-1){pos=url.indexOf("/",pos+3);
+	if(pos!=-1){url=url.substr(pos)}}
+	url+='?nocache='+Math.random()
+	if (AddonName!=''){url+='&remotemethodaddon='+AddonName;}
+	if (QueryString!="") {url+='&'+QueryString;}
+	xmlHttp.open("GET",url,true);
+	xmlHttp.send(null);
+}
+//
+//----------
+// Do NOT call directly, call as cj.ajax.qs()
+//
+// Perform an Ajax call, and push the results into the object with ID=DestinationID
+// QueryString is to be added to the current URL -- less its querystring
+// FormID is the ID of a form on this page that should be submitted with the call
+// DestinationID is the ID of the DIV tag where the returned content will go
+// onEmptyHideID is the ID of a DIV to hide if the ajax call returns nothing
+// onEmptyShowID is the ID of a DIV to show if the ajax call returns nothing
+//----------
+//
+function cjAjaxQs(QueryString,FormID,DestinationID,onEmptyHideID,onEmptyShowID) {
+	var url;
+	var pos;
+	// create LocalURL
+	url=document.URL;
+	pos=url.indexOf("#");
+	if(pos!=-1){url=url.substr(0,pos)}
+	pos=url.indexOf("?");
+	if(pos!=-1){url=url.substr(0,pos)}
+	pos = url.indexOf("://");
+	if(pos!=-1){pos=url.indexOf("/",pos+3);
+	if(pos!=-1){url=url.substr(pos)}}
+	url+='?nocache='+Math.random()
+	if (QueryString!="") {url+='&'+QueryString;}
+	cjAjaxURL(url,FormID,DestinationID,onEmptyHideID,onEmptyShowID);
+}
+//
+//----------
+// Do NOT call directly, call as cj.ajax.qsCallback()
+//
+// Perform an Ajax call, and on return, calls a callback routine
+// QueryString is to be added to the current URL -- less its querystring
+//----------
+//
+function cjAjaxQsCallback(QueryString,Callback,CallbackArg) {
+	cjAjaxAddonCallback('',QueryString,Callback,CallbackArg);
+}
+//
+//-------------------------------------------------------------------------
+// cjAjaxData
+//	handler - the event handler to be called when the ajax call returns. The
+//		response from the ajax call is passed to the hander as it's argument
+//	queryKey - a string that uniquely identifies the query record in the Remote Query content.
+//		see ccLib.GetAjaxQueryKey
+//	args - the name=value&name=value etc pairs.
+//		Each name and each value must be indivually escaped before assembling the string
+//		Depending on the QueryType setup for this key, the args can be used differently
+//			SQLQuery - args are replacement name=value pairs
+//			ContentInsert - args are fieldname=value pairs, but all fieldnames must be in the fieldnamelist
+//			ContentUpdate - args are fieldname=value pairs, but all fieldnames must be in the fieldnamelist
+//	pageSize - records to be returned
+//	pageNumber - the page where the records begin
+//	responseFormat
+//		"table" - Google Visualization format
+//			rows[0].id='fieldname'
+//			rows[0].c[0].v='value'
+//		"namearray" - returns arrays named for each field
+//			dataadded[0]='value'
+//			name[0]='value'
+//		"namevalue" - returns only the first row of a table, with no arrays
+//			dateadded='value'
+//	ajaxMethod - the method used for this query
+//		"data" - use the remote query table as the source for update details
+//		"setvisitproperty" - run serverside SetVisitProperty
+//		"getvisitproperty" - run serverside GetVisitProperty
+//
+//
+//-------------------------------------------------------------------------
+//
+function cjAjaxData(handler,queryKey,args,pageSize,pageNumber,responseFormat,ajaxMethod) {
+	var xmlHttp;
+	var url;
+	var serverResponse;
+	var el1;
+	var pos;
+	var response;
+	try {
+		// Firefox, Opera 8.0+, Safari
+		xmlHttp=new XMLHttpRequest();
+	} catch (e) {
+		// Internet Explorer
+		try{
+			xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
+	    	} catch (e) {
+			try {
+				xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+			} catch (e) {
+				alert("Your browser does not support this function");
+				return false;
+			}
+		}
+	}
+	xmlHttp.onreadystatechange=function() {
+		if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+			response=xmlHttp.responseText;
+			var str = response.toLowerCase();
+			pos=str.indexOf("</data>");
+			if(pos!=-1){response=response.substr(0,pos)}
+			pos=str.indexOf("<data>")
+			if(pos!=-1){response=response.substr(pos+6)}
+			if(handler) { handler( response )}
+		}
+	}
+	// get url w/o QS
+	url=document.URL;
+	pos=url.indexOf("#");
+	if(pos!=-1){url=url.substr(0,pos)}
+	pos = url.indexOf("://");
+	if(pos!=-1){pos=url.indexOf("/",pos+3);
+	if(pos!=-1){url=url.substr(0,pos+1)}}
+	pos=url.indexOf("?")
+	if(pos=-1){url+='?'}else{url+='&'}
+	url+='ajaxfn='+ajaxMethod;
+	url+='&key='+queryKey;
+	if(pageSize) url+='&pagesize='+escape(pageSize)
+	if(pageNumber) url+='&pagenumber='+escape(pageNumber)
+	if(args) url+='&args='+escape(args)
+	url+='&nocache='+Math.random();
+	url+='&responseformat='+responseFormat;
+	xmlHttp.open("GET",url,true);
+	xmlHttp.send(null);
+}
+//
+//-------------------------------------------------------------------------
+// cjAjaxGetTable
+//	runs cj.ajax.data with a 'jsontable' responseFormat
+//-------------------------------------------------------------------------
+//
+function cjAjaxGetTable(handler,queryKey,args,pageSize,pageNumber) {
+	return this.data(handler,queryKey,args,pageSize,pageNumber,'jsontable','data')
+}
+//
+//-------------------------------------------------------------------------
+// cjAjaxGetNameArray
+//	runs cj.ajax.data with a 'namearray' responseFormat
+//-------------------------------------------------------------------------
+//
+function cjAjaxGetNameArray(handler,queryKey,args,pageSize,pageNumber) {
+	return this.data(handler,queryKey,args,pageSize,pageNumber,'jsonnamearray','data')
+}
+//
+//-------------------------------------------------------------------------
+// cjAjaxGetNameValue
+//	runs cj.ajax.data with 1 row and a 'namevalue' responseFormat
+//-------------------------------------------------------------------------
+//
+function cjAjaxGetNameValue(handler,queryKey,args) {
+	return this.data(handler,queryKey,args,1,1,'jsonnamevalue','data')
+}
+//
+//-------------------------------------------------------------------------
+// cjAjaxSetVisitProperty
+//	sets a visit property for the current visit
+//-------------------------------------------------------------------------
+//
+function cjAjaxSetVisitProperty(handler,propertyName,propertyValue) {
+	return this.data(handler,'',escape(propertyName)+'='+escape(propertyValue),0,0,'jsonnamevalue','setvisitproperty')
+}
+//
+//-------------------------------------------------------------------------
+// cjAjaxGetVisitProperty
+//	gets a visit property for the current visit
+//	it is returned in jsonnamevalue format, so you use it like jo.PropertyName=PropertyValue
+//-------------------------------------------------------------------------
+//
+function cjAjaxGetVisitProperty(handler,propertyName,propertyValueDefault) {
+	return this.data(handler,'',escape(propertyName)+'='+escape(propertyValueDefault),0,0,'jsonnamevalue','getvisitproperty')
+}
+//
+//-------------------------------------------------------------------------
+// cjAjaxUpdate
+//	Runs a Content Update query
+//	handler - the routine called when the results return
+//	queryKey - the key used to lookup the query (ccLib.getAjaxQueryKey) for this update
+//	criteria - sql compatible criteria
+//	setPairs - array of name=value pairs formatted as:
+//		setPair=[['name0','value0'],['name1','value1'],...]
+//		where names are valid field names in the content
+//-------------------------------------------------------------------------
+//
+function cjAjaxUpdate(handler,queryKey,criteria,setPairs) {
+	var nameValue,argSet,args,x;
+	argSet='';
+	for (x=0;x<setPairs.length;x++) {
+		argSet+='&'+escape(setPairs[x][0])+'='+escape(setPairs[x][1])
+	}
+	args='criteria='+escape(criteria)+'&setpairs='+escape(argSet);
+	return this.data(handler,queryKey,args,0,0,'','data')
+}
+//
+//-------------------------------------------------------------------------
+// Hook an event listener
+//
+// Example
+// cj.addListener(e,"click",function(){ alert('onclick hook');})
+//-------------------------------------------------------------------------
+//
+function cjAddListener(element, event, listener, bubble) {
+	if(element.addEventListener) {
+		if(typeof(bubble) == "undefined") bubble = false;
+		element.addEventListener(event, listener, bubble);
+	} else if(this.attachEvent) {
+		element.attachEvent("on" + event, listener);
+	}
+}
+//
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+//
+function cjEncodeHTML(source) {
+	if (source) {
+		var r=source;
+		var r=r.replace(/&/g, "&amp;");
+		r=r.replace(/</g, "&lt;");
+		r=r.replace(/>/g, "&gt;");
+		r=r.replace(/"/g, "&quot;");
+		r=r.replace(/\n/, "<br>");
+		return r;
+	}
+}
+//
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+//
+function cjHide(id) {
+	var e = document.getElementById(id);
+	if(e)e.style.display='none';
+}
+//
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+//
+function cjShow(id) {
+	var e = document.getElementById(id);
+	if(e)e.style.display='block';
+}
+//
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+//
+function cjInvisible(id) {
+	var e=document.getElementById(id);
+	if(e)e.style.visibility='hidden';
+}
+//
+//-------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------
+//
+function cjVisible(id) {
+	var e=document.getElementById(id);
+	e.style.visibility='visible';
+}
+//
+//-------------------------------------------------------------------------
+//	adds a spinner to a target div - used when ajaxing in content
+//-------------------------------------------------------------------------
+//
+function cjSetSpinner(destinationID, message, destinationHeight){
+	//
+	if (document.getElementById) {
+		var el1 = document.getElementById(destinationID);
+	} else if (document.all) {
+		var el1 = document.All [destinationID];
+	} else if (document.layers) {
+		var el1 = document.layers[destinationID];
+	}
+	if(el1){
+		if(message) {
+			el1.innerHTML = '<div style="text-align: center;"><img src="/ccLib/images/ajax-loader-big.gif" /><p>' + message + '</p></div>';
+		} else {
+			el1.innerHTML = '<div style="text-align: center;"><img src="/ccLib/images/ajax-loader-big.gif" /></div>';
+		}
+		if(destinationHeight) {
+			el1.style.height = destinationHeight;
+		}
+	}
+	//
+}
+//
+//-------------------------------------------------------------------------
+// cj.xml
+// Load an xml string into an xml object and return it
+// 	from multiple sources, 
+//	including http://www.webreference.com/programming/javascript/definitive2/2.html
+//-------------------------------------------------------------------------
+//
+function cjXMLLoadString(txt) {
+    if (typeof DOMParser != "undefined") { 
+        // Mozilla, Firefox, and related browsers 
+        return (new DOMParser()).parseFromString(text, "application/xml"); 
+    } else if (typeof ActiveXObject != "undefined") { 
+        // Internet Explorer. 
+        var doc = XML.newDocument();  // Create an empty document 
+        doc.loadXML(text);            // Parse text into it 
+        return doc;                   // Return it 
+    } else { 
+        // As a last resort, try loading the document from a data: URL 
+        // This is supposed to work in Safari. Thanks to Manos Batsis and 
+        // his Sarissa library (sarissa.sourceforge.net) for this technique. 
+        var url = "data:text/xml;charset=utf-8," + encodeURIComponent(text); 
+        var request = new XMLHttpRequest(); 
+        request.open("GET", url, false); 
+        request.send(null); 
+        return request.responseXML; 
+    } 
+}
+//
+//-------------------------------------------------------------------------
+// cj.admin
+//	save all the field names that are empty into a targetField
+//-------------------------------------------------------------------------
+//
+function cjAdminSaveEmptyFieldList(targetFieldId){
+	var e=document.getElementById(targetFieldId);
+	var c=document.getElementsByTagName('input');
+	for (i=0;i<c.length;i++){
+		if(c[i].type=='checkbox'){
+			if(c[i].checked==false){
+				e.value+=c[i].name+','
+			}
+		} else if(c[i].type=='radio'){
+			if(c[i].checked==false){
+				e.value+=c[i].name+','
+			}
+		} else if(c[i].value==''){
+			e.value+=c[i].name+','
+		}
+	}
+	c=document.getElementsByTagName('select');
+	for (i=0;i<c.length;i++){
+		if(c[i].value==''){
+			e.value+=c[i].name+','
+		}
+	}
+}
+//
+//-------------------------------------------------------------------------
+// cj.admin object
+//	routines for the admin site
+//-------------------------------------------------------------------------
+//
+function cjAdminClass() {
+	this.saveEmptyFieldList=cjAdminSaveEmptyFieldList;
+}
+//
+//-------------------------------------------------------------------------
+// cj.ajax object
+//	perform remote calls back to the server (ajax)
+//	cj.ajax.getTable()
+//	cj.ajax.getRow()
+//-------------------------------------------------------------------------
+//
+function cjAjaxClass() {
+	this.getTable=cjAjaxGetTable;
+	this.getNameArray=cjAjaxGetNameArray;
+	this.getNameValue=cjAjaxGetNameValue;
+	this.update=cjAjaxUpdate;
+	this.data=cjAjaxData;
+	this.setVisitProperty=cjAjaxSetVisitProperty;
+	this.getVisitProperty=cjAjaxGetVisitProperty;
+	this.url=cjAjaxURL;
+	this.addon=cjAjaxAddon;
+	this.addonCallback=cjAjaxAddonCallback;
+	this.qs=cjAjaxQs;
+	this.qsCallback=cjAjaxQsCallback;
+}
+//
+//-------------------------------------------------------------------------
+// cj.xml object
+//	perform common xml tasks
+//		cj.xml.loadString()
+//-------------------------------------------------------------------------
+//
+function cjXMLClass() {
+	this.loadString=cjXMLLoadString;
+}
+//
+//-------------------------------------------------------------------------
+// Do NOT call directly
+//
+// should be cj.remote()
+//
+// cj.method(options) 
+//		options:
+//			'name': string - addonname
+//			'formId': string - html Id of form to be submitted
+//					***** if provided, the call will POST to the url, url should be index.php, etc.
+//			'callback': function - function to call on completion, two arguments, response and callbackArg
+//			'callbackArg': object - passed direction to the callback function
+//			'destinationId': string - html Id of an element to set innerHtml
+//			'onEmptyHideId': string - if return is empty, hide this element
+//			'onEmptyShowId': string - if return is empty, show this element
+//			'queryString': string - queryString formatted name=value pairs added to post
+//			'url': string - link to hit if not addon name provided
+//-------------------------------------------------------------------------
+//
+function cjRemote( options ) {
+	var url,fo,ptr,e,ret,pos,isPost;
+	isPost=false;
+	if(options.url) {
+		url=options.url;
+	} else {
+		if (options.formId) {
+			// POST must be to actual page, not 404 remote name
+			url="/";
+		} else {
+			url=document.URL;
+		}
+		pos=url.indexOf("#");
+		if(pos!=-1){url=url.substr(0,pos)}
+		pos=url.indexOf("?");
+		if(pos!=-1){url=url.substr(0,pos)}
+		pos = url.indexOf("://");
+		if(pos!=-1){pos=url.indexOf("/",pos+3);
+		if(pos!=-1){url=url.substr(pos)}}
+	}
+	url+='?requestbinary=true&nocache='+Math.random()
+	if (options.method) { url+='&remotemethodaddon='+options.method }
+	if (options.queryString) { url+='&'+options.queryString }
+	if (options.formId) {
+		// post forms, otherwise get
+		// url should be set to host page (index.php)
+		var data = new FormData(document.getElementById(options.formId));
+		//var data = new FormData(jQuery('#'+options.formId));
+		var opts = {
+			url: url,
+			data: data,
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: 'POST',
+			success: function( serverResponse ){ 
+				cjRemoteSuccess ( serverResponse, options )
+			}
+		}
+		if (data.fake) {
+			// use FormData extension included at bottom of core.js for non-Html5 browsers
+			// Make sure no text encoding stuff is done by xhr
+			opts.xhr = function() { var xhr = jQuery.ajaxSettings.xhr(); xhr.send = xhr.sendAsBinary; return xhr; }
+			opts.contentType = "multipart/form-data; boundary="+data.boundary;
+			opts.data = data.toString();
+		}
+		jQuery.ajax( opts );
+	} else {
+		jQuery.get( 
+			url, 
+			function( serverResponse ){ 
+				cjRemoteSuccess ( serverResponse, options )
+			}, 
+			"text" );
+	}
+}
+function cjRemoteSuccess( serverResponse, options ) {
+	var e,start,end,test;
+	var isSrcArray=new Array();
+	var codeArray=new Array();
+	var oldOnLoad = window.onload;
+	if (serverResponse=='') {
+		if (options.onEmptyHideId)
+		{
+			e = document.getElementById(options.onEmptyHideId);
+			if (e)
+			{
+				e.style.display='none'
+			}
+		}
+		if (options.onEmptyShowID)
+		{
+			e = document.getElementById(options.onEmptyShowID);
+			if (e)
+			{
+				e.style.display='block'
+			}
+		}
+	}
+	else
+	{
+		// remove embedded scripts
+		e=document.createElement('div');
+		if(e){
+			// create array of scripts to add
+			// this is a workaround for an issue with ie
+			// where the scripts collection is 0ed after the first eval
+			window.onload='';
+			e.innerHTML = serverResponse;
+			if((serverResponse!='')&&(e.innerHTML=='')) 
+			{
+				//ie7-8,blocks scripts in response
+				test = serverResponse;
+				start = test.indexOf('<script');
+				while (start>-1)
+				{
+					end=test.indexOf('/script>');
+					if(end>-1)
+					{
+						serverResponse = serverResponse.substr(0,start)+serverResponse.substr(end+8);
+					}
+					else
+					{
+						serverResponse = serverResponse.substr(0,start);
+					}
+					test = serverResponse;
+					start = test.indexOf('<script');
+				}
+			}
+			else
+			{
+				//e.innerText = serverResponse;
+				//jQuery(e).html(serverResponse);
+				scripts=e.getElementsByTagName('script');
+				sLen=scripts.length;
+				if(sLen>0){
+					for (i = 0; i < sLen; i++) 
+					{ 
+						if(scripts[0].src) 
+						{
+							isSrcArray.push(true);
+							codeArray.push(scripts[0].src);
+							scripts[0].parentNode.removeChild(scripts[0]);
+						}
+						else
+						{
+							isSrcArray.push(false);
+							codeArray.push(scripts[0].innerHTML);
+							scripts[0].parentNode.removeChild(scripts[0]);
+						}
+					}
+					serverResponse = e.innerHTML;
+				}
+			}
+		}
+		// if destination set, store html response.
+		if (options.destinationId) {
+			if (document.getElementById) 
+			{
+				var el1 = document.getElementById(options.destinationId);
+			} 
+			else if (document.all) 
+			{
+				var el1 = document.All [options.destinationId];
+			} 
+			else if (document.layers) 
+			{
+				var el1 = document.layers[options.destinationId];
+			}
+			if(el1)
+			{
+				el1.innerHTML = serverResponse
+			}
+		}
+		// execute any scripts found
+		for (i = 0; i < codeArray.length; i++) 
+		{ 
+			if (isSrcArray[i]) 
+			{
+				var s=document.createElement("script");
+				s.src = codeArray[i];
+				s.type="text/javascript";
+				document.getElementsByTagName("head")[0].appendChild(s);
+			}
+			else 
+			{
+				eval(codeArray[i]);
+			}
+			
+		}
+	}
+	// execute the callback which may save the response
+	if(options.callback)
+	{
+		options.callback(serverResponse,options.callbackArg);
+	}
+	if(window.onload)
+	{
+		window.onload();
+	}
+
+}
+
+function cjRemoteLegacy( options ) 
+{
+	var url,fo,ptr,e,ret,pos;
+	if(options.url)
+	{
+		url=options.url;
+	}
+	else
+	{
+		url=document.URL;
+		pos=url.indexOf("#");
+		if(pos!=-1){url=url.substr(0,pos)}
+		pos=url.indexOf("?");
+		if(pos!=-1){url=url.substr(0,pos)}
+		pos = url.indexOf("://");
+		if(pos!=-1){pos=url.indexOf("/",pos+3);
+		if(pos!=-1){url=url.substr(pos)}}
+	}
+	url+='?nocache='+Math.random()
+	if (options.method) { url+='&remotemethodaddon='+options.method }
+	if (options.queryString) { url+='&'+options.queryString }
+	if(options.formId)
+	{
+		fo=document.getElementById(options.formId);
+		if(fo)
+		{
+			if(fo.elements) 
+			{
+				for(ptr=0;ptr<fo.elements.length;ptr++)
+				{
+					e = fo.elements[ptr];
+					ret='';
+					if(e.type=='select-multiple') 
+					{
+						while (e.selectedIndex != -1) 
+						{
+							eSelected.push(e.selectedIndex);
+							if(ret) ret+=',';
+							ret+=e.options[e.selectedIndex].value; 
+							e.options[e.selectedIndex].selected = false; 
+						}
+						while (eSelected.length>0) 
+						{
+							e.options[eSelected.pop()].selected = true; 
+						}
+						url+='&'+escape(e.name)+'='+escape(ret)
+					} 
+					else if (e.type=='radio') 
+					{
+						if (e.checked)
+						{
+							ret=e.value;
+							url+='&'+escape(e.name)+'='+escape(ret)
+						}
+					} 
+					else if (e.type=='checkbox') 
+					{
+						if (e.checked)
+						{
+							ret=e.value;
+							url+='&'+escape(e.name)+'='+escape(ret)
+						}
+					} 
+					else 
+					{
+						ret=e.value
+						url+='&'+escape(e.name)+'='+escape(ret)
+					}
+				}
+			}
+		}
+	}
+	jQuery.get( url, 
+		function(serverResponse) 
+		{
+			var e,start,end,test;
+			var isSrcArray=new Array();
+			var codeArray=new Array();
+			var oldOnLoad = window.onload;
+			if (serverResponse=='') {
+				if (options.onEmptyHideId)
+				{
+					e = document.getElementById(options.onEmptyHideId);
+					if (e)
+					{
+						e.style.display='none'
+					}
+				}
+				if (options.onEmptyShowID)
+				{
+					e = document.getElementById(options.onEmptyShowID);
+					if (e)
+					{
+						e.style.display='block'
+					}
+				}
+			}
+			else
+			{
+				// remove embedded scripts
+				e=document.createElement('div');
+				if(e){
+					// create array of scripts to add
+					// this is a workaround for an issue with ie
+					// where the scripts collection is 0ed after the first eval
+					window.onload='';
+					e.innerHTML = serverResponse;
+					if((serverResponse!='')&&(e.innerHTML=='')) 
+					{
+						//ie7-8,blocks scripts in response
+						test = serverResponse;
+						start = test.indexOf('<script');
+						while (start>-1)
+						{
+							end=test.indexOf('/script>');
+							if(end>-1)
+							{
+								serverResponse = serverResponse.substr(0,start)+serverResponse.substr(end+8);
+							}
+							else
+							{
+								serverResponse = serverResponse.substr(0,start);
+							}
+							test = serverResponse;
+							start = test.indexOf('<script');
+						}
+					}
+					else
+					{
+						//e.innerText = serverResponse;
+						//jQuery(e).html(serverResponse);
+						scripts=e.getElementsByTagName('script');
+						sLen=scripts.length;
+						if(sLen>0){
+							for (i = 0; i < sLen; i++) 
+							{ 
+								if(scripts[i].src) 
+								{
+									isSrcArray.push(true);
+									codeArray.push(scripts[i].src);
+									scripts[i].parentNode.removeChild(scripts[i]);
+								}
+								else
+								{
+									isSrcArray.push(false);
+									codeArray.push(scripts[i].innerHTML);
+									scripts[i].parentNode.removeChild(scripts[i]);
+								}
+							}
+							serverResponse = e.innerHTML;
+						}
+					}
+				}
+				// if destination set, store html response.
+				if (options.destinationId) {
+					if (document.getElementById) 
+					{
+						var el1 = document.getElementById(options.destinationId);
+					} 
+					else if (document.all) 
+					{
+						var el1 = document.All [options.destinationId];
+					} 
+					else if (document.layers) 
+					{
+						var el1 = document.layers[options.destinationId];
+					}
+					if(el1)
+					{
+						el1.innerHTML = serverResponse
+					}
+				}
+				// execute any scripts found
+				for (i = 0; i < codeArray.length; i++) 
+				{ 
+					if (isSrcArray[i]) 
+					{
+						var s=document.createElement("script");
+						s.src = codeArray[i];
+						s.type="text/javascript";
+						document.getElementsByTagName("head")[0].appendChild(s);
+					}
+					else 
+					{
+						eval(codeArray[i]);
+					}
+					
+				}
+			}
+			// execute the callback which may save the response
+			if(options.callback)
+			{
+				options.callback(serverResponse,options.callbackArg);
+			}
+			if(window.onload)
+			{
+				window.onload();
+			}
+		},
+		"text"
+	);
+}
+//
+//-------------------------------------------------------------------------
+// Contensive Javascript object
+//-------------------------------------------------------------------------
+//
+function ContensiveJavascriptClass() 
+{
+	this.encodeHTML=cjEncodeHTML;
+	this.invisible=cjInvisible;
+	this.visible=cjVisible;
+	this.hide=cjHide;
+	this.show=cjShow;
+	this.setFrameHeight=cjSetFrameHeight;
+	this.encodeTextAreaKey=cjEncodeTextAreaKey;
+	this.addHeadScriptLink=cjAddHeadScriptLink;
+	this.addHeadStyle=cjAddHeadStyle;
+	this.addHeadStyleLink=cjAddHeadStyleLink;
+	this.addHeadScriptCode=cjAddHeadScriptCode;
+	this.addLoadEvent=cjAddLoadEvent;
+	this.addListener=cjAddListener;
+	this.setSpinner=cjSetSpinner;
+	//
+	this.ajax=new cjAjaxClass();
+	this.xml= new cjXMLClass();
+	this.admin=new cjAdminClass();
+	this.remote=cjRemote;
+	//
+	//-------------------------------------------------------------------------
+	// Add head tag
+	//-------------------------------------------------------------------------
+	//
+	this.addHeadTag=function(tag) 
+	{
+		var i,oTag;
+		var ht = document.getElementsByTagName("head")[0];
+		try 
+		{
+			ht.innerHTML += tag;
+		}
+		catch(e) 
+		{
+			oTag = document.createElement('div');
+			try 
+			{
+				oTag.outerHTML = tag;
+				ht.appendChild(oTag);
+			}
+			catch(e) 
+			{
+				oTag.innerHTML = tag;
+				for(i=0;i<oTag.childNodes.length;i++) 
+				{
+					ht.appendChild(oTag.childNodes[i]);
+				}
+			}
+		}
+	}
+}
+//
+//-------------------------------------------------------------------------
+//	build cj object
+//-------------------------------------------------------------------------
+//
+var cj = new ContensiveJavascriptClass()
+//
+//-------------------------------------------------------------------------
+// Legacy
+//-------------------------------------------------------------------------
+//
+function cjAddHeadTag(tag) {cj.addHeadTag(tag)}
+//
+//-------------------------------------------------------------------------
+//	setup pageclick to hide menuing
+//-------------------------------------------------------------------------
+//
+if (browser.isIE) {
+	document.onmousedown = PageClick;
+	if (document.body) {
+		document.body.onclick = BodyOnClick;
+		document.body.oncontextmenu = BodyOnClick;
+	}
+	else {
+		window.onclick = BodyOnClick;
+		window.oncontextmenu = BodyOnClick;
+	}
+	updateClipboardLinksInit();
+}
+else if(browser.version > 5) {
+	document.addEventListener("mousedown", PageClick, true);
+	document.addEventListener("mouseclick", BodyOnClick, true);
+}
+/**
+ * Emulate FormData for some browsers
+ * MIT License
+ * (c) 2010 FranÃ§ois de Metz
+ * from https://github.com/francois2metz/html5-formdata
+ */
+(function(w) {
+    if (w.FormData)
+        return;
+    function FormData() {
+        this.fake = true;
+        this.boundary = "--------FormData" + Math.random();
+        this._fields = [];
+    }
+    FormData.prototype.append = function(key, value) {
+        this._fields.push([key, value]);
+    }
+    FormData.prototype.toString = function() {
+        var boundary = this.boundary;
+        var body = "";
+        this._fields.forEach(function(field) {
+            body += "--" + boundary + "\r\n";
+            // file upload
+            if (field[1].name) {
+                var file = field[1];
+                body += "Content-Disposition: form-data; name=\""+ field[0] +"\"; filename=\""+ file.name +"\"\r\n";
+                body += "Content-Type: "+ file.type +"\r\n\r\n";
+                body += file.getAsBinary() + "\r\n";
+            } else {
+                body += "Content-Disposition: form-data; name=\""+ field[0] +"\";\r\n\r\n";
+                body += field[1] + "\r\n";
+            }
+        });
+        body += "--" + boundary +"--";
+        return body;
+    }
+    w.FormData = FormData;
+})(window);
+		]]></JavascriptInHead>
+		<JSBodyScriptSrc></JSBodyScriptSrc>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<StylesLinkHref></StylesLinkHref>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML></FormXML>
+		<IsInline>No</IsInline>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<JavascriptInHead></JavascriptInHead>
+		<JSBodyScriptSrc></JSBodyScriptSrc>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles><![CDATA[
+body {overflow:auto;}
+/*
+Body Class Selectors 
+*/
+.ccBodyWeb{}
+.ccBodyPrint{}
+.ccBodyEmail{}
+.ccBodyAdmin {margin:0;padding:0;COLOR:black;BACKGROUND-COLOR:#C3D9FF;FONT-WEIGHT:normal}
+/*
+Contensive Container Resets 
+*/
+.ccCon div,.ccCon p,.ccCon td,.ccCon ul,.ccCon li {color:#222;font-size:11px;font-family:verdana,arial,sans-serif;line-height:1.2;}
+.ccCon p {margin:1.12em 0;}
+.ccCon li {margin:0.3em 0;}
+.ccCon ul {list-style:disc outside;margin:0;padding-left:20px}
+.ccCon ol {list-style:decimal inside;margin:0;padding-left:20px}
+.ccCon td {vertical-align:top;line-height:1.2;}
+.ccCon h1,.ccCon H2,.ccCon H3,.ccCon H4,.ccCon H5,.ccCon H6 {MARGIN-TOP:15PX;MARGIN-BOTTOM:10PX;PADDING:0PX;FONT-WEIGHT:bold;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccCon h2 {FONT-SIZE:17px;}
+.ccCon h2 {FONT-SIZE:14px;}
+.ccCon h3 {FONT-SIZE:13px;}
+.ccCon h4 {FONT-SIZE:12px;}
+.ccCon h5,.ccCon h6 {FONT-SIZE:12px;}
+/*
+Contensive Admin 
+*/
+#desktop { color:#222;Background-color:#C3D9FF}
+.ccCon .ccHeaderCon {width:100%;COLOR:white;BACKGROUND-COLOR:#1F70BD;clear:both;vertical-align:middle;}
+.ccCon .ccHeaderCon .cchLeft {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;}
+.ccCon .ccHeaderCon .cchRight {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;}
+.ccCon .ccHeaderCon .cchSingle {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;vertical-align:middle;}
+.ccCon .ccHeaderCon .cchClosed {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px}
+.ccCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
+.ccCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
+/**/
+.ccCon .ccToolsCon {margin:0;padding:0;Background-color:white;border-right:1px solid black;min-height:400px;}
+.ccCon .ccToolsCon .ccHeaderCon {COLOR:white;BACKGROUND-COLOR:#1F70BD;}
+.ccCon .ccToolsCon .ccHeaderCon .closed {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;}
+.ccCon .ccToolsCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left}
+.ccCon .ccToolsCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right}
+.ccCon .ccToolsCon .ccContentCon {width:100%;margin:0;Background-color:white;min-height:400px;}
+.ccCon .ccToolsCon .ccContentCon .opened {width:100%;margin:0;Background-color:white;min-height:400px;padding-top:10px;padding-bottom:20px;}
+.ccCon .ccToolsCon .ccContentCon .closed {width:100%;margin:0;Background-color:white;min-height:400px;}
+/**/
+.ccCon .ccContentCon {margin:0;padding:0;Background-color:#C3D9FF;width:100%;}
+.ccCon .ccControlsCon {color:black;background-color:#fff8d0;padding:5px ! important;border-top:1px solid #808080;border-left:1px solid #808080;border-bottom:1px solid #f8f8f8;border-right:1px solid #f8f8f8;}
+.ccCon .ccControlsCon .left {text-align:right;}
+.ccCon .ccControlsCon .right {text-align:right;}
+.ccCon .ccEditCaptionCon {color:black;white-space:nowrap;text-align:right;font-size:9px;vertical-align:top;padding-top:4px;}
+.ccCon .ccEditCaptionCon {padding-top:5px;}
+.ccCon .ccEditCaptionCon .textexpandable {padding-top:25px;}
+.ccCon .ccEditCaptionCon .htmleditor {padding-top:100px;}
+.ccCon .ccEditFieldCon {padding:5px;border-top:1px solid #fffdf1;border-bottom:1px solid #dad4b2;color:black;background-color:#fff8d0;text-align:left;font-weight:normal;font-size:9px;vertical-align:baseline;}
+.ccCon .ccEditFieldCon .ccEditorCon {}
+.ccCon .ccEditFieldCon .ccEditorCon .checkBox {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .text {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .select {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .file {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .date {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .number {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .password {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .styles {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .link {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .resourceLink {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorHelpCon {color:#888;font-size:9px;padding:10px;width:80%;}
+.ccCon .ccEditFieldCon .ccEditorHelpCon .opened {display:none;}
+.ccCon .ccEditFieldCon .ccEditorHelpCon .opened .header {font-weight:bold;padding-top:5px;color:#444;}
+.ccCon .ccEditFieldCon .ccEditorHelpCon .opened .body {color:#444;}
+.ccCon .ccHelpCon {width:95%;padding:10px;margin:10px;border: 2px solid #808080;background-color:white}
+.ccCon .ccHelpCon .title {font-size:120%;color:black;FONT-WEIGHT:bold;}
+.ccCon .ccHelpCon .byline {font-size:90%;color:#606060;padding-top:5px;padding-bottom:1px;}
+.ccCon .ccHelpCon .body {font-size:100%;color:#404040;padding-top:5px;border-top:1px solid #808080}
+.ccCon .ccAdminEditHeading {padding:6px;COLOR:black;FONT-WEIGHT:bold;FONT-SIZE:14px;}
+.ccCon .ccAdminEditSubHeader {margin-left:20px;border-bottom:1px solid black;padding:6px;COLOR:black;FONT-WEIGHT:bold;FONT-SIZE:13px;}
+.ccCon .ccAdminEditDescription {COLOR:black;padding:10px;FONT-SIZE:11px;FONT-WEIGHT:normal;}
+.ccCon .ccAdminEditBody {BACKGROUND-COLOR:#E8EEF7;padding:5px;}
+.ccCon .ccAdminEditCaption {COLOR:black;WHITE-SPACE:nowrap;TEXT-ALIGN:right;FONT-WEIGHT:normal;FONT-SIZE:9px;}
+.ccCon .ccAdminEditField {border-top:1px solid #FFFDF1;border-bottom:1px solid #DAD4B2;COLOR:black;Background-color:#fff8d0;TEXT-ALIGN:left;FONT-WEIGHT:normal;FONT-SIZE:9px;vertical-align:baseline;}
+.ccCon .ccAdminListCaption {padding:4px;background-color:#669ACC;COLOR:white;FONT-WEIGHT:normal;FONT-SIZE:11px;border-right:1px solid white;border-bottom:1px solid black;border-top:0px solid white;Text-Decoration:none ! important;}
+.ccCon A.ccAdminListCaption {Display:block;COLOR:white;Text-Decoration:none;border:0px;padding:0px;}
+.ccCon A.ccAdminListCaption:Hover {Text-Decoration:none;}
+.ccCon A.ccAdminListCaption:Visited {Text-Decoration:none;}
+.ccCon .ccAdminListRowEven {BACKGROUND-COLOR:#E8EEF7;padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
+.ccCon .ccAdminListRowOdd {BACKGROUND-COLOR:#ffffff;padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
+.ccCon .ccAdminTab {background-color:#669ACC;color:white;white-space:nowrap;}
+.ccCon A.ccAdminTabLink {color:white;TEXT-DECORATION:none;}
+.ccCon A.ccAdminTabLink:visited {color:white;TEXT-DECORATION:none;}
+.ccCon A.ccAdminTabLink:hover {color:white;TEXT-DECORATION:none;}
+.ccCon .ccAdminTabHit {background-color:white;color:black;white-space:nowrap;}
+.ccCon A.ccAdminTabHitLink {color:black;TEXT-DECORATION:none;}
+.ccCon A.ccAdminTabHitLink:visited {color:black;TEXT-DECORATION:none;}
+.ccCon A.ccAdminTabHitLink:hover {color:black;TEXT-DECORATION:none;}
+.ccCon .ccAdminTabEnd {width:100%;border-bottom:1px solid black;} 
+.ccCon .ccAdminTabEdge {background-color:black;} 
+.ccCon .ccAdminTabBodyCollectionWrap{}
+.ccCon .ccAdminTabBodyWrapShow { display:block;}
+.ccCon .ccAdminTabBodyWrapHide { display:none;}
+.ccCon .ccAdminTabBodyWrap{}
+.ccCon .ccAdminTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;}
+.ccCon .ccAdminTabHitSpacer { width: 5px; }
+.ccCon .ccAdminTabHitFiller { width: 100%; }
+.ccCon A.ccAdminButton {COLOR:#000000;BACKGROUND-COLOR:#e0e0e0;}
+.ccCon A.ccAdminButton:hover {COLOR:#000000;BACKGROUND-COLOR:#ffffff;TEXT-DECORATION:none}
+.ccCon .ccAdminNormal {FONT-WEIGHT:normal;FONT-SIZE:11px;COLOR:#000000;TEXT-DECORATION:none}
+.ccCon .ccAdminSmall {FONT-WEIGHT:normal;FONT-SIZE:9px;COLOR:#000000;TEXT-DECORATION:none}
+.ccCon A.ccAdminNormal {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminSmall {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminSmall:hover {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminSmall:visited {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminLink {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminLink:hover {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminLink:visited{COLOR:blue;TEXT-DECORATION:underline}
+.ccCon .ccAdvSearchText {width:250px}
+.ccCon .ccEditorPreferenceCon {width:400px;height:400px;padding:20px;border: 1px solid #ccc;}
+.ccCon .ccEditorPreferenceCon h1 {}
+.ccCon .ccEditorPreferenceCon p {}
+.ccCon .ccEditorPreferenceCon  .radioCon {padding:0 0 0 10px}
+.ccCon .ccEditorPreferenceCon .buttonCon {padding:20px 0 20px 0}
+/*
+styles used publicly by Contensive 
+*/
+.ccButtonCon {COLOR:black;Background-color:#567694;Padding:5px ! important;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
+div.ccJumpCon {Background-color:#579;Padding:2px;margin:0;}
+.ccJumpCon ul {vertical-align:middle;text-align:right;white-space:nowrap;COLOR:#fff;Padding:5px;margin:0;}
+.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;Padding:5px ! important;color:#ccc;Background-Color:#68a;border-left:1px solid #579;}
+.ccJumpCon ul li:hover {color:#fff;}
+.ccJumpCon ul li.caption {Background-Color:transparent;color:#ccc;border:0;cursor:default;}
+.ccJumpCon ul li.delim {Background-Color:transparent;color:#ccc;border:0;cursor:default;}
+.ccJumpCon ul li.hit {cursor:default;Background-Color:#468;color:#fff;border:1px solid #fff;}
+.ccBubbleCon {position:absolute; border: 2px solid #1F70BD;margin:0;padding:0;Background-color:#C3D9FF;z-index:1;}
+.ccBubbleCon .ccHeaderCon {position:static;width:100%;COLOR:white;BACKGROUND-COLOR:#1F70BD;}
+.ccBubbleCon .ccHeaderCon .bbLeft {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;white-space:nowrap;width:99%}
+.ccBubbleCon .ccHeaderCon .bbRight {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:23px}
+.ccBubbleCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
+.ccBubbleCon .ccContentCon {margin:0;padding:10px;Background-color:#C3D9FF;vertical-align:middle;}
+.ccBubbleCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
+.ccBubbleCon .ccContentCon td.bbLeft {text-align:right;white-space:nowrap;}
+.ccBubbleCon .ccContentCon td.bbRight {text-align:left;}
+.ccDialogCon {margin:0;padding:0;Background-color:#C3D9FF;}
+.ccDialogCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
+.ccDialogCon .ccContentCon {margin:0;padding:10px;Background-color:#C3D9FF;vertical-align:middle;}
+.ccDialogCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
+.ccDialogCon .ccContentCon td.left {text-align:right;white-space:nowrap;}
+.ccDialogCon .ccContentCon td.right {text-align:left;}
+.ccAddonFrameCon {width:100%;border:0;overflow:auto;}
+.ccAddonAjaxCon {}
+.ccAddonEditCaption {white-space:nowrap;clear:left;padding:2px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;line-height:1.2;}
+.ccAddonEditTools {clear:left;padding:0px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;line-height:1.2;}
+.ccHelpIcon a {cursor:help}
+ul.ccChildList {text-align:left}
+ul.ccChildList li.ccListItem {text-align:left}
+ul.ccChildList li.ccListItem a {}
+ul.ccChildList li.ccListItem a:hover {}
+ul.ccChildList li.ccListItem a:visited {}
+ul.ccChildListInactive {text-align:left;border-top:1px solid #444;}
+ul.ccChildListInactive li.ccListItem {text-align:left}
+ul.ccChildListInactive li.ccListItem a {}
+ul.ccChildListInactive li.ccListItem a:hover {}
+ul.ccChildListInactive li.ccListItem a:visited {}
+.ccImgA {width:18px;height:18px;border:0;vertical-align:middle;}
+.ccCategoryListCon {}
+.ccCategoryListCon .caption {padding-top:5px;}
+.ccCategoryListCon .caption a {}
+.ccCategoryListCon UL {margin:0;padding:0;padding-left:20px;}
+.ccCategoryListCon ul li {margin:0;padding:0;padding-left:2px;padding-top:5px;}
+.ccFilterHead {font-size:12px;margin-top:10px;font-weight:bold;color:black}
+.ccFilterSubHead {font-size:10px;margin-top:10px;color:black}
+.ccFilterList {font-size:10px;color:black;}
+A.ccFilterLink {text-decoration:none ! important;color:black ! important;}
+.ccFilterIndent {margin-left:10px;}
+ul.ccFilterList {list-style:none;margin:0;padding:0;}
+ul.ccFilterList li {margin:0;padding:0;padding-left:10px;}
+ul.ccFilterList li a {text-decoration:none ! important;color:black ! important;}
+.ccRecordLinkCon { position: absolute; z-index: 999; }
+.ccListItem .ccRecordLinkCon { position: static; }
+.ccRecordLinkCon a.ccRecordEditLink { }
+.ccRecordLinkCon a.ccRecordCutLink { }
+.ccEditWrapper {border:1px dashed #808080;}
+.ccEditWrapperCaption {FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;line-height:1.2;text-align:left;border-bottom:1px solid #808080;padding:4px;color:black;background-color:#4c4;}
+.ccEditWrapperContent{padding:4px;}
+.ccDisabledReason {color:gray;}
+.ccEditorTextROCon {padding:20px;background-color:#fff;border:1px solid #aaa;}
+.ccAdminMsg {padding:10px;margin:10px;background-color:white;border:1px solid #888}
+.ccAdminButtonBar {COLOR:black;Background-color:#567694;Padding:5px}
+.ccCon  div.ccAdminTitleBar {COLOR:black;Background-color:transparent;FONT-WEIGHT:bold;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;Padding:10px}
+.ccAdminInfoBar {COLOR:black;Background-color:#E8EEF7;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;Padding:10px;Margin:10px;Margin-Top:0px;}
+.ccAuthoringLink {FONT-WEIGHT:normal;FONT-SIZE:9px;COLOR:#ffffff;FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#89ab22;TEXT-DECORATION:none}
+.ccNavLink {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;margin-top:3px;}
+.ccNavLinkEmpty {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;}
+.ccNavLinkChild {margin-left:19px;}
+.ccHeadline {FONT-WEIGHT:bold;FONT-SIZE:14px;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccList {}
+.ccWatchList {}
+.ccListCopy {}
+.ccSmall {FONT-SIZE:9px;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccNormal {FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccLarge {FONT-SIZE:14px;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccSurveyHeadline {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;FONT-WEIGHT:bold;FONT-SIZE:14px;FONT-FAMILY:verdana,arial,sans-serif}
+.ccSurveyQuestion {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif}
+.ccSurveyCopy {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif}
+.ccError {FONT-WEIGHT:bold;FONT-SIZE:11px;COLOR:#c02020;FONT-FAMILY:verdana,arial,sans-serif}
+.ccPanel3D{BACKGROUND-COLOR:#e0e0e0;Border-Top:1px solid #f8f8f8;Border-Left:1px solid #f8f8f8;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
+.ccPanel3DReverse{BACKGROUND-COLOR:#e0e0e0;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
+.ccPanel3DInput{BACKGROUND-COLOR:#f0f0f0;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
+.ccPanel {BACKGROUND-COLOR:#e0e0e0}
+.ccPanelHilite {BACKGROUND-COLOR:#f8f8f8}
+.ccPanelShadow {BACKGROUND-COLOR:#808080}
+.ccPanelInput {BACKGROUND-COLOR:#f0f0f0;}
+.ccPanelBackground {BACKGROUND-COLOR:#f0f0f0}
+.ccPanelButtons {BACKGROUND-COLOR:#a0a0a0}
+.ccPanelDark {BACKGROUND-COLOR:#d0d0d0}
+.ccPanelHeader {FONT-SIZE:11px;COLOR:#ffffff;FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#0320b0}
+.ccPanelHeaderHilite {FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#8080ff}
+.ccPanelHeaderShadow {FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#000000}
+.ccPanelReverse {BACKGROUND-COLOR:#0320c0}
+.ccPanelIndexRow {BACKGROUND-COLOR:#d6dfed}
+.ccPanelRowEven {BACKGROUND-COLOR:#f0f0f0}
+.ccPanelRowOdd {BACKGROUND-COLOR:#ffffff}
+.ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:0px;PADDING-LEFT:0px;PADDING-BOTTOM:4px;PADDING-TOP:4px;white-space:nowrap;}
+A.ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:6px;PADDING-LEFT:6px;PADDING-BOTTOM:4px;PADDING-TOP:4px;FONT-WEIGHT:normal;FONT-SIZE:11px;Z-INDEX:100;COLOR:black;FONT-STYLE:normal;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;white-space:nowrap;}
+A.ccFlyoutButton:hover {TEXT-DECORATION:none;color:white;Background-color:#669ACC;}
+A.ccFlyoutButton:visited {TEXT-DECORATION:none;}
+A.ccFlyoutButtonDown {TEXT-DECORATION:none;color:white;Background-color:#669ACC;}
+A.ccFlyoutButtonDown:hover {TEXT-DECORATION:none;}
+A.ccFlyoutButtonDown:visited {TEXT-DECORATION:none;}
+.ccFlyoutDelimiter {color:#808080;padding:0px;margin:0px;}
+.ccFlyoutPanel {BORDER:white 1px solid;Z-INDEX:101;VISIBILITY:hidden;POSITION:absolute;BACKGROUND-COLOR:#e0e0e0;TEXT-DECORATION:none;}
+A.ccFlyoutPanelButton {DISPLAY:block;BORDER-BOTTOM:#f0f0f0 1px solid;PADDING:4px;PADDING-LEFT:10px;PADDING-RIGHT:10px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-STYLE:normal;FONT-FAMILY:verdana,arial,sans-serif;WHITE-SPACE:nowrap;TEXT-DECORATION:none;COLOR:black;}
+A.ccFlyoutPanelButton:hover {TEXT-DECORATION:none;COLOR:white;BACKGROUND-COLOR:#669ACC;}
+A.ccFlyoutPanelButton:visited {TEXT-DECORATION:none;}
+A.ccFlyoutPanelButtonDown {TEXT-DECORATION:none;COLOR:white;BACKGROUND-COLOR:#669ACC;}
+.ccReport {padding:20px;Background-Color:white;Border-bottom:1px solid black;Border-left:1px solid black;Border-right:1px solid black;} 
+.ccReportRowTop {padding:4px;Background-Color:white;} 
+.ccReportRowOdd {padding:4px;Border-top:1px solid black;Background-Color:#F0F0F0;} 
+.ccReportRowEven {padding:4px;Border-top:1px solid black;Background-Color:white;} 
+.ccTab {background-color:#1F70BD;color:white;}
+A.ccTabLink:Link {color:white;TEXT-DECORATION:none;}
+A.ccTabLink:visited {color:white;TEXT-DECORATION:none;}
+A.ccTabLink:hover {color:white;TEXT-DECORATION:none;}
+.ccTabHit {background-color:white;color:black;}
+A.ccTabHitLink:link {color:black;TEXT-DECORATION:none;}
+A.ccTabHitLink:visited {color:black;TEXT-DECORATION:none;}
+A.ccTabHitLink:hover {color:black;TEXT-DECORATION:none;}
+.ccTabEnd {width:100%;border-bottom:1px solid black;} 
+.ccTabEdge {background-color:black;} 
+.ccTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;border-bottom:1px solid black;margin:0px;}
+.ccTabHitSpacer { width: 5px; }
+.ccTabHitFiller { width: 100%; }
+.ccLiveTab {background-color:#A0A0A0;color:white;}
+A.ccLiveTabLink {color:white;TEXT-DECORATION:none;}
+A.ccLiveTabLink:visited {color:white;TEXT-DECORATION:none;}
+A.ccLiveTabLink:hover {color:white;TEXT-DECORATION:none;}
+.ccLiveTabHit {background-color:white;color:black;}
+A.ccLiveTabHitLink {color:black;TEXT-DECORATION:none;}
+A.ccLiveTabHitLink:visited {color:black;TEXT-DECORATION:none;}
+A.ccLiveTabHitLink:hover {color:black;TEXT-DECORATION:none;}
+.ccLiveTabEnd {width:100%;border-bottom:1px solid black;} 
+.ccLiveTabEdge {background-color:black;} 
+.ccLiveTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;}
+.ccLiveTabHitSpacer { width: 5px; }
+.ccLiveTabHitFiller { width: 100%; }
+.ccLiveTabBodyCollectionWrap { position:relative;background-color:white;}
+.ccWizardHeader{COLOR:white;BACKGROUND-COLOR:#1F70BD;Padding:5px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;Border-Top:1px solid #1330c0;Border-Left:1px solid #1330c0;Border-Bottom:1px solid #0210a0;Border-right:1px solid #0210a0;}
+.ccWizardPanel{COLOR:black;BACKGROUND-COLOR:#E8EEF7;Border-Top:1px solid #ffffff;Border-Left:1px solid #ffffff;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
+.ccTextArea {width:100%;overflow:auto;}
+.ccTextArea textarea {padding:0;margin:0;border:none}
+.ccTextAreaOpened {position:absolute;top:24px;left:0px;;width:100%;overflow:auto;}
+.ccTextAreaHead {COLOR:white;BACKGROUND-COLOR:#669ACC;padding:5px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif}
+div.ccTextAreaHead A:link {COLOR:white;TEXT-DECORATION:none;}
+div.ccTextAreaHead A:visited {COLOR:white;TEXT-DECORATION:none;}
+div.ccTextAreaHead A:hover {COLOR:white;TEXT-DECORATION:none;}
+.ccTextAreaHeadOpened {position:absolute;top:0px;left:0px;height:24px;width:100%;background-color:#669ACC;margin:0px;padding:5px;border-bottom:2px solid #d0d0d0;}
+div.ccTextAreaHeadOpened A:link {COLOR:white;TEXT-DECORATION:none;}
+div.ccTextAreaHeadOpened A:visited {COLOR:white;TEXT-DECORATION:none;}
+div.ccTextAreaHeadOpened A:hover {COLOR:white;TEXT-DECORATION:none;}
+div.ccTestPointMessageCon { margin:10px;border:1px solid #444;padding:20px;background-color:#eee;}
+/*
+for hints created with getAdminHintWrapper
+*/
+.ccEditWrapper {border:1px dashed #808080;}
+.ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}
+.ccEditWrapperContent{padding:4px;}
+.ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}
+.ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}
+/*
+help dialog for addon options, etc.
+*/
+.helpDialogCon {/* blows advanced edit page out - width:420px; */}
+/*
+Container for the login panel when the section is blocked
+*/
+.ccLoginPageCon 
+{
+	width: 400px;
+	margin: 100px auto 0 auto;
+}
+/*
+Container for the default login form
+*/
+.ccLoginFormCon
+{
+	width: 350px;
+	margin: 0 auto;
+}
+/*
+Exception list
+*/
+ul.ccExceptionList { padding: 10px 20px;margin:0;background-color:red;list-style-type: none;}
+li.ccExceptionListRow { padding:0;margin: 10px auto;}]]></Styles>
+		<StylesLinkHref></StylesLinkHref>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="Login Page" guid="{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass><![CDATA[Contensive.Addons.loginPageClass]]></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+		<IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
+		<IncludeAddon name="Contensive Base Javascript" guid="{fbc091aa-45c6-4bde-92f1-87ea77721240}"/>
+		<IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+		<IsInline>No</IsInline>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<JavascriptInHead></JavascriptInHead>
+		<JSBodyScriptSrc></JSBodyScriptSrc>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<StylesLinkHref></StylesLinkHref>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="Page Manager" guid="{3a01572e-0f08-4feb-b189-18371752a3c3}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass><![CDATA[Contensive.Addons.PageManager.getPageManagerClass]]></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+		<IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
+		<IncludeAddon name="Contensive Base Javascript" guid="{fbc091aa-45c6-4bde-92f1-87ea77721240}"/>
+		<IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+		<IsInline>No</IsInline>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<JavascriptInHead><![CDATA[
+//
+// -- Child Page Sorting
+jQuery(function () {
+    jQuery(".ccChildList").sortable({
+        stop: function (event, ui) {
+            var e, c, s;
+            s = jQuery(this).attr('id');
+            e = document.getElementById(listId);
+            for (i = 0; i < e.childNodes.length; i++) {
+                c = e.childNodes[i];
+                if (c.id) { s += ',' + c.id }
+            }
+            cj.ajax.addon('ChildListResort', 'sortlist=' + s);
+        }
+    });
+});
+		]]></JavascriptInHead>
+		<JSBodyScriptSrc></JSBodyScriptSrc>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles><![CDATA[
+.ccChildList li {
+    min-height:30px;
+    vertical-align:middle;
+    border:1px dashed #262;
+    padding-right:40px !important;
+    background:white url(/childPageSort/arrowUpDown.png) no-repeat right;
+}		]]></Styles>
+		<StylesLinkHref></StylesLinkHref>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="savePageManagerChildListSort" guid="{8429641A-03C9-4CD1-9369-5B9F2FA509E9}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass><![CDATA[Contensive.Addons.PageManager.savePageManagerChildListSortClass]]></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+		<IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
+		<IncludeAddon name="Contensive Base Javascript" guid="{fbc091aa-45c6-4bde-92f1-87ea77721240}"/>
+		<IsInline>No</IsInline>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<JavascriptInHead></JavascriptInHead>
+		<JSBodyScriptSrc></JSBodyScriptSrc>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>Yes</RemoteMethod>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<StylesLinkHref></StylesLinkHref>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+  <Addon name="Login Form" guid="{E23C5941-19C2-4164-BCFD-83D6DD42F651}" type="Add-on">
+    <Copy></Copy>
+    <CopyText></CopyText>
+    <ActiveXProgramID><![CDATA[aoLoginForm.LoginClass]]></ActiveXProgramID>
+    <DotNetClass></DotNetClass>
+    <ArgumentList>Force Default Login=false</ArgumentList>
+    <AsAjax>No</AsAjax>
+    <Filter>No</Filter>
+    <Help><![CDATA[<p>This is more complete instructions. This appears in the help bubble.</p>]]></Help>
+    <HelpLink><![CDATA[http://www.Contensive.com]]></HelpLink>
+    <Icon Link="" width="0" height="0" sprites="0" />
+    <InIframe>No</InIframe>
+    <BlockEditTools>Yes</BlockEditTools>
+    <FormXML></FormXML>
+    <IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+    <IncludeAddon name="Contensive Base Styles" guid="{0dd7df28-4924-4881-a1d8-421824f5c2d1}"/>
+    <IncludeAddon name="Contensive Base Javascript" guid="{fbc091aa-45c6-4bde-92f1-87ea77721240}"/>
+    <IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+    <IsInline>No</IsInline>
+    <JavascriptOnLoad></JavascriptOnLoad>
+    <JavascriptInHead></JavascriptInHead>
+    <JavascriptBodyEnd></JavascriptBodyEnd>
+    <MetaDescription></MetaDescription>
+    <OtherHeadTags></OtherHeadTags>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <Admin>No</Admin>
+    <OnPageEndEvent>No</OnPageEndEvent>
+    <OnPageStartEvent>No</OnPageStartEvent>
+    <OnBodyStart>No</OnBodyStart>
+    <OnBodyEnd>No</OnBodyEnd>
+    <RemoteMethod>No</RemoteMethod>
+    <ProcessRunOnce>No</ProcessRunOnce>
+    <ProcessInterval>0</ProcessInterval>
+    <PageTitle></PageTitle>
+    <RemoteAssetLink></RemoteAssetLink>
+    <Styles></Styles>
+    <Scripting Language="" EntryPoint="" Timeout="5000"/>
+  </Addon>
+  <SQLIndex IndexName="ccContentContentTableID" DataSourceName="Default" TableName="ccContent" FieldNameList="ContentTableID"  />
 	<SQLIndex IndexName="ccGroupRulesGroupID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="GroupID"  />
 	<SQLIndex IndexName="ccGroupRulesContentID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="ContentID"  />
 	<SQLIndex IndexName="ccMembersUsernameName" DataSourceName="Default" TableName="ccMembers" FieldNameList="Username,Name"  />
@@ -1326,54 +5257,54 @@
 <!-- /removed with active -->
 	<NavigatorEntry Name="Layouts" NameSpace="Manage Design" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Layouts" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{947AAA5E-A1DE-4B6D-BAE6-086025CFC7D3}" />
 	<NavigatorEntry Name="Site Warnings" NameSpace="Reports" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Site Warnings" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{1D52D30A-571D-4A18-B88B-B1CF00437EF5}" />
-  <NavigatorEntry Name="Download Log Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=25" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{6DB8F8EE-33BD-44D2-A64A-3FEEA0C24257}"/>
-  <NavigatorEntry Name="Visitor Detail Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=20" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D3C7FCC0-01D6-44C7-BDDF-7A67608BEF19}"/>
-  <NavigatorEntry Name="Visit Detail Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=17" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{5D91CC2F-523F-4FF9-9253-5006A3693A11}"/>
-  <NavigatorEntry Name="Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=3" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D290920D-456A-4F7B-B055-CA832A55E28C}"/>
-  <NavigatorEntry Name="Daily Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=2" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D5F34F91-697D-4F7C-913F-4C6A7A643A70}"/>
-  <NavigatorEntry Name="Order Details Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=21" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{03B99008-91D7-4956-BF50-9A83F56BF0AB}"/>
-  <NavigatorEntry Name="Weekly Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=12" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{6FD99C08-A450-498E-BB2A-468D993FA4FE}"/>
-  <NavigatorEntry Name="Site Path Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=4" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{E93613AE-5B24-40A3-A330-ADE2095C49EE}"/>
-  <NavigatorEntry Name="Search Keyword Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=5" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{A897D6C2-12C8-416B-B1C0-72F5BF399D91}"/>
-  <NavigatorEntry Name="Refering Site Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=6" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{C3C00752-1754-4735-954C-D804F19547E0}"/>
-  <NavigatorEntry Name="Browser Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=8" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{E0EAEF9D-4FC3-437C-A21E-545310F25471}"/>
-  <NavigatorEntry Name="IP Address Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=9" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{887419C8-85E5-4EAE-8A10-7F78B59B827C}"/>
-  <NavigatorEntry Name="Surveys Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=15" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{50C82236-3AE7-43D3-B628-6D43BC92DD3E}"/>
-  <NavigatorEntry Name="Orders Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=13" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D5FA43CB-55E0-4371-9398-ADF42F029AE3}"/>
-  <NavigatorEntry Name="Page Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=10" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{75639788-0862-4BB8-80FF-3958F129A6FA}"/>
-  <NavigatorEntry Name="Member Details Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=16" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{023F9A0E-270D-4753-BADB-CD8362223D7F}"/>
-  <NavigatorEntry Name="Visitors Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=11" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{B1FB4444-4EBE-4C13-A134-8529111EC96F}"/>
-  <NavigatorEntry Name="Email Drop Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=28" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{257F77EE-7655-4564-8249-F8FE65199B52}"/>
-  <NavigatorEntry Name="Page Traffic Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=29" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{A9DBCB10-33C8-4031-A582-36FAAD1894FA}"/>
-  <NavigatorEntry Name="Page Performance Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=30" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{B9B3069C-4A4C-4C9B-A81D-D031E11DC54A}"/>
-  <NavigatorEntry Name="Group List Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=34" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{8C8F6BB8-4C8A-4FDE-BCCE-D2A46DB528D5}"/>
-  <NavigatorEntry Name="Group Member List Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=35" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{4802DA7B-91D1-4DB1-960B-9DBCCF21AC11}"/>
-  <NavigatorEntry Name="Trap Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=36" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{018FA96F-43F3-4AAE-9794-0450CE2F9318}"/>
-  <NavigatorEntry Name="Real-Time Activity Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=18" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{5DEFCA75-9F8E-48E7-97A4-D09B7423C180}"/>
-  <NavigatorEntry Name="Download Log Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=25" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{6DB8F8EE-33BD-44D2-A64A-3FEEA0C24257}"/>
-  <NavigatorEntry Name="Visitor Detail Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=20" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D3C7FCC0-01D6-44C7-BDDF-7A67608BEF19}"/>
-  <NavigatorEntry Name="Visit Detail Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=17" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{5D91CC2F-523F-4FF9-9253-5006A3693A11}"/>
-  <NavigatorEntry Name="Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=3" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D290920D-456A-4F7B-B055-CA832A55E28C}"/>
-  <NavigatorEntry Name="Daily Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=2" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D5F34F91-697D-4F7C-913F-4C6A7A643A70}"/>
-  <NavigatorEntry Name="Order Details Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=21" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{03B99008-91D7-4956-BF50-9A83F56BF0AB}"/>
-  <NavigatorEntry Name="Weekly Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=12" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{6FD99C08-A450-498E-BB2A-468D993FA4FE}"/>
-  <NavigatorEntry Name="Site Path Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=4" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{E93613AE-5B24-40A3-A330-ADE2095C49EE}"/>
-  <NavigatorEntry Name="Search Keyword Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=5" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{A897D6C2-12C8-416B-B1C0-72F5BF399D91}"/>
-  <NavigatorEntry Name="Refering Site Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=6" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{C3C00752-1754-4735-954C-D804F19547E0}"/>
-  <NavigatorEntry Name="Browser Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=8" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{E0EAEF9D-4FC3-437C-A21E-545310F25471}"/>
-  <NavigatorEntry Name="IP Address Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=9" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{887419C8-85E5-4EAE-8A10-7F78B59B827C}"/>
-  <NavigatorEntry Name="Surveys Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=15" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{50C82236-3AE7-43D3-B628-6D43BC92DD3E}"/>
-  <NavigatorEntry Name="Orders Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=13" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D5FA43CB-55E0-4371-9398-ADF42F029AE3}"/>
-  <NavigatorEntry Name="Page Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=10" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{75639788-0862-4BB8-80FF-3958F129A6FA}"/>
-  <NavigatorEntry Name="Member Details Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=16" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{023F9A0E-270D-4753-BADB-CD8362223D7F}"/>
-  <NavigatorEntry Name="Visitors Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=11" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{B1FB4444-4EBE-4C13-A134-8529111EC96F}"/>
-  <NavigatorEntry Name="Email Drop Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=28" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{257F77EE-7655-4564-8249-F8FE65199B52}"/>
-  <NavigatorEntry Name="Page Traffic Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=29" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{A9DBCB10-33C8-4031-A582-36FAAD1894FA}"/>
-  <NavigatorEntry Name="Page Performance Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=30" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{B9B3069C-4A4C-4C9B-A81D-D031E11DC54A}"/>
-  <NavigatorEntry Name="Group List Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=34" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{8C8F6BB8-4C8A-4FDE-BCCE-D2A46DB528D5}"/>
-  <NavigatorEntry Name="Group Member List Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=35" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{4802DA7B-91D1-4DB1-960B-9DBCCF21AC11}"/>
-  <NavigatorEntry Name="Trap Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=36" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{018FA96F-43F3-4AAE-9794-0450CE2F9318}"/>
-  <NavigatorEntry Name="Real-Time Activity Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=18" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{5DEFCA75-9F8E-48E7-97A4-D09B7423C180}"/>
+	<NavigatorEntry Name="Download Log Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=25" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{6DB8F8EE-33BD-44D2-A64A-3FEEA0C24257}"/>
+	<NavigatorEntry Name="Visitor Detail Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=20" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D3C7FCC0-01D6-44C7-BDDF-7A67608BEF19}"/>
+	<NavigatorEntry Name="Visit Detail Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=17" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{5D91CC2F-523F-4FF9-9253-5006A3693A11}"/>
+	<NavigatorEntry Name="Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=3" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D290920D-456A-4F7B-B055-CA832A55E28C}"/>
+	<NavigatorEntry Name="Daily Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=2" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D5F34F91-697D-4F7C-913F-4C6A7A643A70}"/>
+	<NavigatorEntry Name="Order Details Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=21" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{03B99008-91D7-4956-BF50-9A83F56BF0AB}"/>
+	<NavigatorEntry Name="Weekly Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=12" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{6FD99C08-A450-498E-BB2A-468D993FA4FE}"/>
+	<NavigatorEntry Name="Site Path Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=4" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{E93613AE-5B24-40A3-A330-ADE2095C49EE}"/>
+	<NavigatorEntry Name="Search Keyword Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=5" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{A897D6C2-12C8-416B-B1C0-72F5BF399D91}"/>
+	<NavigatorEntry Name="Refering Site Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=6" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{C3C00752-1754-4735-954C-D804F19547E0}"/>
+	<NavigatorEntry Name="Browser Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=8" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{E0EAEF9D-4FC3-437C-A21E-545310F25471}"/>
+	<NavigatorEntry Name="IP Address Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=9" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{887419C8-85E5-4EAE-8A10-7F78B59B827C}"/>
+	<NavigatorEntry Name="Surveys Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=15" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{50C82236-3AE7-43D3-B628-6D43BC92DD3E}"/>
+	<NavigatorEntry Name="Orders Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=13" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D5FA43CB-55E0-4371-9398-ADF42F029AE3}"/>
+	<NavigatorEntry Name="Page Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=10" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{75639788-0862-4BB8-80FF-3958F129A6FA}"/>
+	<NavigatorEntry Name="Member Details Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=16" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{023F9A0E-270D-4753-BADB-CD8362223D7F}"/>
+	<NavigatorEntry Name="Visitors Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=11" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{B1FB4444-4EBE-4C13-A134-8529111EC96F}"/>
+	<NavigatorEntry Name="Email Drop Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=28" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{257F77EE-7655-4564-8249-F8FE65199B52}"/>
+	<NavigatorEntry Name="Page Traffic Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=29" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{A9DBCB10-33C8-4031-A582-36FAAD1894FA}"/>
+	<NavigatorEntry Name="Page Performance Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=30" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{B9B3069C-4A4C-4C9B-A81D-D031E11DC54A}"/>
+	<NavigatorEntry Name="Group List Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=34" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{8C8F6BB8-4C8A-4FDE-BCCE-D2A46DB528D5}"/>
+	<NavigatorEntry Name="Group Member List Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=35" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{4802DA7B-91D1-4DB1-960B-9DBCCF21AC11}"/>
+	<NavigatorEntry Name="Trap Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=36" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{018FA96F-43F3-4AAE-9794-0450CE2F9318}"/>
+	<NavigatorEntry Name="Real-Time Activity Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=18" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{5DEFCA75-9F8E-48E7-97A4-D09B7423C180}"/>
+	<NavigatorEntry Name="Download Log Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=25" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{6DB8F8EE-33BD-44D2-A64A-3FEEA0C24257}"/>
+	<NavigatorEntry Name="Visitor Detail Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=20" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D3C7FCC0-01D6-44C7-BDDF-7A67608BEF19}"/>
+	<NavigatorEntry Name="Visit Detail Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=17" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{5D91CC2F-523F-4FF9-9253-5006A3693A11}"/>
+	<NavigatorEntry Name="Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=3" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D290920D-456A-4F7B-B055-CA832A55E28C}"/>
+	<NavigatorEntry Name="Daily Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=2" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D5F34F91-697D-4F7C-913F-4C6A7A643A70}"/>
+	<NavigatorEntry Name="Order Details Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=21" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{03B99008-91D7-4956-BF50-9A83F56BF0AB}"/>
+	<NavigatorEntry Name="Weekly Visits Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=12" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{6FD99C08-A450-498E-BB2A-468D993FA4FE}"/>
+	<NavigatorEntry Name="Site Path Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=4" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{E93613AE-5B24-40A3-A330-ADE2095C49EE}"/>
+	<NavigatorEntry Name="Search Keyword Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=5" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{A897D6C2-12C8-416B-B1C0-72F5BF399D91}"/>
+	<NavigatorEntry Name="Refering Site Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=6" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{C3C00752-1754-4735-954C-D804F19547E0}"/>
+	<NavigatorEntry Name="Browser Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=8" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{E0EAEF9D-4FC3-437C-A21E-545310F25471}"/>
+	<NavigatorEntry Name="IP Address Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=9" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{887419C8-85E5-4EAE-8A10-7F78B59B827C}"/>
+	<NavigatorEntry Name="Surveys Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=15" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{50C82236-3AE7-43D3-B628-6D43BC92DD3E}"/>
+	<NavigatorEntry Name="Orders Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=13" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{D5FA43CB-55E0-4371-9398-ADF42F029AE3}"/>
+	<NavigatorEntry Name="Page Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=10" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{75639788-0862-4BB8-80FF-3958F129A6FA}"/>
+	<NavigatorEntry Name="Member Details Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=16" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{023F9A0E-270D-4753-BADB-CD8362223D7F}"/>
+	<NavigatorEntry Name="Visitors Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=11" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{B1FB4444-4EBE-4C13-A134-8529111EC96F}"/>
+	<NavigatorEntry Name="Email Drop Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=28" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{257F77EE-7655-4564-8249-F8FE65199B52}"/>
+	<NavigatorEntry Name="Page Traffic Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=29" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{A9DBCB10-33C8-4031-A582-36FAAD1894FA}"/>
+	<NavigatorEntry Name="Page Performance Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=30" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{B9B3069C-4A4C-4C9B-A81D-D031E11DC54A}"/>
+	<NavigatorEntry Name="Group List Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=34" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{8C8F6BB8-4C8A-4FDE-BCCE-D2A46DB528D5}"/>
+	<NavigatorEntry Name="Group Member List Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=35" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{4802DA7B-91D1-4DB1-960B-9DBCCF21AC11}"/>
+	<NavigatorEntry Name="Trap Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=36" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{018FA96F-43F3-4AAE-9794-0450CE2F9318}"/>
+	<NavigatorEntry Name="Real-Time Activity Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=18" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{5DEFCA75-9F8E-48E7-97A4-D09B7423C180}"/>
 	<data>
 		<record content="sort methods" guid="{97128516-AEDF-4B6C-BC56-F6EAA4C3AA78}" name="By Name">
 			<field name="OrderByClause"><![CDATA[Name]]></field>
@@ -1391,5 +5322,30 @@
 			<field name="OrderByClause"><![CDATA[sortorder, id]]></field>
 		</record>
 	</data>
-	<ImportCollection name="aoCore5">{04998B99-AA56-4709-8060-4EA7BC2C4D76}</ImportCollection>
-</Collection>
+	<ImportCollection name="JQuery">{A435BF70-041B-43D1-8A8D-5D9D59A7FCD0}</ImportCollection>
+	<ImportCollection name="Primitives">{4D357C85-ABE2-4370-B1D9-2C859BF7762F}</ImportCollection>
+	<ImportCollection name="Personalization">{1339F712-17F7-408A-B021-92DF846BD486}</ImportCollection>
+	<ImportCollection name="Site Explorer">{5426E6D5-05A8-4A87-B535-CD0FABA04F29}</ImportCollection>
+	<ImportCollection name="Contact Manager">{51A67CB6-EA94-497C-896A-979A851BE3DB}</ImportCollection>
+	<ImportCollection name="Resource Library">{F36C7051-F382-4558-8DBF-091F74C26C83}</ImportCollection>
+	<ImportCollection name="Preferences Settings Page">{AF80F787-40CE-47E0-B339-E798CC88222A}</ImportCollection>
+	<ImportCollection name="Dashboard">{B470C25F-DDBC-4593-8161-1A2FD4A35690}</ImportCollection>
+	<ImportCollection name="CoreHelp">{6E905DB1-D3F0-40AF-AAC4-4BD78E680FAE}</ImportCollection>
+	<ImportCollection name="Content Watch List">{3C5C2B2C-CAA5-46DC-92ED-A21DD23DF597}</ImportCollection>
+	<ImportCollection name="Form Wizard">{B5D1FE5B-71EC-403D-90E8-01AE7F8E18AD}</ImportCollection>
+	<ImportCollection name="Menuing5">{237805fb-fcc4-42e5-a1b5-5383850085d5}</ImportCollection>
+	<ImportCollection name="Text Box">{2F869726-B685-458C-8827-B94F37848A1C}</ImportCollection>
+  <ImportCollection name="RSS Client">{685E4C5C-6E24-4A1D-8A43-B7F1710500D4}</ImportCollection>
+  <ImportCollection name="Fancy Box">{B59F4D89-ADD9-4FEA-9D3F-B5A44DFD8F39}</ImportCollection>
+	<ImportCollection name="Add-on Manager">{ECAE49E6-B013-411D-B529-5979190DEA9C}</ImportCollection>
+	<ImportCollection name="File Manager">{0A080FBC-2814-407F-8F8C-CD06F422789D}</ImportCollection>
+	<ImportCollection name="Admin Navigator">{0AB76B52-2C9E-4339-B4DB-902AF42B57EB}</ImportCollection>
+	<ImportCollection name="Import Wizard">{339B9171-5B57-4F42-914C-DCEF4F52F388}</ImportCollection>
+	<ImportCollection name="Logout Link">{1D8AC775-0C19-4310-B375-A2561B7BED12}</ImportCollection>
+	<ImportCollection name="Login">{030DBBCD-8817-4889-8F50-E5DAE4CA7DD1}</ImportCollection>
+	<ImportCollection name="Whats Related">{9E0D6124-0C6B-45A9-A310-2D434A4AA7D6}</ImportCollection>
+	<ImportCollection name="Content Box">{6A681E1F-ABCC-4E28-AAB4-79264DA18B91}</ImportCollection>
+  <ImportCollection name="Redactor Html Editor">{E87AFAFF-2503-44DE-A343-EFF8C64B652D}</ImportCollection>
+  <ImportCollection name="Tool Panel">{374E2B8C-B29D-470B-BD1B-41CAA5BCEDCB}</ImportCollection>
+  <ImportCollection name="Contensive Patch5">{C7308F43-F810-4266-91E0-D4B1F5637BD6}</ImportCollection>
+	</Collection>

@@ -96,7 +96,7 @@ ErrorTrap:
             Dim IsNewDay As Boolean
             Dim appConfig As Core.Models.Entity.serverConfigModel.appConfigModel = cpCore.serverConfig.appConfig
             '
-            If (appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready) And (appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
+            If (appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK) And (appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
                 Using cp As New CPClass(appConfig.name)
                     cpCore.db.sqlCommandTimeout = 120
                     EmailServiceLastCheck = (cpCore.siteProperties.getDate("EmailServiceLastCheck"))

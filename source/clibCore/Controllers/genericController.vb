@@ -2170,42 +2170,42 @@ Namespace Contensive.Core.Controllers
         Public Shared Function GetApplicationStatusMessage(ByVal ApplicationStatus As Models.Entity.serverConfigModel.appStatusEnum) As String
 
             Select Case ApplicationStatus
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorDbFoundButContentMetaMissing
-                    GetApplicationStatusMessage = "The database for this application was found, but content meta table could not be read."
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorAppConfigNotValid
-                    GetApplicationStatusMessage = "The application configuration file on this front-end server is not valid."
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorAppConfigNotFound
-                    GetApplicationStatusMessage = "The application configuration file was not be found on this front-end server."
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorNoHostService
-                    GetApplicationStatusMessage = "Contensive server not running"
-                Case Models.Entity.serverConfigModel.appStatusEnum.notFound
-                    GetApplicationStatusMessage = "Contensive application not found"
-                Case Models.Entity.serverConfigModel.appStatusEnum.notEnabled
-                    GetApplicationStatusMessage = "Contensive application not running"
-                Case Models.Entity.serverConfigModel.appStatusEnum.ready
-                    GetApplicationStatusMessage = "Contensive application running"
-                Case Models.Entity.serverConfigModel.appStatusEnum.loading
-                    GetApplicationStatusMessage = "Contensive application starting"
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorDbBad
-                    GetApplicationStatusMessage = "Error verifying core database records"
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorDbNotFound
-                    GetApplicationStatusMessage = "Error opening application database"
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorKernelFailure
-                    GetApplicationStatusMessage = "Error contacting Contensive kernel services"
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorLicenseFailure
-                    GetApplicationStatusMessage = "Error verifying Contensive site license, see Http://www.Contensive.com/License"
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorConnectionObjectFailure
-                    GetApplicationStatusMessage = "Error creating ODBC Connection object"
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorConnectionStringFailure
-                    GetApplicationStatusMessage = "ODBC Data Source connection failed"
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorDataSourceFailure
-                    GetApplicationStatusMessage = "Error opening default data source"
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorDuplicateDomains
-                    GetApplicationStatusMessage = "Can not determine application because there are multiple applications with domain names that match this site's domain (See Application Manager)"
-                Case Models.Entity.serverConfigModel.appStatusEnum.errorFailedToInitialize
-                    GetApplicationStatusMessage = "Application failed to initialize, see trace log for details"
-                    'Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusPaused
-                    '    GetApplicationStatusMessage = "Contensive application paused"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.notFound
+                '    GetApplicationStatusMessage = "Application not found"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.notEnabled
+                '    GetApplicationStatusMessage = "Application not enabled"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorDbBad
+                '    GetApplicationStatusMessage = "Error verifying core database records"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorDbNotFound
+                '    GetApplicationStatusMessage = "Error opening application database"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorDbFoundButContentMetaMissing
+                '    GetApplicationStatusMessage = "The database for this application was found, but content meta table could not be read."
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorAppConfigNotValid
+                '    GetApplicationStatusMessage = "The application configuration file on this front-end server is not valid."
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorAppConfigNotFound
+                '    GetApplicationStatusMessage = "The application configuration file was not be found on this front-end server."
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorNoHostService
+                '    GetApplicationStatusMessage = "Contensive server not running"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorKernelFailure
+                '    GetApplicationStatusMessage = "Error contacting Contensive kernel services"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorLicenseFailure
+                '    GetApplicationStatusMessage = "Error verifying Contensive site license, see Http://www.Contensive.com/License"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorConnectionObjectFailure
+                '    GetApplicationStatusMessage = "Error creating ODBC Connection object"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorConnectionStringFailure
+                '    GetApplicationStatusMessage = "ODBC Data Source connection failed"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorDataSourceFailure
+                '    GetApplicationStatusMessage = "Error opening default data source"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorDuplicateDomains
+                '    GetApplicationStatusMessage = "Can not determine application because there are multiple applications with domain names that match this site's domain (See Application Manager)"
+                'Case Models.Entity.serverConfigModel.appStatusEnum.errorFailedToInitialize
+                '    GetApplicationStatusMessage = "Application failed to initialize, see trace log for details"
+                '    'Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusPaused
+                '    '    GetApplicationStatusMessage = "Contensive application paused"
+                Case Models.Entity.serverConfigModel.appStatusEnum.OK
+                    GetApplicationStatusMessage = "Application OK"
+                Case Models.Entity.serverConfigModel.appStatusEnum.building
+                    GetApplicationStatusMessage = "Application building"
                 Case Else
                     GetApplicationStatusMessage = "Unknown status code [" & ApplicationStatus & "], see trace log for details"
             End Select

@@ -1242,7 +1242,7 @@ Namespace Contensive
                     ' permissions issue -- this is a root process - maybe the token will be saved in a configuration file
                     '
                     cpSite = New CPClass(AppName)
-                    If cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready Then
+                    If cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK Then
                         hint &= ",app [" & AppName & "] is running, setup cp and cmc"
                         '
                         ' Execute Processes

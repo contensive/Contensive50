@@ -45,6 +45,8 @@ Namespace Contensive.Core.Controllers
         '   SQL Timeouts
         Public sqlSlowThreshholdMsec As Integer        '
         '
+        Private saveTransactionLog_InProcess As Boolean = False
+        '
         ' ContentField Type, Stores information about fields in a content set
         Private Structure ContentSetWriteCacheType
             Dim fieldName As String
@@ -510,14 +512,23 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="LogEntry"></param>
         Private Sub saveTransactionLog(sql As String, ElapsedMilliseconds As Long)
-            If (cpCore.serverConfig.enableLogging) Then
-                If (cpCore.siteProperties.allowTransactionLog) Then
-                    Dim LogEntry As String = ("duration [" & ElapsedMilliseconds & "], sql [" & sql & "]").Replace(vbCr, "").Replace(vbLf, "")
-                    logController.appendLog(cpCore, LogEntry, "DbTransactions")
+            '
+            ' -- do not allow reentry
+            ' -- if during save, site properties need to be loaded, this stack-overflows
+            If (Not saveTransactionLog_InProcess) Then
+                saveTransactionLog_InProcess = True
+                '
+                ' -- block before appStatus OK because need site properties
+                If (cpCore.serverConfig.enableLogging) And (cpCore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK) Then
+                    If (cpCore.siteProperties.allowTransactionLog) Then
+                        Dim LogEntry As String = ("duration [" & ElapsedMilliseconds & "], sql [" & sql & "]").Replace(vbCr, "").Replace(vbLf, "")
+                        logController.appendLog(cpCore, LogEntry, "DbTransactions")
+                    End If
+                    If (ElapsedMilliseconds > sqlSlowThreshholdMsec) Then
+                        logController.appendLog(cpCore, "query time  " & ElapsedMilliseconds & "ms, sql: " & sql, "SlowSQL")
+                    End If
                 End If
-                If (ElapsedMilliseconds > sqlSlowThreshholdMsec) Then
-                    logController.appendLog(cpCore, "query time  " & ElapsedMilliseconds & "ms, sql: " & sql, "SlowSQL")
-                End If
+                saveTransactionLog_InProcess = False
             End If
         End Sub
         ''

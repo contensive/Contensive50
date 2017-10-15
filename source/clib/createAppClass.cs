@@ -190,6 +190,7 @@ namespace  Contensive.CLI {
 
                     //
                     // -- save the app configuration and reload the server using this app
+                    appConfig.appStatus = Core.Models.Entity.serverConfigModel.appStatusEnum.building;
                     cp.core.serverConfig.apps.Add(appName, appConfig);
                     cp.core.serverConfig.saveObject(cp.core);
                     cp.core.serverConfig = Contensive.Core.Models.Entity.serverConfigModel.getObject(cp.core, appName);

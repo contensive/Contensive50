@@ -9691,7 +9691,7 @@ ErrorTrap:
                 Dim htmlBeforeEndOfBody As String = getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools, blockNonContentExtras)
 
                 result = "" _
-                    & cpCore.siteProperties.docTypeDeclarationAdmin _
+                    & cpCore.siteProperties.docTypeDeclaration _
                     & vbCrLf & "<html>" _
                     & vbCrLf & "<head>" _
                     & htmlHead _

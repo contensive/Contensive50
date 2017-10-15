@@ -120,7 +120,7 @@ Namespace Contensive.Core
                 If (core Is Nothing) Then
                     Return False
                 Else
-                    Return (core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready)
+                    Return (core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK)
                 End If
             End Get
         End Property
