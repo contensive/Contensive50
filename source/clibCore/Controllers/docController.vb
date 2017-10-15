@@ -1498,71 +1498,37 @@ ErrorTrap:
         '
         Public Function getPageLink(ByVal PageID As Integer, ByVal QueryStringSuffix As String, Optional ByVal AllowLinkAliasIfEnabled As Boolean = True, Optional ByVal UseContentWatchNotDefaultPage As Boolean = False) As String
             Dim result As String = ""
-            Dim setdomainId As Integer
-            Dim linkLong As String
-            Dim linkprotocol As String
-            Dim linkPathPage As String
-            Dim linkAlias As String = ""
-            Dim linkQS As String
-            Dim linkDomain As String
-            Dim defaultPathPage As String
-            Dim PageIsSecure As Boolean
-            Dim Pos As Integer
-            Dim templateLinkIncludesProtocol As Boolean
-            Dim templateDomain As String = ""
-            '
-            defaultPathPage = cpcore.siteProperties.serverPageDefault
-            If defaultPathPage <> "" Then
-                Pos = genericController.vbInstr(1, defaultPathPage, "?")
-                If Pos <> 0 Then
-                    defaultPathPage = Mid(defaultPathPage, 1, Pos - 1)
-                End If
-                If Left(defaultPathPage, 1) <> "/" Then
-                    defaultPathPage = "/" & defaultPathPage
-                End If
-            Else
-                defaultPathPage = "/" & main_guessDefaultPage()
-            End If
-            templateLinkIncludesProtocol = False ' (InStr(1, template.Link, "://") <> 0)
-            '
-            ' calc linkQS (cleared in come cases later)
-            '
-            linkQS = rnPageId & "=" & PageID
-            If QueryStringSuffix <> "" Then
-                linkQS = linkQS & "&" & QueryStringSuffix
-            End If
-            '
-            ' calculate depends on the template provided
-            '
-            If True Then
-                'End If
-                'If template.Link = "" Then
+            Try
+                Dim linkPathPage As String = Nothing
                 '
-                ' ----- templateLink is blank
-                '
+                ' -- set linkPathPath to linkAlias
                 If AllowLinkAliasIfEnabled And cpcore.siteProperties.allowLinkAlias Then
-                    Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")and(QueryStringSuffix=" & cpcore.db.encodeSQLText(QueryStringSuffix) & ")", "id desc")
-                    If (String.IsNullOrEmpty(QueryStringSuffix)) Then
-                        linkAliasList = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")", "id desc")
+                    linkPathPage = docController.getLinkAlias(cpcore, PageID, QueryStringSuffix, "")
+                End If
+                If (String.IsNullOrEmpty(linkPathPage)) Then
+                    '
+                    ' -- if not linkAlis, set default page and qs
+                    linkPathPage = cpcore.siteProperties.serverPageDefault
+                    If String.IsNullOrEmpty(linkPathPage) Then
+                        linkPathPage = "/" & main_guessDefaultPage()
                     Else
-                        linkAliasList = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")and(QueryStringSuffix=" & cpcore.db.encodeSQLText(QueryStringSuffix) & ")", "id desc")
-                    End If
-                    If linkAliasList.Count > 0 Then
-                        linkAlias = linkAliasList.First.name
-                        If Mid(linkAlias, 1, 1) <> "/" Then
-                            linkAlias = "/" & linkAlias
+                        Dim Pos As Integer = genericController.vbInstr(1, linkPathPage, "?")
+                        If Pos <> 0 Then
+                            linkPathPage = Mid(linkPathPage, 1, Pos - 1)
+                        End If
+                        If Left(linkPathPage, 1) <> "/" Then
+                            linkPathPage = "/" & linkPathPage
                         End If
                     End If
-                End If
-                If (linkAlias = "") Then
-                    linkPathPage = defaultPathPage
-                Else
-                    linkPathPage = linkAlias
-                    linkQS = ""
+                    '
+                    ' -- calc linkQS (cleared in come cases later)
+                    linkPathPage &= "?" & rnPageId & "=" & PageID
+                    If QueryStringSuffix <> "" Then
+                        linkPathPage &= "&" & QueryStringSuffix
+                    End If
                 End If
                 '
-                ' domain (fake for now)
-                '
+                ' -- domain -- determine if the domain has any template requirements, and if so, is this template allowed
                 Dim SqlCriteria As String = "(domainId=" & domain.id & ")"
                 Dim allowTemplateRuleList As List(Of Models.Entity.TemplateDomainRuleModel) = Models.Entity.TemplateDomainRuleModel.createList(cpcore, SqlCriteria)
                 Dim templateAllowed As Boolean = False
@@ -1572,6 +1538,7 @@ ErrorTrap:
                         Exit For
                     End If
                 Next
+                Dim linkDomain As String = ""
                 If (allowTemplateRuleList.Count = 0) Then
                     '
                     ' this template has no domain preference, use current domain
@@ -1591,56 +1558,26 @@ ErrorTrap:
                     '
                     ' there is an allowed domain list and current domain is not on it, or use first
                     '
-                    setdomainId = allowTemplateRuleList.First.domainId
+                    Dim setdomainId As Integer = allowTemplateRuleList.First.domainId
                     linkDomain = cpcore.db.getRecordName("domains", setdomainId)
                     If linkDomain = "" Then
                         linkDomain = cpcore.webServer.requestDomain
                     End If
                 End If
                 '
-                ' protocol
-                '
-                If PageIsSecure Or template.IsSecure Then
+                ' -- protocol
+                Dim linkprotocol As String = ""
+                If page.IsSecure Or template.IsSecure Then
                     linkprotocol = "https://"
                 Else
                     linkprotocol = "http://"
                 End If
-                linkLong = linkprotocol & linkDomain & linkPathPage
-            ElseIf Not templateLinkIncludesProtocol Then
                 '
-                ' ----- Short TemplateLink
-                '
-                linkPathPage = "" ' template.Link
-                '
-                ' domain (fake for now)
-                '
-                If templateDomain <> "" Then
-                    linkDomain = cpcore.webServer.requestDomain
-                Else
-                    linkDomain = cpcore.webServer.requestDomain
-                End If
-                '
-                ' protocol
-                '
-                If PageIsSecure Or template.IsSecure Then
-                    linkprotocol = "https://"
-                Else
-                    linkprotocol = "http://"
-                End If
-                linkLong = linkprotocol & linkDomain & linkPathPage
-            Else
-                '
-                ' ----- Long TemplateLink
-                '
-                linkLong = "" ' template.Link
-            End If
-            '
-            ' assemble
-            '
-            result = linkLong
-            If linkQS <> "" Then
-                result = result & "?" & linkQS
-            End If
+                ' -- assemble
+                result = linkprotocol & linkDomain & linkPathPage
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
             Return result
         End Function
         '

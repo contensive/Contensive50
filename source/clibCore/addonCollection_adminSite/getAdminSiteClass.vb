@@ -12153,14 +12153,14 @@ ErrorTrap:
                             '
                             ' Row Number Column
                             '
-                            DataTable_HdrRow &= ("<td width=20 align=center valign=bottom class=""ccAdminListCaption""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=18 height=1 ><br>Row</td>")
+                            DataTable_HdrRow &= "<td width=20 align=center valign=bottom class=""ccAdminListCaption"">Row</td>"
                             '
                             ' Delete Select Box Columns
                             '
                             If Not AllowDelete Then
-                                DataTable_HdrRow &= ("<td width=20 align=center valign=bottom class=""ccAdminListCaption""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=18 height=1 ><br><input TYPE=CheckBox disabled=""disabled""></td>")
+                                DataTable_HdrRow &= "<td width=20 align=center valign=bottom class=""ccAdminListCaption""><input TYPE=CheckBox disabled=""disabled""></td>"
                             Else
-                                DataTable_HdrRow &= ("<td width=20 align=center valign=bottom class=""ccAdminListCaption""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=18 height=1 ><br><input TYPE=CheckBox OnClick=""CheckInputs('DelCheck',this.checked);""></td>")
+                                DataTable_HdrRow &= "<td width=20 align=center valign=bottom class=""ccAdminListCaption""><input TYPE=CheckBox OnClick=""CheckInputs('DelCheck',this.checked);""></td>"
                             End If
                             '
                             ' Calculate total width
@@ -12176,7 +12176,7 @@ ErrorTrap:
                             '
                             ' Edit Column
                             '
-                            DataTable_HdrRow &= ("<td width=20 align=center valign=bottom class=""ccAdminListCaption""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=18 height=1><br>Edit</td>")
+                            DataTable_HdrRow &= "<td width=20 align=center valign=bottom class=""ccAdminListCaption"">Edit</td>"
                             For Each kvp In IndexConfig.Columns
                                 Dim column As indexConfigColumnClass = kvp.Value
                                 '
@@ -12383,7 +12383,7 @@ ErrorTrap:
                             '            End With
                             '        Next
                             '
-                            DataTable_FindRow = DataTable_FindRow & "<tr><td colspan=" & (3 + IndexConfig.Columns.Count) & " style=""background-color:black;height:1;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td></tr>"
+                            DataTable_FindRow = DataTable_FindRow & "<tr><td colspan=" & (3 + IndexConfig.Columns.Count) & " style=""background-color:black;height:1;""></td></tr>"
                             'DataTable_FindRow = DataTable_FindRow & "<tr><td colspan=" & (3 + CustomAdminColumnCount) & " style=""background-color:black;height:1;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td></tr>"
                             DataTable_FindRow = DataTable_FindRow & "<tr>"
                             DataTable_FindRow = DataTable_FindRow & "<td colspan=3 width=""60"" class=""ccPanel"" align=center style=""text-align:center ! important;"">"

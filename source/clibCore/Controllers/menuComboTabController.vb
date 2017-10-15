@@ -172,11 +172,17 @@ Namespace Contensive.Core.Controllers
                 & "<!--" & vbCrLf & "Tab Replace-TabID" & vbCrLf & "-->" _
                 & "<table cellspacing=0 cellPadding=0 border=0 id=Replace-TabID>"
                 result = result _
-                & vbCrLf & "<tr>" _
-                & vbCrLf & "<td id=Replace-TabIDR00 colspan=2 class="""" height=1 width=2><img src=""/ccLib/images/spacer.gif"" width=2 height=1></td>" _
-                & vbCrLf & "<td id=Replace-TabIDR01 colspan=1 class=""Replace-StyleEdge"" height=1></td>" _
-                & vbCrLf & "<td id=Replace-TabIDR02 colspan=3 class="""" height=1 width=3><img src=""/ccLib/images/spacer.gif"" width=3 height=1></td>" _
-                & vbCrLf & "</tr>"
+                    & vbCrLf & "<tr>" _
+                    & vbCrLf & "<td id=Replace-TabIDR00 colspan=2 class="""" height=1 width=2></td>" _
+                    & vbCrLf & "<td id=Replace-TabIDR01 colspan=1 class=""Replace-StyleEdge"" height=1></td>" _
+                    & vbCrLf & "<td id=Replace-TabIDR02 colspan=3 class="""" height=1 width=3></td>" _
+                    & vbCrLf & "</tr>"
+                'result = result _
+                '    & vbCrLf & "<tr>" _
+                '    & vbCrLf & "<td id=Replace-TabIDR00 colspan=2 class="""" height=1 width=2><img src=""/ccLib/images/spacer.gif"" width=2 height=1></td>" _
+                '    & vbCrLf & "<td id=Replace-TabIDR01 colspan=1 class=""Replace-StyleEdge"" height=1></td>" _
+                '    & vbCrLf & "<td id=Replace-TabIDR02 colspan=3 class="""" height=1 width=3><img src=""/ccLib/images/spacer.gif"" width=3 height=1></td>" _
+                '    & vbCrLf & "</tr>"
                 result = result _
                 & vbCrLf & "<tr>" _
                 & vbCrLf & "<td id=Replace-TabIDR10 colspan=1 class="""" height=1 width=1></td>" _

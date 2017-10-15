@@ -1303,8 +1303,7 @@ Namespace Contensive.Core
         '
         ' DTD
         '
-        Public Const DTDDefault = "<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">"
-        Public Const DTDDefaultAdmin = "<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">"
+        Public Const DTDDefault = "<!DOCTYPE html>"
         '
         ' innova Editor feature list
         '
