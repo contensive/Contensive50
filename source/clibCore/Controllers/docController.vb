@@ -2588,7 +2588,11 @@ ErrorTrap:
             TableName = cpcore.metaData.getContentTablename(ContentName)
             markRecordReviewed(ContentName, RecordID)
             '
+            ' -- invalidate the specific cache for this record
             cpcore.cache.invalidateObject_Entity(TableName, RecordID)
+            '
+            ' -- invalidate the tablename -- meaning any cache consumer that cannot itemize its entity records, can depend on this, which will invalidate anytime any record clears
+            cpcore.cache.invalidateObject(TableName)
             '
             Select Case genericController.vbLCase(TableName)
                 Case linkForwardModel.contentTableName

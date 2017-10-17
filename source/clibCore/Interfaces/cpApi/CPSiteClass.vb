@@ -56,7 +56,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides ReadOnly Property Name() As String 'Inherits BaseClasses.CPSiteBaseClass.Name
+        Public Overrides ReadOnly Property Name() As String
             Get
                 Return cpCore.serverConfig.appConfig.name
             End Get
@@ -64,13 +64,13 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Sub SetProperty(ByVal FieldName As String, ByVal FieldValue As String) 'Inherits BaseClasses.CPSiteBaseClass.SetProperty
+        Public Overrides Sub SetProperty(ByVal FieldName As String, ByVal FieldValue As String)
             Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
         End Sub
         '
         '
         '
-        Public Overrides Function GetProperty(ByVal FieldName As String, Optional ByVal DefaultValue As String = "") As String 'Inherits BaseClasses.CPSiteBaseClass.GetProperty
+        Public Overrides Function GetProperty(ByVal FieldName As String, Optional ByVal DefaultValue As String = "") As String
             Return cpCore.siteProperties.getText(FieldName, DefaultValue)
         End Function
         '
@@ -106,7 +106,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides ReadOnly Property MultiDomainMode() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.MultiDomainMode
+        Public Overrides ReadOnly Property MultiDomainMode() As Boolean
             Get
                 Return False
             End Get
@@ -115,7 +115,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", True)>
-        Public Overrides ReadOnly Property PhysicalFilePath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalFilePath
+        Public Overrides ReadOnly Property PhysicalFilePath() As String
             Get
                 'cpCore.handleException(New ApplicationException("PhysicalFilePath is no longer supported. Use cp.file.cdnFiles instead to support scale modes"))
                 Return cpCore.cdnFiles.rootLocalPath
@@ -125,7 +125,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", True)>
-        Public Overrides ReadOnly Property PhysicalInstallPath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalInstallPath
+        Public Overrides ReadOnly Property PhysicalInstallPath() As String
             Get
                 'cpCore.handleException(New ApplicationException("physicalInstallPath is no longer supported"))
                 Return cpCore.privateFiles.rootLocalPath
@@ -135,7 +135,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", True)>
-        Public Overrides ReadOnly Property PhysicalWWWPath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalWWWPath
+        Public Overrides ReadOnly Property PhysicalWWWPath() As String
             Get
                 'cpCore.handleException(New ApplicationException("PhysicalFilePath is no longer supported. Use cp.file.appRootFiles instead to support scale modes"))
                 Return cpCore.appRootFiles.rootLocalPath
@@ -144,7 +144,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides ReadOnly Property TrapErrors() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.TrapErrors
+        Public Overrides ReadOnly Property TrapErrors() As Boolean
             Get
                 Return genericController.EncodeBoolean(GetProperty("TrapErrors", "1"))
             End Get
@@ -152,7 +152,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides ReadOnly Property AppPath() As String 'Inherits BaseClasses.CPSiteBaseClass.AppPath
+        Public Overrides ReadOnly Property AppPath() As String
             Get
                 Return AppRootPath
                 'Return cpCore.web_requestAppPath

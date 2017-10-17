@@ -306,7 +306,8 @@ Namespace Contensive.Core.Models.Entity
                 'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                 '
                 ' -- object is here, but the cache was invalidated, setting
-                cpCore.cache.setObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", Me.ID.ToString()), Me)
+                ' -- added tablename as depedant object - any change to any template flushes this cache
+                cpCore.cache.setObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", Me.ID.ToString()), Me, primaryContentTableName)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
                 Throw

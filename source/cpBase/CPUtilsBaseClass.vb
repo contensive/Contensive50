@@ -110,6 +110,7 @@ Namespace Contensive.BaseClasses
         Public MustOverride Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal WrapperId As Integer) As String
         Public MustOverride Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal context As addonContext) As String
         Public MustOverride Function ExecuteAddonAsProcess(ByVal IdGuidOrName As String) As String
+        <Obsolete("Deprecated, use AppendLog")> Public MustOverride Sub AppendLogFile(ByVal Text As String)
         Public MustOverride Sub AppendLog(ByVal pathFilename As String, ByVal logText As String)
         Public MustOverride Sub AppendLog(ByVal logText As String)
         Public MustOverride Function ConvertLinkToShortLink(ByVal URL As String, ByVal ServerHost As String, ByVal ServerVirtualPath As String) As String

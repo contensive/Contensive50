@@ -292,7 +292,9 @@ Namespace Contensive.Core
         Public Overrides Function ExecuteAddonAsProcess(ByVal IdGuidOrName As String) As String
             Return CP.core.addon.executeAddonAsProcess(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar())
         End Function
-
+        <Obsolete("Deprecated, use AppendLog")> Public Overrides Sub AppendLogFile(ByVal Text As String)
+            logController.appendLog(CP.core, Text)
+        End Sub
 
         Public Overrides Sub AppendLog(ByVal logFolder As String, ByVal Text As String)
             logController.appendLog(CP.core, Text, logFolder)
