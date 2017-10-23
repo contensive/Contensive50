@@ -37,7 +37,7 @@ Namespace Contensive.BaseClasses
         ''' <param name="PageNumber"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride Function Open(ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal SelectFieldList As String = "", Optional ByVal PageSize As Integer = 0, Optional ByVal PageNumber As Integer = 1) As Boolean
+        Public MustOverride Function Open(ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal SelectFieldList As String = "", Optional ByVal PageSize As Integer = 10, Optional ByVal PageNumber As Integer = 1) As Boolean
         'Public MustOverride Function Open(ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal SelectFieldList As String = "", Optional ByVal ignore As Integer = 10, Optional ByVal PageNumber As Integer = 1, Optional ByVal PageSize As Integer = 0) As Boolean
         ''' <summary>
         ''' Opens a record set with user records that are in a Group

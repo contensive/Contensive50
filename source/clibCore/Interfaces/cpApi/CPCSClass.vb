@@ -98,13 +98,21 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Overrides Function Open(ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal SelectFieldList As String = "", Optional ByVal pageSize As Integer = 0, Optional ByVal PageNumber As Integer = 1) As Boolean
+        Public Overrides Function Open(ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal SelectFieldList As String = "", Optional ByVal pageSize As Integer = 10, Optional ByVal PageNumber As Integer = 1) As Boolean
             'Public Overrides Function Open(ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal SelectFieldList As String = "", Optional ByVal ignore As Integer = 10, Optional ByVal PageNumber As Integer = 1, Optional pageSize As Integer = 0) As Boolean
             Dim success As Boolean = False
             '
             Try
                 If cs <> -1 Then
                     Call cpCore.db.csClose(cs)
+                End If
+                If (pageSize = 0) Or (pageSize = 10) Then
+
+                    ' -- (hack) fix for interface issue that has default value 0. later add new method and deprecate
+                    ' -- pagesize=10, pageNumber=1 -- old code returns all records, new code only returns the first 10 records -- this in effect makes it not compatiblie
+                    ' -- if I change new cpBase to default pagesize=9999, the change is breaking and old code does not run
+                    ' -- when I changed new cpbase to pagesize default 0, and compiled code against it, it would not run on c41 because pagesize=0 is passed
+                    pageSize = 9999
                 End If
                 cs = cpCore.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
                 success = cpCore.db.csOk(cs)

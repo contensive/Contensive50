@@ -202,6 +202,15 @@ Namespace Contensive.Addons.AdminSite
                     '    Stream.Add(loginAddon.getLoginForm())
                 Else
                     '
+                    ' -- add exception if build verison does not match code
+                    If (cpCore.siteProperties.dataBuildVersion <> cp.Version) Then
+                        If (cpCore.siteProperties.dataBuildVersion > cp.Version) Then
+                            cpCore.handleException(New ApplicationException("Application code version is older than Db version. Run command line upgrade method on this site."))
+                        Else
+                            cpCore.handleException(New ApplicationException("Application code version is newer than Db version. Upgrade site code."))
+                        End If
+                    End If
+                    '
                     '-------------------------------------------------------------------------------
                     ' Get Requests
                     '   initialize adminContent and editRecord objects 
