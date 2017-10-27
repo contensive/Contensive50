@@ -9035,11 +9035,6 @@ ErrorTrap:
             End If
             Return result
         End Function
-        Public Sub main_ClearStream()
-            'cpCore.doc.docBuffer = ""
-            cpCore.webServer.bufferRedirect = ""
-            cpCore.webServer.bufferResponseHeader = ""
-        End Sub
         '
         '========================================================================
         '   main_GetPanel( Panel, Optional StylePanel, Optional StyleHilite, Optional StyleShadow, Optional Width, Optional Padding, Optional HeightMin) As String

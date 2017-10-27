@@ -50,7 +50,7 @@ Namespace Contensive.Addons.Core
                 '
                 ' Close page
                 '
-                Call cpCore.html.main_ClearStream()
+                Call cpCore.webServer.clearResponseBuffer()
                 If cpCore.errorCount = 0 Then
                     result = "Contensive OK"
                 Else

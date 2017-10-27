@@ -200,55 +200,9 @@ Namespace Contensive.Core.Controllers
         '
         Public Function initWebContext(httpContext As System.Web.HttpContext) As Boolean
             Try
-                iisContext = httpContext
-                'Dim key As String
-                'Dim keyValue As String
-                'Dim isAdmin As Boolean = False
-                'Dim pos As Integer
-                'Dim aliasRoute As String
-                'Dim SourceProtocol As String = ""
-                'Dim aliasDomain As String = ""
-                'Dim aliasPort As String = ""
-                'Dim aliasPathPage As String = ""
-                'Dim testPage As String
-                'Dim SourceExtension As String = ""
-                ''Dim qsCnt As Integer = 0
-                ''
-                ''
-                'Dim forwardDomain As String
-                'Dim defaultDomainContentList As String = ""
-                'Dim domainDetailsListText As String
-                'Dim InitAddGroupList As String = ""
-                'Dim nothingObject As Object = Nothing
-                '
-                '
-                'Dim PageNotFoundReason As String = ""
-                'Dim PageNotFoundSource As String = ""
-                'Dim IsPageNotFound As Boolean
-                'Dim RedirectReason As String = ""
-                'Dim RefProtocol As String = ""
-                'Dim RefHost As String = ""
-                'Dim Refpath As String = ""
-                'Dim RefQueryString As String = ""
-                'Dim RefPage As String = ""
-                ''Dim Pos As Integer
-                'Dim RedirectLink As String = ""
-                'Dim TextStartPointer As Integer
-                'Dim SQL As String
-                'Dim ShortPath As String = ""
-                'Dim ContentName As String = ""
-                'Dim HardCodedPage As String
-                'Dim Copy As String
-                'Dim CS As Integer
-                'Dim Id As Integer
-                'Dim GroupName As String = ""
-                '
-                'Dim AjaxFastFunction As String = ""
-                'Dim LinkForwardCriteria As String = ""
-                'Dim RemoteMethodFromPage As String = ""
-                'Dim RemoteMethodFromQueryString As String = ""
                 '
                 ' -- setup IIS Response
+                iisContext = httpContext
                 iisContext.Response.CacheControl = "no-cache"
                 iisContext.Response.Expires = -1
                 iisContext.Response.Buffer = True
@@ -864,15 +818,27 @@ ErrorTrap:
                     redirectCycles = cpCore.docProperties.getInteger(rnRedirectCycleFlag)
                     '
                     ' convert link to a long link on this domain
-                    '
-                    If genericController.vbLCase(Mid(NonEncodedLink, 1, 4)) = "http" Then
+                    If (NonEncodedLink.Substring(0, 4).ToLower() = "http") Then
                         FullLink = NonEncodedLink
                     Else
+                        If (NonEncodedLink.Substring(0, 1).ToLower() = "/") Then
+                            '
+                            ' -- root relative - url starts with path, let it go
+                        ElseIf (NonEncodedLink.Substring(0, 1).ToLower() = "?") Then
+                            '
+                            ' -- starts with qs, fix issue where iis consideres this on the physical page, not the link-alias vitrual route
+                            NonEncodedLink = requestPathPage & NonEncodedLink
+                        Else
+                            '
+                            ' -- url starts with the page
+                            NonEncodedLink = requestPath & NonEncodedLink
+                        End If
                         ShortLink = NonEncodedLink
                         ShortLink = genericController.ConvertLinkToShortLink(ShortLink, requestDomain, requestVirtualFilePath)
                         ShortLink = genericController.EncodeAppRootPath(ShortLink, requestVirtualFilePath, requestAppRootPath, requestDomain)
                         FullLink = requestProtocol & requestDomain & ShortLink
                     End If
+
                     If (NonEncodedLink = "") Then
                         '
                         ' Link is not valid
@@ -922,8 +888,7 @@ ErrorTrap:
                         Else
                             '
                             ' -- Redirect now
-                            Call cpCore.html.main_ClearStream()
-                            EncodedLink = genericController.EncodeURL(NonEncodedLink)
+                            Call clearResponseBuffer()
                             If (Not iisContext Is Nothing) Then
                                 '
                                 ' -- redirect and release application. HOWEVER -- the thread will continue so use responseOpen=false to abort as much activity as possible
@@ -1264,5 +1229,9 @@ ErrorTrap:
             End Try
             Return ""
         End Function
+        Public Sub clearResponseBuffer()
+            bufferRedirect = ""
+            bufferResponseHeader = ""
+        End Sub
     End Class
 End Namespace

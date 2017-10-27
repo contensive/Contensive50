@@ -86,7 +86,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Clear() 'Inherits BaseClasses.CPResponseBaseClass.Clear
             If True Then
-                Call cpCore.html.main_ClearStream()
+                Call cpCore.webServer.clearResponseBuffer()
             End If
         End Sub
         '
