@@ -289,25 +289,27 @@ Namespace Contensive.Core.Models.Entity
                         End If
                         '
                         ' -- store cpCore in all extended fields that need it (file fields so content read can happen on demand instead of at load)
-                        For Each instanceProperty As PropertyInfo In result.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
-                            Select Case instanceProperty.PropertyType.Name
-                                Case "fieldTypeTextFile", "fieldTypeJavascriptFile", "fieldTypeCSSFile", "fieldTypeHTMLFile"
-                                    Select Case instanceProperty.PropertyType.Name
-                                        Case "fieldTypeJavascriptFile"
-                                            Dim fileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(result), fieldTypeJavascriptFile)
-                                            fileProperty.internalCpCore = cpCore
-                                        Case "fieldTypeCSSFile"
-                                            Dim fileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(result), fieldTypeCSSFile)
-                                            fileProperty.internalCpCore = cpCore
-                                        Case "fieldTypeHTMLFile"
-                                            Dim fileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(result), fieldTypeHTMLFile)
-                                            fileProperty.internalCpCore = cpCore
-                                        Case Else
-                                            Dim fileProperty As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(result), fieldTypeTextFile)
-                                            fileProperty.internalCpCore = cpCore
-                                    End Select
-                            End Select
-                        Next
+                        If (result IsNot Nothing) Then
+                            For Each instanceProperty As PropertyInfo In result.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
+                                Select Case instanceProperty.PropertyType.Name
+                                    Case "fieldTypeTextFile", "fieldTypeJavascriptFile", "fieldTypeCSSFile", "fieldTypeHTMLFile"
+                                        Select Case instanceProperty.PropertyType.Name
+                                            Case "fieldTypeJavascriptFile"
+                                                Dim fileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(result), fieldTypeJavascriptFile)
+                                                fileProperty.internalCpCore = cpCore
+                                            Case "fieldTypeCSSFile"
+                                                Dim fileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(result), fieldTypeCSSFile)
+                                                fileProperty.internalCpCore = cpCore
+                                            Case "fieldTypeHTMLFile"
+                                                Dim fileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(result), fieldTypeHTMLFile)
+                                                fileProperty.internalCpCore = cpCore
+                                            Case Else
+                                                Dim fileProperty As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(result), fieldTypeTextFile)
+                                                fileProperty.internalCpCore = cpCore
+                                        End Select
+                                End Select
+                            Next
+                        End If
                     End If
                 End If
             Catch ex As Exception

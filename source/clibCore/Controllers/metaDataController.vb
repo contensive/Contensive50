@@ -1710,9 +1710,9 @@ Namespace Contensive.Core.Controllers
                                     field.isBaseField = IsBaseContent
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
-                                If Not cpCore.db.isCdefField(returnContentId, "ContentControlID") Then
+                                If Not cpCore.db.isCdefField(returnContentId, "ContentControlId") Then
                                     field = New CDefFieldModel
-                                    field.nameLc = "ContentControlID"
+                                    field.nameLc = "contentcontrolid"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdLookup
                                     field.editSortPriority = 9999
@@ -1725,7 +1725,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "CreateKey") Then
                                     field = New CDefFieldModel
-                                    field.nameLc = "CreateKey"
+                                    field.nameLc = "createkey"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdInteger
                                     field.editSortPriority = 9999
@@ -1737,12 +1737,25 @@ Namespace Contensive.Core.Controllers
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ccGuid") Then
                                     field = New CDefFieldModel
-                                    field.nameLc = "ccGuid"
+                                    field.nameLc = "ccguid"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdText
                                     field.editSortPriority = 9999
                                     field.authorable = False
                                     field.caption = "Guid"
+                                    field.defaultValue = ""
+                                    field.isBaseField = IsBaseContent
+                                    Call verifyCDefField_ReturnID(contentName, field)
+                                End If
+                                ' -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
+                                If Not cpCore.db.isCdefField(returnContentId, "ContentCategoryId") Then
+                                    field = New CDefFieldModel
+                                    field.nameLc = "contentcategoryid"
+                                    field.active = True
+                                    field.fieldTypeId = FieldTypeIdInteger
+                                    field.editSortPriority = 9999
+                                    field.authorable = False
+                                    field.caption = "Content Category"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
                                     Call verifyCDefField_ReturnID(contentName, field)

@@ -735,9 +735,22 @@ Namespace Contensive.Core
                         End Select
                     End If
                     '
+                    ' -- try route Dictionary (addons, admin, link forwards, link alias), from full route to first segment one at a time
+                    ' -- so route /this/and/that would first test /this/and/that, then test /this/and, then test /this
+                    Dim routeTest As String = normalizedRoute
+                    Dim routeFound As Boolean = False
+                    Dim routeCnt As Integer = 100
+                    Do
+                        routeFound = routeDictionary.ContainsKey(routeTest)
+                        If (routeFound) Then Exit Do
+                        If (routeTest.IndexOf("/") < 0) Then Exit Do
+                        routeTest = routeTest.Substring(0, routeTest.LastIndexOf("/"))
+                        routeCnt -= 1
+                    Loop While ((routeCnt > 0) And (Not routeFound))
+                    '
                     ' -- execute route
-                    If (routeDictionary.ContainsKey(normalizedRoute)) Then
-                        Dim route As CPSiteBaseClass.routeClass = routeDictionary(normalizedRoute)
+                    If (routeFound) Then
+                        Dim route As CPSiteBaseClass.routeClass = routeDictionary(routeTest)
                         Select Case route.routeType
                             Case CPSiteBaseClass.routeTypeEnum.admin
                                 '

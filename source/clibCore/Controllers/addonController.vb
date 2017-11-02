@@ -55,6 +55,7 @@ Namespace Contensive.Core.Controllers
         ''' <returns></returns>
         Public Function execute(addon As Models.Entity.addonModel, executeContext As CPUtilsBaseClass.addonExecuteContext) As String
             Dim result As String = String.Empty
+
             Try
                 If (addon Is Nothing) Then
                     '
@@ -76,6 +77,8 @@ Namespace Contensive.Core.Controllers
                 Else
                     '
                     ' -- ok to execute
+                    Dim parentInstanceId As String = cpCore.docProperties.getText("instanceId")
+                    cpCore.docProperties.setProperty("instanceId", executeContext.instanceGuid)
                     cpCore.addonsCurrentlyRunningIdList.Add(addon.id)
                     '
                     ' -- run included add-ons before their parent
@@ -102,6 +105,9 @@ Namespace Contensive.Core.Controllers
                                 Dim nvpValue As String = ""
                                 If nvp.Length > 1 Then
                                     nvpValue = nvp(1)
+                                End If
+                                If nvpValue.IndexOf("[") >= 0 Then
+                                    nvpValue = nvpValue.Substring(0, nvpValue.IndexOf("["))
                                 End If
                                 cpCore.docProperties.setProperty(nvp(0), nvpValue)
                             End If
@@ -525,6 +531,8 @@ Namespace Contensive.Core.Controllers
                     End If
                     '
                     ' -- this completes the execute of this cpcore.addon. remove it from the 'running' list
+                    ' -- restore the parent's instanceId
+                    cpCore.docProperties.setProperty("instanceId", parentInstanceId)
                     cpCore.addonsCurrentlyRunningIdList.Remove(addon.id)
                     cpCore.pageAddonCnt = cpCore.pageAddonCnt + 1
                 End If
@@ -3620,12 +3628,14 @@ ErrorTrap:
         End Function
         '
         Private Function getAddonDescription(cpcore As coreClass, addon As Models.Entity.addonModel) As String
-            Dim collection As Models.Entity.AddonCollectionModel = Models.Entity.AddonCollectionModel.create(cpcore, addon.CollectionID)
-            Dim addonDescription As String = "[#" & addon.id.ToString() & ", " & addon.name & "], collection [" & collection.name & "]"
-            If (collection Is Nothing) Then
-                addonDescription &= ", no collection set"
-            Else
-                addonDescription &= ", collection [" & collection.name & "]"
+            Dim addonDescription As String = "[invalid addon]"
+            If (addon IsNot Nothing) Then
+                Dim collectionName As String = "invalid collection or collection not set"
+                Dim collection As Models.Entity.AddonCollectionModel = Models.Entity.AddonCollectionModel.create(cpcore, addon.CollectionID)
+                If (collection IsNot Nothing) Then
+                    collectionName = collection.name
+                End If
+                addonDescription = "[#" & addon.id.ToString() & ", " & addon.name & "], collection [" & collectionName & "]"
             End If
             Return addonDescription
         End Function

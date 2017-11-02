@@ -140,7 +140,7 @@ Namespace Contensive.Core
                 Dim downloadRetry As Integer
                 Const downloadRetryMax As Integer = 3
                 '
-                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "downloadCollectionFiles", "downloading collection [" & CollectionGuid & "]")
+                Call logController.appendInstallLog(cpCore, "downloading collection [" & CollectionGuid & "]")
                 '
                 '---------------------------------------------------------------------------------------------------------------
                 ' Request the Download file for this collection
@@ -175,7 +175,7 @@ Namespace Contensive.Core
                         downloadDelay += 2000
                         return_ErrorMessage = "There was an error while requesting the download details for collection [" & CollectionGuid & "]"
                         DownloadCollectionFiles = False
-                        Call appendInstallLog(cpCore, "Server", "AddonInstallClass", errorPrefix & "There was a parse error reading the response [" & ex.ToString() & "]")
+                        Call logController.appendInstallLog(cpCore, errorPrefix & "There was a parse error reading the response [" & ex.ToString() & "]")
                     End Try
                     downloadRetry += 1
                 Loop While (downloadRetry < downloadRetryMax)
@@ -187,7 +187,7 @@ Namespace Contensive.Core
                         If (LCase(Doc.DocumentElement.Name) <> genericController.vbLCase(DownloadFileRootNode)) Then
                             return_ErrorMessage = "The collection file from the server was Not valid for collection [" & CollectionGuid & "]"
                             DownloadCollectionFiles = False
-                            Call appendInstallLog(cpCore, "Server", "AddonInstallClass", errorPrefix & "The response has a basename [" & Doc.DocumentElement.Name & "] but [" & DownloadFileRootNode & "] was expected.")
+                            Call logController.appendInstallLog(cpCore, errorPrefix & "The response has a basename [" & Doc.DocumentElement.Name & "] but [" & DownloadFileRootNode & "] was expected.")
                         Else
                             '
                             '------------------------------------------------------------------
@@ -196,7 +196,7 @@ Namespace Contensive.Core
                             '
                             If Doc.DocumentElement.ChildNodes.Count = 0 Then
                                 return_ErrorMessage = "The collection library status file from the server has a valid basename, but no childnodes."
-                                Call appendInstallLog(cpCore, "Server", "AddonInstallClass", errorPrefix & "The collection library status file from the server has a valid basename, but no childnodes. The collection was probably Not found")
+                                Call logController.appendInstallLog(cpCore, errorPrefix & "The collection library status file from the server has a valid basename, but no childnodes. The collection was probably Not found")
                                 DownloadCollectionFiles = False
                             Else
                                 With Doc.DocumentElement
@@ -234,7 +234,7 @@ Namespace Contensive.Core
                                                                     '
                                                                     ' Skip this file because the collecion file link has no slash (no file)
                                                                     '
-                                                                    Call appendInstallLog(cpCore, "Server", "DownloadCollection", errorPrefix & "Collection [" & Collectionname & "] was Not installed because the Collection File Link does Not point to a valid file [" & CollectionFileLink & "]")
+                                                                    Call logController.appendInstallLog(cpCore, errorPrefix & "Collection [" & Collectionname & "] was Not installed because the Collection File Link does Not point to a valid file [" & CollectionFileLink & "]")
                                                                 Else
                                                                     CollectionFilePath = workingPath & Mid(CollectionFileLink, Pos + 1)
                                                                     Call cpCore.privateFiles.SaveRemoteFile(CollectionFileLink, CollectionFilePath)
@@ -261,7 +261,7 @@ Namespace Contensive.Core
                                                             Next
                                                             If ResourceLink = "" Then
                                                                 UserError = "There was an error processing a collection in the download file [" & Collectionname & "]. An ActiveXDll node with filename [" & ResourceFilename & "] contained no 'Link' attribute."
-                                                                Call appendInstallLog(cpCore, "Server", "AddonInstallClass", errorPrefix & UserError)
+                                                                Call logController.appendInstallLog(cpCore, errorPrefix & UserError)
                                                             Else
                                                                 If ResourceFilename = "" Then
                                                                     '
@@ -274,7 +274,7 @@ Namespace Contensive.Core
                                                                 End If
                                                                 If ResourceFilename = "" Then
                                                                     UserError = "There was an error processing a collection in the download file [" & Collectionname & "]. The ActiveX filename attribute was empty, and the filename could not be read from the link [" & ResourceLink & "]."
-                                                                    Call appendInstallLog(cpCore, "Server", "DownloadCollectionFiles", errorPrefix & UserError)
+                                                                    Call logController.appendInstallLog(cpCore, errorPrefix & UserError)
                                                                 Else
                                                                     Call cpCore.privateFiles.SaveRemoteFile(ResourceLink, workingPath & ResourceFilename)
                                                                 End If
@@ -285,7 +285,7 @@ Namespace Contensive.Core
                                     Next
                                 End With
                                 If CollectionFileCnt = 0 Then
-                                    Call appendInstallLog(cpCore, "Server", "DownloadCollectionFiles", errorPrefix & "The collection was requested and downloaded, but was not installed because the download file did not have a collection root node.")
+                                    Call logController.appendInstallLog(cpCore, errorPrefix & "The collection was requested and downloaded, but was not installed because the download file did not have a collection root node.")
                                 End If
                             End If
                         End If
@@ -437,7 +437,7 @@ Namespace Contensive.Core
                     Catch ex As Exception
                         If allowLogging Then logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), parse error reading collections.xml")
                         Copy = "Error loading privateFiles\addons\Collections.xml"
-                        Call appendInstallLog(cpCore, "Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
+                        Call logController.appendInstallLog(cpCore, Copy)
                         return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                         returnOk = False
                     End Try
@@ -446,7 +446,7 @@ Namespace Contensive.Core
                             If allowLogging Then logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), The addons\Collections.xml file has an invalid root node")
                             Copy = "The addons\Collections.xml has an invalid root node, [" & LocalCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                             'Copy = "The LocalCollections file [" & App.Path & "\Addons\Collections.xml] has an invalid root node, [" & LocalCollections.DocumentElement.name & "] was received and [" & CollectionListRootNode & "] was expected."
-                            Call appendInstallLog(cpCore, "Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
+                            Call logController.appendInstallLog(cpCore, Copy)
                             return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                             returnOk = False
                         Else
@@ -513,7 +513,7 @@ Namespace Contensive.Core
                                                 logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Error downloading or loading GetCollectionList from Support.")
                                             End If
                                             Copy = "Error downloading or loading GetCollectionList from Support."
-                                            Call appendInstallLog(cpCore, "Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
+                                            Call logController.appendInstallLog(cpCore, Copy & ", the request was [" & SupportURL & "]")
                                             return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                                             returnOk = False
                                             loadOK = False
@@ -523,7 +523,7 @@ Namespace Contensive.Core
                                                 If genericController.vbLCase(LibraryCollections.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                                                     Copy = "The GetCollectionList support site remote method returned an xml file with an invalid root node, [" & LibraryCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                                                     If allowLogging Then logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), " & Copy)
-                                                    Call appendInstallLog(cpCore, "Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
+                                                    Call logController.appendInstallLog(cpCore, Copy & ", the request was [" & SupportURL & "]")
                                                     return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                                                     returnOk = False
                                                 Else
@@ -626,7 +626,7 @@ Namespace Contensive.Core
                                                                                                 '
                                                                                                 workingPath = cpCore.addon.getPrivateFilesAddonPath() & "\temp_" & genericController.GetRandomInteger() & "\"
                                                                                                 If allowLogging Then logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & workingPath & "].")
-                                                                                                Call appendInstallLog(cpCore, "server", "UpgradeAllLocalCollectionsFromLib3", "Upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], because LocalChangeDate [" & LocalLastChangeDate & "] < LibraryChangeDate [" & LibLastChangeDate & "]")
+                                                                                                Call logController.appendInstallLog(cpCore, "Upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], because LocalChangeDate [" & LocalLastChangeDate & "] < LibraryChangeDate [" & LibLastChangeDate & "]")
                                                                                                 '
                                                                                                 ' Upgrade Needed
                                                                                                 '
@@ -657,7 +657,7 @@ Namespace Contensive.Core
                                                                                                 '
                                                                                                 If Not returnOk Then
                                                                                                     If allowLogging Then logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), for this local collection, process returned " & returnOk)
-                                                                                                    Call appendInstallLog(cpCore, "server", "UpgradeAllLocalCollectionsFromLib3", "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection, the request was [" & SupportURL & "]")
+                                                                                                    Call logController.appendInstallLog(cpCore, "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection, the request was [" & SupportURL & "]")
                                                                                                     returnOk = True
                                                                                                 End If
                                                                                             End If
@@ -667,7 +667,7 @@ Namespace Contensive.Core
                                                                                             localCollectionUpToDate = True
                                                                                             '
                                                                                             If Not returnOk Then
-                                                                                                Call appendInstallLog(cpCore, "server", "UpgradeAllLocalCollectionsFromLib3", "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection")
+                                                                                                Call logController.appendInstallLog(cpCore, "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection")
                                                                                                 returnOk = True
                                                                                             End If
                                                                                         End If
@@ -713,7 +713,7 @@ Namespace Contensive.Core
             Dim success As Boolean = False
             Try
                 If cpCore.privateFiles.pathExists(sourcePrivateFolderPath) Then
-                    Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & sourcePrivateFolderPath & "]")
+                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, processing files in private folder [" & sourcePrivateFolderPath & "]")
                     Dim SrcFileNamelist As IO.FileInfo() = cpCore.privateFiles.getFileList(sourcePrivateFolderPath)
                     For Each file As IO.FileInfo In SrcFileNamelist
                         If (file.Extension = ".zip") Or (file.Extension = ".xml") Then
@@ -779,9 +779,9 @@ Namespace Contensive.Core
                     result = False
                     return_ErrorMessage = "<p>There was a problem with the installation. The installation folder is not valid.</p>"
                     If allowLogging Then logController.appendLog(cpCore, "BuildLocalCollectionFolder(), " & return_ErrorMessage)
-                    Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" & collectionPath & "]")
+                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" & collectionPath & "]")
                 Else
-                    Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & collectionPath & "]")
+                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, processing files in private folder [" & collectionPath & "]")
                     '
                     ' move collection file to a temp directory
                     '
@@ -801,10 +801,10 @@ Namespace Contensive.Core
                         '
                         For Each file As IO.FileInfo In SrcFileNamelist
                             Filename = file.Name
-                            Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files, filename=[" & Filename & "]")
+                            Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, processing files, filename=[" & Filename & "]")
                             If genericController.vbLCase(Right(Filename, 4)) = ".xml" Then
                                 '
-                                Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing xml file [" & Filename & "]")
+                                Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, processing xml file [" & Filename & "]")
                                 'hint = hint & ",320"
                                 CollectionFile = New XmlDocument
 
@@ -818,7 +818,7 @@ Namespace Contensive.Core
                                     '
                                     'hint = hint & ",330"
                                     return_ErrorMessage = "<p>There was a problem with the Collection File for this cpcore.addon.</p>"
-                                    Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, error reading collection [" & collectionPathFilename & "]")
+                                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, error reading collection [" & collectionPathFilename & "]")
                                     'StatusOK = False
                                     loadOk = False
                                 End Try
@@ -829,7 +829,7 @@ Namespace Contensive.Core
                                         '
                                         ' Not a problem, this is just not a collection file
                                         '
-                                        Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, xml base name wrong [" & CollectionFileBaseName & "]")
+                                        Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, xml base name wrong [" & CollectionFileBaseName & "]")
                                     Else
                                         '
                                         ' Collection File
@@ -843,7 +843,7 @@ Namespace Contensive.Core
                                                 '
                                                 result = False
                                                 return_ErrorMessage = "<p>There was a problem with this Collection. The collection file does not have a collection name.</p>"
-                                                Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, collection has no name")
+                                                Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, collection has no name")
                                             Else
                                                 '
                                                 '------------------------------------------------------------------
@@ -946,7 +946,7 @@ Namespace Contensive.Core
                                                                 'hint = hint & ",513"
                                                                 result = False
                                                                 return_ErrorMessage = "<p>There was a problem with the Collection File. The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.</p>"
-                                                                Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.")
+                                                                Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.")
                                                                 'StatusOK = False
                                                             Else
                                                                 Select Case ResourceType
@@ -993,16 +993,16 @@ Namespace Contensive.Core
                                                                 ChildCollectionGUID = CDefSection.InnerText
                                                             End If
                                                             Dim statusMsg As String = "Installing collection [" & ChildCollectionName & ", " & ChildCollectionGUID & "] referenced from collection [" & Collectionname & "]"
-                                                            Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" & ChildCollectionName & "], childCollectionGuid [" & ChildCollectionGUID & "]")
+                                                            Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" & ChildCollectionName & "], childCollectionGuid [" & ChildCollectionGUID & "]")
                                                             If genericController.vbInstr(1, CollectionVersionPath, ChildCollectionGUID, vbTextCompare) = 0 Then
                                                                 If ChildCollectionGUID = "" Then
                                                                     '
                                                                     ' -- Needs a GUID to install
                                                                     result = False
                                                                     return_ErrorMessage = statusMsg & ". The installation can not continue because an imported collection could not be downloaded because it does not include a valid GUID."
-                                                                    Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, return message [" & return_ErrorMessage & "]")
+                                                                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, return message [" & return_ErrorMessage & "]")
                                                                 ElseIf GetCollectionPath(cpCore, ChildCollectionGUID) = "" Then
-                                                                    Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], not found so needs to be installed")
+                                                                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], not found so needs to be installed")
                                                                     '
                                                                     ' If it is not already installed, download and install it also
                                                                     '
@@ -1013,21 +1013,21 @@ Namespace Contensive.Core
                                                                     StatusOK = DownloadCollectionFiles(cpCore, ChildWorkingPath, ChildCollectionGUID, ChildCollectionLastChangeDate, return_ErrorMessage)
                                                                     If Not StatusOK Then
 
-                                                                        Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & statusMsg & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
+                                                                        Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" & statusMsg & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
                                                                         If return_ErrorMessage = "" Then
                                                                             return_ErrorMessage = statusMsg & ". The installation can not continue because there was an unknown error while downloading the necessary collection file, [" & ChildCollectionGUID & "]."
                                                                         Else
                                                                             return_ErrorMessage = statusMsg & ". The installation can not continue because there was an error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
                                                                         End If
                                                                     Else
-                                                                        Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned OK")
+                                                                        Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned OK")
                                                                         '
                                                                         ' install the downloaded file
                                                                         '
                                                                         Dim ChildCollectionGUIDList As New List(Of String)
                                                                         StatusOK = BuildLocalCollectionReposFromFolder(cpCore, ChildWorkingPath, ChildCollectionLastChangeDate, ChildCollectionGUIDList, return_ErrorMessage, allowLogging)
                                                                         If Not StatusOK Then
-                                                                            Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & statusMsg & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
+                                                                            Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" & statusMsg & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
                                                                             If return_ErrorMessage = "" Then
                                                                                 return_ErrorMessage = statusMsg & ". The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]."
                                                                             Else
@@ -1042,7 +1042,7 @@ Namespace Contensive.Core
                                                                     '
                                                                     '
                                                                     '
-                                                                    Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], already installed")
+                                                                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], already installed")
                                                                 End If
                                                             End If
                                                     End Select
@@ -1100,10 +1100,10 @@ Namespace Contensive.Core
                     ' there was an error processing the collection, be sure to save description in the log
                     '
                     result = False
-                    Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" & return_ErrorMessage & "]")
+                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" & return_ErrorMessage & "]")
                 End If
                 '
-                Call appendInstallLog(cpCore, "Server", "AddonInstallClass", "BuildLocalCollectionFolder, Exiting with ErrorMessage [" & return_ErrorMessage & "]")
+                Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, Exiting with ErrorMessage [" & return_ErrorMessage & "]")
                 '
                 BuildLocalCollectionRepoFromFile = (return_ErrorMessage = "")
                 return_CollectionGUID = CollectionGuid
@@ -1124,850 +1124,636 @@ Namespace Contensive.Core
         Public Shared Function installCollectionFromLocalRepo(cpCore As coreClass, ByVal CollectionGuid As String, ByVal ignore_BuildVersion As String, ByRef return_ErrorMessage As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String)) As Boolean
             Dim result As Boolean = False
             Try
-                '
-                Dim fieldLookupId As Integer
-                Dim ChildCollectionID As Integer
-                Dim ResourceType As String
-                Dim ResourcePath As String
-                Dim SrcPath As String
-                Dim DstPath As String
-                Dim FilePath As String
-                Dim PathFilename As String
-                Dim ExecFileList As String
-                Dim wwwFileList As String
-                Dim ContentFileList As String
-                Dim FileExt As String
-                Dim OtherXML As String = String.Empty
-                Dim ContentID As Integer
-                'Dim ScriptingModuleID As Integer
-                Dim CSCollection As Integer
-                Dim FileList As String
-                Dim Parent_NavID As Integer
-                Dim ChildCollectionLastChangeDate As Date
-                Dim CollectionLastChangeDate As Date
-                Dim NavIconTypeString As String
-                Dim XMLTools As New xmlController(cpCore)
-                Dim AddonGuidFieldName As String
-                Dim CollectionHelp As String
-                Dim CollectionHelpLink As String
-                Dim CollectionWrapper As String
-                Dim ChildCollectionVersionFolderName As String = ""
-                Dim NavIconTypeID As Integer
-                Dim EntryName As String
-                Dim DeveloperOnly As Boolean
-                Dim ChildCollectionGUID As String
-                Dim ChildCollectionName As String
-                Dim Found As Boolean
-                Dim status As String
-                Dim Files() As String
-                Dim Ptr As Integer
-                Dim CDefNode As XmlNode
-                Dim ContentName As String
-                Dim CollectionFile As New XmlDocument
-                Dim CollectionID As Integer
-                Dim Collectionname As String
-                Dim CollectionSystem As Boolean
-                Dim CollectionUpdatable As Boolean
-                Dim CollectionblockNavigatorNode As Boolean
-                Dim srcFileInfoArray As IO.FileInfo()
-                Dim CollectionVersionFolder As String
-                Dim Pos As Integer
-                Dim FieldName As String
-                Dim FieldValue As String = String.Empty
-                Dim CS As Integer
-                Dim DstFilePath As String
-                Dim AOName As String = String.Empty
-                Dim IsFound As Boolean
-                Dim UserError As String
-                Dim Filename As String
-                Dim CDefSection As XmlNode
-                Dim Doc As New XmlDocument
-                Dim CDefInterfaces As XmlNode
-                Dim CollectionFilename As String
-                Dim OKToInstall As Boolean
-                Dim UpgradeOK As Boolean
                 Dim CollectionVersionFolderName As String = ""
-                Dim FileGuid As String
-                Dim DataRecordList As String = String.Empty
-                Dim ChildNode As XmlNode
-                Dim ContentNode As XmlNode
-                Dim NavDoc As XmlDocument
-                Dim FieldNode As XmlNode
-                Dim ContentRecordGuid As String
-                Dim CDef As cdefModel
-                Dim ContentRecordName As String
-                Dim IsFieldFound As Boolean
-                Dim FieldLookupContentID As Integer
-                Dim fieldTypeId As Integer
-                Dim FieldLookupContentName As String
-                Dim CollectionSystem_fileValueOK As Boolean
-                Dim CollectionUpdatable_fileValueOK As Boolean
-                Dim CollectionblockNavigatorNode_fileValueOK As Boolean
-                Dim CollectionHelpLink_fileValueOK As Boolean
-                Dim isBaseCollection As Boolean = (baseCollectionGuid = CollectionGuid)
-                '
-                UpgradeOK = True
-                AddonGuidFieldName = "ccguid"
-                If True Then
+                Dim CollectionLastChangeDate As Date = Nothing
+                Call GetCollectionConfig(cpCore, CollectionGuid, CollectionVersionFolderName, CollectionLastChangeDate, "")
+                If String.IsNullOrEmpty(CollectionVersionFolderName) Then
+                    result = False
+                    return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>"
+                Else
                     '
-                    ' install or upgrade
+                    ' Search Local Collection Folder for collection config file (xml file)
                     '
-                    ''fs = New fileSystemClass
-                    '
-                    ' Get Local Collection Folder Path (the version folder) from Collection.xml
-                    '
-                    Call GetCollectionConfig(cpCore, CollectionGuid, CollectionVersionFolderName, CollectionLastChangeDate, "")
-                    'CollectionVersionFolderName = GetCollectionPath(cpcore,CollectionGuid)
-                    If CollectionVersionFolderName = "" Then
-                        'Call AppendClassLogFile(cmc.appEnvironment.name, "", "UpgradeAppFromLocalCollection, Collection GUID [" & CollectionGuid & "] is not in collections.xml")
-                        UpgradeOK = False
-                        return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>"
+                    Dim CollectionVersionFolder As String = cpCore.addon.getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
+                    Dim srcFileInfoArray As IO.FileInfo() = cpCore.privateFiles.getFileList(CollectionVersionFolder)
+                    If srcFileInfoArray.Count = 0 Then
+                        result = False
+                        return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>"
                     Else
                         '
-                        ' Search Local Collection Folder for collection config file (xml file)
+                        ' collect list of DLL files and add them to the exec files if they were missed
+                        Dim assembliesInZip As New List(Of String)
+                        For Each file As IO.FileInfo In srcFileInfoArray
+                            If (file.Extension.ToLower() = "dll") Then
+                                If Not assembliesInZip.Contains(file.Name.ToLower()) Then
+                                    assembliesInZip.Add(file.Name.ToLower())
+                                End If
+                            End If
+                        Next
                         '
-                        CollectionVersionFolder = cpCore.addon.getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
-                        'CollectionVersionFolder = GetProgramPath & "\Addons\" & CollectionVersionFolderName & "\"
-                        CollectionHelp = ""
-                        CollectionHelpLink = ""
-                        srcFileInfoArray = cpCore.privateFiles.getFileList(CollectionVersionFolder)
-                        If srcFileInfoArray.Count = 0 Then
-                            UpgradeOK = False
-                            return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>"
-                        Else
-                            If True Then
+                        ' -- Process the other files
+                        For Each file As IO.FileInfo In srcFileInfoArray
+                            If (genericController.vbLCase(Right(file.Name, 4)) = ".xml") Then
                                 '
-                                ' Read in the help file
-                                '
-                                For Each file As IO.FileInfo In srcFileInfoArray
-                                    If genericController.vbLCase(file.Name) = "collection.hlp" Then
-                                        CollectionHelp = CollectionHelp & cpCore.privateFiles.readFile(CollectionVersionFolder & file.Name)
-                                    End If
-                                Next
-                                '
-                                ' Process the other files
-                                '
-                                For Each file As IO.FileInfo In srcFileInfoArray
-                                    Filename = file.Name
-                                    If genericController.vbLCase(Right(Filename, 4)) = ".xml" Then
-                                        '
-                                        ' XML file -- open it to figure out if it is one we can use
-                                        '
-                                        CollectionFilename = Filename
-                                        Dim loadOK As Boolean = True
-                                        Try
-                                            Call Doc.Load(cpCore.privateFiles.rootLocalPath & CollectionVersionFolder & Filename)
-                                        Catch ex As Exception
+                                ' -- XML file -- open it to figure out if it is one we can use
+                                Dim Doc As New XmlDocument
+                                Dim CollectionFilename As String = file.Name
+                                Dim loadOK As Boolean = True
+                                Try
+                                    Call Doc.Load(cpCore.privateFiles.rootLocalPath & CollectionVersionFolder & file.Name)
+                                Catch ex As Exception
+                                    '
+                                    ' error - Need a way to reach the user that submitted the file
+                                    '
+                                    Call logController.appendInstallLog(cpCore, "There was an error reading the Meta data file [" & cpCore.privateFiles.rootLocalPath & CollectionVersionFolder & file.Name & "].")
+                                    result = False
+                                    return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the xml collection file has an error</P>"
+                                    loadOK = False
+                                End Try
+                                If loadOK Then
+                                    With Doc.DocumentElement
+                                        If (LCase(.Name) = genericController.vbLCase(CollectionFileRootNode)) Or (LCase(.Name) = genericController.vbLCase(CollectionFileRootNodeOld)) Then
                                             '
-                                            ' error - Need a way to reach the user that submitted the file
+                                            '------------------------------------------------------------------------------------------------------
+                                            ' Collection File - import from sub so it can be re-entrant
+                                            '------------------------------------------------------------------------------------------------------
                                             '
-                                            UserError = "There was an error reading the Meta data file."
-                                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection, UserError [" & UserError & "]")
-                                            UpgradeOK = False
-                                            return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the xml collection file has an error</P>"
-                                            loadOK = False
-                                        End Try
-                                        If loadOK Then
-                                            With Doc.DocumentElement
-                                                If (LCase(.Name) = genericController.vbLCase(CollectionFileRootNode)) Or (LCase(.Name) = genericController.vbLCase(CollectionFileRootNodeOld)) Then
+                                            Dim IsFound As Boolean = False
+                                            Dim Collectionname As String = GetXMLAttribute(cpCore, IsFound, Doc.DocumentElement, "name", "")
+                                            If Collectionname = "" Then
+                                                '
+                                                ' ----- Error condition -- it must have a collection name
+                                                '
+                                                'Call AppendAddonLog("UpgradeAppFromLocalCollection, collection has no name")
+                                                Call logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, collection has no name")
+                                                result = False
+                                                return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the collection name in the xml collection file is blank</P>"
+                                            Else
+                                                Dim CollectionSystem_fileValueOK As Boolean = False
+                                                Dim CollectionUpdatable_fileValueOK As Boolean = False
+                                                Dim CollectionblockNavigatorNode_fileValueOK As Boolean
+                                                Dim CollectionSystem As Boolean = genericController.EncodeBoolean(GetXMLAttribute(cpCore, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""))
+                                                Dim Parent_NavID As Integer = appBuilderController.verifyNavigatorEntry(cpCore, addonGuidManageAddon, "", "Manage Add-ons", "", "", "", False, False, False, True, "", "", "", 0)
+                                                Dim CollectionUpdatable As Boolean = genericController.EncodeBoolean(GetXMLAttribute(cpCore, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""))
+                                                Dim CollectionblockNavigatorNode As Boolean = genericController.EncodeBoolean(GetXMLAttribute(cpCore, CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""))
+                                                Dim FileGuid As String = GetXMLAttribute(cpCore, IsFound, Doc.DocumentElement, "guid", Collectionname)
+                                                If FileGuid = "" Then
+                                                    FileGuid = Collectionname
+                                                End If
+                                                If (LCase(CollectionGuid) <> genericController.vbLCase(FileGuid)) Then
                                                     '
-                                                    '------------------------------------------------------------------------------------------------------
-                                                    ' Collection File - import from sub so it can be re-entrant
-                                                    '------------------------------------------------------------------------------------------------------
                                                     '
-                                                    Collectionname = GetXMLAttribute(cpCore, IsFound, Doc.DocumentElement, "name", "")
-                                                    If Collectionname = "" Then
+                                                    '
+                                                    result = False
+                                                    Call logController.appendInstallLog(cpCore, "Local Collection file contains a different GUID for [" & Collectionname & "] then Collections.xml")
+                                                    return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>"
+                                                Else
+                                                    If CollectionGuid = "" Then
                                                         '
-                                                        ' ----- Error condition -- it must have a collection name
+                                                        ' I hope I do not regret this
                                                         '
-                                                        'Call AppendAddonLog("UpgradeAppFromLocalCollection, collection has no name")
-                                                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, collection has no name")
-                                                        UpgradeOK = False
-                                                        return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the collection name in the xml collection file is blank</P>"
-                                                    Else
-                                                        CollectionSystem = genericController.EncodeBoolean(GetXMLAttribute(cpCore, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""))
-                                                        Parent_NavID = appBuilderController.verifyNavigatorEntry(cpCore, addonGuidManageAddon, "", "Manage Add-ons", "", "", "", False, False, False, True, "", "", "", 0)
-                                                        'Parent_NavID = GetManageAddonNavID()
-                                                        'If CollectionSystem Then
-                                                        '    'Parent_NavID = appBuilderController.verifyNavigatorEntry(cpCore, ccguid, "")
-                                                        '    Parent_NavID = GetNonRootNavigatorID("System", Parent_NavID, 0, 0, NavIconTypeFolder, "System Collections", True, 0, "", 0, 0, 0, True)
-                                                        'End If
-                                                        CollectionUpdatable = genericController.EncodeBoolean(GetXMLAttribute(cpCore, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""))
-                                                        CollectionblockNavigatorNode = genericController.EncodeBoolean(GetXMLAttribute(cpCore, CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""))
-                                                        FileGuid = GetXMLAttribute(cpCore, IsFound, Doc.DocumentElement, "guid", Collectionname)
-                                                        'FileGuid = GetXMLAttribute(cpcore,cpcore,IsFound, Doc.documentElement, "guid")
-                                                        If FileGuid = "" Then
-                                                            FileGuid = Collectionname
-                                                        End If
-                                                        If (LCase(CollectionGuid) <> genericController.vbLCase(FileGuid)) Then
-                                                            '
-                                                            '
-                                                            '
-                                                            UpgradeOK = False
-                                                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "", "UpgradeAppFromLocalCollection, Local Collection file contains a different GUID for [" & Collectionname & "] then Collections.xml")
-                                                            return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>"
-                                                        Else
-                                                            If CollectionGuid = "" Then
+                                                        CollectionGuid = Collectionname
+                                                    End If
+                                                    '
+                                                    '-------------------------------------------------------------------------------
+                                                    ' ----- Pass 1
+                                                    ' Go through all collection nodes
+                                                    ' Process ImportCollection Nodes - so includeaddon nodes will work
+                                                    ' these must be processes regardless of the state of this collection in this app
+                                                    ' Get Resource file list
+                                                    '-------------------------------------------------------------------------------
+                                                    '
+                                                    'CollectionAddOnCnt = 0
+                                                    Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 1")
+                                                    Dim wwwFileList As String = ""
+                                                    Dim ContentFileList As String = ""
+                                                    Dim ExecFileList As String = ""
+                                                    For Each CDefSection As XmlNode In .ChildNodes
+                                                        Select Case CDefSection.Name.ToLower()
+                                                            Case "resource"
                                                                 '
-                                                                ' I hope I do not regret this
+                                                                ' set wwwfilelist, contentfilelist, execfilelist
                                                                 '
-                                                                CollectionGuid = Collectionname
-                                                            End If
-                                                            '
-                                                            '-------------------------------------------------------------------------------
-                                                            ' ----- Pass 1
-                                                            ' Go through all collection nodes
-                                                            ' Process ImportCollection Nodes - so includeaddon nodes will work
-                                                            ' these must be processes regardless of the state of this collection in this app
-                                                            ' Get Resource file list
-                                                            '-------------------------------------------------------------------------------
-                                                            '
-                                                            'CollectionAddOnCnt = 0
-                                                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1")
-                                                            wwwFileList = ""
-                                                            ContentFileList = ""
-                                                            ExecFileList = ""
-                                                            For Each CDefSection In .ChildNodes
-                                                                Select Case genericController.vbLCase(CDefSection.Name)
-                                                                    Case "resource"
-                                                                        '
-                                                                        ' set wwwfilelist, contentfilelist, execfilelist
-                                                                        '
-                                                                        ResourceType = genericController.vbLCase(GetXMLAttribute(cpCore, IsFound, CDefSection, "type", ""))
-                                                                        ResourcePath = genericController.vbLCase(GetXMLAttribute(cpCore, IsFound, CDefSection, "path", ""))
-                                                                        Filename = genericController.vbLCase(GetXMLAttribute(cpCore, IsFound, CDefSection, "name", ""))
-                                                                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, resource found, name [" & Filename & "], type [" & ResourceType & "], path [" & ResourcePath & "]")
-                                                                        Filename = genericController.vbReplace(Filename, "/", "\")
-                                                                        SrcPath = ""
-                                                                        DstPath = ResourcePath
-                                                                        Pos = genericController.vbInstr(1, Filename, "\")
-                                                                        If Pos <> 0 Then
-                                                                            '
-                                                                            ' Source path is in filename
-                                                                            '
-                                                                            SrcPath = Mid(Filename, 1, Pos - 1)
-                                                                            Filename = Mid(Filename, Pos + 1)
-                                                                            If ResourcePath = "" Then
-                                                                                '
-                                                                                ' No Resource Path give, use the same folder structure from source
-                                                                                '
-                                                                                DstPath = SrcPath
-                                                                            Else
-                                                                                '
-                                                                                ' Copy file to resource path
-                                                                                '
-                                                                                DstPath = ResourcePath
-                                                                            End If
-                                                                        End If
-
-                                                                        DstFilePath = genericController.vbReplace(DstPath, "/", "\")
-                                                                        If DstFilePath = "\" Then
-                                                                            DstFilePath = ""
-                                                                        End If
-                                                                        If DstFilePath <> "" Then
-                                                                            If Left(DstFilePath, 1) = "\" Then
-                                                                                DstFilePath = Mid(DstFilePath, 2)
-                                                                            End If
-                                                                            If Right(DstFilePath, 1) <> "\" Then
-                                                                                DstFilePath = DstFilePath & "\"
-                                                                            End If
-                                                                        End If
-
-                                                                        Select Case ResourceType
-                                                                            Case "www"
-                                                                                wwwFileList = wwwFileList & vbCrLf & DstFilePath & Filename
-                                                                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.appConfig.appRootFilesPath & DstFilePath & "].")
-                                                                                'Call appendInstallLog(cpCore, cpCore.serverconfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & "].")
-                                                                                Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.appRootFiles)
-                                                                                If genericController.vbLCase(Right(Filename, 4)) = ".zip" Then
-                                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
-                                                                                    'Call appendInstallLog(cpCore, cpCore.serverconfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
-                                                                                    Call cpCore.appRootFiles.UnzipFile(DstFilePath & Filename)
-                                                                                End If
-                                                                            Case "file", "content"
-                                                                                ContentFileList = ContentFileList & vbCrLf & DstFilePath & Filename
-                                                                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to content, src [" & CollectionVersionFolder & SrcPath & "], dst [" & DstFilePath & "].")
-                                                                                Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.cdnFiles)
-                                                                                If genericController.vbLCase(Right(Filename, 4)) = ".zip" Then
-                                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping content file [" & DstFilePath & Filename & "].")
-                                                                                    Call cpCore.cdnFiles.UnzipFile(DstFilePath & Filename)
-                                                                                End If
-                                                                            Case Else
-                                                                                ExecFileList = ExecFileList & vbCrLf & Filename
-                                                                        End Select
-                                                                    Case "getcollection", "importcollection"
-                                                                        '
-                                                                        ' Get path to this collection and call into it
-                                                                        '
-                                                                        ChildCollectionName = GetXMLAttribute(cpCore, Found, CDefSection, "name", "")
-                                                                        ChildCollectionGUID = GetXMLAttribute(cpCore, Found, CDefSection, "guid", CDefSection.InnerText)
-                                                                        If ChildCollectionGUID = "" Then
-                                                                            ChildCollectionGUID = CDefSection.InnerText
-                                                                        End If
-                                                                        If (InStr(1, ImportFromCollectionsGuidList & "," & CollectionGuid, ChildCollectionGUID, vbTextCompare) <> 0) Then
-                                                                            '
-                                                                            ' circular import detected, this collection is already imported
-                                                                            '
-                                                                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1. The collection to be imported is [" & ChildCollectionName & "], GUID [" & ChildCollectionGUID & "]")
-                                                                        Else
-                                                                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, import collection found, name [" & ChildCollectionName & "], guid [" & ChildCollectionGUID & "]")
-                                                                            If True Then
-                                                                                Call installCollectionFromRemoteRepo(cpCore, ChildCollectionGUID, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, nonCriticalErrorList)
-                                                                            Else
-                                                                                If ChildCollectionGUID = "" Then
-                                                                                    status = "The importcollection node [" & ChildCollectionName & "] can not be upgraded because it does not include a valid guid."
-                                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", status)
-                                                                                Else
-                                                                                    '
-                                                                                    ' This import occurred while upgrading an application from the local collections (Db upgrade or AddonManager)
-                                                                                    ' Its OK to install it if it is missing, but you do not need to upgrade the local collections from the Library
-                                                                                    '
-                                                                                    ' 5/18/2008 -----------------------------------
-                                                                                    ' See if it is in the local collections storage. If yes, just upgrade this app with it. If not,
-                                                                                    ' it must be downloaded and the entire server must be upgraded
-                                                                                    '
-                                                                                    Call GetCollectionConfig(cpCore, ChildCollectionGUID, ChildCollectionVersionFolderName, ChildCollectionLastChangeDate, "")
-                                                                                    If ChildCollectionVersionFolderName <> "" Then
-                                                                                        '
-                                                                                        ' It is installed in the local collections, update just this site
-                                                                                        '
-                                                                                        'Call AppendClassLogFile(cmc.appEnvironment.name, "UpgradeAppFromLocalCollection", "processing importcollection node [" & ChildCollectionName & "] of collection [" & Collectionname & "], GUID [" & CollectionGuid & "]. The collection is installed locally, so only this site will be updated.")
-                                                                                        UpgradeOK = UpgradeOK And installCollectionFromLocalRepo(cpCore, ChildCollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild, nonCriticalErrorList)
-                                                                                        If Not UpgradeOK Then
-                                                                                            UpgradeOK = UpgradeOK
-                                                                                        End If
-                                                                                        'UpgradeOK = UpgradeOK And UpgradeAppFromLocalCollection(cmc, Upgrade, Parent_NavID, Return_IISResetRequired, ChildCollectionGUID, cpCore.app.dataBuildVersion, Return_ErrorMessage, Return_RegisterList, ImportFromCollectionsGuidList & "," & CollectionGuid)
-                                                                                    Else
-                                                                                        '
-                                                                                        ' it is not installed on the server. install it and update all sites on the server
-                                                                                        '
-                                                                                        'Call AppendClassLogFile(cmc.appEnvironment.name, "UpgradeAppFromLocalCollection", "processing importcollection node of collection [" & Collectionname & "], GUID [" & CollectionGuid & "]. The collection to be imported is [" & ChildCollectionName & "], GUID [" & ChildCollectionGUID & "]")
-                                                                                        '
-                                                                                        ' *** one at a time
-                                                                                        '
-                                                                                        'UpgradeOK = UpgradeOK And UpgradeAllAppsFromLibCollection2(ChildCollectionGUID, cpCore.app.config.name, Return_IISResetRequired, Return_RegisterList, Return_ErrorMessage, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild)
-                                                                                    End If
-                                                                                End If
-                                                                            End If
-                                                                        End If
-                                                                End Select
-                                                            Next
-                                                            '
-                                                            '-------------------------------------------------------------------------------
-                                                            ' create an Add-on Collection record
-                                                            '-------------------------------------------------------------------------------
-                                                            '
-                                                            OKToInstall = False
-                                                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1 done, create collection record.")
-                                                            CSCollection = cpCore.db.csOpen("Add-on Collections", "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid) & ")")
-                                                            If cpCore.db.csOk(CSCollection) Then
+                                                                Dim resourceType As String = GetXMLAttribute(cpCore, IsFound, CDefSection, "type", "")
+                                                                Dim resourcePath As String = GetXMLAttribute(cpCore, IsFound, CDefSection, "path", "")
+                                                                Dim filename As String = GetXMLAttribute(cpCore, IsFound, CDefSection, "name", "")
                                                                 '
-                                                                ' Upgrade addon
+                                                                logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 1, resource found, name [" & filename & "], type [" & resourceType & "], path [" & resourcePath & "]")
                                                                 '
-                                                                If CollectionLastChangeDate = Date.MinValue Then
-                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollectionCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.")
-                                                                    OKToInstall = True
-                                                                ElseIf (cpCore.db.csGetDate(CSCollection, "lastchangedate") < CollectionLastChangeDate) Then
-                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has an older version of collection. It will be upgraded.")
-                                                                    OKToInstall = True
-                                                                Else
-                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has an up-to-date version of collection. It will not be upgraded, but all imports in the new version will be checked.")
-                                                                    OKToInstall = False
+                                                                filename = genericController.convertToDosSlash(filename)
+                                                                Dim SrcPath As String = ""
+                                                                Dim DstPath As String = resourcePath
+                                                                Dim Pos As Integer = genericController.vbInstr(1, filename, "\")
+                                                                If Pos <> 0 Then
+                                                                    '
+                                                                    ' Source path is in filename
+                                                                    '
+                                                                    SrcPath = Mid(filename, 1, Pos - 1)
+                                                                    filename = Mid(filename, Pos + 1)
+                                                                    If resourcePath = "" Then
+                                                                        '
+                                                                        ' No Resource Path give, use the same folder structure from source
+                                                                        '
+                                                                        DstPath = SrcPath
+                                                                    Else
+                                                                        '
+                                                                        ' Copy file to resource path
+                                                                        '
+                                                                        DstPath = resourcePath
+                                                                    End If
                                                                 End If
-                                                            Else
-                                                                '
-                                                                ' Install new on this application
-                                                                '
-                                                                Call cpCore.db.csClose(CSCollection)
-                                                                'Call AppendClassLogFile(cmc.appEnvironment.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating a new collection record for Collection [" & Collectionname & "], GUID [" & CollectionGuid & "]")
-                                                                CSCollection = cpCore.db.csInsertRecord("Add-on Collections", 0)
-                                                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App does not have this collection so it will be installed.")
-                                                                OKToInstall = True
-                                                            End If
-                                                            If Not OKToInstall Then
-                                                                '
-                                                                ' Do not install, but still check all imported collections to see if they need to be installed
-                                                                ' imported collections moved in front this check
-                                                                '
-                                                            Else
-                                                                '
-                                                                ' ----- gather help nodes
-                                                                '
-                                                                For Each CDefSection In .ChildNodes
-                                                                    If genericController.vbLCase(CDefSection.Name) = "help" Then
-                                                                        CollectionHelp = CollectionHelp & CDefSection.InnerText
-                                                                    End If
-                                                                    If (CollectionHelpLink = "") And (LCase(CDefSection.Name) = "helplink") Then
-                                                                        '
-                                                                        ' only save the first
-                                                                        '
-                                                                        CollectionHelpLink_fileValueOK = True
-                                                                        CollectionHelpLink = CDefSection.InnerText
-                                                                    End If
-                                                                Next
-                                                                '
-                                                                ' ----- Install or upgrade this collection
-                                                                '
-                                                                If cpCore.db.csOk(CSCollection) Then
-                                                                    '
-                                                                    ' ----- set or clear all fields
-                                                                    '
-                                                                    OtherXML = ""
-                                                                    CollectionID = cpCore.db.csGetInteger(CSCollection, "ID")
-                                                                    Call cpCore.db.csSet(CSCollection, "name", Collectionname)
-                                                                    Call cpCore.db.csSet(CSCollection, "help", CollectionHelp)
-                                                                    Call cpCore.db.csSet(CSCollection, AddonGuidFieldName, CollectionGuid)
-                                                                    Call cpCore.db.csSet(CSCollection, "lastchangedate", CollectionLastChangeDate)
-                                                                    'Call cpCore.db.cs_set(CSCollection, "InstallFile", Doc.DocumentElement.OuterXml)
-                                                                    Call cpCore.db.csSet(CSCollection, "OtherXML", OtherXML)
-                                                                    If True Then
-                                                                        If CollectionSystem_fileValueOK Then
-                                                                            Call cpCore.db.csSet(CSCollection, "system", CollectionSystem)
-                                                                        End If
-                                                                        If True Then
-                                                                            If CollectionUpdatable_fileValueOK Then
-                                                                                Call cpCore.db.csSet(CSCollection, "updatable", CollectionUpdatable)
-                                                                            End If
-                                                                        End If
-                                                                        If True Then
-                                                                            If CollectionblockNavigatorNode_fileValueOK Then
-                                                                                Call cpCore.db.csSet(CSCollection, "blockNavigatorNode", CollectionblockNavigatorNode)
-                                                                            End If
-                                                                            If CollectionHelpLink_fileValueOK Then
-                                                                                Call cpCore.db.csSet(CSCollection, "helpLink", CollectionHelpLink)
-                                                                            End If
-                                                                        End If
-                                                                    End If
-                                                                    Call cpCore.db.csSave2(CSCollection)
-                                                                    '
-                                                                    ' ----- Clear rules from collection if this is an upgrade
-                                                                    '
-                                                                    If False Then
-                                                                        '
-                                                                        ' deprecated addon collection rules for collectionid
-                                                                        '
-                                                                        Call cpCore.db.deleteContentRecords("Add-on Collection Rules", "CollectionID=" & CollectionID)
-                                                                    End If
-                                                                    'Call cpCore.db.deleteContentRecords("Add-on Collection Module Rules", "CollectionID=" & CollectionID)
-                                                                    Call cpCore.db.deleteContentRecords("Add-on Collection CDef Rules", "CollectionID=" & CollectionID)
-                                                                    Call cpCore.db.deleteContentRecords("Add-on Collection Parent Rules", "ParentID=" & CollectionID)
-                                                                    '
-                                                                    ' ----- Compatibility only
-                                                                    '       Update Files field with all the files in the collection
-                                                                    '
-                                                                    If (ContentFileList & wwwFileList & ExecFileList) = "" Then
-                                                                        '
-                                                                        ' If no resource entries were included, use the compatibility mode
-                                                                        '
-                                                                        ' 11/10/2009 +++++ Compatibility copy
-                                                                        FileList = GetCollectionFileList(cpCore, CollectionVersionFolder, "", CollectionFilename)
-                                                                        Files = Split(FileList, vbCrLf)
-                                                                        For Ptr = 0 To UBound(Files)
-                                                                            PathFilename = Files(Ptr)
-                                                                            If Trim(PathFilename) <> "" Then
-                                                                                PathFilename = genericController.vbReplace(PathFilename, "/", "\")
-                                                                                FileExt = ""
-                                                                                Filename = PathFilename
-                                                                                FilePath = ""
-                                                                                Pos = InStrRev(PathFilename, ".")
-                                                                                If Pos > 0 Then
-                                                                                    FileExt = genericController.vbLCase(Mid(PathFilename, Pos + 1))
-                                                                                End If
-                                                                                Pos = InStrRev(PathFilename, "\")
-                                                                                If Pos > 0 Then
-                                                                                    Filename = Mid(PathFilename, Pos + 1)
-                                                                                    FilePath = Mid(PathFilename, 1, Pos)
-                                                                                End If
-                                                                                If (FileExt = "dll") Or (FileExt = "exe") Or (FileExt = "com") Then
-                                                                                    '
-                                                                                    ' executable, do not copy
-                                                                                    '
-                                                                                    ExecFileList = ExecFileList & vbCrLf & PathFilename
-                                                                                ElseIf (LCase(Left(PathFilename, 16)) = "contensivefiles\") Or (LCase(Left(PathFilename, 16)) = "contentfiles\") Then
-                                                                                    '
-                                                                                    ' content file
-                                                                                    '
-                                                                                    FilePath = Mid(FilePath, 17)
-                                                                                    ContentFileList = ContentFileList & vbCrLf & Mid(PathFilename, 16)
 
-                                                                                    Call cpCore.privateFiles.copyFile(CollectionVersionFolder & FilePath & Filename, FilePath & Filename)
+                                                                Dim DstFilePath As String = genericController.vbReplace(DstPath, "/", "\")
+                                                                If DstFilePath = "\" Then
+                                                                    DstFilePath = ""
+                                                                End If
+                                                                If DstFilePath <> "" Then
+                                                                    If Left(DstFilePath, 1) = "\" Then
+                                                                        DstFilePath = Mid(DstFilePath, 2)
+                                                                    End If
+                                                                    If Right(DstFilePath, 1) <> "\" Then
+                                                                        DstFilePath = DstFilePath & "\"
+                                                                    End If
+                                                                End If
+
+                                                                Select Case resourceType.ToLower()
+                                                                    Case "www"
+                                                                        wwwFileList = wwwFileList & vbCrLf & DstFilePath & filename
+                                                                        Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.appConfig.appRootFilesPath & DstFilePath & "].")
+                                                                        'Call logcontroller.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & "].")
+                                                                        Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & filename, DstFilePath & filename, cpCore.appRootFiles)
+                                                                        If genericController.vbLCase(Right(filename, 4)) = ".zip" Then
+                                                                            Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.appConfig.appRootFilesPath & DstFilePath & filename & "].")
+                                                                            'Call logcontroller.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
+                                                                            Call cpCore.appRootFiles.UnzipFile(DstFilePath & filename)
+                                                                        End If
+                                                                    Case "file", "content"
+                                                                        ContentFileList = ContentFileList & vbCrLf & DstFilePath & filename
+                                                                        Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to content, src [" & CollectionVersionFolder & SrcPath & "], dst [" & DstFilePath & "].")
+                                                                        Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & filename, DstFilePath & filename, cpCore.cdnFiles)
+                                                                        If genericController.vbLCase(Right(filename, 4)) = ".zip" Then
+                                                                            Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping content file [" & DstFilePath & filename & "].")
+                                                                            Call cpCore.cdnFiles.UnzipFile(DstFilePath & filename)
+                                                                        End If
+                                                                    Case Else
+                                                                        If (assembliesInZip.Contains(filename.ToLower())) Then
+                                                                            assembliesInZip.Remove(filename.ToLower())
+                                                                        End If
+                                                                        ExecFileList = ExecFileList & vbCrLf & filename
+                                                                End Select
+                                                            Case "getcollection", "importcollection"
+                                                                '
+                                                                ' Get path to this collection and call into it
+                                                                '
+                                                                Dim Found As Boolean = False
+                                                                Dim ChildCollectionName As String = GetXMLAttribute(cpCore, Found, CDefSection, "name", "")
+                                                                Dim ChildCollectionGUID As String = GetXMLAttribute(cpCore, Found, CDefSection, "guid", CDefSection.InnerText)
+                                                                If ChildCollectionGUID = "" Then
+                                                                    ChildCollectionGUID = CDefSection.InnerText
+                                                                End If
+                                                                If (InStr(1, ImportFromCollectionsGuidList & "," & CollectionGuid, ChildCollectionGUID, vbTextCompare) <> 0) Then
+                                                                    '
+                                                                    ' circular import detected, this collection is already imported
+                                                                    '
+                                                                    Call logController.appendInstallLog(cpCore, "Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1. The collection to be imported is [" & ChildCollectionName & "], GUID [" & ChildCollectionGUID & "]")
+                                                                Else
+                                                                    Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 1, import collection found, name [" & ChildCollectionName & "], guid [" & ChildCollectionGUID & "]")
+                                                                    If True Then
+                                                                        Call installCollectionFromRemoteRepo(cpCore, ChildCollectionGUID, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, nonCriticalErrorList)
+                                                                    Else
+                                                                        If ChildCollectionGUID = "" Then
+                                                                            Call logController.appendInstallLog(cpCore, "The importcollection node [" & ChildCollectionName & "] can not be upgraded because it does not include a valid guid.")
+                                                                        Else
+                                                                            '
+                                                                            ' This import occurred while upgrading an application from the local collections (Db upgrade or AddonManager)
+                                                                            ' Its OK to install it if it is missing, but you do not need to upgrade the local collections from the Library
+                                                                            '
+                                                                            ' 5/18/2008 -----------------------------------
+                                                                            ' See if it is in the local collections storage. If yes, just upgrade this app with it. If not,
+                                                                            ' it must be downloaded and the entire server must be upgraded
+                                                                            '
+                                                                            Dim ChildCollectionVersionFolderName As String = ""
+                                                                            Dim ChildCollectionLastChangeDate As Date = Nothing
+                                                                            Call GetCollectionConfig(cpCore, ChildCollectionGUID, ChildCollectionVersionFolderName, ChildCollectionLastChangeDate, "")
+                                                                            If ChildCollectionVersionFolderName <> "" Then
+                                                                                '
+                                                                                ' It is installed in the local collections, update just this site
+                                                                                '
+                                                                                result = result And installCollectionFromLocalRepo(cpCore, ChildCollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild, nonCriticalErrorList)
+                                                                            End If
+                                                                        End If
+                                                                    End If
+                                                                End If
+                                                        End Select
+                                                    Next
+                                                    '
+                                                    ' -- any assemblies found in the zip that were not part of the resources section need to be added
+                                                    For Each filename As String In assembliesInZip
+                                                        ExecFileList = ExecFileList & vbCrLf & filename
+                                                    Next
+                                                    '
+                                                    '-------------------------------------------------------------------------------
+                                                    ' create an Add-on Collection record
+                                                    '-------------------------------------------------------------------------------
+                                                    '
+                                                    Dim OKToInstall As Boolean = False
+                                                    Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 1 done, create collection record.")
+                                                    Dim collection As Models.Entity.AddonCollectionModel = Models.Entity.AddonCollectionModel.create(cpCore, CollectionGuid)
+                                                    If (collection IsNot Nothing) Then
+                                                        '
+                                                        ' Upgrade addon
+                                                        '
+                                                        If CollectionLastChangeDate = Date.MinValue Then
+                                                            Call logController.appendInstallLog(cpCore, "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.")
+                                                            OKToInstall = True
+                                                        ElseIf (collection.LastChangeDate < CollectionLastChangeDate) Then
+                                                            Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has an older version of collection. It will be upgraded.")
+                                                            OKToInstall = True
+                                                        Else
+                                                            Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has an up-to-date version of collection. It will not be upgraded, but all imports in the new version will be checked.")
+                                                            OKToInstall = False
+                                                        End If
+                                                    Else
+                                                        '
+                                                        ' Install new on this application
+                                                        '
+                                                        collection = Models.Entity.AddonCollectionModel.add(cpCore)
+                                                        Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App does not have this collection so it will be installed.")
+                                                        OKToInstall = True
+                                                    End If
+                                                    Dim DataRecordList As String = ""
+                                                    If Not OKToInstall Then
+                                                        '
+                                                        ' Do not install, but still check all imported collections to see if they need to be installed
+                                                        ' imported collections moved in front this check
+                                                        '
+                                                    Else
+                                                        '
+                                                        ' ----- gather help nodes
+                                                        '
+                                                        Dim CollectionHelpLink As String = ""
+                                                        For Each CDefSection As XmlNode In .ChildNodes
+                                                            If (CDefSection.Name.ToLower() = "helplink") Then
+                                                                '
+                                                                ' only save the first
+                                                                CollectionHelpLink = CDefSection.InnerText
+                                                                Exit For
+                                                            End If
+                                                        Next
+                                                        '
+                                                        ' ----- set or clear all fields
+                                                        collection.name = Collectionname
+                                                        collection.Help = ""
+                                                        collection.ccguid = CollectionGuid
+                                                        collection.LastChangeDate = CollectionLastChangeDate
+                                                        If CollectionSystem_fileValueOK Then
+                                                            collection.System = CollectionSystem
+                                                        End If
+                                                        If CollectionUpdatable_fileValueOK Then
+                                                            collection.Updatable = CollectionUpdatable
+                                                        End If
+                                                        If CollectionblockNavigatorNode_fileValueOK Then
+                                                            collection.blockNavigatorNode = CollectionblockNavigatorNode
+                                                        End If
+                                                        collection.helpLink = CollectionHelpLink
+                                                        '
+                                                        Call cpCore.db.deleteContentRecords("Add-on Collection CDef Rules", "CollectionID=" & collection.id)
+                                                        Call cpCore.db.deleteContentRecords("Add-on Collection Parent Rules", "ParentID=" & collection.id)
+                                                        '
+                                                        ' Store all resource found, new way and compatibility way
+                                                        '
+                                                        collection.ContentFileList = ContentFileList
+                                                        collection.ExecFileList = ExecFileList
+                                                        collection.wwwFileList = wwwFileList
+                                                        '
+                                                        ' ----- remove any current navigator nodes installed by the collection previously
+                                                        '
+                                                        If (collection.id <> 0) Then
+                                                            Call cpCore.db.deleteContentRecords(cnNavigatorEntries, "installedbycollectionid=" & collection.id)
+                                                        End If
+                                                        '
+                                                        '-------------------------------------------------------------------------------
+                                                        ' ----- Pass 2
+                                                        ' Go through all collection nodes
+                                                        ' Process all cdef related nodes to the old upgrade
+                                                        '-------------------------------------------------------------------------------
+                                                        '
+                                                        Dim CollectionWrapper As String = ""
+                                                        Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 2")
+                                                        For Each CDefSection As XmlNode In .ChildNodes
+                                                            Select Case genericController.vbLCase(CDefSection.Name)
+                                                                Case "contensivecdef"
+                                                                    '
+                                                                    ' old cdef xection -- take the inner
+                                                                    '
+                                                                    For Each ChildNode As XmlNode In CDefSection.ChildNodes
+                                                                        CollectionWrapper &= vbCrLf & ChildNode.OuterXml
+                                                                    Next
+                                                                Case "cdef", "sqlindex", "style", "styles", "stylesheet", "adminmenu", "menuentry", "navigatorentry"
+                                                                    '
+                                                                    ' handled by Upgrade class
+                                                                    CollectionWrapper &= CDefSection.OuterXml
+                                                            End Select
+                                                        Next
+                                                        '
+                                                        '-------------------------------------------------------------------------------
+                                                        ' ----- Post Pass 2
+                                                        ' if cdef were found, import them now
+                                                        '-------------------------------------------------------------------------------
+                                                        '
+                                                        If CollectionWrapper <> "" Then
+                                                            '
+                                                            ' -- Use the upgrade code to import this part
+                                                            CollectionWrapper = "<" & CollectionFileRootNode & ">" & CollectionWrapper & "</" & CollectionFileRootNode & ">"
+                                                            Dim isBaseCollection As Boolean = (baseCollectionGuid = CollectionGuid)
+                                                            Call installCollectionFromLocalRepo_BuildDbFromXmlData(cpCore, CollectionWrapper, IsNewBuild, isBaseCollection, nonCriticalErrorList)
+                                                            '
+                                                            ' -- Process nodes to save Collection data
+                                                            Dim NavDoc As New XmlDocument
+                                                            loadOK = True
+                                                            Try
+                                                                NavDoc.LoadXml(CollectionWrapper)
+                                                            Catch ex As Exception
+                                                                '
+                                                                ' error - Need a way to reach the user that submitted the file
+                                                                '
+                                                                Call logController.appendInstallLog(cpCore, "Creating navigator entries, there was an error parsing the portion of the collection that contains cdef. Navigator entry creation was aborted. [There was an error reading the Meta data file.]")
+                                                                result = False
+                                                                return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the xml collection file has an error.</P>"
+                                                                loadOK = False
+                                                            End Try
+                                                            If loadOK Then
+                                                                With NavDoc.DocumentElement
+                                                                    For Each CDefNode As XmlNode In .ChildNodes
+                                                                        Select Case genericController.vbLCase(CDefNode.Name)
+                                                                            Case "cdef"
+                                                                                Dim ContentName As String = GetXMLAttribute(cpCore, IsFound, CDefNode, "name", "")
+                                                                                '
+                                                                                ' setup cdef rule
+                                                                                '
+                                                                                Dim ContentID As Integer = cpCore.metaData.getContentId(ContentName)
+                                                                                If ContentID > 0 Then
+                                                                                    Dim CS As Integer = cpCore.db.csInsertRecord("Add-on Collection CDef Rules", 0)
+                                                                                    If cpCore.db.csOk(CS) Then
+                                                                                        Call cpCore.db.csSet(CS, "Contentid", ContentID)
+                                                                                        Call cpCore.db.csSet(CS, "CollectionID", collection.id)
+                                                                                    End If
+                                                                                    Call cpCore.db.csClose(CS)
+                                                                                End If
+                                                                        End Select
+                                                                    Next
+                                                                End With
+                                                            End If
+                                                        End If
+                                                        '
+                                                        '-------------------------------------------------------------------------------
+                                                        ' ----- Pass3
+                                                        ' create any data records
+                                                        '
+                                                        '   process after cdef builds
+                                                        '   process seperate so another pass can create any lookup data from these records
+                                                        '-------------------------------------------------------------------------------
+                                                        '
+                                                        Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 3")
+                                                        For Each CDefSection As XmlNode In .ChildNodes
+                                                            Select Case genericController.vbLCase(CDefSection.Name)
+                                                                Case "data"
+                                                                    '
+                                                                    ' import content
+                                                                    '   This can only be done with matching guid
+                                                                    '
+                                                                    For Each ContentNode As XmlNode In CDefSection.ChildNodes
+                                                                        If genericController.vbLCase(ContentNode.Name) = "record" Then
+                                                                            '
+                                                                            ' Data.Record node
+                                                                            '
+                                                                            Dim ContentName As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "content", "")
+                                                                            If ContentName = "" Then
+                                                                                Call logController.appendInstallLog(cpCore, "install collection file contains a data.record node with a blank content attribute.")
+                                                                                result = False
+                                                                                return_ErrorMessage = return_ErrorMessage & "<P>Collection file contains a data.record node with a blank content attribute.</P>"
+                                                                            Else
+                                                                                Dim ContentRecordGuid As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "guid", "")
+                                                                                Dim ContentRecordName As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "name", "")
+                                                                                If (ContentRecordGuid = "") And (ContentRecordName = "") Then
+                                                                                    Call logController.appendInstallLog(cpCore, "install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" & ContentName & "]")
+                                                                                    result = False
+                                                                                    return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" & ContentName & "].</P>"
                                                                                 Else
                                                                                     '
-                                                                                    ' www file
+                                                                                    ' create or update the record
                                                                                     '
-                                                                                    wwwFileList = wwwFileList & vbCrLf & PathFilename
-                                                                                    Call cpCore.privateFiles.copyFile(CollectionVersionFolder & FilePath & Filename, FilePath & Filename, cpCore.appRootFiles)
-                                                                                End If
-                                                                            End If
-                                                                        Next
-                                                                    End If
-                                                                    '
-                                                                    ' Store all resource found, new way and compatibility way
-                                                                    '
-                                                                    Call cpCore.db.csSet(CSCollection, "ContentFileList", ContentFileList)
-                                                                    Call cpCore.db.csSet(CSCollection, "ExecFileList", ExecFileList)
-                                                                    Call cpCore.db.csSet(CSCollection, "wwwFileList", wwwFileList)
-                                                                    '
-                                                                    ' ----- remove any current navigator nodes installed by the collection previously
-                                                                    '
-                                                                    If (True) And (CollectionID <> 0) Then
-                                                                        Call cpCore.db.deleteContentRecords(cnNavigatorEntries, "installedbycollectionid=" & CollectionID)
-                                                                    End If
-                                                                    '
-                                                                    '-------------------------------------------------------------------------------
-                                                                    ' ----- Pass 2
-                                                                    ' Go through all collection nodes
-                                                                    ' Process all cdef related nodes to the old upgrade
-                                                                    '-------------------------------------------------------------------------------
-                                                                    '
-                                                                    CollectionWrapper = ""
-                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 2")
-                                                                    For Each CDefSection In .ChildNodes
-                                                                        Select Case genericController.vbLCase(CDefSection.Name)
-                                                                            Case "contensivecdef"
-                                                                                '
-                                                                                ' old cdef xection -- take the inner
-                                                                                '
-                                                                                For Each ChildNode In CDefSection.ChildNodes
-                                                                                    CollectionWrapper = CollectionWrapper & vbCrLf & ChildNode.OuterXml
-                                                                                Next
-                                                                                '
-                                                                                ' 6/29/2010
-                                                                                ' took importcollection out because it was being added to OtherXML, and phase 1 of this routine
-                                                                                ' handles importcollections. I think running it in the upgrade is a duplication.
-                                                                                '
-                                                                            Case "cdef", "sqlindex", "style", "styles", "stylesheet", "adminmenu", "menuentry", "navigatorentry"
-                                                                                'Case "cdef", "importcollection", "sqlindex", "style", "styles", "stylesheet", "adminmenu", "menuentry", "navigatorentry"
-                                                                                '
-                                                                                ' handled by Upgrade class
-                                                                                '
-                                                                                CollectionWrapper = CollectionWrapper & vbCrLf & CDefSection.OuterXml
-                                                                        End Select
-                                                                    Next
-                                                                    '
-                                                                    '-------------------------------------------------------------------------------
-                                                                    ' ----- Post Pass 2
-                                                                    ' if cdef were found, import them now
-                                                                    '-------------------------------------------------------------------------------
-                                                                    '
-                                                                    If CollectionWrapper <> "" Then
-                                                                        '
-                                                                        ' Use the upgrade code to import this part
-                                                                        '
-                                                                        CollectionWrapper = "<" & CollectionFileRootNode & ">" & CollectionWrapper & "</" & CollectionFileRootNode & ">"
-                                                                        'saveLogFolder = builder.classLogFolder
-                                                                        'builder.classLogFolder = "AddonInstall"
-                                                                        Call installCollectionFromLocalRepo_BuildDbFromXmlData(cpCore, CollectionWrapper, IsNewBuild, isBaseCollection, nonCriticalErrorList)
-                                                                        'builder.classLogFolder = saveLogFolder
-                                                                        '
-                                                                        ' Process nodes to save Collection data
-                                                                        '
-                                                                        NavDoc = New XmlDocument
-                                                                        loadOK = True
-                                                                        Try
-                                                                            NavDoc.LoadXml(CollectionWrapper)
-                                                                        Catch ex As Exception
-                                                                            '
-                                                                            ' error - Need a way to reach the user that submitted the file
-                                                                            '
-                                                                            UserError = "There was an error reading the Meta data file."
-                                                                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromtLocalCollection", "Creating navigator entries, there was an error parsing the portion of the collection that contains cdef. Navigator entry creation was aborted. [" & UserError & "]")
-                                                                            UpgradeOK = False
-                                                                            return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the xml collection file has an error.</P>"
-                                                                            loadOK = False
-                                                                        End Try
-                                                                        If loadOK Then
-                                                                            With NavDoc.DocumentElement
-                                                                                For Each CDefNode In .ChildNodes
-                                                                                    Select Case genericController.vbLCase(CDefNode.Name)
-                                                                                        Case "cdef"
-                                                                                            ContentName = GetXMLAttribute(cpCore, IsFound, CDefNode, "name", "")
-                                                                                            '
-                                                                                            ' setup cdef rule
-                                                                                            '
-                                                                                            ContentID = cpCore.metaData.getContentId(ContentName)
-                                                                                            If ContentID > 0 Then
-                                                                                                CS = cpCore.db.csInsertRecord("Add-on Collection CDef Rules", 0)
-                                                                                                If cpCore.db.csOk(CS) Then
-                                                                                                    Call cpCore.db.csSet(CS, "Contentid", ContentID)
-                                                                                                    Call cpCore.db.csSet(CS, "CollectionID", CollectionID)
-                                                                                                End If
-                                                                                                Call cpCore.db.csClose(CS)
-                                                                                            End If
-                                                                                            '
-                                                                                            ' create navigator entry
-                                                                                            '
-                                                                                            DeveloperOnly = genericController.EncodeBoolean(GetXMLAttribute(cpCore, IsFound, CDefNode, "developeronly", ""))
-                                                                                            NavIconTypeString = GetXMLAttribute(cpCore, IsFound, CDefNode, "navicontype", "Content")
-                                                                                            EntryName = EncodeInitialCaps(ContentName)
-                                                                                            NavIconTypeID = GetListIndex(NavIconTypeString, NavIconTypeList)
-                                                                                        Case "importcollection"
-                                                                                            '
-                                                                                            ' 6/29/2010
-                                                                                            ' took importcollection out because it was being added to OtherXML, and phase 1 of this routine
-                                                                                            ' handles importcollections. I think running it in the upgrade is a duplication.
-                                                                                            ' - just in case excluded it here too so if it is added back, it still works
-                                                                                            '
-                                                                                        Case Else
-                                                                                            '
-                                                                                            ' other nodes within collected data
-                                                                                            '
-                                                                                            OtherXML = OtherXML & vbCrLf & CDefNode.OuterXml
-                                                                                    End Select
-                                                                                Next
-                                                                            End With
-                                                                        End If
-                                                                        'Call AppendClassLogFile(cmc.appEnvironment.name, "UpgradeAppFromtLocalCollection", "Creating navigator entries. Ending search")
-                                                                    End If
-                                                                    '
-                                                                    '-------------------------------------------------------------------------------
-                                                                    ' ----- Pass3
-                                                                    ' create any data records
-                                                                    '
-                                                                    '   process after cdef builds
-                                                                    '   process seperate so another pass can create any lookup data from these records
-                                                                    '-------------------------------------------------------------------------------
-                                                                    '
-                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 3")
-                                                                    For Each CDefSection In .ChildNodes
-                                                                        Select Case genericController.vbLCase(CDefSection.Name)
-                                                                            Case "data"
-                                                                                '
-                                                                                ' import content
-                                                                                '   This can only be done with matching guid
-                                                                                '
-                                                                                For Each ContentNode In CDefSection.ChildNodes
-                                                                                    If genericController.vbLCase(ContentNode.Name) = "record" Then
+                                                                                    Dim CDef As cdefModel = cpCore.metaData.getCdef(ContentName)
+                                                                                    Dim cs As Integer = -1
+                                                                                    If ContentRecordGuid <> "" Then
+                                                                                        cs = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
+                                                                                    Else
+                                                                                        cs = cpCore.db.csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
+                                                                                    End If
+                                                                                    Dim recordfound As Boolean = True
+                                                                                    If Not cpCore.db.csOk(cs) Then
                                                                                         '
-                                                                                        ' Data.Record node
+                                                                                        ' Insert the new record
                                                                                         '
-                                                                                        ContentName = GetXMLAttribute(cpCore, IsFound, ContentNode, "content", "")
-                                                                                        If ContentName = "" Then
-                                                                                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "Collection file contains a data.record node with a blank content attribute.")
-                                                                                            UpgradeOK = False
-                                                                                            return_ErrorMessage = return_ErrorMessage & "<P>Collection file contains a data.record node with a blank content attribute.</P>"
+                                                                                        recordfound = False
+                                                                                        Call cpCore.db.csClose(cs)
+                                                                                        cs = cpCore.db.csInsertRecord(ContentName, 0)
+                                                                                    End If
+                                                                                    If cpCore.db.csOk(cs) Then
+                                                                                        '
+                                                                                        ' Update the record
+                                                                                        '
+                                                                                        If recordfound And (ContentRecordGuid <> "") Then
+                                                                                            '
+                                                                                            ' found by guid, use guid in list and save name
+                                                                                            '
+                                                                                            Call cpCore.db.csSet(cs, "name", ContentRecordName)
+                                                                                            DataRecordList = DataRecordList & vbCrLf & ContentName & "," & ContentRecordGuid
+                                                                                        ElseIf recordfound Then
+                                                                                            '
+                                                                                            ' record found by name, use name is list but do not add guid
+                                                                                            '
+                                                                                            DataRecordList = DataRecordList & vbCrLf & ContentName & "," & ContentRecordName
                                                                                         Else
-                                                                                            ContentRecordGuid = GetXMLAttribute(cpCore, IsFound, ContentNode, "guid", "")
-                                                                                            ContentRecordName = GetXMLAttribute(cpCore, IsFound, ContentNode, "name", "")
-                                                                                            If (ContentRecordGuid = "") And (ContentRecordName = "") Then
-                                                                                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "Collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" & ContentName & "]")
-                                                                                                UpgradeOK = False
-                                                                                                return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" & ContentName & "].</P>"
-                                                                                            Else
-                                                                                                '
-                                                                                                ' create or update the record
-                                                                                                '
-                                                                                                CDef = cpCore.metaData.getCdef(ContentName)
-                                                                                                If ContentRecordGuid <> "" Then
-                                                                                                    CS = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
-                                                                                                Else
-                                                                                                    CS = cpCore.db.csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
-                                                                                                End If
-                                                                                                Dim recordfound As Boolean
-
-                                                                                                recordfound = True
-                                                                                                If Not cpCore.db.csOk(CS) Then
-                                                                                                    '
-                                                                                                    ' Insert the new record
-                                                                                                    '
-                                                                                                    recordfound = False
-                                                                                                    Call cpCore.db.csClose(CS)
-                                                                                                    CS = cpCore.db.csInsertRecord(ContentName, 0)
-                                                                                                End If
-                                                                                                If cpCore.db.csOk(CS) Then
-                                                                                                    '
-                                                                                                    ' Update the record
-                                                                                                    '
-                                                                                                    If recordfound And (ContentRecordGuid <> "") Then
-                                                                                                        '
-                                                                                                        ' found by guid, use guid in list and save name
-                                                                                                        '
-                                                                                                        Call cpCore.db.csSet(CS, "name", ContentRecordName)
-                                                                                                        DataRecordList = DataRecordList & vbCrLf & ContentName & "," & ContentRecordGuid
-                                                                                                    ElseIf recordfound Then
-                                                                                                        '
-                                                                                                        ' record found by name, use name is list but do not add guid
-                                                                                                        '
-                                                                                                        DataRecordList = DataRecordList & vbCrLf & ContentName & "," & ContentRecordName
-                                                                                                    Else
-                                                                                                        '
-                                                                                                        ' record was created
-                                                                                                        '
-                                                                                                        Call cpCore.db.csSet(CS, "ccguid", ContentRecordGuid)
-                                                                                                        Call cpCore.db.csSet(CS, "name", ContentRecordName)
-                                                                                                        DataRecordList = DataRecordList & vbCrLf & ContentName & "," & ContentRecordGuid
-                                                                                                    End If
-                                                                                                End If
-                                                                                                Call cpCore.db.csClose(CS)
-                                                                                            End If
+                                                                                            '
+                                                                                            ' record was created
+                                                                                            '
+                                                                                            Call cpCore.db.csSet(cs, "ccguid", ContentRecordGuid)
+                                                                                            Call cpCore.db.csSet(cs, "name", ContentRecordName)
+                                                                                            DataRecordList = DataRecordList & vbCrLf & ContentName & "," & ContentRecordGuid
                                                                                         End If
                                                                                     End If
-                                                                                Next
-                                                                        End Select
+                                                                                    Call cpCore.db.csClose(cs)
+                                                                                End If
+                                                                            End If
+                                                                        End If
                                                                     Next
+                                                            End Select
+                                                        Next
+                                                        '
+                                                        '-------------------------------------------------------------------------------
+                                                        ' ----- Pass 4, process fields in data nodes
+                                                        '-------------------------------------------------------------------------------
+                                                        '
+                                                        Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 4")
+                                                        For Each CDefSection As XmlNode In .ChildNodes
+                                                            Select Case genericController.vbLCase(CDefSection.Name)
+                                                                Case "data"
                                                                     '
-                                                                    '-------------------------------------------------------------------------------
-                                                                    ' ----- Pass 4, process fields in data nodes
-                                                                    '-------------------------------------------------------------------------------
+                                                                    ' import content
+                                                                    '   This can only be done with matching guid
                                                                     '
-                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 4")
-                                                                    For Each CDefSection In .ChildNodes
-                                                                        Select Case genericController.vbLCase(CDefSection.Name)
-                                                                            Case "data"
-                                                                                '
-                                                                                ' import content
-                                                                                '   This can only be done with matching guid
-                                                                                '
-                                                                                'OtherXML = OtherXML & vbCrLf & CDefSection.xml
-                                                                                '
-                                                                                For Each ContentNode In CDefSection.ChildNodes
-                                                                                    If genericController.vbLCase(ContentNode.Name) = "record" Then
+                                                                    'OtherXML = OtherXML & vbCrLf & CDefSection.xml
+                                                                    '
+                                                                    For Each ContentNode As XmlNode In CDefSection.ChildNodes
+                                                                        If genericController.vbLCase(ContentNode.Name) = "record" Then
+                                                                            '
+                                                                            ' Data.Record node
+                                                                            '
+                                                                            Dim ContentName As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "content", "")
+                                                                            If ContentName = "" Then
+                                                                                Call logController.appendInstallLog(cpCore, "install collection file contains a data.record node with a blank content attribute.")
+                                                                                result = False
+                                                                                return_ErrorMessage = return_ErrorMessage & "<P>Collection file contains a data.record node with a blank content attribute.</P>"
+                                                                            Else
+                                                                                Dim ContentRecordGuid As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "guid", "")
+                                                                                Dim ContentRecordName As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "name", "")
+                                                                                If (ContentRecordGuid <> "") Or (ContentRecordName <> "") Then
+                                                                                    Dim CDef As cdefModel = cpCore.metaData.getCdef(ContentName)
+                                                                                    Dim cs As Integer = -1
+                                                                                    If ContentRecordGuid <> "" Then
+                                                                                        cs = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
+                                                                                    Else
+                                                                                        cs = cpCore.db.csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
+                                                                                    End If
+                                                                                    If cpCore.db.csOk(cs) Then
                                                                                         '
-                                                                                        ' Data.Record node
-                                                                                        '
-                                                                                        ContentName = GetXMLAttribute(cpCore, IsFound, ContentNode, "content", "")
-                                                                                        If ContentName = "" Then
-                                                                                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "Collection file contains a data.record node with a blank content attribute.")
-                                                                                            UpgradeOK = False
-                                                                                            return_ErrorMessage = return_ErrorMessage & "<P>Collection file contains a data.record node with a blank content attribute.</P>"
-                                                                                        Else
-                                                                                            ContentRecordGuid = GetXMLAttribute(cpCore, IsFound, ContentNode, "guid", "")
-                                                                                            ContentRecordName = GetXMLAttribute(cpCore, IsFound, ContentNode, "name", "")
-                                                                                            If (ContentRecordGuid <> "") Or (ContentRecordName <> "") Then
-                                                                                                CDef = cpCore.metaData.getCdef(ContentName)
-                                                                                                If ContentRecordGuid <> "" Then
-                                                                                                    CS = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
-                                                                                                Else
-                                                                                                    CS = cpCore.db.csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
-                                                                                                End If
-                                                                                                If Not cpCore.db.csOk(CS) Then
-                                                                                                    CS = CS
-                                                                                                Else
-                                                                                                    '
-                                                                                                    ' Update the record
-                                                                                                    '
-                                                                                                    For Each FieldNode In ContentNode.ChildNodes
-                                                                                                        If genericController.vbLCase(FieldNode.Name) = "field" Then
-                                                                                                            IsFieldFound = False
-                                                                                                            FieldName = genericController.vbLCase(GetXMLAttribute(cpCore, IsFound, FieldNode, "name", ""))
-                                                                                                            For Each keyValuePair In CDef.fields
-                                                                                                                Dim field As CDefFieldModel = keyValuePair.Value
-                                                                                                                If genericController.vbLCase(field.nameLc) = FieldName Then
-                                                                                                                    fieldTypeId = field.fieldTypeId
-                                                                                                                    FieldLookupContentID = field.lookupContentID
-                                                                                                                    IsFieldFound = True
-                                                                                                                    Exit For
-                                                                                                                End If
-                                                                                                            Next
-                                                                                                            'For Ptr = 0 To CDef.fields.count - 1
-                                                                                                            '    CDefField = CDef.fields(Ptr)
-                                                                                                            '    If genericController.vbLCase(CDefField.Name) = FieldName Then
-                                                                                                            '        fieldType = CDefField.fieldType
-                                                                                                            '        FieldLookupContentID = CDefField.LookupContentID
-                                                                                                            '        IsFieldFound = True
-                                                                                                            '        Exit For
-                                                                                                            '    End If
-                                                                                                            'Next
-                                                                                                            If IsFieldFound Then
-                                                                                                                FieldValue = FieldNode.InnerText
-                                                                                                                Select Case fieldTypeId
-                                                                                                                    Case FieldTypeIdAutoIdIncrement, FieldTypeIdRedirect
+                                                                                        ' Update the record
+                                                                                        For Each FieldNode As XmlNode In ContentNode.ChildNodes
+                                                                                            If FieldNode.Name.ToLower() = "field" Then
+                                                                                                Dim IsFieldFound As Boolean = False
+                                                                                                Dim FieldName As String = GetXMLAttribute(cpCore, IsFound, FieldNode, "name", "").ToLower()
+                                                                                                Dim fieldTypeId As Integer = -1
+                                                                                                Dim FieldLookupContentID As Integer = -1
+                                                                                                For Each keyValuePair In CDef.fields
+                                                                                                    Dim field As CDefFieldModel = keyValuePair.Value
+                                                                                                    If genericController.vbLCase(field.nameLc) = FieldName Then
+                                                                                                        fieldTypeId = field.fieldTypeId
+                                                                                                        FieldLookupContentID = field.lookupContentID
+                                                                                                        IsFieldFound = True
+                                                                                                        Exit For
+                                                                                                    End If
+                                                                                                Next
+                                                                                                'For Ptr = 0 To CDef.fields.count - 1
+                                                                                                '    CDefField = CDef.fields(Ptr)
+                                                                                                '    If genericController.vbLCase(CDefField.Name) = FieldName Then
+                                                                                                '        fieldType = CDefField.fieldType
+                                                                                                '        FieldLookupContentID = CDefField.LookupContentID
+                                                                                                '        IsFieldFound = True
+                                                                                                '        Exit For
+                                                                                                '    End If
+                                                                                                'Next
+                                                                                                If IsFieldFound Then
+                                                                                                    Dim FieldValue As String = FieldNode.InnerText
+                                                                                                    Select Case fieldTypeId
+                                                                                                        Case FieldTypeIdAutoIdIncrement, FieldTypeIdRedirect
                                                                                                                         '
                                                                                                                         ' not supported
                                                                                                                         '
-                                                                                                                    Case FieldTypeIdLookup
+                                                                                                        Case FieldTypeIdLookup
+                                                                                                            '
+                                                                                                            ' read in text value, if a guid, use it, otherwise assume name
+                                                                                                            '
+                                                                                                            If FieldLookupContentID <> 0 Then
+                                                                                                                Dim FieldLookupContentName As String = cpCore.metaData.getContentNameByID(FieldLookupContentID)
+                                                                                                                If FieldLookupContentName <> "" Then
+                                                                                                                    If (Left(FieldValue, 1) = "{") And (Right(FieldValue, 1) = "}") And cpCore.metaData.isContentFieldSupported(FieldLookupContentName, "ccguid") Then
                                                                                                                         '
-                                                                                                                        ' read in text value, if a guid, use it, otherwise assume name
+                                                                                                                        ' Lookup by guid
                                                                                                                         '
-                                                                                                                        If FieldLookupContentID <> 0 Then
-                                                                                                                            FieldLookupContentName = cpCore.metaData.getContentNameByID(FieldLookupContentID)
-                                                                                                                            If FieldLookupContentName <> "" Then
-                                                                                                                                If (Left(FieldValue, 1) = "{") And (Right(FieldValue, 1) = "}") And cpCore.metaData.isContentFieldSupported(FieldLookupContentName, "ccguid") Then
-                                                                                                                                    '
-                                                                                                                                    ' Lookup by guid
-                                                                                                                                    '
-                                                                                                                                    fieldLookupId = genericController.EncodeInteger(cpCore.db.GetRecordIDByGuid(FieldLookupContentName, FieldValue))
-                                                                                                                                    If fieldLookupId <= 0 Then
-                                                                                                                                        return_ErrorMessage = return_ErrorMessage & "<P>Warning: There was a problem translating field [" & FieldName & "] in record [" & ContentName & "] because the record it refers to was not found in this site.</P>"
-                                                                                                                                    Else
-                                                                                                                                        Call cpCore.db.csSet(CS, FieldName, fieldLookupId)
-                                                                                                                                    End If
-                                                                                                                                Else
-                                                                                                                                    '
-                                                                                                                                    ' lookup by name
-                                                                                                                                    '
-                                                                                                                                    If FieldValue <> "" Then
-                                                                                                                                        fieldLookupId = cpCore.db.getRecordID(FieldLookupContentName, FieldValue)
-                                                                                                                                        If fieldLookupId <= 0 Then
-                                                                                                                                            return_ErrorMessage = return_ErrorMessage & "<P>Warning: There was a problem translating field [" & FieldName & "] in record [" & ContentName & "] because the record it refers to was not found in this site.</P>"
-                                                                                                                                        Else
-                                                                                                                                            Call cpCore.db.csSet(CS, FieldName, fieldLookupId)
-                                                                                                                                        End If
-                                                                                                                                    End If
-                                                                                                                                End If
-                                                                                                                            End If
-                                                                                                                        ElseIf (genericController.vbIsNumeric(FieldValue)) Then
-                                                                                                                            '
-                                                                                                                            ' must be lookup list
-                                                                                                                            '
-                                                                                                                            Call cpCore.db.csSet(CS, FieldName, FieldValue)
+                                                                                                                        Dim fieldLookupId As Integer = genericController.EncodeInteger(cpCore.db.GetRecordIDByGuid(FieldLookupContentName, FieldValue))
+                                                                                                                        If fieldLookupId <= 0 Then
+                                                                                                                            return_ErrorMessage = return_ErrorMessage & "<P>Warning: There was a problem translating field [" & FieldName & "] in record [" & ContentName & "] because the record it refers to was not found in this site.</P>"
+                                                                                                                        Else
+                                                                                                                            Call cpCore.db.csSet(cs, FieldName, fieldLookupId)
                                                                                                                         End If
-                                                                                                                    Case Else
-                                                                                                                        Call cpCore.db.csSet(CS, FieldName, FieldValue)
-                                                                                                                End Select
+                                                                                                                    Else
+                                                                                                                        '
+                                                                                                                        ' lookup by name
+                                                                                                                        '
+                                                                                                                        If FieldValue <> "" Then
+                                                                                                                            Dim fieldLookupId As Integer = cpCore.db.getRecordID(FieldLookupContentName, FieldValue)
+                                                                                                                            If fieldLookupId <= 0 Then
+                                                                                                                                return_ErrorMessage = return_ErrorMessage & "<P>Warning: There was a problem translating field [" & FieldName & "] in record [" & ContentName & "] because the record it refers to was not found in this site.</P>"
+                                                                                                                            Else
+                                                                                                                                Call cpCore.db.csSet(cs, FieldName, fieldLookupId)
+                                                                                                                            End If
+                                                                                                                        End If
+                                                                                                                    End If
+                                                                                                                End If
+                                                                                                            ElseIf (genericController.vbIsNumeric(FieldValue)) Then
+                                                                                                                '
+                                                                                                                ' must be lookup list
+                                                                                                                '
+                                                                                                                Call cpCore.db.csSet(cs, FieldName, FieldValue)
                                                                                                             End If
-                                                                                                        End If
-                                                                                                    Next
+                                                                                                        Case Else
+                                                                                                            Call cpCore.db.csSet(cs, FieldName, FieldValue)
+                                                                                                    End Select
                                                                                                 End If
-                                                                                                Call cpCore.db.csClose(CS)
                                                                                             End If
-                                                                                        End If
+                                                                                        Next
                                                                                     End If
-                                                                                Next
-                                                                        End Select
+                                                                                    Call cpCore.db.csClose(cs)
+                                                                                End If
+                                                                            End If
+                                                                        End If
                                                                     Next
-                                                                    ' --- end of pass
+                                                            End Select
+                                                        Next
+                                                        ' --- end of pass
+                                                        '
+                                                        '-------------------------------------------------------------------------------
+                                                        ' ----- Pass 5, all other collection nodes
+                                                        '
+                                                        ' Process all non-import <Collection> nodes
+                                                        '-------------------------------------------------------------------------------
+                                                        '
+                                                        Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 5")
+                                                        For Each CDefSection As XmlNode In .ChildNodes
+                                                            Select Case genericController.vbLCase(CDefSection.Name)
+                                                                Case "cdef", "data", "help", "resource", "helplink"
+                                                                            '
+                                                                            ' ignore - processed in previous passes
+                                                                Case "getcollection", "importcollection"
                                                                     '
-                                                                    '-------------------------------------------------------------------------------
-                                                                    ' ----- Pass 5, all other collection nodes
-                                                                    '
-                                                                    ' Process all non-import <Collection> nodes
-                                                                    '-------------------------------------------------------------------------------
-                                                                    '
-                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 5")
-                                                                    For Each CDefSection In .ChildNodes
-                                                                        Select Case genericController.vbLCase(CDefSection.Name)
-                                                                            Case "cdef", "data", "help", "resource", "helplink"
-                                                                                '
-                                                                                ' ignore - processed in previous passes
-                                                                                '
-                                                                                FieldValue = FieldValue
-                                                                            Case "getcollection", "importcollection"
-                                                                                '
-                                                                                ' processed, but add rule for collection record
-                                                                                '
-                                                                                ChildCollectionName = GetXMLAttribute(cpCore, Found, CDefSection, "name", "")
-                                                                                ChildCollectionGUID = GetXMLAttribute(cpCore, Found, CDefSection, "guid", CDefSection.InnerText)
-                                                                                If ChildCollectionGUID = "" Then
-                                                                                    ChildCollectionGUID = CDefSection.InnerText
-                                                                                End If
-                                                                                If ChildCollectionGUID <> "" Then
-                                                                                    ChildCollectionID = 0
-                                                                                    CS = cpCore.db.csOpen("Add-on Collections", "ccguid=" & cpCore.db.encodeSQLText(ChildCollectionGUID), , , , , , "id")
-                                                                                    If cpCore.db.csOk(CS) Then
-                                                                                        ChildCollectionID = cpCore.db.csGetInteger(CS, "id")
-                                                                                    End If
-                                                                                    Call cpCore.db.csClose(CS)
-                                                                                    If ChildCollectionID <> 0 Then
-                                                                                        CS = cpCore.db.csInsertRecord("Add-on Collection Parent Rules", 0)
-                                                                                        If cpCore.db.csOk(CS) Then
-                                                                                            Call cpCore.db.csSet(CS, "ParentID", CollectionID)
-                                                                                            Call cpCore.db.csSet(CS, "ChildID", ChildCollectionID)
-                                                                                        End If
-                                                                                        Call cpCore.db.csClose(CS)
-                                                                                    End If
-                                                                                End If
-                                                                            'Case "scriptingmodule", "scriptingmodules"
+                                                                    ' processed, but add rule for collection record
+                                                                    Dim Found As Boolean = False
+                                                                    Dim ChildCollectionName As String = GetXMLAttribute(cpCore, Found, CDefSection, "name", "")
+                                                                    Dim ChildCollectionGUID As String = GetXMLAttribute(cpCore, Found, CDefSection, "guid", CDefSection.InnerText)
+                                                                    If ChildCollectionGUID = "" Then
+                                                                        ChildCollectionGUID = CDefSection.InnerText
+                                                                    End If
+                                                                    If ChildCollectionGUID <> "" Then
+                                                                        Dim ChildCollectionID As Integer = 0
+                                                                        Dim cs As Integer = -1
+                                                                        cs = cpCore.db.csOpen("Add-on Collections", "ccguid=" & cpCore.db.encodeSQLText(ChildCollectionGUID), , , , , , "id")
+                                                                        If cpCore.db.csOk(cs) Then
+                                                                            ChildCollectionID = cpCore.db.csGetInteger(cs, "id")
+                                                                        End If
+                                                                        Call cpCore.db.csClose(cs)
+                                                                        If ChildCollectionID <> 0 Then
+                                                                            cs = cpCore.db.csInsertRecord("Add-on Collection Parent Rules", 0)
+                                                                            If cpCore.db.csOk(cs) Then
+                                                                                Call cpCore.db.csSet(cs, "ParentID", collection.id)
+                                                                                Call cpCore.db.csSet(cs, "ChildID", ChildCollectionID)
+                                                                            End If
+                                                                            Call cpCore.db.csClose(cs)
+                                                                        End If
+                                                                    End If
+                                                                Case "scriptingmodule", "scriptingmodules"
+                                                                    result = False
+                                                                    return_ErrorMessage = return_ErrorMessage & "<P>Collection includes a scripting module which is no longer supported. Move scripts to the code tab.</P>"
                                                                             '    '
                                                                             '    ' Scripting modules
                                                                             '    '
@@ -1987,7 +1773,7 @@ Namespace Contensive.Core
                                                                             '        '
                                                                             '        ' Update the Addon
                                                                             '        '
-                                                                            '        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing scripting module, Updating module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                            '        Call logcontroller.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, GUID match with existing scripting module, Updating module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                             '    Else
                                                                             '        '
                                                                             '        ' not found by GUID - search name against name to update legacy Add-ons
@@ -1996,7 +1782,7 @@ Namespace Contensive.Core
                                                                             '        Criteria = "(name=" & cpCore.db.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
                                                                             '        CS = cpCore.db.cs_open("Scripting Modules", Criteria)
                                                                             '        If cpCore.db.cs_ok(CS) Then
-                                                                            '            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                            '            Call logcontroller.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                             '        End If
                                                                             '    End If
                                                                             '    If Not cpCore.db.cs_ok(CS) Then
@@ -2006,14 +1792,14 @@ Namespace Contensive.Core
                                                                             '        Call cpCore.db.cs_Close(CS)
                                                                             '        CS = cpCore.db.cs_insertRecord("Scripting Modules", 0)
                                                                             '        If cpCore.db.cs_ok(CS) Then
-                                                                            '            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                            '            Call logcontroller.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                             '        End If
                                                                             '    End If
                                                                             '    If Not cpCore.db.cs_ok(CS) Then
                                                                             '        '
                                                                             '        ' Could not create new
                                                                             '        '
-                                                                            '        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                            '        Call logcontroller.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                             '    Else
                                                                             '        ScriptingModuleID = cpCore.db.cs_getInteger(CS, "ID")
                                                                             '        Call cpCore.db.cs_set(CS, "code", CDefSection.InnerText)
@@ -2032,7 +1818,10 @@ Namespace Contensive.Core
                                                                             '        End If
                                                                             '        Call cpCore.db.cs_Close(CS)
                                                                             '    End If
-                                                                            'Case "sharedstyle"
+                                                                Case "sharedstyle"
+                                                                    result = False
+                                                                    return_ErrorMessage = return_ErrorMessage & "<P>Collection includes a shared style which is no longer supported. Move styles to the default styles tab.</P>"
+
                                                                             '    '
                                                                             '    ' added 9/3/2012
                                                                             '    ' Shared Style
@@ -2053,7 +1842,7 @@ Namespace Contensive.Core
                                                                             '        '
                                                                             '        ' Update the Addon
                                                                             '        '
-                                                                            '        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing shared style, Updating [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                            '        Call logcontroller.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, GUID match with existing shared style, Updating [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                             '    Else
                                                                             '        '
                                                                             '        ' not found by GUID - search name against name to update legacy Add-ons
@@ -2062,7 +1851,7 @@ Namespace Contensive.Core
                                                                             '        Criteria = "(name=" & cpCore.db.encodeSQLText(NodeName) & ")and(ccguid is null)"
                                                                             '        CS = cpCore.db.cs_open("shared styles", Criteria)
                                                                             '        If cpCore.db.cs_ok(CS) Then
-                                                                            '            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                            '            Call logcontroller.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                             '        End If
                                                                             '    End If
                                                                             '    If Not cpCore.db.cs_ok(CS) Then
@@ -2072,14 +1861,14 @@ Namespace Contensive.Core
                                                                             '        Call cpCore.db.cs_Close(CS)
                                                                             '        CS = cpCore.db.cs_insertRecord("shared styles", 0)
                                                                             '        If cpCore.db.cs_ok(CS) Then
-                                                                            '            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                            '            Call logcontroller.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                             '        End If
                                                                             '    End If
                                                                             '    If Not cpCore.db.cs_ok(CS) Then
                                                                             '        '
                                                                             '        ' Could not create new
                                                                             '        '
-                                                                            '        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                            '        Call logcontroller.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                             '    Else
                                                                             '        sharedStyleId = cpCore.db.cs_getInteger(CS, "ID")
                                                                             '        Call cpCore.db.cs_set(CS, "StyleFilename", CDefSection.InnerText)
@@ -2092,111 +1881,96 @@ Namespace Contensive.Core
                                                                             '        Call cpCore.db.cs_set(CS, "sortOrder", GetXMLAttribute(cpcore,IsFound, CDefSection, "sortOrder", ""))
                                                                             '    End If
                                                                             '    Call cpCore.db.cs_Close(CS)
-                                                                            Case "addon", "add-on"
-                                                                                '
-                                                                                ' Add-on Node, do part 1 of 2
-                                                                                '   (include add-on node must be done after all add-ons are installed)
-                                                                                '
-                                                                                Call InstallCollectionFromLocalRepo_addonNode_Phase1(cpCore, CDefSection, AddonGuidFieldName, cpCore.siteProperties.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
-                                                                                If Not UpgradeOK Then
-                                                                                    UpgradeOK = UpgradeOK
-                                                                                End If
-                                                                            Case "interfaces"
-                                                                                '
-                                                                                ' Legacy Interface Node
-                                                                                '
-                                                                                For Each CDefInterfaces In CDefSection.ChildNodes
-                                                                                    Call InstallCollectionFromLocalRepo_addonNode_Phase1(cpCore, CDefInterfaces, AddonGuidFieldName, cpCore.siteProperties.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
-                                                                                    If Not UpgradeOK Then
-                                                                                        UpgradeOK = UpgradeOK
-                                                                                    End If
-                                                                                Next
-                                                                            Case "otherxml", "importcollection", "sqlindex", "style", "styles", "stylesheet", "adminmenu", "menuentry", "navigatorentry"
-                                                                                '
-                                                                                ' otherxml
-                                                                                '
-                                                                                If genericController.vbLCase(CDefSection.OuterXml) <> "<otherxml></otherxml>" Then
-                                                                                    OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
-                                                                                End If
-                                                                                'Case Else
-                                                                                '    '
-                                                                                '    ' Unknown node in collection file
-                                                                                '    '
-                                                                                '    OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
-                                                                                '    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromtLocalCollection", "Addon Collection for [" & Collectionname & "] contained an unknown node [" & CDefSection.Name & "]. This node will be ignored.")
-                                                                        End Select
+                                                                Case "addon", "add-on"
+                                                                    '
+                                                                    ' Add-on Node, do part 1 of 2
+                                                                    '   (include add-on node must be done after all add-ons are installed)
+                                                                    '
+                                                                    Call InstallCollectionFromLocalRepo_addonNode_Phase1(cpCore, CDefSection, "ccguid", cpCore.siteProperties.dataBuildVersion, collection.id, result, return_ErrorMessage)
+                                                                    If Not result Then
+                                                                        result = result
+                                                                    End If
+                                                                Case "interfaces"
+                                                                    '
+                                                                    ' Legacy Interface Node
+                                                                    '
+                                                                    For Each CDefInterfaces As XmlNode In CDefSection.ChildNodes
+                                                                        Call InstallCollectionFromLocalRepo_addonNode_Phase1(cpCore, CDefInterfaces, "ccguid", cpCore.siteProperties.dataBuildVersion, collection.id, result, return_ErrorMessage)
+                                                                        If Not result Then
+                                                                            result = result
+                                                                        End If
                                                                     Next
+                                                                    'Case "otherxml", "importcollection", "sqlindex", "style", "styles", "stylesheet", "adminmenu", "menuentry", "navigatorentry"
+                                                                    '    '
+                                                                    '    ' otherxml
+                                                                    '    '
+                                                                    '    If genericController.vbLCase(CDefSection.OuterXml) <> "<otherxml></otherxml>" Then
+                                                                    '        OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
+                                                                    '    End If
+                                                                    '    'Case Else
+                                                                    '    '    '
+                                                                    '    '    ' Unknown node in collection file
+                                                                    '    '    '
+                                                                    '    '    OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
+                                                                    '    '    Call logcontroller.appendInstallLog(cpCore, "Addon Collection for [" & Collectionname & "] contained an unknown node [" & CDefSection.Name & "]. This node will be ignored.")
+                                                            End Select
+                                                        Next
+                                                        '
+                                                        ' --- end of pass
+                                                        '
+                                                        '-------------------------------------------------------------------------------
+                                                        ' ----- Pass 6
+                                                        '
+                                                        ' process include add-on node of add-on nodes
+                                                        '-------------------------------------------------------------------------------
+                                                        '
+                                                        Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 6")
+                                                        For Each CDefSection As XmlNode In .ChildNodes
+                                                            Select Case genericController.vbLCase(CDefSection.Name)
+                                                                Case "addon", "add-on"
                                                                     '
-                                                                    ' --- end of pass
+                                                                    ' Add-on Node, do part 1 of 2
+                                                                    '   (include add-on node must be done after all add-ons are installed)
                                                                     '
-                                                                    '-------------------------------------------------------------------------------
-                                                                    ' ----- Pass 6
+                                                                    Call InstallCollectionFromLocalRepo_addonNode_Phase2(cpCore, CDefSection, "ccguid", cpCore.siteProperties.dataBuildVersion, collection.id, result, return_ErrorMessage)
+                                                                    If Not result Then
+                                                                        result = result
+                                                                    End If
+                                                                Case "interfaces"
                                                                     '
-                                                                    ' process include add-on node of add-on nodes
-                                                                    '-------------------------------------------------------------------------------
+                                                                    ' Legacy Interface Node
                                                                     '
-                                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 6")
-                                                                    For Each CDefSection In .ChildNodes
-                                                                        Select Case genericController.vbLCase(CDefSection.Name)
-                                                                            Case "addon", "add-on"
-                                                                                '
-                                                                                ' Add-on Node, do part 1 of 2
-                                                                                '   (include add-on node must be done after all add-ons are installed)
-                                                                                '
-                                                                                Call InstallCollectionFromLocalRepo_addonNode_Phase2(cpCore, CDefSection, AddonGuidFieldName, cpCore.siteProperties.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
-                                                                                If Not UpgradeOK Then
-                                                                                    UpgradeOK = UpgradeOK
-                                                                                End If
-                                                                            Case "interfaces"
-                                                                                '
-                                                                                ' Legacy Interface Node
-                                                                                '
-                                                                                For Each CDefInterfaces In CDefSection.ChildNodes
-                                                                                    Call InstallCollectionFromLocalRepo_addonNode_Phase2(cpCore, CDefInterfaces, AddonGuidFieldName, cpCore.siteProperties.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
-                                                                                    If Not UpgradeOK Then
-                                                                                        UpgradeOK = UpgradeOK
-                                                                                    End If
-                                                                                Next
-                                                                        End Select
+                                                                    For Each CDefInterfaces As XmlNode In CDefSection.ChildNodes
+                                                                        Call InstallCollectionFromLocalRepo_addonNode_Phase2(cpCore, CDefInterfaces, "ccguid", cpCore.siteProperties.dataBuildVersion, collection.id, result, return_ErrorMessage)
+                                                                        If Not result Then
+                                                                            result = result
+                                                                        End If
                                                                     Next
-                                                                    '
-                                                                    ' --- end of pass
-                                                                    '
-                                                                End If
-                                                            End If
-                                                            Call cpCore.db.csSet(CSCollection, "DataRecordList", DataRecordList)
-                                                            Call cpCore.db.csSet(CSCollection, "OtherXML", OtherXML)
-                                                            Call cpCore.db.csClose(CSCollection)
-                                                        End If
+                                                            End Select
+                                                        Next
                                                         '
-                                                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], upgrade complete, flush cache")
+                                                        ' --- end of pass
                                                         '
-                                                        ' import complete, flush caches
-                                                        '
-                                                        Call cpCore.cache.invalidateAll()
                                                     End If
+                                                    collection.DataRecordList = DataRecordList
+                                                    collection.save(cpCore)
                                                 End If
-                                            End With
+                                                '
+                                                Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], upgrade complete, flush cache")
+                                                '
+                                                ' -- import complete, flush caches
+                                                Call cpCore.cache.invalidateAll()
+                                            End If
                                         End If
-                                    End If
-                                Next
+                                    End With
+                                End If
                             End If
-                        End If
+                        Next
                     End If
                 End If
-                ''
-                'If Not UpgradeOK Then
-                '    '
-                '    ' Must clear these out, if there is an error, a reset will keep the error message from making it to the page
-                '    '
-                '    Return_IISResetRequired = False
-                'End If
-                '
-                result = UpgradeOK
             Catch ex As Exception
                 '
                 ' Log error and exit with failure. This way any other upgrading will still continue
-                '
                 cpCore.handleException(ex) : Throw
             End Try
             Return result
@@ -2285,11 +2059,11 @@ Namespace Contensive.Core
                 Try
                     Call Doc.LoadXml(getCollectionListFile(cpCore))
                 Catch ex As Exception
-                    Call appendInstallLog(cpCore, "Server", "", "UpdateConfig, Error loading Collections.xml file.")
+                    Call logController.appendInstallLog(cpCore, "UpdateConfig, Error loading Collections.xml file.")
                 End Try
                 If loadOK Then
                     If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
-                        Call appendInstallLog(cpCore, "Server", "", "UpdateConfig, The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
+                        Call logController.appendInstallLog(cpCore, "UpdateConfig, The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
                     Else
                         With Doc.DocumentElement
                             If genericController.vbLCase(.Name) = "collectionlist" Then
@@ -2403,12 +2177,12 @@ Namespace Contensive.Core
                     Call Doc.LoadXml(getCollectionListFile(cpCore))
                 Catch ex As Exception
                     'hint = hint & ",parse error"
-                    Call appendInstallLog(cpCore, "Server", "", "GetCollectionConfig, Hint=[" & hint & "], Error loading Collections.xml file.")
+                    Call logController.appendInstallLog(cpCore, "GetCollectionConfig, Hint=[" & hint & "], Error loading Collections.xml file.")
                     loadOK = False
                 End Try
                 If loadOK Then
                     If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
-                        Call appendInstallLog(cpCore, "Server", "GetCollectionConfig", "Hint=[" & hint & "], The Collections.xml file has an invalid root node")
+                        Call logController.appendInstallLog(cpCore, "Hint=[" & hint & "], The Collections.xml file has an invalid root node")
                     Else
                         With Doc.DocumentElement
                             If True Then
@@ -2473,11 +2247,11 @@ Namespace Contensive.Core
                     '
                     ' BuildLocal failed, log it and do not upgrade
                     '
-                    Call appendInstallLog(cpCore, "", "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
+                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
                 Else
                     For Each collectionGuid As String In return_CollectionGUIDList
                         If Not installCollectionFromLocalRepo(cpCore, collectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild, nonCriticalErrorList) Then
-                            Call appendInstallLog(cpCore, "", "InstallCollectionFilesFromPrivateFolder", "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
+                            Call logController.appendInstallLog(cpCore, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
                             Exit For
                         End If
                     Next
@@ -2507,14 +2281,14 @@ Namespace Contensive.Core
                     '
                     ' BuildLocal failed, log it and do not upgrade
                     '
-                    Call appendInstallLog(cpCore, "", "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
+                    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
                 Else
                     returnSuccess = installCollectionFromLocalRepo(cpCore, return_CollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild, nonCriticalErrorList)
                     If Not returnSuccess Then
                         '
                         ' Upgrade all apps failed
                         '
-                        Call appendInstallLog(cpCore, "", "InstallCollectionFilesFromPrivateFolder", "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
+                        Call logController.appendInstallLog(cpCore, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
                     Else
                         returnSuccess = True
                     End If
@@ -2713,7 +2487,7 @@ Namespace Contensive.Core
                         '
                         ' Update the Addon
                         '
-                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & addonName & "], Guid [" & addonGuid & "]")
+                        Call logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                     Else
                         '
                         ' not found by GUID - search name against name to update legacy Add-ons
@@ -2722,7 +2496,7 @@ Namespace Contensive.Core
                         Criteria = "(name=" & cpCore.db.encodeSQLText(addonName) & ")and(" & AddonGuidFieldName & " is null)"
                         CS = cpCore.db.csOpen(cnAddons, Criteria, , False)
                         If cpCore.db.csOk(CS) Then
-                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" & addonName & "], Guid [" & addonGuid & "]")
+                            Call logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                         End If
                     End If
                     If Not cpCore.db.csOk(CS) Then
@@ -2732,14 +2506,14 @@ Namespace Contensive.Core
                         Call cpCore.db.csClose(CS)
                         CS = cpCore.db.csInsertRecord(cnAddons, 0)
                         If cpCore.db.csOk(CS) Then
-                            Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Add-on [" & addonName & "], Guid [" & addonGuid & "]")
+                            Call logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Creating new Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                         End If
                     End If
                     If Not cpCore.db.csOk(CS) Then
                         '
                         ' Could not create new Add-on
                         '
-                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & addonName & "], Guid [" & addonGuid & "]")
+                        Call logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                     Else
                         addonId = cpCore.db.csGetInteger(CS, "ID")
                         '
@@ -3180,7 +2954,7 @@ Namespace Contensive.Core
                     '                                                    AddRule = False
                     '                                                    If SrcAddonID = 0 Then
                     '                                                        UserError = "The add-on being installed is referenced by another add-on in collection [], but this add-on could not be found by the respoective criteria [" & Criteria & "]"
-                    '                                                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
+                    '                                                        Call logcontroller.appendInstallLog(cpCore,  "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
                     '                                                    Else
                     '                                                        CS2 = cpCore.db.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
                     '                                                        AddRule = Not cpCore.db.cs_ok(CS2)
@@ -3264,7 +3038,7 @@ Namespace Contensive.Core
                         '
                         ' Update the Addon
                         '
-                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & AOName & "], Guid [" & AOGuid & "]")
+                        Call logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & AOName & "], Guid [" & AOGuid & "]")
                     Else
                         '
                         ' not found by GUID - search name against name to update legacy Add-ons
@@ -3277,7 +3051,7 @@ Namespace Contensive.Core
                         '
                         ' Could not find add-on
                         '
-                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & AOName & "], Guid [" & AOGuid & "]")
+                        Call logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & AOName & "], Guid [" & AOGuid & "]")
                     Else
                         addonId = cpCore.db.csGetInteger(CS, "ID")
                         ArgumentList = ""
@@ -3313,7 +3087,7 @@ Namespace Contensive.Core
                                                 AddRule = False
                                                 If IncludeAddonID = 0 Then
                                                     UserError = "The include add-on [" & IncludeAddonName & "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it."
-                                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
+                                                    Call logController.appendInstallLog(cpCore, "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
                                                     ReturnUpgradeOK = False
                                                     ReturnErrorMessage = ReturnErrorMessage & "<P>The collection was not installed because the add-on [" & AOName & "] requires an included add-on [" & IncludeAddonName & "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>"
                                                 Else
@@ -3847,19 +3621,19 @@ Namespace Contensive.Core
         '    logController.appendLogWithLegacyRow( cpcore,ApplicationName, Cause, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "AddonInstall", "")
 
         'End Sub
-        '
-        '===========================================================================
-        '   Append Log File
-        '===========================================================================
-        '
-        Private Shared Sub appendInstallLog(cpCore As coreClass, ByVal ignore As String, ByVal Method As String, ByVal LogMessage As String)
-            Try
-                Console.WriteLine(Method & ", " & LogMessage)
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "Build", "")
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-        End Sub
+        ''
+        ''===========================================================================
+        ''   Append Log File
+        ''===========================================================================
+        ''
+        'Private Shared Sub logcontroller.appendInstallLog(cpCore As coreClass, ByVal ignore As String, ByVal Method As String, ByVal LogMessage As String)
+        '    Try
+        '        Console.WriteLine("install, " & LogMessage)
+        '        logController.appendLog(cpCore, LogMessage, "install")
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex)
+        '    End Try
+        'End Sub
         '
         '=========================================================================================
         '   Import CDef on top of current configuration and the base configuration
@@ -3868,26 +3642,36 @@ Namespace Contensive.Core
         '
         Public Shared Sub installBaseCollection(cpCore As coreClass, isNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String))
             Try
-                Dim tmpFolderPath As String = "tmp" & genericController.GetRandomInteger().ToString & "\"
                 Dim ignoreString As String = ""
                 Dim returnErrorMessage As String = ""
                 Dim ignoreBoolean As Boolean = False
                 Dim isBaseCollection As Boolean = True
                 '
-                If isNewBuild Then
-                    '
-                    ' special case, with base collection, first do just a pass with the cdef nodes, to build out a new site
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "installBaseCollection", "Special case -- installing base collection on new site, run cdef first")
-                    '
-                    Dim CollectionWorking As New miniCollectionModel
-                    Dim CollectionNew As New miniCollectionModel
-                    Dim baseCollectionXml As String = cpCore.programFiles.readFile("aoBase5.xml")
-                    Call installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
-                    Call installCollection_BuildDbFromMiniCollection(cpCore, CollectionNew, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
-                End If
+                ' -- new build
+                ' 20171029 -- upgrading should restore base collection fields as a fix to deleted required fields
+                Dim baseCollectionXml As String = cpCore.programFiles.readFile("aoBase5.xml")
+                Call logController.appendInstallLog(cpCore, "Verify base collection -- new build")
+                Dim baseCollection As miniCollectionModel = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, True, True, isNewBuild, New miniCollectionModel)
+                Call installCollection_BuildDbFromMiniCollection(cpCore, baseCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
+                'If isNewBuild Then
+                '    '
+                '    ' -- new build
+                '    Call logcontroller.appendInstallLog(cpCore,  "Verify base collection -- new build")
+                '    Dim baseCollection As miniCollectionModel = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, True, True, isNewBuild, New miniCollectionModel)
+                '    Call installCollection_BuildDbFromMiniCollection(cpCore, baseCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
+                '    'Else
+                '    '    '
+                '    '    ' -- verify current build
+                '    '    Call logcontroller.appendInstallLog(cpCore,  "Verify base collection - existing build")
+                '    '    Dim baseCollection As miniCollectionModel = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, True, True, isNewBuild, New miniCollectionModel)
+                '    '    Dim workingCollection As miniCollectionModel = installCollection_GetApplicationMiniCollection(cpCore, False)
+                '    '    Call installCollection_AddMiniCollectionSrcToDst(cpCore, workingCollection, baseCollection, False)
+                '    '    Call installCollection_BuildDbFromMiniCollection(cpCore, workingCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
+                'End If
                 '
                 ' now treat as a regular collection and install - to pickup everything else 
                 '
+                Dim tmpFolderPath As String = "tmp" & genericController.GetRandomInteger().ToString & "\"
                 cpCore.privateFiles.createPath(tmpFolderPath)
                 cpCore.programFiles.copyFile("aoBase5.xml", tmpFolderPath & "aoBase5.xml", cpCore.privateFiles)
                 Dim ignoreList As New List(Of String)
@@ -3895,31 +3679,6 @@ Namespace Contensive.Core
                     Throw New ApplicationException(returnErrorMessage)
                 End If
                 cpCore.privateFiles.DeleteFileFolder(tmpFolderPath)
-                ''
-                'If isNewBuild Then
-                '    '
-                '    ' There is no database, this is an empty startup with a "BuildData" -- skip export/import
-                '    '
-                '    Call AppendClassLogFile(cpCore.app.config.name, "installBaseCollection", "Is new build. Ignoring current application collection.")
-                'ElseIf cpCore.app.csv_IsSQLTable("default", "cccontent") Then
-                '    Call AppendClassLogFile(cpCore.app.config.name, "installBaseCollection", "Adding base collection to current application collection.")
-                '    CollectionWorking = installCollection_GetApplicationCollectionX(isNewBuild)
-                'End If
-                'baseCollectionXml = cpCore.cluster.files.ReadFile("clibResources\aoBase5.xml")
-                'Call installCollection_LoadXmlToCollectionX(baseCollectionXml, CollectionNew, True, False, isNewBuild, CollectionWorking)
-                'Call installCollection_AddCollectionXSrcToDst(CollectionWorking, CollectionNew, False)
-                ''
-                '' Now Create / Modify Db based on all CDef records that are 'CDefChanged'
-                ''
-                'Call installCollection_BuildDbFromCollectionX(CollectionWorking, ignoreRefactor, cpCore.app.dataBuildVersion, isNewBuild)
-                ''
-                'If isNewBuild Then
-                '    Call cpCore.app.executeSql("update ccfields set IsBaseField=1")
-                '    Call cpCore.app.executeSql("update cccontent set IsBaseContent=1")
-                'End If
-                'cpCore.cache.cache_invalidateAll()
-                'cpCore.metaData.clear()
-                'End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -3932,12 +3691,12 @@ Namespace Contensive.Core
         Public Shared Sub installCollectionFromLocalRepo_BuildDbFromXmlData(cpCore As coreClass, ByVal XMLText As String, isNewBuild As Boolean, isBaseCollection As Boolean, ByRef nonCriticalErrorList As List(Of String))
             Try
                 '
-                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "installCollectionFromLocalRepo_BuildDbFromXmlData", "Application: " & cpCore.serverConfig.appConfig.name)
+                Call logController.appendInstallLog(cpCore, "Application: " & cpCore.serverConfig.appConfig.name)
                 '
                 ' ----- Import any CDef files, allowing for changes
                 Dim miniCollectionToAdd As New miniCollectionModel
                 Dim miniCollectionWorking As miniCollectionModel = installCollection_GetApplicationMiniCollection(cpCore, isNewBuild)
-                Call installCollection_LoadXmlToMiniCollection(cpCore, XMLText, miniCollectionToAdd, isBaseCollection, False, isNewBuild, miniCollectionWorking)
+                miniCollectionToAdd = installCollection_LoadXmlToMiniCollection(cpCore, XMLText, isBaseCollection, False, isNewBuild, miniCollectionWorking)
                 Call installCollection_AddMiniCollectionSrcToDst(cpCore, miniCollectionWorking, miniCollectionToAdd, True)
                 Call installCollection_BuildDbFromMiniCollection(cpCore, miniCollectionWorking, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
             Catch ex As Exception
@@ -3974,7 +3733,8 @@ Namespace Contensive.Core
         '       - cdef are added to the cdefs in the application collection
         '=========================================================================================
         '
-        Private Shared Sub installCollection_LoadXmlToMiniCollection(cpCore As coreClass, ByVal srcCollecionXml As String, ByRef returnCollection As miniCollectionModel, ByVal IsccBaseFile As Boolean, ByVal setAllDataChanged As Boolean, IsNewBuild As Boolean, defaultCollection As miniCollectionModel)
+        Private Shared Function installCollection_LoadXmlToMiniCollection(cpCore As coreClass, ByVal srcCollecionXml As String, ByVal IsccBaseFile As Boolean, ByVal setAllDataChanged As Boolean, IsNewBuild As Boolean, defaultCollection As miniCollectionModel) As miniCollectionModel
+            Dim result As miniCollectionModel
             Try
                 Dim DefaultCDef As cdefModel
                 Dim DefaultCDefField As CDefFieldModel
@@ -4005,9 +3765,9 @@ Namespace Contensive.Core
                 Dim NodeName As String
                 Dim FieldChildNode As XmlNode
                 '
-                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_LoadDataToCollection", "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_LoadDataToCollection")
+                Call logController.appendInstallLog(cpCore, "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_LoadDataToCollection")
                 '
-                returnCollection = New miniCollectionModel()
+                result = New miniCollectionModel()
                 '
                 If String.IsNullOrEmpty(srcCollecionXml) Then
                     '
@@ -4028,18 +3788,18 @@ Namespace Contensive.Core
                             ' -- root node must be collection (or legacy contensivecdef)
                             cpCore.handleException(New ApplicationException("the archive file has a syntax error. Application name must be the first node."))
                         Else
-                            returnCollection.isBaseCollection = IsccBaseFile
+                            result.isBaseCollection = IsccBaseFile
                             '
                             ' Get Collection Name for logs
                             '
                             'hint = "get collection name"
                             Collectionname = GetXMLAttribute(cpCore, Found, srcXmlDom.DocumentElement, "name", "")
                             If Collectionname = "" Then
-                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & cpCore.serverConfig.appConfig.name & ", Collection has no name")
+                                Call logController.appendInstallLog(cpCore, "UpgradeCDef_LoadDataToCollection, Application: " & cpCore.serverConfig.appConfig.name & ", Collection has no name")
                             Else
                                 'Call AppendClassLogFile(cpcore.app.config.name,"UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & cpcore.app.appEnvironment.name & ", Collection: " & Collectionname)
                             End If
-                            returnCollection.name = Collectionname
+                            result.name = Collectionname
                             ''
                             '' Load possible DefaultSortMethods
                             ''
@@ -4090,13 +3850,13 @@ Namespace Contensive.Core
                                                 '
                                                 ' ----- Add CDef if not already there
                                                 '
-                                                If Not returnCollection.CDef.ContainsKey(ContentName.ToLower) Then
-                                                    returnCollection.CDef.Add(ContentName.ToLower, New cdefModel())
+                                                If Not result.CDef.ContainsKey(ContentName.ToLower) Then
+                                                    result.CDef.Add(ContentName.ToLower, New cdefModel())
                                                 End If
                                                 '
                                                 ' Get CDef attributes
                                                 '
-                                                With returnCollection.CDef(ContentName.ToLower)
+                                                With result.CDef(ContentName.ToLower)
                                                     Dim activeDefaultText As String = "1"
                                                     If Not (DefaultCDef.Active) Then activeDefaultText = "0"
                                                     ActiveText = GetXMLAttribute(cpCore, Found, CDef_Node, "Active", activeDefaultText)
@@ -4168,10 +3928,10 @@ Namespace Contensive.Core
                                                             DefaultCDefField = New CDefFieldModel()
                                                         End If
                                                         '
-                                                        If Not returnCollection.CDef(ContentName.ToLower).fields.ContainsKey(FieldName.ToLower()) Then
-                                                            returnCollection.CDef(ContentName.ToLower).fields.Add(FieldName.ToLower, New CDefFieldModel)
+                                                        If Not result.CDef(ContentName.ToLower).fields.ContainsKey(FieldName.ToLower()) Then
+                                                            result.CDef(ContentName.ToLower).fields.Add(FieldName.ToLower, New CDefFieldModel)
                                                         End If
-                                                        With returnCollection.CDef(ContentName.ToLower).fields(FieldName.ToLower)
+                                                        With result.CDef(ContentName.ToLower).fields(FieldName.ToLower)
                                                             .nameLc = FieldName.ToLower
                                                             ActiveText = "0"
                                                             If DefaultCDefField.active Then
@@ -4260,7 +4020,7 @@ Namespace Contensive.Core
                                         '
                                         ' SQL Indexes
                                         '
-                                        With returnCollection
+                                        With result
                                             IndexName = GetXMLAttribute(cpCore, Found, CDef_Node, "indexname", "")
                                             TableName = GetXMLAttribute(cpCore, Found, CDef_Node, "TableName", "")
                                             DataSourceName = GetXMLAttribute(cpCore, Found, CDef_Node, "DataSourceName", "")
@@ -4307,7 +4067,7 @@ Namespace Contensive.Core
                                         Else
                                             MenuKey = MenuGuid
                                         End If
-                                        With returnCollection
+                                        With result
                                             '
                                             ' Go through all current menus and check for duplicates
                                             '
@@ -4362,7 +4122,7 @@ Namespace Contensive.Core
                                         ' Aggregate Objects (just make them -- there are not too many
                                         '
                                         Name = GetXMLAttribute(cpCore, Found, CDef_Node, "Name", "")
-                                        With returnCollection
+                                        With result
                                             If .AddOnCnt > 0 Then
                                                 For Ptr = 0 To .AddOnCnt - 1
                                                     If TextMatch(cpCore, .AddOns(Ptr).Name, Name) Then
@@ -4391,7 +4151,7 @@ Namespace Contensive.Core
                                         ' style sheet entries
                                         '
                                         Name = GetXMLAttribute(cpCore, Found, CDef_Node, "Name", "")
-                                        With returnCollection
+                                        With result
                                             If .StyleCnt > 0 Then
                                                 For Ptr = 0 To .StyleCnt - 1
                                                     If TextMatch(cpCore, .Styles(Ptr).Name, Name) Then
@@ -4415,7 +4175,7 @@ Namespace Contensive.Core
                                         '
                                         ' style sheet in one entry
                                         '
-                                        returnCollection.StyleSheet = CDef_Node.InnerText
+                                        result.StyleSheet = CDef_Node.InnerText
                                     Case "getcollection", "importcollection"
                                         If True Then
                                             'If Not UpgradeDbOnly Then
@@ -4431,10 +4191,10 @@ Namespace Contensive.Core
                                                 status = "The collection you selected [" & Collectionname & "] can not be downloaded because it does not include a valid GUID."
                                                 'cpCore.AppendLog("builderClass.UpgradeCDef_LoadDataToCollection, UserError [" & status & "], The error was [" & Doc.ParseError.reason & "]")
                                             Else
-                                                ReDim Preserve returnCollection.collectionImports(returnCollection.ImportCnt)
-                                                returnCollection.collectionImports(returnCollection.ImportCnt).Guid = CollectionGuid
-                                                returnCollection.collectionImports(returnCollection.ImportCnt).Name = Collectionname
-                                                returnCollection.ImportCnt = returnCollection.ImportCnt + 1
+                                                ReDim Preserve result.collectionImports(result.ImportCnt)
+                                                result.collectionImports(result.ImportCnt).Guid = CollectionGuid
+                                                result.collectionImports(result.ImportCnt).Name = Collectionname
+                                                result.ImportCnt = result.ImportCnt + 1
                                             End If
                                         End If
                                     Case "pagetemplate"
@@ -4445,7 +4205,7 @@ Namespace Contensive.Core
                                         ' *********************************************************************************
                                         ' Page Template - started, but Return_Collection and LoadDataToCDef are all that is done do far
                                         '
-                                        With returnCollection
+                                        With result
                                             If .PageTemplateCnt > 0 Then
                                                 For Ptr = 0 To .PageTemplateCnt - 1
                                                     If TextMatch(cpCore, .PageTemplates(Ptr).Name, Name) Then
@@ -4495,11 +4255,11 @@ Namespace Contensive.Core
                             '
                             ' Convert Menus.ParentName to Menu.menuNameSpace
                             '
-                            With returnCollection
+                            With result
                                 If .MenuCnt > 0 Then
                                     For Ptr = 0 To .MenuCnt - 1
                                         If .Menus(Ptr).ParentName <> "" Then
-                                            .Menus(Ptr).menuNameSpace = GetMenuNameSpace(cpCore, returnCollection, Ptr, .Menus(Ptr).IsNavigator, "")
+                                            .Menus(Ptr).menuNameSpace = GetMenuNameSpace(cpCore, result, Ptr, .Menus(Ptr).IsNavigator, "")
                                             '.Menus(Ptr).ParentName = ""
                                             Ptr = Ptr
                                         End If
@@ -4512,7 +4272,8 @@ Namespace Contensive.Core
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
-        End Sub
+            Return result
+        End Function
         '
         '========================================================================
         ''' <summary>
@@ -4551,16 +4312,16 @@ Namespace Contensive.Core
                 ' Dim builder As New coreBuilderClass(cpCore)
                 Dim InstallCollectionList As String = ""                 'Collections to Install when upgrade is complete
                 '
-                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_BuildDbFromCollection")
+                Call logController.appendInstallLog(cpCore, "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_BuildDbFromCollection")
                 '
                 '----------------------------------------------------------------------------------------------------------------------
-                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 0.5: verify core sql tables")
+                Call logController.appendInstallLog(cpCore, "CDef Load, stage 0.5: verify core sql tables")
                 '----------------------------------------------------------------------------------------------------------------------
                 '
                 Call appBuilderController.VerifyBasicTables(cpCore)
                 '
                 '----------------------------------------------------------------------------------------------------------------------
-                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 1: create SQL tables in default datasource")
+                Call logController.appendInstallLog(cpCore, "CDef Load, stage 1: create SQL tables in default datasource")
                 '----------------------------------------------------------------------------------------------------------------------
                 '
                 With Collection
@@ -4571,7 +4332,7 @@ Namespace Contensive.Core
                             ContentName = workingCdef.Name
                             With workingCdef
                                 If .dataChanged Then
-                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating sql table [" & .ContentTableName & "], datasource [" & .ContentDataSourceName & "]")
+                                    Call logController.appendInstallLog(cpCore, "creating sql table [" & .ContentTableName & "], datasource [" & .ContentDataSourceName & "]")
                                     If genericController.vbLCase(.ContentDataSourceName) = "default" Or .ContentDataSourceName = "" Then
                                         TableName = .ContentTableName
                                         If genericController.vbInstr(1, "," & UsedTables & ",", "," & TableName & ",", vbTextCompare) <> 0 Then
@@ -4589,7 +4350,7 @@ Namespace Contensive.Core
                     End If
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 2: Verify all CDef names in ccContent so GetContentID calls will succeed")
+                    Call logController.appendInstallLog(cpCore, "CDef Load, stage 2: Verify all CDef names in ccContent so GetContentID calls will succeed")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     NodeCount = 0
@@ -4603,7 +4364,7 @@ Namespace Contensive.Core
                     For Each keypairvalue In .CDef
                         With keypairvalue.Value
                             If .dataChanged Then
-                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef name [" & .Name & "]")
+                                Call logController.appendInstallLog(cpCore, "adding cdef name [" & .Name & "]")
                                 If (Not installedContentList.Contains(.Name.ToLower())) Then
                                     SQL = "Insert into ccContent (name,ccguid,active,createkey)values(" & cpCore.db.encodeSQLText(.Name) & "," & cpCore.db.encodeSQLText(.guid) & ",1,0);"
                                     Call cpCore.db.executeQuery(SQL)
@@ -4617,7 +4378,7 @@ Namespace Contensive.Core
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 4: Verify content records required for Content Server")
+                    Call logController.appendInstallLog(cpCore, "CDef Load, stage 4: Verify content records required for Content Server")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     Call VerifySortMethods(cpCore)
@@ -4626,13 +4387,13 @@ Namespace Contensive.Core
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 5: verify 'Content' content definition")
+                    Call logController.appendInstallLog(cpCore, "CDef Load, stage 5: verify 'Content' content definition")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     For Each keypairvalue In .CDef
                         With keypairvalue.Value
                             If .Name.ToLower() = "content" Then
-                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
+                                Call logController.appendInstallLog(cpCore, "adding cdef [" & .Name & "]")
                                 Call installCollection_BuildDbFromCollection_AddCDefToDb(cpCore, keypairvalue.Value, BuildVersion)
                                 RequireReload = True
                                 Exit For
@@ -4643,7 +4404,7 @@ Namespace Contensive.Core
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 6.1: Verify all definitions and fields")
+                    Call logController.appendInstallLog(cpCore, "CDef Load, stage 6.1: Verify all definitions and fields")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     RequireReload = False
@@ -4653,7 +4414,7 @@ Namespace Contensive.Core
                             ' todo tmp fix, changes to field caption in base.xml do not set fieldChange
                             If (True) Then ' If .dataChanged Or .includesAFieldChange Then
                                 If (.Name.ToLower() <> "content") Then
-                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
+                                    Call logController.appendInstallLog(cpCore, "adding cdef [" & .Name & "]")
                                     Call installCollection_BuildDbFromCollection_AddCDefToDb(cpCore, keypairvalue.Value, BuildVersion)
                                     RequireReload = True
                                 End If
@@ -4664,7 +4425,7 @@ Namespace Contensive.Core
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 6.2: Verify all field help")
+                    Call logController.appendInstallLog(cpCore, "CDef Load, stage 6.2: Verify all field help")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     FieldHelpCID = cpCore.db.getRecordID("content", "Content Field Help")
@@ -4714,13 +4475,13 @@ Namespace Contensive.Core
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 7: create SQL indexes")
+                    Call logController.appendInstallLog(cpCore, "CDef Load, stage 7: create SQL indexes")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     For Ptr = 0 To .SQLIndexCnt - 1
                         With .SQLIndexes(Ptr)
                             If .dataChanged Then
-                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating index [" & .IndexName & "], fields [" & .FieldNameList & "], on table [" & .TableName & "]")
+                                Call logController.appendInstallLog(cpCore, "creating index [" & .IndexName & "], fields [" & .FieldNameList & "], on table [" & .TableName & "]")
                                 '
                                 ' stop the errors here, so a bad field does not block the upgrade
                                 '
@@ -4733,7 +4494,7 @@ Namespace Contensive.Core
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 8a: Verify All Menu Names, then all Menus")
+                    Call logController.appendInstallLog(cpCore, "CDef Load, stage 8a: Verify All Menu Names, then all Menus")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     For Ptr = 0 To .MenuCnt - 1
@@ -4745,12 +4506,12 @@ Namespace Contensive.Core
                                 .Name = .Name
                             End If
                             If .dataChanged Then
-                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating navigator entry [" & .Name & "], namespace [" & .menuNameSpace & "], guid [" & .Guid & "]")
+                                Call logController.appendInstallLog(cpCore, "creating navigator entry [" & .Name & "], namespace [" & .menuNameSpace & "], guid [" & .Guid & "]")
                                 Call appBuilderController.verifyNavigatorEntry(cpCore, .Guid, .menuNameSpace, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, .AddonName, .NavIconType, .NavIconTitle, 0)
                                 'If .IsNavigator Then
                                 'Else
                                 '    ContentName = cnNavigatorEntries
-                                '    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating menu entry [" & .Name & "], parentname [" & .ParentName & "]")
+                                '    Call logcontroller.appendInstallLog(cpCore,  "creating menu entry [" & .Name & "], parentname [" & .ParentName & "]")
                                 '    Call Controllers.appBuilderController.admin_VerifyMenuEntry(cpCore, .ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
                                 'End If
                             End If
@@ -4783,7 +4544,7 @@ Namespace Contensive.Core
                     'End If
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 8d: Verify Import Collections")
+                    Call logController.appendInstallLog(cpCore, "CDef Load, stage 8d: Verify Import Collections")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     If Collection.ImportCnt > 0 Then
@@ -4803,9 +4564,9 @@ Namespace Contensive.Core
                     Dim CollectionPath As String = ""
                     Dim lastChangeDate As New Date
                     Dim ignoreRefactor As Boolean = False
-                    Call appendInstallLog(cpCore, "", "", "Installing Add-on Collections gathered during upgrade")
+                    Call logController.appendInstallLog(cpCore, "Installing Add-on Collections gathered during upgrade")
                     If InstallCollectionList = "" Then
-                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "", "No Add-on collections added during upgrade")
+                        Call logController.appendInstallLog(cpCore, "No Add-on collections added during upgrade")
                     Else
                         errorMessage = ""
                         Guids = Split(InstallCollectionList, ",")
@@ -4835,7 +4596,7 @@ Namespace Contensive.Core
                     End If
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 9: Verify Styles")
+                    Call logController.appendInstallLog(cpCore, "CDef Load, stage 9: Verify Styles")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     NodeCount = 0
@@ -4957,12 +4718,12 @@ Namespace Contensive.Core
                 Dim SQL As String
                 Dim ContentIsBaseContent As Boolean
                 '
-                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddCDefToDb", "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_BuildDbFromCollection_AddCDefToDb")
+                Call logController.appendInstallLog(cpCore, "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_BuildDbFromCollection_AddCDefToDb")
                 '
                 If Not (False) Then
                     With cdef
                         '
-                        Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddCDefToDb", "Upgrading CDef [" & .Name & "]")
+                        Call logController.appendInstallLog(cpCore, "Upgrading CDef [" & .Name & "]")
                         '
                         ContentID = 0
                         ContentName = .Name
@@ -4995,7 +4756,7 @@ Namespace Contensive.Core
                                 '
                                 cpCore.handleException(New ApplicationException("Warning: An attempt was made to update Content Definition [" & .Name & "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."))
                                 .IsBaseContent = ContentIsBaseContent
-                                'cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
+                                'cpCore.handleLegacyError3( "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
                             End If
                             '
                             ' ----- update definition (use SingleRecord as an update flag)
@@ -5026,7 +4787,7 @@ Namespace Contensive.Core
                                     , .installedByCollectionGuid
                                     )
                             If ContentID = 0 Then
-                                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "AddCDefToDb", "Could not determine contentid after createcontent3 for [" & ContentName & "], upgrade for this cdef aborted.")
+                                Call logController.appendInstallLog(cpCore, "Could not determine contentid after createcontent3 for [" & ContentName & "], upgrade for this cdef aborted.")
                             Else
                                 '
                                 ' ----- Other fields not in the csv call
@@ -5197,7 +4958,7 @@ Namespace Contensive.Core
                 '   if the is no CollectionDst for the CollectionSrc, add it and set okToUpdateDstFromSrc
                 ' -------------------------------------------------------------------------------------------------
                 '
-                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_AddSrcToDst", "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_AddSrcToDst")
+                Call logController.appendInstallLog(cpCore, "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_AddSrcToDst")
                 '
                 For Each srcKeyValuePair In srcCollection.CDef
                     srcCollectionCdef = srcKeyValuePair.Value
@@ -5325,14 +5086,14 @@ Namespace Contensive.Core
                                     ' Dst is a base CDef, Src is not. This update is not allowed. Log it and skip the Add
                                     '
                                     Copy = "An attempt was made to update a Base Content Definition [" & DstName & "] from a collection that is not the Base Collection. This is not allowed."
-                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_AddSrcToDst", "UpgradeCDef_AddSrcToDst, " & Copy)
+                                    Call logController.appendInstallLog(cpCore, "UpgradeCDef_AddSrcToDst, " & Copy)
                                     Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, Copy, "dll", "builderClass", "UpgradeCDef_AddSrcToDst", 0, "", "", False, True, "")
                                     okToUpdateDstFromSrc = False
                                 Else
                                     '
                                     ' Just log the change for tracking
                                     '
-                                    Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "UpgradeCDef_AddSrcToDst", "UpgradeCDef_AddSrcToDst, (Logging only) While merging two collections (probably application and an upgrade), one or more attributes for a content definition or field were different, first change was CDef=" & SrcContentName & ", field=" & n)
+                                    Call logController.appendInstallLog(cpCore, "UpgradeCDef_AddSrcToDst, (Logging only) While merging two collections (probably application and an upgrade), one or more attributes for a content definition or field were different, first change was CDef=" & SrcContentName & ", field=" & n)
                                 End If
                             End If
                         End If
@@ -5985,7 +5746,7 @@ Namespace Contensive.Core
                     Call exportApplicationCDefXml(cpCore, ExportPathPage, True)
                     CollectionData = cpCore.privateFiles.readFile(ExportPathPage)
                     Call cpCore.privateFiles.deleteFile(ExportPathPage)
-                    Call installCollection_LoadXmlToMiniCollection(cpCore, CollectionData, returnColl, False, False, isNewBuild, New miniCollectionModel)
+                    returnColl = installCollection_LoadXmlToMiniCollection(cpCore, CollectionData, False, False, isNewBuild, New miniCollectionModel)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -6136,7 +5897,7 @@ Namespace Contensive.Core
         Public Shared Sub VerifySortMethods(cpCore As coreClass)
             Try
                 '
-                Call appendInstallLog(cpCore, cpCore.serverConfig.appConfig.name, "VerifySortMethods", "Verify Sort Records")
+                Call logController.appendInstallLog(cpCore, "Verify Sort Records")
                 '
                 Call VerifySortMethod(cpCore, "By Name", "Name")
                 Call VerifySortMethod(cpCore, "By Alpha Sort Order Field", "SortOrder")

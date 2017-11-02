@@ -312,7 +312,12 @@ ErrorTrap:
             End If
             '
         End Sub
-
+        '
+        '====================================================================================================
+        '
+        Friend Shared Sub appendInstallLog(cpCore As coreClass, ByVal message As String)
+            Console.WriteLine("install, " & message)
+            appendLog(cpCore, message, "install")
+        End Sub
     End Class
-    '
 End Namespace

@@ -271,35 +271,29 @@ Namespace Contensive.Core.Controllers
         '
         Public Shared Sub upgrade(cpcore As coreClass, isNewBuild As Boolean)
             Try
-                Dim addonInstallOk As Boolean
-                Dim UpgradeOK As Boolean
-                Dim LastChangeDate As Date
-                Dim LocalLastChangeDate As Date
-                Dim upgradeCollection As Boolean
-                Dim LocalListNode As XmlNode
-                Dim CollectionNode As XmlNode
-                Dim LocalGuid As String
-                Dim IISResetRequired As Boolean
-                Dim ErrorMessage As String
-                Dim XMLTools As New xmlController(cpcore)
-                Dim StyleSN As Integer
-                Dim Doc As XmlDocument
-                Dim DataBuildVersion As String
-                Dim SQL As String
-                Dim dt As DataTable
-                Dim Copy As String
-                Dim MethodName As String = "Upgrade2"
-                Dim nonCriticalErrorList As New List(Of String)
-                '
-                '---------------------------------------------------------------------
-                ' ----- verify upgrade is not already in progress
-                '---------------------------------------------------------------------
-                '
                 If cpcore.upgradeInProgress Then
                     ' leftover from 4.1
                 Else
                     cpcore.upgradeInProgress = True
+                    Dim DataBuildVersion As String = cpcore.siteProperties.dataBuildVersion
+                    Dim nonCriticalErrorList As New List(Of String)
                     '
+                    ' -- Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods), then other basic system ops work, like site properties
+                    Call VerifyBasicTables(cpcore)
+                    '
+                    ' -- verify base collection
+                    Call logController.appendInstallLog(cpcore, "Install base collection")
+                    Call addonInstallClass.installBaseCollection(cpcore, isNewBuild, nonCriticalErrorList)
+                    '
+                    ' -- Update server config file
+                    Call logController.appendInstallLog(cpcore, "Update configuration file")
+                    If (Not cpcore.serverConfig.appConfig.appStatus.Equals(serverConfigModel.appStatusEnum.OK)) Then
+                        cpcore.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK
+                        cpcore.serverConfig.saveObject(cpcore)
+                    End If
+                    '
+                    ' -- verify iis configuration
+                    Call logController.appendInstallLog(cpcore, "Verify iis configuration")
                     With cpcore.serverConfig.appConfig
                         Dim primaryDomain As String = .name
                         If .domainList.Count > 0 Then
@@ -309,44 +303,17 @@ Namespace Contensive.Core.Controllers
                     End With
                     '
                     '---------------------------------------------------------------------
-                    '   Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods)
-                    '   Then other basic system ops work, like site properties
-                    '---------------------------------------------------------------------
-                    '
-                    Call appendBuildLog(cpcore, "VerifyBasicTables...")
-                    Call VerifyBasicTables(cpcore)
-                    DataBuildVersion = cpcore.siteProperties.dataBuildVersion
-                    Call appendBuildLog(cpcore, "Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpcore.codeVersion & "]")
-                    '
-                    '---------------------------------------------------------------------
-                    ' ----- build/verify Content Definitions
-                    '---------------------------------------------------------------------
-                    '
-                    ' Update the Db Content from CDef Files
-                    '
-                    Call appendBuildLog(cpcore, "UpgradeCDef...")
-                    Call addonInstallClass.installBaseCollection(cpcore, isNewBuild, nonCriticalErrorList)
-                    '
-                    Call appendBuildLog(cpcore, "base collection installed, verify app status is ok.")
-                    If (Not cpcore.serverConfig.appConfig.appStatus.Equals(serverConfigModel.appStatusEnum.OK)) Then
-                        cpcore.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK
-                        cpcore.serverConfig.saveObject(cpcore)
-                    End If
-                    '
-                    '---------------------------------------------------------------------
                     ' ----- Convert Database fields for new Db
                     '---------------------------------------------------------------------
                     '
                     If isNewBuild Then
-                        'cpcore.siteProperties.setProperty("publicFileContentPathPrefix", cpcore.serverConfig.appConfig.cdnFilesNetprefix)
                         '
-                        ' add the root developer
-                        '
-                        Dim cid As Integer
-                        cid = cpcore.metaData.getContentId("people")
-                        dt = cpcore.db.executeQuery("select id from ccmembers where (Developer<>0)")
+                        ' -- verify root developer
+                        Call logController.appendInstallLog(cpcore, "New build, verify root user")
+                        Dim cid As Integer = cpcore.metaData.getContentId("people")
+                        Dim dt As DataTable = cpcore.db.executeQuery("select id from ccmembers where (Developer<>0)")
                         If dt.Rows.Count = 0 Then
-                            SQL = "" _
+                            Dim SQL As String = "" _
                                 & "insert into ccmembers" _
                                 & " (active,contentcontrolid,name,firstName,username,password,developer,admin,AllowToolsPanel,AllowBulkEmail,AutoLogin)" _
                                 & " values (1," & cid & ",'root','root','root','contensive',1,1,1,1,1)" _
@@ -356,12 +323,11 @@ Namespace Contensive.Core.Controllers
                             cpcore.db.executeQuery(SQL)
                         End If
                         '
-                        ' Copy default styles into Template Styles
-                        '
+                        ' -- Copy default styles into Template Styles
+                        Call logController.appendInstallLog(cpcore, "New build, verify legacy styles")
                         Call cpcore.appRootFiles.copyFile("ccLib\Config\Styles.css", "Templates\Styles.css", cpcore.cdnFiles)
                         '
-                        ' set build version so a scratch build will not go through data conversion
-                        '
+                        ' -- set build version so a scratch build will not go through data conversion
                         DataBuildVersion = cpcore.codeVersion()
                         cpcore.siteProperties.dataBuildVersion = cpcore.codeVersion
                     End If
@@ -372,8 +338,8 @@ Namespace Contensive.Core.Controllers
                     '
                     If DataBuildVersion < cpcore.codeVersion() Then
                         '
-                        Call appendBuildLog(cpcore, "Calling database conversion, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpcore.codeVersion() & "]")
-                        '
+                        ' -- data updates
+                        Call logController.appendInstallLog(cpcore, "Run database conversions, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpcore.codeVersion() & "]")
                         Call Upgrade_Conversion(cpcore, DataBuildVersion)
                     End If
                     '
@@ -381,87 +347,82 @@ Namespace Contensive.Core.Controllers
                     ' ----- Verify content
                     '---------------------------------------------------------------------
                     '
-                    If True Then
-                        Call appendBuildLog(cpcore, "Verify records required")
-                        '
-                        ' ##### menus are created in ccBase.xml, this just checks for dups
-                        Call VerifyAdminMenus(cpcore, DataBuildVersion)
-                        Call VerifyLanguageRecords(cpcore)
-                        Call VerifyCountries(cpcore)
-                        Call VerifyStates(cpcore)
-                        Call VerifyLibraryFolders(cpcore)
-                        Call VerifyLibraryFileTypes(cpcore)
-                        Call VerifyDefaultGroups(cpcore)
-                        Call VerifyScriptingRecords(cpcore)
-                    End If
+                    Call logController.appendInstallLog(cpcore, "Verify records required")
+                    '
+                    ' ##### menus are created in ccBase.xml, this just checks for dups
+                    Call VerifyAdminMenus(cpcore, DataBuildVersion)
+                    Call VerifyLanguageRecords(cpcore)
+                    Call VerifyCountries(cpcore)
+                    Call VerifyStates(cpcore)
+                    Call VerifyLibraryFolders(cpcore)
+                    Call VerifyLibraryFileTypes(cpcore)
+                    Call VerifyDefaultGroups(cpcore)
+                    Call VerifyScriptingRecords(cpcore)
                     '
                     '---------------------------------------------------------------------
                     ' ----- Set Default SitePropertyDefaults
                     '       must be after upgrade_conversion
                     '---------------------------------------------------------------------
                     '
-                    If True Then
-                        Call appendBuildLog(cpcore, "Verify Site Properties")
-                        '
-                        Copy = cpcore.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild))
-                        Copy = cpcore.siteProperties.getText("AllowAutoLogin", "False")
-                        Copy = cpcore.siteProperties.getText("AllowBake", "True")
-                        Copy = cpcore.siteProperties.getText("AllowChildMenuHeadline", "True")
-                        Copy = cpcore.siteProperties.getText("AllowContentAutoLoad", "True")
-                        Copy = cpcore.siteProperties.getText("AllowContentSpider", "False")
-                        Copy = cpcore.siteProperties.getText("AllowContentWatchLinkUpdate", "True")
-                        Copy = cpcore.siteProperties.getText("AllowDuplicateUsernames", "False")
-                        Copy = cpcore.siteProperties.getText("ConvertContentText2HTML", "False")
-                        Copy = cpcore.siteProperties.getText("AllowMemberJoin", "False")
-                        Copy = cpcore.siteProperties.getText("AllowPasswordEmail", "True")
-                        Copy = cpcore.siteProperties.getText("AllowPathBlocking", "True")
-                        Copy = cpcore.siteProperties.getText("AllowPopupErrors", "True")
-                        Copy = cpcore.siteProperties.getText("AllowTestPointLogging", "False")
-                        Copy = cpcore.siteProperties.getText("AllowTestPointPrinting", "False")
-                        Copy = cpcore.siteProperties.getText("AllowTransactionLog", "False")
-                        Copy = cpcore.siteProperties.getText("AllowTrapEmail", "True")
-                        Copy = cpcore.siteProperties.getText("AllowTrapLog", "True")
-                        Copy = cpcore.siteProperties.getText("AllowWorkflowAuthoring", "False")
-                        Copy = cpcore.siteProperties.getText("ArchiveAllowFileClean", "False")
-                        Copy = cpcore.siteProperties.getText("ArchiveRecordAgeDays", "90")
-                        Copy = cpcore.siteProperties.getText("ArchiveTimeOfDay", "2:00:00 AM")
-                        Copy = cpcore.siteProperties.getText("BreadCrumbDelimiter", "&nbsp;&gt;&nbsp;")
-                        Copy = cpcore.siteProperties.getText("CalendarYearLimit", "1")
-                        Copy = cpcore.siteProperties.getText("ContentPageCompatibility21", "false")
-                        Copy = cpcore.siteProperties.getText("DefaultFormInputHTMLHeight", "500")
-                        Copy = cpcore.siteProperties.getText("DefaultFormInputTextHeight", "1")
-                        Copy = cpcore.siteProperties.getText("DefaultFormInputWidth", "60")
-                        Copy = cpcore.siteProperties.getText("EditLockTimeout", "5")
-                        Copy = cpcore.siteProperties.getText("EmailAdmin", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0))
-                        Copy = cpcore.siteProperties.getText("EmailFromAddress", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0))
-                        Copy = cpcore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0))
-                        Copy = cpcore.siteProperties.getText("Language", "English")
-                        Copy = cpcore.siteProperties.getText("PageContentMessageFooter", "Copyright " & cpcore.serverConfig.appConfig.domainList(0))
-                        Copy = cpcore.siteProperties.getText("SelectFieldLimit", "4000")
-                        Copy = cpcore.siteProperties.getText("SelectFieldWidthLimit", "100")
-                        Copy = cpcore.siteProperties.getText("SMTPServer", "127.0.0.1")
-                        Copy = cpcore.siteProperties.getText("TextSearchEndTag", "<!-- TextSearchEnd -->")
-                        Copy = cpcore.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->")
-                        Copy = cpcore.siteProperties.getText("TrapEmail", "")
-                        Copy = cpcore.siteProperties.getText("TrapErrors", "0")
-                        Dim defaultRouteAddonId As Integer = cpcore.siteProperties.getinteger(spDefaultRouteAddonId, 0)
-                        Dim defaultRouteAddon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, defaultRouteAddonId)
-                        If (defaultRouteAddon Is Nothing) Then
-                            defaultRouteAddon = Models.Entity.addonModel.create(cpcore, addonGuidPageManager)
-                            If (defaultRouteAddon IsNot Nothing) Then
-                                cpcore.siteProperties.setProperty(spDefaultRouteAddonId, defaultRouteAddon.id)
-                            End If
+                    Call logController.appendInstallLog(cpcore, "Verify Site Properties")
+                    '
+                    cpcore.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild))
+                    cpcore.siteProperties.getText("AllowAutoLogin", "False")
+                    cpcore.siteProperties.getText("AllowBake", "True")
+                    cpcore.siteProperties.getText("AllowChildMenuHeadline", "True")
+                    cpcore.siteProperties.getText("AllowContentAutoLoad", "True")
+                    cpcore.siteProperties.getText("AllowContentSpider", "False")
+                    cpcore.siteProperties.getText("AllowContentWatchLinkUpdate", "True")
+                    cpcore.siteProperties.getText("AllowDuplicateUsernames", "False")
+                    cpcore.siteProperties.getText("ConvertContentText2HTML", "False")
+                    cpcore.siteProperties.getText("AllowMemberJoin", "False")
+                    cpcore.siteProperties.getText("AllowPasswordEmail", "True")
+                    cpcore.siteProperties.getText("AllowPathBlocking", "True")
+                    cpcore.siteProperties.getText("AllowPopupErrors", "True")
+                    cpcore.siteProperties.getText("AllowTestPointLogging", "False")
+                    cpcore.siteProperties.getText("AllowTestPointPrinting", "False")
+                    cpcore.siteProperties.getText("AllowTransactionLog", "False")
+                    cpcore.siteProperties.getText("AllowTrapEmail", "True")
+                    cpcore.siteProperties.getText("AllowTrapLog", "True")
+                    cpcore.siteProperties.getText("AllowWorkflowAuthoring", "False")
+                    cpcore.siteProperties.getText("ArchiveAllowFileClean", "False")
+                    cpcore.siteProperties.getText("ArchiveRecordAgeDays", "90")
+                    cpcore.siteProperties.getText("ArchiveTimeOfDay", "2:00:00 AM")
+                    cpcore.siteProperties.getText("BreadCrumbDelimiter", "&nbsp;&gt;&nbsp;")
+                    cpcore.siteProperties.getText("CalendarYearLimit", "1")
+                    cpcore.siteProperties.getText("ContentPageCompatibility21", "false")
+                    cpcore.siteProperties.getText("DefaultFormInputHTMLHeight", "500")
+                    cpcore.siteProperties.getText("DefaultFormInputTextHeight", "1")
+                    cpcore.siteProperties.getText("DefaultFormInputWidth", "60")
+                    cpcore.siteProperties.getText("EditLockTimeout", "5")
+                    cpcore.siteProperties.getText("EmailAdmin", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0))
+                    cpcore.siteProperties.getText("EmailFromAddress", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0))
+                    cpcore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0))
+                    cpcore.siteProperties.getText("Language", "English")
+                    cpcore.siteProperties.getText("PageContentMessageFooter", "Copyright " & cpcore.serverConfig.appConfig.domainList(0))
+                    cpcore.siteProperties.getText("SelectFieldLimit", "4000")
+                    cpcore.siteProperties.getText("SelectFieldWidthLimit", "100")
+                    cpcore.siteProperties.getText("SMTPServer", "127.0.0.1")
+                    cpcore.siteProperties.getText("TextSearchEndTag", "<!-- TextSearchEnd -->")
+                    cpcore.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->")
+                    cpcore.siteProperties.getText("TrapEmail", "")
+                    cpcore.siteProperties.getText("TrapErrors", "0")
+                    Dim defaultRouteAddonId As Integer = cpcore.siteProperties.getinteger(spDefaultRouteAddonId, 0)
+                    Dim defaultRouteAddon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, defaultRouteAddonId)
+                    If (defaultRouteAddon Is Nothing) Then
+                        defaultRouteAddon = Models.Entity.addonModel.create(cpcore, addonGuidPageManager)
+                        If (defaultRouteAddon IsNot Nothing) Then
+                            cpcore.siteProperties.setProperty(spDefaultRouteAddonId, defaultRouteAddon.id)
                         End If
                     End If
                     '
                     '---------------------------------------------------------------------
                     ' ----- Changes that effect the web server or content files, not the Database
                     '---------------------------------------------------------------------
-
                     '
-                    StyleSN = (cpcore.siteProperties.getinteger("StylesheetSerialNumber"))
+                    Dim StyleSN As Integer = (cpcore.siteProperties.getinteger("StylesheetSerialNumber"))
                     If StyleSN > 0 Then
-                        StyleSN = StyleSN + 1
+                        StyleSN += 1
                         Call cpcore.siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
                         ' too lazy
                         'Call cpcore.app.publicFiles.SaveFile(cpcore.app.genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), cpcore.app.csv_getStyleSheetProcessed)
@@ -525,7 +486,7 @@ Namespace Contensive.Core.Controllers
                     '---------------------------------------------------------------------
                     '
                     If True Then
-                        Call appendBuildLog(cpcore, "Internal upgrade complete, set Buildversion to " & cpcore.codeVersion)
+                        Call logController.appendInstallLog(cpcore, "Internal upgrade complete, set Buildversion to " & cpcore.codeVersion)
                         Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.codeVersion)
                         '
                         '---------------------------------------------------------------------
@@ -540,10 +501,11 @@ Namespace Contensive.Core.Controllers
                             '
                             ' 4.1.575 - 8/28 - put this code behind the DbOnly check, makes DbOnly beuild MUCH faster
                             '
-                            ErrorMessage = ""
+                            Dim ErrorMessage As String = ""
+                            Dim IISResetRequired As Boolean
                             'RegisterList = ""
-                            Call appendBuildLog(cpcore, "Upgrading All Local Collections to new server build.")
-                            UpgradeOK = addonInstallClass.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ErrorMessage, "", IISResetRequired, isNewBuild, nonCriticalErrorList)
+                            Call logController.appendInstallLog(cpcore, "Upgrading All Local Collections to new server build.")
+                            Dim UpgradeOK As Boolean = addonInstallClass.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ErrorMessage, "", IISResetRequired, isNewBuild, nonCriticalErrorList)
                             If ErrorMessage <> "" Then
                                 Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             ElseIf Not UpgradeOK Then
@@ -598,10 +560,10 @@ Namespace Contensive.Core.Controllers
                             Dim Collectionname As String
                             Dim CollectionGuid As String
                             Dim localCollectionFound As Boolean
-                            Call appendBuildLog(cpcore, "Checking all installed collections for upgrades from Collection Library")
-                            Call appendBuildLog(cpcore, "...Open collectons.xml")
+                            Call logController.appendInstallLog(cpcore, "Checking all installed collections for upgrades from Collection Library")
+                            Call logController.appendInstallLog(cpcore, "...Open collectons.xml")
                             Try
-                                Doc = New XmlDocument
+                                Dim Doc As New XmlDocument
                                 Call Doc.LoadXml(addonInstallClass.getCollectionListFile(cpcore))
                                 If True Then
                                     If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
@@ -612,9 +574,9 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 ' now go through each collection in this app and check the last updated agains the one here
                                                 '
-                                                Call appendBuildLog(cpcore, "...Open site collectons, iterate through all collections")
+                                                Call logController.appendInstallLog(cpcore, "...Open site collectons, iterate through all collections")
                                                 'Dim dt As DataTable
-                                                dt = cpcore.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)")
+                                                Dim dt As DataTable = cpcore.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)")
                                                 If dt.Rows.Count > 0 Then
                                                     Dim rowptr As Integer
                                                     For rowptr = 0 To dt.Rows.Count - 1
@@ -622,30 +584,30 @@ Namespace Contensive.Core.Controllers
                                                         ErrorMessage = ""
                                                         CollectionGuid = genericController.vbLCase(dt.Rows(rowptr).Item("ccguid").ToString)
                                                         Collectionname = dt.Rows(rowptr).Item("name").ToString
-                                                        Call appendBuildLog(cpcore, "...checking collection [" & Collectionname & "], guid [" & CollectionGuid & "]")
+                                                        Call logController.appendInstallLog(cpcore, "...checking collection [" & Collectionname & "], guid [" & CollectionGuid & "]")
                                                         If CollectionGuid <> "{7c6601a7-9d52-40a3-9570-774d0d43d758}" Then
                                                             '
                                                             ' upgrade all except base collection from the local collections
                                                             '
                                                             localCollectionFound = False
-                                                            upgradeCollection = False
-                                                            LastChangeDate = genericController.EncodeDate(dt.Rows(rowptr).Item("LastChangeDate"))
+                                                            Dim upgradeCollection As Boolean = False
+                                                            Dim LastChangeDate As Date = genericController.EncodeDate(dt.Rows(rowptr).Item("LastChangeDate"))
                                                             If LastChangeDate = Date.MinValue Then
                                                                 '
                                                                 ' app version has no lastchangedate
                                                                 '
                                                                 upgradeCollection = True
-                                                                Call appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString & " because the collection installed in the application has no LastChangeDate. It may have been installed manually.")
+                                                                Call appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, "upgrade", "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString & " because the collection installed in the application has no LastChangeDate. It may have been installed manually.")
                                                             Else
                                                                 '
                                                                 ' compare to last change date in collection config file
                                                                 '
-                                                                LocalGuid = ""
-                                                                LocalLastChangeDate = Date.MinValue
-                                                                For Each LocalListNode In .ChildNodes
+                                                                Dim LocalGuid As String = ""
+                                                                Dim LocalLastChangeDate As Date = Date.MinValue
+                                                                For Each LocalListNode As XmlNode In .ChildNodes
                                                                     Select Case genericController.vbLCase(LocalListNode.Name)
                                                                         Case "collection"
-                                                                            For Each CollectionNode In LocalListNode.ChildNodes
+                                                                            For Each CollectionNode As XmlNode In LocalListNode.ChildNodes
                                                                                 Select Case genericController.vbLCase(CollectionNode.Name)
                                                                                     Case "guid"
                                                                                         '
@@ -658,10 +620,10 @@ Namespace Contensive.Core.Controllers
                                                                     End Select
                                                                     If CollectionGuid = genericController.vbLCase(LocalGuid) Then
                                                                         localCollectionFound = True
-                                                                        Call appendBuildLog(cpcore, "...local collection found")
+                                                                        Call logController.appendInstallLog(cpcore, "...local collection found")
                                                                         If LocalLastChangeDate <> Date.MinValue Then
                                                                             If LocalLastChangeDate > LastChangeDate Then
-                                                                                Call appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString() & " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.")
+                                                                                Call appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, "upgrade", "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString() & " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.")
                                                                                 upgradeCollection = True
                                                                             End If
                                                                         End If
@@ -671,17 +633,17 @@ Namespace Contensive.Core.Controllers
                                                             End If
                                                             ErrorMessage = ""
                                                             If Not localCollectionFound Then
-                                                                Call appendBuildLog(cpcore, "...site collection [" & Collectionname & "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.")
-                                                                addonInstallOk = addonInstallClass.installCollectionFromRemoteRepo(cpcore, CollectionGuid, ErrorMessage, "", isNewBuild, nonCriticalErrorList)
+                                                                Call logController.appendInstallLog(cpcore, "...site collection [" & Collectionname & "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.")
+                                                                Dim addonInstallOk As Boolean = addonInstallClass.installCollectionFromRemoteRepo(cpcore, CollectionGuid, ErrorMessage, "", isNewBuild, nonCriticalErrorList)
                                                                 If Not addonInstallOk Then
                                                                     '
                                                                     ' this may be OK so log, but do not call it an error
                                                                     '
-                                                                    Call appendBuildLog(cpcore, "...site collection [" & Collectionname & "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" & CollectionGuid & "]")
+                                                                    Call logController.appendInstallLog(cpcore, "...site collection [" & Collectionname & "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" & CollectionGuid & "]")
                                                                 End If
                                                             Else
                                                                 If upgradeCollection Then
-                                                                    Call appendBuildLog(cpcore, "...upgrading collection")
+                                                                    Call logController.appendInstallLog(cpcore, "...upgrading collection")
                                                                     Call addonInstallClass.installCollectionFromLocalRepo(cpcore, CollectionGuid, cpcore.codeVersion, ErrorMessage, "", isNewBuild, nonCriticalErrorList)
                                                                 End If
                                                             End If
@@ -694,7 +656,7 @@ Namespace Contensive.Core.Controllers
                                 End If
 
                             Catch ex9 As Exception
-                                Call handleClassException(cpcore, ex9, cpcore.serverConfig.appConfig.name, MethodName) ' "upgrade2")
+                                Call handleClassException(cpcore, ex9, cpcore.serverConfig.appConfig.name, "upgrade") ' "upgrade2")
                             End Try
                             '
                             ' done
@@ -707,7 +669,7 @@ Namespace Contensive.Core.Controllers
                     '---------------------------------------------------------------------
                     '
                     cpcore.cache.invalidateAll()
-                    appendBuildLog(cpcore, "Upgrade Complete")
+                    logController.appendInstallLog(cpcore, "Upgrade Complete")
                     cpcore.upgradeInProgress = False
                 End If
             Catch ex As Exception
@@ -2246,7 +2208,7 @@ Namespace Contensive.Core.Controllers
         '===========================================================================
         '
         Private Shared Sub appendUpgradeLog(cpCore As coreClass, ByVal appName As String, ByVal Method As String, ByVal Message As String)
-            appendBuildLog(cpCore, "app [" & appName & "], Method [" & Method & "], Message [" & Message & "]")
+            logController.appendInstallLog(cpCore, "app [" & appName & "], Method [" & Method & "], Message [" & Message & "]")
         End Sub
         '
         '=============================================================================
@@ -2268,11 +2230,6 @@ Namespace Contensive.Core.Controllers
             SQLValue(Index) = InputValue
             Index = Index + 1
             '
-        End Sub
-        '
-        Private Shared Sub appendBuildLog(cpCore As coreClass, ByVal message As String)
-            Console.WriteLine("upgrade: " & message)
-            logController.appendLog(cpCore, message, "Build")
         End Sub
         ''
         ''=============================================================================

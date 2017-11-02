@@ -650,10 +650,12 @@ Namespace Contensive.Core.Controllers
                     Call createSQLTableField(DataSourceName, TableName, "sortOrder", FieldTypeIdText)
                     Call createSQLTableField(DataSourceName, TableName, "contentControlID", FieldTypeIdInteger)
                     Call createSQLTableField(DataSourceName, TableName, "ccGuid", FieldTypeIdText)
+                    ' -- 20171029 - deprecating fields makes migration difficult. add back and figure out future path
+                    Call createSQLTableField(DataSourceName, TableName, "ContentCategoryID", FieldTypeIdInteger)
                     '
                     ' ----- setup core indexes
                     '
-                    Call createSQLIndex(DataSourceName, TableName, TableName & "Id", "ID")
+                    ' 20171029 primary key dow not need index -- Call createSQLIndex(DataSourceName, TableName, TableName & "Id", "ID")
                     Call createSQLIndex(DataSourceName, TableName, TableName & "Active", "ACTIVE")
                     Call createSQLIndex(DataSourceName, TableName, TableName & "Name", "NAME")
                     Call createSQLIndex(DataSourceName, TableName, TableName & "SortOrder", "SORTORDER")
