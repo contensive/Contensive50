@@ -607,7 +607,7 @@ ErrorTrap:
                 'Dim InlineStyles As String
                 Dim emailWorkingStyles As String
                 Dim RootURL As String
-                Dim PrimaryLink As String
+                Dim protocolHostLink As String
                 Dim ToAddress As String
                 'Dim ToAddressName As String
                 Dim EmailBodyEncoded As String
@@ -637,7 +637,7 @@ ErrorTrap:
                     '
                     ' Get the Template
                     '
-                    PrimaryLink = "http://" & GetPrimaryDomainName()
+                    protocolHostLink = "http://" & GetPrimaryDomainName()
                     '
                     ' Get the Member
                     '
@@ -646,7 +646,7 @@ ErrorTrap:
                         ToAddress = cpCore.db.csGet(CSPeople, "Email")
                         EmailToName = cpCore.db.csGet(CSPeople, "Name")
                         ServerPageDefault = cpCore.siteProperties.getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
-                        RootURL = PrimaryLink & requestAppRootPath
+                        RootURL = protocolHostLink & requestAppRootPath
                         If EmailDropID <> 0 Then
                             Select Case (cpCore.siteProperties.getinteger("GroupEmailOpenTriggerMethod", 0))
                                 Case 1
@@ -666,12 +666,14 @@ ErrorTrap:
                         '
                         ' Encode body and subject
                         '
-                        EmailBodyEncoded = cpCore.html.html_executeContentCommands(Nothing, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
-                        EmailBodyEncoded = cpCore.html.encodeContent10(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                        EmailBodyEncoded = cpCore.html.executeContentCommands(Nothing, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
+                        EmailBodyEncoded = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailBodyEncoded, MemberID, ClickFlagQuery)
+                        'EmailBodyEncoded = cpCore.html.convertActiveContent_internal(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         'EmailBodyEncoded = cpCore.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         '
-                        EmailSubjectEncoded = cpCore.html.html_executeContentCommands(Nothing, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
-                        EmailSubjectEncoded = cpCore.html.encodeContent10(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                        EmailSubjectEncoded = cpCore.html.executeContentCommands(Nothing, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
+                        EmailSubjectEncoded = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailSubjectEncoded, MemberID, ClickFlagQuery)
+                        'EmailSubjectEncoded = cpCore.html.convertActiveContent_internal(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         'EmailSubjectEncoded = cpCore.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         '
                         ' Encode/Merge Template
@@ -685,8 +687,9 @@ ErrorTrap:
                             '
                             ' use provided template
                             '
-                            EmailTemplateEncoded = cpCore.html.html_executeContentCommands(Nothing, EmailTemplateEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
-                            EmailTemplateEncoded = cpCore.html.encodeContent10(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                            EmailTemplateEncoded = cpCore.html.executeContentCommands(Nothing, EmailTemplateEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
+                            EmailTemplateEncoded = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailTemplate, MemberID, ClickFlagQuery)
+                            'EmailTemplateEncoded = cpCore.html.convertActiveContent_internal(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, protocolHostLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                             'EmailTemplateEncoded = cpCore.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                             'EmailTemplateEncoded = cpCore.csv_encodecontent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
                             If genericController.vbInstr(1, EmailTemplateEncoded, fpoContentBox) <> 0 Then
@@ -755,7 +758,7 @@ ErrorTrap:
                 End If
                 'Call cpCore.app.closeCS(CSLog)
             Catch ex As Exception
-                throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
+                Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
                 Err.Clear()
             Finally
                 Call cpCore.db.csClose(CSPeople)
@@ -794,7 +797,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
+            Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Function
         '
@@ -826,12 +829,14 @@ ErrorTrap:
                 If cpCore.db.csOk(CSPeople) Then
                     ClickFlagQuery = rnEmailClickFlag & "=" & EmailDropID & "&" & rnEmailMemberID & "=" & ConfirmationMemberID
                     '
-                    EmailSubject = cpCore.html.html_executeContentCommands(Nothing, EmailSubject, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
-                    EmailSubject = cpCore.html.encodeContent10(EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                    EmailSubject = cpCore.html.executeContentCommands(Nothing, EmailSubject, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
+                    EmailSubject = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailSubject, ConfirmationMemberID, ClickFlagQuery)
+                    'EmailSubject = cpCore.html.convertActiveContent_internal(EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                     'EmailSubject = cpCore.csv_EncodeContent8(Nothing, EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                     '
-                    EmailBody = cpCore.html.html_executeContentCommands(Nothing, EmailBody, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
-                    EmailBody = cpCore.html.encodeContent10(EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                    EmailBody = cpCore.html.executeContentCommands(Nothing, EmailBody, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
+                    EmailBody = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailBody, ConfirmationMemberID, ClickFlagQuery)
+                    'EmailBody = cpCore.html.convertActiveContent_internal(EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                     'EmailBody = cpCore.csv_EncodeContent8(Nothing, EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                     '
                     ' Encode the template
@@ -843,8 +848,9 @@ ErrorTrap:
                         EmailBody = "<div style=""padding:10px"">" & EmailBody & "</div>"
                     Else
                         WorkingTemplate = EmailTemplate
-                        WorkingTemplate = cpCore.html.html_executeContentCommands(Nothing, WorkingTemplate, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
-                        WorkingTemplate = cpCore.html.encodeContent10(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                        WorkingTemplate = cpCore.html.executeContentCommands(Nothing, WorkingTemplate, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
+                        WorkingTemplate = cpCore.html.convertActiveContentToHtmlForEmailSend(WorkingTemplate, ConfirmationMemberID, ClickFlagQuery)
+                        'WorkingTemplate = cpCore.html.convertActiveContent_internal(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         'WorkingTemplate = cpCore.csv_encodecontent8(Nothing, EmailTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
                         If genericController.vbInstr(1, WorkingTemplate, fpoContentBox) <> 0 Then
                             EmailBody = genericController.vbReplace(WorkingTemplate, fpoContentBox, EmailBody)

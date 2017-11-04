@@ -71,7 +71,7 @@ Namespace Contensive.Core
         Public Overrides Function ConvertHTML2Text(ByVal Source As String) As String
 
             If True Then
-                ConvertHTML2Text = CP.core.html.main_ConvertHTML2Text(Source)
+                ConvertHTML2Text = CP.core.html.convertHTMLToText(Source)
             Else
                 ConvertHTML2Text = Source
             End If
@@ -81,7 +81,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function ConvertText2Html(ByVal Source As String) As String
             If True Then
-                ConvertText2Html = CP.core.html.html_convertText2HTML(Source)
+                ConvertText2Html = CP.core.html.convertTextToHTML(Source)
             Else
                 ConvertText2Html = Source
             End If
@@ -96,20 +96,11 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function EncodeContentForWeb(ByVal Source As String, Optional ByVal ContextContentName As String = "", Optional ByVal ContextRecordID As Integer = 0, Optional ByVal WrapperID As Integer = 0) As String
-            If True Then
-                EncodeContentForWeb = CP.core.html.encodeContentForWeb(Source, ContextContentName, ContextRecordID, "", WrapperID)
-            Else
-                EncodeContentForWeb = ""
-            End If
+            Return CP.core.html.convertActiveContentToHtmlForWebRender(Source, ContextContentName, ContextRecordID, 0, "", WrapperID, CPUtilsBaseClass.addonContext.ContextPage)
         End Function
 
         Public Overrides Function DecodeHtml(ByVal Source As String) As String
             Return genericController.decodeHtml(Source)
-            'If true Then
-            '    DecodeHtml = cmc.main_DecodeHtml(Source)
-            'Else
-            '    DecodeHtml = ""
-            'End If
         End Function
 
         Public Overrides Function EncodeHtml(ByVal Source As String) As String
@@ -479,7 +470,8 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function EncodeHtmlForWysiwygEditor(Source As String) As String
-            Return CP.core.html.encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
+            Return CP.core.html.convertActiveContentToHtmlForWysiwygEditor(Source)
+            'Return CP.core.html.convertActiveContent_internal(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
             'Return CP.core.encodeContent9(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", 1)
         End Function
         '
@@ -490,7 +482,7 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function DecodeHtmlFromWysiwygEditor(Source As String) As String
-            Return CP.core.html.decodeContent(Source)
+            Return CP.core.html.convertEditorResponseToActiveContent(Source)
             'Throw New NotImplementedException()
         End Function
         '

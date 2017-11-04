@@ -31,7 +31,7 @@ Namespace Contensive.Addons.Core
                     ' Open a page compatible with a dialog
                     '
                     Call cpCore.doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
-                    Call cpCore.html.main_AddPagetitle("Site Explorer")
+                    Call cpCore.html.addTitle("Site Explorer")
                     Call cpCore.doc.setMetaContent(0, 0)
                     Dim copy As String = cpCore.addon.execute(
                         addonModel.createByName(cpCore, "Site Explorer"),

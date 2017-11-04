@@ -236,7 +236,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addMetaDescription(ByVal MetaDescription As String)
             If True Then
-                Call cpCore.html.main_addMetaDescription(MetaDescription)
+                Call cpCore.html.addMetaDescription(MetaDescription)
             End If
         End Sub
         '
@@ -244,7 +244,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addMetaKeywordList(ByVal MetaKeywordList As String)
             If True Then
-                Call cpCore.html.main_addMetaKeywordList(MetaKeywordList)
+                Call cpCore.html.addMetaKeywordList(MetaKeywordList)
             End If
         End Sub
         '
@@ -260,7 +260,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addTitle(ByVal PageTitle As String)
             If True Then
-                Call cpCore.html.main_AddPagetitle(PageTitle)
+                Call cpCore.html.addTitle(PageTitle)
             End If
         End Sub
         '
@@ -283,7 +283,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub addHeadStyleLink(ByVal StyleSheetLink As String)
-            Call cpCore.html.addHeadStyleLink(StyleSheetLink, "")
+            Call cpCore.html.addStyleLink(StyleSheetLink, "")
         End Sub
         '
         '====================================================================================================

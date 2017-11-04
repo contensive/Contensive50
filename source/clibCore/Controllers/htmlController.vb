@@ -2446,7 +2446,7 @@ ErrorTrap:
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = html_GetFormInputHTML(FieldName, FieldValueText, , Width.ToString)
+                                        returnResult = getFormInputHTML(FieldName, FieldValueText, , Width.ToString)
                                     End If
                                 '
                                 ' html files, read from cdnFiles and use html editor
@@ -2460,7 +2460,7 @@ ErrorTrap:
                                         returnResult = FieldValueText
                                     Else
                                         'Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = html_GetFormInputHTML(FieldName, FieldValueText, , Width.ToString)
+                                        returnResult = getFormInputHTML(FieldName, FieldValueText, , Width.ToString)
                                     End If
                                 '
                                 ' text cdnFiles files, read from cdnFiles and use text editor
@@ -2547,7 +2547,7 @@ ErrorTrap:
                                         If FieldReadOnly Then
                                             CSPointer = cpCore.db.cs_open2(FieldLookupContentName, FieldValueInteger)
                                             If cpCore.db.csOk(CSLookup) Then
-                                                returnResult = csController.main_cs_getEncodedField(cpCore, CSLookup, "name")
+                                                returnResult = csController.getTextEncoded(cpCore, CSLookup, "name")
                                             End If
                                             Call cpCore.db.csClose(CSLookup)
                                         Else
@@ -2579,7 +2579,7 @@ ErrorTrap:
                                         returnResult = FieldValueText
                                     Else
                                         If FieldHTMLContent Then
-                                            returnResult = html_GetFormInputHTML3(FieldName, FieldValueText, CStr(Height), CStr(Width), FieldReadOnly, False)
+                                            returnResult = getFormInputHTML(FieldName, FieldValueText, CStr(Height), CStr(Width), FieldReadOnly, False)
                                             'main_GetFormInputCS = main_GetFormInputActiveContent(fieldname, FieldValueText, height, width)
                                         Else
                                             returnResult = html_GetFormInputText2(FieldName, FieldValueText, Height, Width)
@@ -2973,7 +2973,7 @@ ErrorTrap:
                             MTMRuleField0 = .ManyToManyRulePrimaryField
                             MTMRuleField1 = .ManyToManyRuleSecondaryField
                         End With
-                        result = getInputCheckList(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False)
+                        result = getCheckList(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False)
                         'result = getInputCheckListCategories(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, HtmlValue)
                     Case FieldTypeIdMemberSelect
                         '
@@ -3023,7 +3023,7 @@ ErrorTrap:
                         '
                         '
                         '
-                        result = html_GetFormInputHTML(InputName, HtmlValue)
+                        result = getFormInputHTML(InputName, HtmlValue)
                         If HtmlStyle <> "" Then
                             result = genericController.vbReplace(result, ">", " style=""" & HtmlStyle & """>")
                         End If
@@ -3353,7 +3353,7 @@ ErrorTrap:
         '   encode (execute) all {% -- %} commands
         '========================================================================
         '
-        Public Function html_executeContentCommands(ByVal nothingObject As Object, ByVal Source As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean, ByRef Return_ErrorMessage As String) As String
+        Public Function executeContentCommands(ByVal nothingObject As Object, ByVal Source As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean, ByRef Return_ErrorMessage As String) As String
             Dim returnValue As String = ""
             Try
                 Dim LoopPtr As Integer
@@ -3425,7 +3425,7 @@ ErrorTrap:
         '   BlockPointer    the current block being examined
         '========================================================================
         '
-        Public Function html_EncodeActiveContent_Internal(ByVal Source As String, ByVal personalizationPeopleId As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal moreInfoPeopleId As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, Optional ByVal context As CPUtilsBaseClass.addonContext = CPUtilsBaseClass.addonContext.ContextPage) As String
+        Private Function convertActiveContent_Internal_activeParts(ByVal Source As String, ByVal personalizationPeopleId As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal moreInfoPeopleId As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostLink As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, Optional ByVal context As CPUtilsBaseClass.addonContext = CPUtilsBaseClass.addonContext.ContextPage) As String
             Dim result As String = ""
             Try
                 Dim ACGuid As String
@@ -3636,7 +3636,7 @@ ErrorTrap:
                     If KmaHTML.ElementCount > 0 Then
                         ElementPointer = 0
                         workingContent = ""
-                        serverFilePath = ProtocolHostString & "/" & cpCore.serverConfig.appConfig.name & "/files/"
+                        serverFilePath = ProtocolHostLink & "/" & cpCore.serverConfig.appConfig.name & "/files/"
                         Stream = New stringBuilderLegacyController
                         Do While ElementPointer < KmaHTML.ElementCount
                             Copy = KmaHTML.Text(ElementPointer)
@@ -4240,7 +4240,7 @@ ErrorTrap:
                                                         If ACAttrAlt = "" Then
                                                             ACAttrAlt = genericController.encodeText(file.AltText)
                                                         End If
-                                                        Copy = "<a href=""" & ProtocolHostString & requestAppRootPath & cpCore.siteProperties.serverPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/ccLib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
+                                                        Copy = "<a href=""" & ProtocolHostLink & requestAppRootPath & cpCore.siteProperties.serverPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostLink & "/ccLib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
                                                     End If
                                                 End If
                                             Case ACTypeTemplateContent
@@ -4419,7 +4419,7 @@ ErrorTrap:
         '   ACInstanceID - used to identify an AC tag on a page. Each instance of an AC tag must havea unique ACinstanceID
         '========================================================================
         '
-        Public Function html_DecodeActiveContent(ByVal SourceCopy As String) As String
+        Public Function convertEditorResponseToActiveContent(ByVal SourceCopy As String) As String
             Dim result As String = ""
             Try
                 Dim imageNewLink As String
@@ -5065,44 +5065,22 @@ ErrorTrap:
         End Function
         '
         '========================================================================
-        ' ----- Decode Content
-        '========================================================================
-        '
-        Public Function renderActiveContent(ByVal Source As String) As String
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-186" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            ' ----- Do Active Content Conversion
-            '
-            renderActiveContent = Source
-            If (renderActiveContent <> "") Then
-                renderActiveContent = html_DecodeActiveContent(Source)
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeContent", True)
-        End Function
-        '
-        '========================================================================
         ' Modify a string to be printed through the HTML stream
         '   convert carriage returns ( 0x10 ) to <br>
         '   remove linefeeds ( 0x13 )
         '========================================================================
         '
-        Public Function main_EncodeCRLF(ByVal Source As Object) As String
+        Public Function convertCRLFToHtmlBreak(ByVal Source As Object) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("EncodeCRLF")
             '
             Dim iSource As String
             '
             iSource = genericController.encodeText(Source)
-            main_EncodeCRLF = ""
+            convertCRLFToHtmlBreak = ""
             If (iSource <> "") Then
-                main_EncodeCRLF = iSource
-                main_EncodeCRLF = genericController.vbReplace(main_EncodeCRLF, vbCr, "")
-                main_EncodeCRLF = genericController.vbReplace(main_EncodeCRLF, vbLf, "<br >")
+                convertCRLFToHtmlBreak = iSource
+                convertCRLFToHtmlBreak = genericController.vbReplace(convertCRLFToHtmlBreak, vbCr, "")
+                convertCRLFToHtmlBreak = genericController.vbReplace(convertCRLFToHtmlBreak, vbLf, "<br >")
             End If
             Exit Function
             '
@@ -5139,396 +5117,22 @@ ErrorTrap:
         '       encodes reserved HTML characters to their equivalent
         '========================================================================
         '
-        Public Function html_convertText2HTML(ByVal Source As Object) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ConvertText2HTML")
-            '
-            html_convertText2HTML = encodeHTML(genericController.encodeText(Source))
-            html_convertText2HTML = main_EncodeCRLF(html_convertText2HTML)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_ConvertText2HTML")
-        End Function
-        '
-        '========================================================================
-        '   11/26/2009 - changed to 'undo' what encodehtml does
-        '
-        '   it converts the html equivlent "5 &gt; 6" to the he equation 5>6
-        '========================================================================
-        '
-        Public Function main_DecodeHTML(ByVal Source As Object) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("DecodeHTML")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_DecodeHTML = genericController.decodeHtml(genericController.encodeText(Source))
-            '
-            '    '
-            '    Dim Decoder As htmlDecodeClass
-            '    Dim iSource As String
-            '    '
-            '    iSource = genericController.encodeText(Source)
-            '    '
-            '    Decoder = New htmlDecodeClass
-            '    main_DecodeHTML = Decoder.Decode(iSource)
-            '    Decoder = Nothing
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            'Set Decoder = Nothing
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_DecodeHTML")
+        Public Function convertTextToHTML(ByVal Source As String) As String
+            Return convertCRLFToHtmlBreak(encodeHTML(Source))
         End Function
         '
         '========================================================================
         ' ----- Encode Active Content AI
         '========================================================================
         '
-        Public Function main_ConvertHTML2Text(ByVal Source As String) As String
+        Public Function convertHTMLToText(ByVal Source As String) As String
             Try
                 Dim Decoder As New htmlToTextControllers(cpCore)
                 Return Decoder.convert(Source)
             Catch ex As Exception
-                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_ConvertHTML2Text")
+                Throw New ApplicationException("Unexpected exception")
             End Try
         End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function main_EncodeRequestVariable(Source As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeRequestVariable")
-            '
-            main_EncodeRequestVariable = genericController.EncodeRequestVariable(genericController.encodeText(Source))
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeRequestVariable")
-        End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function main_EncodeURL(Source As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeURL")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_EncodeURL = genericController.EncodeURL(genericController.encodeText(Source))
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeURL")
-        End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function main_DecodeUrl(ByVal sUrl As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("DecodeUrl")
-            '
-            main_DecodeUrl = genericController.DecodeResponseVariable(genericController.encodeText(sUrl))
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("DecodeUrl")
-        End Function
-        '        '
-        '        '
-        '        '
-        '        Private Function html_DecodeActiveContent_ProcessDynamicMenu(ByVal QueryString As String) As String
-        '            On Error GoTo ErrorTrap 'Const Tn = "csv_DecodeActiveContent_ProcessDynamicMenu" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim EditTabCaption As String
-        '            Dim ACTags() As String
-        '            Dim TagPtr As Integer
-        '            Dim QSPos As Integer
-        '            Dim QSPosEnd As Integer
-        '            Dim QS As String
-        '            Dim MenuName As String
-        '            Dim StylePrefix As String
-        '            Dim CS As Integer
-        '            Dim IsFound As Boolean
-        '            Dim StyleSheet As String
-        '            'Dim DefaultStyles As String
-        '            'Dim DynamicStyles As String
-        '            'Dim AddStyles As String
-        '            'Dim StyleSplit() As String
-        '            'Dim StylePtr as integer
-        '            'Dim StyleLine As String
-        '            Dim Filename As String
-        '            'Dim NewStyleLine As String
-        '            Dim Menu As String
-        '            Dim MenuNew As String
-        '            '
-        '            QS = QueryString
-        '            If True Then
-        '                If genericController.vbInstr(1, QS, "Menu=", vbTextCompare) <> 0 Then
-        '                    '
-        '                    ' New menu
-        '                    '
-        '                    Menu = cpCore.csv_GetAddonOption("Menu", QS)
-        '                    MenuNew = cpCore.csv_GetAddonOption("NewMenu", QS)
-        '                    If MenuNew <> "" Then
-        '                        '
-        '                        ' Add a new Menu
-        '                        '
-        '                        Menu = MenuNew
-        '                        Call cpCore.csv_VerifyDynamicMenu(Menu)
-        '                    End If
-        '                    '
-        '                    ' fixup the tag so next encode it pulls a new list of Dynamic Menus
-        '                    '
-        '                    QS = "Menu=" & Menu
-        '                ElseIf genericController.vbInstr(1, QS, "MenuName=", vbTextCompare) <> 0 Then
-        '                    '
-        '                    ' Old Style Menu Icon
-        '                    '
-        '                    MenuName = cpCore.csv_GetAddonOption("MenuName", QS)
-        '                    Call cpCore.csv_VerifyDynamicMenu(MenuName)
-        '                End If
-        '            End If
-        '            html_DecodeActiveContent_ProcessDynamicMenu = QS
-        '            '
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent_ProcessDynamicMenu", True, True)
-        '        End Function
-        '        '
-        '        '=======================================================================================================
-        '        '   return the entire stylesheet for the given templateID and/or EmailID
-        '        '=======================================================================================================
-        '        '
-        '        Public Function html_getStyleSheet2(ByVal ContentType As csv_contentTypeEnum, ByVal templateId As Integer, Optional ByVal EmailID As Integer = 0) As String
-        '            On Error GoTo ErrorTrap 'Const Tn = "getStyleSheet2" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim blockStyles As Boolean
-        '            Dim usedSharedStyleList As String = String.Empty
-        '            Dim EMailTemplateID As Integer
-        '            Dim SQL As String
-        '            Dim CS As Integer
-        '            Dim Filename As String
-        '            'dim dt as datatable
-        '            Dim StyleName As String
-        '            Dim styleId As Integer
-        '            Dim Ptr As Integer
-        '            Dim DefaultStyles As String
-        '            Dim SiteStyles As String
-        '            Dim sharedStyles As String = String.Empty
-        '            Dim templateStyles As String = String.Empty
-        '            Dim emailstyles As String = String.Empty
-        '            '
-        '            For Ptr = 0 To cpCore.stylesheetCacheCnt - 1
-        '                If (cpCore.stylesheetCache(Ptr).EmailID = EmailID) And (cpCore.stylesheetCache(Ptr).EmailID = EmailID) Then
-        '                    html_getStyleSheet2 = cpCore.stylesheetCache(Ptr).StyleSheet
-        '                    Exit For
-        '                End If
-        '            Next
-        '            If Ptr >= cpCore.stylesheetCacheCnt Then
-        '                blockStyles = False
-        '                DefaultStyles = getStyleSheetDefault()
-        '                SiteStyles = "" _
-        '                    & vbCrLf & "/*" _
-        '                    & vbCrLf & "Site Styles" _
-        '                    & vbCrLf & "*/" _
-        '                    & vbCrLf & genericController.RemoveStyleTags(cpCore.cdnFiles.readFile("templates\styles.css"))
-        '                '
-        '                ' shared styles marked AlwaysInclude
-        '                '
-        '                SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s where (s.active<>0)and(s.AlwaysInclude<>0)"
-        '                Dim dt As DataTable
-        '                dt = cpCore.db.executeSql(SQL)
-        '                If dt.Rows.Count > 0 Then
-        '                    For Each row As DataRow In dt.Rows
-        '                        styleId = genericController.EncodeInteger(row("id"))
-        '                        StyleName = genericController.encodeText(row("name"))
-        '                        StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
-        '                        If (InStr(1, usedSharedStyleList & ",", "," & styleId & ",") = 0) Then
-        '                            usedSharedStyleList = usedSharedStyleList & "," & styleId
-        '                            Filename = genericController.encodeText(row("stylefilename"))
-        '                            If Filename <> "" Then
-        '                                sharedStyles = sharedStyles _
-        '                                    & vbCrLf & "/*" _
-        '                                    & vbCrLf & "Shared Style " & StyleName & " marked always include" _
-        '                                    & vbCrLf & "*/" _
-        '                                    & vbCrLf & genericController.RemoveStyleTags(cpCore.cdnFiles.readFile(Filename))
-        '                            End If
-        '                        End If
-        '                    Next
-        '                End If
-        '                '
-        '                If templateId <> 0 Then
-        '                    '
-        '                    ' template exclusive styles
-        '                    '
-        '                    SQL = "select name,stylesFilename from cctemplates where (id=" & templateId & ")and(stylesFilename is not null)"
-        '                    'Dim dt As DataTable
-        '                    dt = cpCore.db.executeSql(SQL)
-        '                    If dt.Rows.Count > 0 Then
-        '                        For Each dr As DataRow In dt.Rows
-        '                            Filename = genericController.encodeText(dr("stylesfilename"))
-        '                            StyleName = genericController.encodeText(dr("name"))
-        '                            StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
-        '                            If Filename <> "" Then
-        '                                templateStyles = templateStyles _
-        '                                    & vbCrLf & "/*" _
-        '                                    & vbCrLf & "Template Styles" _
-        '                                    & vbCrLf & "*/" _
-        '                                    & vbCrLf & genericController.RemoveStyleTags(cpCore.cdnFiles.readFile(Filename))
-        '                            End If
-
-        '                        Next
-        '                    End If
-        '                    '
-        '                    ' template shared styles
-        '                    '
-        '                    Dim rs As DataTable
-
-        '                    SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccSharedStylesTemplateRules r on s.id=r.styleid where (s.active<>0)and(r.templateid=" & templateId & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
-        '                    rs = cpCore.db.executeSql(SQL)
-        '                    If rs.Rows.Count > 0 Then
-        '                        styleId = genericController.EncodeInteger(rs.Rows(0).Item("id"))
-        '                        StyleName = genericController.encodeText(rs.Rows(0).Item("name"))
-        '                        StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
-        '                        If (InStr(1, usedSharedStyleList & ",", "," & styleId & ",") = 0) Then
-        '                            usedSharedStyleList = usedSharedStyleList & "," & styleId
-        '                            Filename = genericController.encodeText(rs.Rows(0).Item("stylefilename"))
-        '                            If Filename <> "" Then
-        '                                sharedStyles = sharedStyles _
-        '                                    & vbCrLf & "/*" _
-        '                                    & vbCrLf & "Shared Style " & StyleName & " included in template" _
-        '                                    & vbCrLf & "*/" _
-        '                                    & vbCrLf & genericController.RemoveStyleTags(cpCore.cdnFiles.readFile(Filename))
-        '                            End If
-        '                        End If
-        '                    End If
-        '                End If
-        '                '
-        '                If EmailID <> 0 Then
-        '                    '
-        '                    ' email exclusive styles
-        '                    '
-        '                    SQL = "select name,blockSiteStyles,stylesFilename,emailTemplateID from ccemail where id=" & EmailID
-        '                    'Dim dt As DataTable
-
-        '                    dt = cpCore.db.executeSql(SQL)
-        '                    If dt.Rows.Count > 0 Then
-        '                        For Each rsDr As DataRow In dt.Rows
-        '                            blockStyles = genericController.EncodeBoolean(rsDr("blockSiteStyles"))
-        '                            If Not blockStyles Then
-        '                                EMailTemplateID = genericController.EncodeInteger("EmailTemplateID")
-        '                                Filename = genericController.encodeText(rsDr("stylesFilename"))
-        '                                StyleName = genericController.encodeText(rsDr("name"))
-        '                                StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
-        '                                If Filename <> "" Then
-        '                                    emailstyles = emailstyles _
-        '                                        & vbCrLf & "/*" _
-        '                                        & vbCrLf & "Email Styles" _
-        '                                        & vbCrLf & "*/" _
-        '                                        & vbCrLf & genericController.RemoveStyleTags(cpCore.cdnFiles.readFile(Filename))
-        '                                End If
-        '                            End If
-        '                        Next
-        '                    End If
-        '                    '
-        '                    ' email shared styles
-        '                    '
-        '                    SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccEmailStyleRules r on s.id=r.sharedstylesid where (s.active<>0)and(r.emailid=" & EmailID & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
-        '                    dt = cpCore.db.executeSql(SQL)
-        '                    For Each rsDr As DataRow In dt.Rows
-        '                        styleId = genericController.EncodeInteger(rsDr("id"))
-        '                        StyleName = genericController.encodeText(rsDr("name"))
-        '                        StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
-        '                        If (InStr(1, usedSharedStyleList & ",", "," & styleId & ",") = 0) Then
-        '                            usedSharedStyleList = usedSharedStyleList & "," & styleId
-        '                            Filename = genericController.encodeText(rsDr("stylefilename"))
-        '                            If Filename <> "" Then
-        '                                sharedStyles = sharedStyles _
-        '                                    & vbCrLf & "/*" _
-        '                                    & vbCrLf & "Shared Styles included in email" _
-        '                                    & vbCrLf & "*/" _
-        '                                    & vbCrLf & genericController.RemoveStyleTags(cpCore.cdnFiles.readFile(Filename))
-        '                            End If
-        '                        End If
-        '                    Next
-        '                    '
-        '                    If EMailTemplateID <> 0 Then
-        '                        '
-        '                        ' email templates do not have styles (yet, or not at all)
-        '                        '
-        '                    End If
-        '                End If
-        '                '
-        '                ' assemble styles
-        '                '
-        '                If blockStyles Then
-        '                    html_getStyleSheet2 = ""
-        '                Else
-        '                    html_getStyleSheet2 = "" _
-        '                        & DefaultStyles _
-        '                        & SiteStyles _
-        '                        & sharedStyles _
-        '                        & templateStyles _
-        '                        & emailstyles
-        '                    '
-        '                    ' convert ccBodyWeb and ccBodyEmail to body tag on contentType
-        '                    '
-        '                End If
-        '                '
-        '                ' save it in cache in case there are >1 call on this page
-        '                '
-        '                Ptr = cpCore.stylesheetCacheCnt
-        '                ReDim Preserve cpCore.stylesheetCache(Ptr)
-        '                cpCore.stylesheetCacheCnt = cpCore.stylesheetCacheCnt + 1
-        '                With cpCore.stylesheetCache(Ptr)
-        '                    .EmailID = EmailID
-        '                    .templateId = templateId
-        '                    .StyleSheet = html_getStyleSheet2
-        '                End With
-        '            End If
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheet2", True, False)
-        '        End Function
-        ''
-        ''
-        ''
-        'Public Function getStyleSheetDefault() As String
-        '    '
-        '    getStyleSheetDefault = ""
-        '    If cpCore.siteProperties.getBoolean("Allow CSS Reset") Then
-        '        getStyleSheetDefault = getStyleSheetDefault _
-        '            & vbCrLf & "/*" _
-        '            & vbCrLf & "Reset Styles" _
-        '            & vbCrLf & "*/" _
-        '            & vbCrLf & genericController.RemoveStyleTags(cpCore.appRootFiles.readFile("\cclib\styles\ccreset.css"))
-        '    End If
-        '    getStyleSheetDefault = getStyleSheetDefault _
-        '        & vbCrLf & "/*" _
-        '        & vbCrLf & "Contensive Styles" _
-        '        & vbCrLf & "*/" _
-        '        & vbCrLf & genericController.RemoveStyleTags(cpCore.appRootFiles.readFile("\cclib\styles\" & defaultStyleFilename))
-        'End Function
-        ''
         '
         '===============================================================================================================================
         '   Get Addon Selector
@@ -5542,273 +5146,244 @@ ErrorTrap:
         '===============================================================================================================================
         '
         Public Function getAddonSelector(ByVal SrcOptionName As String, ByVal InstanceOptionValue_AddonEncoded As String, ByVal SrcOptionValueSelector As String) As String
-            On Error GoTo ErrorTrap 'Const Tn = "GetAddonSelector" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            'ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue_AddonEncoded, SrcOptionValueSelector)
-            '
-            Const ACFunctionList = "List"
-            Const ACFunctionList1 = "selectname"
-            Const ACFunctionList2 = "listname"
-            Const ACFunctionList3 = "selectcontentname"
-            Const ACFunctionListID = "ListID"
-            Const ACFunctionListFields = "ListFields"
-
-            '
-            Dim CID As Integer
-            Dim IsContentList As Boolean
-            Dim IsListField As Boolean
-            Dim Choice As String
-            Dim Choices() As String
-            Dim ChoiceCnt As Integer
-            Dim Ptr As Integer
-            Dim IncludeID As Boolean
-            Dim FnLen As Integer
-            Dim RecordID As Integer
-            Dim CS As Integer
-            Dim ContentName As String
-            Dim SrcOptionList As String
-            Dim Pos As Integer
-            Dim list As String
-            Dim FnArgList As String
-            Dim FnArgs() As String
-            Dim FnArgCnt As Integer
-            Dim ContentCriteria As String
-            Dim RecordName As String
-            Dim REsultOptionValue As String
-            Dim ResultOptionListHTMLEncoded As String
-            Dim SrcSelectorInner As String
-            Dim FunctionListNames As String
-            Dim SrcSelectorSuffix As String = String.Empty
-            Dim Cell(,) As Object
-            Dim RowCnt As Integer
-            Dim RowPtr As Integer
-            'Dim Ptr as integer
-            '
-            Dim SrcSelector As String
-            SrcSelector = Trim(SrcOptionValueSelector)
-            '
-            SrcSelectorInner = SrcSelector
-            Dim PosLeft As Integer
-            Dim PosRight As Integer
-            PosLeft = genericController.vbInstr(1, SrcSelector, "[")
-            If PosLeft <> 0 Then
-                PosRight = genericController.vbInstr(1, SrcSelector, "]")
-                If PosRight <> 0 Then
-                    If (PosRight < Len(SrcSelector)) Then
-                        SrcSelectorSuffix = Mid(SrcSelector, PosRight + 1)
+            Dim result As String = ""
+            Try
+                '
+                Const ACFunctionList = "List"
+                Const ACFunctionList1 = "selectname"
+                Const ACFunctionList2 = "listname"
+                Const ACFunctionList3 = "selectcontentname"
+                Const ACFunctionListID = "ListID"
+                Const ACFunctionListFields = "ListFields"
+                '
+                Dim CID As Integer
+                Dim IsContentList As Boolean
+                Dim IsListField As Boolean
+                Dim Choice As String
+                Dim Choices() As String
+                Dim ChoiceCnt As Integer
+                Dim Ptr As Integer
+                Dim IncludeID As Boolean
+                Dim FnLen As Integer
+                Dim RecordID As Integer
+                Dim CS As Integer
+                Dim ContentName As String
+                Dim Pos As Integer
+                Dim list As String
+                Dim FnArgList As String
+                Dim FnArgs() As String
+                Dim FnArgCnt As Integer
+                Dim ContentCriteria As String
+                Dim RecordName As String
+                Dim SrcSelectorInner As String
+                Dim SrcSelectorSuffix As String = String.Empty
+                Dim Cell(,) As Object
+                Dim RowCnt As Integer
+                Dim RowPtr As Integer
+                Dim SrcSelector As String = Trim(SrcOptionValueSelector)
+                '
+                SrcSelectorInner = SrcSelector
+                Dim PosLeft As Integer = genericController.vbInstr(1, SrcSelector, "[")
+                If PosLeft <> 0 Then
+                    Dim PosRight As Integer = genericController.vbInstr(1, SrcSelector, "]")
+                    If PosRight <> 0 Then
+                        If (PosRight < Len(SrcSelector)) Then
+                            SrcSelectorSuffix = Mid(SrcSelector, PosRight + 1)
+                        End If
+                        SrcSelector = Trim(Mid(SrcSelector, PosLeft, PosRight - PosLeft + 1))
+                        SrcSelectorInner = Trim(Mid(SrcSelector, 2, Len(SrcSelector) - 2))
                     End If
-                    SrcSelector = Trim(Mid(SrcSelector, PosLeft, PosRight - PosLeft + 1))
-                    SrcSelectorInner = Trim(Mid(SrcSelector, 2, Len(SrcSelector) - 2))
                 End If
-            End If
-            list = ""
-            '
-            ' Break SrcSelectorInner up into individual choices to detect functions
-            '
-
-            If SrcSelectorInner <> "" Then
-                Choices = Split(SrcSelectorInner, "|")
-                ChoiceCnt = UBound(Choices) + 1
-                For Ptr = 0 To ChoiceCnt - 1
-                    Choice = Choices(Ptr)
-                    IsContentList = False
-                    IsListField = False
-                    '
-                    ' List Function (and all the indecision that went along with it)
-                    '
-                    Pos = 0
-                    If Pos = 0 Then
-                        Pos = genericController.vbInstr(1, Choice, ACFunctionList1 & "(", vbTextCompare)
-                        If Pos > 0 Then
-                            IsContentList = True
-                            IncludeID = False
-                            FnLen = Len(ACFunctionList1)
-                        End If
-                    End If
-                    If Pos = 0 Then
-                        Pos = genericController.vbInstr(1, Choice, ACFunctionList2 & "(", vbTextCompare)
-                        If Pos > 0 Then
-                            IsContentList = True
-                            IncludeID = False
-                            FnLen = Len(ACFunctionList2)
-                        End If
-                    End If
-                    If Pos = 0 Then
-                        Pos = genericController.vbInstr(1, Choice, ACFunctionList3 & "(", vbTextCompare)
-                        If Pos > 0 Then
-                            IsContentList = True
-                            IncludeID = False
-                            FnLen = Len(ACFunctionList3)
-                        End If
-                    End If
-                    If Pos = 0 Then
-                        Pos = genericController.vbInstr(1, Choice, ACFunctionListID & "(", vbTextCompare)
-                        If Pos > 0 Then
-                            IsContentList = True
-                            IncludeID = True
-                            FnLen = Len(ACFunctionListID)
-                        End If
-                    End If
-                    If Pos = 0 Then
-                        Pos = genericController.vbInstr(1, Choice, ACFunctionList & "(", vbTextCompare)
-                        If Pos > 0 Then
-                            IsContentList = True
-                            IncludeID = False
-                            FnLen = Len(ACFunctionList)
-                        End If
-                    End If
-                    If Pos = 0 Then
-                        Pos = genericController.vbInstr(1, Choice, ACFunctionListFields & "(", vbTextCompare)
-                        If Pos > 0 Then
-                            IsListField = True
-                            IncludeID = False
-                            FnLen = Len(ACFunctionListFields)
-                        End If
-                    End If
-                    '
-                    If Pos > 0 Then
+                list = ""
+                '
+                ' Break SrcSelectorInner up into individual choices to detect functions
+                '
+                If SrcSelectorInner <> "" Then
+                    Choices = Split(SrcSelectorInner, "|")
+                    ChoiceCnt = UBound(Choices) + 1
+                    For Ptr = 0 To ChoiceCnt - 1
+                        Choice = Choices(Ptr)
+                        IsContentList = False
+                        IsListField = False
                         '
-                        FnArgList = Trim(Mid(Choice, Pos + FnLen))
-                        ContentName = ""
-                        ContentCriteria = ""
-                        If (Left(FnArgList, 1) = "(") And (Right(FnArgList, 1) = ")") Then
-                            '
-                            ' set ContentName and ContentCriteria from argument list
-                            '
-                            FnArgList = Mid(FnArgList, 2, Len(FnArgList) - 2)
-                            FnArgs = genericController.SplitDelimited(FnArgList, ",")
-                            FnArgCnt = UBound(FnArgs) + 1
-                            If FnArgCnt > 0 Then
-                                ContentName = Trim(FnArgs(0))
-                                If (Left(ContentName, 1) = """") And (Right(ContentName, 1) = """") Then
-                                    ContentName = Trim(Mid(ContentName, 2, Len(ContentName) - 2))
-                                ElseIf (Left(ContentName, 1) = "'") And (Right(ContentName, 1) = "'") Then
-                                    ContentName = Trim(Mid(ContentName, 2, Len(ContentName) - 2))
-                                End If
-                            End If
-                            If FnArgCnt > 1 Then
-                                ContentCriteria = Trim(FnArgs(1))
-                                If (Left(ContentCriteria, 1) = """") And (Right(ContentCriteria, 1) = """") Then
-                                    ContentCriteria = Trim(Mid(ContentCriteria, 2, Len(ContentCriteria) - 2))
-                                ElseIf (Left(ContentCriteria, 1) = "'") And (Right(ContentCriteria, 1) = "'") Then
-                                    ContentCriteria = Trim(Mid(ContentCriteria, 2, Len(ContentCriteria) - 2))
-                                End If
+                        ' List Function (and all the indecision that went along with it)
+                        '
+                        Pos = 0
+                        If Pos = 0 Then
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionList1 & "(", vbTextCompare)
+                            If Pos > 0 Then
+                                IsContentList = True
+                                IncludeID = False
+                                FnLen = Len(ACFunctionList1)
                             End If
                         End If
-                        CS = -1
-                        If IsContentList Then
-                            '
-                            ' ContentList - Open the Content and build the options from the names
-                            '
-                            If ContentCriteria <> "" Then
-                                CS = cpCore.db.csOpen(ContentName, ContentCriteria, "name", , , , , "ID,Name")
-                            Else
-                                CS = cpCore.db.csOpen(ContentName, , "name", , , , , "ID,Name")
-                            End If
-                        ElseIf IsListField Then
-                            '
-                            ' ListField
-                            '
-                            CID = cpCore.metaData.getContentId(ContentName)
-                            If CID > 0 Then
-                                CS = cpCore.db.csOpen("Content Fields", "Contentid=" & CID, "name", , , , , "ID,Name")
+                        If Pos = 0 Then
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionList2 & "(", vbTextCompare)
+                            If Pos > 0 Then
+                                IsContentList = True
+                                IncludeID = False
+                                FnLen = Len(ACFunctionList2)
                             End If
                         End If
-
-                        If cpCore.db.csOk(CS) Then
-                            Cell = cpCore.db.cs_getRows(CS)
-                            RowCnt = UBound(Cell, 2) + 1
-                            For RowPtr = 0 To RowCnt - 1
+                        If Pos = 0 Then
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionList3 & "(", vbTextCompare)
+                            If Pos > 0 Then
+                                IsContentList = True
+                                IncludeID = False
+                                FnLen = Len(ACFunctionList3)
+                            End If
+                        End If
+                        If Pos = 0 Then
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionListID & "(", vbTextCompare)
+                            If Pos > 0 Then
+                                IsContentList = True
+                                IncludeID = True
+                                FnLen = Len(ACFunctionListID)
+                            End If
+                        End If
+                        If Pos = 0 Then
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionList & "(", vbTextCompare)
+                            If Pos > 0 Then
+                                IsContentList = True
+                                IncludeID = False
+                                FnLen = Len(ACFunctionList)
+                            End If
+                        End If
+                        If Pos = 0 Then
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionListFields & "(", vbTextCompare)
+                            If Pos > 0 Then
+                                IsListField = True
+                                IncludeID = False
+                                FnLen = Len(ACFunctionListFields)
+                            End If
+                        End If
+                        '
+                        If Pos > 0 Then
+                            '
+                            FnArgList = Trim(Mid(Choice, Pos + FnLen))
+                            ContentName = ""
+                            ContentCriteria = ""
+                            If (Left(FnArgList, 1) = "(") And (Right(FnArgList, 1) = ")") Then
                                 '
-                                RecordName = genericController.encodeText(Cell(1, RowPtr))
-                                RecordName = genericController.vbReplace(RecordName, vbCrLf, " ")
-                                RecordID = genericController.EncodeInteger(Cell(0, RowPtr))
-                                If RecordName = "" Then
-                                    RecordName = "record " & RecordID
-                                ElseIf Len(RecordName) > 50 Then
-                                    RecordName = Left(RecordName, 50) & "..."
+                                ' set ContentName and ContentCriteria from argument list
+                                '
+                                FnArgList = Mid(FnArgList, 2, Len(FnArgList) - 2)
+                                FnArgs = genericController.SplitDelimited(FnArgList, ",")
+                                FnArgCnt = UBound(FnArgs) + 1
+                                If FnArgCnt > 0 Then
+                                    ContentName = Trim(FnArgs(0))
+                                    If (Left(ContentName, 1) = """") And (Right(ContentName, 1) = """") Then
+                                        ContentName = Trim(Mid(ContentName, 2, Len(ContentName) - 2))
+                                    ElseIf (Left(ContentName, 1) = "'") And (Right(ContentName, 1) = "'") Then
+                                        ContentName = Trim(Mid(ContentName, 2, Len(ContentName) - 2))
+                                    End If
                                 End If
-                                RecordName = genericController.encodeNvaArgument(RecordName)
-                                list = list & "|" & RecordName
-                                If IncludeID Then
-                                    list = list & ":" & RecordID
+                                If FnArgCnt > 1 Then
+                                    ContentCriteria = Trim(FnArgs(1))
+                                    If (Left(ContentCriteria, 1) = """") And (Right(ContentCriteria, 1) = """") Then
+                                        ContentCriteria = Trim(Mid(ContentCriteria, 2, Len(ContentCriteria) - 2))
+                                    ElseIf (Left(ContentCriteria, 1) = "'") And (Right(ContentCriteria, 1) = "'") Then
+                                        ContentCriteria = Trim(Mid(ContentCriteria, 2, Len(ContentCriteria) - 2))
+                                    End If
                                 End If
-                            Next
+                            End If
+                            CS = -1
+                            If IsContentList Then
+                                '
+                                ' ContentList - Open the Content and build the options from the names
+                                '
+                                If ContentCriteria <> "" Then
+                                    CS = cpCore.db.csOpen(ContentName, ContentCriteria, "name", , , , , "ID,Name")
+                                Else
+                                    CS = cpCore.db.csOpen(ContentName, , "name", , , , , "ID,Name")
+                                End If
+                            ElseIf IsListField Then
+                                '
+                                ' ListField
+                                '
+                                CID = cpCore.metaData.getContentId(ContentName)
+                                If CID > 0 Then
+                                    CS = cpCore.db.csOpen("Content Fields", "Contentid=" & CID, "name", , , , , "ID,Name")
+                                End If
+                            End If
+
+                            If cpCore.db.csOk(CS) Then
+                                Cell = cpCore.db.cs_getRows(CS)
+                                RowCnt = UBound(Cell, 2) + 1
+                                For RowPtr = 0 To RowCnt - 1
+                                    '
+                                    RecordName = genericController.encodeText(Cell(1, RowPtr))
+                                    RecordName = genericController.vbReplace(RecordName, vbCrLf, " ")
+                                    RecordID = genericController.EncodeInteger(Cell(0, RowPtr))
+                                    If RecordName = "" Then
+                                        RecordName = "record " & RecordID
+                                    ElseIf Len(RecordName) > 50 Then
+                                        RecordName = Left(RecordName, 50) & "..."
+                                    End If
+                                    RecordName = genericController.encodeNvaArgument(RecordName)
+                                    list = list & "|" & RecordName
+                                    If IncludeID Then
+                                        list = list & ":" & RecordID
+                                    End If
+                                Next
+                            End If
+                            Call cpCore.db.csClose(CS)
+                        Else
+                            '
+                            ' choice is not a function, just add the choice back to the list
+                            '
+                            list = list & "|" & Choices(Ptr)
                         End If
-                        Call cpCore.db.csClose(CS)
-                    Else
-                        '
-                        ' choice is not a function, just add the choice back to the list
-                        '
-                        list = list & "|" & Choices(Ptr)
+                    Next
+                    If list <> "" Then
+                        list = Mid(list, 2)
                     End If
-                Next
-                If list <> "" Then
-                    list = Mid(list, 2)
                 End If
-            End If
-            '
-            ' Build output string
-            '
-            'csv_GetAddonSelector = encodeNvaArgument(SrcOptionName)
-            getAddonSelector = encodeHTML(genericController.encodeNvaArgument(SrcOptionName)) & "="
-            If InstanceOptionValue_AddonEncoded <> "" Then
-                getAddonSelector = getAddonSelector & encodeHTML(InstanceOptionValue_AddonEncoded)
-            End If
-            If SrcSelectorSuffix = "" And list = "" Then
                 '
-                ' empty list with no suffix, return with name=value
+                ' Build output string
                 '
-            ElseIf genericController.vbLCase(SrcSelectorSuffix) = "resourcelink" Then
-                '
-                ' resource link, exit with empty list
-                '
-                getAddonSelector = getAddonSelector & "[]ResourceLink"
-            Else
-                '
-                '
-                '
-                getAddonSelector = getAddonSelector & "[" & list & "]" & SrcSelectorSuffix
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            cpCore.handleException(New Exception("Unexpected exception"))
+                'csv_result = encodeNvaArgument(SrcOptionName)
+                result = encodeHTML(genericController.encodeNvaArgument(SrcOptionName)) & "="
+                If InstanceOptionValue_AddonEncoded <> "" Then
+                    result = result & encodeHTML(InstanceOptionValue_AddonEncoded)
+                End If
+                If SrcSelectorSuffix = "" And list = "" Then
+                    '
+                    ' empty list with no suffix, return with name=value
+                    '
+                ElseIf genericController.vbLCase(SrcSelectorSuffix) = "resourcelink" Then
+                    '
+                    ' resource link, exit with empty list
+                    '
+                    result = result & "[]ResourceLink"
+                Else
+                    '
+                    '
+                    '
+                    result = result & "[" & list & "]" & SrcSelectorSuffix
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '========================================================================
-        '   Compatibility
-        '========================================================================
+        ' main_Get an HTML Form text input (or text area)
         '
-        Public Function html_GetFormInputHTML(ByVal TagName As String, Optional ByVal DefaultValue As String = "", Optional ByVal Height As String = "", Optional ByVal Width As String = "") As String
-            html_GetFormInputHTML = html_GetFormInputHTML3(genericController.encodeText(TagName), genericController.encodeText(DefaultValue), genericController.encodeText(Height), genericController.encodeText(Width))
-        End Function
-        '
-        '========================================================================
-        ' ----- main_Get an HTML Form text input (or text area)
-        '========================================================================
-        '
-        Public Function html_GetFormInputHTML3(ByVal htmlName As String, Optional ByVal DefaultValue As String = "", Optional ByVal styleHeight As String = "", Optional ByVal styleWidth As String = "", Optional ByVal readOnlyfield As Boolean = False, Optional ByVal allowActiveContent As Boolean = False, Optional ByVal addonListJSON As String = "", Optional ByVal styleList As String = "", Optional ByVal styleOptionList As String = "", Optional ByVal allowResourceLibrary As Boolean = False) As String
+        Public Function getFormInputHTML(ByVal htmlName As String, Optional ByVal DefaultValue As String = "", Optional ByVal styleHeight As String = "", Optional ByVal styleWidth As String = "", Optional ByVal readOnlyfield As Boolean = False, Optional ByVal allowActiveContent As Boolean = False, Optional ByVal addonListJSON As String = "", Optional ByVal styleList As String = "", Optional ByVal styleOptionList As String = "", Optional ByVal allowResourceLibrary As Boolean = False) As String
             Dim returnHtml As String = ""
             Try
-                Dim FieldTypeDefaultEditorAddonIdList As String
-                Dim FieldTypeDefaultEditorAddonIds() As String
-                Dim FieldTypeDefaultEditorAddonId As Integer
-                '
-                FieldTypeDefaultEditorAddonIdList = editorController.getFieldTypeDefaultEditorAddonIdList(cpCore)
-                FieldTypeDefaultEditorAddonIds = Split(FieldTypeDefaultEditorAddonIdList, ",")
-                FieldTypeDefaultEditorAddonId = genericController.EncodeInteger(FieldTypeDefaultEditorAddonIds(FieldTypeIdHTML))
-
+                Dim FieldTypeDefaultEditorAddonIdList As String = editorController.getFieldTypeDefaultEditorAddonIdList(cpCore)
+                Dim FieldTypeDefaultEditorAddonIds() As String = Split(FieldTypeDefaultEditorAddonIdList, ",")
+                Dim FieldTypeDefaultEditorAddonId As Integer = genericController.EncodeInteger(FieldTypeDefaultEditorAddonIds(FieldTypeIdHTML))
                 If FieldTypeDefaultEditorAddonId = 0 Then
                     '
                     '    use default wysiwyg
-                    '
                     returnHtml = html_GetFormInputTextExpandable2(htmlName, DefaultValue)
                 Else
                     '
                     ' use addon editor
-                    '
                     Dim arguments As New Dictionary(Of String, String)
                     arguments.Add("editorName", htmlName)
                     arguments.Add("editorValue", DefaultValue)
@@ -5825,24 +5400,7 @@ ErrorTrap:
                         .addonType = CPUtilsBaseClass.addonContext.ContextEditor,
                         .instanceArguments = arguments
                     })
-                    'addonOption_String = "" _
-                    '    & "editorName=" & genericController.encodeNvaArgument(htmlName) _
-                    '    & "&editorValue=" & genericController.encodeNvaArgument(DefaultValue) _
-                    '    & "&editorFieldType=" & FieldTypeIdHTML _
-                    '    & "&editorReadOnly=" & readOnlyfield _
-                    '    & "&editorWidth=" & styleWidth _
-                    '    & "&editorHeight=" & styleHeight _
-                    '    & ""
-                    'addonOption_String = addonOption_String _
-                    '    & "&editorAllowResourceLibrary=" & genericController.encodeNvaArgument(CStr(allowResourceLibrary)) _
-                    '    & "&editorAllowActiveContent=" & genericController.encodeNvaArgument(CStr(allowActiveContent)) _
-                    '    & "&editorAddonList=" & genericController.encodeNvaArgument(addonListJSON) _
-                    '    & "&editorStyles=" & genericController.encodeNvaArgument(styleList) _
-                    '    & "&editorStyleOptions=" & genericController.encodeNvaArgument(styleOptionList) _
-                    '    & ""
-                    'returnHtml = cpCore.addon.execute_legacy4(FieldTypeDefaultEditorAddonId.ToString, addonOption_String, CPUtilsBaseClass.addonContext.ContextEditor)
                 End If
-
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -6133,7 +5691,7 @@ ErrorTrap:
                     If PosACInstanceID = 0 Then
                         cpCore.handleException(New Exception("AC Instance [" & ACInstanceID & "] not found in record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                     Else
-                        Copy = html_EncodeContentUpgrades(Copy)
+                        Copy = upgradeActiveContent(Copy)
                         ParseOK = False
                         PosStart = InStrRev(Copy, "<ac ", PosACInstanceID, vbTextCompare)
                         If PosStart <> 0 Then
@@ -6282,33 +5840,36 @@ ErrorTrap:
         End Sub
         '
         '====================================================================================================
-        '   encode content moved to csv so support cp.content.GetCopy()
+        ''' <summary>
+        ''' Convert an active content field (html data stored with <ac></ac> html tags) to a wysiwyg editor request (html with edit icon <img> for <ac></ac>)
+        ''' </summary>
+        ''' <param name="editorValue"></param>
+        ''' <returns></returns>
+        Public Function convertActiveContentToHtmlForWysiwygEditor(editorValue As String) As String
+            Return cpCore.html.convertActiveContent_internal(editorValue, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
+        End Function
+        '
         '====================================================================================================
         '
-        Public Function encodeContent9(Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, addonContext As CPUtilsBaseClass.addonContext) As String
-            Return encodeContent10(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything())
+        Public Function convertActiveContentToJsonForRemoteMethod(Source As String, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, ProtocolHostString As String, DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, addonContext As CPUtilsBaseClass.addonContext) As String
+            Return convertActiveContent_internal(Source, cpCore.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, False, False, True, True, False, True, "", ProtocolHostString, False, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything())
+            'False, False, True, True, False, True, ""
         End Function
         '
-        '========================================================================
-        ' ----- Encode Active Content AI
-        '========================================================================
+        '====================================================================================================
         '
-        Public Function decodeContent(ByVal Source As String) As String
-            Return renderActiveContent(genericController.encodeText(Source))
+        Public Function convertActiveContentToHtmlForWebRender(Source As String, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, ProtocolHostString As String, DefaultWrapperID As Integer, addonContext As CPUtilsBaseClass.addonContext) As String
+            Return convertActiveContent_internal(Source, cpCore.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, False, False, True, True, False, True, "", ProtocolHostString, False, DefaultWrapperID, "", addonContext, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything())
+            'False, False, True, True, False, True, ""
         End Function
         '
-        '==========================================================================================================================================
-        '   Encode Content call for preparing content for display on the web page
-        '       BasePath is for a future addition:
-        '           Each page will have its own URLName. The URLName is the part of the URL that points to this page.
-        '           If an aggr object is on a page, and it offers variations depending on a QS value, the BasePath is like
-        '           the main_RefreshQueryString -- it is the path that main_Gets you back here. This needs to be passed into the objects
-        '           so an object can call encodecontentforweb.
-        '==========================================================================================================================================
+        '====================================================================================================
         '
-        Public Function encodeContentForWeb(Source As String, ContextContentName As String, ContextRecordID As Integer, Ignore_BasePath As String, WrapperID As Integer) As String
-            Return encodeContent9(Source, cpCore.authContext.user.id, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+        Public Function convertActiveContentToHtmlForEmailSend(Source As String, personalizationPeopleID As Integer, queryStringForLinkAppend As String) As String
+            Return convertActiveContent_internal(Source, personalizationPeopleID, "", 0, 0, False, True, True, True, False, True, queryStringForLinkAppend, "", True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+            'False, False, True, True, False, True, ""
         End Function
+
         '
         '========================================================================
         ' Print the Member Edit form
@@ -6323,8 +5884,8 @@ ErrorTrap:
         '       RulesSecondaryFieldName = "GroupID"
         '========================================================================
         '
-        Public Function getINputChecList2(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal readOnlyfield As Boolean = False) As String
-            getINputChecList2 = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, genericController.encodeText(CaptionFieldName), readOnlyfield, False, "")
+        Public Function getCheckList2(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal readOnlyfield As Boolean = False) As String
+            getCheckList2 = getCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, genericController.encodeText(CaptionFieldName), readOnlyfield, False, "")
         End Function
         '
         '========================================================================
@@ -6343,7 +5904,7 @@ ErrorTrap:
         '       RulesSecondaryFieldName = "GroupID"
         '========================================================================
         '
-        Public Function getInputCheckList(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal readOnlyfield As Boolean = False, Optional ByVal IncludeContentFolderDivs As Boolean = False, Optional ByVal DefaultSecondaryIDList As String = "") As String
+        Public Function getCheckList(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal readOnlyfield As Boolean = False, Optional ByVal IncludeContentFolderDivs As Boolean = False, Optional ByVal DefaultSecondaryIDList As String = "") As String
             Dim returnHtml As String = ""
             Try
                 Dim main_MemberShipText() As String
@@ -6877,19 +6438,17 @@ ErrorTrap:
         '
         '=========================================================================================================
         '
-        '=========================================================================================================
-        '
-        Public Sub main_AddPagetitle(PageTitle As String)
-            Call doc_AddPagetitle2(PageTitle, "")
+        Public Sub addTitle(PageTitle As String)
+            Call addTitle(PageTitle, "")
         End Sub
         '
+        '=========================================================================================================
         '
-        '
-        Public Sub doc_AddPagetitle2(PageTitle As String, addedByMessage As String)
+        Public Sub addTitle(PageTitle As String, addedByMessage As String)
             Try
                 If PageTitle <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_Title, PageTitle, vbTextCompare) = 0 Then
                     If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                        Call doc_AddHeadTag2("<!-- title from " & addedByMessage & " -->", "")
+                        Call addHeadTag("<!-- title from " & addedByMessage & " -->", "")
                     End If
                     If cpCore.doc.htmlMetaContent_Title <> "" Then
                         cpCore.doc.htmlMetaContent_Title = cpCore.doc.htmlMetaContent_Title & ", "
@@ -6904,36 +6463,31 @@ ErrorTrap:
         '
         '=========================================================================================================
         '
+        Public Sub addMetaDescription(MetaDescription As String)
+            Call addMetaDescription(MetaDescription, "")
+        End Sub
+        '
         '=========================================================================================================
         '
-        Public Sub main_addMetaDescription(MetaDescription As String)
-            Call doc_addMetaDescription2(MetaDescription, "")
+        Public Sub addMetaDescription(MetaDescription As String, addedByMessage As String)
+            Try
+                If MetaDescription <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
+                    If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
+                        Call addHeadTag("<!-- meta description from " & addedByMessage & " -->", "")
+                    End If
+                    If cpCore.doc.htmlMetaContent_Description <> "" Then
+                        cpCore.doc.htmlMetaContent_Description = cpCore.doc.htmlMetaContent_Description & ", "
+                    End If
+                    cpCore.doc.htmlMetaContent_Description = cpCore.doc.htmlMetaContent_Description & MetaDescription
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
+        '=========================================================================================================
         '
-        '
-        Public Sub doc_addMetaDescription2(MetaDescription As String, addedByMessage As String)
-            On Error GoTo ErrorTrap
-            '
-            If MetaDescription <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
-                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    Call doc_AddHeadTag2("<!-- meta description from " & addedByMessage & " -->", "")
-                End If
-                If cpCore.doc.htmlMetaContent_Description <> "" Then
-                    cpCore.doc.htmlMetaContent_Description = cpCore.doc.htmlMetaContent_Description & ", "
-                End If
-                cpCore.doc.htmlMetaContent_Description = cpCore.doc.htmlMetaContent_Description & MetaDescription
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_addMetaDescription2")
-        End Sub
-
-        '
-        '
-        '
-        Public Sub addHeadStyleLink(StyleSheetLink As String, addedByMessage As String)
+        Public Sub addStyleLink(StyleSheetLink As String, addedByMessage As String)
             Try
                 If StyleSheetLink <> "" Then
                     cpCore.doc.htmlMetaContent_StyleSheetTags = cpCore.doc.htmlMetaContent_StyleSheetTags & cr
@@ -6946,64 +6500,40 @@ ErrorTrap:
                 cpCore.handleException(ex)
             End Try
         End Sub
-
         '
+        '=========================================================================================================
         '
-        '
-        Public Sub addSharedStyleID2(ByVal styleId As Integer, Optional ByVal addedByMessage As String = "")
-            On Error GoTo ErrorTrap
-            '
-            If genericController.vbInstr(1, cpCore.doc.metaContent_SharedStyleIDList & ",", "," & styleId & ",") = 0 Then
-                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    Call doc_AddHeadTag2("<!-- shared style " & styleId & " from " & addedByMessage & " -->", "")
-                End If
-                cpCore.doc.metaContent_SharedStyleIDList = cpCore.doc.metaContent_SharedStyleIDList & "," & styleId
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddSharedStyleID2")
+        Public Sub addMetaKeywordList(MetaKeywordList As String)
+            Call addMetaKeywordList(MetaKeywordList, "")
         End Sub
         '
         '=========================================================================================================
         '
-        '=========================================================================================================
-        '
-        Public Sub main_addMetaKeywordList(MetaKeywordList As String)
-            Call doc_addMetaKeywordList2(MetaKeywordList, "")
-        End Sub
-        '
-        '
-        '
-        Public Sub doc_addMetaKeywordList2(MetaKeywordList As String, addedByMessage As String)
-            On Error GoTo ErrorTrap
-            '
-            If MetaKeywordList <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
-                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    Call doc_AddHeadTag2("<!-- meta keyword list from " & addedByMessage & " -->", "")
+        Public Sub addMetaKeywordList(MetaKeywordList As String, addedByMessage As String)
+            Try
+                If MetaKeywordList <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
+                    If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
+                        Call addHeadTag("<!-- meta keyword list from " & addedByMessage & " -->", "")
+                    End If
+                    If cpCore.doc.htmlMetaContent_KeyWordList <> "" Then
+                        cpCore.doc.htmlMetaContent_KeyWordList = cpCore.doc.htmlMetaContent_KeyWordList & ", "
+                    End If
+                    cpCore.doc.htmlMetaContent_KeyWordList = cpCore.doc.htmlMetaContent_KeyWordList & MetaKeywordList
                 End If
-                If cpCore.doc.htmlMetaContent_KeyWordList <> "" Then
-                    cpCore.doc.htmlMetaContent_KeyWordList = cpCore.doc.htmlMetaContent_KeyWordList & ", "
-                End If
-                cpCore.doc.htmlMetaContent_KeyWordList = cpCore.doc.htmlMetaContent_KeyWordList & MetaKeywordList
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_addMetaKeywordList2")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
-        '
-        '=========================================================================================================
         '
         '=========================================================================================================
         '
         Public Sub addHeadTag(HeadTag As String)
-            Call doc_AddHeadTag2(HeadTag, "")
+            Call addHeadTag(HeadTag, "")
         End Sub
         '
+        '=========================================================================================================
         '
-        '
-        Public Sub doc_AddHeadTag2(HeadTag As String, addedByMessage As String)
+        Public Sub addHeadTag(HeadTag As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
             If HeadTag <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
@@ -7021,18 +6551,6 @@ ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadTag")
         End Sub
         '
-        '
-        '
-        Public Sub main_addMeta(metaName As String, metaContent As String, addedByMessage As String)
-            Call doc_AddHeadTag2("<meta name=""" & encodeHTML(metaName) & """ content=""" & encodeHTML(metaContent) & """>", addedByMessage)
-        End Sub
-        '
-        '
-        '
-        Public Sub main_addMetaProperty(metaProperty As String, metaContent As String, addedByMessage As String)
-            Call doc_AddHeadTag2("<meta property=""" & encodeHTML(metaProperty) & """ content=""" & encodeHTML(metaContent) & """>", addedByMessage)
-        End Sub
-        '
         Friend ReadOnly Property main_ReturnAfterEdit() As Boolean
             Get
                 Return True
@@ -7040,329 +6558,279 @@ ErrorTrap:
         End Property
         '
         '===================================================================================================
-        '   Wrap the content in a common wrapper if authoring is enabled
-        '===================================================================================================
         '
-        Public Function main_GetEditWrapper(ByVal Caption As String, ByVal Content As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetEditWrapper")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim IsAuthoring As Boolean
-            '
-            IsAuthoring = cpCore.authContext.isEditingAnything()
-            If Not IsAuthoring Then
-                main_GetEditWrapper = Content
-            Else
-                main_GetEditWrapper = html_GetLegacySiteStyles()
-                If False Then
-                    main_GetEditWrapper = main_GetEditWrapper _
-                        & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">" _
-                        & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperInner"">" _
-                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperCaption"">" _
-                            & genericController.encodeText(Caption) _
-                            & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle>" _
-                            & "</td></tr></table>" _
-                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & cpCore.doc.editWrapperCnt & """>" _
-                            & genericController.encodeText(Content) _
-                            & "</td></tr></table>" _
-                        & "</td></tr></table>" _
-                        & "</td></tr></table>"
-                Else
-                    main_GetEditWrapper = main_GetEditWrapper _
+        Public Function getEditWrapper(ByVal Caption As String, ByVal Content As String) As String
+            Dim result As String = Content
+            Try
+                If cpCore.authContext.isEditingAnything() Then
+                    result = html_GetLegacySiteStyles() _
                         & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">"
                     If Caption <> "" Then
-                        main_GetEditWrapper = main_GetEditWrapper _
+                        result &= "" _
                                 & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperCaption"">" _
                                 & genericController.encodeText(Caption) _
                                 & "<!-- <img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle> -->" _
                                 & "</td></tr></table>"
                     End If
-                    main_GetEditWrapper = main_GetEditWrapper _
+                    result &= "" _
                             & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & cpCore.doc.editWrapperCnt & """>" _
                             & genericController.encodeText(Content) _
                             & "</td></tr></table>" _
-                        & "</td></tr></table>"
+                            & "</td></tr></table>"
+                    cpCore.doc.editWrapperCnt = cpCore.doc.editWrapperCnt + 1
                 End If
-                cpCore.doc.editWrapperCnt = cpCore.doc.editWrapperCnt + 1
-            End If
-
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetEditWrapper")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
+        '===================================================================================================
         ' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
         '
-        Public Function encodeContent10(Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, queryStringForLinkAppend As String, ProtocolHostString As String, IsEmailContent As Boolean, ignore_DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As CPUtilsBaseClass.addonContext, personalizationIsAuthenticated As Boolean, nothingObject As Object, isEditingAnything As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("EncodeContent9")
-            '
-            Const StartFlag = "<!-- ADDON"
-            Const EndFlag = " -->"
-            '
-            Dim DoAnotherPass As Boolean
-            Dim returnValue As String
-            Dim ArgCnt As Integer
-            Dim AddonGuid As String
-            Dim SortMethodID As Integer
-            Dim SortMethod As String
-            Dim ACInstanceID As String
-            Dim ArgSplit() As String
-            Dim AddonName As String
-            Dim addonOptionString As String
-            Dim LineStart As Integer
-            Dim FormSetName As String
-            'Dim RecordID as integer
-            Dim ContentID As Integer
-            'Dim ContentName As String
-            'Dim ContactMemberID as integer
-            Dim Instruction As String
-            Dim LineEnd As Integer
-            Dim InstrSplit As Object
-            Dim AggrObject As Object
-            Dim Copy As String
-            Dim OptionString As String
-            Dim Wrapper() As String
-            Dim Stream As String
-            Dim SegmentSplit() As String
-            Dim AcCmd As String
-            Dim SegmentPrefix As String
-            Dim SegmentSuffix As String
-            Dim AcCmdSplit() As String
-            Dim ACType As String
-            'Dim AcCmdArgs As String
-            Dim ContentSplit() As String
-            Dim ContentSplitCnt As Integer
-            Dim Segment As String
-            Dim Ptr As Integer
-            'Dim ContentFound as integer
-            Dim CopyName As String
-            'Dim CSContext as integer
-            Dim AggregateObjectName As String
-            Dim ListName As String
-            Dim SortField As String
-            Dim SortReverse As Boolean
-            Dim ACName As String
-            Dim Obj As Object
-            Dim hint As String
-            Dim AdminURL As String
-            '
-            Dim converthtmlToText As htmlToTextControllers
-            Dim Pos As Integer
-            Dim LayoutEngineOptionString As String
-            Dim LayoutErrorMessage As String
-            '
-            ' if personalizationPeopleId is 0, set it to the current user
-            '
-            Dim iPersonalizationPeopleId As Integer
-            iPersonalizationPeopleId = personalizationPeopleId
-            If iPersonalizationPeopleId = 0 Then
-                iPersonalizationPeopleId = cpCore.authContext.user.id
-            End If
-            '
-            returnValue = Source
-            'hint = "csv_EncodeContent9 enter"
-            If returnValue <> "" Then
-                AdminURL = "/" & cpCore.serverConfig.appConfig.adminRoute
+        Private Function convertActiveContent_internal(Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, queryStringForLinkAppend As String, ProtocolHostLink As String, IsEmailContent As Boolean, ignore_DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As CPUtilsBaseClass.addonContext, personalizationIsAuthenticated As Boolean, nothingObject As Object, isEditingAnything As Boolean) As String
+            Dim result As String = Source
+            Try
                 '
-                '--------
-                ' cut-paste from csv_EncodeContent8
-                '--------
+                Const StartFlag = "<!-- ADDON"
+                Const EndFlag = " -->"
                 '
-                ' ----- Do EncodeCRLF Conversion
+                Dim DoAnotherPass As Boolean
+                Dim ArgCnt As Integer
+                Dim AddonGuid As String
+                Dim ACInstanceID As String
+                Dim ArgSplit() As String
+                Dim AddonName As String
+                Dim addonOptionString As String
+                Dim LineStart As Integer
+                Dim LineEnd As Integer
+                Dim Copy As String
+                Dim Wrapper() As String
+                Dim SegmentSplit() As String
+                Dim AcCmd As String
+                Dim SegmentSuffix As String
+                Dim AcCmdSplit() As String
+                Dim ACType As String
+                Dim ContentSplit() As String
+                Dim ContentSplitCnt As Integer
+                Dim Segment As String
+                Dim Ptr As Integer
+                Dim CopyName As String
+                Dim ListName As String
+                Dim SortField As String
+                Dim SortReverse As Boolean
+                Dim AdminURL As String
                 '
-                'hint = hint & ",010"
-                If cpCore.siteProperties.getBoolean("ConvertContentCRLF2BR", False) And (Not PlainText) Then
-                    returnValue = genericController.vbReplace(returnValue, vbCr, "")
-                    returnValue = genericController.vbReplace(returnValue, vbLf, "<br>")
+                Dim converthtmlToText As htmlToTextControllers
+                '
+                Dim iPersonalizationPeopleId As Integer
+                iPersonalizationPeopleId = personalizationPeopleId
+                If iPersonalizationPeopleId = 0 Then
+                    iPersonalizationPeopleId = cpCore.authContext.user.id
                 End If
                 '
-                ' ----- Do upgrade conversions (upgrade legacy objects and upgrade old images)
-                '
-                'hint = hint & ",020"
-                returnValue = html_EncodeContentUpgrades(returnValue)
-                '
-                ' ----- Do Active Content Conversion
-                '
-                'hint = hint & ",030"
-                If (AddLinkEID Or EncodeActiveFormatting Or EncodeActiveImages Or EncodeActiveEditIcons) Then
-                    returnValue = html_EncodeActiveContent_Internal(returnValue, iPersonalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostString, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context)
-                End If
-                '
-                ' ----- Do Plain Text Conversion
-                '
-                'hint = hint & ",040"
-                If PlainText Then
-                    converthtmlToText = New htmlToTextControllers(cpCore)
-                    returnValue = converthtmlToText.convert(returnValue)
-                    converthtmlToText = Nothing
-                End If
-                '
-                ' Process Active Content that must be run here to access webclass objects
-                '     parse as {{functionname?querystring}}
-                '
-                'hint = hint & ",110"
-                If (Not EncodeActiveEditIcons) And (InStr(1, returnValue, "{{") <> 0) Then
-                    ContentSplit = Split(returnValue, "{{")
-                    returnValue = ""
-                    ContentSplitCnt = UBound(ContentSplit) + 1
-                    Ptr = 0
-                    Do While Ptr < ContentSplitCnt
-                        'hint = hint & ",200"
-                        Segment = ContentSplit(Ptr)
-                        If Ptr = 0 Then
-                            '
-                            ' Add in the non-command text that is before the first command
-                            '
-                            returnValue = returnValue & Segment
-                        ElseIf (Segment <> "") Then
-                            If genericController.vbInstr(1, Segment, "}}") = 0 Then
+
+                'hint = "csv_EncodeContent9 enter"
+                If result <> "" Then
+                    AdminURL = "/" & cpCore.serverConfig.appConfig.adminRoute
+                    '
+                    '--------
+                    ' cut-paste from csv_EncodeContent8
+                    '--------
+                    '
+                    ' ----- Do EncodeCRLF Conversion
+                    '
+                    'hint = hint & ",010"
+                    If cpCore.siteProperties.getBoolean("ConvertContentCRLF2BR", False) And (Not PlainText) Then
+                        result = genericController.vbReplace(result, vbCr, "")
+                        result = genericController.vbReplace(result, vbLf, "<br>")
+                    End If
+                    '
+                    ' ----- Do upgrade conversions (upgrade legacy objects and upgrade old images)
+                    '
+                    'hint = hint & ",020"
+                    result = upgradeActiveContent(result)
+                    '
+                    ' ----- Do Active Content Conversion
+                    '
+                    'hint = hint & ",030"
+                    If (AddLinkEID Or EncodeActiveFormatting Or EncodeActiveImages Or EncodeActiveEditIcons) Then
+                        result = convertActiveContent_Internal_activeParts(result, iPersonalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostLink, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context)
+                    End If
+                    '
+                    ' ----- Do Plain Text Conversion
+                    '
+                    'hint = hint & ",040"
+                    If PlainText Then
+                        converthtmlToText = New htmlToTextControllers(cpCore)
+                        result = converthtmlToText.convert(result)
+                        converthtmlToText = Nothing
+                    End If
+                    '
+                    ' Process Active Content that must be run here to access webclass objects
+                    '     parse as {{functionname?querystring}}
+                    '
+                    'hint = hint & ",110"
+                    If (Not EncodeActiveEditIcons) And (InStr(1, result, "{{") <> 0) Then
+                        ContentSplit = Split(result, "{{")
+                        result = ""
+                        ContentSplitCnt = UBound(ContentSplit) + 1
+                        Ptr = 0
+                        Do While Ptr < ContentSplitCnt
+                            'hint = hint & ",200"
+                            Segment = ContentSplit(Ptr)
+                            If Ptr = 0 Then
                                 '
-                                ' No command found, return the marker and deliver the Segment
+                                ' Add in the non-command text that is before the first command
                                 '
-                                'hint = hint & ",210"
-                                returnValue = returnValue & "{{" & Segment
-                            Else
-                                '
-                                ' isolate the command
-                                '
-                                'hint = hint & ",220"
-                                SegmentSplit = Split(Segment, "}}")
-                                AcCmd = SegmentSplit(0)
-                                SegmentSplit(0) = ""
-                                SegmentSuffix = Mid(Join(SegmentSplit, "}}"), 3)
-                                If Trim(AcCmd) <> "" Then
+                                result = result & Segment
+                            ElseIf (Segment <> "") Then
+                                If genericController.vbInstr(1, Segment, "}}") = 0 Then
                                     '
-                                    ' isolate the arguments
+                                    ' No command found, return the marker and deliver the Segment
                                     '
-                                    'hint = hint & ",230"
-                                    AcCmdSplit = Split(AcCmd, "?")
-                                    ACType = Trim(AcCmdSplit(0))
-                                    If UBound(AcCmdSplit) = 0 Then
-                                        addonOptionString = ""
-                                    Else
-                                        addonOptionString = AcCmdSplit(1)
-                                        addonOptionString = genericController.decodeHtml(addonOptionString)
+                                    'hint = hint & ",210"
+                                    result = result & "{{" & Segment
+                                Else
+                                    '
+                                    ' isolate the command
+                                    '
+                                    'hint = hint & ",220"
+                                    SegmentSplit = Split(Segment, "}}")
+                                    AcCmd = SegmentSplit(0)
+                                    SegmentSplit(0) = ""
+                                    SegmentSuffix = Mid(Join(SegmentSplit, "}}"), 3)
+                                    If Trim(AcCmd) <> "" Then
+                                        '
+                                        ' isolate the arguments
+                                        '
+                                        'hint = hint & ",230"
+                                        AcCmdSplit = Split(AcCmd, "?")
+                                        ACType = Trim(AcCmdSplit(0))
+                                        If UBound(AcCmdSplit) = 0 Then
+                                            addonOptionString = ""
+                                        Else
+                                            addonOptionString = AcCmdSplit(1)
+                                            addonOptionString = genericController.decodeHtml(addonOptionString)
+                                        End If
+                                        '
+                                        ' execute the command
+                                        '
+                                        Select Case genericController.vbUCase(ACType)
+                                            Case ACTypeDynamicForm
+                                                '
+                                                ' Dynamic Form - run the core addon replacement instead
+                                                Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                                    .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                                    .cssContainerClass = "",
+                                                    .cssContainerId = "",
+                                                    .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
+                                                        .contentName = ContextContentName,
+                                                        .fieldName = "",
+                                                        .recordId = ContextRecordID
+                                                    },
+                                                    .personalizationAuthenticated = personalizationIsAuthenticated,
+                                                    .personalizationPeopleId = iPersonalizationPeopleId,
+                                                    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
+                                                }
+                                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpCore, addonGuidDynamicForm)
+                                                result &= cpCore.addon.execute(addon, executeContext)
+                                            Case ACTypeChildList
+                                                '
+                                                ' Child Page List
+                                                '
+                                                'hint = hint & ",320"
+                                                ListName = addonController.getAddonOption("name", addonOptionString)
+                                                result = result & cpCore.doc.getChildPageList(ListName, ContextContentName, ContextRecordID, True)
+                                            Case ACTypeTemplateText
+                                                '
+                                                ' Text Box = copied here from gethtmlbody
+                                                '
+                                                CopyName = addonController.getAddonOption("new", addonOptionString)
+                                                If CopyName = "" Then
+                                                    CopyName = addonController.getAddonOption("name", addonOptionString)
+                                                    If CopyName = "" Then
+                                                        CopyName = "Default"
+                                                    End If
+                                                End If
+                                                result = result & html_GetContentCopy(CopyName, "", iPersonalizationPeopleId, False, personalizationIsAuthenticated)
+                                            Case ACTypeWatchList
+                                                '
+                                                ' Watch List
+                                                '
+                                                'hint = hint & ",330"
+                                                ListName = addonController.getAddonOption("LISTNAME", addonOptionString)
+                                                SortField = addonController.getAddonOption("SORTFIELD", addonOptionString)
+                                                SortReverse = genericController.EncodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString))
+                                                result = result & cpCore.doc.main_GetWatchList(cpCore, ListName, SortField, SortReverse)
+                                            Case Else
+                                                '
+                                                ' Unrecognized command - put all the syntax back in
+                                                '
+                                                'hint = hint & ",340"
+                                                result = result & "{{" & AcCmd & "}}"
+                                        End Select
                                     End If
                                     '
-                                    ' execute the command
+                                    ' add the SegmentSuffix back on
                                     '
-                                    Select Case genericController.vbUCase(ACType)
-                                        Case ACTypeDynamicForm
-                                            '
-                                            ' Dynamic Form - run the core addon replacement instead
-                                            Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
-                                                .addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                                                .cssContainerClass = "",
-                                                .cssContainerId = "",
-                                                .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
-                                                    .contentName = ContextContentName,
-                                                    .fieldName = "",
-                                                    .recordId = ContextRecordID
-                                                },
-                                                .personalizationAuthenticated = personalizationIsAuthenticated,
-                                                .personalizationPeopleId = iPersonalizationPeopleId,
-                                                .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
-                                            }
-                                            Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpCore, addonGuidDynamicForm)
-                                            returnValue &= cpCore.addon.execute(addon, executeContext)
-                                            'returnValue = returnValue & cpCore.addon.execute_legacy6(0, addonGuidDynamicForm, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
-                                        Case ACTypeChildList
-                                            '
-                                            ' Child Page List
-                                            '
-                                            'hint = hint & ",320"
-                                            ListName = addonController.getAddonOption("name", addonOptionString)
-                                            returnValue = returnValue & cpCore.doc.getChildPageList(ListName, ContextContentName, ContextRecordID, True)
-                                        Case ACTypeTemplateText
-                                            '
-                                            ' Text Box = copied here from gethtmlbody
-                                            '
-                                            CopyName = addonController.getAddonOption("new", addonOptionString)
-                                            If CopyName = "" Then
-                                                CopyName = addonController.getAddonOption("name", addonOptionString)
-                                                If CopyName = "" Then
-                                                    CopyName = "Default"
+                                    result = result & SegmentSuffix
+                                End If
+                            End If
+                            '
+                            ' Encode into Javascript if required
+                            '
+                            Ptr = Ptr + 1
+                        Loop
+                    End If
+                    '
+                    ' Process Addons
+                    '   parse as <!-- Addon "Addon Name","OptionString" -->
+                    '   They are handled here because Addons are written against cpCoreClass, not the Content Server class
+                    '   ...so Group Email can not process addons 8(
+                    '   Later, remove the csv routine that translates <ac to this, and process it directly right here
+                    '   Later, rewrite so addons call csv, not cpCoreClass, so email processing can include addons
+                    ' (2/16/2010) - move csv_EncodeContent to csv, or wait and move it all to CP
+                    '    eventually, everything should migrate to csv and/or cp to eliminate the cpCoreClass dependancy
+                    '    and all add-ons run as processes the same as they run on pages, or as remote methods
+                    ' (2/16/2010) - if <!-- AC --> has four arguments, the fourth is the addon guid
+                    '
+                    If (InStr(1, result, StartFlag) <> 0) Then
+                        Do While (InStr(1, result, StartFlag) <> 0)
+                            LineStart = genericController.vbInstr(1, result, StartFlag)
+                            LineEnd = genericController.vbInstr(LineStart, result, EndFlag)
+                            If LineEnd = 0 Then
+                                logController.appendLog(cpCore, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
+                                Exit Do
+                            Else
+                                AddonName = ""
+                                addonOptionString = ""
+                                ACInstanceID = ""
+                                AddonGuid = ""
+                                Copy = Mid(result, LineStart + 11, LineEnd - LineStart - 11)
+                                ArgSplit = genericController.SplitDelimited(Copy, ",")
+                                ArgCnt = UBound(ArgSplit) + 1
+                                If ArgSplit(0) <> "" Then
+                                    AddonName = Mid(ArgSplit(0), 2, Len(ArgSplit(0)) - 2)
+                                    If ArgCnt > 1 Then
+                                        If ArgSplit(1) <> "" Then
+                                            addonOptionString = Mid(ArgSplit(1), 2, Len(ArgSplit(1)) - 2)
+                                            addonOptionString = genericController.decodeHtml(Trim(addonOptionString))
+                                        End If
+                                        If ArgCnt > 2 Then
+                                            If ArgSplit(2) <> "" Then
+                                                ACInstanceID = Mid(ArgSplit(2), 2, Len(ArgSplit(2)) - 2)
+                                            End If
+                                            If ArgCnt > 3 Then
+                                                If ArgSplit(3) <> "" Then
+                                                    AddonGuid = Mid(ArgSplit(3), 2, Len(ArgSplit(3)) - 2)
                                                 End If
                                             End If
-                                            returnValue = returnValue & html_GetContentCopy(CopyName, "", iPersonalizationPeopleId, False, personalizationIsAuthenticated)
-                                        Case ACTypeWatchList
-                                            '
-                                            ' Watch List
-                                            '
-                                            'hint = hint & ",330"
-                                            ListName = addonController.getAddonOption("LISTNAME", addonOptionString)
-                                            SortField = addonController.getAddonOption("SORTFIELD", addonOptionString)
-                                            SortReverse = genericController.EncodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString))
-                                            returnValue = returnValue & cpCore.doc.main_GetWatchList(cpCore, ListName, SortField, SortReverse)
-                                        Case Else
-                                            '
-                                            ' Unrecognized command - put all the syntax back in
-                                            '
-                                            'hint = hint & ",340"
-                                            returnValue = returnValue & "{{" & AcCmd & "}}"
-                                    End Select
-                                End If
-                                '
-                                ' add the SegmentSuffix back on
-                                '
-                                returnValue = returnValue & SegmentSuffix
-                            End If
-                        End If
-                        '
-                        ' Encode into Javascript if required
-                        '
-                        Ptr = Ptr + 1
-                    Loop
-                End If
-                '
-                ' Process Addons
-                '   parse as <!-- Addon "Addon Name","OptionString" -->
-                '   They are handled here because Addons are written against cpCoreClass, not the Content Server class
-                '   ...so Group Email can not process addons 8(
-                '   Later, remove the csv routine that translates <ac to this, and process it directly right here
-                '   Later, rewrite so addons call csv, not cpCoreClass, so email processing can include addons
-                ' (2/16/2010) - move csv_EncodeContent to csv, or wait and move it all to CP
-                '    eventually, everything should migrate to csv and/or cp to eliminate the cpCoreClass dependancy
-                '    and all add-ons run as processes the same as they run on pages, or as remote methods
-                ' (2/16/2010) - if <!-- AC --> has four arguments, the fourth is the addon guid
-                '
-                If (InStr(1, returnValue, StartFlag) <> 0) Then
-                    Do While (InStr(1, returnValue, StartFlag) <> 0)
-                        LineStart = genericController.vbInstr(1, returnValue, StartFlag)
-                        LineEnd = genericController.vbInstr(LineStart, returnValue, EndFlag)
-                        If LineEnd = 0 Then
-                            logController.appendLog(cpCore, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
-                            Exit Do
-                        Else
-                            AddonName = ""
-                            addonOptionString = ""
-                            ACInstanceID = ""
-                            AddonGuid = ""
-                            Copy = Mid(returnValue, LineStart + 11, LineEnd - LineStart - 11)
-                            ArgSplit = genericController.SplitDelimited(Copy, ",")
-                            ArgCnt = UBound(ArgSplit) + 1
-                            If ArgSplit(0) <> "" Then
-                                AddonName = Mid(ArgSplit(0), 2, Len(ArgSplit(0)) - 2)
-                                If ArgCnt > 1 Then
-                                    If ArgSplit(1) <> "" Then
-                                        addonOptionString = Mid(ArgSplit(1), 2, Len(ArgSplit(1)) - 2)
-                                        addonOptionString = genericController.decodeHtml(Trim(addonOptionString))
-                                    End If
-                                    If ArgCnt > 2 Then
-                                        If ArgSplit(2) <> "" Then
-                                            ACInstanceID = Mid(ArgSplit(2), 2, Len(ArgSplit(2)) - 2)
-                                        End If
-                                        If ArgCnt > 3 Then
-                                            If ArgSplit(3) <> "" Then
-                                                AddonGuid = Mid(ArgSplit(3), 2, Len(ArgSplit(3)) - 2)
-                                            End If
                                         End If
                                     End If
-                                End If
-                                ' dont have any way of getting fieldname yet
+                                    ' dont have any way of getting fieldname yet
 
-                                Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
+                                    Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
                                     .addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                     .cssContainerClass = "",
                                     .cssContainerId = "",
@@ -7376,594 +6844,450 @@ ErrorTrap:
                                     .instanceGuid = ACInstanceID,
                                     .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
                                 }
-                                If AddonGuid <> "" Then
-                                    Copy = cpCore.addon.execute(Models.Entity.addonModel.create(cpCore, AddonGuid), executeContext)
-                                    'Copy = cpCore.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
-                                Else
-                                    Copy = cpCore.addon.execute(Models.Entity.addonModel.createByName(cpCore, AddonName), executeContext)
-                                    'Copy = cpCore.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    If AddonGuid <> "" Then
+                                        Copy = cpCore.addon.execute(Models.Entity.addonModel.create(cpCore, AddonGuid), executeContext)
+                                        'Copy = cpCore.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    Else
+                                        Copy = cpCore.addon.execute(Models.Entity.addonModel.createByName(cpCore, AddonName), executeContext)
+                                        'Copy = cpCore.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    End If
                                 End If
                             End If
-                        End If
-                        returnValue = Mid(returnValue, 1, LineStart - 1) & Copy & Mid(returnValue, LineEnd + 4)
-                    Loop
-                End If
-                '
-                ' process out text block comments inserted by addons
-                ' remove all content between BlockTextStartMarker and the next BlockTextEndMarker, or end of copy
-                ' exception made for the content with just the startmarker because when the AC tag is replaced with
-                ' with the marker, encode content is called with the result, which is just the marker, and this
-                ' section will remove it
-                '
-                If (Not isEditingAnything) And (returnValue <> BlockTextStartMarker) Then
-                    DoAnotherPass = True
-                    Do While (InStr(1, returnValue, BlockTextStartMarker, vbTextCompare) <> 0) And DoAnotherPass
-                        LineStart = genericController.vbInstr(1, returnValue, BlockTextStartMarker, vbTextCompare)
-                        If LineStart = 0 Then
-                            DoAnotherPass = False
-                        Else
-                            LineEnd = genericController.vbInstr(LineStart, returnValue, BlockTextEndMarker, vbTextCompare)
-                            If LineEnd <= 0 Then
+                            result = Mid(result, 1, LineStart - 1) & Copy & Mid(result, LineEnd + 4)
+                        Loop
+                    End If
+                    '
+                    ' process out text block comments inserted by addons
+                    ' remove all content between BlockTextStartMarker and the next BlockTextEndMarker, or end of copy
+                    ' exception made for the content with just the startmarker because when the AC tag is replaced with
+                    ' with the marker, encode content is called with the result, which is just the marker, and this
+                    ' section will remove it
+                    '
+                    If (Not isEditingAnything) And (result <> BlockTextStartMarker) Then
+                        DoAnotherPass = True
+                        Do While (InStr(1, result, BlockTextStartMarker, vbTextCompare) <> 0) And DoAnotherPass
+                            LineStart = genericController.vbInstr(1, result, BlockTextStartMarker, vbTextCompare)
+                            If LineStart = 0 Then
                                 DoAnotherPass = False
-                                returnValue = Mid(returnValue, 1, LineStart - 1)
                             Else
-                                LineEnd = genericController.vbInstr(LineEnd, returnValue, " -->")
+                                LineEnd = genericController.vbInstr(LineStart, result, BlockTextEndMarker, vbTextCompare)
                                 If LineEnd <= 0 Then
                                     DoAnotherPass = False
+                                    result = Mid(result, 1, LineStart - 1)
                                 Else
-                                    returnValue = Mid(returnValue, 1, LineStart - 1) & Mid(returnValue, LineEnd + 4)
-                                    'returnValue = Mid(returnValue, 1, LineStart - 1) & Copy & Mid(returnValue, LineEnd + 4)
+                                    LineEnd = genericController.vbInstr(LineEnd, result, " -->")
+                                    If LineEnd <= 0 Then
+                                        DoAnotherPass = False
+                                    Else
+                                        result = Mid(result, 1, LineStart - 1) & Mid(result, LineEnd + 4)
+                                        'returnValue = Mid(returnValue, 1, LineStart - 1) & Copy & Mid(returnValue, LineEnd + 4)
+                                    End If
                                 End If
                             End If
-                        End If
-                    Loop
-                End If
-                '
-                ' only valid for a webpage
-                '
-                If True Then
-                    '
-                    ' Add in EditWrappers for Aggregate scripts and replacements
-                    '   This is also old -- used here because csv encode content can create replacements and links, but can not
-                    '   insert wrappers. This is all done in GetAddonContents() now. This routine is left only to
-                    '   handle old style calls in cache.
-                    '
-                    'hint = hint & ",500, Adding edit wrappers"
-                    If isEditingAnything Then
-                        If (InStr(1, returnValue, "<!-- AFScript -->", vbTextCompare) <> 0) Then
-                            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
-                            Copy = main_GetEditWrapper("Aggregate Script", "##MARKER##")
-                            Wrapper = Split(Copy, "##MARKER##")
-                            returnValue = genericController.vbReplace(returnValue, "<!-- AFScript -->", Wrapper(0), 1, 99, vbTextCompare)
-                            returnValue = genericController.vbReplace(returnValue, "<!-- /AFScript -->", Wrapper(1), 1, 99, vbTextCompare)
-                        End If
-                        If (InStr(1, returnValue, "<!-- AFReplacement -->", vbTextCompare) <> 0) Then
-                            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
-                            Copy = main_GetEditWrapper("Aggregate Replacement", "##MARKER##")
-                            Wrapper = Split(Copy, "##MARKER##")
-                            returnValue = genericController.vbReplace(returnValue, "<!-- AFReplacement -->", Wrapper(0), 1, 99, vbTextCompare)
-                            returnValue = genericController.vbReplace(returnValue, "<!-- /AFReplacement -->", Wrapper(1), 1, 99, vbTextCompare)
-                        End If
+                        Loop
                     End If
                     '
-                    ' Process Feedback form
+                    ' only valid for a webpage
                     '
-                    'hint = hint & ",600, Handle webclient features"
-                    If genericController.vbInstr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
-                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, pageContentController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
-                    End If
-                    '
-                    ' if call from webpage, push addon js and css out to cpCoreClass
-                    '
-                    Copy = cpCore.doc.headTags
-                    If Copy <> "" Then
+                    If True Then
                         '
-                        ' headtags generated from csv_EncodeContent
+                        ' Add in EditWrappers for Aggregate scripts and replacements
+                        '   This is also old -- used here because csv encode content can create replacements and links, but can not
+                        '   insert wrappers. This is all done in GetAddonContents() now. This routine is left only to
+                        '   handle old style calls in cache.
                         '
-                        Call doc_AddHeadTag2(Copy, "embedded content")
-                    End If
-                    '
-                    ' If any javascript or styles were added during encode, pick them up now
-                    '
-                    Copy = cpCore.doc.getNextJavascriptBodyEnd()
-                    Do While Copy <> ""
-                        Call addBodyJavascriptCode(Copy, "embedded content")
+                        'hint = hint & ",500, Adding edit wrappers"
+                        If isEditingAnything Then
+                            If (InStr(1, result, "<!-- AFScript -->", vbTextCompare) <> 0) Then
+                                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
+                                Copy = getEditWrapper("Aggregate Script", "##MARKER##")
+                                Wrapper = Split(Copy, "##MARKER##")
+                                result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper(0), 1, 99, vbTextCompare)
+                                result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper(1), 1, 99, vbTextCompare)
+                            End If
+                            If (InStr(1, result, "<!-- AFReplacement -->", vbTextCompare) <> 0) Then
+                                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
+                                Copy = getEditWrapper("Aggregate Replacement", "##MARKER##")
+                                Wrapper = Split(Copy, "##MARKER##")
+                                result = genericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper(0), 1, 99, vbTextCompare)
+                                result = genericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper(1), 1, 99, vbTextCompare)
+                            End If
+                        End If
+                        '
+                        ' Process Feedback form
+                        '
+                        'hint = hint & ",600, Handle webclient features"
+                        If genericController.vbInstr(1, result, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
+                            result = genericController.vbReplace(result, FeedbackFormNotSupportedComment, pageContentController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
+                        End If
+                        '
+                        ' if call from webpage, push addon js and css out to cpCoreClass
+                        '
+                        Copy = cpCore.doc.headTags
+                        If Copy <> "" Then
+                            '
+                            ' headtags generated from csv_EncodeContent
+                            '
+                            Call addHeadTag(Copy, "embedded content")
+                        End If
+                        '
+                        ' If any javascript or styles were added during encode, pick them up now
+                        '
                         Copy = cpCore.doc.getNextJavascriptBodyEnd()
-                    Loop
-                    '
-                    ' current
-                    '
-                    Copy = cpCore.doc.getNextJSFilename()
-                    Do While Copy <> ""
-                        If genericController.vbInstr(1, Copy, "://") <> 0 Then
-                        ElseIf Left(Copy, 1) = "/" Then
-                        Else
-                            Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
-                        End If
-                        Call addHeadJsLink(Copy, "embedded content")
+                        Do While Copy <> ""
+                            Call addBodyJavascriptCode(Copy, "embedded content")
+                            Copy = cpCore.doc.getNextJavascriptBodyEnd()
+                        Loop
+                        '
+                        ' current
+                        '
                         Copy = cpCore.doc.getNextJSFilename()
-                    Loop
-                    ''
-                    'Copy = cpCore.doc.getJavascriptOnLoad()
-                    'Do While Copy <> ""
-                    '    Call addOnLoadJs(Copy, "")
-                    '    Copy = cpCore.doc.getJavascriptOnLoad()
-                    'Loop
-                    '
-                    Copy = cpCore.doc.getNextStyleFilenames()
-                    Do While Copy <> ""
-                        If genericController.vbInstr(1, Copy, "://") <> 0 Then
-                        ElseIf Left(Copy, 1) = "/" Then
-                        Else
-                            Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
-                        End If
-                        Call addHeadStyleLink(Copy, "")
+                        Do While Copy <> ""
+                            If genericController.vbInstr(1, Copy, "://") <> 0 Then
+                            ElseIf Left(Copy, 1) = "/" Then
+                            Else
+                                Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
+                            End If
+                            Call addHeadJsLink(Copy, "embedded content")
+                            Copy = cpCore.doc.getNextJSFilename()
+                        Loop
+                        ''
+                        'Copy = cpCore.doc.getJavascriptOnLoad()
+                        'Do While Copy <> ""
+                        '    Call addOnLoadJs(Copy, "")
+                        '    Copy = cpCore.doc.getJavascriptOnLoad()
+                        'Loop
+                        '
                         Copy = cpCore.doc.getNextStyleFilenames()
-                    Loop
+                        Do While Copy <> ""
+                            If genericController.vbInstr(1, Copy, "://") <> 0 Then
+                            ElseIf Left(Copy, 1) = "/" Then
+                            Else
+                                Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
+                            End If
+                            Call addStyleLink(Copy, "")
+                            Copy = cpCore.doc.getNextStyleFilenames()
+                        Loop
+                    End If
                 End If
-            End If
-            '
-            encodeContent10 = returnValue
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            If hint <> "" Then
-                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("csv_EncodeContent9-" & hint, "Unexpected Trap Error")
-            Else
-                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("csv_EncodeContent9", "Unexpected Trap Error")
-            End If
+                '
+                result = result
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         ' ================================================================================================================
         '   Upgrade old objects in content, and update changed resource library images
         ' ================================================================================================================
         '
-        Public Function html_EncodeContentUpgrades(Source As String) As String
-            On Error GoTo ErrorTrap 'Const Tn = "EncodeContentUpgrades": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            'Dim hint As String
-            Dim RecordVirtualPath As String = String.Empty
-            Dim RecordVirtualFilename As String
-            Dim RecordFilename As String
-            Dim RecordFilenameNoExt As String
-            Dim RecordFilenameExt As String = String.Empty
-            Dim RecordFilenameAltSize As String
-            Dim SizeTest() As String
-            Dim RecordAltSizeList As String
-            Dim TagPosEnd As Integer
-            Dim TagPosStart As Integer
-            Dim InTag As Boolean
-            Dim Wrapper As String
-            Dim AddonFound As Boolean
-            Dim ACNameCaption As String
-            Dim GroupIDList As String
-            Dim IDControlString As String
-            Dim IconIDControlString As String
-            Dim Criteria As String
-            Dim AddonContentName As String
-            Dim SelectList As String
-            Dim CSFields As Integer
-            Dim IconWidth As Integer
-            Dim IconHeight As Integer
-            Dim IconSprites As Integer
-            Dim IconIsInline As Boolean
-            Dim IconAlt As String
-            Dim IconTitle As String
-            Dim IconImg As String
-            'dim buildversion As String
-            Dim Cmd As String
-            Dim TextName As String
-            Dim ACInstanceOptionList As String
-            Dim SortFieldList As String
-            Dim ListName As String
-            Dim SortDirection As String
-            Dim AllowGroupAccess As Boolean
-            Dim LoopPtr As Integer
-            Dim SrcOptionSelector As String
-            Dim ResultOptionSelector As String
-            Dim ContentName As String
-            Dim SrcOptionList As String
-            Dim Pos As Integer
-            Dim list As String
-            Dim FnArgList As String
-            Dim FnArgs() As String
-            Dim FnArgCnt As Integer
-            Dim ContentCriteria As String
-            Dim RecordName As String
-            Dim REsultOptionValue As String
-            Dim SrcOptionValueSelector As String
-            Dim InstanceOptionValue As String
-            Dim ResultOptionListHTMLEncoded As String
-            Dim UCaseACName As String
-            Dim IconFilename As String
-            Dim FilenameSegment As String
-            Dim EndPos1 As Integer
-            Dim EndPos2 As Integer
-            Dim LinkSplit() As String
-            Dim LinkCnt As Integer
-            Dim LinkPtr As Integer
-            Dim TableSplit() As String
-            Dim TableName As String
-            Dim FieldName As String
-            Dim RecordID As Integer
-            Dim SQL As String
-            Dim SaveChanges As Boolean
-            Dim NextPosSpace As Integer
-            Dim NextPosQuote As Integer
-            Dim LinkEndPos As Integer
-            Dim EndPos As Integer
-            Dim Ptr As Integer
-            Dim FilePrefixSegment As String
-            Dim ElementPointer As Integer
-            Dim ListCount As Integer
-            Dim CSVisitor As Integer
-            Dim CSVisit As Integer
-            Dim CSChildList As Integer
-            Dim CSVisitorSet As Boolean
-            Dim CSVisitSet As Boolean
-            'Dim ContextContentName As String
-            'Dim ContextRecordID as integer
-            Dim ElementTag As String
-            Dim ElementName As String
-            Dim ACType As String
-            Dim ACField As String
-            Dim ACName As String
-            Dim ACBullet As Boolean
-            'Dim ContextContactPeopleID as integer
-            Dim Copy As String
-            Dim LinkLabel As String
-            Dim Overview As String
-            'Dim CSContext as integer
-            Dim KmaHTML As htmlParserController
-            Dim AttributeCount As Integer
-            Dim AttributePointer As Integer
-            Dim Name As String
-            Dim Value As String
-            Dim JoinCriteria As String
-            Dim CS As Integer
-            'Dim FormattingContentID as integer
-            Dim ACAttrRecordID As Integer
-            Dim ACAttrWidth As Integer
-            Dim ACAttrHeight As Integer
-            Dim ACAttrAlt As String
-            Dim ACAttrBorder As Integer
-            Dim ACAttrLoop As Integer
-            Dim ACAttrVSpace As Integer
-            Dim ACAttrHSpace As Integer
-            Dim Filename As String
-            Dim ACAttrAlign As String
-            Dim ProcessAnchorTags As Boolean
-            Dim ProcessACTags As Boolean
-            Dim SelectFieldList As String
-            Dim ACLanguageName As String
-            Dim Stream As stringBuilderLegacyController
-            Dim AnchorQuery As String
-            '
-            Dim CSOrganization As Integer
-            Dim CSOrganizationSet As Boolean
-            '
-            Dim CSPeople As Integer
-            Dim CSPeopleSet As Boolean
-            '
-            Dim CSlanguage As Integer
-            Dim PeopleLanguageSet As Boolean
-            Dim PeopleLanguage As String
-            Dim UcasePeopleLanguage As String
-            '
-            Dim serverFilePath As String
-            Dim ReplaceCount As Integer
-            Dim ReplaceInstructions As String
-            '
-            Dim Link As String
-            Dim NotUsedID As Integer
-            Dim CSInstance As Integer
-            Dim InstanceOptionList As String
-            Dim InstanceOptionListHTMLEncoded As String
-            Dim ProgramID As String
-            Dim AggrObject As Object
-            Dim OptionString As String
-            Dim Options() As String
-            Dim OptionCnt As Integer
-            Dim OptionPtr As Integer
-            Dim OptionPair() As String
-            Dim OptionName As String
-            Dim OptionValue As String
-            Dim SrcOptions() As String
-            Dim SrcOptionCnt As Integer
-            Dim SrcOptionPtr As Integer
-            Dim SrcOptionPair() As String
-            Dim SrcOptionName As String
-            Dim SrcOptionValue As String
-
-            Dim FormCount As Integer
-            Dim FormInputCount As Integer
-            Dim CDef As cdefModel
-            Dim FieldList As String
-            Dim ImageAllowUpdate As Boolean
-            Dim ContentFilesLinkPrefix As String
-            Dim ResourceLibraryLinkPrefix As String
-            Dim TestChr As String
-            Dim ACInstanceID As String
-            Dim ParseError As Boolean
-            Dim PosStart As Integer
-            Dim PosEnd As Integer
-            Dim AllowGroups As String
-            '
-            ''hint = "csv_EncodeContentUpgrades enter"
-            html_EncodeContentUpgrades = Source
-            '
-            ContentFilesLinkPrefix = "/" & cpCore.serverConfig.appConfig.name & "/files/"
-            ResourceLibraryLinkPrefix = ContentFilesLinkPrefix & "ccLibraryFiles/"
-            ImageAllowUpdate = cpCore.siteProperties.getBoolean("ImageAllowUpdate", True)
-            ImageAllowUpdate = ImageAllowUpdate And (InStr(1, Source, ResourceLibraryLinkPrefix, vbTextCompare) <> 0)
-            If ImageAllowUpdate Then
+        Public Function upgradeActiveContent(Source As String) As String
+            Dim result As String = Source
+            Try
+                Dim RecordVirtualPath As String = String.Empty
+                Dim RecordVirtualFilename As String
+                Dim RecordFilename As String
+                Dim RecordFilenameNoExt As String
+                Dim RecordFilenameExt As String = String.Empty
+                Dim SizeTest() As String
+                Dim RecordAltSizeList As String
+                Dim TagPosEnd As Integer
+                Dim TagPosStart As Integer
+                Dim InTag As Boolean
+                Dim Pos As Integer
+                Dim FilenameSegment As String
+                Dim EndPos1 As Integer
+                Dim EndPos2 As Integer
+                Dim LinkSplit() As String
+                Dim LinkCnt As Integer
+                Dim LinkPtr As Integer
+                Dim TableSplit() As String
+                Dim TableName As String
+                Dim FieldName As String
+                Dim RecordID As Integer
+                Dim SaveChanges As Boolean
+                Dim EndPos As Integer
+                Dim Ptr As Integer
+                Dim FilePrefixSegment As String
+                Dim ImageAllowUpdate As Boolean
+                Dim ContentFilesLinkPrefix As String
+                Dim ResourceLibraryLinkPrefix As String
+                Dim TestChr As String
+                Dim ParseError As Boolean
+                result = Source
                 '
-                ' ----- Process Resource Library Images (swap in most current file)
-                '
-                '   There is a better way:
-                '   problem with replacing the images is the problem with parsing - too much work to find it
-                '   instead, use new replacement tags <ac type=image src="cclibraryfiles/filename/00001" width=0 height=0>
-                '
-                ''hint = hint & ",010"
-                ParseError = False
-                LinkSplit = Split(Source, ContentFilesLinkPrefix, , vbTextCompare)
-                LinkCnt = UBound(LinkSplit) + 1
-                For LinkPtr = 1 To LinkCnt - 1
+                ContentFilesLinkPrefix = "/" & cpCore.serverConfig.appConfig.name & "/files/"
+                ResourceLibraryLinkPrefix = ContentFilesLinkPrefix & "ccLibraryFiles/"
+                ImageAllowUpdate = cpCore.siteProperties.getBoolean("ImageAllowUpdate", True)
+                ImageAllowUpdate = ImageAllowUpdate And (InStr(1, Source, ResourceLibraryLinkPrefix, vbTextCompare) <> 0)
+                If ImageAllowUpdate Then
                     '
-                    ' Each LinkSplit(1...) is a segment that would have started with '/appname/files/'
-                    ' Next job is to determine if this sement is in a tag (<img src="...">) or in content (&quot...&quote)
-                    ' For now, skip the ones in content
+                    ' ----- Process Resource Library Images (swap in most current file)
                     '
-                    ''hint = hint & ",020"
-                    TagPosEnd = genericController.vbInstr(1, LinkSplit(LinkPtr), ">")
-                    TagPosStart = genericController.vbInstr(1, LinkSplit(LinkPtr), "<")
-                    If TagPosEnd = 0 And TagPosStart = 0 Then
+                    '   There is a better way:
+                    '   problem with replacing the images is the problem with parsing - too much work to find it
+                    '   instead, use new replacement tags <ac type=image src="cclibraryfiles/filename/00001" width=0 height=0>
+                    '
+                    ''hint = hint & ",010"
+                    ParseError = False
+                    LinkSplit = Split(Source, ContentFilesLinkPrefix, , vbTextCompare)
+                    LinkCnt = UBound(LinkSplit) + 1
+                    For LinkPtr = 1 To LinkCnt - 1
                         '
-                        ' no tags found, skip it
+                        ' Each LinkSplit(1...) is a segment that would have started with '/appname/files/'
+                        ' Next job is to determine if this sement is in a tag (<img src="...">) or in content (&quot...&quote)
+                        ' For now, skip the ones in content
                         '
-                        InTag = False
-                    ElseIf TagPosEnd = 0 Then
-                        '
-                        ' no end tag, but found a start tag -> in content
-                        '
-                        InTag = False
-                    ElseIf TagPosEnd < TagPosStart Then
-                        '
-                        ' Found end before start - > in tag
-                        '
-                        InTag = True
-                    Else
-                        '
-                        ' Found start before end -> in content
-                        '
-                        InTag = False
-                    End If
-                    If InTag Then
-                        ''hint = hint & ",030"
-                        TableSplit = Split(LinkSplit(LinkPtr), "/")
-                        If UBound(TableSplit) > 2 Then
-                            TableName = TableSplit(0)
-                            FieldName = TableSplit(1)
-                            RecordID = genericController.EncodeInteger(TableSplit(2))
-                            FilenameSegment = TableSplit(3)
-                            If (LCase(TableName) = "cclibraryfiles") And (LCase(FieldName) = "filename") And (RecordID <> 0) Then
-                                Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, RecordID)
-                                If (file IsNot Nothing) Then
-                                    ''hint = hint & ",060"
-                                    FieldName = "filename"
-                                    'SQL = "select filename,altsizelist from " & TableName & " where id=" & RecordID
-                                    'CS = app.csv_OpenCSSQL("default", SQL)
-                                    'If app.csv_IsCSOK(CS) Then
-                                    If True Then
-                                        '
-                                        ' now figure out how the link is delimited by how it starts
-                                        '   go to the left and look for:
-                                        '   ' ' - ignore spaces, continue forward until we find one of these
-                                        '   '=' - means space delimited (src=/image.jpg), ends in ' ' or '>'
-                                        '   '"' - means quote delimited (src="/image.jpg"), ends in '"'
-                                        '   '>' - means this is not in an HTML tag - skip it (<B>image.jpg</b>)
-                                        '   '<' - means god knows what, but its wrong, skip it
-                                        '   '(' - means it is a URL(/image.jpg), go to ')'
-                                        '
-                                        ' odd cases:
-                                        '   URL( /image.jpg) -
-                                        '
-                                        RecordVirtualFilename = file.Filename
-                                        RecordAltSizeList = file.AltSizeList
-                                        If RecordVirtualFilename = genericController.EncodeJavascript(RecordVirtualFilename) Then
+                        ''hint = hint & ",020"
+                        TagPosEnd = genericController.vbInstr(1, LinkSplit(LinkPtr), ">")
+                        TagPosStart = genericController.vbInstr(1, LinkSplit(LinkPtr), "<")
+                        If TagPosEnd = 0 And TagPosStart = 0 Then
+                            '
+                            ' no tags found, skip it
+                            '
+                            InTag = False
+                        ElseIf TagPosEnd = 0 Then
+                            '
+                            ' no end tag, but found a start tag -> in content
+                            '
+                            InTag = False
+                        ElseIf TagPosEnd < TagPosStart Then
+                            '
+                            ' Found end before start - > in tag
+                            '
+                            InTag = True
+                        Else
+                            '
+                            ' Found start before end -> in content
+                            '
+                            InTag = False
+                        End If
+                        If InTag Then
+                            ''hint = hint & ",030"
+                            TableSplit = Split(LinkSplit(LinkPtr), "/")
+                            If UBound(TableSplit) > 2 Then
+                                TableName = TableSplit(0)
+                                FieldName = TableSplit(1)
+                                RecordID = genericController.EncodeInteger(TableSplit(2))
+                                FilenameSegment = TableSplit(3)
+                                If (LCase(TableName) = "cclibraryfiles") And (LCase(FieldName) = "filename") And (RecordID <> 0) Then
+                                    Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, RecordID)
+                                    If (file IsNot Nothing) Then
+                                        ''hint = hint & ",060"
+                                        FieldName = "filename"
+                                        'SQL = "select filename,altsizelist from " & TableName & " where id=" & RecordID
+                                        'CS = app.csv_OpenCSSQL("default", SQL)
+                                        'If app.csv_IsCSOK(CS) Then
+                                        If True Then
                                             '
-                                            ' The javascript version of the filename must match the filename, since we have no way
-                                            ' of differentiating a ligitimate file, from a block of javascript. If the file
-                                            ' contains an apostrophe, the original code could have encoded it, but we can not here
-                                            ' so the best plan is to skip it
+                                            ' now figure out how the link is delimited by how it starts
+                                            '   go to the left and look for:
+                                            '   ' ' - ignore spaces, continue forward until we find one of these
+                                            '   '=' - means space delimited (src=/image.jpg), ends in ' ' or '>'
+                                            '   '"' - means quote delimited (src="/image.jpg"), ends in '"'
+                                            '   '>' - means this is not in an HTML tag - skip it (<B>image.jpg</b>)
+                                            '   '<' - means god knows what, but its wrong, skip it
+                                            '   '(' - means it is a URL(/image.jpg), go to ')'
                                             '
-                                            ' example:
-                                            ' RecordVirtualFilename = "jay/files/cclibraryfiles/filename/000005/test.png"
+                                            ' odd cases:
+                                            '   URL( /image.jpg) -
                                             '
-                                            ' RecordFilename = "test.png"
-                                            ' RecordFilenameAltSize = "" (does not exist - the record has the raw filename in it)
-                                            ' RecordFilenameExt = "png"
-                                            ' RecordFilenameNoExt = "test"
-                                            '
-                                            ' RecordVirtualFilename = "jay/files/cclibraryfiles/filename/000005/test-100x200.png"
-                                            ' this is a specail case - most cases to not have the alt size format saved in the filename
-                                            ' RecordFilename = "test-100x200.png"
-                                            ' RecordFilenameAltSize (does not exist - the record has the raw filename in it)
-                                            ' RecordFilenameExt = "png"
-                                            ' RecordFilenameNoExt = "test-100x200"
-                                            ' this is wrong
-                                            '   xRecordFilenameAltSize = "100x200"
-                                            '   xRecordFilenameExt = "png"
-                                            '   xRecordFilenameNoExt = "test"
-                                            '
-                                            ''hint = hint & ",080"
-                                            Pos = InStrRev(RecordVirtualFilename, "/")
-                                            RecordFilename = ""
-                                            If Pos > 0 Then
-                                                RecordVirtualPath = Mid(RecordVirtualFilename, 1, Pos)
-                                                RecordFilename = Mid(RecordVirtualFilename, Pos + 1)
-                                            End If
-                                            Pos = InStrRev(RecordFilename, ".")
-                                            RecordFilenameNoExt = ""
-                                            If Pos > 0 Then
-                                                RecordFilenameExt = genericController.vbLCase(Mid(RecordFilename, Pos + 1))
-                                                RecordFilenameNoExt = genericController.vbLCase(Mid(RecordFilename, 1, Pos - 1))
-                                            End If
-                                            FilePrefixSegment = LinkSplit(LinkPtr - 1)
-                                            If Len(FilePrefixSegment) > 1 Then
+                                            RecordVirtualFilename = file.Filename
+                                            RecordAltSizeList = file.AltSizeList
+                                            If RecordVirtualFilename = genericController.EncodeJavascript(RecordVirtualFilename) Then
                                                 '
-                                                ' Look into FilePrefixSegment and see if we are in the querystring attribute of an <AC tag
-                                                '   if so, the filename may be AddonEncoded and delimited with & (so skip it)
-                                                Pos = InStrRev(FilePrefixSegment, "<")
+                                                ' The javascript version of the filename must match the filename, since we have no way
+                                                ' of differentiating a ligitimate file, from a block of javascript. If the file
+                                                ' contains an apostrophe, the original code could have encoded it, but we can not here
+                                                ' so the best plan is to skip it
+                                                '
+                                                ' example:
+                                                ' RecordVirtualFilename = "jay/files/cclibraryfiles/filename/000005/test.png"
+                                                '
+                                                ' RecordFilename = "test.png"
+                                                ' RecordFilenameAltSize = "" (does not exist - the record has the raw filename in it)
+                                                ' RecordFilenameExt = "png"
+                                                ' RecordFilenameNoExt = "test"
+                                                '
+                                                ' RecordVirtualFilename = "jay/files/cclibraryfiles/filename/000005/test-100x200.png"
+                                                ' this is a specail case - most cases to not have the alt size format saved in the filename
+                                                ' RecordFilename = "test-100x200.png"
+                                                ' RecordFilenameAltSize (does not exist - the record has the raw filename in it)
+                                                ' RecordFilenameExt = "png"
+                                                ' RecordFilenameNoExt = "test-100x200"
+                                                ' this is wrong
+                                                '   xRecordFilenameAltSize = "100x200"
+                                                '   xRecordFilenameExt = "png"
+                                                '   xRecordFilenameNoExt = "test"
+                                                '
+                                                ''hint = hint & ",080"
+                                                Pos = InStrRev(RecordVirtualFilename, "/")
+                                                RecordFilename = ""
                                                 If Pos > 0 Then
-                                                    If genericController.vbLCase(Mid(FilePrefixSegment, Pos + 1, 3)) <> "ac " Then
-                                                        '
-                                                        ' look back in the FilePrefixSegment to find the character before the link
-                                                        '
-                                                        EndPos = 0
-                                                        For Ptr = Len(FilePrefixSegment) To 1 Step -1
-                                                            TestChr = Mid(FilePrefixSegment, Ptr, 1)
-                                                            Select Case TestChr
-                                                                Case "="
-                                                                    '
-                                                                    ' Ends in ' ' or '>', find the first
-                                                                    '
-                                                                    EndPos1 = genericController.vbInstr(1, FilenameSegment, " ")
-                                                                    EndPos2 = genericController.vbInstr(1, FilenameSegment, ">")
-                                                                    If EndPos1 <> 0 And EndPos2 <> 0 Then
-                                                                        If EndPos1 < EndPos2 Then
+                                                    RecordVirtualPath = Mid(RecordVirtualFilename, 1, Pos)
+                                                    RecordFilename = Mid(RecordVirtualFilename, Pos + 1)
+                                                End If
+                                                Pos = InStrRev(RecordFilename, ".")
+                                                RecordFilenameNoExt = ""
+                                                If Pos > 0 Then
+                                                    RecordFilenameExt = genericController.vbLCase(Mid(RecordFilename, Pos + 1))
+                                                    RecordFilenameNoExt = genericController.vbLCase(Mid(RecordFilename, 1, Pos - 1))
+                                                End If
+                                                FilePrefixSegment = LinkSplit(LinkPtr - 1)
+                                                If Len(FilePrefixSegment) > 1 Then
+                                                    '
+                                                    ' Look into FilePrefixSegment and see if we are in the querystring attribute of an <AC tag
+                                                    '   if so, the filename may be AddonEncoded and delimited with & (so skip it)
+                                                    Pos = InStrRev(FilePrefixSegment, "<")
+                                                    If Pos > 0 Then
+                                                        If genericController.vbLCase(Mid(FilePrefixSegment, Pos + 1, 3)) <> "ac " Then
+                                                            '
+                                                            ' look back in the FilePrefixSegment to find the character before the link
+                                                            '
+                                                            EndPos = 0
+                                                            For Ptr = Len(FilePrefixSegment) To 1 Step -1
+                                                                TestChr = Mid(FilePrefixSegment, Ptr, 1)
+                                                                Select Case TestChr
+                                                                    Case "="
+                                                                        '
+                                                                        ' Ends in ' ' or '>', find the first
+                                                                        '
+                                                                        EndPos1 = genericController.vbInstr(1, FilenameSegment, " ")
+                                                                        EndPos2 = genericController.vbInstr(1, FilenameSegment, ">")
+                                                                        If EndPos1 <> 0 And EndPos2 <> 0 Then
+                                                                            If EndPos1 < EndPos2 Then
+                                                                                EndPos = EndPos1
+                                                                            Else
+                                                                                EndPos = EndPos2
+                                                                            End If
+                                                                        ElseIf EndPos1 <> 0 Then
                                                                             EndPos = EndPos1
-                                                                        Else
+                                                                        ElseIf EndPos2 <> 0 Then
                                                                             EndPos = EndPos2
+                                                                        Else
+                                                                            EndPos = 0
                                                                         End If
-                                                                    ElseIf EndPos1 <> 0 Then
-                                                                        EndPos = EndPos1
-                                                                    ElseIf EndPos2 <> 0 Then
-                                                                        EndPos = EndPos2
-                                                                    Else
-                                                                        EndPos = 0
-                                                                    End If
-                                                                    Exit For
-                                                                Case """"
-                                                                    '
-                                                                    ' Quoted, ends is '"'
-                                                                    '
-                                                                    EndPos = genericController.vbInstr(1, FilenameSegment, """")
-                                                                    Exit For
-                                                                Case "("
-                                                                    '
-                                                                    ' url() style, ends in ')' or a ' '
-                                                                    '
-                                                                    If genericController.vbLCase(Mid(FilePrefixSegment, Ptr, 7)) = "(&quot;" Then
-                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, "&quot;)")
-                                                                    ElseIf genericController.vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "('" Then
-                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, "')")
-                                                                    ElseIf genericController.vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "(""" Then
-                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, """)")
-                                                                    Else
-                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, ")")
-                                                                    End If
-                                                                    Exit For
-                                                                Case "'"
-                                                                    '
-                                                                    ' Delimited within a javascript pair of apostophys
-                                                                    '
-                                                                    EndPos = genericController.vbInstr(1, FilenameSegment, "'")
-                                                                    Exit For
-                                                                Case ">", "<"
-                                                                    '
-                                                                    ' Skip this link
-                                                                    '
-                                                                    ParseError = True
-                                                                    Exit For
-                                                            End Select
-                                                        Next
-                                                        '
-                                                        ' check link
-                                                        '
-                                                        If EndPos = 0 Then
-                                                            ParseError = True
-                                                            Exit For
-                                                        Else
-                                                            Dim ImageFilename As String
-                                                            Dim SegmentAfterImage As String
-
-                                                            Dim ImageFilenameNoExt As String
-                                                            Dim ImageFilenameExt As String
-                                                            Dim ImageAltSize As String
-
-                                                            ''hint = hint & ",120"
-                                                            SegmentAfterImage = Mid(FilenameSegment, EndPos)
-                                                            ImageFilename = genericController.DecodeResponseVariable(Mid(FilenameSegment, 1, EndPos - 1))
-                                                            ImageFilenameNoExt = ImageFilename
-                                                            ImageFilenameExt = ""
-                                                            Pos = InStrRev(ImageFilename, ".")
-                                                            If Pos > 0 Then
-                                                                ImageFilenameNoExt = genericController.vbLCase(Mid(ImageFilename, 1, Pos - 1))
-                                                                ImageFilenameExt = genericController.vbLCase(Mid(ImageFilename, Pos + 1))
-                                                            End If
+                                                                        Exit For
+                                                                    Case """"
+                                                                        '
+                                                                        ' Quoted, ends is '"'
+                                                                        '
+                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, """")
+                                                                        Exit For
+                                                                    Case "("
+                                                                        '
+                                                                        ' url() style, ends in ')' or a ' '
+                                                                        '
+                                                                        If genericController.vbLCase(Mid(FilePrefixSegment, Ptr, 7)) = "(&quot;" Then
+                                                                            EndPos = genericController.vbInstr(1, FilenameSegment, "&quot;)")
+                                                                        ElseIf genericController.vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "('" Then
+                                                                            EndPos = genericController.vbInstr(1, FilenameSegment, "')")
+                                                                        ElseIf genericController.vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "(""" Then
+                                                                            EndPos = genericController.vbInstr(1, FilenameSegment, """)")
+                                                                        Else
+                                                                            EndPos = genericController.vbInstr(1, FilenameSegment, ")")
+                                                                        End If
+                                                                        Exit For
+                                                                    Case "'"
+                                                                        '
+                                                                        ' Delimited within a javascript pair of apostophys
+                                                                        '
+                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, "'")
+                                                                        Exit For
+                                                                    Case ">", "<"
+                                                                        '
+                                                                        ' Skip this link
+                                                                        '
+                                                                        ParseError = True
+                                                                        Exit For
+                                                                End Select
+                                                            Next
                                                             '
-                                                            ' Get ImageAltSize
+                                                            ' check link
                                                             '
-                                                            ''hint = hint & ",130"
-                                                            ImageAltSize = ""
-                                                            If ImageFilenameNoExt = RecordFilenameNoExt Then
-                                                                '
-                                                                ' Exact match
-                                                                '
-                                                            ElseIf genericController.vbInstr(1, ImageFilenameNoExt, RecordFilenameNoExt, vbTextCompare) <> 1 Then
-                                                                '
-                                                                ' There was a change and the recordfilename is not part of the imagefilename
-                                                                '
+                                                            If EndPos = 0 Then
+                                                                ParseError = True
+                                                                Exit For
                                                             Else
+                                                                Dim ImageFilename As String
+                                                                Dim SegmentAfterImage As String
+
+                                                                Dim ImageFilenameNoExt As String
+                                                                Dim ImageFilenameExt As String
+                                                                Dim ImageAltSize As String
+
+                                                                ''hint = hint & ",120"
+                                                                SegmentAfterImage = Mid(FilenameSegment, EndPos)
+                                                                ImageFilename = genericController.DecodeResponseVariable(Mid(FilenameSegment, 1, EndPos - 1))
+                                                                ImageFilenameNoExt = ImageFilename
+                                                                ImageFilenameExt = ""
+                                                                Pos = InStrRev(ImageFilename, ".")
+                                                                If Pos > 0 Then
+                                                                    ImageFilenameNoExt = genericController.vbLCase(Mid(ImageFilename, 1, Pos - 1))
+                                                                    ImageFilenameExt = genericController.vbLCase(Mid(ImageFilename, Pos + 1))
+                                                                End If
                                                                 '
-                                                                ' the recordfilename is the first part of the imagefilename - Get ImageAltSize
+                                                                ' Get ImageAltSize
                                                                 '
-                                                                ImageAltSize = Mid(ImageFilenameNoExt, Len(RecordFilenameNoExt) + 1)
-                                                                If Left(ImageAltSize, 1) <> "-" Then
-                                                                    ImageAltSize = ""
+                                                                ''hint = hint & ",130"
+                                                                ImageAltSize = ""
+                                                                If ImageFilenameNoExt = RecordFilenameNoExt Then
+                                                                    '
+                                                                    ' Exact match
+                                                                    '
+                                                                ElseIf genericController.vbInstr(1, ImageFilenameNoExt, RecordFilenameNoExt, vbTextCompare) <> 1 Then
+                                                                    '
+                                                                    ' There was a change and the recordfilename is not part of the imagefilename
+                                                                    '
                                                                 Else
-                                                                    ImageAltSize = Mid(ImageAltSize, 2)
-                                                                    SizeTest = Split(ImageAltSize, "x")
-                                                                    If UBound(SizeTest) <> 1 Then
+                                                                    '
+                                                                    ' the recordfilename is the first part of the imagefilename - Get ImageAltSize
+                                                                    '
+                                                                    ImageAltSize = Mid(ImageFilenameNoExt, Len(RecordFilenameNoExt) + 1)
+                                                                    If Left(ImageAltSize, 1) <> "-" Then
                                                                         ImageAltSize = ""
                                                                     Else
-                                                                        If genericController.vbIsNumeric(SizeTest(0)) And genericController.vbIsNumeric(SizeTest(1)) Then
-                                                                            ImageFilenameNoExt = RecordFilenameNoExt
-                                                                            'ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
-                                                                            'RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)
-                                                                        Else
+                                                                        ImageAltSize = Mid(ImageAltSize, 2)
+                                                                        SizeTest = Split(ImageAltSize, "x")
+                                                                        If UBound(SizeTest) <> 1 Then
                                                                             ImageAltSize = ""
+                                                                        Else
+                                                                            If genericController.vbIsNumeric(SizeTest(0)) And genericController.vbIsNumeric(SizeTest(1)) Then
+                                                                                ImageFilenameNoExt = RecordFilenameNoExt
+                                                                                'ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
+                                                                                'RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)
+                                                                            Else
+                                                                                ImageAltSize = ""
+                                                                            End If
                                                                         End If
                                                                     End If
                                                                 End If
-                                                            End If
-                                                            '
-                                                            ' problem - in the case where the recordfilename = img-100x200, the imagefilenamenoext is img
-                                                            '
-                                                            ''hint = hint & ",140"
-                                                            If (RecordFilenameNoExt <> ImageFilenameNoExt) Or (RecordFilenameExt <> ImageFilenameExt) Then
                                                                 '
-                                                                ' There has been a change
+                                                                ' problem - in the case where the recordfilename = img-100x200, the imagefilenamenoext is img
                                                                 '
-                                                                Dim NewRecordFilename As String
-                                                                Dim ImageHeight As Integer
-                                                                Dim ImageWidth As Integer
-                                                                NewRecordFilename = RecordVirtualPath & RecordFilenameNoExt & "." & RecordFilenameExt
-                                                                '
-                                                                ' realtime image updates replace without creating new size - that is for the edit interface
-                                                                '
-                                                                ' put the New file back into the tablesplit in case there are more then 4 splits
-                                                                '
-                                                                TableSplit(0) = ""
-                                                                TableSplit(1) = ""
-                                                                TableSplit(2) = ""
-                                                                TableSplit(3) = SegmentAfterImage
-                                                                NewRecordFilename = genericController.EncodeURL(NewRecordFilename) & Mid(Join(TableSplit, "/"), 4)
-                                                                LinkSplit(LinkPtr) = NewRecordFilename
-                                                                SaveChanges = True
+                                                                ''hint = hint & ",140"
+                                                                If (RecordFilenameNoExt <> ImageFilenameNoExt) Or (RecordFilenameExt <> ImageFilenameExt) Then
+                                                                    '
+                                                                    ' There has been a change
+                                                                    '
+                                                                    Dim NewRecordFilename As String
+                                                                    Dim ImageHeight As Integer
+                                                                    Dim ImageWidth As Integer
+                                                                    NewRecordFilename = RecordVirtualPath & RecordFilenameNoExt & "." & RecordFilenameExt
+                                                                    '
+                                                                    ' realtime image updates replace without creating new size - that is for the edit interface
+                                                                    '
+                                                                    ' put the New file back into the tablesplit in case there are more then 4 splits
+                                                                    '
+                                                                    TableSplit(0) = ""
+                                                                    TableSplit(1) = ""
+                                                                    TableSplit(2) = ""
+                                                                    TableSplit(3) = SegmentAfterImage
+                                                                    NewRecordFilename = genericController.EncodeURL(NewRecordFilename) & Mid(Join(TableSplit, "/"), 4)
+                                                                    LinkSplit(LinkPtr) = NewRecordFilename
+                                                                    SaveChanges = True
+                                                                End If
                                                             End If
                                                         End If
                                                     End If
@@ -7974,48 +7298,44 @@ ErrorTrap:
                                 End If
                             End If
                         End If
+                        If ParseError Then
+                            Exit For
+                        End If
+                    Next
+                    ''hint = hint & ",910"
+                    If SaveChanges And (Not ParseError) Then
+                        result = Join(LinkSplit, ContentFilesLinkPrefix)
                     End If
-                    If ParseError Then
-                        Exit For
+                End If
+                ''hint = hint & ",920"
+                If Not ParseError Then
+                    '
+                    ' Convert ACTypeDynamicForm to Add-on
+                    '
+                    If genericController.vbInstr(1, result, "<ac type=""" & ACTypeDynamicForm, vbTextCompare) <> 0 Then
+                        result = genericController.vbReplace(result, "type=""DYNAMICFORM""", "TYPE=""aggregatefunction""", 1, 99, vbTextCompare)
+                        result = genericController.vbReplace(result, "name=""DYNAMICFORM""", "name=""DYNAMIC FORM""", 1, 99, vbTextCompare)
                     End If
-                Next
-                ''hint = hint & ",910"
-                If SaveChanges And (Not ParseError) Then
-                    html_EncodeContentUpgrades = Join(LinkSplit, ContentFilesLinkPrefix)
                 End If
-            End If
-            ''hint = hint & ",920"
-            If Not ParseError Then
-                '
-                ' Convert ACTypeDynamicForm to Add-on
-                '
-                If genericController.vbInstr(1, html_EncodeContentUpgrades, "<ac type=""" & ACTypeDynamicForm, vbTextCompare) <> 0 Then
-                    html_EncodeContentUpgrades = genericController.vbReplace(html_EncodeContentUpgrades, "type=""DYNAMICFORM""", "TYPE=""aggregatefunction""", 1, 99, vbTextCompare)
-                    html_EncodeContentUpgrades = genericController.vbReplace(html_EncodeContentUpgrades, "name=""DYNAMICFORM""", "name=""DYNAMIC FORM""", 1, 99, vbTextCompare)
-                End If
-            End If
-            ''hint = hint & ",930"
-            If ParseError Then
-                html_EncodeContentUpgrades = "" _
+                ''hint = hint & ",930"
+                If ParseError Then
+                    result = "" _
                     & vbCrLf & "<!-- warning: parsing aborted on ccLibraryFile replacement -->" _
-                    & vbCrLf & html_EncodeContentUpgrades _
+                    & vbCrLf & result _
                     & vbCrLf & "<!-- /warning: parsing aborted on ccLibraryFile replacement -->"
-            End If
-            '
-            ' {{content}} should be <ac type="templatecontent" etc>
-            ' the merge is now handled in csv_EncodeActiveContent, but some sites have hand {{content}} tags entered
-            '
-            ''hint = hint & ",940"
-            If genericController.vbInstr(1, html_EncodeContentUpgrades, "{{content}}", vbTextCompare) <> 0 Then
-                html_EncodeContentUpgrades = genericController.vbReplace(html_EncodeContentUpgrades, "{{content}}", "<AC type=""" & ACTypeTemplateContent & """>", 1, 99, vbTextCompare)
-            End If
-            '
-            'Call main_testPoint(hint)
-            '
-            Exit Function
-ErrorTrap:
-            cpCore.handleException(New Exception("Unexpected exception"))
-            'Call csv_HandleClassTrapError(Err.Number, Err.Source, Err.Description, "unknownMethodNameLegacyCall" & ", hint=[" & hint & "]", True)
+                End If
+                '
+                ' {{content}} should be <ac type="templatecontent" etc>
+                ' the merge is now handled in csv_EncodeActiveContent, but some sites have hand {{content}} tags entered
+                '
+                ''hint = hint & ",940"
+                If genericController.vbInstr(1, result, "{{content}}", vbTextCompare) <> 0 Then
+                    result = genericController.vbReplace(result, "{{content}}", "<AC type=""" & ACTypeTemplateContent & """>", 1, 99, vbTextCompare)
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '============================================================================
@@ -8050,14 +7370,15 @@ ErrorTrap:
                     RecordID = cpCore.db.csGetInteger(CS, "ID")
                     contactPeopleId = cpCore.db.csGetInteger(CS, "modifiedBy")
                     returnCopy = cpCore.db.csGet(CS, "Copy")
-                    returnCopy = html_executeContentCommands(Nothing, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, Return_ErrorMessage)
-                    returnCopy = encodeContent10(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, False, Nothing, False)
+                    returnCopy = executeContentCommands(Nothing, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, Return_ErrorMessage)
+                    returnCopy = convertActiveContentToHtmlForWebRender(returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage)
+                    'returnCopy = convertActiveContent_internal(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, False, Nothing, False)
                     '
                     If True Then
                         If cpCore.authContext.isEditingAnything() Then
                             returnCopy = cpCore.db.csGetRecordEditLink(CS, False) & returnCopy
                             If AllowEditWrapper Then
-                                returnCopy = main_GetEditWrapper("copy content", returnCopy)
+                                returnCopy = getEditWrapper("copy content", returnCopy)
                             End If
                         End If
                     End If
@@ -8750,7 +8071,7 @@ ErrorTrap:
                     If Not useFlyout Then
                         Link = "/" & cpCore.serverConfig.appConfig.adminRoute & "?cid=" & iContentID & "&af=4&aa=2&ad=1"
                         If PresetNameValueList <> "" Then
-                            Link = Link & "&wc=" & cpCore.html.main_EncodeRequestVariable(PresetNameValueList)
+                            Link = Link & "&wc=" & genericController.EncodeRequestVariable(PresetNameValueList)
                         End If
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 _
                             & "<a" _
@@ -8996,7 +8317,7 @@ ErrorTrap:
                             If PresetNameValueList <> "" Then
                                 Dim NameValueList As String
                                 NameValueList = PresetNameValueList
-                                Link = Link & "&wc=" & cpCore.html.main_EncodeRequestVariable(PresetNameValueList)
+                                Link = Link & "&wc=" & genericController.EncodeRequestVariable(PresetNameValueList)
                             End If
                         End If
                         Call cpCore.menuFlyout.menu_AddEntry(MenuName & ":" & ContentName, ParentMenuName, , , Link, ButtonCaption, "", "", True)
@@ -9749,11 +9070,11 @@ ErrorTrap:
         ''' <param name="cpCore"></param>
         ''' <param name="ButtonList"></param>
         ''' <returns></returns>
-        Public Shared Function CloseFormTable(cpCore As coreClass, ByVal ButtonList As String) As String
+        Public Shared Function legacy_closeFormTable(cpCore As coreClass, ByVal ButtonList As String) As String
             If ButtonList <> "" Then
-                CloseFormTable = "</td></tr></TABLE>" & cpCore.html.main_GetPanelButtons(ButtonList, "Button") & "</form>"
+                legacy_closeFormTable = "</td></tr></TABLE>" & cpCore.html.main_GetPanelButtons(ButtonList, "Button") & "</form>"
             Else
-                CloseFormTable = "</td></tr></TABLE></form>"
+                legacy_closeFormTable = "</td></tr></TABLE></form>"
             End If
         End Function
         '
@@ -9764,7 +9085,7 @@ ErrorTrap:
         ''' <param name="cpCore"></param>
         ''' <param name="ButtonList"></param>
         ''' <returns></returns>
-        Public Shared Function OpenFormTable(cpCore As coreClass, ByVal ButtonList As String) As String
+        Public Shared Function legacy_openFormTable(cpCore As coreClass, ByVal ButtonList As String) As String
             Dim result As String = ""
             Try
                 result = cpCore.html.html_GetFormStart()

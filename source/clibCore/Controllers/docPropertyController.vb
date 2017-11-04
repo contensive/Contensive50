@@ -130,7 +130,7 @@ Namespace Contensive.Core.Controllers
         '
         Public Function getRenderedActiveContent(ByVal RequestName As String) As String
             Try
-                Return cpCore.html.renderActiveContent(genericController.encodeText(getProperty(RequestName).Value))
+                Return cpCore.html.convertEditorResponseToActiveContent(genericController.encodeText(getProperty(RequestName).Value))
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try

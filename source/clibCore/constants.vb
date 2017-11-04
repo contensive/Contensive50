@@ -21,25 +21,25 @@ Namespace Contensive.Core
         Public Const requestAppRootPath As String = "/"
         '
         ' -- buttons
-        Public Const ButtonCreateFields = " Create Fields "
-        Public Const ButtonRun = "     Run     "
-        Public Const ButtonSelect = "  Select "
-        Public Const ButtonFindAndReplace = " Find and Replace "
-        Public Const ButtonIISReset = " IIS Reset "
-        Public Const ButtonCancel = " Cancel "
+        Public Const ButtonCreateFields As String = " Create Fields "
+        Public Const ButtonRun As String = "     Run     "
+        Public Const ButtonSelect As String = "  Select "
+        Public Const ButtonFindAndReplace As String = " Find and Replace "
+        Public Const ButtonIISReset As String = " IIS Reset "
+        Public Const ButtonCancel As String = " Cancel "
         '
-        Public Const protectedContentSetControlFieldList = "ID,CREATEDBY,DATEADDED,MODIFIEDBY,MODIFIEDDATE,CONTENTCONTROLID"
+        Public Const protectedContentSetControlFieldList As String = "ID,CREATEDBY,DATEADDED,MODIFIEDBY,MODIFIEDDATE,CONTENTCONTROLID"
         '
-        Public Const HTMLEditorDefaultCopyStartMark = "<!-- cc -->"
-        Public Const HTMLEditorDefaultCopyEndMark = "<!-- /cc -->"
-        Public Const HTMLEditorDefaultCopyNoCr = HTMLEditorDefaultCopyStartMark & "<p><br></p>" & HTMLEditorDefaultCopyEndMark
-        Public Const HTMLEditorDefaultCopyNoCr2 = "<p><br></p>"
+        Public Const HTMLEditorDefaultCopyStartMark As String = "<!-- cc -->"
+        Public Const HTMLEditorDefaultCopyEndMark As String = "<!-- /cc -->"
+        Public Const HTMLEditorDefaultCopyNoCr As String = HTMLEditorDefaultCopyStartMark & "<p><br></p>" & HTMLEditorDefaultCopyEndMark
+        Public Const HTMLEditorDefaultCopyNoCr2 As String = "<p><br></p>"
         '
-        Public Const IconWidthHeight = " width=21 height=22 "
+        Public Const IconWidthHeight As String = " width=21 height=22 "
         '
         Public Const baseCollectionGuid As String = "{7C6601A7-9D52-40A3-9570-774D0D43D758}"        ' part of software dist - base cdef plus addons with classes in in core library, plus depenancy on coreCollection
-        Public Const CoreCollectionGuid = "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}"                  ' contains core Contensive objects, loaded from Library
-        Public Const ApplicationCollectionGuid = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}"           ' exported from application during upgrade
+        Public Const CoreCollectionGuid As String = "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}"                  ' contains core Contensive objects, loaded from Library
+        Public Const ApplicationCollectionGuid As String = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}"           ' exported from application during upgrade
         '
         ' -- navigator entries
         Public Const addonGuidManageAddon As String = "{DBA354AB-5D3E-4882-8718-CF23CAAB7927}"
@@ -47,40 +47,43 @@ Namespace Contensive.Core
         ' -- addons
         Public Const addonGuidBaseStlyles As String = "{0dd7df28-4924-4881-a1d8-421824f5c2d1}"
         Public Const addonGuidAdminSite As String = "{c2de2acf-ca39-4668-b417-aa491e7d8460}"
-        Public Const addonGuidDashboard = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}"
-        Public Const addonGuidPersonalization = "{C82CB8A6-D7B9-4288-97FF-934080F5FC9C}"
-        Public Const addonGuidTextBox = "{7010002E-5371-41F7-9C77-0BBFF1F8B728}"
-        Public Const addonGuidContentBox = "{E341695F-C444-4E10-9295-9BEEC41874D8}"
-        Public Const addonGuidDynamicMenu = "{DB1821B3-F6E4-4766-A46E-48CA6C9E4C6E}"
-        Public Const addonGuidChildList = "{D291F133-AB50-4640-9A9A-18DB68FF363B}"
-        Public Const addonGuidDynamicForm = "{8284FA0C-6C9D-43E1-9E57-8E9DD35D2DCC}"
-        Public Const addonGuidAddonManager = "{1DC06F61-1837-419B-AF36-D5CC41E1C9FD}"
-        Public Const addonGuidFormWizard = "{2B1384C4-FD0E-4893-B3EA-11C48429382F}"
-        Public Const addonGuidImportWizard = "{37F66F90-C0E0-4EAF-84B1-53E90A5B3B3F}"
-        Public Const addonGuidJQuery = "{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"
-        Public Const addonGuidJQueryUI = "{840B9AEF-9470-4599-BD47-7EC0C9298614}"
-        Public Const addonGuidImportProcess = "{5254FAC6-A7A6-4199-8599-0777CC014A13}"
-        Public Const addonGuidStructuredDataProcessor = "{65D58FE9-8B76-4490-A2BE-C863B372A6A4}"
-        Public Const addonGuidjQueryFancyBox = "{24C2DBCF-3D84-44B6-A5F7-C2DE7EFCCE3D}"
-        Public Const addonGuidSiteStructureGuid = "{8CDD7960-0FCA-4042-B5D8-3A65BE487AC4}"
-        'Public Const addonGuidLoginDefaultPage As String = "{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}"
+        Public Const addonGuidDashboard As String = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}"
+        Public Const addonGuidPersonalization As String = "{C82CB8A6-D7B9-4288-97FF-934080F5FC9C}"
+        Public Const addonGuidTextBox As String = "{7010002E-5371-41F7-9C77-0BBFF1F8B728}"
+        Public Const addonGuidContentBox As String = "{E341695F-C444-4E10-9295-9BEEC41874D8}"
+        Public Const addonGuidDynamicMenu As String = "{DB1821B3-F6E4-4766-A46E-48CA6C9E4C6E}"
+        Public Const addonGuidChildList As String = "{D291F133-AB50-4640-9A9A-18DB68FF363B}"
+        Public Const addonGuidDynamicForm As String = "{8284FA0C-6C9D-43E1-9E57-8E9DD35D2DCC}"
+        Public Const addonGuidAddonManager As String = "{1DC06F61-1837-419B-AF36-D5CC41E1C9FD}"
+        Public Const addonGuidFormWizard As String = "{2B1384C4-FD0E-4893-B3EA-11C48429382F}"
+        Public Const addonGuidImportWizard As String = "{37F66F90-C0E0-4EAF-84B1-53E90A5B3B3F}"
+        Public Const addonGuidJQuery As String = "{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"
+        Public Const addonGuidJQueryUI As String = "{840B9AEF-9470-4599-BD47-7EC0C9298614}"
+        Public Const addonGuidImportProcess As String = "{5254FAC6-A7A6-4199-8599-0777CC014A13}"
+        Public Const addonGuidStructuredDataProcessor As String = "{65D58FE9-8B76-4490-A2BE-C863B372A6A4}"
+        Public Const addonGuidjQueryFancyBox As String = "{24C2DBCF-3D84-44B6-A5F7-C2DE7EFCCE3D}"
+        Public Const addonGuidSiteStructureGuid As String = "{8CDD7960-0FCA-4042-B5D8-3A65BE487AC4}"
+        'Public Const addonGuidLoginDefaultPage   As String  = "{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}"
         ' -- Login Page displays the currently selected login form addon
         Public Const addonGuidLoginPage As String = "{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}"
         ' -- Login Form, this is the addonGuid of the default login form. Login Page calls the addon
         Public Const addonGuidLoginForm As String = "{E23C5941-19C2-4164-BCFD-83D6DD42F651}"
-        Public Const addonGuidPageManager = "{3a01572e-0f08-4feb-b189-18371752a3c3}"
+        Public Const addonGuidPageManager As String = "{3a01572e-0f08-4feb-b189-18371752a3c3}"
         '
         ' -- content
-        Public Const DefaultLandingPageGuid = "{925F4A57-32F7-44D9-9027-A91EF966FB0D}"
-        Public Const DefaultLandingSectionGuid = "{D882ED77-DB8F-4183-B12C-F83BD616E2E1}"
-        Public Const DefaultTemplateGuid = "{47BE95E4-5D21-42CC-9193-A343241E2513}"
-        Public Const DefaultDynamicMenuGuid = "{E8D575B9-54AE-4BF9-93B7-C7E7FE6F2DB3}"
+        Public Const DefaultLandingPageGuid As String = "{925F4A57-32F7-44D9-9027-A91EF966FB0D}"
+        Public Const DefaultLandingSectionGuid As String = "{D882ED77-DB8F-4183-B12C-F83BD616E2E1}"
+        Public Const DefaultTemplateGuid As String = "{47BE95E4-5D21-42CC-9193-A343241E2513}"
+        Public Const DefaultDynamicMenuGuid As String = "{E8D575B9-54AE-4BF9-93B7-C7E7FE6F2DB3}"
         '
-        Public Const fpoContentBox = "{1571E62A-972A-4BFF-A161-5F6075720791}"
+        ' -- instance id used when running addons in the addon site 
+        Public Const adminSiteInstanceId As String = "{E5418109-1206-43C5-A4F8-425E28BC629C}"
         '
-        Public Const sfImageExtList = "jpg,jpeg,gif,png"
+        Public Const fpoContentBox As String = "{1571E62A-972A-4BFF-A161-5F6075720791}"
         '
-        Public Const PageChildListInstanceID = "{ChildPageList}"
+        Public Const sfImageExtList As String = "jpg,jpeg,gif,png"
+        '
+        Public Const PageChildListInstanceID As String = "{ChildPageList}"
         '
         Public Const cr = vbCrLf & vbTab
         Public Const cr2 = cr & vbTab
@@ -89,9 +92,9 @@ Namespace Contensive.Core
         Public Const cr5 = cr4 & vbTab
         Public Const cr6 = cr5 & vbTab
         '
-        Public Const AddonOptionConstructor_BlockNoAjax = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]" & vbCrLf & "css Container id" & vbCrLf & "css Container class"
-        Public Const AddonOptionConstructor_Block = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]" & vbCrLf & "As Ajax=[If Add-on is Ajax:0|Yes:1]" & vbCrLf & "css Container id" & vbCrLf & "css Container class"
-        Public Const AddonOptionConstructor_Inline = "As Ajax=[If Add-on is Ajax:0|Yes:1]" & vbCrLf & "css Container id" & vbCrLf & "css Container class"
+        Public Const AddonOptionConstructor_BlockNoAjax As String = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]" & vbCrLf & "css Container id" & vbCrLf & "css Container class"
+        Public Const AddonOptionConstructor_Block As String = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]" & vbCrLf & "As Ajax=[If Add-on is Ajax:0|Yes:1]" & vbCrLf & "css Container id" & vbCrLf & "css Container class"
+        Public Const AddonOptionConstructor_Inline As String = "As Ajax=[If Add-on is Ajax:0|Yes:1]" & vbCrLf & "css Container id" & vbCrLf & "css Container class"
         '
         ' Constants used as arguments to SiteBuilderClass.CreateNewSite
         '
@@ -102,10 +105,10 @@ Namespace Contensive.Core
         '
         'Public Const AddonNewParse = True
         '
-        Public Const AddonOptionConstructor_ForBlockText = "AllowGroups=[listid(groups)]checkbox"
-        Public Const AddonOptionConstructor_ForBlockTextEnd = ""
-        Public Const BlockTextStartMarker = "<!-- BLOCKTEXTSTART -->"
-        Public Const BlockTextEndMarker = "<!-- BLOCKTEXTEND -->"
+        Public Const AddonOptionConstructor_ForBlockText As String = "AllowGroups=[listid(groups)]checkbox"
+        Public Const AddonOptionConstructor_ForBlockTextEnd As String = ""
+        Public Const BlockTextStartMarker As String = "<!-- BLOCKTEXTSTART -->"
+        Public Const BlockTextEndMarker As String = "<!-- BLOCKTEXTEND -->"
         '
         'Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Integer)
         'Private Declare Function GetExitCodeProcess Lib "kernel32" (ByVal hProcess As Integer, ByVal lpExitCode As Integer) As Integer
@@ -113,19 +116,19 @@ Namespace Contensive.Core
         'Private Declare Function OpenProcess Lib "kernel32" (ByVal dwDesiredAccess As Integer, ByVal bInheritHandle As Integer, ByVal dwProcessId As Integer) As Integer
         'Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Integer) As Integer
         '
-        Public Const InstallFolderName = "Install"
-        Public Const DownloadFileRootNode = "collectiondownload"
-        Public Const CollectionFileRootNode = "collection"
-        Public Const CollectionFileRootNodeOld = "addoncollection"
-        Public Const CollectionListRootNode = "collectionlist"
+        Public Const InstallFolderName As String = "Install"
+        Public Const DownloadFileRootNode As String = "collectiondownload"
+        Public Const CollectionFileRootNode As String = "collection"
+        Public Const CollectionFileRootNodeOld As String = "addoncollection"
+        Public Const CollectionListRootNode As String = "collectionlist"
         '
-        Public Const LegacyLandingPageName = "Landing Page Content"
-        Public Const DefaultNewLandingPageName = "Home"
-        Public Const DefaultLandingSectionName = "Home"
+        Public Const LegacyLandingPageName As String = "Landing Page Content"
+        Public Const DefaultNewLandingPageName As String = "Home"
+        Public Const DefaultLandingSectionName As String = "Home"
         '
-        Public Const defaultLandingPageHtml = ""
-        Public Const defaultTemplateName = "Default"
-        Public Const defaultTemplateHtml = "{% {""addon"":{""addon"":""menu"",""name"":""Default""}} %}{% ""Content Box"" %}"
+        Public Const defaultLandingPageHtml As String = ""
+        Public Const defaultTemplateName As String = "Default"
+        Public Const defaultTemplateHtml As String = "{% {""addon"":{""addon"":""menu"",""name"":""Default""}} %}{% ""Content Box"" %}"
         '
         '
         '
@@ -137,7 +140,7 @@ Namespace Contensive.Core
         'Public Const ignoreInteger = KmaObjectError + 1
         'Public Const KmaccErrorServiceStopped = KmaObjectError + 2
         '
-        Public Const UserErrorHeadline = "<p class=""ccError"">There was a problem with this page.</p>"
+        Public Const UserErrorHeadline As String = "<p class=""ccError"">There was a problem with this page.</p>"
         ''
         '' ----- Errors connecting to server
         ''
@@ -158,17 +161,17 @@ Namespace Contensive.Core
         '
         ' ----- Previous errors, can be replaced
         '
-        'Public Const KmaError_UnderlyingObject_Msg = "An error occurred in an underlying routine."
-        'Public Const KmaccErrorServiceStopped_Msg = "The Contensive CSv Service is not running."
-        'Public Const KmaError_BadObject_Msg = "Server Object is not valid."
-        'Public Const ignoreString = "Server is busy with internal builder."
+        'Public Const KmaError_UnderlyingObject_Msg  As String  = "An error occurred in an underlying routine."
+        'Public Const KmaccErrorServiceStopped_Msg  As String  = "The Contensive CSv Service is not running."
+        'Public Const KmaError_BadObject_Msg  As String  = "Server Object is not valid."
+        'Public Const ignoreString  As String  = "Server is busy with internal builder."
         '
-        'Public Const KmaError_InvalidArgument_Msg = "Invalid Argument"
-        'Public Const KmaError_UnderlyingObject_Msg = "An error occurred in an underlying routine."
-        'Public Const KmaccErrorServiceStopped_Msg = "The Contensive CSv Service is not running."
-        'Public Const KmaError_BadObject_Msg = "Server Object is not valid."
-        'Public Const ignoreString = "Server is busy with internal builder."
-        'Public Const KmaError_InvalidArgument_Msg = "Invalid Argument"
+        'Public Const KmaError_InvalidArgument_Msg  As String  = "Invalid Argument"
+        'Public Const KmaError_UnderlyingObject_Msg  As String  = "An error occurred in an underlying routine."
+        'Public Const KmaccErrorServiceStopped_Msg  As String  = "The Contensive CSv Service is not running."
+        'Public Const KmaError_BadObject_Msg  As String  = "Server Object is not valid."
+        'Public Const ignoreString  As String  = "Server is busy with internal builder."
+        'Public Const KmaError_InvalidArgument_Msg  As String  = "Invalid Argument"
         '
         '-----------------------------------------------------------------------
         '   GetApplicationList indexes
@@ -218,29 +221,29 @@ Namespace Contensive.Core
         ' ----- Active Content Definitions
         '-----------------------------------------------------------------------
         '
-        Public Const ACTypeDate = "DATE"
-        Public Const ACTypeVisit = "VISIT"
-        Public Const ACTypeVisitor = "VISITOR"
-        Public Const ACTypeMember = "MEMBER"
-        Public Const ACTypeOrganization = "ORGANIZATION"
-        Public Const ACTypeChildList = "CHILDLIST"
-        Public Const ACTypeContact = "CONTACT"
-        Public Const ACTypeFeedback = "FEEDBACK"
-        Public Const ACTypeLanguage = "LANGUAGE"
-        Public Const ACTypeAggregateFunction = "AGGREGATEFUNCTION"
-        Public Const ACTypeAddon = "ADDON"
-        Public Const ACTypeImage = "IMAGE"
-        Public Const ACTypeDownload = "DOWNLOAD"
-        Public Const ACTypeEnd = "END"
-        Public Const ACTypeTemplateContent = "CONTENT"
-        Public Const ACTypeTemplateText = "TEXT"
-        'Public Const ACTypeDynamicMenu = "DYNAMICMENU"
-        Public Const ACTypeWatchList = "WATCHLIST"
-        Public Const ACTypeRSSLink = "RSSLINK"
-        Public Const ACTypePersonalization = "PERSONALIZATION"
-        Public Const ACTypeDynamicForm = "DYNAMICFORM"
+        Public Const ACTypeDate As String = "DATE"
+        Public Const ACTypeVisit As String = "VISIT"
+        Public Const ACTypeVisitor As String = "VISITOR"
+        Public Const ACTypeMember As String = "MEMBER"
+        Public Const ACTypeOrganization As String = "ORGANIZATION"
+        Public Const ACTypeChildList As String = "CHILDLIST"
+        Public Const ACTypeContact As String = "CONTACT"
+        Public Const ACTypeFeedback As String = "FEEDBACK"
+        Public Const ACTypeLanguage As String = "LANGUAGE"
+        Public Const ACTypeAggregateFunction As String = "AGGREGATEFUNCTION"
+        Public Const ACTypeAddon As String = "ADDON"
+        Public Const ACTypeImage As String = "IMAGE"
+        Public Const ACTypeDownload As String = "DOWNLOAD"
+        Public Const ACTypeEnd As String = "END"
+        Public Const ACTypeTemplateContent As String = "CONTENT"
+        Public Const ACTypeTemplateText As String = "TEXT"
+        'Public Const ACTypeDynamicMenu  As String  = "DYNAMICMENU"
+        Public Const ACTypeWatchList As String = "WATCHLIST"
+        Public Const ACTypeRSSLink As String = "RSSLINK"
+        Public Const ACTypePersonalization As String = "PERSONALIZATION"
+        Public Const ACTypeDynamicForm As String = "DYNAMICFORM"
         '
-        Public Const ACTagEnd = "<ac type=""" & ACTypeEnd & """>"
+        Public Const ACTagEnd As String = "<ac type=""" & ACTypeEnd & """>"
         '
         ' ----- PropertyType Definitions
         '
@@ -286,8 +289,8 @@ Namespace Contensive.Core
         '
         ' -- Default username/password
         '
-        Public Const DefaultServerUsername = "root"
-        Public Const DefaultServerPassword = "contensive"
+        Public Const DefaultServerUsername As String = "root"
+        Public Const DefaultServerPassword As String = "contensive"
         '
         ' -- Request Names
         '
@@ -322,26 +325,26 @@ Namespace Contensive.Core
         '
         '-----------------------------------------------------------------------
         '
-        Public Const FormTypeToolsPanel = "do30a8vl29"
-        Public Const FormTypeActiveEditor = "l1gk70al9n"
-        Public Const FormTypeImageSelector = "ila9c5s01m"
-        Public Const FormTypePageAuthoring = "2s09lmpalb"
-        Public Const FormTypeMyProfile = "89aLi180j5"
-        Public Const FormTypeLogin = "login"
-        'Public Const FormTypeLogin = "l09H58a195"
-        Public Const FormTypeSendPassword = "lk0q56am09"
-        Public Const FormTypeJoin = "6df38abv00"
-        Public Const FormTypeHelpBubbleEditor = "9df019d77sA"
-        Public Const FormTypeAddonSettingsEditor = "4ed923aFGw9d"
-        Public Const FormTypeAddonStyleEditor = "ar5028jklkfd0s"
-        Public Const FormTypeSiteStyleEditor = "fjkq4w8794kdvse"
-        'Public Const FormTypeAggregateFunctionProperties = "9wI751270"
+        Public Const FormTypeToolsPanel As String = "do30a8vl29"
+        Public Const FormTypeActiveEditor As String = "l1gk70al9n"
+        Public Const FormTypeImageSelector As String = "ila9c5s01m"
+        Public Const FormTypePageAuthoring As String = "2s09lmpalb"
+        Public Const FormTypeMyProfile As String = "89aLi180j5"
+        Public Const FormTypeLogin As String = "login"
+        'Public Const FormTypeLogin As String = "l09H58a195"
+        Public Const FormTypeSendPassword As String = "lk0q56am09"
+        Public Const FormTypeJoin As String = "6df38abv00"
+        Public Const FormTypeHelpBubbleEditor As String = "9df019d77sA"
+        Public Const FormTypeAddonSettingsEditor As String = "4ed923aFGw9d"
+        Public Const FormTypeAddonStyleEditor As String = "ar5028jklkfd0s"
+        Public Const FormTypeSiteStyleEditor As String = "fjkq4w8794kdvse"
+        'Public Const FormTypeAggregateFunctionProperties As String = "9wI751270"
         '
         '-----------------------------------------------------------------------
         '   Hardcoded profile form const
         '-----------------------------------------------------------------------
         '
-        Public Const rnMyProfileTopics = "profileTopics"
+        Public Const rnMyProfileTopics As String = "profileTopics"
         '
         '-----------------------------------------------------------------------
         ' Legacy - replaced with HardCodedPages
@@ -354,15 +357,15 @@ Namespace Contensive.Core
         '       the physical page calls.
         '-----------------------------------------------------------------------
         '
-        'Public Const RequestNameInterceptpage = "ccIPage"
+        'Public Const RequestNameInterceptpage As String = "ccIPage"
         '
-        Public Const LegacyInterceptPageSNResourceLibrary = "s033l8dm15"
-        Public Const LegacyInterceptPageSNSiteExplorer = "kdif3318sd"
-        Public Const LegacyInterceptPageSNImageUpload = "ka983lm039"
-        Public Const LegacyInterceptPageSNMyProfile = "k09ddk9105"
-        Public Const LegacyInterceptPageSNLogin = "6ge42an09a"
-        Public Const LegacyInterceptPageSNPrinterVersion = "l6d09a10sP"
-        Public Const LegacyInterceptPageSNUploadEditor = "k0hxp2aiOZ"
+        Public Const LegacyInterceptPageSNResourceLibrary As String = "s033l8dm15"
+        Public Const LegacyInterceptPageSNSiteExplorer As String = "kdif3318sd"
+        Public Const LegacyInterceptPageSNImageUpload As String = "ka983lm039"
+        Public Const LegacyInterceptPageSNMyProfile As String = "k09ddk9105"
+        Public Const LegacyInterceptPageSNLogin As String = "6ge42an09a"
+        Public Const LegacyInterceptPageSNPrinterVersion As String = "l6d09a10sP"
+        Public Const LegacyInterceptPageSNUploadEditor As String = "k0hxp2aiOZ"
         '
         '-----------------------------------------------------------------------
         ' Ajax functions intercepted during init, answered and response closed
@@ -374,28 +377,28 @@ Namespace Contensive.Core
         '   These name=value pairs go in the QueryString argument of the javascript cj.ajax.qs() function
         '-----------------------------------------------------------------------
         '
-        'Public Const RequestNameOpenSettingPage = "settingpageid"
-        Public Const RequestNameAjaxFunction = "ajaxfn"
-        Public Const RequestNameAjaxFastFunction = "ajaxfastfn"
+        'Public Const RequestNameOpenSettingPage As String = "settingpageid"
+        Public Const RequestNameAjaxFunction As String = "ajaxfn"
+        Public Const RequestNameAjaxFastFunction As String = "ajaxfastfn"
         '
-        Public Const AjaxOpenAdminNav = "aps89102kd"
-        Public Const AjaxOpenAdminNavGetContent = "d8475jkdmfj2"
-        Public Const AjaxCloseAdminNav = "3857fdjdskf91"
-        Public Const AjaxAdminNavOpenNode = "8395j2hf6jdjf"
-        Public Const AjaxAdminNavOpenNodeGetContent = "eieofdwl34efvclaeoi234598"
-        Public Const AjaxAdminNavCloseNode = "w325gfd73fhdf4rgcvjk2"
+        Public Const AjaxOpenAdminNav As String = "aps89102kd"
+        Public Const AjaxOpenAdminNavGetContent As String = "d8475jkdmfj2"
+        Public Const AjaxCloseAdminNav As String = "3857fdjdskf91"
+        Public Const AjaxAdminNavOpenNode As String = "8395j2hf6jdjf"
+        Public Const AjaxAdminNavOpenNodeGetContent As String = "eieofdwl34efvclaeoi234598"
+        Public Const AjaxAdminNavCloseNode As String = "w325gfd73fhdf4rgcvjk2"
         '
-        Public Const AjaxCloseIndexFilter = "k48smckdhorle0"
-        Public Const AjaxOpenIndexFilter = "Ls8jCDt87kpU45YH"
-        Public Const AjaxOpenIndexFilterGetContent = "llL98bbJQ38JC0KJm"
-        Public Const AjaxStyleEditorAddStyle = "ajaxstyleeditoradd"
-        Public Const AjaxPing = "ajaxalive"
-        Public Const AjaxGetFormEditTabContent = "ajaxgetformedittabcontent"
-        Public Const AjaxData = "data"
-        Public Const AjaxGetVisitProperty = "getvisitproperty"
-        Public Const AjaxSetVisitProperty = "setvisitproperty"
-        Public Const AjaxGetDefaultAddonOptionString = "ccGetDefaultAddonOptionString"
-        Public Const ajaxGetFieldEditorPreferenceForm = "ajaxgetfieldeditorpreference"
+        Public Const AjaxCloseIndexFilter As String = "k48smckdhorle0"
+        Public Const AjaxOpenIndexFilter As String = "Ls8jCDt87kpU45YH"
+        Public Const AjaxOpenIndexFilterGetContent As String = "llL98bbJQ38JC0KJm"
+        Public Const AjaxStyleEditorAddStyle As String = "ajaxstyleeditoradd"
+        Public Const AjaxPing As String = "ajaxalive"
+        Public Const AjaxGetFormEditTabContent As String = "ajaxgetformedittabcontent"
+        Public Const AjaxData As String = "data"
+        Public Const AjaxGetVisitProperty As String = "getvisitproperty"
+        Public Const AjaxSetVisitProperty As String = "setvisitproperty"
+        Public Const AjaxGetDefaultAddonOptionString As String = "ccGetDefaultAddonOptionString"
+        Public Const ajaxGetFieldEditorPreferenceForm As String = "ajaxgetfieldeditorpreference"
         '
         '-----------------------------------------------------------------------
         '
@@ -410,7 +413,7 @@ Namespace Contensive.Core
         '       should all be prefixed with 'cc'
         '-----------------------------------------------------------------------
         '
-        'Public Const HardcodedAddonGetDefaultAddonOptionString = "ccGetDefaultAddonOptionString"
+        'Public Const HardcodedAddonGetDefaultAddonOptionString As String = "ccGetDefaultAddonOptionString"
         '
         '-----------------------------------------------------------------------
         '   Remote Methods
@@ -419,7 +422,7 @@ Namespace Contensive.Core
         '       blocks all other Contensive output (tools panel, javascript, etc)
         '-----------------------------------------------------------------------
         '
-        Public Const RequestNameRemoteMethodAddon = "remotemethodaddon"
+        Public Const RequestNameRemoteMethodAddon As String = "remotemethodaddon"
         '
         '-----------------------------------------------------------------------
         '   Hard Coded Pages
@@ -428,42 +431,42 @@ Namespace Contensive.Core
         '       replaces output stream with html output
         '-----------------------------------------------------------------------
         '
-        Public Const RequestNameHardCodedPage = "method"
+        Public Const RequestNameHardCodedPage As String = "method"
         '
-        Public Const HardCodedPageLogin = "login"
-        Public Const HardCodedPageLoginDefault = "logindefault"
-        Public Const HardCodedPageMyProfile = "myprofile"
-        Public Const HardCodedPagePrinterVersion = "printerversion"
-        Public Const HardCodedPageResourceLibrary = "resourcelibrary"
-        Public Const HardCodedPageLogoutLogin = "logoutlogin"
-        Public Const HardCodedPageLogout = "logout"
-        Public Const HardCodedPageSiteExplorer = "siteexplorer"
-        'Public Const HardCodedPageForceMobile = "forcemobile"
-        'Public Const HardCodedPageForceNonMobile = "forcenonmobile"
-        Public Const HardCodedPageNewOrder = "neworderpage"
-        Public Const HardCodedPageStatus = "status"
-        'Public Const HardCodedPageGetJSPage = "getjspage"
-        'Public Const HardCodedPageGetJSLogin = "getjslogin"
-        Public Const HardCodedPageRedirect = "redirect"
-        Public Const HardCodedPageExportAscii = "exportascii"
-        Public Const HardCodedPagePayPalConfirm = "paypalconfirm"
-        Public Const HardCodedPageSendPassword = "sendpassword"
+        Public Const HardCodedPageLogin As String = "login"
+        Public Const HardCodedPageLoginDefault As String = "logindefault"
+        Public Const HardCodedPageMyProfile As String = "myprofile"
+        Public Const HardCodedPagePrinterVersion As String = "printerversion"
+        Public Const HardCodedPageResourceLibrary As String = "resourcelibrary"
+        Public Const HardCodedPageLogoutLogin As String = "logoutlogin"
+        Public Const HardCodedPageLogout As String = "logout"
+        Public Const HardCodedPageSiteExplorer As String = "siteexplorer"
+        'Public Const HardCodedPageForceMobile As String = "forcemobile"
+        'Public Const HardCodedPageForceNonMobile As String = "forcenonmobile"
+        Public Const HardCodedPageNewOrder As String = "neworderpage"
+        Public Const HardCodedPageStatus As String = "status"
+        'Public Const HardCodedPageGetJSPage As String = "getjspage"
+        'Public Const HardCodedPageGetJSLogin As String = "getjslogin"
+        Public Const HardCodedPageRedirect As String = "redirect"
+        Public Const HardCodedPageExportAscii As String = "exportascii"
+        Public Const HardCodedPagePayPalConfirm As String = "paypalconfirm"
+        Public Const HardCodedPageSendPassword As String = "sendpassword"
         '
         '-----------------------------------------------------------------------
         '   Option values
         '       does not effect output directly
         '-----------------------------------------------------------------------
         '
-        Public Const RequestNamePageOptions = "ccoptions"
+        Public Const RequestNamePageOptions As String = "ccoptions"
         '
-        Public Const PageOptionForceMobile = "forcemobile"
-        Public Const PageOptionForceNonMobile = "forcenonmobile"
-        Public Const PageOptionLogout = "logout"
-        Public Const PageOptionPrinterVersion = "printerversion"
+        Public Const PageOptionForceMobile As String = "forcemobile"
+        Public Const PageOptionForceNonMobile As String = "forcenonmobile"
+        Public Const PageOptionLogout As String = "logout"
+        Public Const PageOptionPrinterVersion As String = "printerversion"
         '
         ' convert to options later
         '
-        Public Const RequestNameDashboardReset = "ResetDashboard"
+        Public Const RequestNameDashboardReset As String = "ResetDashboard"
         '
         '-----------------------------------------------------------------------
         '   DataSource constants
@@ -496,39 +499,39 @@ Namespace Contensive.Core
         '           Oracle
         '-----------------------------------------------------------------------
         '
-        'Public Const SQLFalse = "0"
-        'Public Const SQLTrue = "1"
+        'Public Const SQLFalse As String = "0"
+        'Public Const SQLTrue As String = "1"
         '
         '-----------------------------------------------------------------------
         ' ----- Style sheet definitions
         '-----------------------------------------------------------------------
         '
-        Public Const defaultStyleFilename = "ccDefault.r5.css"
-        Public Const StyleSheetStart = "<STYLE TYPE=""text/css"">"
-        Public Const StyleSheetEnd = "</STYLE>"
+        Public Const defaultStyleFilename As String = "ccDefault.r5.css"
+        Public Const StyleSheetStart As String = "<STYLE TYPE=""text/css"">"
+        Public Const StyleSheetEnd As String = "</STYLE>"
         '
-        Public Const SpanClassAdminNormal = "<span class=""ccAdminNormal"">"
-        Public Const SpanClassAdminSmall = "<span class=""ccAdminSmall"">"
+        Public Const SpanClassAdminNormal As String = "<span class=""ccAdminNormal"">"
+        Public Const SpanClassAdminSmall As String = "<span class=""ccAdminSmall"">"
         '
         ' remove these from ccWebx
         '
-        Public Const SpanClassNormal = "<span class=""ccNormal"">"
-        Public Const SpanClassSmall = "<span class=""ccSmall"">"
-        Public Const SpanClassLarge = "<span class=""ccLarge"">"
-        Public Const SpanClassHeadline = "<span class=""ccHeadline"">"
-        Public Const SpanClassList = "<span class=""ccList"">"
-        Public Const SpanClassListCopy = "<span class=""ccListCopy"">"
-        Public Const SpanClassError = "<span class=""ccError"">"
-        Public Const SpanClassSeeAlso = "<span class=""ccSeeAlso"">"
-        Public Const SpanClassEnd = "</span>"
+        Public Const SpanClassNormal As String = "<span class=""ccNormal"">"
+        Public Const SpanClassSmall As String = "<span class=""ccSmall"">"
+        Public Const SpanClassLarge As String = "<span class=""ccLarge"">"
+        Public Const SpanClassHeadline As String = "<span class=""ccHeadline"">"
+        Public Const SpanClassList As String = "<span class=""ccList"">"
+        Public Const SpanClassListCopy As String = "<span class=""ccListCopy"">"
+        Public Const SpanClassError As String = "<span class=""ccError"">"
+        Public Const SpanClassSeeAlso As String = "<span class=""ccSeeAlso"">"
+        Public Const SpanClassEnd As String = "</span>"
         '
         '-----------------------------------------------------------------------
         ' ----- XHTML definitions
         '-----------------------------------------------------------------------
         '
-        Public Const DTDTransitional = "<!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"">"
+        Public Const DTDTransitional As String = "<!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"">"
         '
-        Public Const BR = "<br>"
+        Public Const BR As String = "<br>"
         '
         '-----------------------------------------------------------------------
         ' AuthoringControl Types
@@ -543,13 +546,13 @@ Namespace Contensive.Core
         ' ----- Panel and header colors
         '-----------------------------------------------------------------------
         '
-        'Public Const "ccPanel" = "#E0E0E0"    ' The background color of a panel (black copy visible on it)
-        'Public Const "ccPanelHilite" = "#F8F8F8"  '
-        'Public Const "ccPanelShadow" = "#808080"  '
+        'Public Const "ccPanel" As String = "#E0E0E0"    ' The background color of a panel (black copy visible on it)
+        'Public Const "ccPanelHilite" As String = "#F8F8F8"  '
+        'Public Const "ccPanelShadow" As String = "#808080"  '
         '
-        'Public Const HeaderColorBase = "#0320B0"   ' The background color of a panel header (reverse copy visible)
-        'Public Const "ccPanelHeaderHilite" = "#8080FF" '
-        'Public Const "ccPanelHeaderShadow" = "#000000" '
+        'Public Const HeaderColorBase As String = "#0320B0"   ' The background color of a panel header (reverse copy visible)
+        'Public Const "ccPanelHeaderHilite" As String = "#8080FF" '
+        'Public Const "ccPanelHeaderShadow" As String = "#000000" '
         '
         '-----------------------------------------------------------------------
         ' ----- Field type Definitions
@@ -585,49 +588,49 @@ Namespace Contensive.Core
         '       These are what are publicly displayed for each type
         '       See GetFieldTypeNameByType and vise-versa to translater
         '
-        Public Const FieldTypeNameInteger = "Integer"
-        Public Const FieldTypeNameText = "Text"
-        Public Const FieldTypeNameLongText = "LongText"
-        Public Const FieldTypeNameBoolean = "Boolean"
-        Public Const FieldTypeNameDate = "Date"
-        Public Const FieldTypeNameFile = "File"
-        Public Const FieldTypeNameLookup = "Lookup"
-        Public Const FieldTypeNameRedirect = "Redirect"
-        Public Const FieldTypeNameCurrency = "Currency"
-        Public Const FieldTypeNameImage = "Image"
-        Public Const FieldTypeNameFloat = "Float"
-        Public Const FieldTypeNameManyToMany = "ManyToMany"
-        Public Const FieldTypeNameTextFile = "TextFile"
-        Public Const FieldTypeNameCSSFile = "CSSFile"
-        Public Const FieldTypeNameXMLFile = "XMLFile"
-        Public Const FieldTypeNameJavascriptFile = "JavascriptFile"
-        Public Const FieldTypeNameLink = "Link"
-        Public Const FieldTypeNameResourceLink = "ResourceLink"
-        Public Const FieldTypeNameMemberSelect = "MemberSelect"
-        Public Const FieldTypeNameHTML = "HTML"
-        Public Const FieldTypeNameHTMLFile = "HTMLFile"
+        Public Const FieldTypeNameInteger As String = "Integer"
+        Public Const FieldTypeNameText As String = "Text"
+        Public Const FieldTypeNameLongText As String = "LongText"
+        Public Const FieldTypeNameBoolean As String = "Boolean"
+        Public Const FieldTypeNameDate As String = "Date"
+        Public Const FieldTypeNameFile As String = "File"
+        Public Const FieldTypeNameLookup As String = "Lookup"
+        Public Const FieldTypeNameRedirect As String = "Redirect"
+        Public Const FieldTypeNameCurrency As String = "Currency"
+        Public Const FieldTypeNameImage As String = "Image"
+        Public Const FieldTypeNameFloat As String = "Float"
+        Public Const FieldTypeNameManyToMany As String = "ManyToMany"
+        Public Const FieldTypeNameTextFile As String = "TextFile"
+        Public Const FieldTypeNameCSSFile As String = "CSSFile"
+        Public Const FieldTypeNameXMLFile As String = "XMLFile"
+        Public Const FieldTypeNameJavascriptFile As String = "JavascriptFile"
+        Public Const FieldTypeNameLink As String = "Link"
+        Public Const FieldTypeNameResourceLink As String = "ResourceLink"
+        Public Const FieldTypeNameMemberSelect As String = "MemberSelect"
+        Public Const FieldTypeNameHTML As String = "HTML"
+        Public Const FieldTypeNameHTMLFile As String = "HTMLFile"
         '
-        Public Const FieldTypeNameLcaseInteger = "integer"
-        Public Const FieldTypeNameLcaseText = "text"
-        Public Const FieldTypeNameLcaseLongText = "longtext"
-        Public Const FieldTypeNameLcaseBoolean = "boolean"
-        Public Const FieldTypeNameLcaseDate = "date"
-        Public Const FieldTypeNameLcaseFile = "file"
-        Public Const FieldTypeNameLcaseLookup = "lookup"
-        Public Const FieldTypeNameLcaseRedirect = "redirect"
-        Public Const FieldTypeNameLcaseCurrency = "currency"
-        Public Const FieldTypeNameLcaseImage = "image"
-        Public Const FieldTypeNameLcaseFloat = "float"
-        Public Const FieldTypeNameLcaseManyToMany = "manytomany"
-        Public Const FieldTypeNameLcaseTextFile = "textfile"
-        Public Const FieldTypeNameLcaseCSSFile = "cssfile"
-        Public Const FieldTypeNameLcaseXMLFile = "xmlfile"
-        Public Const FieldTypeNameLcaseJavascriptFile = "javascriptfile"
-        Public Const FieldTypeNameLcaseLink = "link"
-        Public Const FieldTypeNameLcaseResourceLink = "resourcelink"
-        Public Const FieldTypeNameLcaseMemberSelect = "memberselect"
-        Public Const FieldTypeNameLcaseHTML = "html"
-        Public Const FieldTypeNameLcaseHTMLFile = "htmlfile"
+        Public Const FieldTypeNameLcaseInteger As String = "integer"
+        Public Const FieldTypeNameLcaseText As String = "text"
+        Public Const FieldTypeNameLcaseLongText As String = "longtext"
+        Public Const FieldTypeNameLcaseBoolean As String = "boolean"
+        Public Const FieldTypeNameLcaseDate As String = "date"
+        Public Const FieldTypeNameLcaseFile As String = "file"
+        Public Const FieldTypeNameLcaseLookup As String = "lookup"
+        Public Const FieldTypeNameLcaseRedirect As String = "redirect"
+        Public Const FieldTypeNameLcaseCurrency As String = "currency"
+        Public Const FieldTypeNameLcaseImage As String = "image"
+        Public Const FieldTypeNameLcaseFloat As String = "float"
+        Public Const FieldTypeNameLcaseManyToMany As String = "manytomany"
+        Public Const FieldTypeNameLcaseTextFile As String = "textfile"
+        Public Const FieldTypeNameLcaseCSSFile As String = "cssfile"
+        Public Const FieldTypeNameLcaseXMLFile As String = "xmlfile"
+        Public Const FieldTypeNameLcaseJavascriptFile As String = "javascriptfile"
+        Public Const FieldTypeNameLcaseLink As String = "link"
+        Public Const FieldTypeNameLcaseResourceLink As String = "resourcelink"
+        Public Const FieldTypeNameLcaseMemberSelect As String = "memberselect"
+        Public Const FieldTypeNameLcaseHTML As String = "html"
+        Public Const FieldTypeNameLcaseHTMLFile As String = "htmlfile"
         '
         '------------------------------------------------------------------------
         ' ----- Payment Options
@@ -680,71 +683,71 @@ Namespace Contensive.Core
         '   project width button defintions
         '------------------------------------------------------------------------
         '
-        Public Const ButtonApply = "  Apply "
-        Public Const ButtonLogin = "  Login  "
-        Public Const ButtonLogout = "  Logout  "
-        Public Const ButtonSendPassword = "  Send Password  "
-        Public Const ButtonJoin = "   Join   "
-        Public Const ButtonSave = "  Save  "
-        Public Const ButtonOK = "     OK     "
-        Public Const ButtonReset = "  Reset  "
-        Public Const ButtonSaveAddNew = " Save + Add "
-        'Public Const ButtonSaveAddNew = " Save > Add "
-        'Public Const ButtonCancel = " Cancel "
-        Public Const ButtonRestartContensiveApplication = " Restart Contensive Application "
-        Public Const ButtonCancelAll = "  Cancel  "
-        Public Const ButtonFind = "   Find   "
-        Public Const ButtonDelete = "  Delete  "
-        Public Const ButtonDeletePerson = " Delete Person "
-        Public Const ButtonDeleteRecord = " Delete Record "
-        Public Const ButtonDeleteEmail = " Delete Email "
-        Public Const ButtonDeletePage = " Delete Page "
-        Public Const ButtonFileChange = "   Upload   "
-        Public Const ButtonFileDelete = "    Delete    "
-        Public Const ButtonClose = "  Close   "
-        Public Const ButtonAdd = "   Add    "
-        Public Const ButtonAddChildPage = " Add Child "
-        Public Const ButtonAddSiblingPage = " Add Sibling "
-        Public Const ButtonContinue = " Continue >> "
-        Public Const ButtonBack = "  << Back  "
-        Public Const ButtonNext = "   Next   "
-        Public Const ButtonPrevious = " Previous "
-        Public Const ButtonFirst = "  First   "
-        Public Const ButtonSend = "  Send   "
-        Public Const ButtonSendTest = "Send Test"
-        Public Const ButtonCreateDuplicate = " Create Duplicate "
-        Public Const ButtonActivate = "  Activate   "
-        Public Const ButtonDeactivate = "  Deactivate   "
-        Public Const ButtonOpenActiveEditor = "Active Edit"
-        'Public Const ButtonPublish = " Publish Changes "
-        'Public Const ButtonAbortEdit = " Abort Edits "
-        'Public Const ButtonPublishSubmit = " Submit for Publishing "
-        'Public Const ButtonPublishApprove = " Approve for Publishing "
-        'Public Const ButtonPublishDeny = " Deny for Publishing "
-        'Public Const ButtonWorkflowPublishApproved = " Publish Approved Records "
-        'Public Const ButtonWorkflowPublishSelected = " Publish Selected Records "
-        Public Const ButtonSetHTMLEdit = " Edit WYSIWYG "
-        Public Const ButtonSetTextEdit = " Edit HTML "
-        Public Const ButtonRefresh = " Refresh "
-        Public Const ButtonOrder = " Order "
-        Public Const ButtonSearch = " Search "
-        Public Const ButtonSpellCheck = " Spell Check "
-        Public Const ButtonLibraryUpload = " Upload "
-        Public Const ButtonCreateReport = " Create Report "
-        Public Const ButtonClearTrapLog = " Clear Trap Log "
-        Public Const ButtonNewSearch = " New Search "
-        Public Const ButtonSaveandInvalidateCache = " Save and Invalidate Cache "
-        Public Const ButtonImportTemplates = " Import Templates "
-        Public Const ButtonRSSRefresh = " Update RSS Feeds Now "
-        Public Const ButtonRequestDownload = " Request Download "
-        Public Const ButtonFinish = " Finish "
-        Public Const ButtonRegister = " Register "
-        Public Const ButtonBegin = "Begin"
-        Public Const ButtonAbort = "Abort"
-        Public Const ButtonCreateGUID = " Create GUID "
-        Public Const ButtonEnable = " Enable "
-        Public Const ButtonDisable = " Disable "
-        Public Const ButtonMarkReviewed = " Mark Reviewed "
+        Public Const ButtonApply As String = "  Apply "
+        Public Const ButtonLogin As String = "  Login  "
+        Public Const ButtonLogout As String = "  Logout  "
+        Public Const ButtonSendPassword As String = "  Send Password  "
+        Public Const ButtonJoin As String = "   Join   "
+        Public Const ButtonSave As String = "  Save  "
+        Public Const ButtonOK As String = "     OK     "
+        Public Const ButtonReset As String = "  Reset  "
+        Public Const ButtonSaveAddNew As String = " Save + Add "
+        'Public Const ButtonSaveAddNew As String = " Save > Add "
+        'Public Const ButtonCancel As String = " Cancel "
+        Public Const ButtonRestartContensiveApplication As String = " Restart Contensive Application "
+        Public Const ButtonCancelAll As String = "  Cancel  "
+        Public Const ButtonFind As String = "   Find   "
+        Public Const ButtonDelete As String = "  Delete  "
+        Public Const ButtonDeletePerson As String = " Delete Person "
+        Public Const ButtonDeleteRecord As String = " Delete Record "
+        Public Const ButtonDeleteEmail As String = " Delete Email "
+        Public Const ButtonDeletePage As String = " Delete Page "
+        Public Const ButtonFileChange As String = "   Upload   "
+        Public Const ButtonFileDelete As String = "    Delete    "
+        Public Const ButtonClose As String = "  Close   "
+        Public Const ButtonAdd As String = "   Add    "
+        Public Const ButtonAddChildPage As String = " Add Child "
+        Public Const ButtonAddSiblingPage As String = " Add Sibling "
+        Public Const ButtonContinue As String = " Continue >> "
+        Public Const ButtonBack As String = "  << Back  "
+        Public Const ButtonNext As String = "   Next   "
+        Public Const ButtonPrevious As String = " Previous "
+        Public Const ButtonFirst As String = "  First   "
+        Public Const ButtonSend As String = "  Send   "
+        Public Const ButtonSendTest As String = "Send Test"
+        Public Const ButtonCreateDuplicate As String = " Create Duplicate "
+        Public Const ButtonActivate As String = "  Activate   "
+        Public Const ButtonDeactivate As String = "  Deactivate   "
+        Public Const ButtonOpenActiveEditor As String = "Active Edit"
+        'Public Const ButtonPublish As String = " Publish Changes "
+        'Public Const ButtonAbortEdit As String = " Abort Edits "
+        'Public Const ButtonPublishSubmit As String = " Submit for Publishing "
+        'Public Const ButtonPublishApprove As String = " Approve for Publishing "
+        'Public Const ButtonPublishDeny As String = " Deny for Publishing "
+        'Public Const ButtonWorkflowPublishApproved As String = " Publish Approved Records "
+        'Public Const ButtonWorkflowPublishSelected As String = " Publish Selected Records "
+        Public Const ButtonSetHTMLEdit As String = " Edit WYSIWYG "
+        Public Const ButtonSetTextEdit As String = " Edit HTML "
+        Public Const ButtonRefresh As String = " Refresh "
+        Public Const ButtonOrder As String = " Order "
+        Public Const ButtonSearch As String = " Search "
+        Public Const ButtonSpellCheck As String = " Spell Check "
+        Public Const ButtonLibraryUpload As String = " Upload "
+        Public Const ButtonCreateReport As String = " Create Report "
+        Public Const ButtonClearTrapLog As String = " Clear Trap Log "
+        Public Const ButtonNewSearch As String = " New Search "
+        Public Const ButtonSaveandInvalidateCache As String = " Save and Invalidate Cache "
+        Public Const ButtonImportTemplates As String = " Import Templates "
+        Public Const ButtonRSSRefresh As String = " Update RSS Feeds Now "
+        Public Const ButtonRequestDownload As String = " Request Download "
+        Public Const ButtonFinish As String = " Finish "
+        Public Const ButtonRegister As String = " Register "
+        Public Const ButtonBegin As String = "Begin"
+        Public Const ButtonAbort As String = "Abort"
+        Public Const ButtonCreateGUID As String = " Create GUID "
+        Public Const ButtonEnable As String = " Enable "
+        Public Const ButtonDisable As String = " Disable "
+        Public Const ButtonMarkReviewed As String = " Mark Reviewed "
         '
         '------------------------------------------------------------------------
         '   member actions
@@ -768,12 +771,12 @@ Namespace Contensive.Core
         Public Const NoteFormList = 1
         Public Const NoteFormRead = 2
         '
-        Public Const NoteButtonPrevious = " Previous "
-        Public Const NoteButtonNext = "   Next   "
-        Public Const NoteButtonDelete = "  Delete  "
-        Public Const NoteButtonClose = "  Close   "
+        Public Const NoteButtonPrevious As String = " Previous "
+        Public Const NoteButtonNext As String = "   Next   "
+        Public Const NoteButtonDelete As String = "  Delete  "
+        Public Const NoteButtonClose As String = "  Close   "
         '                       ' Submit button is created in CommonDim, so it is simple
-        Public Const NoteButtonSubmit = "Submit"
+        Public Const NoteButtonSubmit As String = "Submit"
         '
         '-----------------------------------------------------------------------
         ' ----- Admin site storage
@@ -988,80 +991,80 @@ Namespace Contensive.Core
         '   Common RequestName Variables
         '------------------------------------------------------------------------
         '
-        Public Const RequestNameDynamicFormID = "dformid"
+        Public Const RequestNameDynamicFormID As String = "dformid"
         '
-        Public Const RequestNameRunAddon = "addonid"
-        Public Const RequestNameEditReferer = "EditReferer"
-        'Public Const RequestNameRefreshBlock = "ccFormRefreshBlockSN"
-        Public Const RequestNameCatalogOrder = "CatalogOrderID"
-        Public Const RequestNameCatalogCategoryID = "CatalogCatID"
-        Public Const RequestNameCatalogForm = "CatalogFormID"
-        Public Const RequestNameCatalogItemID = "CatalogItemID"
-        Public Const RequestNameCatalogItemAge = "CatalogItemAge"
-        Public Const RequestNameCatalogRecordTop = "CatalogTop"
-        Public Const RequestNameCatalogFeatured = "CatalogFeatured"
-        Public Const RequestNameCatalogSpan = "CatalogSpan"
-        Public Const RequestNameCatalogKeywords = "CatalogKeywords"
-        Public Const RequestNameCatalogSource = "CatalogSource"
+        Public Const RequestNameRunAddon As String = "addonid"
+        Public Const RequestNameEditReferer As String = "EditReferer"
+        'Public Const RequestNameRefreshBlock As String = "ccFormRefreshBlockSN"
+        Public Const RequestNameCatalogOrder As String = "CatalogOrderID"
+        Public Const RequestNameCatalogCategoryID As String = "CatalogCatID"
+        Public Const RequestNameCatalogForm As String = "CatalogFormID"
+        Public Const RequestNameCatalogItemID As String = "CatalogItemID"
+        Public Const RequestNameCatalogItemAge As String = "CatalogItemAge"
+        Public Const RequestNameCatalogRecordTop As String = "CatalogTop"
+        Public Const RequestNameCatalogFeatured As String = "CatalogFeatured"
+        Public Const RequestNameCatalogSpan As String = "CatalogSpan"
+        Public Const RequestNameCatalogKeywords As String = "CatalogKeywords"
+        Public Const RequestNameCatalogSource As String = "CatalogSource"
         '
-        Public Const RequestNameLibraryFileID = "fileEID"
-        Public Const RequestNameDownloadID = "downloadid"
-        Public Const RequestNameLibraryUpload = "LibraryUpload"
-        Public Const RequestNameLibraryName = "LibraryName"
-        Public Const RequestNameLibraryDescription = "LibraryDescription"
+        Public Const RequestNameLibraryFileID As String = "fileEID"
+        Public Const RequestNameDownloadID As String = "downloadid"
+        Public Const RequestNameLibraryUpload As String = "LibraryUpload"
+        Public Const RequestNameLibraryName As String = "LibraryName"
+        Public Const RequestNameLibraryDescription As String = "LibraryDescription"
 
-        Public Const RequestNameRootPage = "RootPageName"
-        Public Const RequestNameRootPageID = "RootPageID"
-        Public Const RequestNameContent = "ContentName"
-        Public Const RequestNameOrderByClause = "OrderByClause"
-        Public Const RequestNameAllowChildPageList = "AllowChildPageList"
+        Public Const RequestNameRootPage As String = "RootPageName"
+        Public Const RequestNameRootPageID As String = "RootPageID"
+        Public Const RequestNameContent As String = "ContentName"
+        Public Const RequestNameOrderByClause As String = "OrderByClause"
+        Public Const RequestNameAllowChildPageList As String = "AllowChildPageList"
         '
-        Public Const RequestNameCRKey = "crkey"
-        Public Const RequestNameAdminForm = "af"
-        Public Const RequestNameAdminSubForm = "subform"
-        Public Const RequestNameButton = "button"
-        Public Const RequestNameAdminSourceForm = "asf"
-        Public Const RequestNameAdminFormSpelling = "SpellingRequest"
-        Public Const RequestNameInlineStyles = "InlineStyles"
-        Public Const RequestNameAllowCSSReset = "AllowCSSReset"
+        Public Const RequestNameCRKey As String = "crkey"
+        Public Const RequestNameAdminForm As String = "af"
+        Public Const RequestNameAdminSubForm As String = "subform"
+        Public Const RequestNameButton As String = "button"
+        Public Const RequestNameAdminSourceForm As String = "asf"
+        Public Const RequestNameAdminFormSpelling As String = "SpellingRequest"
+        Public Const RequestNameInlineStyles As String = "InlineStyles"
+        Public Const RequestNameAllowCSSReset As String = "AllowCSSReset"
         '
-        Public Const RequestNameReportForm = "rid"
+        Public Const RequestNameReportForm As String = "rid"
         '
-        Public Const RequestNameToolContentID = "ContentID"
+        Public Const RequestNameToolContentID As String = "ContentID"
         '
-        Public Const RequestNameCut = "a904o2pa0cut"
-        Public Const RequestNamePaste = "dp29a7dsa6paste"
-        Public Const RequestNamePasteParentContentID = "dp29a7dsa6cid"
-        Public Const RequestNamePasteParentRecordID = "dp29a7dsa6rid"
-        Public Const RequestNamePasteFieldList = "dp29a7dsa6key"
-        Public Const RequestNameCutClear = "dp29a7dsa6clear"
+        Public Const RequestNameCut As String = "a904o2pa0cut"
+        Public Const RequestNamePaste As String = "dp29a7dsa6paste"
+        Public Const RequestNamePasteParentContentID As String = "dp29a7dsa6cid"
+        Public Const RequestNamePasteParentRecordID As String = "dp29a7dsa6rid"
+        Public Const RequestNamePasteFieldList As String = "dp29a7dsa6key"
+        Public Const RequestNameCutClear As String = "dp29a7dsa6clear"
         '
-        Public Const RequestNameRequestBinary = "RequestBinary"
+        Public Const RequestNameRequestBinary As String = "RequestBinary"
         ' removed -- this was an old method of blocking form input for file uploads
-        'Public Const RequestNameFormBlock = "RB"
-        Public Const RequestNameJSForm = "RequestJSForm"
-        Public Const RequestNameJSProcess = "ProcessJSForm"
+        'Public Const RequestNameFormBlock As String = "RB"
+        Public Const RequestNameJSForm As String = "RequestJSForm"
+        Public Const RequestNameJSProcess As String = "ProcessJSForm"
         '
-        Public Const RequestNameFolderID = "FolderID"
+        Public Const RequestNameFolderID As String = "FolderID"
         '
-        Public Const rnEmailMemberID = "emi8s9Kj"
-        Public Const rnEmailOpenFlag = "eof9as88"
-        Public Const RequestNameEmailOpenCssFlag = "8aa41pM3"
-        Public Const rnEmailClickFlag = "ecf34Msi"
-        Public Const rnEmailBlockRecipientEmail = "9dq8Nh61"
-        Public Const rnEmailBlockRequestDropID = "BlockEmailRequest"
-        Public Const RequestNameVisitTracking = "s9lD1088"
-        Public Const RequestNameBlockContentTracking = "BlockContentTracking"
-        Public Const RequestNameCookieDetectVisitID = "f92vo2a8d"
+        Public Const rnEmailMemberID As String = "emi8s9Kj"
+        Public Const rnEmailOpenFlag As String = "eof9as88"
+        Public Const RequestNameEmailOpenCssFlag As String = "8aa41pM3"
+        Public Const rnEmailClickFlag As String = "ecf34Msi"
+        Public Const rnEmailBlockRecipientEmail As String = "9dq8Nh61"
+        Public Const rnEmailBlockRequestDropID As String = "BlockEmailRequest"
+        Public Const RequestNameVisitTracking As String = "s9lD1088"
+        Public Const RequestNameBlockContentTracking As String = "BlockContentTracking"
+        Public Const RequestNameCookieDetectVisitID As String = "f92vo2a8d"
 
-        Public Const RequestNamePageNumber = "PageNumber"
-        Public Const RequestNamePageSize = "PageSize"
+        Public Const RequestNamePageNumber As String = "PageNumber"
+        Public Const RequestNamePageSize As String = "PageSize"
         '
-        Public Const RequestValueNull = "[NULL]"
+        Public Const RequestValueNull As String = "[NULL]"
         '
-        Public Const SpellCheckUserDictionaryFilename = "SpellCheck\UserDictionary.txt"
+        Public Const SpellCheckUserDictionaryFilename As String = "SpellCheck\UserDictionary.txt"
         '
-        Public Const RequestNameStateString = "vstate"
+        Public Const RequestNameStateString As String = "vstate"
         '
         ' ----- Actions
         '
@@ -1085,8 +1088,8 @@ Namespace Contensive.Core
         '   sitepropertyNames
         '=======================================================================
         '
-        Public Const siteproperty_serverPageDefault_name = "serverPageDefault"
-        Public Const siteproperty_serverPageDefault_defaultValue = "default.aspx"
+        Public Const siteproperty_serverPageDefault_name As String = "serverPageDefault"
+        Public Const siteproperty_serverPageDefault_defaultValue As String = "default.aspx"
         Public Const spAllowPageWithoutSectionDisplay As String = "Allow Page Without Section Display"
         Public Const spAllowPageWithoutSectionDisplay_default As Boolean = True
         Public Const spDefaultRouteAddonId As String = "Default Route AddonId"
@@ -1095,8 +1098,8 @@ Namespace Contensive.Core
         '   content replacements
         '=======================================================================
         '
-        Public Const contentReplaceEscapeStart = "{%"
-        Public Const contentReplaceEscapeEnd = "%}"
+        Public Const contentReplaceEscapeStart As String = "{%"
+        Public Const contentReplaceEscapeEnd As String = "%}"
         '
         Public Class fieldEditorType
             Public fieldId As Integer
@@ -1130,8 +1133,8 @@ Namespace Contensive.Core
         Private TimerStack(TimerStackMax) As TimerStackType
         Private TimerStackCount As Integer
         '
-        Public Const TextSearchStartTagDefault = "<!--TextSearchStart-->"
-        Public Const TextSearchEndTagDefault = "<!--TextSearchEnd-->"
+        Public Const TextSearchStartTagDefault As String = "<!--TextSearchStart-->"
+        Public Const TextSearchEndTagDefault As String = "<!--TextSearchEnd-->"
         '
         '-------------------------------------------------------------------------------------
         '   IPDaemon communication objects
@@ -1162,31 +1165,31 @@ Namespace Contensive.Core
         Public Const EmailLogTypeBlockRequest = 5           ' recipient asked us to stop sending email
         Public Const EmailLogTypeImmediateSend = 6        ' Email was dropped
         '
-        Public Const DefaultSpamFooter = "<p>To block future emails from this site, <link>click here</link></p>"
+        Public Const DefaultSpamFooter As String = "<p>To block future emails from this site, <link>click here</link></p>"
         '
-        Public Const FeedbackFormNotSupportedComment = "<!--" & vbCrLf & "Feedback form is not supported in this context" & vbCrLf & "-->"
+        Public Const FeedbackFormNotSupportedComment As String = "<!--" & vbCrLf & "Feedback form is not supported in this context" & vbCrLf & "-->"
         '
         '-------------------------------------------------------------------------------------
         '   Page Content constants
         '-------------------------------------------------------------------------------------
         '
-        Public Const ContentBlockCopyName = "Content Block Copy"
+        Public Const ContentBlockCopyName As String = "Content Block Copy"
         '
-        Public Const BubbleCopy_AdminAddPage = "Use the Add page to create new content records. The save button puts you in edit mode. The OK button creates the record and exits."
-        Public Const BubbleCopy_AdminIndexPage = "Use the Admin Listing page to locate content records through the Admin Site."
-        Public Const BubbleCopy_SpellCheckPage = "Use the Spell Check page to verify and correct spelling throught the content."
-        Public Const BubbleCopy_AdminEditPage = "Use the Edit page to add and modify content."
+        Public Const BubbleCopy_AdminAddPage As String = "Use the Add page to create new content records. The save button puts you in edit mode. The OK button creates the record and exits."
+        Public Const BubbleCopy_AdminIndexPage As String = "Use the Admin Listing page to locate content records through the Admin Site."
+        Public Const BubbleCopy_SpellCheckPage As String = "Use the Spell Check page to verify and correct spelling throught the content."
+        Public Const BubbleCopy_AdminEditPage As String = "Use the Edit page to add and modify content."
         '
         '
-        Public Const TemplateDefaultName = "Default"
-        'Public Const TemplateDefaultBody = "<!--" & vbCrLf & "Default Template - edit this Page Template, or select a different template for your page or section" & vbCrLf & "-->{{DYNAMICMENU?MENU=}}<br>{{CONTENT}}"
-        Public Const TemplateDefaultBody = "" _
+        Public Const TemplateDefaultName As String = "Default"
+        'Public Const TemplateDefaultBody As String = "<!--" & vbCrLf & "Default Template - edit this Page Template, or select a different template for your page or section" & vbCrLf & "-->{{DYNAMICMENU?MENU=}}<br>{{CONTENT}}"
+        Public Const TemplateDefaultBody As String = "" _
             & vbCrLf & vbTab & "<!--" _
             & vbCrLf & vbTab & "Default Template - edit this Page Template, or select a different template for your page or section" _
             & vbCrLf & vbTab & "-->" _
             & vbCrLf & vbTab & "{% {""addon"":{""addon"":""menu"",""menu"":""Default""}} %}" _
             & vbCrLf & vbTab & "{% ""content box"" %}"
-        Public Const TemplateDefaultBodyTag = "<body class=""ccBodyWeb"">"
+        Public Const TemplateDefaultBodyTag As String = "<body class=""ccBodyWeb"">"
         '
         '=======================================================================
         '   Internal Tab interface storage
@@ -1303,13 +1306,13 @@ Namespace Contensive.Core
         '
         ' DTD
         '
-        Public Const DTDDefault = "<!DOCTYPE html>"
+        Public Const DTDDefault As String = "<!DOCTYPE html>"
         '
         ' innova Editor feature list
         '
-        Public Const InnovaEditorFeaturefilename = "innova\EditorConfig.txt"
-        Public Const InnovaEditorFeatureList = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Image,Flash,Media,CustomObject,CustomTag,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor"
-        Public Const InnovaEditorPublicFeatureList = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor"
+        Public Const InnovaEditorFeaturefilename As String = "innova\EditorConfig.txt"
+        Public Const InnovaEditorFeatureList As String = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Image,Flash,Media,CustomObject,CustomTag,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor"
+        Public Const InnovaEditorPublicFeatureList As String = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor"
         ''
         '' Content Type
         ''
@@ -1326,17 +1329,17 @@ Namespace Contensive.Core
         'End Enum
         'Public EditorContext As EditorContextEnum
         ''
-        'Public Const EditorAddonMenuEmailTemplateFilename = "templates/EditorAddonMenuTemplateEmail.js"
-        'Public Const EditorAddonMenuEmailContentFilename = "templates/EditorAddonMenuContentEmail.js"
-        'Public Const EditorAddonMenuWebTemplateFilename = "templates/EditorAddonMenuTemplateWeb.js"
-        'Public Const EditorAddonMenuWebContentFilename = "templates/EditorAddonMenuContentWeb.js"
+        'Public Const EditorAddonMenuEmailTemplateFilename As String = "templates/EditorAddonMenuTemplateEmail.js"
+        'Public Const EditorAddonMenuEmailContentFilename As String = "templates/EditorAddonMenuContentEmail.js"
+        'Public Const EditorAddonMenuWebTemplateFilename As String = "templates/EditorAddonMenuTemplateWeb.js"
+        'Public Const EditorAddonMenuWebContentFilename As String = "templates/EditorAddonMenuContentWeb.js"
         '
-        Public Const DynamicStylesFilename = "templates/styles.css"
-        Public Const AdminSiteStylesFilename = "templates/AdminSiteStyles.css"
-        Public Const EditorStyleRulesFilenamePattern = "templates/EditorStyleRules$TemplateID$.js"
+        Public Const DynamicStylesFilename As String = "templates/styles.css"
+        Public Const AdminSiteStylesFilename As String = "templates/AdminSiteStyles.css"
+        Public Const EditorStyleRulesFilenamePattern As String = "templates/EditorStyleRules$TemplateID$.js"
         ' deprecated 11/24/3009 - StyleRules destinction between web/email not needed b/c body background blocked
-        'Public Const EditorStyleWebRulesFilename = "templates/EditorStyleWebRules.js"
-        'Public Const EditorStyleEmailRulesFilename = "templates/EditorStyleEmailRules.js"
+        'Public Const EditorStyleWebRulesFilename As String = "templates/EditorStyleWebRules.js"
+        'Public Const EditorStyleEmailRulesFilename As String = "templates/EditorStyleEmailRules.js"
         '
         ' ----- ccGroupRules storage for list of Content that a group can author
         '
@@ -1349,13 +1352,13 @@ Namespace Contensive.Core
         '
         ' ----- This should match the Lookup List in the NavIconType field in the Navigator Entry content definition
         '
-        Public Const navTypeIDList = "Add-on,Report,Setting,Tool"
+        Public Const navTypeIDList As String = "Add-on,Report,Setting,Tool"
         Public Const NavTypeIDAddon = 1
         Public Const NavTypeIDReport = 2
         Public Const NavTypeIDSetting = 3
         Public Const NavTypeIDTool = 4
         '
-        Public Const NavIconTypeList = "Custom,Advanced,Content,Folder,Email,User,Report,Setting,Tool,Record,Addon,help"
+        Public Const NavIconTypeList As String = "Custom,Advanced,Content,Folder,Email,User,Report,Setting,Tool,Record,Addon,help"
         Public Const NavIconTypeCustom = 1
         Public Const NavIconTypeAdvanced = 2
         Public Const NavIconTypeContent = 3
@@ -1485,16 +1488,16 @@ Namespace Contensive.Core
         '
         ' addonIncludeRules cache
         '
-        Public Const cache_addonIncludeRules_cacheName = "cache_addonIncludeRules"
-        Public Const cache_addonIncludeRules_fieldList = "addonId,includedAddonId"
+        Public Const cache_addonIncludeRules_cacheName As String = "cache_addonIncludeRules"
+        Public Const cache_addonIncludeRules_fieldList As String = "addonId,includedAddonId"
         Public Const addonIncludeRulesCache_addonId = 0
         Public Const addonIncludeRulesCache_includedAddonId = 1
         Public Const addonIncludeRulesCacheColCnt = 2
         '
         ' addonIncludeRules cache
         '
-        Public Const cache_LibraryFiles_cacheName = "cache_LibraryFiles"
-        Public Const cache_LibraryFiles_fieldList = "id,ccguid,clicks,filename,width,height,AltText,altsizelist"
+        Public Const cache_LibraryFiles_cacheName As String = "cache_LibraryFiles"
+        Public Const cache_LibraryFiles_fieldList As String = "id,ccguid,clicks,filename,width,height,AltText,altsizelist"
         Public Const LibraryFilesCache_Id = 0
         Public Const LibraryFilesCache_ccGuid = 1
         Public Const LibraryFilesCache_clicks = 2
@@ -1507,13 +1510,13 @@ Namespace Contensive.Core
         '
         ' link forward cache
         '
-        Public Const cache_linkForward_cacheName = "cache_linkForward"
+        Public Const cache_linkForward_cacheName As String = "cache_linkForward"
         '
-        Public Const main_cookieNameVisit = "visit"
-        Public Const main_cookieNameVisitor = "visitor"
-        Public Const html_quickEdit_fpo = "<quickeditor>"
+        Public Const main_cookieNameVisit As String = "visit"
+        Public Const main_cookieNameVisitor As String = "visitor"
+        Public Const html_quickEdit_fpo As String = "<quickeditor>"
         '
-        'Public Const sqlAddonStyles As String = "select addonid,styleid from ccSharedStylesAddonRules where (active<>0) order by id"
+        'Public Const sqlAddonStyles  As String  = "select addonid,styleid from ccSharedStylesAddonRules where (active<>0) order by id"
         '
         Public Const cacheNameAddonStyleRules As String = "addon styles"
         '
@@ -1815,46 +1818,46 @@ Namespace Contensive.Core
         '   Messages
         '-----------------------------------------------------------------------
         '
-        Public Const Msg_AuthoringDeleted = "<b>Record Deleted</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_AuthoringDeleted As String = "<b>Record Deleted</b><br>" & SpanClassAdminSmall _
                                                 & "This record was deleted and will be removed when publishing is complete.</SPAN>"
-        Public Const Msg_AuthoringInserted = "<b>Record Added</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_AuthoringInserted As String = "<b>Record Added</b><br>" & SpanClassAdminSmall _
                                                 & "This record was added and will display when publishing is complete.</span>"
-        Public Const Msg_EditLock = "<b>Edit Locked</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_EditLock As String = "<b>Edit Locked</b><br>" & SpanClassAdminSmall _
                                                 & "This record is currently being edited by <EDITNAME>.<br>" _
                                                 & "This lock will be released when the user releases the record, or at <EDITEXPIRES> (about <EDITEXPIRESMINUTES> minutes).</span>"
-        Public Const Msg_WorkflowDisabled = "<b>Immediate Authoring</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_WorkflowDisabled As String = "<b>Immediate Authoring</b><br>" & SpanClassAdminSmall _
                                                 & "Changes made will be reflected on the web site immediately.</span>"
-        Public Const Msg_ContentWorkflowDisabled = "<b>Immediate Authoring Content Definition</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_ContentWorkflowDisabled As String = "<b>Immediate Authoring Content Definition</b><br>" & SpanClassAdminSmall _
                                                 & "Changes made will be reflected on the web site immediately.</span>"
-        Public Const Msg_AuthoringRecordNotModifed = "" & SpanClassAdminSmall _
+        Public Const Msg_AuthoringRecordNotModifed As String = "" & SpanClassAdminSmall _
                                                 & "No changes have been saved to this record.</span>"
-        Public Const Msg_AuthoringRecordModifed = "<b>Edits Pending</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_AuthoringRecordModifed As String = "<b>Edits Pending</b><br>" & SpanClassAdminSmall _
                                                 & "This record has been edited by <EDITNAME>.<br>" _
                                                 & "To publish these edits, submit for publishing, or have an administrator 'Publish Changes'.</span>"
-        Public Const Msg_AuthoringRecordModifedAdmin = "<b>Edits Pending</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_AuthoringRecordModifedAdmin As String = "<b>Edits Pending</b><br>" & SpanClassAdminSmall _
                                                 & "This record has been edited by <EDITNAME>.<br>" _
                                                 & "To publish these edits immediately, hit 'Publish Changes'.<br>" _
                                                 & "To submit these changes for workflow publishing, hit 'Submit for Publishing'.</span>"
-        Public Const Msg_AuthoringSubmitted = "<b>Edits Submitted for Publishing</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_AuthoringSubmitted As String = "<b>Edits Submitted for Publishing</b><br>" & SpanClassAdminSmall _
                                                 & "This record has been edited and was submitted for publishing by <EDITNAME>.</span>"
-        Public Const Msg_AuthoringSubmittedAdmin = "<b>Edits Submitted for Publishing</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_AuthoringSubmittedAdmin As String = "<b>Edits Submitted for Publishing</b><br>" & SpanClassAdminSmall _
                                                 & "This record has been edited and was submitted for publishing by <EDITNAME>.<br>" _
                                                 & "As an administrator, you can make changes to this submitted record.<br>" _
                                                 & "To publish these edits immediately, hit 'Publish Changes'.<br>" _
                                                 & "To deny these edits, hit 'Abort Edits'.<br>" _
                                                 & "To approve these edits for workflow publishing, hit 'Approve for Publishing'." _
                                                 & "</span>"
-        Public Const Msg_AuthoringApproved = "<b>Edits Approved for Publishing</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_AuthoringApproved As String = "<b>Edits Approved for Publishing</b><br>" & SpanClassAdminSmall _
                                                 & "This record has been edited and approved for publishing.<br>" _
                                                 & "No further changes can be made to this record until an administrator publishs, or aborts publishing." _
                                                 & "</span>"
-        Public Const Msg_AuthoringApprovedAdmin = "<b>Edits Approved for Publishing</b><br>" & SpanClassAdminSmall _
+        Public Const Msg_AuthoringApprovedAdmin As String = "<b>Edits Approved for Publishing</b><br>" & SpanClassAdminSmall _
                                                 & "This record has been edited and approved for publishing.<br>" _
                                                 & "No further changes can be made to this record until an administrator publishs, or aborts publishing.<br>" _
                                                 & "To publish these edits immediately, hit 'Publish Changes'.<br>" _
                                                 & "To deny these edits, hit 'Abort Edits'." _
                                                 & "</span>"
-        Public Const Msg_AuthoringSubmittedNotification = "The following Content has been submitted for publication. Instructions on how to publish this content to web site are at the bottom of this message.<br>" _
+        Public Const Msg_AuthoringSubmittedNotification As String = "The following Content has been submitted for publication. Instructions on how to publish this content to web site are at the bottom of this message.<br>" _
                                                 & "<br>" _
                                                 & "website: <DOMAINNAME><br>" _
                                                 & "Name: <RECORDNAME><br>" _
@@ -1872,25 +1875,25 @@ Namespace Contensive.Core
         '& "<p>To publish this content immediately, click on the website link above and locate this record in the list of modified records presented. his content has been modified and was submitted for publication by the individual shown above. Click the 'Admin Site' link to edit the record, and hit the publish button.</p>" _
         '& "<p>To approved this record for workflow publishing, locate the record as described above, and hit the 'Approve for Publishing' button.</p>" _
         '& "<p>To publish all content records approved, go to the Workflow Publishing Screen (on the Administration Menu or the Administration Site) and hit the 'Publish Approved Records' button.</p>"
-        Public Const PageNotAvailable_Msg = "This page is not currently available. <br>" _
+        Public Const PageNotAvailable_Msg As String = "This page is not currently available. <br>" _
                             & "Please use your back button to return to the previous page. <br>"
-        Public Const NewPage_Msg = ""
+        Public Const NewPage_Msg As String = ""
         '
         'Public Const htmlDoc_JavaStreamChunk = 100
         'Public Const htmlDoc_OutStreamStandard = 0
         'Public Const htmlDoc_OutStreamJavaScript = 1
-        Public Const main_BakeHeadDelimiter = "#####MultilineFlag#####"
+        Public Const main_BakeHeadDelimiter As String = "#####MultilineFlag#####"
         Public Const navStruc_Descriptor = 1           ' Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page
         Public Const navStruc_Descriptor_CurrentPage = 2
         Public Const navStruc_Descriptor_ChildPage = 3
         Public Const navStruc_TemplateId = 7
-        Public Const blockMessageDefault = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
+        Public Const blockMessageDefault As String = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
         Public Const main_BlockSourceDefaultMessage = 0
         Public Const main_BlockSourceCustomMessage = 1
         Public Const main_BlockSourceLogin = 2
         Public Const main_BlockSourceRegistration = 3
-        Public Const main_FieldDelimiter = " , "
-        Public Const main_LineDelimiter = " ,, "
+        Public Const main_FieldDelimiter As String = " , "
+        Public Const main_LineDelimiter As String = " ,, "
         Public Const main_IPosType = 0
         Public Const main_IPosCaption = 1
         Public Const main_IPosRequired = 2

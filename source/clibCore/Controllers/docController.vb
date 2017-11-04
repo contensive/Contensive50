@@ -426,7 +426,7 @@ Namespace Contensive.Core.Controllers
                 Call Me.cpcore.db.csClose(CS)
                 '
                 If Me.cpcore.visitProperty.getBoolean("AllowAdvancedEditor") Then
-                    result = Me.cpcore.html.main_GetEditWrapper("Watch List [" & ListName & "]", result)
+                    result = Me.cpcore.html.getEditWrapper("Watch List [" & ListName & "]", result)
                 End If
             Catch ex As Exception
                 Me.cpcore.handleException(ex)
@@ -483,7 +483,7 @@ Namespace Contensive.Core.Controllers
                 Dim ApprovedDate As Date
                 Dim ModifiedDate As Date
                 '
-                Call cpcore.html.addHeadStyleLink("/quickEditor/styles.css", "Quick Editor")
+                Call cpcore.html.addStyleLink("/quickEditor/styles.css", "Quick Editor")
                 '
                 ' ----- First Active Record - Output Quick Editor form
                 '
@@ -774,7 +774,7 @@ Namespace Contensive.Core.Controllers
                     Dim page As pageContentModel = pageContentModel.create(cpcore, RecordID)
                     If (page IsNot Nothing) Then
                         Copy = cpcore.docProperties.getText("copyFilename")
-                        Copy = cpcore.html.decodeContent(Copy)
+                        Copy = cpcore.html.convertEditorResponseToActiveContent(Copy)
                         If Copy <> page.Copyfilename.content Then
                             page.Copyfilename.content = Copy
                             SaveButNoChanges = False
@@ -915,60 +915,49 @@ Namespace Contensive.Core.Controllers
         Public Function getChildPageList(ByVal RequestedListName As String, ByVal ContentName As String, ByVal parentPageID As Integer, ByVal allowChildListDisplay As Boolean, Optional ByVal ArchivePages As Boolean = False) As String
             Dim result As String = ""
             Try
-                Dim ChildContent As String
-                Dim Brief As String
-                Dim UcaseRequestedListName As String
-                Dim ChildListCount As Integer
-                Dim AddLink As String
-                Dim BlockContentComposite As Boolean
-                Dim Link As String
-                Dim LinkedText As String
-                Dim ActiveList As String = ""
-                Dim InactiveList As String = String.Empty
-                Dim archiveLink As String
-                Dim PageLink As String
-                Dim pageMenuHeadline As String
-                Dim pageEditLink As String
-                Dim isAuthoring = cpcore.authContext.isEditing(pageContentModel.contentName)
+                If (String.IsNullOrEmpty(ContentName)) Then
+                    ContentName = pageContentModel.contentName
+                End If
+                Dim isAuthoring = cpcore.authContext.isEditing(ContentName)
                 '
-                ChildListCount = 0
-                UcaseRequestedListName = genericController.vbUCase(RequestedListName)
+                Dim ChildListCount As Integer = 0
+                Dim UcaseRequestedListName As String = genericController.vbUCase(RequestedListName)
                 If (UcaseRequestedListName = "NONE") Or (UcaseRequestedListName = "ORPHAN") Then
                     UcaseRequestedListName = ""
                 End If
                 '
-                archiveLink = cpcore.webServer.requestPathPage
+                Dim archiveLink As String = cpcore.webServer.requestPathPage
                 archiveLink = genericController.ConvertLinkToShortLink(archiveLink, cpcore.webServer.requestDomain, cpcore.webServer.requestVirtualFilePath)
                 archiveLink = genericController.EncodeAppRootPath(archiveLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
                 '
                 Dim sqlCriteria As String = "(parentId=" & page.id & ")"
                 Dim sqlOrderBy As String = "sortOrder"
                 Dim childPageList As List(Of pageContentModel) = pageContentModel.createList(cpcore, sqlCriteria, sqlOrderBy)
+                Dim inactiveList As String = ""
+                Dim activeList As String = ""
                 For Each childPage As pageContentModel In childPageList
-                    PageLink = getPageLink(childPage.id, "", True, False)
-                    pageMenuHeadline = childPage.MenuHeadline
+                    Dim PageLink As String = getPageLink(childPage.id, "", True, False)
+                    Dim pageMenuHeadline As String = childPage.MenuHeadline
                     If pageMenuHeadline = "" Then
                         pageMenuHeadline = Trim(childPage.name)
                         If pageMenuHeadline = "" Then
                             pageMenuHeadline = "Related Page"
                         End If
                     End If
-                    pageEditLink = ""
+                    Dim pageEditLink As String = ""
                     If cpcore.authContext.isEditing(ContentName) Then
                         pageEditLink = cpcore.html.main_GetRecordEditLink2(ContentName, childPage.id, True, childPage.name, True)
                     End If
                     '
+                    Dim link As String = PageLink
                     If ArchivePages Then
-                        Link = genericController.modifyLinkQuery(archiveLink, rnPageId, CStr(childPage.id), True)
-                    Else
-                        Link = PageLink
+                        link = genericController.modifyLinkQuery(archiveLink, rnPageId, CStr(childPage.id), True)
                     End If
+                    Dim blockContentComposite As Boolean = False
                     If childPage.BlockContent Or childPage.BlockPage Then
-                        BlockContentComposite = Not bypassContentBlock(childPage.ContentControlID, childPage.id)
-                    Else
-                        BlockContentComposite = False
+                        blockContentComposite = Not bypassContentBlock(childPage.ContentControlID, childPage.id)
                     End If
-                    LinkedText = genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML(Link) & """>", pageMenuHeadline)
+                    Dim LinkedText As String = genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML(link) & """>", pageMenuHeadline)
                     If (UcaseRequestedListName = "") And (childPage.ParentListName <> "") And (Not isAuthoring) Then
                         '
                         ' ----- Requested orphan list, and this record is in a named list, and not editing, do not display
@@ -978,10 +967,10 @@ Namespace Contensive.Core.Controllers
                         ' ----- Requested orphan list, and this record is in a named list, but authoring, list it
                         '
                         If isAuthoring Then
-                            InactiveList = InactiveList & cr & "<li name=""page" & childPage.id & """ name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
-                            InactiveList = InactiveList & pageEditLink
-                            InactiveList = InactiveList & "[from Child Page List '" & childPage.ParentListName & "': " & LinkedText & "]"
-                            InactiveList = InactiveList & "</li>"
+                            inactiveList = inactiveList & cr & "<li name=""page" & childPage.id & """ name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
+                            inactiveList = inactiveList & pageEditLink
+                            inactiveList = inactiveList & "[from Child Page List '" & childPage.ParentListName & "': " & LinkedText & "]"
+                            inactiveList = inactiveList & "</li>"
                         End If
                     ElseIf (UcaseRequestedListName = "") And (Not allowChildListDisplay) And (Not isAuthoring) Then
                         '
@@ -996,59 +985,59 @@ Namespace Contensive.Core.Controllers
                         ' ----- Allow in Child Page Lists is false, display hint to authors
                         '
                         If isAuthoring Then
-                            InactiveList = InactiveList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
-                            InactiveList = InactiveList & pageEditLink
-                            InactiveList = InactiveList & "[Hidden (Allow in Child Lists is not checked): " & LinkedText & "]"
-                            InactiveList = InactiveList & "</li>"
+                            inactiveList = inactiveList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
+                            inactiveList = inactiveList & pageEditLink
+                            inactiveList = inactiveList & "[Hidden (Allow in Child Lists is not checked): " & LinkedText & "]"
+                            inactiveList = inactiveList & "</li>"
                         End If
                     ElseIf Not childPage.Active Then
                         '
                         ' ----- Not active record, display hint if authoring
                         '
                         If isAuthoring Then
-                            InactiveList = InactiveList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
-                            InactiveList = InactiveList & pageEditLink
-                            InactiveList = InactiveList & "[Hidden (Inactive): " & LinkedText & "]"
-                            InactiveList = InactiveList & "</li>"
+                            inactiveList = inactiveList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
+                            inactiveList = inactiveList & pageEditLink
+                            inactiveList = inactiveList & "[Hidden (Inactive): " & LinkedText & "]"
+                            inactiveList = inactiveList & "</li>"
                         End If
                     ElseIf (childPage.PubDate <> Date.MinValue) And (childPage.PubDate > cpcore.profileStartTime) Then
                         '
                         ' ----- Child page has not been published
                         '
                         If isAuthoring Then
-                            InactiveList = InactiveList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
-                            InactiveList = InactiveList & pageEditLink
-                            InactiveList = InactiveList & "[Hidden (To be published " & childPage.PubDate & "): " & LinkedText & "]"
-                            InactiveList = InactiveList & "</li>"
+                            inactiveList = inactiveList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
+                            inactiveList = inactiveList & pageEditLink
+                            inactiveList = inactiveList & "[Hidden (To be published " & childPage.PubDate & "): " & LinkedText & "]"
+                            inactiveList = inactiveList & "</li>"
                         End If
                     ElseIf (childPage.DateExpires <> Date.MinValue) And (childPage.DateExpires < cpcore.profileStartTime) Then
                         '
                         ' ----- Child page has expired
                         '
                         If isAuthoring Then
-                            InactiveList = InactiveList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
-                            InactiveList = InactiveList & pageEditLink
-                            InactiveList = InactiveList & "[Hidden (Expired " & childPage.DateExpires & "): " & LinkedText & "]"
-                            InactiveList = InactiveList & "</li>"
+                            inactiveList = inactiveList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
+                            inactiveList = inactiveList & pageEditLink
+                            inactiveList = inactiveList & "[Hidden (Expired " & childPage.DateExpires & "): " & LinkedText & "]"
+                            inactiveList = inactiveList & "</li>"
                         End If
                     Else
                         '
                         ' ----- display list (and authoring links)
                         '
-                        ActiveList = ActiveList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
+                        activeList = activeList & cr & "<li name=""page" & childPage.id & """  id=""page" & childPage.id & """ class=""ccListItem"">"
                         If pageEditLink <> "" Then
-                            ActiveList = ActiveList & pageEditLink & "&nbsp;"
+                            activeList = activeList & pageEditLink & "&nbsp;"
                         End If
-                        ActiveList = ActiveList & LinkedText
+                        activeList = activeList & LinkedText
                         '
                         ' include authoring mark for content block
                         '
                         If isAuthoring Then
                             If childPage.BlockContent Then
-                                ActiveList = ActiveList & "&nbsp;[Content Blocked]"
+                                activeList = activeList & "&nbsp;[Content Blocked]"
                             End If
                             If childPage.BlockPage Then
-                                ActiveList = ActiveList & "&nbsp;[Page Blocked]"
+                                activeList = activeList & "&nbsp;[Page Blocked]"
                             End If
                         End If
                         '
@@ -1056,12 +1045,12 @@ Namespace Contensive.Core.Controllers
                         ' if AllowBrief is false, BriefFilename is not loaded
                         '
                         If (childPage.BriefFilename <> "") And (childPage.AllowBrief) Then
-                            Brief = Trim(cpcore.cdnFiles.readFile(childPage.BriefFilename))
+                            Dim Brief As String = Trim(cpcore.cdnFiles.readFile(childPage.BriefFilename))
                             If Brief <> "" Then
-                                ActiveList = ActiveList & "<div class=""ccListCopy"">" & Brief & "</div>"
+                                activeList = activeList & "<div class=""ccListCopy"">" & Brief & "</div>"
                             End If
                         End If
-                        ActiveList = ActiveList & "</li>"
+                        activeList = activeList & "</li>"
                         ChildListCount = ChildListCount + 1
                         '.IsDisplayed = True
                     End If
@@ -1070,11 +1059,7 @@ Namespace Contensive.Core.Controllers
                 ' ----- Add Link
                 '
                 If (Not ArchivePages) Then
-                    ChildContent = pageContentModel.contentName
-                    If ChildContent = "" Then
-                        ChildContent = "Page Content"
-                    End If
-                    AddLink = cpcore.html.main_GetRecordAddLink(ChildContent, "parentid=" & parentPageID & ",ParentListName=" & UcaseRequestedListName, True)
+                    Dim AddLink As String = cpcore.html.main_GetRecordAddLink(ContentName, "parentid=" & parentPageID & ",ParentListName=" & UcaseRequestedListName, True)
                     If AddLink <> "" Then
                         InactiveList = InactiveList & cr & "<li class=""ccListItem"">" & AddLink & "</LI>"
                     End If
@@ -2892,9 +2877,9 @@ ErrorTrap:
                 CS = cpcore.db.csOpen("Meta Content", Criteria, , , , ,, FieldList)
                 If cpcore.db.csOk(CS) Then
                     MetaContentID = cpcore.db.csGetInteger(CS, "ID")
-                    Call cpcore.html.doc_AddPagetitle2(genericController.encodeHTML(cpcore.db.csGetText(CS, "Name")), "page content")
-                    Call cpcore.html.doc_addMetaDescription2(genericController.encodeHTML(cpcore.db.csGetText(CS, "MetaDescription")), "page content")
-                    Call cpcore.html.doc_AddHeadTag2(cpcore.db.csGetText(CS, "OtherHeadTags"), "page content")
+                    Call cpcore.html.addTitle(genericController.encodeHTML(cpcore.db.csGetText(CS, "Name")), "page content")
+                    Call cpcore.html.addMetaDescription(genericController.encodeHTML(cpcore.db.csGetText(CS, "MetaDescription")), "page content")
+                    Call cpcore.html.addHeadTag(cpcore.db.csGetText(CS, "OtherHeadTags"), "page content")
                     If True Then
                         KeywordList = genericController.vbReplace(cpcore.db.csGetText(CS, "MetaKeywordList"), vbCrLf, ",")
                     End If
@@ -2921,7 +2906,7 @@ ErrorTrap:
                     End If
                     'KeyWordList = Mid(KeyWordList, 2)
                     KeywordList = genericController.encodeHTML(KeywordList)
-                    Call cpcore.html.doc_addMetaKeywordList2(KeywordList, "page content")
+                    Call cpcore.html.addMetaKeywordList(KeywordList, "page content")
                 End If
                 Call cpcore.db.csClose(CS)
             End If

@@ -257,19 +257,22 @@ Namespace Contensive.Core.Controllers
                         '
                         ' encode subject
                         '
-                        subjectEncoded = cpcore.html.html_executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
-                        subjectEncoded = cpcore.html.encodeContent10(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        subjectEncoded = cpcore.html.executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
+                        subjectEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(subjectEncoded, personId, "")
+                        'subjectEncoded = cpcore.html.convertActiveContent_internal(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode Body
                         '
-                        bodyEncoded = cpcore.html.html_executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
-                        bodyEncoded = cpcore.html.encodeContent10(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        bodyEncoded = cpcore.html.executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
+                        bodyEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(bodyEncoded, personId, "")
+                        'bodyEncoded = cpcore.html.convertActiveContent_internal(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode template
                         '
                         If (templateEncoded <> "") Then
-                            templateEncoded = cpcore.html.html_executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
-                            templateEncoded = cpcore.html.encodeContent10(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                            templateEncoded = cpcore.html.executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
+                            templateEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(templateEncoded, personId, "")
+                            'templateEncoded = cpcore.html.convertActiveContent_internal(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
                                 bodyEncoded = genericController.vbReplace(templateEncoded, fpoContentBox, bodyEncoded)

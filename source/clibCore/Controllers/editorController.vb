@@ -45,7 +45,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' ----- convert editor active edit icons
                     '
-                    ContentCopy = cpCore.html.decodeContent(ContentCopy)
+                    ContentCopy = cpCore.html.convertEditorResponseToActiveContent(ContentCopy)
                     '
                     ' ----- save the content
                     '
@@ -101,7 +101,7 @@ Namespace Contensive.Core.Controllers
                         EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHidden("ID", intRecordId)
                         EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHidden("fn", strFieldName)
                         EditorPanel = EditorPanel & genericController.encodeText(FormElements)
-                        EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHTML3("ContentCopy", Copy, "3", "45", False, True)
+                        EditorPanel = EditorPanel & cpcore.html.getFormInputHTML("ContentCopy", Copy, "3", "45", False, True)
                         'EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
                         ButtonPanel = cpcore.html.main_GetPanelButtons(ButtonCancel & "," & ButtonSave, "button")
                         EditorPanel = EditorPanel & ButtonPanel

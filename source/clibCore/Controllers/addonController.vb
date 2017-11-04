@@ -325,9 +325,33 @@ Namespace Contensive.Core.Controllers
                             result = addon.CopyText & addon.Copy
                             If result <> "" Then
                                 Dim ignoreLayoutErrors As String = String.Empty
-                                result = cpCore.html.html_executeContentCommands(Nothing, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ignoreLayoutErrors)
+                                result = cpCore.html.executeContentCommands(Nothing, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ignoreLayoutErrors)
                             End If
-                            result = cpCore.html.encodeContent10(result, executeContext.personalizationPeopleId, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, 0, False, False, True, True, False, True, "", "", (executeContext.addonType = CPUtilsBaseClass.addonContext.ContextEmail), executeContext.wrapperID, "", executeContext.addonType, executeContext.personalizationAuthenticated, Nothing, False)
+                            Select Case executeContext.addonType
+                                Case CPUtilsBaseClass.addonContext.ContextEditor
+                                    result = cpCore.html.convertActiveContentToHtmlForWysiwygEditor(result)
+                                Case CPUtilsBaseClass.addonContext.ContextEmail
+                                    result = cpCore.html.convertActiveContentToHtmlForEmailSend(result, executeContext.personalizationPeopleId, "")
+                                Case CPUtilsBaseClass.addonContext.ContextFilter,
+                                     CPUtilsBaseClass.addonContext.ContextOnBodyEnd,
+                                     CPUtilsBaseClass.addonContext.ContextOnBodyStart,
+                                     CPUtilsBaseClass.addonContext.ContextOnBodyEnd,
+                                     CPUtilsBaseClass.addonContext.ContextOnPageEnd,
+                                     CPUtilsBaseClass.addonContext.ContextOnPageStart,
+                                     CPUtilsBaseClass.addonContext.ContextPage,
+                                     CPUtilsBaseClass.addonContext.ContextTemplate,
+                                     CPUtilsBaseClass.addonContext.ContextAdmin,
+                                     CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml
+                                    result = cpCore.html.convertActiveContentToHtmlForWebRender(result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType)
+                                Case CPUtilsBaseClass.addonContext.ContextOnContentChange,
+                                     CPUtilsBaseClass.addonContext.ContextSimple
+                                    result = cpCore.html.convertActiveContentToHtmlForWebRender(result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType)
+                                Case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson
+                                    result = cpCore.html.convertActiveContentToJsonForRemoteMethod(result, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType)
+                                Case Else
+                                    result = cpCore.html.convertActiveContentToHtmlForWebRender(result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType)
+                            End Select
+                            'result = cpCore.html.convertActiveContent_internal(result, executeContext.personalizationPeopleId, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, 0, False, False, True, True, False, True, "", "", (executeContext.addonType = CPUtilsBaseClass.addonContext.ContextEmail), executeContext.wrapperID, "", executeContext.addonType, executeContext.personalizationAuthenticated, Nothing, False)
                         End If
                         '
                         ' -- Scripting code
@@ -408,10 +432,10 @@ Namespace Contensive.Core.Controllers
                         If Not cpCore.addonIdListRunInThisDoc.Contains(addon.id) Then
                             cpCore.addonIdListRunInThisDoc.Add(addon.id)
                             Dim AddedByName As String = addon.name & " addon"
-                            Call cpCore.html.doc_AddPagetitle2(addon.PageTitle, AddedByName)
-                            Call cpCore.html.doc_addMetaDescription2(addon.MetaDescription, AddedByName)
-                            Call cpCore.html.doc_addMetaKeywordList2(addon.MetaKeywordList, AddedByName)
-                            Call cpCore.html.doc_AddHeadTag2(addon.OtherHeadTags, AddedByName)
+                            Call cpCore.html.addTitle(addon.PageTitle, AddedByName)
+                            Call cpCore.html.addMetaDescription(addon.MetaDescription, AddedByName)
+                            Call cpCore.html.addMetaKeywordList(addon.MetaKeywordList, AddedByName)
+                            Call cpCore.html.addHeadTag(addon.OtherHeadTags, AddedByName)
                             '
                             ' -- js head links
                             If addon.JSHeadScriptSrc <> "" Then
@@ -433,12 +457,12 @@ Namespace Contensive.Core.Controllers
                             '
                             ' -- styles
                             If addon.StylesFilename.filename <> "" Then
-                                Call cpCore.html.addHeadStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.StylesFilename.filename), addon.name & " Stylesheet")
+                                Call cpCore.html.addStyleLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.StylesFilename.filename), addon.name & " Stylesheet")
                             End If
                             '
                             ' -- link to stylesheet
                             If addon.StylesLinkHref <> "" Then
-                                Call cpCore.html.addHeadStyleLink(addon.StylesLinkHref, addon.name & " Stylesheet Link")
+                                Call cpCore.html.addStyleLink(addon.StylesLinkHref, addon.name & " Stylesheet Link")
                             End If
                         End If
                         '
@@ -505,9 +529,9 @@ Namespace Contensive.Core.Controllers
                                     Dim SiteStylesEditIcon As String = String.Empty ' ?????
                                     Dim ToolBar As String = InstanceSettingsEditIcon & AddonEditIcon & getAddonStylesBubble(addon.id, DialogList) & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
                                     ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
-                                    result = cpCore.html.main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & addon.name & DialogList & "</div>", result)
+                                    result = cpCore.html.getEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & addon.name & DialogList & "</div>", result)
                                 ElseIf cpCore.visitProperty.getBoolean("AllowEditing") Then
-                                    result = cpCore.html.main_GetEditWrapper("<div class=""ccAddonEditCaption"">" & addon.name & "&nbsp;" & HelpIcon & "</div>", result)
+                                    result = cpCore.html.getEditWrapper("<div class=""ccAddonEditCaption"">" & addon.name & "&nbsp;" & HelpIcon & "</div>", result)
                                 End If
                             End If
                         End If
@@ -928,7 +952,7 @@ Namespace Contensive.Core.Controllers
                                                                             Else
                                                                                 FieldValue = cpCore.cdnFiles.readFile(FieldValue)
                                                                                 If FieldHTML Then
-                                                                                    Copy = cpCore.html.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                    Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue)
                                                                                 Else
                                                                                     Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
                                                                                 End If
@@ -964,7 +988,7 @@ Namespace Contensive.Core.Controllers
                                                                                 Copy = FieldValue & tmp
                                                                             Else
                                                                                 If FieldHTML Then
-                                                                                    Copy = cpCore.html.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                    Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue)
                                                                                 Else
                                                                                     Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
                                                                                 End If
@@ -1011,7 +1035,7 @@ Namespace Contensive.Core.Controllers
                                                                     '
                                                                     ' HTML
                                                                     '
-                                                                    Copy = cpCore.html.html_GetFormInputHTML3(FieldName, FieldValue)
+                                                                    Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue)
                                                                     'Copy = cpcore.main_GetFormInputActiveContent( FieldName, FieldValue)
                                                                 Else
                                                                     '
@@ -2786,7 +2810,7 @@ ErrorTrap:
                                                                             Else
                                                                                 FieldValue = cpCore.cdnFiles.readFile(FieldValue)
                                                                                 If FieldHTML Then
-                                                                                    Copy = cpCore.html.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                    Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue)
                                                                                 Else
                                                                                     Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
                                                                                 End If
@@ -2820,7 +2844,7 @@ ErrorTrap:
                                                                                 Copy = FieldValue & cpCore.html.html_GetFormInputHidden(FieldName, FieldValue)
                                                                             Else
                                                                                 If FieldHTML Then
-                                                                                    Copy = cpCore.html.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                    Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue)
                                                                                 Else
                                                                                     Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue)
                                                                                 End If
@@ -2867,7 +2891,7 @@ ErrorTrap:
                                                                     '
                                                                     ' HTML
                                                                     '
-                                                                    Copy = cpCore.html.html_GetFormInputHTML3(FieldName, FieldValue)
+                                                                    Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue)
                                                                     'Copy = cpcore.main_GetFormInputActiveContent( FieldName, FieldValue)
                                                                 Else
                                                                     '
@@ -3402,7 +3426,7 @@ ErrorTrap:
                 End If
                 Call cpCore.html.addOnLoadJs(cpCore.db.csGetText(CS, "javascriptonload"), SourceComment)
                 Call cpCore.html.addBodyJavascriptCode(cpCore.db.csGetText(CS, "javascriptbodyend"), SourceComment)
-                Call cpCore.html.doc_AddHeadTag2(cpCore.db.csGetText(CS, "OtherHeadTags"), SourceComment)
+                Call cpCore.html.addHeadTag(cpCore.db.csGetText(CS, "OtherHeadTags"), SourceComment)
                 '
                 JSFilename = cpCore.db.csGetText(CS, "jsfilename")
                 If JSFilename <> "" Then
@@ -3416,7 +3440,7 @@ ErrorTrap:
                     Else
                         Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
                     End If
-                    Call cpCore.html.addHeadStyleLink(Copy, SourceComment)
+                    Call cpCore.html.addStyleLink(Copy, SourceComment)
                 End If
                 '
                 If Wrapper <> "" Then

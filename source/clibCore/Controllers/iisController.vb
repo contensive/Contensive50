@@ -235,6 +235,9 @@ Namespace Contensive.Core.Controllers
                 For Each key As String In iisContext.Request.Form.Keys
                     Dim keyValue As String = iisContext.Request.Form(key)
                     cpCore.docProperties.setProperty(key, keyValue, True)
+                    If requestFormDict.ContainsKey(keyValue) Then
+                        requestFormDict.Remove(keyValue)
+                    End If
                     requestFormDict.Add(key, keyValue)
                 Next
                 '
@@ -347,7 +350,6 @@ Namespace Contensive.Core.Controllers
                     cpCore.domainLegacyCache.domainDetails.visited = False
                     cpCore.domainLegacyCache.domainDetails.id = 0
                     cpCore.domainLegacyCache.domainDetails.forwardUrl = ""
-                    requestDomain = requestDomain
                     '
                     ' REFACTOR -- move to cpcore.domains class 
                     cpCore.domainLegacyCache.domainDetailsList = cpCore.cache.getObject(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))("domainContentList")
@@ -368,7 +370,13 @@ Namespace Contensive.Core.Controllers
                             domainDetailsNew.defaultTemplateId = domain.DefaultTemplateId
                             domainDetailsNew.pageNotFoundPageId = domain.PageNotFoundPageID
                             domainDetailsNew.forwardDomainId = domain.forwardDomainId
-                            cpCore.domainLegacyCache.domainDetailsList.Add(domain.name.ToLower(), domainDetailsNew)
+                            If (cpCore.domainLegacyCache.domainDetailsList.ContainsKey(domain.name.ToLower())) Then
+                                '
+                                logController.appendLog(cpCore, "Duplicate domain record found when adding domains from table [" & domain.name.ToLower() & "], duplicate skipped.")
+                                '
+                            Else
+                                cpCore.domainLegacyCache.domainDetailsList.Add(domain.name.ToLower(), domainDetailsNew)
+                            End If
                         Next
                         updateDomainCache = True
                     End If
@@ -388,80 +396,19 @@ Namespace Contensive.Core.Controllers
                             domainDetailsNew.defaultTemplateId = 0
                             domainDetailsNew.pageNotFoundPageId = 0
                             domainDetailsNew.forwardDomainId = 0
-                            cpCore.domainLegacyCache.domainDetailsList.Add(domain.ToLower(), domainDetailsNew)
+                            If (cpCore.domainLegacyCache.domainDetailsList.ContainsKey(domain.ToLower())) Then
+                                '
+                                logController.appendLog(cpCore, "Duplicate domain record found when adding appConfig.domainList [" & domain.ToLower() & "], duplicate skipped")
+                                '
+                            Else
+                                cpCore.domainLegacyCache.domainDetailsList.Add(domain.ToLower(), domainDetailsNew)
+                            End If
                         End If
                     Next
-                    If cpCore.domainLegacyCache.domainDetailsList.ContainsKey(requestDomain.ToLower()) Then
+                    If Not cpCore.domainLegacyCache.domainDetailsList.ContainsKey(requestDomain.ToLower()) Then
                         '
-                        ' domain found
-                        '
-                        cpCore.domainLegacyCache.domainDetails = cpCore.domainLegacyCache.domainDetailsList(requestDomain.ToLower())
-                        If (cpCore.domainLegacyCache.domainDetails.id = 0) Then
-                            '
-                            ' this is a default domain or a new domain -- add to the domain table
-                            '
-                            Dim domain As New Models.Entity.domainModel() With {
-                                .name = requestDomain,
-                                .TypeID = 1,
-                                .RootPageID = cpCore.domainLegacyCache.domainDetails.rootPageId,
-                                .ForwardURL = cpCore.domainLegacyCache.domainDetails.forwardUrl,
-                                .NoFollow = cpCore.domainLegacyCache.domainDetails.noFollow,
-                                .Visited = cpCore.domainLegacyCache.domainDetails.visited,
-                                .DefaultTemplateId = cpCore.domainLegacyCache.domainDetails.defaultTemplateId,
-                                .PageNotFoundPageID = cpCore.domainLegacyCache.domainDetails.pageNotFoundPageId
-                            }
-                            cpCore.domainLegacyCache.domainDetails.id = domain.id
-                        End If
-                        If Not cpCore.domainLegacyCache.domainDetails.visited Then
-                            '
-                            ' set visited true
-                            '
-                            Call cpCore.db.executeQuery("update ccdomains set visited=1 where name=" & cpCore.db.encodeSQLText(requestDomain))
-                            Call cpCore.cache.setObject("domainContentList", "", "domains")
-                        End If
-                        If cpCore.domainLegacyCache.domainDetails.typeId = 1 Then
-                            '
-                            ' normal domain, leave it
-                            '
-                        ElseIf genericController.vbInstr(1, requestPathPage, "/" & cpCore.serverconfig.appconfig.adminRoute, vbTextCompare) <> 0 Then
-                            '
-                            ' forwarding does not work in the admin site
-                            '
-                        ElseIf (cpCore.domainLegacyCache.domainDetails.typeId = 2) And (cpCore.domainLegacyCache.domainDetails.forwardUrl <> "") Then
-                            '
-                            ' forward to a URL
-                            '
-                            '
-                            'Call AppendLog("main_init(), 1710 - exit for domain forward")
-                            '
-                            If genericController.vbInstr(1, cpCore.domainLegacyCache.domainDetails.forwardUrl, "://") = 0 Then
-                                cpCore.domainLegacyCache.domainDetails.forwardUrl = "http://" & cpCore.domainLegacyCache.domainDetails.forwardUrl
-                            End If
-                            Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
-                            Return cpCore.continueProcessing
-                        ElseIf (cpCore.domainLegacyCache.domainDetails.typeId = 3) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> 0) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> cpCore.domainLegacyCache.domainDetails.id) Then
-                            '
-                            ' forward to a replacement domain
-                            '
-                            Dim forwardDomain As String = cpCore.db.getRecordName("domains", cpCore.domainLegacyCache.domainDetails.forwardDomainId)
-                            If forwardDomain <> "" Then
-                                Dim pos As Integer = genericController.vbInstr(1, requestUrlSource, requestDomain, vbTextCompare)
-                                If (pos > 0) Then
-                                    cpCore.domainLegacyCache.domainDetails.forwardUrl = Mid(requestUrlSource, 1, pos - 1) & forwardDomain & Mid(requestUrlSource, pos + Len(requestDomain))
-                                    Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
-                                    Return cpCore.continueProcessing
-                                End If
-                            End If
-                        End If
-                        If cpCore.domainLegacyCache.domainDetails.noFollow Then
-                            response_NoFollow = True
-                        End If
-
-                    Else
-                        '
-                        ' domain not found
-                        ' current host not in domainContent, add it and re-save the cache
-                        '
+                        ' -- domain not found
+                        ' -- current host not in domainContent, add it and re-save the cache
                         Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
                         domainDetailsNew.name = requestDomain
                         domainDetailsNew.rootPageId = 0
@@ -472,10 +419,10 @@ Namespace Contensive.Core.Controllers
                         domainDetailsNew.forwardUrl = ""
                         domainDetailsNew.defaultTemplateId = 0
                         domainDetailsNew.pageNotFoundPageId = 0
-                        'domainDetailsNew.allowCrossLogin = False
                         domainDetailsNew.forwardDomainId = 0
                         cpCore.domainLegacyCache.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
                         '
+                        ' -- update database
                         Dim domain As Models.Entity.domainModel = Models.Entity.domainModel.add(cpCore, New List(Of String))
                         cpCore.domainLegacyCache.domainDetails.id = domain.id
                         domain.name = requestDomain
@@ -483,6 +430,70 @@ Namespace Contensive.Core.Controllers
                         domain.save(cpCore)
                         '
                         updateDomainCache = True
+                    End If
+                    '
+                    ' domain found
+                    '
+                    cpCore.domainLegacyCache.domainDetails = cpCore.domainLegacyCache.domainDetailsList(requestDomain.ToLower())
+                    If (cpCore.domainLegacyCache.domainDetails.id = 0) Then
+                        '
+                        ' this is a default domain or a new domain -- add to the domain table
+                        '
+                        Dim domain As New Models.Entity.domainModel() With {
+                                .name = requestDomain,
+                                .TypeID = 1,
+                                .RootPageID = cpCore.domainLegacyCache.domainDetails.rootPageId,
+                                .ForwardURL = cpCore.domainLegacyCache.domainDetails.forwardUrl,
+                                .NoFollow = cpCore.domainLegacyCache.domainDetails.noFollow,
+                                .Visited = cpCore.domainLegacyCache.domainDetails.visited,
+                                .DefaultTemplateId = cpCore.domainLegacyCache.domainDetails.defaultTemplateId,
+                                .PageNotFoundPageID = cpCore.domainLegacyCache.domainDetails.pageNotFoundPageId
+                            }
+                        cpCore.domainLegacyCache.domainDetails.id = domain.id
+                    End If
+                    If Not cpCore.domainLegacyCache.domainDetails.visited Then
+                        '
+                        ' set visited true
+                        '
+                        Call cpCore.db.executeQuery("update ccdomains set visited=1 where name=" & cpCore.db.encodeSQLText(requestDomain))
+                        Call cpCore.cache.setObject("domainContentList", "", "domains")
+                    End If
+                    If cpCore.domainLegacyCache.domainDetails.typeId = 1 Then
+                        '
+                        ' normal domain, leave it
+                        '
+                    ElseIf genericController.vbInstr(1, requestPathPage, "/" & cpCore.serverConfig.appConfig.adminRoute, vbTextCompare) <> 0 Then
+                        '
+                        ' forwarding does not work in the admin site
+                        '
+                    ElseIf (cpCore.domainLegacyCache.domainDetails.typeId = 2) And (cpCore.domainLegacyCache.domainDetails.forwardUrl <> "") Then
+                        '
+                        ' forward to a URL
+                        '
+                        '
+                        'Call AppendLog("main_init(), 1710 - exit for domain forward")
+                        '
+                        If genericController.vbInstr(1, cpCore.domainLegacyCache.domainDetails.forwardUrl, "://") = 0 Then
+                            cpCore.domainLegacyCache.domainDetails.forwardUrl = "http://" & cpCore.domainLegacyCache.domainDetails.forwardUrl
+                        End If
+                        Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
+                        Return cpCore.continueProcessing
+                    ElseIf (cpCore.domainLegacyCache.domainDetails.typeId = 3) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> 0) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> cpCore.domainLegacyCache.domainDetails.id) Then
+                        '
+                        ' forward to a replacement domain
+                        '
+                        Dim forwardDomain As String = cpCore.db.getRecordName("domains", cpCore.domainLegacyCache.domainDetails.forwardDomainId)
+                        If forwardDomain <> "" Then
+                            Dim pos As Integer = genericController.vbInstr(1, requestUrlSource, requestDomain, vbTextCompare)
+                            If (pos > 0) Then
+                                cpCore.domainLegacyCache.domainDetails.forwardUrl = Mid(requestUrlSource, 1, pos - 1) & forwardDomain & Mid(requestUrlSource, pos + Len(requestDomain))
+                                Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
+                                Return cpCore.continueProcessing
+                            End If
+                        End If
+                    End If
+                    If cpCore.domainLegacyCache.domainDetails.noFollow Then
+                        response_NoFollow = True
                     End If
                     If (updateDomainCache) Then
                         '
@@ -1143,7 +1154,7 @@ ErrorTrap:
                     '
                     ' ----- handle content special cases (prevent redirect to deleted records)
                     '
-                    NonEncodedLink = cpcore.html.main_DecodeUrl(EncodedLink)
+                    NonEncodedLink = genericController.DecodeResponseVariable(EncodedLink)
                     Select Case genericController.vbUCase(iContentName)
                         Case "CONTENT WATCH"
                             '

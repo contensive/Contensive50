@@ -1123,7 +1123,7 @@ ErrorTrap:
                 Dim pageViewings As Integer
                 Dim layoutError As String = ""
                 '
-                Call cpCore.html.doc_AddHeadTag2("<meta name=""contentId"" content=""" & cpCore.doc.page.id & """ >", "page content")
+                Call cpCore.html.addHeadTag("<meta name=""contentId"" content=""" & cpCore.doc.page.id & """ >", "page content")
                 '
                 returnHtml = getContentBox_content(cpCore, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, ignoreme, UseContentWatchLink, allowPageWithoutSectionDisplay)
                 '
@@ -1337,8 +1337,8 @@ ErrorTrap:
                     '
                     ' Encode the copy
                     '
-                    returnHtml = cpCore.html.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
-                    returnHtml = cpCore.html.encodeContent9(returnHtml, cpCore.authContext.user.id, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, False, False, True, True, False, True, "", "http://" & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                    returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                    returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
                     If cpCore.doc.refreshQueryString <> "" Then
                         returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" & cpCore.doc.refreshQueryString, 1, 99, vbTextCompare)
                     End If
@@ -1359,20 +1359,20 @@ ErrorTrap:
                             '
                             ' Link authoring, workflow rendering -> do encoding, but no tracking
                             '
-                            returnHtml = cpCore.html.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
-                            returnHtml = cpCore.html.encodeContent9(returnHtml, cpCore.authContext.user.id, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, False, False, True, True, False, True, "", "http://" & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                            returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
                         ElseIf cpCore.doc.isPrintVersion Then
                             '
                             ' Printer Version -> personalize and count viewings, no tracking
                             '
-                            returnHtml = cpCore.html.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
-                            returnHtml = cpCore.html.encodeContent9(returnHtml, cpCore.authContext.user.id, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, False, False, True, True, False, True, "", "http://" & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                            returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
                             Call cpCore.db.executeQuery("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpCore.doc.page.id)
                         Else
                             '
                             ' Live content
-                            returnHtml = cpCore.html.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
-                            returnHtml = cpCore.html.encodeContent9(returnHtml, cpCore.authContext.user.id, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, False, False, True, True, False, True, "", "http://" & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                            returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
                             Call cpCore.db.executeQuery("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpCore.doc.page.id)
                         End If
                         '
@@ -1500,10 +1500,10 @@ ErrorTrap:
                     ' Set the Meta Content flag
                     '---------------------------------------------------------------------------------
                     '
-                    Call cpCore.html.doc_AddPagetitle2(genericController.encodeHTML(cpCore.doc.page.pageTitle), "page content")
-                    Call cpCore.html.doc_addMetaDescription2(genericController.encodeHTML(cpCore.doc.page.metaDescription), "page content")
-                    Call cpCore.html.doc_AddHeadTag2(cpCore.doc.page.OtherHeadTags, "page content")
-                    Call cpCore.html.doc_addMetaKeywordList2(cpCore.doc.page.MetaKeywordList, "page content")
+                    Call cpCore.html.addTitle(genericController.encodeHTML(cpCore.doc.page.pageTitle), "page content")
+                    Call cpCore.html.addMetaDescription(genericController.encodeHTML(cpCore.doc.page.metaDescription), "page content")
+                    Call cpCore.html.addHeadTag(cpCore.doc.page.OtherHeadTags, "page content")
+                    Call cpCore.html.addMetaKeywordList(cpCore.doc.page.MetaKeywordList, "page content")
                     '
                     Dim instanceArguments As New Dictionary(Of String, String)
                     instanceArguments.Add("CSPage", "-1")
@@ -1538,7 +1538,7 @@ ErrorTrap:
                 '
                 ' add contentid and sectionid
                 '
-                Call cpCore.html.doc_AddHeadTag2("<meta name=""contentId"" content=""" & cpCore.doc.page.id & """ >", "page content")
+                Call cpCore.html.addHeadTag("<meta name=""contentId"" content=""" & cpCore.doc.page.id & """ >", "page content")
                 '
                 ' Display Admin Warnings with Edits for record errors
                 '
@@ -1592,7 +1592,7 @@ ErrorTrap:
                         If cpcore.authContext.isAdvancedEditing(cpcore, "") Then
                             result = result & cpcore.html.main_GetRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (Not isRootPage)) & LiveBody
                         ElseIf isEditing Then
-                            result = result & cpcore.html.main_GetEditWrapper("", cpcore.html.main_GetRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (Not isRootPage)) & LiveBody)
+                            result = result & cpcore.html.getEditWrapper("", cpcore.html.main_GetRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (Not isRootPage)) & LiveBody)
                         Else
                             result = result & LiveBody
                         End If
@@ -1958,7 +1958,7 @@ ErrorTrap:
                         If (Copy = "") Then
                             NoteCopy = NoteCopy & "[no comments entered]" & BR
                         Else
-                            NoteCopy = NoteCopy & cpcore.html.main_EncodeCRLF(Copy) & BR
+                            NoteCopy = NoteCopy & cpcore.html.convertCRLFToHtmlBreak(Copy) & BR
                         End If
                         '
                         NoteCopy = NoteCopy & BR
@@ -1990,7 +1990,7 @@ ErrorTrap:
                         '
                         ' ----- From Name
                         '
-                        Copy = cpcore.authContext.user.Name
+                        Copy = cpcore.authContext.user.name
                         Panel = Panel & "<td align=""right"" width=""100""><p>Your Name</p></td>"
                         Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & genericController.encodeHTML(Copy) & """></span></td>"
                         Panel = Panel & "</tr><tr>"
@@ -2085,8 +2085,8 @@ ErrorTrap:
                     ' ----- Encode Template
                     '
                     If Not cpCore.doc.isPrintVersion Then
-                        LocalTemplateBody = cpCore.html.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
-                        returnBody = returnBody & cpCore.html.encodeContent9(LocalTemplateBody, cpCore.authContext.user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
+                        LocalTemplateBody = cpCore.html.executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                        returnBody = returnBody & cpCore.html.convertActiveContentToHtmlForWebRender(LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
@@ -2109,7 +2109,7 @@ ErrorTrap:
                         ' Add template editing
                         '
                         If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") And cpCore.authContext.isEditing("Page Templates") Then
-                            returnBody = cpCore.html.main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", cpCore.html.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, cpCore.authContext.isEditing("Page Templates")) & returnBody)
+                            returnBody = cpCore.html.getEditWrapper("Page Template [" & LocalTemplateName & "]", cpCore.html.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, cpCore.authContext.isEditing("Page Templates")) & returnBody)
                         End If
                     End If
                     '
@@ -2260,7 +2260,7 @@ ErrorTrap:
                     End If
                     Dim stylesheetCommaList As String = "" 'cpCore.html.main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
                     addonListJSON = cpCore.html.main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
-                    Editor = cpCore.html.html_GetFormInputHTML3("copyFilename", cpCore.doc.quickEditCopy, CStr(FieldRows), "100%", False, True, addonListJSON, stylesheetCommaList, styleOptionList)
+                    Editor = cpCore.html.getFormInputHTML("copyFilename", cpCore.doc.quickEditCopy, CStr(FieldRows), "100%", False, True, addonListJSON, stylesheetCommaList, styleOptionList)
                     returnHtml = genericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor)
                 End If
                 '
@@ -2287,7 +2287,7 @@ ErrorTrap:
                 If cpCore.doc.redirectLink <> "" Then
                     Call cpCore.webServer.redirect(cpCore.doc.redirectLink, cpCore.doc.redirectReason, cpCore.doc.redirectBecausePageNotFound)
                 ElseIf AllowEditWrapper Then
-                    returnHtml = cpCore.html.main_GetEditWrapper("Page Content", returnHtml)
+                    returnHtml = cpCore.html.getEditWrapper("Page Content", returnHtml)
                 End If
                 '
             Catch ex As Exception

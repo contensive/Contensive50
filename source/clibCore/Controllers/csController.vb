@@ -438,17 +438,16 @@ Namespace Contensive.Core
         '   main_cs_get Field, translate all fields to their best text equivalent, and encode for display
         '========================================================================
         '
-        Public Shared Function main_cs_getEncodedField(cpcore As coreClass, ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            Dim result As String = ""
+        Public Shared Function getTextEncoded(cpcore As coreClass, ByVal CSPointer As Integer, ByVal FieldName As String) As String
             Dim ContentName As String = String.Empty
-            Dim RecordID As Integer
-            '
+            Dim RecordID As Integer = 0
             If cpcore.db.cs_isFieldSupported(CSPointer, "id") And cpcore.db.cs_isFieldSupported(CSPointer, "contentcontrolId") Then
                 RecordID = cpcore.db.csGetInteger(CSPointer, "id")
                 ContentName = cpcore.metaData.getContentNameByID(cpcore.db.csGetInteger(CSPointer, "contentcontrolId"))
             End If
-            result = cpcore.html.encodeContent10(cpcore.db.csGet(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything())
-            Return result
+            Dim source As String = cpcore.db.csGet(CSPointer, FieldName)
+            Return cpcore.html.convertActiveContentToHtmlForWebRender(source, ContentName, RecordID, cpcore.authContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage)
+            'Return cpcore.html.convertActiveContent_internal(source, cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything())
         End Function
         '
         '========================================================================

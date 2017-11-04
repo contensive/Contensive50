@@ -880,7 +880,7 @@ Namespace Contensive.Core
                         Description = Description & "<div style=""Margin-left:50px"">" & status & "</div>"
                     End If
                     addonManager = Adminui.GetBody(Caption, ButtonList, "", False, False, Description, "", 0, Content.Text)
-                    Call cpCore.html.main_AddPagetitle("Add-on Manager")
+                    Call cpCore.html.addTitle("Add-on Manager")
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw

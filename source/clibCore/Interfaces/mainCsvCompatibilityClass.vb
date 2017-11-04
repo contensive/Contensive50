@@ -28,7 +28,8 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Function EncodeContent9(Source As Object, i0 As Integer, s2 As String, i3 As Integer, i4 As Integer, b5 As Boolean, b6 As Boolean, b7 As Boolean, b8 As Boolean, b9 As Boolean, b10 As Boolean, s11 As String, s12 As String, b13 As Boolean, i14 As Integer, s15 As String, i16 As Integer) As String
-            Return cpCore.html.encodeContent10(Controllers.genericController.encodeText(Source), 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
+            Return cpCore.html.convertActiveContentToHtmlForWysiwygEditor(Controllers.genericController.encodeText(Source))
+            'Return cpCore.html.convertActiveContent_LegacyInternal(Controllers.genericController.encodeText(Source), 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
         End Function
     End Class
 End Namespace
