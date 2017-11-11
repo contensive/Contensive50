@@ -22,21 +22,13 @@ Namespace Contensive.Core.Controllers
         '
         'Private cpCore As cpCoreClass
         '
-        Private runnerGuid As String                    ' set in constructor. used to tag tasks assigned to this runner
-        '
-        ' ----- Log File
-        '
-        Private Const LogMsg = "For more information, see the Contensive Trace Log."
-        Public allowVerboseLogging As Boolean = True
-        Public allowConsoleWrite As Boolean = False
+        Private Property runnerGuid As String                    ' set in constructor. used to tag tasks assigned to this runner
         '
         ' ----- Task Timer
         '
-        Private processTimer As System.Timers.Timer
-        Private ProcessTimerTickCnt As Integer
+        Private Property processTimer As System.Timers.Timer
         Const ProcessTimerMsecPerTick = 5000            ' Check processs every 5 seconds
-        Private ProcessTimerInProcess As Boolean        '
-        Private ProcessTimerProcessCount As Integer        '
+        Private Property ProcessTimerInProcess As Boolean        '
         '
         ' ----- Alarms within Process Timer
         '
@@ -44,8 +36,6 @@ Namespace Contensive.Core.Controllers
         Const SiteProcessIntervalSeconds = 30           '
         '
         ' ----- Debugging
-        '
-        Public StartServiceInProgress As Boolean
         '
         Protected disposed As Boolean = False
         '
@@ -86,7 +76,7 @@ Namespace Contensive.Core.Controllers
         ''' <summary>
         ''' Stop all activity through the content server, but do not unload
         ''' </summary>
-        Public Sub stopService()
+        Public Sub stopTimerEvents()
             processTimer.Enabled = False
         End Sub
         '
@@ -97,7 +87,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="setVerbose"></param>
         ''' <param name="singleThreaded"></param>
         ''' <returns></returns>
-        Public Function StartService() As Boolean
+        Public Function startTimerEvents() As Boolean
             Dim returnStartedOk As Boolean = True
             processTimer = New System.Timers.Timer(ProcessTimerMsecPerTick)
             AddHandler processTimer.Elapsed, AddressOf processTimerTick
@@ -113,27 +103,22 @@ Namespace Contensive.Core.Controllers
         Protected Sub processTimerTick(sender As Object, e As EventArgs)
             Try
                 '
-                appendLog("taskRunnerService.processTimerTick")
+                Console.WriteLine("taskRunnerService.processTimerTick")
                 '
                 If (ProcessTimerInProcess) Then
                     '
-                    appendLog("taskRunnerService.processTimerTick, processTimerInProcess true, skip")
-                    '
+                    Console.WriteLine("taskRunnerService.processTimerTick, processTimerInProcess true, skip")
                 Else
                     ProcessTimerInProcess = True
                     '
                     ' run tasks in task
                     '
                     Using cpCluster As New CPClass
-                        Using programDataFiles As New fileController(cpCluster.core, cpCluster.core.serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
-                            Dim JSONTemp = programDataFiles.readFile("serverConfig.json")
-                            Dim serverConfig As Models.Entity.serverConfigModel = cpCluster.core.json.Deserialize(Of Models.Entity.serverConfigModel)(JSONTemp)
-                            If (Not serverConfig.allowTaskRunnerService) Then
-                                appendLog("taskRunnerService.processTimerTick, allowTaskRunnerService false, skip")
-                            Else
-                                Call runTasks(cpCluster.core)
-                            End If
-                        End Using
+                        If (Not cpCluster.core.serverConfig.allowTaskRunnerService) Then
+                            Console.WriteLine("taskRunnerService.processTimerTick, allowTaskRunnerService false, skip")
+                        Else
+                            Call runTasks(cpCluster.core)
+                        End If
                     End Using
                     ProcessTimerInProcess = False
                 End If
@@ -150,6 +135,9 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         Private Sub runTasks(cpClusterCore As coreClass)
             Try
+                Console.WriteLine("taskRunnerController.runTasks")
+                Dim sw As New Stopwatch()
+                sw.Start()
                 '
                 Dim command As String
                 Dim cmdDetail As cmdDetailClass
@@ -161,12 +149,12 @@ Namespace Contensive.Core.Controllers
                 Dim sql As String
                 Dim AppName As String
                 '
-                appendLog("taskRunnerService.runTasks")
+                Console.WriteLine("taskRunnerService.runTasks")
                 '
                 For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cpClusterCore.serverConfig.apps
                     AppName = kvp.Value.name
                     '
-                    appendLog("taskRunnerService.runTasks, appname=[" & AppName & "]")
+                    Console.WriteLine("taskRunnerService.runTasks, appname=[" & AppName & "]")
                     '
                     ' query tasks that need to be run
                     '
@@ -184,7 +172,10 @@ Namespace Contensive.Core.Controllers
                                     cpSite.core.db.executeQuery(sql)
                                     CS = cpSite.core.db.csOpen("tasks", "(cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
                                     If cpSite.core.db.csOk(CS) Then
-                                        'Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
+                                        '
+                                        Console.WriteLine("taskRunnerController.runTasks, execute task [" & cpSite.core.db.csGetText(CS, "name") & "]")
+                                        '
+                                        ' -- execute a task
                                         recordsRemaining = True
                                         Call cpSite.core.db.csSet(CS, "datestarted", Now())
                                         Call cpSite.core.db.csSave2(CS)
@@ -193,7 +184,7 @@ Namespace Contensive.Core.Controllers
                                         cmdDetailText = cpSite.core.db.csGetText(CS, "cmdDetail")
                                         cmdDetail = cpSite.core.json.Deserialize(Of cmdDetailClass)(cmdDetailText)
                                         '
-                                        appendLog("taskRunnerService.runTasks, command=[" & command & "], cmdDetailText=[" & cmdDetailText & "]")
+                                        Console.WriteLine("taskRunnerService.runTasks, command=[" & command & "], cmdDetailText=[" & cmdDetailText & "]")
                                         '
                                         Select Case command.ToLower()
                                             Case taskQueueCommandEnumModule.runAddon
@@ -207,6 +198,7 @@ Namespace Contensive.Core.Controllers
                                                     )
                                                 'Call cpSite.core.addon.execute_legacy7(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
                                         End Select
+                                        Call cpSite.core.db.csSet(CS, "datecompleted", Now())
                                     End If
                                     cpSite.core.db.csClose(CS)
                                 Loop While recordsRemaining
@@ -216,20 +208,10 @@ Namespace Contensive.Core.Controllers
                         End If
                     End Using
                 Next
+                Console.WriteLine("taskRunnerController.runTasks, exit (" & sw.ElapsedMilliseconds & "ms)")
             Catch ex As Exception
                 cpClusterCore.handleException(ex)
             End Try
-        End Sub
-        '
-        Private Sub appendLog(ByVal logText As String, Optional isImportant As Boolean = False)
-            Using cp As New CPClass
-                If (isImportant Or allowVerboseLogging) Then
-                    logController.appendLog(cp.core, logText, "", "trace")
-                End If
-                If (allowConsoleWrite) Then
-                    Console.WriteLine(logText)
-                End If
-            End Using
         End Sub
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.

@@ -9,7 +9,7 @@
     </SchemaVersion>
     <ProjectGuid>{11A00FD7-5DAF-46CA-A8DF-7C8426AC4226}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>Contensive.Core.ccService2</StartupObject>
+    <StartupObject>Contensive.Core.Services</StartupObject>
     <RootNamespace>
     </RootNamespace>
     <AssemblyName>clibService</AssemblyName>

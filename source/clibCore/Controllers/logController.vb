@@ -42,39 +42,29 @@ Namespace Contensive.Core.Controllers
         ''' <remarks></remarks>
         Public Shared Sub appendLog(cpCore As coreClass, ByVal LogLine As String, Optional ByVal LogFolder As String = "", Optional ByVal LogNamePrefix As String = "", Optional allowErrorHandling As Boolean = True)
             Try
+                '
+                Dim threadId As Integer = System.Threading.Thread.CurrentThread.ManagedThreadId
+                Dim threadName As String = Format(threadId, "00000000")
+                Dim absContent As String = LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & "thread:" & threadName & vbTab & LogLine & vbCrLf
+                Console.WriteLine(LogLine)
+                '
                 If (String.IsNullOrEmpty(LogFolder) Or cpCore.serverConfig.enableLogging) Then
-                    '
-                    ' -- log in root folder or if enable logging it enabled
-                    Dim logPath As String
-                    Dim MonthNumber As Integer
-                    Dim DayNumber As Integer
-                    Dim FilenameNoExt As String
-                    Dim PathFilenameNoExt As String
-                    Dim FileSize As Integer
-                    Dim RetryCnt As Integer
-                    Dim SaveOK As Boolean
-                    Dim FileSuffix As String
-                    Dim threadId As Integer = System.Threading.Thread.CurrentThread.ManagedThreadId
-                    Dim threadName As String = Format(threadId, "00000000")
-                    Dim fileSystem As fileController = Nothing
-                    '
                     Try
+                        Dim fileSystem As fileController = Nothing
                         If (cpCore.serverConfig IsNot Nothing) Then
                             If (cpCore.serverConfig.appConfig IsNot Nothing) Then
                                 '
                                 ' -- use app log space
-                                fileSystem = cpCore.privateFiles
+                                FileSystem = cpCore.privateFiles
                             End If
                         End If
-                        If (fileSystem Is Nothing) Then
+                        If (FileSystem Is Nothing) Then
                             '
                             ' -- no app or no server, use program data files
-                            fileSystem = cpCore.programDataFiles
+                            FileSystem = cpCore.programDataFiles
                         End If
-                        DayNumber = Day(Now)
-                        MonthNumber = Month(Now)
-                        FilenameNoExt = getDateString(Now)
-                        logPath = LogFolder
+                        Dim FilenameNoExt As String = getDateString(Now)
+                        Dim logPath As String = LogFolder
                         If logPath <> "" Then
                             logPath = logPath & "\"
                         End If
@@ -82,11 +72,11 @@ Namespace Contensive.Core.Controllers
                         '
                         ' check for serverconfig, then for appConfig, else use programdata folder
                         '
-                        ' logPathRoot = privatefiles.rootLocalPath
-                        If Not fileSystem.pathExists(logPath) Then
-                            Call fileSystem.createPath(logPath)
+                        Dim FileSize As Integer = 0
+                        If Not FileSystem.pathExists(logPath) Then
+                            Call FileSystem.createPath(logPath)
                         Else
-                            Dim logFiles As IO.FileInfo() = fileSystem.getFileList(logPath)
+                            Dim logFiles As IO.FileInfo() = FileSystem.getFileList(logPath)
                             For Each fileInfo As IO.FileInfo In logFiles
                                 If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
                                     FileSize = CInt(fileInfo.Length)
@@ -94,18 +84,17 @@ Namespace Contensive.Core.Controllers
                                 End If
                             Next
                         End If
-                        PathFilenameNoExt = logPath & FilenameNoExt
+                        Dim PathFilenameNoExt As String = logPath & FilenameNoExt
                         '
                         ' -- add to log file
                         If FileSize < 10000000 Then
-                            RetryCnt = 0
-                            SaveOK = False
-                            FileSuffix = ""
+                            Dim RetryCnt As Integer = 0
+                            Dim SaveOK As Boolean = False
+                            Dim FileSuffix As String = ""
                             Do While (Not SaveOK) And (RetryCnt < 10)
                                 SaveOK = True
                                 Try
-                                    Dim absContent As String = LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
-                                    fileSystem.appendFile(PathFilenameNoExt & FileSuffix & ".log", absContent)
+                                    FileSystem.appendFile(PathFilenameNoExt & FileSuffix & ".log", absContent)
                                 Catch ex As IO.IOException
                                     '
                                     ' permission denied - happens when more then one process are writing at once, go to the next suffix

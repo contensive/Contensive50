@@ -28,7 +28,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         ''' <summary>
-        ''' constructor for server use. No application context will be available. Use to create new apps.
+        ''' constructor for server use. No application context will be available. Use to create new apps or iterate through apps.
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub New()

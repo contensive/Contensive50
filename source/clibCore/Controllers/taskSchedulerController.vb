@@ -68,7 +68,7 @@ Namespace Contensive.Core.Controllers
         ''' <summary>
         ''' Stop all activity through the content server, but do not unload
         ''' </summary>
-        Public Sub stopService()
+        Public Sub stopTimerEvents()
             Try
                 'appendLog("taskScheduleServiceClass.stopService")
                 processTimer.Enabled = False
@@ -86,7 +86,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="setVerbose"></param>
         ''' <param name="singleThreaded"></param>
         ''' <returns></returns>
-        Public Function StartService(ByVal setVerbose As Boolean, ByVal singleThreaded As Boolean) As Boolean
+        Public Function startTimerEvents(ByVal setVerbose As Boolean, ByVal singleThreaded As Boolean) As Boolean
             Dim returnStartedOk As Boolean = False
             Try
                 'appendLog("taskScheduleServiceClass.startService")
@@ -116,35 +116,27 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         Public Sub processTimerTick(sender As Object, e As EventArgs)
             Try
-                'Using cp As New CPClass()
-                Console.WriteLine("tmp-taskScheduleServiceClass.processTimerTick")
-                'appendLog(cp.core, "taskScheduleServiceClass.processTimerTick")
-                '
+                Console.WriteLine("taskScheduleServiceClass.processTimerTick")
+                Dim sw As New Stopwatch()
+                sw.Start()
                 If (ProcessTimerInProcess) Then
                     Console.WriteLine("tmp-taskScheduleServiceClass.processTimerTick, skipped because timerInProcess")
-                    'appendLog(cp.core, "taskScheduleServiceClass.processTimerTick, skipped because timerInProcess")
                 Else
+                    '
+                    ' -- schedule tasks
                     ProcessTimerInProcess = True
-                    '
-                    ' schedule tasks
-                    '
-                    'Using programDataFiles As New fileSystemClass(cp.core, cp.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib")
-                    Dim JSONTemp As String = "{""clusterPath"":""c:\\inetPub"",""allowTaskRunnerService"":true,""allowTaskSchedulerService"":true}"
-                    'Dim JSONTemp = programDataFiles.ReadFile("serverConfig.json")
-                    Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
-                    Dim serverConfig As Models.Entity.serverConfigModel = json_serializer.Deserialize(Of Models.Entity.serverConfigModel)(JSONTemp)
-                    If (Not serverConfig.allowTaskSchedulerService) Then
-                        Console.WriteLine("tmp-taskScheduleServiceClass.processTimerTick, skipped because serviceConfig.allowTaskSchedulerService false.")
-                        'appendLog(cp.core, "taskScheduleServiceClass.processTimerTick, skipped because serviceConfig.allowTaskSchedulerService false.")
-                    Else
-                        Console.WriteLine("tmp-taskScheduleServiceClass.processTimerTick, call to scheduleTasks commented for debug.")
-                        'appendLog(cp.core, "taskScheduleServiceClass.processTimerTick, call to scheduleTasks commented for debug.")
-                        'Call scheduleTasks(cp.core)
-                    End If
-                    'End Using
+                    Using cp As New CPClass()
+                        If (Not cp.core.serverConfig.allowTaskSchedulerService) Then
+                            Console.WriteLine("taskScheduleServiceClass.processTimerTick, skipped because serviceConfig.allowTaskSchedulerService false.")
+                        Else
+                            Console.WriteLine("taskScheduleServiceClass.processTimerTick, call scheduleTasks.")
+                            Call scheduleTasks(cp.core)
+                        End If
+                        'End Using
+                    End Using
                     ProcessTimerInProcess = False
                 End If
-                ' End Using
+                Console.WriteLine("taskScheduleServiceClass.processTimerTick exit (" & sw.ElapsedMilliseconds & "ms)")
             Catch ex As Exception
                 Using cp As New CPClass()
                     cp.core.handleException(ex)
@@ -160,39 +152,34 @@ Namespace Contensive.Core.Controllers
             Dim hint As String = ""
             Try
                 '
-                Dim addonId As Integer
-                Dim addonName As String
-                Dim addonArguments As String
-                Dim addonProcessRunOnce As Boolean
-                Dim addonProcessNextRun As Date
-                Dim addonProcessInterval As Integer
-                Dim cmdDetail As cmdDetailClass
-                '
-                Dim SQLNow As String
-                Dim CS As Integer
-                Dim sqlAddonsCriteria As String
-                Dim NextRun As Date
-                Dim RightNow As Date
-                Dim AppName As String
-                '
                 logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks")
                 '
-                RightNow = DateTime.Now
                 For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cpClusterCore.serverConfig.apps
-                    AppName = kvp.Value.name
                     '
                     ' schedule tasks for this app
                     '
-                    logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" & AppName & "]")
+                    logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" & kvp.Value.name & "]")
                     '
-                    Using cpSite As New CPClass(AppName)
-                        If (cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK) And (cpSite.core.serverConfig.appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
+                    Using cpSite As New CPClass(kvp.Value.name)
+                        If (Not (cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK)) Then
+                            '
+                            logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app status not ok")
+                            '
+                        ElseIf (Not (cpSite.core.serverConfig.appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal)) Then
+                            '
+                            logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app mode not normal")
+                            '
+                        Else
                             '
                             ' Execute Processes
                             '
                             Try
-                                SQLNow = cpSite.core.db.encodeSQLDate(RightNow)
-                                sqlAddonsCriteria = "" _
+                                '
+                                logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, search for addons to run")
+                                '
+                                Dim RightNow As Date = Now
+                                Dim SQLNow As String = cpSite.core.db.encodeSQLDate(RightNow)
+                                Dim sqlAddonsCriteria As String = "" _
                                     & "(Active<>0)" _
                                     & " and(name<>'')" _
                                     & " and(" _
@@ -200,55 +187,49 @@ Namespace Contensive.Core.Controllers
                                     & "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))" _
                                     & "  or(ProcessNextRun<" & SQLNow & ")" _
                                     & " )"
-                                CS = cpSite.core.db.csOpen(cnAddons, sqlAddonsCriteria)
+                                Dim CS As Integer = cpSite.core.db.csOpen(cnAddons, sqlAddonsCriteria)
                                 Do While cpSite.core.db.csOk(CS)
-                                    addonProcessInterval = cpSite.core.db.csGetInteger(CS, "ProcessInterval")
-                                    addonId = cpSite.core.db.csGetInteger(CS, "ID")
-                                    addonName = cpSite.core.db.csGetText(CS, "name")
-                                    addonArguments = cpSite.core.db.csGetText(CS, "argumentlist")
-                                    addonProcessRunOnce = cpSite.core.db.csGetBoolean(CS, "ProcessRunOnce")
-                                    addonProcessNextRun = cpSite.core.db.csGetDate(CS, "ProcessNextRun")
-                                    NextRun = Date.MinValue
+                                    Dim addonProcessInterval As Integer = cpSite.core.db.csGetInteger(CS, "ProcessInterval")
+                                    Dim addonName As String = cpSite.core.db.csGetText(CS, "name")
+                                    Dim addonProcessRunOnce As Boolean = cpSite.core.db.csGetBoolean(CS, "ProcessRunOnce")
+                                    Dim addonProcessNextRun As Date = cpSite.core.db.csGetDate(CS, "ProcessNextRun")
+                                    Dim NextRun As Date = Date.MinValue
                                     hint &= ",run addon " & addonName
                                     If addonProcessInterval > 0 Then
                                         NextRun = RightNow.AddMinutes(addonProcessInterval)
                                     End If
-                                    If addonProcessRunOnce Then
+                                    If (addonProcessNextRun < RightNow) Or (addonProcessRunOnce) Then
                                         '
-                                        ' Run Once
+                                        logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, add task for addon [" & addonName & "], addonProcessRunOnce [" & addonProcessRunOnce & "], addonProcessNextRun [" & addonProcessNextRun & "]")
                                         '
+                                        ' -- resolve triggering state
                                         Call cpSite.core.db.csSet(CS, "ProcessRunOnce", False)
-                                        Call cpSite.core.db.csSet(CS, "ProcessNextRun", "")
+                                        If (addonProcessNextRun < RightNow) Then
+                                            Call cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun)
+                                        End If
                                         Call cpSite.core.db.csSave2(CS)
                                         '
-                                        cmdDetail = New cmdDetailClass
-                                        cmdDetail.addonId = addonId
+                                        ' -- add task to queue for runner
+                                        Dim cmdDetail As New cmdDetailClass
+                                        cmdDetail.addonId = cpSite.core.db.csGetInteger(CS, "ID")
                                         cmdDetail.addonName = addonName
-                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
+                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpSite.core, cpSite.core.db.csGetText(CS, "argumentlist"))
                                         Call addTaskToQueue(cpSite.core, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
                                     ElseIf cpSite.core.db.csGetDate(CS, "ProcessNextRun") = Date.MinValue Then
                                         '
-                                        ' Interval is OK but NextRun is 0, just set next run
+                                        logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, addon [" & addonName & "], ProcessInterval set but no processNextRun, set processNextRun [" & NextRun & "]")
                                         '
+                                        ' -- Interval is OK but NextRun is 0, just set next run
                                         Call cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun)
                                         Call cpSite.core.db.csSave2(CS)
-                                    ElseIf addonProcessNextRun < RightNow Then
-                                        '
-                                        ' All is OK, triggered on NextRun, Cycle RightNow
-                                        '
-                                        Call cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun)
-                                        Call cpSite.core.db.csSave2(CS)
-                                        '
-                                        cmdDetail = New cmdDetailClass
-                                        cmdDetail.addonId = addonId
-                                        cmdDetail.addonName = addonName
-                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
-                                        Call addTaskToQueue(cpSite.core, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
                                     End If
                                     Call cpSite.core.db.csGoNext(CS)
                                 Loop
                                 Call cpSite.core.db.csClose(CS)
                             Catch ex As Exception
+                                '
+                                logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, execption scheduling addon")
+                                '
                                 cpClusterCore.handleException(ex)
                             End Try
                         End If
@@ -262,7 +243,7 @@ Namespace Contensive.Core.Controllers
         '
         '====================================================================================================
         ''' <summary>
-        ''' Add a command task to the taskQueue to be run by the taskRunner
+        ''' Add a command task to the taskQueue to be run by the taskRunner. Returns false if the task was already there (dups fround by command name and cmdDetailJson)
         ''' </summary>
         ''' <param name="cpSiteCore"></param>
         ''' <param name="Command"></param>
@@ -285,7 +266,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' Search for a duplicate
                     '
-                    sql = "select top 1 id from cctasks where ((command=" & cpSiteCore.db.encodeSQLText(Command) & ")and(cmdDetail=" & cmdDetailJson & "))"
+                    sql = "select top 1 id from cctasks where ((command=" & cpSiteCore.db.encodeSQLText(Command) & ")and(cmdDetail=" & cmdDetailJson & ")and(datestarted is not null))"
                     cs = cpSiteCore.db.csOpenSql(sql)
                     If cpSiteCore.db.csOk(cs) Then
                         returnTaskAdded = False
@@ -295,10 +276,17 @@ Namespace Contensive.Core.Controllers
                 '
                 ' Add it to the queue and shell out to the command
                 '
-                If returnTaskAdded Then
+                If Not returnTaskAdded Then
+                    '
+                    logController.appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, command skipped because the unstarted command and details were already in the queue.")
+                    '
+                Else
+                    '
+                    logController.appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.serverConfig.appConfig.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
+                    '
                     cs = cpSiteCore.db.csInsertRecord("tasks")
                     If cpSiteCore.db.csOk(cs) Then
-                        cpSiteCore.db.csSet(cs, "name", "")
+                        cpSiteCore.db.csSet(cs, "name", "command [" & Command & "], addon [#" & cmdDetail.addonId & "," & cmdDetail.addonName & "]")
                         cpSiteCore.db.csSet(cs, "command", Command)
                         cpSiteCore.db.csSet(cs, "cmdDetail", cmdDetailJson)
                         returnTaskAdded = True

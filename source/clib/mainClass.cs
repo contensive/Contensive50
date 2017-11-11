@@ -185,9 +185,9 @@ namespace Contensive.CLI
                                             taskSchedulerController taskScheduler = new taskSchedulerController();
                                             taskScheduler.allowVerboseLogging = true;
                                             taskScheduler.allowConsoleWrite = true;
-                                            taskScheduler.StartService(true, false);
+                                            taskScheduler.startTimerEvents(true, false);
                                             object keyStroke = Console.ReadKey();
-                                            taskScheduler.stopService();
+                                            taskScheduler.stopTimerEvents();
                                             exitArgumentProcessing = true;
                                         }
                                         else
@@ -212,11 +212,9 @@ namespace Contensive.CLI
                                             // -- run the taskrunner in the console
                                             Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
                                             taskRunnerController taskRunner = new taskRunnerController();
-                                            taskRunner.allowVerboseLogging = true;
-                                            taskRunner.allowConsoleWrite = true;
-                                            taskRunner.StartService();
+                                            taskRunner.startTimerEvents();
                                             object keyStroke = Console.ReadKey();
-                                            taskRunner.stopService();
+                                            taskRunner.stopTimerEvents();
                                             exitArgumentProcessing = true;
                                         }
                                         else
@@ -245,15 +243,13 @@ namespace Contensive.CLI
                                             taskSchedulerController taskScheduler = new taskSchedulerController();
                                             taskScheduler.allowVerboseLogging = true;
                                             taskScheduler.allowConsoleWrite = true;
-                                            taskScheduler.StartService(true, false);
+                                            taskScheduler.startTimerEvents(true, false);
                                             //
                                             taskRunnerController taskRunner = new taskRunnerController();
-                                            taskRunner.allowVerboseLogging = true;
-                                            taskRunner.allowConsoleWrite = true;
-                                            taskRunner.StartService();
+                                            taskRunner.startTimerEvents();
                                             //
                                             object keyStroke = Console.ReadKey();
-                                            taskRunner.stopService();
+                                            taskRunner.stopTimerEvents();
                                             exitArgumentProcessing = true;
                                         }
                                         else
@@ -313,6 +309,9 @@ namespace Contensive.CLI
             + "\r\n"
             + "\r\n--taskrunner on|off"
             + "\r\n\tStart or stop the taskrunner service"
+            + "\r\n"
+            + "\r\n--tasks run"
+            + "\r\n\tRun the taskscheduler and the taskrunner in the console (temporary)"
             + "";
     }
 

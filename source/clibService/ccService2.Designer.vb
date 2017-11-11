@@ -3,7 +3,7 @@
 Namespace Contensive.Core
 
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-    Partial Class ccService2
+    Partial Class Services
         Inherits System.ServiceProcess.ServiceBase
 
         'UserService overrides dispose to clean up the component list.
@@ -30,7 +30,7 @@ Namespace Contensive.Core
             '
             '   ServicesToRun = New System.ServiceProcess.ServiceBase () {New Service1, New MySecondUserService}
             '
-            ServicesToRun = New System.ServiceProcess.ServiceBase() {New ccService2}
+            ServicesToRun = New System.ServiceProcess.ServiceBase() {New Services}
 
             System.ServiceProcess.ServiceBase.Run(ServicesToRun)
         End Sub
