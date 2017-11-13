@@ -927,63 +927,63 @@ Namespace Contensive.Core
                                                 For Each CDefSection In CollectionFile.DocumentElement.ChildNodes
                                                     Select Case genericController.vbLCase(CDefSection.Name)
                                                         Case "resource"
-                                                            '
-                                                            ' resource node, if executable node, save to RegisterList
-                                                            '
-                                                            'hint = hint & ",510"
-                                                            ResourceType = genericController.vbLCase(GetXMLAttribute(cpCore, IsFound, CDefSection, "type", ""))
-                                                            Dim resourceFilename As String = Trim(GetXMLAttribute(cpCore, IsFound, CDefSection, "name", ""))
-                                                            Dim resourcePathFilename As String = CollectionVersionPath & resourceFilename
-                                                            If resourceFilename = "" Then
-                                                                '
-                                                                ' filename is blank
-                                                                '
-                                                                'hint = hint & ",511"
-                                                            ElseIf Not cpCore.privateFiles.fileExists(resourcePathFilename) Then
-                                                                '
-                                                                ' resource is not here
-                                                                '
-                                                                'hint = hint & ",513"
-                                                                result = False
-                                                                return_ErrorMessage = "<p>There was a problem with the Collection File. The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.</p>"
-                                                                Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.")
-                                                                'StatusOK = False
-                                                            Else
-                                                                Select Case ResourceType
-                                                                    Case "executable"
-                                                                        '
-                                                                        ' Executable resources - add to register list
-                                                                        '
-                                                                        'hint = hint & ",520"
-                                                                        If False Then
-                                                                            '
-                                                                            ' file is already installed
-                                                                            '
-                                                                            'hint = hint & ",521"
-                                                                        Else
-                                                                            '
-                                                                            ' Add the file to be registered
-                                                                            '
-                                                                        End If
-                                                                    Case "www"
-                                                                    Case "file"
-                                                                End Select
-                                                            End If
+                                                            ''
+                                                            '' resource node, if executable node, save to RegisterList
+                                                            ''
+                                                            ''hint = hint & ",510"
+                                                            'ResourceType = genericController.vbLCase(GetXMLAttribute(cpCore, IsFound, CDefSection, "type", ""))
+                                                            'Dim resourceFilename As String = Trim(GetXMLAttribute(cpCore, IsFound, CDefSection, "name", ""))
+                                                            'Dim resourcePathFilename As String = CollectionVersionPath & resourceFilename
+                                                            'If resourceFilename = "" Then
+                                                            '    '
+                                                            '    ' filename is blank
+                                                            '    '
+                                                            '    'hint = hint & ",511"
+                                                            'ElseIf Not cpCore.privateFiles.fileExists(resourcePathFilename) Then
+                                                            '    '
+                                                            '    ' resource is not here
+                                                            '    '
+                                                            '    'hint = hint & ",513"
+                                                            '    result = False
+                                                            '    return_ErrorMessage = "<p>There was a problem with the Collection File. The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.</p>"
+                                                            '    Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.")
+                                                            '    'StatusOK = False
+                                                            'Else
+                                                            '    Select Case ResourceType
+                                                            '        Case "executable"
+                                                            '            '
+                                                            '            ' Executable resources - add to register list
+                                                            '            '
+                                                            '            'hint = hint & ",520"
+                                                            '            If False Then
+                                                            '                '
+                                                            '                ' file is already installed
+                                                            '                '
+                                                            '                'hint = hint & ",521"
+                                                            '            Else
+                                                            '                '
+                                                            '                ' Add the file to be registered
+                                                            '                '
+                                                            '            End If
+                                                            '        Case "www"
+                                                            '        Case "file"
+                                                            '    End Select
+                                                            'End If
                                                         Case "interfaces"
-                                                            '
-                                                            ' Compatibility only - this is deprecated - Install ActiveX found in Add-ons
-                                                            '
-                                                            'hint = hint & ",530"
-                                                            For Each CDefInterfaces In CDefSection.ChildNodes
-                                                                AOName = GetXMLAttribute(cpCore, IsFound, CDefInterfaces, "name", "No Name")
-                                                                If AOName = "" Then
-                                                                    AOName = "No Name"
-                                                                End If
-                                                                AOGuid = GetXMLAttribute(cpCore, IsFound, CDefInterfaces, "guid", AOName)
-                                                                If AOGuid = "" Then
-                                                                    AOGuid = AOName
-                                                                End If
-                                                            Next
+                                                            ''
+                                                            '' Compatibility only - this is deprecated - Install ActiveX found in Add-ons
+                                                            ''
+                                                            ''hint = hint & ",530"
+                                                            'For Each CDefInterfaces In CDefSection.ChildNodes
+                                                            '    AOName = GetXMLAttribute(cpCore, IsFound, CDefInterfaces, "name", "No Name")
+                                                            '    If AOName = "" Then
+                                                            '        AOName = "No Name"
+                                                            '    End If
+                                                            '    AOGuid = GetXMLAttribute(cpCore, IsFound, CDefInterfaces, "guid", AOName)
+                                                            '    If AOGuid = "" Then
+                                                            '        AOGuid = AOName
+                                                            '    End If
+                                                            'Next
                                                         Case "getcollection", "importcollection"
                                                             '
                                                             ' -- Download Collection file into install folder
@@ -3650,35 +3650,41 @@ Namespace Contensive.Core
                 ' -- new build
                 ' 20171029 -- upgrading should restore base collection fields as a fix to deleted required fields
                 Dim baseCollectionXml As String = cpCore.programFiles.readFile("aoBase5.xml")
-                Call logController.appendInstallLog(cpCore, "Verify base collection -- new build")
-                Dim baseCollection As miniCollectionModel = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, True, True, isNewBuild, New miniCollectionModel)
-                Call installCollection_BuildDbFromMiniCollection(cpCore, baseCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
-                'If isNewBuild Then
-                '    '
-                '    ' -- new build
-                '    Call logcontroller.appendInstallLog(cpCore,  "Verify base collection -- new build")
-                '    Dim baseCollection As miniCollectionModel = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, True, True, isNewBuild, New miniCollectionModel)
-                '    Call installCollection_BuildDbFromMiniCollection(cpCore, baseCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
-                '    'Else
-                '    '    '
-                '    '    ' -- verify current build
-                '    '    Call logcontroller.appendInstallLog(cpCore,  "Verify base collection - existing build")
-                '    '    Dim baseCollection As miniCollectionModel = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, True, True, isNewBuild, New miniCollectionModel)
-                '    '    Dim workingCollection As miniCollectionModel = installCollection_GetApplicationMiniCollection(cpCore, False)
-                '    '    Call installCollection_AddMiniCollectionSrcToDst(cpCore, workingCollection, baseCollection, False)
-                '    '    Call installCollection_BuildDbFromMiniCollection(cpCore, workingCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
-                'End If
-                '
-                ' now treat as a regular collection and install - to pickup everything else 
-                '
-                Dim tmpFolderPath As String = "tmp" & genericController.GetRandomInteger().ToString & "\"
-                cpCore.privateFiles.createPath(tmpFolderPath)
-                cpCore.programFiles.copyFile("aoBase5.xml", tmpFolderPath & "aoBase5.xml", cpCore.privateFiles)
-                Dim ignoreList As New List(Of String)
-                If Not InstallCollectionsFromPrivateFolder(cpCore, tmpFolderPath, returnErrorMessage, ignoreList, isNewBuild, nonCriticalErrorList) Then
-                    Throw New ApplicationException(returnErrorMessage)
+                If (String.IsNullOrEmpty(baseCollectionXml)) Then
+                    '
+                    ' -- base collection notfound
+                    Throw New ApplicationException("Cannot load aoBase5.xml [" & cpCore.programFiles.rootLocalPath & "aoBase5.xml]")
+                Else
+                    Call logController.appendInstallLog(cpCore, "Verify base collection -- new build")
+                    Dim baseCollection As miniCollectionModel = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, True, True, isNewBuild, New miniCollectionModel)
+                    Call installCollection_BuildDbFromMiniCollection(cpCore, baseCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
+                    'If isNewBuild Then
+                    '    '
+                    '    ' -- new build
+                    '    Call logcontroller.appendInstallLog(cpCore,  "Verify base collection -- new build")
+                    '    Dim baseCollection As miniCollectionModel = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, True, True, isNewBuild, New miniCollectionModel)
+                    '    Call installCollection_BuildDbFromMiniCollection(cpCore, baseCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
+                    '    'Else
+                    '    '    '
+                    '    '    ' -- verify current build
+                    '    '    Call logcontroller.appendInstallLog(cpCore,  "Verify base collection - existing build")
+                    '    '    Dim baseCollection As miniCollectionModel = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, True, True, isNewBuild, New miniCollectionModel)
+                    '    '    Dim workingCollection As miniCollectionModel = installCollection_GetApplicationMiniCollection(cpCore, False)
+                    '    '    Call installCollection_AddMiniCollectionSrcToDst(cpCore, workingCollection, baseCollection, False)
+                    '    '    Call installCollection_BuildDbFromMiniCollection(cpCore, workingCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, nonCriticalErrorList)
+                    'End If
+                    '
+                    ' now treat as a regular collection and install - to pickup everything else 
+                    '
+                    Dim tmpFolderPath As String = "tmp" & genericController.GetRandomInteger().ToString & "\"
+                    cpCore.privateFiles.createPath(tmpFolderPath)
+                    cpCore.programFiles.copyFile("aoBase5.xml", tmpFolderPath & "aoBase5.xml", cpCore.privateFiles)
+                    Dim ignoreList As New List(Of String)
+                    If Not InstallCollectionsFromPrivateFolder(cpCore, tmpFolderPath, returnErrorMessage, ignoreList, isNewBuild, nonCriticalErrorList) Then
+                        Throw New ApplicationException(returnErrorMessage)
+                    End If
+                    cpCore.privateFiles.DeleteFileFolder(tmpFolderPath)
                 End If
-                cpCore.privateFiles.DeleteFileFolder(tmpFolderPath)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try

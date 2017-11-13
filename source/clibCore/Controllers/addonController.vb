@@ -1532,6 +1532,13 @@ Namespace Contensive.Core.Controllers
             Dim result As String = ""
             Try
                 Dim AddonFound As Boolean = False
+                '
+                ' -- try appbase folder
+                ' ***** no -- if we convert to moving addons into the application's private path (wwwroot/bin)...
+                ' ***** because the addon solution has to be for both web apps and non-web apps running on the server at the same time. so - loadFrom(addon path) is required
+                '
+                ' -- try development bypass folder (addonAssemblyBypass)
+                ' -- purpose is to provide a path that can be hardcoded in visual studio after-build event to make development easier
                 Dim commonAssemblyPath As String = cpCore.programDataFiles.rootLocalPath & "AddonAssemblyBypass\"
                 If Not IO.Directory.Exists(commonAssemblyPath) Then
                     IO.Directory.CreateDirectory(commonAssemblyPath)
@@ -1540,14 +1547,14 @@ Namespace Contensive.Core.Controllers
                 End If
                 If Not AddonFound Then
                     '
-                    ' try app /bin folder
-                    '
+                    ' -- try app /bin folder
+                    ' -- purpose is to allow add-ons to be included in the website's (wwwRoot) assembly. So a website's custom addons are within the wwwRoot build, not separate
                     Dim addonAppRootPath As String = cpCore.privateFiles.joinPath(cpCore.appRootFiles.rootLocalPath, "bin\")
                     result = executeAssembly_byFilePath(addon.id, addon.name, addonAppRootPath, addon.DotNetClass, True, AddonFound)
                     If Not AddonFound Then
                         '
-                        ' legacy mode, consider eliminating this and storing addon binaries in apps /bin folder
-                        '
+                        ' -- try addon folder
+                        ' -- purpose is to have a repository where addons can be stored for now web and non-web apps, and allow permissions to be installed with online upload
                         If String.IsNullOrEmpty(addonCollection.ccguid) Then
                             Throw New ApplicationException("The assembly for addon [" & addon.name & "] could not be executed because it's collection has an invalid guid.")
                         Else
@@ -3693,6 +3700,23 @@ ErrorTrap:
                 cpCore.handleException(ex) : Throw
             End Try
             Return addonManager
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' If an addon assembly references a system assembly that is not in the gac (system.io.compression.filesystem), it does not look in the folder I did the loadfrom.
+        ''' Problem is knowing where to look. No argument to pass a path...
+        ''' </summary>
+        ''' <param name="sender"></param>
+        ''' <param name="args"></param>
+        ''' <returns></returns>
+        Public Shared Function myAssemblyResolve(sender As Object, args As ResolveEventArgs) As Assembly
+            Dim sample_folderPath As String = IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
+
+            Dim assemblyPath As String = IO.Path.Combine(sample_folderPath, New AssemblyName(args.Name).Name + ".dll")
+            If (Not IO.File.Exists(assemblyPath)) Then Return Nothing
+            Dim assembly As Assembly = Assembly.LoadFrom(assemblyPath)
+            Return assembly
         End Function
 
         '====================================================================================================

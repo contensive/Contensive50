@@ -11,6 +11,18 @@ Namespace Contensive.Core.Controllers
     ''' <summary>
     ''' Interface to cache systems. Cache objects are saved to dotnet cache, remotecache, filecache. 
     ''' 
+    ''' three  types of cache entries:
+    '''  -- simple entity cache -- cache of an entity model (one record)
+    '''     .. saveCache, reachCache in the entity model
+    '''     .. invalidateCache in the entity model, includes invalication for complex objects that include the entity
+    '''      
+    '''  -- complex entity cache -- cache of an object with mixed data based on the entity data model (an org object that contains a person object)
+    '''    .. has an id for the topmost object
+    '''    .. these objects are in .. ? (another model folder?)
+    '''    
+    '''  -- complex objects that are not entity -- 
+    '''    .. 
+    ''' 
     ''' When a record is saved in admin, an invalidation call is made for tableName+1d.
     ''' 
     ''' If code edits a db record, you should call invalidation for tablename+id+#
