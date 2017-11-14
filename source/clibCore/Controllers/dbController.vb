@@ -2797,22 +2797,20 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                If (FieldValue.Length > 255) Then
-                                                    cpCore.handleException(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for Text field is 255. Save will be attempted"))
-                                                Else
-                                                    If genericController.encodeText(FieldValue) <> csGetText(CSPointer, FieldNameLc) Then
-                                                        SetNeeded = True
+                                                If genericController.encodeText(FieldValue) <> csGetText(CSPointer, FieldNameLc) Then
+                                                    SetNeeded = True
+                                                    If (FieldValue.Length > 255) Then
+                                                        cpCore.handleException(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for Text field is 255. Save will be attempted"))
                                                     End If
                                                 End If
                                             Case FieldTypeIdLongText, FieldTypeIdHTML
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                If (FieldValue.Length > 65535) Then
-                                                    cpCore.handleException(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for LongText and Html is 65535. Save will be attempted"))
-                                                Else
-                                                    If genericController.encodeText(FieldValue) <> csGetText(CSPointer, FieldNameLc) Then
-                                                        SetNeeded = True
+                                                If genericController.encodeText(FieldValue) <> csGetText(CSPointer, FieldNameLc) Then
+                                                    SetNeeded = True
+                                                    If (FieldValue.Length > 65535) Then
+                                                        cpCore.handleException(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for LongText and Html is 65535. Save will be attempted"))
                                                     End If
                                                 End If
                                             Case Else
