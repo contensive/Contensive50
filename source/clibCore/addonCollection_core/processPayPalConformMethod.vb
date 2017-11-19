@@ -44,7 +44,7 @@ Namespace Contensive.Addons.Core
                         Call cpCore.db.csSet(CS, "ShipState", cpCore.docProperties.getText("address_state"))
                         Call cpCore.db.csSet(CS, "ShipZip", cpCore.docProperties.getText("address_zip"))
                         Call cpCore.db.csSet(CS, "BilleMail", cpCore.docProperties.getText("payer_email"))
-                        Call cpCore.db.csSet(CS, "ContentControlID", cpCore.metaData.getContentId("Orders Completed"))
+                        Call cpCore.db.csSet(CS, "ContentControlID", models.complex.cdefmodel.getcontentid(cpcore,"Orders Completed"))
                         Call cpCore.db.csSave2(CS)
                     End If
                     Call cpCore.db.csClose(CS)

@@ -1,9 +1,6 @@
 ﻿
 //
-//----------
-// Globals
-//	Please do no use any functions that are not in the cj object. They will all be migrated into cj in future builds.
-//----------
+// -- contensive base: included for all base addons: adminSite, pageManager, etc
 //
 var ImagePropertyEditorObject;
 var DialogObject;
@@ -52,6 +49,7 @@ var AFinnerHTML;
 // cross browser window size function
 //
 window.size = function () {
+    console.log("contensive.base.window.size");
     var w = 0;
     var h = 0;
 
@@ -79,24 +77,28 @@ window.size = function () {
 //----------
 //
 function DeleteCheck() {
+    console.log("base.DeleteCheck");
     return confirm("This action will delete this record.\n\nAre you sure you would like to delete this record?\n\n")
 }
 //
 //----------
 //
 function DeleteCheckWithChildren() {
+    console.log("base.DeleteCheckWithChildren");
     return confirm("This action will delete this record and its child records.\n\nAre you sure you would like to delete this record?\n\n")
 }
 //
 //----------
 //
 function DeletePageCheck() {
+    console.log("base.DeletePageCheck");
     return confirm("This action will delete this page and its child pages.\n\nAre you sure you would like to delete this page?\n\n")
 }
 //
 //----------
 //
 function CheckInputs(TargetID, SetValue) {
+    console.log("base.CheckInputs");
     var e, ptr;
     e = document.getElementsByTagName('input');
     for (ptr = 0; ptr < e.length; ptr++) {
@@ -106,11 +108,15 @@ function CheckInputs(TargetID, SetValue) {
 //
 //----------
 //
-function SetFieldName(FieldName) { document.all['fn'].value = FieldName; return true; }
+function SetFieldName(FieldName) {
+    console.log("base.SetFieldName");
+    document.all['fn'].value = FieldName; return true;
+}
 //
 // ----- hide select menus
 //
 function hideselect(hiddenIn) {
+    console.log("base.hideselect");
     var i, j, index, objs, wmode, paramName
     //
     if (hiddenIn) {
@@ -200,6 +206,7 @@ function hideselect(hiddenIn) {
 // ----- Browser Detect
 //
 function BrowserType() {
+    console.log("base.BrowserType");
     var ua, s, i;
     this.isIE = false;  // Internet Explorer
     this.isNS = false;  // Netscape
@@ -233,9 +240,8 @@ function BrowserType() {
 // ----- Code for handling the menu bar and active button.
 //
 function PageClick(event) {
-
+    console.log("base.PageClick");
     var el;
-
     if (activeButton == null) return;
     if (browser.isIE)
         el = window.event.srcElement;
@@ -253,6 +259,7 @@ function PageClick(event) {
 // ----- Clear the menu
 //
 function ClearMenu() {
+    console.log("base.ClearMenu");
     if (activeButton == null) return;
     resetButton(activeButton);
     activeButton = null;
@@ -261,6 +268,7 @@ function ClearMenu() {
 // -----
 //
 function ccFlyoutHoverMode(val) {
+    console.log("base.ccFlyoutHoverMode");
     flag = val;
     if (val == 0) {
         setTimeout(timerEvent, 1000);
@@ -274,7 +282,7 @@ function ccFlyoutHoverMode(val) {
 // -----
 //
 function timerEvent() {
-
+    console.log("base.timerEvent");
     if (flag == 0) {
         resetFlag = 1;
         resetButton(activeButton);
@@ -288,9 +296,9 @@ function timerEvent() {
 // -----
 //
 function setAnchorTagsToColor(classToFind, colorToSet) {
+    console.log("base.setAnchorTagsToColor");
     var i;
     var aTags = document.getElementsByTagName("A");
-
     for (i = 0; i < aTags.length; i++) {
         if (hasClassName(aTags[i], classToFind)) {
             aTags[i].style.color = colorToSet;
@@ -301,6 +309,7 @@ function setAnchorTagsToColor(classToFind, colorToSet) {
 // -----
 //
 function ccFlyoutButtonClick(event, menuId, position, StyleSheetPrefix, OpenOnHover) {
+    console.log("base.ccFlyoutButtonClick");
     var button;
     var x, y;
     var offY;
@@ -388,6 +397,7 @@ function ccFlyoutButtonClick(event, menuId, position, StyleSheetPrefix, OpenOnHo
 // -----
 //
 function ccFlyoutButtonHover(event, menuId, position) {
+    console.log("base.ccFlyoutButtonHover");
     var button;
     if (browser.isIE)
         button = window.event.srcElement;
@@ -400,6 +410,7 @@ function ccFlyoutButtonHover(event, menuId, position) {
 // -----
 //
 function resetButton(button) {
+    console.log("base.resetButton");
     if (button) {
         removeClassNameAfter(button, "kmaMenuDown");
         if (button.menu != null) {
@@ -412,6 +423,7 @@ function resetButton(button) {
 // -----
 //
 function activateButton(button) {
+    console.log("base.activateButton");
     if (button.menu != null) {
         button.menu.style.visibility = "visible";
     }
@@ -420,6 +432,7 @@ function activateButton(button) {
 // -----
 //
 function ccFlyoutPanelHover(event, StyleSheetPrefix) {
+    console.log("base.ccFlyoutPanelHover");
     var menu;
     if (browser.isIE)
         menu = getContainerWith(window.event.srcElement, "DIV", StyleSheetPrefix + "Panel");
@@ -438,6 +451,7 @@ function ccFlyoutPanelHover(event, StyleSheetPrefix) {
 // -----
 //
 function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
+    console.log("base.ccFlyoutPanelButtonHover");
     var item, menu, x, y;
     var maxX, maxY;
     if (browser.isIE)
@@ -496,6 +510,7 @@ function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
 // -----
 //
 function closeSubMenu(menu) {
+    console.log("base.closeSubMenu");
     if (!menu)
         return;
     if (menu.activeItem == null)
@@ -513,6 +528,7 @@ function closeSubMenu(menu) {
 // -----
 //
 function menuInit(menu) {
+    console.log("base.menuInit");
     var itemList, spanList;
     var textEl, arrowEl;
     var itemWidth;
@@ -538,6 +554,7 @@ function menuInit(menu) {
 // -----
 //
 function getContainerWith(node, tagName, className) {
+    console.log("base.getContainerWith");
     while (node != null) {
         if (node.tagName != null && node.tagName == tagName &&
 				hasClassName(node, className))
@@ -550,6 +567,7 @@ function getContainerWith(node, tagName, className) {
 // -----
 //
 function getContainer(node, tagName) {
+    console.log("base.getContainer");
     while (node != null) {
         if (node.tagName != null && node.tagName == tagName)
             return node;
@@ -561,6 +579,7 @@ function getContainer(node, tagName) {
 // -----
 //
 function hasClassName(el, name) {
+    console.log("base.hasClassName");
     var i, list;
     list = el.className.split(" ");
     for (i = 0; i < list.length; i++)
@@ -571,6 +590,7 @@ function hasClassName(el, name) {
 // -----
 //
 function removeClassName(el, name) {
+    console.log("base.removeClassName");
     var i, curList, newList;
     if (el.className == null) return;
     //newList = new Array();
@@ -588,6 +608,7 @@ function removeClassName(el, name) {
 // -----
 //
 function removeClassNameAfter(el, name) {
+    console.log("base.removeClassNameAfter");
     var i, curList, newList;
     if (el.className == null) return;
     curList = el.className.split(" ");
@@ -605,50 +626,23 @@ function removeClassNameAfter(el, name) {
 //----------
 //
 function getPageOffsetLeft(el) {
+    console.log("base.getPageOffsetLeft");
     var offset = jQuery(el).position();
     return offset.left;
-    //   var x, p, pos, offset;
-    //   p = el.offsetParent;
-    //   x = el.offsetLeft;
-    //   pos = '';
-    //   while (p !=null){
-    //       if (typeof($) != "undefined") { pos = jQuery(p).css('position') }
-    //       if((pos=='absolute')||(pos=='relative')) {
-    //           p=null;
-    //       }else{
-    //           x+=p.offsetLeft;
-    //           p=p.offsetParent;
-    //       }
-    //   }
-    //   return x;
 }
 //
 //----------
 //
 function getPageOffsetTop(el) {
+    console.log("base.getPageOffsetTop");
     var offset = jQuery(el).position();
     return offset.top;
-    //   var y, p, pos;
-    //   p = el.offsetParent;
-    //   y = el.offsetTop;
-    //   pos = '';
-    //   //msg = ''+y;
-    //   while (p !=null){
-    //       if (typeof($) != "undefined") { pos = jQuery(p).css('position') }
-    //       if((pos=='absolute')||(pos=='relative')) {
-    //       //if((p.style.position=='absolute')||(p.style.position=='relative')) {
-    //           p=null;
-    //       }else{
-    //           y+=p.offsetTop;
-    //           p=p.offsetParent;
-    //       }
-    //   }
-    //   return y;
 }
 //
 //----------
 //
 function updateClipboardLinks() {
+    console.log("base.updateClipboardLinks");
     if (!browser.isIE) {
         return;
     }
@@ -678,11 +672,10 @@ function updateClipboardLinks() {
 //----------
 //
 function updateClipboardLinksInit() {
-
+    console.log("base.updateClipboardLinksInit");
     if (!browser.isIE) {
         return;
     }
-
     setAnchorTagsToColor("ccPaste", "#000000");
     lastClipCheck = true;
     setAnchorTagsToColor("ccSelect", "#FFFFFF");
@@ -691,6 +684,7 @@ function updateClipboardLinksInit() {
 //----------
 //
 function SaveFieldPlus(ObjectName) {
+    console.log("base.SaveFieldPlus");
     var RefreshTemp;
     RefreshTemp = document.all.tags('div')[ObjectName].innerHTML;
     document.all[ObjectName + 'Field'].value = RefreshTemp;
@@ -699,6 +693,7 @@ function SaveFieldPlus(ObjectName) {
 //----------
 //
 function OpenImagePropertyWindow(EditorObject, ImageObject) {
+    console.log("base.OpenImagePropertyWindow");
     DialogObject = ImageObject;
     showModalDialog("/cclib/Popup/ActiveEditorImageProperties.htm", window, "status:false;dialogWidth:32em;dialogHeight:25em");
 }
@@ -706,6 +701,7 @@ function OpenImagePropertyWindow(EditorObject, ImageObject) {
 //----------
 //
 function OpenACPropertyWindow(EditorObject, ACObject) {
+    console.log("base.OpenACPropertyWindow");
     ACPropertyObject = ACObject;
     showModalDialog("/cclib/Popup/ActiveEditorACProperties.htm", window, "status:false;dialogWidth:18em;dialogHeight:14em");
 }
@@ -713,18 +709,21 @@ function OpenACPropertyWindow(EditorObject, ACObject) {
 //----------
 //
 function OpenSiteExplorerWindow(TargetInputID) {
+    console.log("base.OpenSiteExplorerWindow");
     window.open('?ccIPage=kdif3318sd&LinkObjectName=' + TargetInputID, 'PageSelector', 'menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable')
 }
 //
 //----------
 //
 function OpenResourceLinkWindow(TargetInputID) {
+    console.log("base.OpenResourceLinkWindow");
     window.open('/admin/index.asp?ccIPage=s033l8dm15&SourceMode=0&LinkObjectName=' + TargetInputID, 'ResourceSelector', 'menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable')
 }
 //
 //----------
 //
 function OpenTablePropertyWindow(EditorObject, TableObject, TableBodyObject) {
+    console.log("base.OpenTablePropertyWindow");
     TablePropertyObject = TableObject;
     TableBodyPropertyObject = TableBodyObject;
     ClearMenu();
@@ -739,6 +738,7 @@ function OpenTablePropertyWindow(EditorObject, TableObject, TableBodyObject) {
 var globalAddonIconObj;
 //
 function OpenAddonPropertyWindow(AddonIconObj, AdminURL) {
+    console.log("base.OpenAddonPropertyWindow");
     var RawString, SplitString, addonOptionString, addonGuid;
     //
     globalAddonIconObj = AddonIconObj;
@@ -760,6 +760,7 @@ function OpenAddonPropertyWindow(AddonIconObj, AdminURL) {
 //----------
 //
 function OpenAPWithOptionString(addonOptionString, AdminURL) {
+    console.log("base.OpenAPWithOptionString");
     var RawString, SplitString;
     var PairPointer;
     var PairSplit;
@@ -916,6 +917,7 @@ function OpenAPWithOptionString(addonOptionString, AdminURL) {
 //----------
 //
 function InsertTag(OpenTag, CloseTag) {
+    console.log("base.InsertTag");
     var SelectionObject;
     var SelectionObjectType;
     var ControlRangeCollection;
@@ -946,6 +948,7 @@ function InsertTag(OpenTag, CloseTag) {
 //----------
 //
 function PrintElement(ElementIdentifier) {
+    console.log("base.PrintElement");
     var ElementObject = document.all(ElementIdentifier);
     var tr = ElementObject.createTextRange();
     var msgWind = window.open('', '_blank', 'scrollbars=yes,toolbar=no,status=no,resizable=yes');
@@ -957,6 +960,7 @@ function PrintElement(ElementIdentifier) {
 //----------
 //
 function RemoveStyle(ElementIdentifier) {
+    console.log("base.RemoveStyle");
     var ElementObject;
     var SelectedObject;
     var TextRange;
@@ -972,6 +976,7 @@ function RemoveStyle(ElementIdentifier) {
 //----------
 //
 function ExecCmdPlus(cmd, ui, opt, ObjectName) {
+    console.log("base.ExecCmdPlus");
     var CommandPassed, editor;
     editor = document.all[ObjectName]
     if (!editor.document.queryCommandSupported(cmd)) {
@@ -993,12 +998,14 @@ function ExecCmdPlus(cmd, ui, opt, ObjectName) {
 //----------
 //
 function OpenResourceLibrary(EditorObjectName) {
+    console.log("base.OpenResourceLibrary");
     window.open('?ccIPage=s033l8dm15&EditorObjectName=' + EditorObjectName, 'ImageSelector', 'menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable')
 }
 //
 //----------
 //
 function InsertImage(Name, Src, Alt, Width, Height, ObjectName) {
+    console.log("base.InsertImage");
     var tag
     tag = '<IMG SRC="' + Src + '"'
     tag += 'name="' + Name + '" ID="' + Name + '"'
@@ -1011,6 +1018,7 @@ function InsertImage(Name, Src, Alt, Width, Height, ObjectName) {
 //----------
 //
 function InsertDownload(RecordID, ObjectName, ImageLink) {
+    console.log("base.InsertDownload");
     var tag;
     tag = '<a href="?downloadid=' + RecordID + '" target="_blank"><img src="' + ImageLink + '" border=0 width=16 height=16 alt="Download" ></a>';
     oUtil.obj.insertHTML(tag);
@@ -1020,6 +1028,7 @@ function InsertDownload(RecordID, ObjectName, ImageLink) {
 //----------
 //
 function InsertActiveContentPlus(ACType, ACSubType, ACArg1, ObjectName) {
+    console.log("base.InsertActiveContentPlus");
     var SelectionObject;
     var SelectionObjectType;
     var ControlRangeObject;
@@ -1048,6 +1057,7 @@ function InsertActiveContentPlus(ACType, ACSubType, ACArg1, ObjectName) {
 //----------
 //
 function InsertActiveChildList(ACType, ObjectName) {
+    console.log("base.InsertActiveChildList");
     var RandomNumber;
     RandomNumber = Math.floor(Math.random() * 1000000);
     InsertActiveContentPlus(ACType, '', RandomNumber, ObjectName);
@@ -1056,6 +1066,7 @@ function InsertActiveChildList(ACType, ObjectName) {
 //----------
 //
 function OpenPropertiesWindowPlus(ObjectName) {
+    console.log("base.OpenPropertiesWindowPlus");
     var EditorObject;
     var SelectionObject;
     var TextRangeObject;
@@ -1102,6 +1113,7 @@ function OpenPropertiesWindowPlus(ObjectName) {
 //----------
 //
 function tableDialog(ObjectName) {
+    console.log("base.tableDialog");
     ClearMenu();
     var rtNumRows = null;
     var rtNumCols = null;
@@ -1114,6 +1126,7 @@ function tableDialog(ObjectName) {
 //----------
 //
 function tdDialog(tabIndex, fieldName) {
+    console.log("base.tdDialog");
     ClearMenu();
     var h = new Object();
     h.win = window;
@@ -1125,6 +1138,7 @@ function tdDialog(tabIndex, fieldName) {
 //----------
 //
 function createTable() {
+    console.log("base.createTable");
     var HTMLEditor = document.all[tableDialogEditor]
     var CellWidth;
     if (rtNumRows == "" || rtNumRows == "0") {
@@ -1155,12 +1169,14 @@ function createTable() {
 //----------
 //
 function clickIE() {
+    console.log("base.clickIE");
     return false;
 }
 //
 //----------
 //
 function createTableNew() {
+    console.log("base.createTableNew");
     rtNumRows = currentRow;
     rtNumCols = currentCol;
     rtTblAlign = "";
@@ -1175,6 +1191,7 @@ function createTableNew() {
 //----------
 //
 function hideTableIF(ObjectName) {
+    console.log("base.hideTableIF");
     var tableDiv = document.all[ObjectName];
     tableDiv.style.visibility = "hidden";
     var tableCreateIF = tableDiv.getElementsByTagName("TABLE");
@@ -1187,6 +1204,7 @@ function hideTableIF(ObjectName) {
 //----------
 //
 function highlightTDs(ObjectName, num, CellDataHolder) {
+    console.log("base.highlightTDs");
     var tableCreateIF = document.all[ObjectName];
     var tableCells = tableCreateIF.getElementsByTagName("TD");
     var tableRows = tableCreateIF.getElementsByTagName("TR");
@@ -1221,12 +1239,14 @@ function highlightTDs(ObjectName, num, CellDataHolder) {
 //----------
 //
 function rowVal(num, tableWidth) {
+    console.log("base.rowVal");
     return Math.floor((num + tableWidth) / tableWidth);
 }
 //
 //----------
 //
 function colVal(num, tableWidth) {
+    console.log("base.colVal");
     var retVal;
     if (num == 0) {
         retVal = 1;
@@ -1243,12 +1263,14 @@ function colVal(num, tableWidth) {
 //----------
 //
 function setEditor(objectName) {
+    console.log("base.setEditor");
     tableDialogEditor = objectName;
 }
 //
 //----------
 //
 function editorRightClick(prefix, divName) {
+    console.log("base.editorRightClick");
     var possibleTableElement;
     if (parseInt(navigator.appVersion) > 3) {
         var clickType = 1;
@@ -1307,6 +1329,7 @@ function editorRightClick(prefix, divName) {
 //----------
 //
 function findTagAmongstParents(startingElement, tagName, divName) {
+    console.log("base.findTagAmongstParents");
     var found;
     var currEl;
     found = false;
@@ -1331,6 +1354,7 @@ function findTagAmongstParents(startingElement, tagName, divName) {
 //----------
 //
 function hideRightMenu(ObjectName) {
+    console.log("base.hideRightMenu");
     var i;
     var tableMenu = document.all[ObjectName];
     for (i = 0; i < tableMenu.childNodes.length; i++) {
@@ -1344,6 +1368,7 @@ function hideRightMenu(ObjectName) {
 //----------
 //
 function insertRowBefore() {
+    console.log("base.insertRowBefore");
     var tRows = TablePropertyObject.getElementsByTagName("TR");
     var tCells = TablePropertyObject.getElementsByTagName("TD");
     var tCols = Math.round(tCells.length / tRows.length);
@@ -1360,6 +1385,7 @@ function insertRowBefore() {
 //----------
 //
 function insertRowAfter() {
+    console.log("base.insertRowAfter");
     var tRows = TablePropertyObject.getElementsByTagName("TR");
     var tCells = TablePropertyObject.getElementsByTagName("TD");
     var tCols = Math.round(tCells.length / tRows.length);
@@ -1378,6 +1404,7 @@ function insertRowAfter() {
 //----------
 //
 function findColumn() {
+    console.log("base.findColumn");
     var i;
     for (i = 0; i < TableRowPropertyObject.childNodes.length; i++) {
         if (TableRowPropertyObject.childNodes[i] == TableCellPropertyObject) {
@@ -1389,6 +1416,7 @@ function findColumn() {
 //----------
 //
 function insertColLeft() {
+    console.log("base.insertColLeft");
     var colIndex = findColumn();
     var tRows = TableBodyPropertyObject.getElementsByTagName("TR");
     for (i = 0; i < tRows.length; i++) {
@@ -1406,6 +1434,7 @@ function insertColLeft() {
 //----------
 //
 function deleteColumn() {
+    console.log("base.deleteColumn");
     var colIndex = findColumn();
     var tRows = TableBodyPropertyObject.getElementsByTagName("TR");
     for (i = 0; i < tRows.length; i++) {
@@ -1421,6 +1450,7 @@ function deleteColumn() {
 //----------
 //
 function insertColRight() {
+    console.log("base.insertColRight");
     var colIndex = findColumn();
     var tRows = TableBodyPropertyObject.getElementsByTagName("TR");
     for (i = 0; i < tRows.length; i++) {
@@ -1438,6 +1468,7 @@ function insertColRight() {
 //----------
 //
 function deleteRow() {
+    console.log("base.deleteRow");
     TableRowPropertyObject.removeNode(true);
     ClearMenu();
 }
@@ -1445,6 +1476,7 @@ function deleteRow() {
 //----------
 //
 function showPanel(panelNum) {
+    console.log("base.showPanel");
     if (currentPanel != null) {
         hidePanel();
     }
@@ -1456,6 +1488,7 @@ function showPanel(panelNum) {
 //----------
 //
 function hidePanel() {
+    console.log("base.hidePanel");
     document.getElementById('panel' + currentPanel).style.visibility = 'hidden';
     document.getElementById('tab' + currentPanel).style.backgroundColor = '#ffffff';
     document.getElementById('tab' + currentPanel).style.color = 'navy';
@@ -1464,6 +1497,7 @@ function hidePanel() {
 //----------
 //
 function setState(tabNum) {
+    console.log("base.setState");
     if (tabNum == currentPanel) {
         document.getElementById('tab' + tabNum).style.backgroundColor = '#ddddff';
         document.getElementById('tab' + tabNum).style.color = 'red';
@@ -1476,12 +1510,14 @@ function setState(tabNum) {
 //----------
 //
 function hover(tab) {
+    console.log("base.hover");
     tab.style.backgroundColor = 'ddddff';
 }
 //
 //----------
 //
 function showTab(tabnum) {
+    console.log("base.showTab");
     var tabsDef = new Array(4)
     for (i = 1; i <= tabsDef.length; i++) {
         tabName = 'tabContent' + i;
@@ -1504,6 +1540,7 @@ function showTab(tabnum) {
 //----------
 //
 function ImagePreview(ImageURL, ImageHeight, ImageWidth) {
+    console.log("base.ImagePreview");
     var Options
     Options = 'menubar=no,toolbar=no,location=no,status=no,scrollbars=no,resizable,directories=no'
     if (ImageWidth) {
@@ -1521,6 +1558,7 @@ function ImagePreview(ImageURL, ImageHeight, ImageWidth) {
 //
 var LastBubbleID;
 function HelpBubbleOn(BubbleID, Source) {
+    console.log("base.HelpBubbleOn");
     var DivTarget, DivLeft, DivTop, pageYOffset;
     //
     HelpBubbleOff(LastBubbleID);
@@ -1551,6 +1589,7 @@ function HelpBubbleOn(BubbleID, Source) {
 //----------
 //
 function HelpBubbleOff(BubbleID) {
+    console.log("base.HelpBubbleOff");
     var DivTarget = document.getElementById(BubbleID);
     if (DivTarget) {
         DivTarget.style.visibility = 'hidden';
@@ -1561,6 +1600,7 @@ function HelpBubbleOff(BubbleID) {
 //----------
 //
 function HelpBubbleHover(BubbleID, Source) {
+    console.log("base.HelpBubbleHover");
     var DivTarget;
     var DivLeft, DivTop;
     //
@@ -1573,6 +1613,7 @@ function HelpBubbleHover(BubbleID, Source) {
 //----------
 //
 function HelpBubbleAjaxOn(BubbleID, Source, ContentName, FieldName) {
+    console.log("base.HelpBubbleAjaxOn");
     var DivTarget;
     var DivLeft, DivTop;
     //
@@ -1596,29 +1637,25 @@ function HelpBubbleAjaxOn(BubbleID, Source, ContentName, FieldName) {
         }
     }
 }
-
 //
 //------------------------------------------------------------------------------------------------------
 //	Update the help message
-//------------------------------------------------------------------------------------------------------
 //
 function updateFieldHelp(fieldId, helpEditorId, helpClosedContentId) {
     var eDst = document.getElementById(helpClosedContentId);
     var eSrc = document.getElementById(helpEditorId);
-    var txt = eSrc.value;
-    var txtShort = txt;
-    var criteria, setPairs;
-    if (txtShort.length > 100) txtShort = txtShort.substr(0, 100) + '...';
-    eDst.innerHTML = txtShort;
-    criteria = '(fieldid=' + fieldId + ')';
-    setPairs = new Array();
-    setPairs = [['helpcustom', eSrc.value]];
-    cj.ajax.update('', 'ccFieldHelpUpdate', criteria, setPairs);
+    eDst.innerHTML = eSrc.value;
+    jQuery.ajax({
+        url: "/setAdminSiteFieldHelp?fieldId=" + fieldId + "&helpCustom=" + eSrc.value,
+    }).done(function (data) {
+        //
+    });
 }
 //
 //----------
 //
 function InsertFolderRow() {
+    console.log("base.InsertFolderRow");
     var RLTable = document.getElementById('AddFolderTable');
     var CountElement = document.getElementById('AddFolderCount');
     var tCols, tRows, NewRowNumber;
@@ -1642,6 +1679,7 @@ function InsertFolderRow() {
 //----------
 //
 function InsertUploadRow() {
+    console.log("base.InsertUploadRow");
     var RLTable = document.getElementById('UploadInsert');
     var CountElement = document.getElementById('LibraryUploadCount');
     var tCols, tRows, NewRowNumber;
@@ -1667,6 +1705,7 @@ function InsertUploadRow() {
 //----------
 //
 function InsertUpload() {
+    console.log("base.InsertUpload");
     var RLTable = document.getElementById('UploadInsert');
     var CountElement = document.getElementById('UploadCount');
     var tCols, tRows, NewRowNumber;
@@ -1685,6 +1724,7 @@ function InsertUpload() {
 //----------
 //
 function RLRowClick(IsChecked, RowID) {
+    console.log("base.RLRowClick");
     var RLRow = document.getElementById(RowID);
     if (IsChecked) {
         RLRow.style.backgroundColor = "#F0F0F0";
@@ -1697,6 +1737,7 @@ function RLRowClick(IsChecked, RowID) {
 //
 var DPanel = '0';
 function ToggleToolPanelDev() {
+    console.log("base.ToggleToolPanelDev");
     if (DPanel == '0') {
         DPanel = '1';
         document.all['ToolPanelDev'].style.visibility = 'visible';
@@ -1710,6 +1751,7 @@ function ToggleToolPanelDev() {
 //----------
 //
 function SubmitToolsPanel() {
+    console.log("base.SubmitToolsPanel");
     var SelectedObject;
     var TextRange;
     SelectedObject = document.selection;
@@ -1725,6 +1767,7 @@ function SubmitToolsPanel() {
 //----------
 //
 function InsertTemplateIcon(ImageLink, ObjectName) {
+    console.log("base.InsertTemplateIcon");
     ExecCmdPlus('InsertImage', false, ImageLink, ObjectName);
     ClearMenu();
 }
@@ -1732,6 +1775,7 @@ function InsertTemplateIcon(ImageLink, ObjectName) {
 //----------
 //
 function switchContentFolderDiv(ShowID, HideID, ContentCaptionDivID, ContentCaption, EmptyDivID) {
+    console.log("base.switchContentFolderDiv");
     var ShowDiv, HideDiv, CaptionDiv, EmptyDiv, ptr;
     var HiddenInput, Hit;
     //
@@ -1805,12 +1849,14 @@ function switchContentFolderDiv(ShowID, HideID, ContentCaptionDivID, ContentCapt
 //----------
 //
 function SetDisplay(Id, Value) {
+    console.log("base.SetDisplay");
     document.getElementById(Id).style.display = Value;
 }
 //
 // Close TextAreaExpandable
 //
 function CloseTextArea(TextAreaID) {
+    console.log("base.CloseTextArea");
     var tc = document.getElementById(TextAreaID);
     var to = document.getElementById(TextAreaID + 'Opened');
     var hc = document.getElementById(TextAreaID + 'Head')
@@ -1830,6 +1876,7 @@ function CloseTextArea(TextAreaID) {
 // Open TextAreaExpandable
 //
 function OpenTextArea(TextAreaID) {
+    console.log("base.OpenTextArea");
     window.scroll(0, 0);
     var tc = document.getElementById(TextAreaID);
     var to = document.getElementById(TextAreaID + 'Opened');
@@ -1879,6 +1926,7 @@ function OpenTextArea(TextAreaID) {
 // Disable all buttons on the page
 //
 function processSubmit(e) {
+    console.log("base.processSubmit");
     if (typeof (docLoaded) != "undefined") {
         if (!docLoaded) {
             alert('This page has not loaded completed. Please wait for the page to load before submitting the form. If the page has loaded, there may have been an error. Please refresh the page.');
@@ -1896,6 +1944,7 @@ function processSubmit(e) {
 //
 //
 function EncodeAddonOptionArgument(EncodedArg) {
+    console.log("base.EncodeAddonOptionArgument");
     var a = EncodedArg;
     a = a.replace(/&/g, "#0038#");
     a = a.replace(/=/g, "#0061#");
@@ -1912,6 +1961,7 @@ function EncodeAddonOptionArgument(EncodedArg) {
 //
 //
 function DecodeAddonOptionArgument(EncodedArg) {
+    console.log("base.DecodeAddonOptionArgument");
     var a = EncodedArg;
     a = a.replace(/#0058#/g, ":");
     a = a.replace(/#0093#/g, "]");
@@ -1928,6 +1978,7 @@ function DecodeAddonOptionArgument(EncodedArg) {
 //----------
 //
 function BodyOnClick() {
+    console.log("base.BodyOnClick");
     var el;
     hideselect(false);
 }
@@ -1938,6 +1989,7 @@ function BodyOnClick() {
 //-------------------------------------------------------------------------
 //
 function cjAddLoadEvent(func) {
+    console.log("base.cjAddLoadEvent");
     var oldonload = window.onload;
     if (typeof window.onload != 'function') {
         window.onload = func;
@@ -1958,12 +2010,8 @@ function cjAddLoadEvent(func) {
 //-------------------------------------------------------------------------
 //
 function cjAddHeadScriptCode(codeAsString) {
+    console.log("base.cjAddHeadScriptCode");
     eval(codeAsString)
-    //	var st=document.createElement('script');
-    //	st.type = 'text/javascript';
-    //	st.text='eval(\''+codeAsString+'\')';
-    //	var ht = document.getElementsByTagName("head")[0];
-    //	ht.appendChild(st);
 }
 //
 //-------------------------------------------------------------------------
@@ -1971,6 +2019,7 @@ function cjAddHeadScriptCode(codeAsString) {
 //-------------------------------------------------------------------------
 //
 function cjAddHeadScriptLink(link) {
+    console.log("base.cjAddHeadScriptLink");
     var st = document.createElement('script');
     st.type = 'text/javascript';
     st.src = link;
@@ -1983,6 +2032,7 @@ function cjAddHeadScriptLink(link) {
 //-------------------------------------------------------------------------
 //
 function cjAddHeadStyleLink(linkHref) {
+    console.log("base.cjAddHeadStyleLink");
     var st = document.createElement('link');
     st.rel = 'stylesheet';
     st.type = 'text/css';
@@ -1996,6 +2046,7 @@ function cjAddHeadStyleLink(linkHref) {
 //-------------------------------------------------------------------------
 //
 function cjAddHeadStyle(styles) {
+    console.log("base.cjAddHeadStyle");
     var st = document.createElement('style');
     st.type = 'text/css';
     if (st.styleSheet) {
@@ -2018,6 +2069,7 @@ function cjAddHeadStyle(styles) {
 //
 
 function cjSetFrameHeight(frameId) {
+    console.log("base.cjSetFrameHeight");
     var e, h, f;
     e = document.getElementById(frameId);
     if (e) {
@@ -2033,6 +2085,7 @@ function cjSetFrameHeight(frameId) {
 //
 
 function cjEncodeTextAreaKey(sender, e) {
+    console.log("base.cjEncodeTextAreaKey");
     if (e.keyCode == 9) {
         if (e.srcElement) {
             sender.selection = document.selection.createRange();
@@ -2066,7 +2119,7 @@ function cjEncodeTextAreaKey(sender, e) {
 //----------
 //
 function cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID) {
-    //alert('cjAjaxURL');	
+    console.log("base.cjAjaxURL");
     var xmlHttp, fo, i, url, serverResponse, el1, pos, ret, e;
     var eSelected = new Array();
     try {
@@ -2184,6 +2237,7 @@ function cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID
 //----------
 //
 function GetURLAjax(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID) {
+    console.log("base.GetURLAjax");
     cjAjaxURL(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowID);
 }
 //
@@ -2202,6 +2256,7 @@ function GetURLAjax(LocalURL, FormID, DestinationID, onEmptyHideID, onEmptyShowI
 //----------
 //
 function cjAjaxAddon(AddonName, QueryString, FormID, DestinationID, onEmptyHideID, onEmptyShowID) {
+    console.log("base.cjAjaxAddon");
     //
     // compatibility mode
     //
@@ -2227,6 +2282,7 @@ function cjAjaxAddon(AddonName, QueryString, FormID, DestinationID, onEmptyHideI
 //----------
 //
 function GetAjax(AddonName, QueryString, FormID, DestinationID, onEmptyHideID, onEmptyShowID) {
+    console.log("base.GetAjax");
     cjAjaxAddon(AddonName, QueryString, FormID, DestinationID, onEmptyHideID, onEmptyShowID);
 }
 //
@@ -2245,6 +2301,7 @@ function GetAjax(AddonName, QueryString, FormID, DestinationID, onEmptyHideID, o
 //----------
 //
 function cjAjaxAddonCallback(AddonName, QueryString, Callback, CallbackArg) {
+    console.log("base.cjAjaxAddonCallback");
     var xmlHttp, url, pos;
     try {
         // Firefox, Opera 8.0+, Safari
@@ -2350,6 +2407,7 @@ function cjAjaxAddonCallback(AddonName, QueryString, Callback, CallbackArg) {
 //----------
 //
 function cjAjaxQs(QueryString, FormID, DestinationID, onEmptyHideID, onEmptyShowID) {
+    console.log("base.cjAjaxQs");
     var url;
     var pos;
     // create LocalURL
@@ -2376,6 +2434,7 @@ function cjAjaxQs(QueryString, FormID, DestinationID, onEmptyHideID, onEmptyShow
 //----------
 //
 function cjAjaxQsCallback(QueryString, Callback, CallbackArg) {
+    console.log("base.cjAjaxQsCallback");
     cjAjaxAddonCallback('', QueryString, Callback, CallbackArg);
 }
 //
@@ -2411,6 +2470,7 @@ function cjAjaxQsCallback(QueryString, Callback, CallbackArg) {
 //-------------------------------------------------------------------------
 //
 function cjAjaxData(handler, queryKey, args, pageSize, pageNumber, responseFormat, ajaxMethod) {
+    console.log("base.cjAjaxData");
     var xmlHttp;
     var url;
     var serverResponse;
@@ -2472,6 +2532,7 @@ function cjAjaxData(handler, queryKey, args, pageSize, pageNumber, responseForma
 //-------------------------------------------------------------------------
 //
 function cjAjaxGetTable(handler, queryKey, args, pageSize, pageNumber) {
+    console.log("base.cjAjaxGetTable");
     return this.data(handler, queryKey, args, pageSize, pageNumber, 'jsontable', 'data')
 }
 //
@@ -2481,6 +2542,7 @@ function cjAjaxGetTable(handler, queryKey, args, pageSize, pageNumber) {
 //-------------------------------------------------------------------------
 //
 function cjAjaxGetNameArray(handler, queryKey, args, pageSize, pageNumber) {
+    console.log("base.cjAjaxGetNameArray");
     return this.data(handler, queryKey, args, pageSize, pageNumber, 'jsonnamearray', 'data')
 }
 //
@@ -2490,6 +2552,7 @@ function cjAjaxGetNameArray(handler, queryKey, args, pageSize, pageNumber) {
 //-------------------------------------------------------------------------
 //
 function cjAjaxGetNameValue(handler, queryKey, args) {
+    console.log("base.cjAjaxGetNameValue");
     return this.data(handler, queryKey, args, 1, 1, 'jsonnamevalue', 'data')
 }
 //
@@ -2499,6 +2562,7 @@ function cjAjaxGetNameValue(handler, queryKey, args) {
 //-------------------------------------------------------------------------
 //
 function cjAjaxSetVisitProperty(handler, propertyName, propertyValue) {
+    console.log("base.cjAjaxSetVisitProperty");
     return this.data(handler, '', escape(propertyName) + '=' + escape(propertyValue), 0, 0, 'jsonnamevalue', 'setvisitproperty')
 }
 //
@@ -2509,6 +2573,7 @@ function cjAjaxSetVisitProperty(handler, propertyName, propertyValue) {
 //-------------------------------------------------------------------------
 //
 function cjAjaxGetVisitProperty(handler, propertyName, propertyValueDefault) {
+    console.log("base.cjAjaxGetVisitProperty");
     return this.data(handler, '', escape(propertyName) + '=' + escape(propertyValueDefault), 0, 0, 'jsonnamevalue', 'getvisitproperty')
 }
 //
@@ -2524,6 +2589,7 @@ function cjAjaxGetVisitProperty(handler, propertyName, propertyValueDefault) {
 //-------------------------------------------------------------------------
 //
 function cjAjaxUpdate(handler, queryKey, criteria, setPairs) {
+    console.log("base.cjAjaxUpdate");
     var nameValue, argSet, args, x;
     argSet = '';
     for (x = 0; x < setPairs.length; x++) {
@@ -2541,6 +2607,7 @@ function cjAjaxUpdate(handler, queryKey, criteria, setPairs) {
 //-------------------------------------------------------------------------
 //
 function cjAddListener(element, event, listener, bubble) {
+    console.log("base.cjAddListener");
     if (element.addEventListener) {
         if (typeof (bubble) == "undefined") bubble = false;
         element.addEventListener(event, listener, bubble);
@@ -2554,6 +2621,7 @@ function cjAddListener(element, event, listener, bubble) {
 //-------------------------------------------------------------------------
 //
 function cjEncodeHTML(source) {
+    console.log("base.cjEncodeHTML");
     if (source) {
         var r = source;
         var r = r.replace(/&/g, "&amp;");
@@ -2570,6 +2638,7 @@ function cjEncodeHTML(source) {
 //-------------------------------------------------------------------------
 //
 function cjHide(id) {
+    console.log("base.cjHide");
     var e = document.getElementById(id);
     if (e) e.style.display = 'none';
 }
@@ -2579,6 +2648,7 @@ function cjHide(id) {
 //-------------------------------------------------------------------------
 //
 function cjShow(id) {
+    console.log("base.cjShow");
     var e = document.getElementById(id);
     if (e) e.style.display = 'block';
 }
@@ -2588,6 +2658,7 @@ function cjShow(id) {
 //-------------------------------------------------------------------------
 //
 function cjInvisible(id) {
+    console.log("base.cjInvisible");
     var e = document.getElementById(id);
     if (e) e.style.visibility = 'hidden';
 }
@@ -2597,6 +2668,7 @@ function cjInvisible(id) {
 //-------------------------------------------------------------------------
 //
 function cjVisible(id) {
+    console.log("base.cjVisible");
     var e = document.getElementById(id);
     e.style.visibility = 'visible';
 }
@@ -2606,6 +2678,7 @@ function cjVisible(id) {
 //-------------------------------------------------------------------------
 //
 function cjSetSpinner(destinationID, message, destinationHeight) {
+    console.log("base.cjSetSpinner");
     //
     if (document.getElementById) {
         var el1 = document.getElementById(destinationID);
@@ -2635,6 +2708,7 @@ function cjSetSpinner(destinationID, message, destinationHeight) {
 //-------------------------------------------------------------------------
 //
 function cjXMLLoadString(txt) {
+    console.log("base.cjXMLLoadString");
     if (typeof DOMParser != "undefined") {
         // Mozilla, Firefox, and related browsers 
         return (new DOMParser()).parseFromString(text, "application/xml");
@@ -2661,6 +2735,7 @@ function cjXMLLoadString(txt) {
 //-------------------------------------------------------------------------
 //
 function cjAdminSaveEmptyFieldList(targetFieldId) {
+    console.log("base.cjAdminSaveEmptyFieldList");
     var e = document.getElementById(targetFieldId);
     var c = document.getElementsByTagName('input');
     for (i = 0; i < c.length; i++) {
@@ -2690,6 +2765,7 @@ function cjAdminSaveEmptyFieldList(targetFieldId) {
 //-------------------------------------------------------------------------
 //
 function cjAdminClass() {
+    console.log("base.cjAdminClass");
     this.saveEmptyFieldList = cjAdminSaveEmptyFieldList;
 }
 //
@@ -2701,6 +2777,7 @@ function cjAdminClass() {
 //-------------------------------------------------------------------------
 //
 function cjAjaxClass() {
+    console.log("base.cjAjaxClass");
     this.getTable = cjAjaxGetTable;
     this.getNameArray = cjAjaxGetNameArray;
     this.getNameValue = cjAjaxGetNameValue;
@@ -2722,6 +2799,7 @@ function cjAjaxClass() {
 //-------------------------------------------------------------------------
 //
 function cjXMLClass() {
+    console.log("base.cjXMLClass");
     this.loadString = cjXMLLoadString;
 }
 //
@@ -2744,6 +2822,7 @@ function cjXMLClass() {
 //-------------------------------------------------------------------------
 //
 function cjRemote(options) {
+    console.log("base.cjRemote");
     var url, fo, ptr, e, ret, pos;
     if (options.url) {
         url = options.url;
@@ -2915,6 +2994,7 @@ function cjRemote(options) {
 //-------------------------------------------------------------------------
 //
 function ContensiveJavascriptClass() {
+    console.log("base.ContensiveJavascriptClass");
     this.encodeHTML = cjEncodeHTML;
     this.invisible = cjInvisible;
     this.visible = cjVisible;
@@ -2971,7 +3051,10 @@ var cj = new ContensiveJavascriptClass()
 // Legacy
 //-------------------------------------------------------------------------
 //
-function cjAddHeadTag(tag) { cj.addHeadTag(tag) }
+function cjAddHeadTag(tag) {
+    console.log("base.cjAddHeadTag");
+    cj.addHeadTag(tag)
+}
 //
 //-------------------------------------------------------------------------
 //	setup pageclick to hide menuing
@@ -2993,3 +3076,23 @@ else if (browser.version > 5) {
     document.addEventListener("mousedown", PageClick, true);
     document.addEventListener("mouseclick", BodyOnClick, true);
 }
+//
+// -- child list methods
+function saveSortable(listId) {
+    console.log("base.saveSortable");
+    var e, c, s;
+    s = listId;
+    e = document.getElementById(listId);
+    for (i = 0; i < e.childNodes.length; i++) {
+        c = e.childNodes[i];
+        if (c.id) { s += ',' + c.id }
+    }
+    cj.ajax.addon('savePageManagerChildListSort', 'sortlist=' + s)
+}
+jQuery(document).ready(function () {
+    jQuery(".ccEditWrapper .ccChildList").sortable({
+        stop: function (event, ui) {
+            saveSortable(jQuery(this).attr('id'));
+        }
+    });
+})

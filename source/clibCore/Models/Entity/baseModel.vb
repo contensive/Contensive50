@@ -967,7 +967,7 @@ Namespace Contensive.Core.Models.Entity
                     cpcore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     Dim contentName As String = derivedContentName(instanceType)
-                    Dim CDef As Models.Complex.cdefModel = cpcore.metaData.getCdef(contentName)
+                    Dim CDef As Models.Complex.cdefModel = Models.Complex.cdefModel.getCdef(cpcore, contentName)
                     If (CDef Is Nothing) Then
                         Throw New ApplicationException("content [" & contentName & "] could Not be found.")
                     ElseIf (CDef.Id <= 0) Then

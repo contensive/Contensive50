@@ -443,7 +443,7 @@ Namespace Contensive.Core
             Dim RecordID As Integer = 0
             If cpcore.db.cs_isFieldSupported(CSPointer, "id") And cpcore.db.cs_isFieldSupported(CSPointer, "contentcontrolId") Then
                 RecordID = cpcore.db.csGetInteger(CSPointer, "id")
-                ContentName = cpcore.metaData.getContentNameByID(cpcore.db.csGetInteger(CSPointer, "contentcontrolId"))
+                ContentName = models.complex.cdefmodel.getContentNameByID(cpcore,cpcore.db.csGetInteger(CSPointer, "contentcontrolId"))
             End If
             Dim source As String = cpcore.db.csGet(CSPointer, FieldName)
             Return cpcore.html.convertActiveContentToHtmlForWebRender(source, ContentName, RecordID, cpCore.doc.authContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage)

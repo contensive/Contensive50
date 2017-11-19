@@ -1164,7 +1164,7 @@ ErrorTrap:
                             '
                             LinkPrefix = cpcore.webServer.requestContentWatchPrefix
                             ContentID = (cpcore.db.csGetInteger(CSPointer, "ContentID"))
-                            HostContentName = cpcore.metaData.getContentNameByID(ContentID)
+                            HostContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ContentID)
                             If (HostContentName = "") Then
                                 '
                                 ' ----- Content Watch with a bad ContentID, mark inactive
@@ -1195,7 +1195,7 @@ ErrorTrap:
                                 '
                                 ' ----- if a content watch record is blocked, delete the content tracking
                                 '
-                                Call cpcore.db.deleteContentRules(cpcore.metaData.getContentId(HostContentName), HostRecordID)
+                                Call cpcore.db.deleteContentRules(models.complex.cdefmodel.getcontentid(cpcore,HostContentName), HostRecordID)
                             End If
                     End Select
                 End If

@@ -62,31 +62,31 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetContentControlCriteria(ByVal ContentName As String) As String
-            Return cpCore.metaData.content_getContentControlCriteria(ContentName)
+            Return Models.Complex.cdefModel.getContentControlCriteria(cpCore, ContentName)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As String
-            Return cpCore.metaData.GetContentFieldProperty(ContentName, FieldName, PropertyName)
+            Return Models.Complex.cdefModel.GetContentFieldProperty(cpCore, ContentName, FieldName, PropertyName)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetID(ByVal ContentName As String) As Integer
-            Return cpCore.metaData.getContentId(ContentName)
+            Return models.complex.cdefmodel.getcontentid(cpcore,ContentName)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetProperty(ByVal ContentName As String, ByVal PropertyName As String) As String
-            Return cpCore.metaData.GetContentProperty(ContentName, PropertyName)
+            Return Models.Complex.cdefModel.GetContentProperty(cp.core, ContentName, PropertyName)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetDataSource(ByVal ContentName As String) As String
-            Return cpCore.metaData.getContentDataSource(ContentName)
+            Return Models.Complex.cdefModel.getContentDataSource(cpCore, ContentName)
         End Function
         '
         '====================================================================================================
@@ -131,7 +131,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetTable(ByVal ContentName As String) As String
-            Return cpCore.metaData.getContentTablename(ContentName)
+            Return Models.Complex.cdefModel.getContentTablename(cpCore, ContentName)
         End Function
         '
         '====================================================================================================
@@ -144,7 +144,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsField(ByVal ContentName As String, ByVal FieldName As String) As Boolean
-            Return cpCore.metaData.IsContentFieldSupported(ContentName, FieldName)
+            Return Models.Complex.cdefModel.isContentFieldSupported(cpCore, ContentName, FieldName)
         End Function
         '
         '====================================================================================================
@@ -156,7 +156,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsChildContent(ByVal ChildContentID As String, ByVal ParentContentID As String) As Boolean
-            Return cpCore.metaData.isWithinContent(genericController.EncodeInteger(ChildContentID), genericController.EncodeInteger(ParentContentID))
+            Return Models.Complex.cdefModel.isWithinContent(cp.core, genericController.EncodeInteger(ChildContentID), genericController.EncodeInteger(ParentContentID))
         End Function
         '
         '====================================================================================================
@@ -254,7 +254,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub DeleteContent(ContentName As String)
-            cpCore.metaData.deleteContent(ContentName)
+            Models.Entity.contentModel.delete(cpCore, Models.Complex.cdefModel.getContentId(cpCore, ContentName))
         End Sub
         '
         '====================================================================================================
@@ -266,7 +266,7 @@ Namespace Contensive.Core
             field.authorable = True
             field.blockAccess = False
             field.caption = FieldName
-            field.contentId = cpCore.metaData.getContentId(ContentName)
+            field.contentId = models.complex.cdefmodel.getcontentid(cpcore,ContentName)
             field.developerOnly = False
             field.editSortPriority = 9999
             field.editTabName = ""
@@ -300,7 +300,7 @@ Namespace Contensive.Core
             field.Scramble = False
             field.TextBuffered = False
             field.UniqueName = False
-            Return cpCore.metaData.verifyCDefField_ReturnID(ContentName, field)
+            Return Models.Complex.cdefModel.verifyCDefField_ReturnID(cpCore, ContentName, field)
         End Function
         '
         '====================================================================================================
@@ -318,7 +318,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function AddContent(ContentName As String, sqlTableName As String, dataSourceName As String) As Integer
-            Return cpCore.metaData.createContent(True _
+            Return Models.Complex.cdefModel.addContent(cpCore, True _
                 , Models.Entity.dataSourceModel.create(cpCore, dataSourceName, New List(Of String)) _
                 , sqlTableName _
                 , ContentName _

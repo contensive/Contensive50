@@ -1491,7 +1491,7 @@ Namespace Contensive.Core
                                                                                 '
                                                                                 ' setup cdef rule
                                                                                 '
-                                                                                Dim ContentID As Integer = cpCore.metaData.getContentId(ContentName)
+                                                                                Dim ContentID As Integer = Models.Complex.cdefModel.getContentId(cpCore, ContentName)
                                                                                 If ContentID > 0 Then
                                                                                     Dim CS As Integer = cpCore.db.csInsertRecord("Add-on Collection CDef Rules", 0)
                                                                                     If cpCore.db.csOk(CS) Then
@@ -1543,7 +1543,7 @@ Namespace Contensive.Core
                                                                                     '
                                                                                     ' create or update the record
                                                                                     '
-                                                                                    Dim CDef As Models.Complex.cdefModel = cpCore.metaData.getCdef(ContentName)
+                                                                                    Dim CDef As Models.Complex.cdefModel = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                                                                                     Dim cs As Integer = -1
                                                                                     If ContentRecordGuid <> "" Then
                                                                                         cs = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
@@ -1619,7 +1619,7 @@ Namespace Contensive.Core
                                                                                 Dim ContentRecordGuid As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "guid", "")
                                                                                 Dim ContentRecordName As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "name", "")
                                                                                 If (ContentRecordGuid <> "") Or (ContentRecordName <> "") Then
-                                                                                    Dim CDef As Models.Complex.cdefModel = cpCore.metaData.getCdef(ContentName)
+                                                                                    Dim CDef As Models.Complex.cdefModel = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                                                                                     Dim cs As Integer = -1
                                                                                     If ContentRecordGuid <> "" Then
                                                                                         cs = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
@@ -1665,9 +1665,9 @@ Namespace Contensive.Core
                                                                                                             ' read in text value, if a guid, use it, otherwise assume name
                                                                                                             '
                                                                                                             If FieldLookupContentID <> 0 Then
-                                                                                                                Dim FieldLookupContentName As String = cpCore.metaData.getContentNameByID(FieldLookupContentID)
+                                                                                                                Dim FieldLookupContentName As String = models.complex.cdefmodel.getContentNameByID(cpcore,FieldLookupContentID)
                                                                                                                 If FieldLookupContentName <> "" Then
-                                                                                                                    If (Left(FieldValue, 1) = "{") And (Right(FieldValue, 1) = "}") And cpCore.metaData.isContentFieldSupported(FieldLookupContentName, "ccguid") Then
+                                                                                                                    If (Left(FieldValue, 1) = "{") And (Right(FieldValue, 1) = "}") And Models.Complex.cdefModel.isContentFieldSupported(cpCore, FieldLookupContentName, "ccguid") Then
                                                                                                                         '
                                                                                                                         ' Lookup by guid
                                                                                                                         '
@@ -4351,7 +4351,7 @@ Namespace Contensive.Core
                                 End If
                             End With
                         Next
-                        cpCore.metaData.clear()
+                        cpCore.doc.clearMetaData()
                         cpCore.cache.invalidateAll()
                     End If
                     '
@@ -4380,7 +4380,7 @@ Namespace Contensive.Core
                             End If
                         End With
                     Next
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
@@ -4389,7 +4389,7 @@ Namespace Contensive.Core
                     '
                     Call VerifySortMethods(cpCore)
                     Call VerifyContentFieldTypes(cpCore)
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
@@ -4406,7 +4406,7 @@ Namespace Contensive.Core
                             End If
                         End With
                     Next
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
@@ -4427,7 +4427,7 @@ Namespace Contensive.Core
                             End If
                         End With
                     Next
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
@@ -4477,7 +4477,7 @@ Namespace Contensive.Core
                             End With
                         Next
                     Next
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
@@ -4496,7 +4496,7 @@ Namespace Contensive.Core
                             End If
                         End With
                     Next
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
@@ -4734,7 +4734,7 @@ Namespace Contensive.Core
                         ContentID = 0
                         ContentName = .Name
                         ContentIsBaseContent = False
-                        FieldHelpCID = cpCore.metaData.getContentId("Content Field Help")
+                        FieldHelpCID = Models.Complex.cdefModel.getContentId(cpCore, "Content Field Help")
                         Dim datasource As Contensive.Core.Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.createByName(cpCore, .ContentDataSourceName, New List(Of String))
                         '
                         ' get contentid and protect content with IsBaseContent true
@@ -4767,7 +4767,7 @@ Namespace Contensive.Core
                             '
                             ' ----- update definition (use SingleRecord as an update flag)
                             '
-                            Call cpCore.metaData.createContent(True _
+                            Call Models.Complex.cdefModel.addContent(cpCore, True _
                                     , datasource _
                                     , .ContentTableName _
                                     , ContentName _
@@ -4834,7 +4834,7 @@ Namespace Contensive.Core
                                 Dim field As Models.Complex.CDefFieldModel = nameValuePair.Value
                                 With field
                                     If (.dataChanged) Then
-                                        fieldId = cpCore.metaData.verifyCDefField_ReturnID(ContentName, field)
+                                        fieldId = Models.Complex.cdefModel.verifyCDefField_ReturnID(cpCore, ContentName, field)
                                     End If
                                     '
                                     ' ----- update content field help records
@@ -4875,7 +4875,7 @@ Namespace Contensive.Core
                             '
                             ' clear the cdef cache and list
                             '
-                            cpCore.metaData.clear()
+                            cpCore.doc.clearMetaData()
                             cpCore.cache.invalidateAll()
                         End If
                     End With
@@ -5877,7 +5877,7 @@ Namespace Contensive.Core
                 Call sqlList.add("CreatedBy", "0")
                 Call sqlList.add("OrderByClause", cpCore.db.encodeSQLText(OrderByCriteria))
                 Call sqlList.add("active", SQLTrue)
-                Call sqlList.add("ContentControlID", cpCore.metaData.getContentId("Sort Methods").ToString())
+                Call sqlList.add("ContentControlID", Models.Complex.cdefModel.getContentId(cpCore, "Sort Methods").ToString())
                 '
                 dt = cpCore.db.openTable("Default", "ccSortMethods", "Name=" & cpCore.db.encodeSQLText(Name), "ID", "ID", 1)
                 If dt.Rows.Count > 0 Then
@@ -5968,7 +5968,7 @@ Namespace Contensive.Core
                 '
                 RowsNeeded = FieldTypeIdMax - RowsFound
                 If RowsNeeded > 0 Then
-                    CID = cpCore.metaData.getContentId("Content Field Types")
+                    CID = Models.Complex.cdefModel.getContentId(cpCore, "Content Field Types")
                     If CID <= 0 Then
                         '
                         ' Problem

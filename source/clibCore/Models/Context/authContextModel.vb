@@ -504,7 +504,7 @@ Namespace Contensive.Core.Models.Context
                                 If (LCase(Left(resultAuthContext.visit.Name, 5)) <> "visit") Then
                                     DefaultMemberName = resultAuthContext.visit.Name
                                 Else
-                                    DefaultMemberName = genericController.encodeText(cpCore.metaData.GetContentFieldProperty("people", "name", "default"))
+                                    DefaultMemberName = genericController.encodeText(models.complex.cdefmodel.GetContentFieldProperty(cpcore,"people", "name", "default"))
                                 End If
                                 'resultAuthContext.isAuthenticatedAdmin_cache_isLoaded = False
                                 'resultAuthContext.property_user_isMember_isLoaded = False
@@ -951,7 +951,7 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' admin is content manager if the CDef is not developer only
                         '
-                        CDef = cpCore.metaData.getCdef(ContentName)
+                        CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                         If CDef.Id <> 0 Then
                             If Not CDef.DeveloperOnly Then
                                 returnAllowEdit = True
@@ -963,7 +963,7 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' Authenticated and not admin or developer
                         '
-                        ContentID = cpCore.metaData.getContentId(ContentName)
+                        ContentID = Models.Complex.cdefModel.getContentId(cpCore, ContentName)
                         Call getContentAccessRights_NonAdminByContentId(cpCore, ContentID, returnAllowEdit, returnAllowAdd, returnAllowDelete, "")
                     End If
                 End If
@@ -1035,9 +1035,9 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' ----- Not a content manager for this one, check the parent
                         '
-                        ContentName = cpCore.metaData.getContentNameByID(ContentID)
+                        ContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ContentID)
                         If ContentName <> "" Then
-                            CDef = cpCore.metaData.getCdef(ContentName)
+                            CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                             ParentID = CDef.parentID
                             If ParentID > 0 Then
                                 Call getContentAccessRights_NonAdminByContentId(cpCore, ParentID, returnAllowEdit, returnAllowAdd, returnAllowDelete, usedContentIdList & "," & CStr(ContentID))
@@ -1224,7 +1224,7 @@ Namespace Contensive.Core.Models.Context
         Public Function isAuthenticatedMember(cpCore As coreClass) As Boolean
             Dim result As Boolean = False
             Try
-                result = visit.VisitAuthenticated And (cpCore.metaData.isWithinContent(user.ContentControlID, cpCore.metaData.getContentId("members")))
+                result = visit.VisitAuthenticated And (Models.Complex.cdefModel.isWithinContent(cpCore, user.ContentControlID, Models.Complex.cdefModel.getContentId(cpCore, "members")))
                 'If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
                 '    property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(user.ContentControlID, cpCore.main_GetContentID("members"))
                 '    property_user_isMember_isLoaded = True
@@ -1409,7 +1409,7 @@ Namespace Contensive.Core.Models.Context
                             If (cpCore.visitProperty.getBoolean("AllowEditing") Or cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) Then
                                 If localContentNameOrId <> "" Then
                                     If genericController.vbIsNumeric(localContentNameOrId) Then
-                                        localContentNameOrId = cpCore.metaData.getContentNameByID(EncodeInteger(localContentNameOrId))
+                                        localContentNameOrId = models.complex.cdefmodel.getContentNameByID(cpcore,EncodeInteger(localContentNameOrId))
                                     End If
                                 End If
                                 returnResult = isAuthenticatedContentManager(cpCore, localContentNameOrId)

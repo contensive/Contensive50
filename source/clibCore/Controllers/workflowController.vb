@@ -261,7 +261,7 @@ Namespace Contensive.Core.Controllers
         '        '
         '        MethodName = "csv_PublishEdit"
         '        '
-        '        CDef = cpCore.metaData.getCdef(ContentName)
+        '        CDef = models.complex.cdefmodel.getcdef(cpcore,ContentName)
         '        If CDef.Id > 0 Then
         '            If false And cpCore.siteProperties.allowWorkflowAuthoring Then
         '                With CDef
@@ -561,7 +561,7 @@ Namespace Contensive.Core.Controllers
         '        Dim CDef As Models.Complex.cdefModel
         '        Dim sqlFieldList As New sqlFieldListClass
         '        '
-        '        CDef = cpCore.metaData.getCdef(ContentName)
+        '        CDef = models.complex.cdefmodel.getcdef(cpcore,ContentName)
         '        If CDef.Id > 0 Then
         '            If false And cpCore.siteProperties.allowWorkflowAuthoring Then
         '                With CDef
@@ -686,7 +686,7 @@ Namespace Contensive.Core.Controllers
         '        '
         '        Dim CDef As Models.Complex.cdefModel
         '        '
-        '        CDef = cpCore.metaData.getCdef(ContentName)
+        '        CDef = models.complex.cdefmodel.getcdef(cpcore,ContentName)
         '        If CDef.Id > 0 Then
         '            If false And cpCore.siteProperties.allowWorkflowAuthoring Then
         '                Call setAuthoringControl(ContentName, RecordID, AuthoringControlsApproved, MemberID)
@@ -706,7 +706,7 @@ Namespace Contensive.Core.Controllers
         '        '
         '        Dim CDef As Models.Complex.cdefModel
         '        '
-        '        CDef = cpCore.metaData.getCdef(ContentName)
+        '        CDef = models.complex.cdefmodel.getcdef(cpcore,ContentName)
         '        If CDef.Id > 0 Then
         '            If false And cpCore.siteProperties.allowWorkflowAuthoring Then
         '                Call setAuthoringControl(ContentName, RecordID, AuthoringControlsSubmitted, MemberID)
@@ -824,7 +824,7 @@ Namespace Contensive.Core.Controllers
                 '
                 MethodName = "csv_SetAuthoringControl"
                 '
-                CDef = cpCore.metaData.getCdef(ContentName)
+                CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                 ContentID = CDef.Id
                 If ContentID <> 0 Then
                     'TableID = csv_GetContentTableID(ContentName)
@@ -924,7 +924,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' Get Workflow Locks
                     '
-                    CDef = cpCore.metaData.getCdef(ContentName)
+                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                     ContentID = CDef.Id
                     If ContentID > 0 Then
                         'If false And cpCore.siteProperties.allowWorkflowAuthoring Then

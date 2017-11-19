@@ -459,7 +459,7 @@
 '        Public Shared Function createDefault(cpcore As coreClass) As contentModel
 '            Dim instance As New contentModel
 '            Try
-'                Dim CDef As Models.Complex.cdefModel = cpcore.metaData.getCdef(primaryContentName)
+'                Dim CDef As Models.Complex.cdefModel = models.complex.cdefmodel.getcdef(cpcore,primaryContentName)
 '                If (CDef Is Nothing) Then
 '                    Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
 '                ElseIf (CDef.Id <= 0) Then

@@ -523,7 +523,7 @@ Namespace Contensive.Core.Controllers
                                 If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
                                     Dim addonArgumentListPassToBubbleEditor As String = "" ' comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
                                     Dim AddonEditIcon As String = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & addon.name & " Add-on", "Edit the " & addon.name & " Add-on", "", True, "")
-                                    AddonEditIcon = "<a href=""" & "/" & cpCore.serverConfig.appConfig.adminRoute & "?cid=" & cpCore.metaData.getContentId(cnAddons) & "&id=" & addon.id & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
+                                    AddonEditIcon = "<a href=""" & "/" & cpCore.serverConfig.appConfig.adminRoute & "?cid=" & models.complex.cdefmodel.getcontentid(cpcore,cnAddons) & "&id=" & addon.id & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
                                     Dim InstanceSettingsEditIcon As String = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, DialogList)
                                     Dim HTMLViewerEditIcon As String = getHTMLViewerBubble(addon.id, "editWrapper" & cpCore.doc.editWrapperCnt, DialogList)
                                     Dim SiteStylesEditIcon As String = String.Empty ' ?????

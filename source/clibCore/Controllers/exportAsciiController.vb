@@ -55,7 +55,7 @@ Namespace Contensive.Core.Controllers
                 '
                 Call cpCore.webServer.setResponseContentType("text/plain")
                 Call cpCore.html.enableOutputBuffer(False)
-                TableName = genericController.GetDbObjectTableName(cpCore.metaData.getContentTablename(iContentName))
+                TableName = genericController.GetDbObjectTableName(models.complex.cdefmodel.getContentTablename(  cpcore,iContentName))
                 Select Case genericController.vbUCase(TableName)
                     Case "CCMEMBERS"
                         '

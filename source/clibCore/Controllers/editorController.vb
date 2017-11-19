@@ -49,7 +49,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' ----- save the content
                     '
-                    ContentName = cpCore.metaData.getContentNameByID(ContentID)
+                    ContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ContentID)
                     If ContentName <> "" Then
                         CS = cpCore.db.csOpen(ContentName, "ID=" & cpCore.db.encodeSQLNumber(RecordID), , False)
                         If cpCore.db.csOk(CS) Then
@@ -83,12 +83,12 @@ Namespace Contensive.Core.Controllers
             strFieldName = genericController.encodeText(FieldName)
             '
             EditorPanel = ""
-            ContentID = cpcore.metaData.getContentId(intContentName)
+            ContentID = models.complex.cdefmodel.getcontentid(cpcore,intContentName)
             If (ContentID < 1) Or (intRecordId < 1) Or (strFieldName = "") Then
                 PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
                 EditorPanel = EditorPanel & cpcore.html.main_GetPanel(PanelCopy)
             Else
-                intContentName = cpcore.metaData.getContentNameByID(ContentID)
+                intContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ContentID)
                 If intContentName <> "" Then
                     CSPointer = cpcore.db.csOpen(intContentName, "ID=" & intRecordId)
                     If Not cpcore.db.csOk(CSPointer) Then

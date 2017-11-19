@@ -107,12 +107,55 @@ Namespace Contensive.Core.Controllers
         Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
         Public Property pageAddonCnt As Integer = 0
         '
+        ' -- persistant store for cdef complex model
+        Friend Property cdefDictionary As Dictionary(Of String, Models.Complex.cdefModel)
+        '
+        ' -- persistant store for tableSchema complex mode
+        Friend Property tableSchemaDictionary As Dictionary(Of String, Models.Complex.tableSchemaModel)
+        '
+        '====================================================================================================
+        ' -- lookup contentId by contentName
+        Friend ReadOnly Property contentNameIdDictionary As Dictionary(Of String, Integer)
+            Get
+                If (_contentNameIdDictionary Is Nothing) Then
+                    _contentNameIdDictionary = New Dictionary(Of String, Integer)
+                    For Each kvp As KeyValuePair(Of Integer, contentModel) In contentIdDict
+                        Dim key As String = kvp.Value.name.Trim().ToLower()
+                        If Not String.IsNullOrEmpty(key) Then
+                            If (Not _contentNameIdDictionary.ContainsKey(key)) Then
+                                _contentNameIdDictionary.Add(key, kvp.Value.id)
+                            End If
+                        End If
+                    Next
+                End If
+                Return _contentNameIdDictionary
+            End Get
+        End Property
+        Friend Sub contentNameIdDictionaryClear()
+            _contentNameIdDictionary = Nothing
+        End Sub
+        Private _contentNameIdDictionary As Dictionary(Of String, Integer) = Nothing
+        '
+        '====================================================================================================
+        ' -- lookup contentModel by contentId
+        Friend ReadOnly Property contentIdDict As Dictionary(Of Integer, contentModel)
+            Get
+                If (_contentIdDict Is Nothing) Then
+                    _contentIdDict = contentModel.createDict(cpcore, New List(Of String))
+                End If
+                Return _contentIdDict
+            End Get
+        End Property
+        Friend Sub contentIdDictClear()
+            _contentIdDict = Nothing
+        End Sub
+        Private _contentIdDict As Dictionary(Of Integer, contentModel) = Nothing
+        '
         '====================================================================================================
         ''' <summary>
         ''' this will eventuall be an addon, but lets do this first to keep the converstion complexity down
         ''' </summary>
         ''' <param name="cpCore"></param>
-
         Public Sub New(cpCore As coreClass)
             Me.cpcore = cpCore
             '
@@ -120,80 +163,8 @@ Namespace Contensive.Core.Controllers
             page = New pageContentModel()
             pageToRootList = New List(Of pageContentModel)
             template = New pageTemplateModel()
-            '' -- setup domain
-            'domain = Models.Entity.domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
-            'If (domain Is Nothing) Then
-            '    '
-            '    ' -- domain not configured
-            '    cpCore.handleExceptionAndContinue(New ApplicationException("Domain [" & cpCore.webServer.requestDomain & "] has not been configured."))
-            'Else
-            '    If (pageId = 0) Then
-            '        '
-            '        ' -- Nothing specified, use the Landing Page
-            '        pageId = getLandingPageID()
-            '    End If
-            '    Call cpCore.doc.addRefreshQueryString(rnPageId, CStr(pageId))
-            '    '
-            '    ' -- build parentpageList (first = current page, last = root)
-            '    ' -- add a 0, then repeat until another 0 is found, or there is a repeat
-            '    pageToRootList = New List(Of Models.Entity.pageContentModel)()
-            '    Dim usedPageIdList As New List(Of Integer)()
-            '    Dim targetPageId = pageId
-            '    usedPageIdList.Add(0)
-            '    Do While (Not usedPageIdList.Contains(targetPageId))
-            '        usedPageIdList.Add(targetPageId)
-            '        Dim targetpage As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpCore, targetPageId, New List(Of String))
-            '        If (targetpage Is Nothing) Then
-            '            Exit Do
-            '        Else
-            '            pageToRootList.Add(targetpage)
-            '            targetPageId = targetpage.ParentID
-            '        End If
-            '    Loop
-            '    If (pageToRootList.Count = 0) Then
-            '        '
-            '        page = New pageContentModel()
-            '    Else
-            '        page = pageToRootList.First
-            '    End If
-            '    '
-            '    ' -- get template from pages
-            '    template = Nothing
-            '    For Each page As Models.Entity.pageContentModel In pageToRootList
-            '        If page.TemplateID > 0 Then
-            '            template = Models.Entity.pageTemplateModel.create(cpCore, page.TemplateID, New List(Of String))
-            '            If (template IsNot Nothing) Then
-            '                If (page Is pageToRootList.First) Then
-            '                    templateReason = "This template was used because it is selected by the current page."
-            '                Else
-            '                    templateReason = "This template was used because it is selected one of this page's parents [" & page.name & "]."
-            '                End If
-            '                Exit For
-            '            End If
-            '        End If
-            '    Next
-            '    '
-            '    If (template Is Nothing) Then
-            '        '
-            '        ' -- get template from domain
-            '        If (domain IsNot Nothing) Then
-            '            template = Models.Entity.pageTemplateModel.create(cpCore, domain.DefaultTemplateId, New List(Of String))
-            '        End If
-            '        If (template Is Nothing) Then
-            '            '
-            '            ' -- get template named Default
-            '            template = Models.Entity.pageTemplateModel.createByName(cpCore, defaultTemplateName, New List(Of String))
-            '        End If
-            '        If (template Is Nothing) Then
-            '            '
-            '            ' -- ceate new template named Default
-            '            template = Models.Entity.pageTemplateModel.add(cpCore, New List(Of String))
-            '            template.Name = defaultTemplateName
-            '            template.BodyHTML = defaultTemplateHtml
-            '            template.save(cpCore)
-            '        End If
-            '    End If
-            'End If
+            cdefDictionary = New Dictionary(Of String, Models.Complex.cdefModel)
+            tableSchemaDictionary = Nothing
         End Sub
         '
         Public Sub loadPage(pageId As Integer, Optional domainName As String = "")
@@ -274,7 +245,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-
+                cpcore.handleException(ex)
             End Try
         End Sub
         '
@@ -287,7 +258,7 @@ Namespace Contensive.Core.Controllers
             Try
                 result = main_OpenCSContentWatchList(cpCore, "What's New", SortFieldList, ActiveOnly, PageSize, PageNumber)
             Catch ex As Exception
-                Me.cpcore.handleException(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function
@@ -387,7 +358,7 @@ Namespace Contensive.Core.Controllers
                 CSPointer = main_OpenCSWhatsNew(cpcore, SortFieldList)
                 '
                 If Me.cpcore.db.csOk(CSPointer) Then
-                    ContentID = Me.cpcore.metaData.getContentId("Content Watch")
+                    ContentID = Models.Complex.cdefModel.getContentId(cpcore, "Content Watch")
                     Do While Me.cpcore.db.csOk(CSPointer)
                         Link = Me.cpcore.db.csGetText(CSPointer, "link")
                         LinkLabel = Me.cpcore.db.csGetText(CSPointer, "LinkLabel")
@@ -430,7 +401,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
                 If Me.cpcore.db.csOk(CS) Then
-                    ContentID = Me.cpcore.metaData.getContentId("Content Watch")
+                    ContentID = Models.Complex.cdefModel.getContentId(cpCore, "Content Watch")
                     Do While Me.cpcore.db.csOk(CS)
                         Link = Me.cpcore.db.csGetText(CS, "link")
                         LinkLabel = Me.cpcore.db.csGetText(CS, "LinkLabel")
@@ -514,7 +485,7 @@ Namespace Contensive.Core.Controllers
                 '
                 ' ----- First Active Record - Output Quick Editor form
                 '
-                CDef = cpcore.metaData.getCdef(LiveRecordContentName)
+                CDef = Models.Complex.cdefModel.getCdef(cpcore, LiveRecordContentName)
                 '
                 ' main_Get Authoring Status and permissions
                 '
@@ -534,7 +505,7 @@ Namespace Contensive.Core.Controllers
                 Dim IsRootPage As Boolean = False
                 Call getAuthoringStatus(LiveRecordContentName, page.id, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
                 Call getAuthoringPermissions(LiveRecordContentName, page.id, AllowInsert, AllowCancel, allowSave, AllowDelete, False, False, False, False, readOnlyField)
-                AllowMarkReviewed = cpcore.metaData.isContentFieldSupported(Models.Entity.pageContentModel.contentName, "DateReviewed")
+                AllowMarkReviewed = Models.Complex.cdefModel.isContentFieldSupported(cpcore, Models.Entity.pageContentModel.contentName, "DateReviewed")
                 OptionsPanelAuthoringStatus = cpcore.doc.authContext.main_GetAuthoringStatusMessage(cpcore, False, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
                 '
                 ' Set Editing Authoring Control
@@ -1126,7 +1097,7 @@ Namespace Contensive.Core.Controllers
             '
             If cpcore.doc.authContext.isAuthenticatedAdmin(cpcore) Then
                 bypassContentBlock = True
-            ElseIf cpcore.doc.authContext.isAuthenticatedContentManager(cpcore, cpcore.metaData.getContentNameByID(ContentID)) Then
+            ElseIf cpcore.doc.authContext.isAuthenticatedContentManager(cpcore, Models.Complex.cdefModel.getContentNameByID(cpcore, ContentID)) Then
                 bypassContentBlock = True
             Else
                 SQL = "SELECT ccMemberRules.MemberID" _
@@ -1285,7 +1256,7 @@ ErrorTrap:
             '
             ' main_Get Content Definition
             '
-            CDef = cpcore.metaData.getCdef(ContentName)
+            CDef = Models.Complex.cdefModel.getCdef(cpcore, ContentName)
             '
             ' Set Buttons based on Status
             '
@@ -1465,7 +1436,7 @@ ErrorTrap:
             MethodName = "main_SendPublishSubmitNotice"
             '
             FromAddress = cpcore.siteProperties.getText("EmailPublishSubmitFrom", cpcore.siteProperties.emailAdmin)
-            CDef = cpcore.metaData.getCdef(ContentName)
+            CDef = Models.Complex.cdefModel.getCdef(cpcore, ContentName)
             Link = "/" & cpcore.serverConfig.appConfig.adminRoute & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
             Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & genericController.encodeHTML(Link) & """>" & cpcore.webServer.requestDomain & "</a>")
@@ -1497,7 +1468,7 @@ ErrorTrap:
             '
             Dim ContentRecordKey As String
             '
-            ContentRecordKey = cpcore.metaData.getContentId(genericController.encodeText(ContentName)) & "." & genericController.EncodeInteger(RecordID)
+            ContentRecordKey = Models.Complex.cdefModel.getContentId(cpcore, genericController.encodeText(ContentName)) & "." & genericController.EncodeInteger(RecordID)
             getContentWatchLinkByName = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks)
             '
             Exit Function
@@ -1701,7 +1672,7 @@ ErrorTrap:
             '
             main_IsChildRecord = (ChildRecordID = ParentRecordID)
             If Not main_IsChildRecord Then
-                CDef = cpcore.metaData.getCdef(ContentName)
+                CDef = Models.Complex.cdefModel.getCdef(cpcore, ContentName)
                 If genericController.IsInDelimitedString(UCase(CDef.SelectCommaList), "PARENTID", ",") Then
                     main_IsChildRecord = main_IsChildRecord_Recurse(CDef.ContentDataSourceName, CDef.ContentTableName, ChildRecordID, ParentRecordID, "")
                 End If
@@ -2361,12 +2332,12 @@ ErrorTrap:
                                         '
                                         If DupCausesWarning Then
                                             If LinkAliasPageID = 0 Then '
-                                                PageContentCID = cpcore.metaData.getContentId("Page Content")
+                                                PageContentCID = Models.Complex.cdefModel.getContentId(cpcore, "Page Content")
                                                 return_WarningMessage = "" _
                                                     & "This page has been saved, but the Link Alias could not be created (" & WorkingLinkAlias & ") because it is already in use for another page." _
                                                     & " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique on this site. To set or change the Link Alias, clicke the Link Alias tab and select a name not used by another page or a folder in your website."
                                             Else
-                                                PageContentCID = cpcore.metaData.getContentId("Page Content")
+                                                PageContentCID = Models.Complex.cdefModel.getContentId(cpcore, "Page Content")
                                                 return_WarningMessage = "" _
                                                     & "This page has been saved, but the Link Alias could not be created (" & WorkingLinkAlias & ") because it is already in use for another page (<a href=""?af=4&cid=" & PageContentCID & "&id=" & LinkAliasPageID & """>edit</a>)." _
                                                     & " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique. To set or change the Link Alias, click the Link Alias tab and select a name not used by another page or a folder in your website."
@@ -2596,8 +2567,8 @@ ErrorTrap:
             Dim ContentID As Integer
             Dim ActivityLogOrganizationID As Integer
             '
-            ContentID = cpcore.metaData.getContentId(ContentName)
-            TableName = cpcore.metaData.getContentTablename(ContentName)
+            ContentID = Models.Complex.cdefModel.getContentId(cpcore, ContentName)
+            TableName = Models.Complex.cdefModel.getContentTablename(cpcore, ContentName)
             markRecordReviewed(ContentName, RecordID)
             '
             ' -- invalidate the specific cache for this record
@@ -2856,11 +2827,11 @@ ErrorTrap:
         '
         Public Sub markRecordReviewed(ContentName As String, RecordID As Integer)
             Try
-                If cpcore.metaData.isContentFieldSupported(ContentName, "DateReviewed") Then
-                    Dim DataSourceName As String = cpcore.metaData.getContentDataSource(ContentName)
-                    Dim TableName As String = cpcore.metaData.getContentTablename(ContentName)
+                If Models.Complex.cdefModel.isContentFieldSupported(cpcore, ContentName, "DateReviewed") Then
+                    Dim DataSourceName As String = Models.Complex.cdefModel.getContentDataSource(cpcore, ContentName)
+                    Dim TableName As String = Models.Complex.cdefModel.getContentTablename(cpcore, ContentName)
                     Dim SQL As String = "update " & TableName & " set DateReviewed=" & cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime)
-                    If cpcore.metaData.isContentFieldSupported(ContentName, "ReviewedBy") Then
+                    If Models.Complex.cdefModel.isContentFieldSupported(cpcore, ContentName, "ReviewedBy") Then
                         SQL &= ",ReviewedBy=" & cpcore.doc.authContext.user.id
                     End If
                     '
@@ -2937,6 +2908,25 @@ ErrorTrap:
                 End If
                 Call cpcore.db.csClose(CS)
             End If
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Clear all data from the metaData current instance. Next request will load from cache.
+        ''' </summary>
+        Public Sub clearMetaData()
+            Try
+                If (Not cpcore.doc.cdefDictionary Is Nothing) Then
+                    cdefDictionary.Clear()
+                End If
+                If (Not tableSchemaDictionary Is Nothing) Then
+                    tableSchemaDictionary.Clear()
+                End If
+                contentNameIdDictionaryClear()
+                contentIdDictClear()
+            Catch ex As Exception
+                cpcore.handleException(ex) : Throw
+            End Try
         End Sub
 
     End Class

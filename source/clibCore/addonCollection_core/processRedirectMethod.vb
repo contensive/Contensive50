@@ -29,7 +29,7 @@ Namespace Contensive.Addons.Core
                 cpCore.doc.redirectContentID = cpCore.docProperties.getInteger(rnRedirectContentId)
                 cpCore.doc.redirectRecordID = cpCore.docProperties.getInteger(rnRedirectRecordId)
                 If cpCore.doc.redirectContentID <> 0 And cpCore.doc.redirectRecordID <> 0 Then
-                    Dim ContentName As String = cpCore.metaData.getContentNameByID(cpCore.doc.redirectContentID)
+                    Dim ContentName As String = models.complex.cdefmodel.getContentNameByID(cpcore,cpCore.doc.redirectContentID)
                     If ContentName <> "" Then
                         Call iisController.main_RedirectByRecord_ReturnStatus(cpCore, ContentName, cpCore.doc.redirectRecordID)
                         result = ""

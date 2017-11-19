@@ -471,7 +471,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function createDefault(cpcore As coreClass) As pageTemplateModel
             Dim instance As New pageTemplateModel
             Try
-                Dim CDef As Models.Complex.cdefModel = cpcore.metaData.getCdef(primaryContentName)
+                Dim CDef As Models.Complex.cdefModel = Models.Complex.cdefModel.getCdef(cpcore, primaryContentName)
                 If (CDef Is Nothing) Then
                     Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
                 ElseIf (CDef.Id <= 0) Then

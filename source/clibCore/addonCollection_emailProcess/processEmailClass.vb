@@ -177,9 +177,9 @@ ErrorTrap:
             CSEmail = cpCore.db.csOpen("Email", Criteria, , , , , , FieldList)
             If cpCore.db.csOk(CSEmail) Then
                 '
-                SQLTablePeople = cpCore.metaData.getContentTablename("People")
-                SQLTableMemberRules = cpCore.metaData.getContentTablename("Member Rules")
-                SQLTableGroups = cpCore.metaData.getContentTablename("Groups")
+                SQLTablePeople = models.complex.cdefmodel.getContentTablename(  cpcore,"People")
+                SQLTableMemberRules = models.complex.cdefmodel.getContentTablename(  cpcore,"Member Rules")
+                SQLTableGroups = models.complex.cdefmodel.getContentTablename(  cpcore,"Groups")
                 BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
                 'siteStyles = cpCore.html.html_getStyleSheet2(0, 0)
                 '
@@ -367,9 +367,9 @@ ErrorTrap:
             Dim sqlDateTest As String
             '
             dataSourceType = cpCore.db.getDataSourceType("default")
-            SQLTablePeople = cpCore.metaData.getContentTablename("People")
-            SQLTableMemberRules = cpCore.metaData.getContentTablename("Member Rules")
-            SQLTableGroups = cpCore.metaData.getContentTablename("Groups")
+            SQLTablePeople = models.complex.cdefmodel.getContentTablename(  cpcore,"People")
+            SQLTableMemberRules = models.complex.cdefmodel.getContentTablename(  cpcore,"Member Rules")
+            SQLTableGroups = models.complex.cdefmodel.getContentTablename(  cpcore,"Groups")
             BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
             ' siteStyles = cpCore.html.html_getStyleSheet2(0, 0)
             '

@@ -5274,5 +5274,119 @@ ErrorTrap:
             End Try
             Return returnList
         End Function
+        '
+        '=============================================================================
+        '   Return just the copy from a content page
+        '=============================================================================
+        '
+        Public Shared Function TextDeScramble(cpcore As coreClass, ByVal Copy As String) As String
+            Dim returnCopy As String = ""
+            Try
+                Dim CPtr As Integer
+                Dim C As String
+                Dim CValue As Integer
+                Dim crc As Integer
+                Dim Source As String
+                Dim Base As Integer
+                Const CMin = 32
+                Const CMax = 126
+                '
+                ' assume this one is not converted
+                '
+                Source = Copy
+                Base = 50
+                '
+                ' First characger must be _
+                ' Second character is the scramble version 'a' is the starting system
+                '
+                If Mid(Source, 1, 2) <> "_a" Then
+                    returnCopy = Copy
+                Else
+                    Source = Mid(Source, 3)
+                    '
+                    ' cycle through all characters
+                    '
+                    For CPtr = Len(Source) - 1 To 1 Step -1
+                        C = Mid(Source, CPtr, 1)
+                        CValue = Asc(C)
+                        crc = crc + CValue
+                        If (CValue < CMin) Or (CValue > CMax) Then
+                            '
+                            ' if out of ascii bounds, just leave it in place
+                            '
+                        Else
+                            CValue = CValue - Base
+                            If CValue < CMin Then
+                                CValue = CValue + CMax - CMin + 1
+                            End If
+                        End If
+                        returnCopy = returnCopy & Chr(CValue)
+                    Next
+                    '
+                    ' Test mod
+                    '
+                    If CStr(crc Mod 9) <> Mid(Source, Len(Source), 1) Then
+                        '
+                        ' Nope - set it back to the input
+                        '
+                        returnCopy = Copy
+                    End If
+                End If
+            Catch ex As Exception
+                cpcore.handleException(ex) : Throw
+            End Try
+            Return returnCopy
+        End Function
+
+        '
+        '=============================================================================
+        '   Return just the copy from a content page
+        '=============================================================================
+        '
+        Public Shared Function TextScramble(cpcore As coreClass, ByVal Copy As String) As String
+            Dim returnCopy As String = ""
+            Try
+                Dim CPtr As Integer
+                Dim C As String
+                Dim CValue As Integer
+                Dim crc As Integer
+                Dim Base As Integer
+                Const CMin = 32
+                Const CMax = 126
+                '
+                ' scrambled starts with _
+                '
+                Base = 50
+                For CPtr = 1 To Len(Copy)
+                    C = Mid(Copy, CPtr, 1)
+                    CValue = Asc(C)
+                    If (CValue < CMin) Or (CValue > CMax) Then
+                        '
+                        ' if out of ascii bounds, just leave it in place
+                        '
+                    Else
+                        CValue = CValue + Base
+                        If CValue > CMax Then
+                            CValue = CValue - CMax + CMin - 1
+                        End If
+                    End If
+                    '
+                    ' CRC is addition of all scrambled characters
+                    '
+                    crc = crc + CValue
+                    '
+                    ' put together backwards
+                    '
+                    returnCopy = Chr(CValue) & returnCopy
+                Next
+                '
+                ' Ends with the mod of the CRC and 13
+                '
+                returnCopy = "_a" & returnCopy & CStr(crc Mod 9)
+            Catch ex As Exception
+                cpcore.handleException(ex) : Throw
+            End Try
+            Return returnCopy
+        End Function
     End Class
 End Namespace

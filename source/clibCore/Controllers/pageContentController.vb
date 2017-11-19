@@ -140,7 +140,7 @@ Namespace Contensive.Core.Controllers
                     If (cpCore.doc.redirectContentID <> 0) Then
                         cpCore.doc.redirectRecordID = (cpCore.docProperties.getInteger(rnRedirectRecordId))
                         If (cpCore.doc.redirectRecordID <> 0) Then
-                            Dim contentName As String = cpCore.metaData.getContentNameByID(cpCore.doc.redirectContentID)
+                            Dim contentName As String = models.complex.cdefmodel.getContentNameByID(cpcore,cpCore.doc.redirectContentID)
                             If contentName <> "" Then
                                 If iisController.main_RedirectByRecord_ReturnStatus(cpCore, contentName, cpCore.doc.redirectRecordID) Then
                                     '
@@ -211,7 +211,7 @@ Namespace Contensive.Core.Controllers
                         Call cpCore.visitProperty.setProperty("Clipboard", "")
                         Call genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNamePasteParentContentID, "")
                         Call genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNamePasteParentRecordID, "")
-                        ClipParentContentName = cpCore.metaData.getContentNameByID(ClipParentContentID)
+                        ClipParentContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ClipParentContentID)
                         If (ClipParentContentName = "") Then
                             ' state not working...
                         ElseIf (ClipBoard = "") Then
@@ -233,13 +233,13 @@ Namespace Contensive.Core.Controllers
                                     Else
                                         ClipChildContentID = genericController.EncodeInteger(ClipBoardArray(0))
                                         ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray(1))
-                                        If Not cpCore.metaData.isWithinContent(ClipChildContentID, ClipParentContentID) Then
+                                        If Not Models.Complex.cdefModel.isWithinContent(cpCore, ClipChildContentID, ClipParentContentID) Then
                                             Call errorController.error_AddUserError(cpCore, "The paste operation failed because the destination location is not compatible with the clipboard data.")
                                         Else
                                             '
                                             ' the content definition relationship is OK between the child and parent record
                                             '
-                                            ClipChildContentName = cpCore.metaData.getContentNameByID(ClipChildContentID)
+                                            ClipChildContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ClipChildContentID)
                                             If Not ClipChildContentName <> "" Then
                                                 Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data content is undefined.")
                                             Else
@@ -775,7 +775,7 @@ Namespace Contensive.Core.Controllers
                                     ' People Record
                                     '
                                     FormValue = cpcore.docProperties.getText(.PeopleField)
-                                    If (FormValue <> "") And genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
+                                    If (FormValue <> "") And genericController.EncodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "people", .PeopleField, "uniquename")) Then
                                         SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & cpcore.db.encodeSQLText(FormValue)
                                         CS = cpcore.db.csOpenSql(SQL)
                                         If cpcore.db.csOk(CS) Then
@@ -786,12 +786,12 @@ Namespace Contensive.Core.Controllers
                                             errorController.error_AddUserError(cpcore, "The field [" & .Caption & "] must be unique, and the value [" & genericController.encodeHTML(FormValue) & "] has already been used.")
                                         End If
                                     End If
-                                    If (.REquired Or genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
+                                    If (.REquired Or genericController.EncodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "people", .PeopleField, "required"))) And FormValue = "" Then
                                         Success = False
                                         errorController.error_AddUserError(cpcore, "The field [" & genericController.encodeHTML(.Caption) & "] is required.")
                                     Else
                                         If Not cpcore.db.csOk(CSPeople) Then
-                                            CSPeople = cpcore.db.csOpenRecord("people", cpCore.doc.authContext.user.id)
+                                            CSPeople = cpcore.db.csOpenRecord("people", cpcore.doc.authContext.user.id)
                                         End If
                                         If cpcore.db.csOk(CSPeople) Then
                                             Select Case genericController.vbUCase(.PeopleField)
@@ -823,7 +823,7 @@ Namespace Contensive.Core.Controllers
                                     ' Group main_MemberShip
                                     '
                                     IsInGroup = cpcore.docProperties.getBoolean("Group" & .GroupName)
-                                    WasInGroup = cpCore.doc.authContext.IsMemberOfGroup2(cpcore, .GroupName)
+                                    WasInGroup = cpcore.doc.authContext.IsMemberOfGroup2(cpcore, .GroupName)
                                     If WasInGroup And Not IsInGroup Then
                                         groupController.group_DeleteGroupMember(cpcore, .GroupName)
                                     ElseIf IsInGroup And Not WasInGroup Then
@@ -849,7 +849,7 @@ Namespace Contensive.Core.Controllers
                         ' Authenticate
                         '
                         If f.AuthenticateOnFormProcess Then
-                            Call cpCore.doc.authContext.authenticateById(cpcore, cpCore.doc.authContext.user.id, cpCore.doc.authContext)
+                            Call cpcore.doc.authContext.authenticateById(cpcore, cpcore.doc.authContext.user.id, cpcore.doc.authContext)
                         End If
                         '
                         ' Join Group requested by page that created form
@@ -1041,10 +1041,10 @@ Namespace Contensive.Core.Controllers
                                 CaptionSpan = "<span>"
                             End If
                             If Not cpcore.db.csOk(CSPeople) Then
-                                CSPeople = cpcore.db.csOpenRecord("people", cpCore.doc.authContext.user.id)
+                                CSPeople = cpcore.db.csOpenRecord("people", cpcore.doc.authContext.user.id)
                             End If
                             Caption = .Caption
-                            If .REquired Or genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("People", .PeopleField, "Required")) Then
+                            If .REquired Or genericController.EncodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "People", .PeopleField, "Required")) Then
                                 Caption = "*" & Caption
                             End If
                             If cpcore.db.csOk(CSPeople) Then
@@ -1834,7 +1834,7 @@ ErrorTrap:
                 '
                 SeeAlsoCount = 0
                 If iRecordID > 0 Then
-                    ContentID = cpcore.metaData.getContentId(iContentName)
+                    ContentID = models.complex.cdefmodel.getcontentid(cpcore,iContentName)
                     If (ContentID > 0) Then
                         '
                         ' ----- Set authoring only for valid ContentName
@@ -1844,7 +1844,7 @@ ErrorTrap:
                         '
                         ' ----- if iContentName was bad, maybe they put table in, no authoring
                         '
-                        ContentID = cpcore.metaData.GetContentIDByTablename(iContentName)
+                        ContentID = Models.Complex.cdefModel.getContentIDByTablename(cpcore, iContentName)
                     End If
                     If (ContentID > 0) Then
                         '

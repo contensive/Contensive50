@@ -45,7 +45,7 @@ Namespace Contensive.Core.Controllers
                 If dt.Rows.Count > 0 Then
                     returnGroupId = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                 Else
-                    cid = cpCore.metaData.getContentId("groups")
+                    cid = models.complex.cdefmodel.getcontentid(cpcore,"groups")
                     createkey = genericController.GetRandomInteger()
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & sqlGroupName & "," & sqlGroupName & ")"
                     Call cpCore.db.executeQuery(sql)

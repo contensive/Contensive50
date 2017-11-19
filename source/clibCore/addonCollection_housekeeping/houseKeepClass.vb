@@ -219,7 +219,7 @@ Namespace Contensive.Core
                                 DataSourceType = cp.core.db.getDataSourceType("default")
                                 '
                                 DefaultMemberName = ""
-                                PeopleCID = cp.core.metaData.getContentId("people")
+                                PeopleCID = Models.Complex.cdefModel.getContentId(cp.core, "people")
                                 SQL = "select defaultvalue from ccfields where name='name' and contentid=(" & PeopleCID & ")"
                                 CS = cp.core.db.csOpenSql_rev("default", SQL)
                                 If cp.core.db.csOk(CS) Then
@@ -613,9 +613,9 @@ ErrorTrap:
             TimeoutSave = cp.core.db.sqlCommandTimeout
             cp.core.db.sqlCommandTimeout = 1800
             '
-            SQLTablePeople = cp.core.metaData.getContentTablename("People")
-            SQLTableMemberRules = cp.core.metaData.getContentTablename("Member Rules")
-            SQLTableGroups = cp.core.metaData.getContentTablename("Groups")
+            SQLTablePeople = Models.Complex.cdefModel.getContentTablename(cp.core, "People")
+            SQLTableMemberRules = Models.Complex.cdefModel.getContentTablename(cp.core, "Member Rules")
+            SQLTableGroups = Models.Complex.cdefModel.getContentTablename(cp.core, "Groups")
             SQLDateMidnightTwoDaysAgo = cp.core.db.encodeSQLDate(MidnightTwoDaysAgo)
             '
             ' Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
@@ -1606,7 +1606,7 @@ ErrorTrap:
             TimeoutSave = cp.core.db.sqlCommandTimeout
             cp.core.db.sqlCommandTimeout = 1800
             '
-            SQLTablePeople = cp.core.metaData.getContentTablename("People")
+            SQLTablePeople = Models.Complex.cdefModel.getContentTablename(cp.core, "People")
             'SQLTableMemberRules = cp.Core.csv_GetContentTablename("Member Rules")
             'SQLTableGroups = cp.Core.csv_GetContentTablename("Groups")
             '
@@ -1725,7 +1725,7 @@ ErrorTrap:
             TimeoutSave = cp.core.db.sqlCommandTimeout
             cp.core.db.sqlCommandTimeout = 1800
             '
-            SQLTablePeople = cp.core.metaData.getContentTablename("People")
+            SQLTablePeople = Models.Complex.cdefModel.getContentTablename(cp.core, "People")
             'SQLTableMemberRules = cp.Core.csv_GetContentTablename("Member Rules")
             'SQLTableGroups = cp.Core.csv_GetContentTablename("Groups")
             '

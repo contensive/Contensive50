@@ -952,7 +952,7 @@ ErrorTrap:
                     '
                     ' This was commented out -- I really do not know why -- seems like the best way
                     '
-                    CDef = cpCore.metaData.getCdef(ContentName)
+                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                     TableName = CDef.ContentTableName
                     DataSource = CDef.ContentDataSourceName
                     ContentControlCriteria = CDef.ContentControlCriteria
@@ -1280,9 +1280,9 @@ ErrorTrap:
                     ' Build the SelectRaw
                     ' Test selection size
                     '
-                    PeopleTableName = cpCore.metaData.getContentTablename("people")
-                    PeopleDataSource = cpCore.metaData.getContentDataSource("People")
-                    MemberRulesTableName = cpCore.metaData.getContentTablename("Member Rules")
+                    PeopleTableName = Models.Complex.cdefModel.getContentTablename(cpCore, "people")
+                    PeopleDataSource = Models.Complex.cdefModel.getContentDataSource(cpCore, "People")
+                    MemberRulesTableName = Models.Complex.cdefModel.getContentTablename(cpCore, "Member Rules")
                     '
                     RowMax = 0
                     SQL = "select count(*) as cnt" _
@@ -1324,7 +1324,7 @@ ErrorTrap:
                         '
                         ' ----- Generate Drop Down Field Names
                         '
-                        DropDownFieldList = cpCore.metaData.GetContentProperty("people", "DropDownFieldList")
+                        DropDownFieldList = Models.Complex.cdefModel.GetContentProperty(cpCore, "people", "DropDownFieldList")
                         If DropDownFieldList = "" Then
                             DropDownFieldList = "NAME"
                         End If
@@ -2299,7 +2299,7 @@ ErrorTrap:
             '
             ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
             '
-            SecondaryCDef = cpCore.metaData.getCdef(SecondaryContentName)
+            SecondaryCDef = Models.Complex.cdefModel.getCdef(cpCore, SecondaryContentName)
             SecondaryTablename = SecondaryCDef.ContentTableName
             SecondaryContentID = SecondaryCDef.Id
             SecondaryCDef.childIdList(cpCore).Add(SecondaryContentID)
@@ -2399,7 +2399,7 @@ ErrorTrap:
                 Stream = ""
                 If True Then
                     fieldFound = False
-                    Contentdefinition = cpCore.metaData.getCdef(ContentName)
+                    Contentdefinition = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                     For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In Contentdefinition.fields
                         Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         With field
@@ -2539,7 +2539,7 @@ ErrorTrap:
                                 '
                                 Case FieldTypeIdLookup
                                     FieldValueInteger = genericController.EncodeInteger(FieldValueVariant)
-                                    FieldLookupContentName = cpCore.metaData.getContentNameByID(FieldLookupContentID)
+                                    FieldLookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, FieldLookupContentID)
                                     If FieldLookupContentName <> "" Then
                                         '
                                         ' Lookup into Content
@@ -2830,7 +2830,7 @@ ErrorTrap:
                     InputName = FieldName
                 End If
                 '
-                fieldType = genericController.EncodeInteger(cpCore.metaData.GetContentFieldProperty(ContentName, FieldName, "type"))
+                fieldType = genericController.EncodeInteger(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, ContentName, FieldName, "type"))
                 Select Case fieldType
                     Case FieldTypeIdBoolean
                         '
@@ -2938,7 +2938,7 @@ ErrorTrap:
                         '
                         '
                         '
-                        CDef = cpCore.metaData.getCdef(ContentName)
+                        CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                         LookupContentName = ""
                         With CDef
                             For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In CDef.fields
@@ -2946,7 +2946,7 @@ ErrorTrap:
                                 With field
                                     If genericController.vbUCase(.nameLc) = genericController.vbUCase(FieldName) Then
                                         If .lookupContentID <> 0 Then
-                                            LookupContentName = genericController.encodeText(cpCore.metaData.getContentNameByID(.lookupContentID))
+                                            LookupContentName = genericController.encodeText(Models.Complex.cdefModel.getContentNameByID(cpCore, .lookupContentID))
                                         End If
                                         If LookupContentName <> "" Then
                                             result = main_GetFormInputSelect2(InputName, genericController.EncodeInteger(HtmlValue), LookupContentName, "", "Select One", HtmlId, IgnoreBoolean, HtmlClass)
@@ -2965,11 +2965,11 @@ ErrorTrap:
                         '
                         '
                         '
-                        CDef = cpCore.metaData.getCdef(ContentName)
+                        CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                         With CDef.fields(FieldName.ToLower())
-                            MTMContent0 = cpCore.metaData.getContentNameByID(.contentId)
-                            MTMContent1 = cpCore.metaData.getContentNameByID(.manyToManyContentID)
-                            MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
+                            MTMContent0 = Models.Complex.cdefModel.getContentNameByID(cpCore, .contentId)
+                            MTMContent1 = Models.Complex.cdefModel.getContentNameByID(cpCore, .manyToManyContentID)
+                            MTMRuleContent = Models.Complex.cdefModel.getContentNameByID(cpCore, .manyToManyRuleContentID)
                             MTMRuleField0 = .ManyToManyRulePrimaryField
                             MTMRuleField1 = .ManyToManyRuleSecondaryField
                         End With
@@ -2979,7 +2979,7 @@ ErrorTrap:
                         '
                         '
                         '
-                        GroupID = genericController.EncodeInteger(cpCore.metaData.GetContentFieldProperty(ContentName, FieldName, "memberselectgroupid"))
+                        GroupID = genericController.EncodeInteger(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, ContentName, FieldName, "memberselectgroupid"))
                         result = getInputMemberSelect(InputName, genericController.EncodeInteger(HtmlValue), GroupID, , , HtmlId)
                         If HtmlClass <> "" Then
                             result = genericController.vbReplace(result, ">", " class=""" & HtmlClass & """>")
@@ -3148,7 +3148,7 @@ ErrorTrap:
                         '
                         ' Personalization Tag
                         '
-                        FieldList = cpCore.metaData.GetContentProperty("people", "SelectFieldList")
+                        FieldList = Models.Complex.cdefModel.GetContentProperty(cpCore, "people", "SelectFieldList")
                         FieldList = genericController.vbReplace(FieldList, ",", "|")
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
                         IconImg = genericController.GetAddonIconImg("/" & cpCore.serverConfig.appConfig.adminRoute, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
@@ -5301,7 +5301,7 @@ ErrorTrap:
                                 '
                                 ' ListField
                                 '
-                                CID = cpCore.metaData.getContentId(ContentName)
+                                CID = Models.Complex.cdefModel.getContentId(cpCore, ContentName)
                                 If CID > 0 Then
                                     CS = cpCore.db.csOpen("Content Fields", "Contentid=" & CID, "name", , , , , "ID,Name")
                                 End If
@@ -5833,7 +5833,7 @@ ErrorTrap:
                             SQL = "update ccfields set caption=" & cpCore.db.encodeSQLText(HelpCaption) & ",HelpMessage=" & cpCore.db.encodeSQLText(HelpMessage) & " where id=" & RecordID
                             Call cpCore.db.executeQuery(SQL)
                             cpCore.cache.invalidateAll()
-                            cpCore.metaData.clear()
+                            cpCore.doc.clearMetaData()
                         End If
                     End If
             End Select
@@ -5947,11 +5947,11 @@ ErrorTrap:
                 ' IsRuleCopySupported - if true, the rule records include an allow button, and copy
                 '   This is for a checkbox like [ ] Other [enter other copy here]
                 '
-                IsRuleCopySupported = cpCore.metaData.isContentFieldSupported(RulesContentName, "RuleCopy")
+                IsRuleCopySupported = Models.Complex.cdefModel.isContentFieldSupported(cpCore, RulesContentName, "RuleCopy")
                 If IsRuleCopySupported Then
-                    IsRuleCopySupported = IsRuleCopySupported And cpCore.metaData.isContentFieldSupported(SecondaryContentName, "AllowRuleCopy")
+                    IsRuleCopySupported = IsRuleCopySupported And Models.Complex.cdefModel.isContentFieldSupported(cpCore, SecondaryContentName, "AllowRuleCopy")
                     If IsRuleCopySupported Then
-                        IsRuleCopySupported = IsRuleCopySupported And cpCore.metaData.isContentFieldSupported(SecondaryContentName, "RuleCopyCaption")
+                        IsRuleCopySupported = IsRuleCopySupported And Models.Complex.cdefModel.isContentFieldSupported(cpCore, SecondaryContentName, "RuleCopyCaption")
                     End If
                 End If
                 If CaptionFieldName = "" Then
@@ -5965,8 +5965,8 @@ ErrorTrap:
                     '
                     ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     '
-                    PrimaryContentID = cpCore.metaData.getContentId(PrimaryContentName)
-                    SecondaryCDef = cpCore.metaData.getCdef(SecondaryContentName)
+                    PrimaryContentID = Models.Complex.cdefModel.getContentId(cpCore, PrimaryContentName)
+                    SecondaryCDef = Models.Complex.cdefModel.getCdef(cpCore, SecondaryContentName)
                     SecondaryTablename = SecondaryCDef.ContentTableName
                     SecondaryContentID = SecondaryCDef.Id
                     ContentIDList.Add(SecondaryContentID)
@@ -5974,7 +5974,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    rulesTablename = cpCore.metaData.getContentTablename(RulesContentName)
+                    rulesTablename = Models.Complex.cdefModel.getContentTablename(cpCore, RulesContentName)
                     SingularPrefixHtmlEncoded = encodeHTML(genericController.GetSingular(SecondaryContentName)) & "&nbsp;"
                     '
                     main_MemberShipCount = 0
@@ -6197,7 +6197,7 @@ ErrorTrap:
         '        Dim JSSwitchAll As String
         '        Dim IsContentCategoriesSupported As Boolean
         '        '
-        '        IsContentCategoriesSupported = cpCore.metaData.isContentFieldSupported(SecondaryContentName, "ContentCategoryID")
+        '        IsContentCategoriesSupported = models.complex.cdefmodel.isContentFieldSupported(cpcore,SecondaryContentName, "ContentCategoryID")
         '        If Not IsContentCategoriesSupported Then
         '            result = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
         '        Else
@@ -6252,7 +6252,7 @@ ErrorTrap:
         '                ' + Add Category
         '                '
         '                If cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
-        '                    LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & "/" & cpCore.serverconfig.appconfig.adminRoute & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+        '                    LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & "/" & cpCore.serverconfig.appconfig.adminRoute & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & models.complex.cdefmodel.getcontentid(cpcore,"Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
         '                End If
         '                '
         '                LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.htmlIndent(LeftPane) & cr & "</div>"
@@ -7699,11 +7699,11 @@ ErrorTrap:
                 '
                 ' Test if RuleCopy is supported
                 '
-                SupportRuleCopy = cpCore.metaData.isContentFieldSupported(RulesContentName, "RuleCopy")
+                SupportRuleCopy = Models.Complex.cdefModel.isContentFieldSupported(cpCore, RulesContentName, "RuleCopy")
                 If SupportRuleCopy Then
-                    SupportRuleCopy = SupportRuleCopy And cpCore.metaData.isContentFieldSupported(SecondaryContentName, "AllowRuleCopy")
+                    SupportRuleCopy = SupportRuleCopy And Models.Complex.cdefModel.isContentFieldSupported(cpCore, SecondaryContentName, "AllowRuleCopy")
                     If SupportRuleCopy Then
-                        SupportRuleCopy = SupportRuleCopy And cpCore.metaData.isContentFieldSupported(SecondaryContentName, "RuleCopyCaption")
+                        SupportRuleCopy = SupportRuleCopy And Models.Complex.cdefModel.isContentFieldSupported(cpCore, SecondaryContentName, "RuleCopyCaption")
                     End If
                 End If
                 '
@@ -7714,7 +7714,7 @@ ErrorTrap:
                 '
                 currentRulesCnt = 0
                 dupRuleIdList = ""
-                rulesTablename = cpCore.metaData.getContentTablename(RulesContentName)
+                rulesTablename = Models.Complex.cdefModel.getContentTablename(cpCore, RulesContentName)
                 SQL = "select " & RulesSecondaryFieldName & ",id from " & rulesTablename & " where (" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(active<>0) order by " & RulesSecondaryFieldName
                 currentRulesCnt = 0
                 currentRules = cpCore.db.executeQuery(SQL)
@@ -7877,7 +7877,7 @@ ErrorTrap:
                         '
                         ' Edit link, main_Get the CID
                         '
-                        ContentID = cpCore.metaData.getContentId(iContentName)
+                        ContentID = Models.Complex.cdefModel.getContentId(cpCore, iContentName)
                         '
                         main_GetRecordEditLink2 = main_GetRecordEditLink2 _
                             & "<a" _
@@ -8063,7 +8063,7 @@ ErrorTrap:
                 If iContentName = "" Then
                     Throw (New ApplicationException("Method called with blank ContentName")) ' handleLegacyError14(MethodName, "")
                 Else
-                    iContentID = cpCore.metaData.getContentId(iContentName)
+                    iContentID = Models.Complex.cdefModel.getContentId(cpCore, iContentName)
                     csChildContent = cpCore.db.csOpen("Content", "ParentID=" & iContentID, , , , , , "id")
                     useFlyout = cpCore.db.csOk(csChildContent)
                     Call cpCore.db.csClose(csChildContent)
@@ -8107,7 +8107,7 @@ ErrorTrap:
                                     ClipboardContentID = genericController.EncodeInteger(ClipBoardArray(0))
                                     ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray(1))
                                     'iContentID = main_GetContentID(iContentName)
-                                    If cpCore.metaData.isWithinContent(ClipboardContentID, iContentID) Then
+                                    If Models.Complex.cdefModel.isWithinContent(cpCore, ClipboardContentID, iContentID) Then
                                         If genericController.vbInstr(1, iPresetNameValueList, "PARENTID=", vbTextCompare) <> 0 Then
                                             '
                                             ' must test for main_IsChildRecord
@@ -8298,7 +8298,7 @@ ErrorTrap:
                             ' ----- No entry found, this member does not have access, just main_Get ContentID
                             '
                             ContentRecordFound = True
-                            ContentID = cpCore.metaData.getContentId(ContentName)
+                            ContentID = Models.Complex.cdefModel.getContentId(cpCore, ContentName)
                             ContentAllowAdd = False
                             GroupRulesAllowAdd = False
                             MemberRulesAllow = False
@@ -8753,7 +8753,7 @@ ErrorTrap:
                             '            '
                             '            ' Path is blocked
                             '            '
-                            '            Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML("/" & cpCore.serverconfig.appconfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                            '            Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML("/" & cpCore.serverconfig.appconfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & models.complex.cdefmodel.getcontentid(cpcore,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                             '        Else
                             '            '
                             '            ' Path is not blocked

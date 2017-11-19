@@ -1,14 +1,17 @@
 
+/*
+    contensive base: adminSite, pageManager, etc
+*/
 body {overflow:auto;}
 /*
-Body Class Selectors 
+    Body Class Selectors 
 */
 .ccBodyWeb{}
 .ccBodyPrint{}
 .ccBodyEmail{}
 .ccBodyAdmin {margin:0;padding:0;COLOR:black;BACKGROUND-COLOR:#C3D9FF;FONT-WEIGHT:normal}
 /*
-Contensive Container Resets 
+    container resets 
 */
 .ccCon div,.ccCon p,.ccCon td,.ccCon ul,.ccCon li {color:#222;font-size:11px;font-family:verdana,arial,sans-serif;line-height:1.2;}
 .ccCon p {margin:1.12em 0;}
@@ -23,7 +26,7 @@ Contensive Container Resets
 .ccCon h4 {FONT-SIZE:12px;}
 .ccCon h5,.ccCon h6 {FONT-SIZE:12px;}
 /*
-Contensive Admin 
+    adminSite
 */
 #desktop { color:#222;Background-color:#C3D9FF}
 .ccCon .ccHeaderCon {width:100%;COLOR:white;BACKGROUND-COLOR:#1F70BD;clear:both;vertical-align:middle;}
@@ -309,12 +312,21 @@ Exception list
 ul.ccExceptionList { padding: 10px 20px;margin:0;background-color:red;list-style-type: none;}
 li.ccExceptionListRow { padding:0;margin: 10px auto;}
 /*
-* page manager verified styles
+    page manager verified styles
 */
 .ccChildList li {
     min-height:30px;
     vertical-align:middle;
     border:1px dashed #262;
     padding-right:40px !important;
-    background:white url(/childPageSort/arrowUpDown.png) no-repeat right;
+    background:white url(/contensiveBase/arrowUpDown.png) no-repeat right;
 }
+/*
+    child list
+*/
+.ccEditWrapper .ccChildList li {
+	min-height:30px;
+	vertical-align:middle;
+	border:1px dashed #262;
+	padding-right:40px !important;background:white url(/contensiveBase/arrowUpDown.png) no-repeat right;
+}	

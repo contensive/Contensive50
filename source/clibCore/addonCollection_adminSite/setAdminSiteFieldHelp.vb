@@ -33,6 +33,10 @@ Namespace Contensive.Addons.AdminSite
                     End If
                     help.HelpCustom = cp.Doc.GetText("helpcustom")
                     help.save(cpCore)
+                    Dim contentField As Models.Entity.contentFieldModel = Models.Entity.contentFieldModel.create(cpCore, fieldId)
+                    If (contentField IsNot Nothing) Then
+                        Models.Complex.cdefModel.invalidateCache(cpCore, contentField.ContentID)
+                    End If
                 End If
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

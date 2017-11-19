@@ -611,7 +611,7 @@ Namespace Contensive.Core.Controllers
                     ''
                     '' test if this tag is a content name
                     ''
-                    'Dim cdef As coreMetaDataClass.CDefClass = cpCore.metaData.getCdef(cacheName)
+                    'Dim cdef As coreMetaDataClass.CDefClass = models.complex.cdefmodel.getcdef(cpcore,cacheName)
                     'If Not cdef Is Nothing Then
                     '    '
                     '    ' Invalidate all child cdef
@@ -619,7 +619,7 @@ Namespace Contensive.Core.Controllers
                     '    If cdef.childIdList.Count > 0 Then
                     '        For Each childId As Integer In cdef.childIdList
                     '            Dim childCdef As coreMetaDataClass.CDefClass
-                    '            childCdef = cpCore.metaData.getCdef(childId)
+                    '            childCdef = models.complex.cdefmodel.getcdef(cpcore,childId)
                     '            If Not childCdef Is Nothing Then
                     '                setCacheWrapper(childCdef.Name, invalidatedCacheWrapper)
                     '            End If
@@ -629,7 +629,7 @@ Namespace Contensive.Core.Controllers
                     '    ' Now go up to the top-most parent
                     '    '
                     '    Do While cdef.parentID > 0
-                    '        cdef = cpCore.metaData.getCdef(cdef.parentID)
+                    '        cdef = models.complex.cdefmodel.getcdef(cpcore,cdef.parentID)
                     '        If Not cdef Is Nothing Then
                     '            setCacheWrapper(cdef.Name, invalidatedCacheWrapper)
                     '        End If
@@ -648,7 +648,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="ContentName"></param>
         Public Sub invalidateAllObjectsInContent(ByVal ContentName As String)
             Try
-                invalidateAllObjectsInTable(cpCore.metaData.getContentTablename(ContentName))
+                invalidateAllObjectsInTable(Models.Complex.cdefModel.getContentTablename(cpCore, ContentName))
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try

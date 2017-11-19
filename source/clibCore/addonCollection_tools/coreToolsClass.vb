@@ -739,8 +739,8 @@ ErrorTrap:
                     Call cpCore.db.createSQLTable(datasource.Name, TableName)
                     Call cpCore.db.createContentFromSQLTable(datasource, TableName, ContentName)
                     cpCore.cache.invalidateAll()
-                    cpCore.metaData.clear()
-                    ContentID = cpCore.metaData.getContentId(ContentName)
+                    cpCore.doc.clearMetaData()
+                    ContentID = Models.Complex.cdefModel.getContentId(cpCore, ContentName)
                     ParentNavID = cpCore.db.getRecordID(cnNavigatorEntries, "Manage Site Content")
                     If ParentNavID <> 0 Then
                         CS = cpCore.db.csOpen(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText("Advanced") & ")and(parentid=" & ParentNavID & ")")
@@ -763,7 +763,7 @@ ErrorTrap:
                             Call cpCore.db.csClose(CS)
                         End If
                     End If
-                    ContentID = cpCore.metaData.getContentId(ContentName)
+                    ContentID = Models.Complex.cdefModel.getContentId(cpCore, ContentName)
                     Call Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=""?af=105&ContentID=" & ContentID & """>Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>")
                 Else
                     Stream.Add("<P>Error, a required field is missing. Content not created.</P>")
@@ -903,7 +903,7 @@ ErrorTrap:
             If ContentID <> 0 Then
                 ButtonList = ButtonCancel & "," & ButtonSaveandInvalidateCache
                 ContentName = Local_GetContentNameByID(ContentID)
-                CDef = cpCore.metaData.getCdef(ContentID, True, False)
+                CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentID, True, False)
                 If ToolsAction <> 0 Then
                     '
                     ' Block contentautoload, then force a load at the end
@@ -1240,11 +1240,11 @@ ErrorTrap:
                     '
                     ' Get a new copy of the content definition
                     '
-                    CDef = cpCore.metaData.getCdef(ContentID, True, False)
+                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentID, True, False)
                 End If
                 If (Button = ButtonSaveandInvalidateCache) Then
                     cpCore.cache.invalidateAll()
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     Call cpCore.webServer.redirect("?af=" & AdminFormToolConfigureListing & "&ContentID=" & ContentID)
                 End If
                 '
@@ -2050,11 +2050,11 @@ ErrorTrap:
                     ' Create Definition
                     '
                     Stream.Add("<P>Creating content [" & ChildContentName & "] from [" & ParentContentName & "]")
-                    Call cpCore.metaData.createContentChild(ChildContentName, ParentContentName, cpCore.doc.authContext.user.id)
+                    Call Models.Complex.cdefModel.createContentChild(cpCore, ChildContentName, ParentContentName, cpCore.doc.authContext.user.id)
                     '
                     Stream.Add("<br>Reloading Content Definitions...")
                     cpCore.cache.invalidateAll()
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     '
                     ' Add Admin Menu Entry
                     '
@@ -2172,7 +2172,7 @@ ErrorTrap:
                     CSContent = cpCore.db.csOpen("Content", , , , , ,, "id")
                     If cpCore.db.csOk(CSContent) Then
                         Do
-                            CD = cpCore.metaData.getCdef(cpCore.db.csGetInteger(CSContent, "id"))
+                            CD = Models.Complex.cdefModel.getCdef(cpCore, cpCore.db.csGetInteger(CSContent, "id"))
                             TableName = CD.ContentTableName
                             Call Stream.Add("Synchronizing Content " & CD.Name & " to table " & TableName & "<br>")
                             Call cpCore.db.createSQLTable(CD.ContentDataSourceName, TableName)
@@ -2911,7 +2911,7 @@ ErrorTrap:
                     If (Not String.IsNullOrEmpty(ContentName)) Then
                         TableName = cp.Content.GetTable(ContentName)
                         DataSourceName = cp.Content.GetDataSource(ContentName)
-                        CDef = cpCore.metaData.getCdef(ContentID, True, True)
+                        CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentID, True, True)
                     End If
                 End If
                 If (CDef IsNot Nothing) Then
@@ -3047,7 +3047,7 @@ ErrorTrap:
                                 Next
                             End If
                             cpCore.cache.invalidateAll()
-                            cpCore.metaData.clear()
+                            cpCore.doc.clearMetaData()
                         End If
                         If (ToolButton = ButtonAdd) Then
                             '
@@ -3067,7 +3067,7 @@ ErrorTrap:
                         ''
                         If (ToolButton = ButtonSaveandInvalidateCache) Then
                             cpCore.cache.invalidateAll()
-                            cpCore.metaData.clear()
+                            cpCore.doc.clearMetaData()
                         End If
                         '
                         ' ----- Restore Content Autoload site property
@@ -3103,7 +3103,7 @@ ErrorTrap:
                 Else
                     Stream.Add("<div style=""width:45%;float:left;padding:10px;"">Related Tools:" _
                         & "<div style=""padding-left:20px;""><a href=""?af=104&ContentID=" & ContentID & """>Set Default Admin Listing page columns for '" & ContentName & "'</a></div>" _
-                        & "<div style=""padding-left:20px;""><a href=""?af=4&cid=" & cpCore.metaData.getContentId("content") & "&id=" & ContentID & """>Edit '" & ContentName & "' Content Definition</a></div>" _
+                        & "<div style=""padding-left:20px;""><a href=""?af=4&cid=" & Models.Complex.cdefModel.getContentId(cpCore, "content") & "&id=" & ContentID & """>Edit '" & ContentName & "' Content Definition</a></div>" _
                         & "<div style=""padding-left:20px;""><a href=""?cid=" & ContentID & """>View records in '" & ContentName & "'</a></div>" _
                         & "</div>")
                 End If
@@ -3118,7 +3118,7 @@ ErrorTrap:
                     Stream.Add("<div style=""clear:both"">&nbsp;</div>")
                 End If
                 If ReloadCDef Then
-                    CDef = cpCore.metaData.getCdef(ContentID, True, True)
+                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentID, True, True)
                 End If
                 If (ContentID <> 0) Then
                     '
@@ -3140,8 +3140,8 @@ ErrorTrap:
                         AllowCDefInherit = False
                     Else
                         AllowCDefInherit = True
-                        ParentContentName = cpCore.metaData.getContentNameByID(ParentContentID)
-                        ParentCDef = cpCore.metaData.getCdef(ParentContentID, True, True)
+                        ParentContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ParentContentID)
+                        ParentCDef = Models.Complex.cdefModel.getCdef(cpCore, ParentContentID, True, True)
                     End If
                     If CDef.fields.Count > 0 Then
                         Stream.Add("<tr>")
@@ -3914,7 +3914,7 @@ ErrorTrap:
                     '
                     Call Stream.Add("<br>Loading Content Definitions...")
                     cpCore.cache.invalidateAll()
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     Call Stream.Add("<br>Content Definitions loaded")
                 End If
                 '
@@ -3957,7 +3957,7 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.doc.authContext.user.Name & " (" & cpCore.doc.authContext.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.requestUrl, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.doc.authContext.user.name & " (" & cpCore.doc.authContext.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.requestUrl, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
@@ -3996,7 +3996,7 @@ ErrorTrap:
         '
         '
         Private Function GetCDef(ByVal ContentName As String) As Models.Complex.cdefModel
-            Return cpCore.metaData.getCdef(ContentName)
+            Return Models.Complex.cdefModel.getCdef(cpCore, ContentName)
         End Function
 
 
@@ -4258,7 +4258,7 @@ ErrorTrap:
         '                '
         '                ParentID = cpCore.db.cs_getInteger(CSContent, "parentID")
         '                If ParentID <> 0 Then
-        '                    ParentContentName = cpCore.metaData.getContentNameByID(ParentID)
+        '                    ParentContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ParentID)
         '                    If ParentContentName <> "" Then
         '                        LoadCDef = LoadCDef(ParentContentName)
         '                    End If
@@ -4581,7 +4581,7 @@ ErrorTrap:
                 '
                 '
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.doc.authContext.user.Name & " (" & cpCore.doc.authContext.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.requestUrl, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.doc.authContext.user.name & " (" & cpCore.doc.authContext.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.requestUrl, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)

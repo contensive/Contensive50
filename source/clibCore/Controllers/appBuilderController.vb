@@ -310,7 +310,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' -- verify root developer
                         Call logController.appendInstallLog(cpcore, "New build, verify root user")
-                        Dim cid As Integer = cpcore.metaData.getContentId("people")
+                        Dim cid As Integer = Models.Complex.cdefModel.getContentId(cpcore, "people")
                         Dim dt As DataTable = cpcore.db.executeQuery("select id from ccmembers where (Developer<>0)")
                         If dt.Rows.Count = 0 Then
                             Dim SQL As String = "" _
@@ -1318,7 +1318,7 @@ Namespace Contensive.Core.Controllers
                 Dim sql3 As String
                 '
                 Active = Not InActive
-                Dim cdef As Models.Complex.cdefModel = cpcore.metaData.getCdef(ContentName)
+                Dim cdef As Models.Complex.cdefModel = Models.Complex.cdefModel.getCdef(cpcore, ContentName)
                 Dim tableName As String = cdef.ContentTableName
                 Dim cid As Integer = cdef.Id
                 '
@@ -1358,7 +1358,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' remove all non add-on contentdefs for ccaggregatefunctions
                     '
-                    CID = cpCore.metaData.getContentId(cnAddons)
+                    CID = Models.Complex.cdefModel.getContentId(cpCore, cnAddons)
                     If CID <> 0 Then
                         Call cpCore.db.executeQuery("update ccaggregatefunctions set contentcontrolid=" & CID)
                         Call cpCore.db.executeQuery("delete from cccontent where id in (select c.id from cccontent c left join cctables t on t.id=c.contenttableid where t.name='ccAggregateFunctions' and c.id<>" & CID & ")")
@@ -1379,7 +1379,7 @@ Namespace Contensive.Core.Controllers
                 ' ----- Reload CSv
                 '
                 Call cpCore.cache.invalidateAll()
-                Call cpCore.metaData.clear()
+                Call cpCore.doc.clearMetaData()
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -2268,7 +2268,7 @@ Namespace Contensive.Core.Controllers
         '        Dim SupportAddonID As Boolean
         '        '
         '        SelectList = "Name,ContentID,ParentID,LinkPage,SortOrder,AdminOnly,DeveloperOnly,NewWindow,Active"
-        '        SupportAddonID = cpCore.metaData.isContentFieldSupported(MenuContentName, "AddonID")
+        '        SupportAddonID = models.complex.cdefmodel.isContentFieldSupported(cpcore,MenuContentName, "AddonID")
         '        '
         '        ' Get AddonID from AddonName
         '        '
@@ -2301,7 +2301,7 @@ Namespace Contensive.Core.Controllers
         '        '
         '        ContentID = -1
         '        If ContentName <> "" Then
-        '            ContentID = cpCore.metaData.getContentId(ContentName)
+        '            ContentID = models.complex.cdefmodel.getcontentid(cpcore,ContentName)
         '        End If
         '        '
         '        ' Locate current entry
@@ -2367,7 +2367,7 @@ Namespace Contensive.Core.Controllers
                 If (Not String.IsNullOrEmpty(EntryName.Trim())) Then
                     Dim addonId As Integer = cpCore.db.getRecordID(cnAddons, AddonName)
                     Dim parentId As Integer = verifyNavigatorEntry_getParentIdFromNameSpace(cpCore, menuNameSpace)
-                    Dim contentId As Integer = cpCore.metaData.getContentId(ContentName)
+                    Dim contentId As Integer = Models.Complex.cdefModel.getContentId(cpCore, ContentName)
                     Dim listCriteria As String = "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(Parentid=" & parentId & ")"
                     Dim entryList As List(Of Models.Entity.NavigatorEntryModel) = Models.Entity.NavigatorEntryModel.createList(cpCore, listCriteria, "id")
                     Dim entry As Models.Entity.NavigatorEntryModel
@@ -2434,8 +2434,8 @@ Namespace Contensive.Core.Controllers
         '            ' Setup misc arguments
         '            '
         '            SelectList = "Name,ContentID,ParentID,LinkPage,SortOrder,AdminOnly,DeveloperOnly,NewWindow,Active,NavIconType,NavIconTitle"
-        '            SupportAddonID = cpCore.metaData.isContentFieldSupported(cnNavigatorEntries, "AddonID")
-        '            SupportInstalledByCollectionID = cpCore.metaData.isContentFieldSupported(cnNavigatorEntries, "InstalledByCollectionID")
+        '            SupportAddonID = models.complex.cdefmodel.isContentFieldSupported(cpcore,cnNavigatorEntries, "AddonID")
+        '            SupportInstalledByCollectionID = models.complex.cdefmodel.isContentFieldSupported(cpcore,cnNavigatorEntries, "InstalledByCollectionID")
         '            If SupportAddonID Then
         '                SelectList = SelectList & ",AddonID"
         '            Else
@@ -2444,12 +2444,12 @@ Namespace Contensive.Core.Controllers
         '            If SupportInstalledByCollectionID Then
         '                SelectList = SelectList & ",InstalledByCollectionID"
         '            End If
-        '            If cpCore.metaData.isContentFieldSupported(cnNavigatorEntries, "ccGuid") Then
+        '            If models.complex.cdefmodel.isContentFieldSupported(cpcore,cnNavigatorEntries, "ccGuid") Then
         '                SupportGuid = True
         '                SupportccGuid = True
         '                GuidFieldName = "ccguid"
         '                SelectList = SelectList & ",ccGuid"
-        '            ElseIf cpCore.metaData.isContentFieldSupported(cnNavigatorEntries, "NavGuid") Then
+        '            ElseIf models.complex.cdefmodel.isContentFieldSupported(cpcore,cnNavigatorEntries, "NavGuid") Then
         '                SupportGuid = True
         '                SupportNavGuid = True
         '                GuidFieldName = "navguid"
@@ -2457,7 +2457,7 @@ Namespace Contensive.Core.Controllers
         '            Else
         '                SelectList = SelectList & ",'' as ccGuid"
         '            End If
-        '            SupportNavIcon = cpCore.metaData.isContentFieldSupported(cnNavigatorEntries, "NavIconType")
+        '            SupportNavIcon = models.complex.cdefmodel.isContentFieldSupported(cpcore,cnNavigatorEntries, "NavIconType")
         '            addonId = 0
         '            If SupportAddonID And (AddonName <> "") Then
         '                CS = cpCore.db.cs_open(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
@@ -2469,7 +2469,7 @@ Namespace Contensive.Core.Controllers
         '            ParentID = getNavigatorEntryParentIDFromNameSpace(cpCore, cnNavigatorEntries, menuNameSpace)
         '            ContentID = -1
         '            If ContentName <> "" Then
-        '                ContentID = cpCore.metaData.getContentId(ContentName)
+        '                ContentID = models.complex.cdefmodel.getcontentid(cpcore,ContentName)
         '            End If
         '            '
         '            ' Locate current entry(s)

@@ -488,7 +488,7 @@
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />
-    <Compile Include="Models\Entity\tableSchemeModel.vb" />
+    <Compile Include="Models\Complex\tableSchemeModel.vb" />
     <Compile Include="Models\Complex\cdefFieldModel.vb" />
     <Compile Include="Models\Complex\cdefModel.vb" />
     <Compile Include="Models\Entity\domainLegacyModel.vb" />
@@ -496,7 +496,6 @@
     <Compile Include="addonCollection_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Controllers\sitePropertiesController.vb" />
     <Compile Include="Controllers\iisController.vb" />
-    <Compile Include="Controllers\metaDataController.vb" />
     <Compile Include="Controllers\cacheKeyPtrController.vb" />
     <Compile Include="Controllers\securityController.vb" />
     <Compile Include="Controllers\addonInstallClass.vb" />

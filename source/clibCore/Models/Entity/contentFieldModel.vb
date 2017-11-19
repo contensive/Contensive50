@@ -37,7 +37,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property IndexSortPriority As Integer
         Public Property IndexWidth As String
         Public Property InstalledByCollectionID As Integer
-        Public Property IsBaseField As Boolean
+        'Public Property IsBaseField As Boolean
         Public Property LookupContentID As Integer
         Public Property LookupList As String
         Public Property ManyToManyContentID As Integer

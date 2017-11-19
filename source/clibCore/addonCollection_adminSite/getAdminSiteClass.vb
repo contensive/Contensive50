@@ -415,7 +415,7 @@ Namespace Contensive.Addons.AdminSite
                             Case AdminFormDownloads
                                 ContentCell = (GetForm_Downloads())
                             Case AdminformRSSControl
-                                Call cpCore.webServer.redirect("?cid=" & cpCore.metaData.getContentId("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
+                                Call cpCore.webServer.redirect("?cid=" & Models.Complex.cdefModel.getContentId(cpCore, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
                             Case AdminFormImportWizard
                                 ContentCell = cpCore.addon.execute(addonModel.create(cpCore, addonGuidImportWizard), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, .errorCaption = "Import Wizard"})
                                 'ContentCell = cpCore.addon.execute_legacy4(addonGuidImportWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
@@ -588,7 +588,7 @@ Namespace Contensive.Addons.AdminSite
             '
             requestedContentId = cpCore.docProperties.getInteger("cid")
             If requestedContentId <> 0 Then
-                adminContent = cpCore.metaData.getCdef(requestedContentId)
+                adminContent = Models.Complex.cdefModel.getCdef(cpCore, requestedContentId)
                 If adminContent Is Nothing Then
                     adminContent = New Models.Complex.cdefModel
                     adminContent.Id = 0
@@ -625,7 +625,7 @@ Namespace Contensive.Addons.AdminSite
                     If adminContent.Id <= 0 Then
                         adminContent.Id = requestedContentId
                     ElseIf adminContent.Id <> requestedContentId Then
-                        adminContent = cpCore.metaData.getCdef(adminContent.Id)
+                        adminContent = Models.Complex.cdefModel.getCdef(cpCore, adminContent.Id)
                     End If
                 End If
                 Call cpCore.db.csClose(CS)
@@ -930,7 +930,7 @@ ErrorTrap:
                         '            Call cpCore.workflow.publishEdit(ContentName, RecordID)
                         '            Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
                         '            Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, recordId))
-                        '            Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & cpCore.metaData.getContentId(ContentName))
+                        '            Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & models.complex.cdefmodel.getcontentid(cpcore,ContentName))
                         '        End If
                         '    Next
                         'Case AdminActionWorkflowPublishApproved
@@ -941,7 +941,7 @@ ErrorTrap:
                         '    Do While cpCore.db.cs_ok(CS)
                         '        ContentID = cpCore.db.cs_getInteger(CS, "ContentID")
                         '        RecordID = cpCore.db.cs_getInteger(CS, "RecordID")
-                        '        ContentName = cpCore.metaData.getContentNameByID(ContentID)
+                        '        ContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ContentID)
                         '        If ContentName <> "" Then
                         '            Call cpCore.workflow.publishEdit(ContentName, RecordID)
                         '            Call cpCore.doc.processAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
@@ -1142,7 +1142,7 @@ ErrorTrap:
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 If Not (cpCore.doc.debug_iUserError <> "") Then
-                                    If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Group Email")) Then
+                                    If Not Models.Complex.cdefModel.isWithinContent(cpCore, editRecord.contentControlId, Models.Complex.cdefModel.getContentId(cpCore, "Group Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The send action only supports Group Email.")
                                     Else
                                         CS = cpCore.db.csOpenRecord("Group Email", editRecord.id)
@@ -1175,7 +1175,7 @@ ErrorTrap:
                                 ' no save, page was read only - Call ProcessActionSave
                                 Call LoadEditRecord(adminContent, editRecord)
                                 If Not (cpCore.doc.debug_iUserError <> "") Then
-                                    If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
+                                    If Not Models.Complex.cdefModel.isWithinContent(cpCore, editRecord.contentControlId, Models.Complex.cdefModel.getContentId(cpCore, "Conditional Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The deactivate action only supports Conditional Email.")
                                     Else
                                         CS = cpCore.db.csOpenRecord("Conditional Email", editRecord.id)
@@ -1201,7 +1201,7 @@ ErrorTrap:
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 If Not (cpCore.doc.debug_iUserError <> "") Then
-                                    If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
+                                    If Not Models.Complex.cdefModel.isWithinContent(cpCore, editRecord.contentControlId, Models.Complex.cdefModel.getContentId(cpCore, "Conditional Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The activate action only supports Conditional Email.")
                                     Else
                                         CS = cpCore.db.csOpenRecord("Conditional Email", editRecord.id)
@@ -1262,7 +1262,7 @@ ErrorTrap:
                                                 '
                                                 ' non-Workflow Delete
                                                 '
-                                                ContentName = cpCore.metaData.getContentNameByID(cpCore.db.csGetInteger(CSEditRecord, "ContentControlID"))
+                                                ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, cpCore.db.csGetInteger(CSEditRecord, "ContentControlID"))
                                                 Call cpCore.cache.invalidateObject(cacheController.getCacheName_Entity(adminContent.ContentTableName, RecordID))
                                                 Call cpCore.doc.processAfterSave(True, ContentName, RecordID, "", 0, UseContentWatchLink)
                                             End If
@@ -1294,7 +1294,7 @@ ErrorTrap:
                                 Call LoadEditRecord_Request(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 cpCore.cache.invalidateAll()
-                                cpCore.metaData.clear()
+                                cpCore.doc.clearMetaData()
                             End If
                             AdminAction = AdminActionNop ' convert so action can be used in as a refresh
                         Case Else
@@ -1773,7 +1773,7 @@ ErrorTrap:
                                             editrecord.fieldsLc(field.nameLc).value = DefaultValueText
                                         Else
                                             If .lookupContentID <> 0 Then
-                                                LookupContentName = cpCore.metaData.getContentNameByID(.lookupContentID)
+                                                LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, .lookupContentID)
                                                 If LookupContentName <> "" Then
                                                     editrecord.fieldsLc(field.nameLc).value = cpCore.db.getRecordID(LookupContentName, DefaultValueText)
                                                 End If
@@ -2042,7 +2042,7 @@ ErrorTrap:
                                         editrecord.active = cpCore.db.csGetBoolean(CSEditRecord, .nameLc)
                                     Case "CONTENTCONTROLID"
                                         editrecord.contentControlId = cpCore.db.csGetInteger(CSEditRecord, .nameLc)
-                                        editrecord.contentControlId_Name = cpCore.metaData.getContentNameByID(editrecord.contentControlId)
+                                        editrecord.contentControlId_Name = Models.Complex.cdefModel.getContentNameByID(cpCore, editrecord.contentControlId)
                                     Case "ID"
                                         editrecord.id = cpCore.db.csGetInteger(CSEditRecord, .nameLc)
                                     Case "MENUHEADLINE"
@@ -2601,7 +2601,7 @@ ErrorTrap:
                                         '
                                         ' ----- Do the unique check for this field
                                         '
-                                        Dim SQLUnique As String = "select id from " & adminContent.ContentTableName & " where (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")and(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
+                                        Dim SQLUnique As String = "select id from " & adminContent.ContentTableName & " where (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")and(" & Models.Complex.cdefModel.getContentControlCriteria(cpCore, adminContent.Name) & ")"
                                         If editRecord.id > 0 Then
                                             '
                                             ' --editing record
@@ -3155,16 +3155,16 @@ ErrorTrap:
                                             '
                                             ' Many to Many checklist
                                             '
-                                            'MTMContent0 = cpCore.metaData.getContentNameByID(.contentId)
-                                            'MTMContent1 = cpCore.metaData.getContentNameByID(.manyToManyContentID)
-                                            'MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
+                                            'MTMContent0 = models.complex.cdefmodel.getContentNameByID(cpcore,.contentId)
+                                            'MTMContent1 = models.complex.cdefmodel.getContentNameByID(cpcore,.manyToManyContentID)
+                                            'MTMRuleContent = models.complex.cdefmodel.getContentNameByID(cpcore,.manyToManyRuleContentID)
                                             'MTMRuleField0 = .ManyToManyRulePrimaryField
                                             'MTMRuleField1 = .ManyToManyRuleSecondaryField
                                             Call cpCore.html.main_ProcessCheckList("ManyToMany" & .id _
-                                                , cpCore.metaData.getContentNameByID(.contentId) _
+                                                , Models.Complex.cdefModel.getContentNameByID(cpCore, .contentId) _
                                                 , CStr(editRecord.id) _
-                                                , cpCore.metaData.getContentNameByID(.manyToManyContentID) _
-                                                , cpCore.metaData.getContentNameByID(.manyToManyRuleContentID) _
+                                                , Models.Complex.cdefModel.getContentNameByID(cpCore, .manyToManyContentID) _
+                                                , Models.Complex.cdefModel.getContentNameByID(cpCore, .manyToManyRuleContentID) _
                                                 , .ManyToManyRulePrimaryField _
                                                 , .ManyToManyRuleSecondaryField)
                                         Case Else
@@ -3214,9 +3214,9 @@ ErrorTrap:
                             ' -- clear cache
                             Dim tableName As String = ""
                             If editRecord.contentControlId = 0 Then
-                                tableName = cpCore.metaData.getContentTablename(adminContent.Name)
+                                tableName = Models.Complex.cdefModel.getContentTablename(cpCore, adminContent.Name)
                             Else
-                                tableName = cpCore.metaData.getContentTablename(editRecord.contentControlId_Name)
+                                tableName = Models.Complex.cdefModel.getContentTablename(cpCore, editRecord.contentControlId_Name)
                             End If
                             Select Case tableName.ToLower()
                                 Case linkAliasModel.contentTableName.ToLower()
@@ -3252,9 +3252,9 @@ ErrorTrap:
                         ' ----- if admin content is changed, reload the admincontent data in case this is a save, and not an OK
                         '
                         If RecordChanged And SaveCCIDValue <> 0 Then
-                            Call cpCore.metaData.content_SetContentControl(editRecord.contentControlId, editRecord.id, SaveCCIDValue)
-                            editRecord.contentControlId_Name = cpCore.metaData.getContentNameByID(SaveCCIDValue)
-                            adminContent = cpCore.metaData.getCdef(editRecord.contentControlId_Name)
+                            Call Models.Complex.cdefModel.setContentControlId(cpCore, editRecord.contentControlId, editRecord.id, SaveCCIDValue)
+                            editRecord.contentControlId_Name = Models.Complex.cdefModel.getContentNameByID(cpCore, SaveCCIDValue)
+                            adminContent = Models.Complex.cdefModel.getCdef(cpCore, editRecord.contentControlId_Name)
                             adminContent.Id = adminContent.Id
                             adminContent.Name = adminContent.Name
                             ' false = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
@@ -3302,7 +3302,7 @@ ErrorTrap:
             Try
                 Dim ContentName As String
                 '
-                ContentName = cpCore.metaData.getContentNameByID(ContentID)
+                ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID)
                 If ContentName <> "" Then
                     returnHas = cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, ContentName)
                 End If
@@ -3427,8 +3427,8 @@ ErrorTrap:
             Dim CS As Integer
             Dim AllowMarkReviewed As Boolean
             '
-            IsPageContent = cpCore.metaData.isWithinContent(adminContent.Id, cpCore.metaData.getContentId("Page Content"))
-            If cpCore.metaData.isContentFieldSupported(adminContent.Name, "parentid") Then
+            IsPageContent = Models.Complex.cdefModel.isWithinContent(cpCore, adminContent.Id, Models.Complex.cdefModel.getContentId(cpCore, "Page Content"))
+            If Models.Complex.cdefModel.isContentFieldSupported(cpCore, adminContent.Name, "parentid") Then
                 CS = cpCore.db.csOpen(adminContent.Name, "parentid=" & editRecord.id, , , , , , "ID")
                 HasChildRecords = cpCore.db.csOk(CS)
                 Call cpCore.db.csClose(CS)
@@ -3957,8 +3957,8 @@ ErrorTrap:
                         '
                         ' ----- Email table
                         '
-                        SystemEmailCID = cpCore.metaData.getContentId("System Email")
-                        ConditionalEmailCID = cpCore.metaData.getContentId("Conditional Email")
+                        SystemEmailCID = Models.Complex.cdefModel.getContentId(cpCore, "System Email")
+                        ConditionalEmailCID = Models.Complex.cdefModel.getContentId(cpCore, "Conditional Email")
                         LastSendTestDate = Date.MinValue
                         If True Then ' 3.4.201" Then
                             AllowEmailSendWithoutTest = (cpCore.siteProperties.getBoolean("AllowEmailSendWithoutTest", False))
@@ -3974,7 +3974,7 @@ ErrorTrap:
                             "This edit form requires Member Administration access." _
                             , "This edit form requires Member Administration access."
                             ))
-                        ElseIf cpCore.metaData.isWithinContent(editRecord.contentControlId, SystemEmailCID) Then
+                        ElseIf Models.Complex.cdefModel.isWithinContent(cpCore, editRecord.contentControlId, SystemEmailCID) Then
                             '
                             ' System Email
                             '
@@ -4014,7 +4014,7 @@ ErrorTrap:
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
-                        ElseIf cpCore.metaData.isWithinContent(editRecord.contentControlId, ConditionalEmailCID) Then
+                        ElseIf Models.Complex.cdefModel.isWithinContent(cpCore, editRecord.contentControlId, ConditionalEmailCID) Then
                             '
                             ' Conditional Email
                             '
@@ -4678,7 +4678,7 @@ ErrorTrap:
                             SQL = "delete from ccAuthoringControls where ContentID=" & ContentID & " and RecordID=" & RecordID
                             Call cpCore.db.executeQuery(SQL)
                         Else
-                            TableName = cpCore.metaData.GetContentProperty(ContentName, "ContentTableName")
+                            TableName = Models.Complex.cdefModel.GetContentProperty(cpCore, ContentName, "ContentTableName")
                             If Not (cpCore.db.csGetBoolean(CS, "ContentAllowWorkflowAuthoring")) Then
                                 '
                                 ' Authoring bug -- This record should not be here, the content does not support workflow authoring
@@ -5293,7 +5293,7 @@ ErrorTrap:
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             LookupContentName = ""
                                             If .lookupContentID <> 0 Then
-                                                LookupContentName = genericController.encodeText(cpCore.metaData.getContentNameByID(.lookupContentID))
+                                                LookupContentName = genericController.encodeText(Models.Complex.cdefModel.getContentNameByID(cpCore, .lookupContentID))
                                             End If
                                             If LookupContentName <> "" Then
                                                 CSLookup = cpCore.db.cs_open2(LookupContentName, FieldValueInteger, False, , "Name,ContentControlID")
@@ -5345,7 +5345,7 @@ ErrorTrap:
                                                 '    End If
                                                 'End If
                                                 'EditorString &=  ("&nbsp;[<a TabIndex=-1 href=""?cid=" & cpCore.main_GetContentID("groups") & """ target=""_blank"">" & SelectMessage & "</a>]")
-                                                EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?af=4&cid=" & cpCore.metaData.getContentId("people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">View details in new window</a>]")
+                                                EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?af=4&cid=" & Models.Complex.cdefModel.getContentId(cpCore, "people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">View details in new window</a>]")
                                             End If
                                             EditorString &= WhyReadOnlyMsg
                                             '
@@ -5354,9 +5354,9 @@ ErrorTrap:
                                             '   Placeholder
                                             '
                                             FieldValueText = genericController.encodeText(FieldValueObject)
-                                            MTMContent0 = cpCore.metaData.getContentNameByID(.contentId)
-                                            MTMContent1 = cpCore.metaData.getContentNameByID(.manyToManyContentID)
-                                            MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
+                                            MTMContent0 = Models.Complex.cdefModel.getContentNameByID(cpCore, .contentId)
+                                            MTMContent1 = Models.Complex.cdefModel.getContentNameByID(cpCore, .manyToManyContentID)
+                                            MTMRuleContent = Models.Complex.cdefModel.getContentNameByID(cpCore, .manyToManyRuleContentID)
                                             MTMRuleField0 = .ManyToManyRulePrimaryField
                                             MTMRuleField1 = .ManyToManyRuleSecondaryField
                                             EditorString &= cpCore.html.getCheckList("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1)
@@ -5552,7 +5552,7 @@ ErrorTrap:
                                             FieldValueInteger = genericController.EncodeInteger(FieldValueObject)
                                             LookupContentName = ""
                                             If .lookupContentID <> 0 Then
-                                                LookupContentName = genericController.encodeText(cpCore.metaData.getContentNameByID(.lookupContentID))
+                                                LookupContentName = genericController.encodeText(Models.Complex.cdefModel.getContentNameByID(cpCore, .lookupContentID))
                                             End If
                                             If LookupContentName <> "" Then
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
@@ -5598,12 +5598,12 @@ ErrorTrap:
                                             If FieldValueInteger <> 0 Then
                                                 CSPointer = cpCore.db.cs_open2("people", FieldValueInteger, , , "ID")
                                                 If cpCore.db.csOk(CSPointer) Then
-                                                    EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & cpCore.metaData.getContentId("people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">Details</a>]")
+                                                    EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & Models.Complex.cdefModel.getContentId(cpCore, "people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">Details</a>]")
                                                 End If
                                                 Call cpCore.db.csClose(CSPointer)
                                             End If
                                             GroupName = cpCore.db.getRecordName("groups", .MemberSelectGroupID)
-                                            EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?cid=" & cpCore.metaData.getContentId("groups") & """ target=""_blank"">Select from members of " & GroupName & "</a>]")
+                                            EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?cid=" & Models.Complex.cdefModel.getContentId(cpCore, "groups") & """ target=""_blank"">Select from members of " & GroupName & "</a>]")
                                             's.Add( "</span></nobr></td>")
                                             '
                                         Case FieldTypeIdManyToMany
@@ -5613,9 +5613,9 @@ ErrorTrap:
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             '
-                                            MTMContent0 = cpCore.metaData.getContentNameByID(.contentId)
-                                            MTMContent1 = cpCore.metaData.getContentNameByID(.manyToManyContentID)
-                                            MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
+                                            MTMContent0 = Models.Complex.cdefModel.getContentNameByID(cpCore, .contentId)
+                                            MTMContent1 = Models.Complex.cdefModel.getContentNameByID(cpCore, .manyToManyContentID)
+                                            MTMRuleContent = Models.Complex.cdefModel.getContentNameByID(cpCore, .manyToManyRuleContentID)
                                             MTMRuleField0 = .ManyToManyRulePrimaryField
                                             MTMRuleField1 = .ManyToManyRuleSecondaryField
                                             EditorString &= cpCore.html.getCheckList("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, False, FieldValueText)
@@ -6462,7 +6462,7 @@ ErrorTrap:
                         Else
                             RecordContentName = editRecord.contentControlId_Name
                             Dim RecordCDef As Models.Complex.cdefModel
-                            TableName2 = cpCore.metaData.getContentTablename(RecordContentName)
+                            TableName2 = Models.Complex.cdefModel.getContentTablename(cpCore, RecordContentName)
                             TableID = cpCore.db.getRecordID("Tables", TableName2)
                             '
                             ' Test for parentid
@@ -6508,13 +6508,13 @@ ErrorTrap:
                                 ' Limit the list to only those cdefs that are within the record's parent contentid
                                 '
                                 RecordContentName = editRecord.contentControlId_Name
-                                TableName2 = cpCore.metaData.getContentTablename(RecordContentName)
+                                TableName2 = Models.Complex.cdefModel.getContentTablename(cpCore, RecordContentName)
                                 TableID = cpCore.db.getRecordID("Tables", TableName2)
                                 CSPointer = cpCore.db.csOpen("Content", "ContentTableID=" & TableID, , , , , , "ContentControlID")
                                 Do While cpCore.db.csOk(CSPointer)
                                     ChildCID = cpCore.db.csGetInteger(CSPointer, "ID")
-                                    If (cpCore.metaData.isWithinContent(ChildCID, LimitContentSelectToThisID)) Then
-                                        If (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) Or (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, cpCore.metaData.getContentNameByID(ChildCID))) Then
+                                    If (Models.Complex.cdefModel.isWithinContent(cpCore, ChildCID, LimitContentSelectToThisID)) Then
+                                        If (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) Or (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, Models.Complex.cdefModel.getContentNameByID(cpCore, ChildCID))) Then
                                             CIDList = CIDList & "," & ChildCID
                                         End If
                                     End If
@@ -6532,7 +6532,7 @@ ErrorTrap:
                 End If
                 If HTMLFieldString = "" Then
                     HTMLFieldString = editRecord.contentControlId_Name
-                    'HTMLFieldString = cpCore.metaData.getContentNameByID(EditRecord.ContentID)
+                    'HTMLFieldString = models.complex.cdefmodel.getContentNameByID(cpcore,EditRecord.ContentID)
                 End If
                 Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Controlling Content", FieldHelp, FieldRequired, False, ""))
                 '
@@ -7410,7 +7410,7 @@ ErrorTrap:
                 & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & s & "</span></td>" _
                 & "</tr><tr>" _
                 & "<td class=""ccAdminEditCaption"">&nbsp;</td>" _
-                & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.metaData.getContentId("Groups") & " target=_blank>Manage Groups</a>]</span></td>" _
+                & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & Models.Complex.cdefModel.getContentId(cpCore, "Groups") & " target=_blank>Manage Groups</a>]</span></td>" _
                 & "</tr>"
             s = Adminui.EditTableOpen & s & Adminui.EditTableClose
             s = Adminui.GetEditPanel((Not allowAdminTabs), "Email Rules", "Send email to people in these groups", s)
@@ -7452,7 +7452,7 @@ ErrorTrap:
             End If
             f.Add("<tr>")
             f.Add("<td class=""ccAdminEditCaption"">&nbsp;</td>")
-            f.Add("<td class=""ccAdminEditCaption"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.metaData.getContentId("Groups") & " target=_blank>Manage Groups</a>]</span></td>")
+            f.Add("<td class=""ccAdminEditCaption"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & Models.Complex.cdefModel.getContentId(cpCore, "Groups") & " target=_blank>Manage Groups</a>]</span></td>")
             f.Add("</tr>")
             GetForm_Edit_EmailRules = Adminui.GetEditPanel((Not allowAdminTabs), "Email Rules", "Send email to people in these groups", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
             EditSectionPanelCount = EditSectionPanelCount + 1
@@ -7491,7 +7491,7 @@ ErrorTrap:
                 & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & s & "</span></td>" _
                 & "</tr><tr>" _
                 & "<td class=""ccAdminEditCaption"">&nbsp;</td>" _
-                & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.metaData.getContentId("Topics") & " target=_blank>Manage Topics</a>]</span></td>" _
+                & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & Models.Complex.cdefModel.getContentId(cpCore, "Topics") & " target=_blank>Manage Topics</a>]</span></td>" _
                 & "</tr>"
             s = Adminui.EditTableOpen & s & Adminui.EditTableClose
             s = Adminui.GetEditPanel((Not allowAdminTabs), "Email Rules", "Send email to people in these groups", s)
@@ -7619,8 +7619,8 @@ ErrorTrap:
             '
             ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
             '
-            PeopleContentID = cpCore.metaData.getContentId("People")
-            GroupContentID = cpCore.metaData.getContentId("Groups")
+            PeopleContentID = Models.Complex.cdefModel.getContentId(cpCore, "People")
+            GroupContentID = Models.Complex.cdefModel.getContentId(cpCore, "Groups")
             '
             MembershipCount = 0
             MembershipSize = 0
@@ -7734,7 +7734,7 @@ ErrorTrap:
             End If
             f.Add("<tr>")
             f.Add("<td class=""ccAdminEditCaption"">&nbsp;</td>")
-            f.Add("<td class=""ccAdminEditField"">" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.metaData.getContentId("Groups") & " target=_blank>Manage Groups</a>]</span></td>")
+            f.Add("<td class=""ccAdminEditField"">" & SpanClassAdminNormal & "[<a href=?cid=" & Models.Complex.cdefModel.getContentId(cpCore, "Groups") & " target=_blank>Manage Groups</a>]</span></td>")
             f.Add("</tr>")
 
             GetForm_Edit_MemberGroups = Adminui.GetEditPanel((Not allowAdminTabs), "Group Membership", "This person is a member of these groups", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
@@ -8787,7 +8787,7 @@ ErrorTrap:
             Criteria = "(Active<>0)"
             If MenuContentName <> "" Then
                 'ContentControlCriteria = cpCore.csv_GetContentControlCriteria(MenuContentName)
-                Criteria = Criteria & "AND" & cpCore.metaData.content_getContentControlCriteria(MenuContentName)
+                Criteria = Criteria & "AND" & Models.Complex.cdefModel.getContentControlCriteria(cpCore, MenuContentName)
             End If
             iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "")
             If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
@@ -8812,7 +8812,7 @@ ErrorTrap:
                 '
                 Dim CMCriteria As String
 
-                editableCdefIdList = cpCore.metaData.getEditableCdefIdList
+                editableCdefIdList = Models.Complex.cdefModel.getEditableCdefIdList(cpCore)
                 If editableCdefIdList.Count = 0 Then
                     CMCriteria = "(1=0)"
                 ElseIf editableCdefIdList.Count = 1 Then
@@ -9645,7 +9645,7 @@ ErrorTrap:
                             '
                             ' content managers, need the ContentManagementList
                             '
-                            editableCdefIdList = cpCore.metaData.getEditableCdefIdList()
+                            editableCdefIdList = Models.Complex.cdefModel.getEditableCdefIdList(cpCore)
                         Else
                             editableCdefIdList = New List(Of Integer)
                         End If
@@ -9915,7 +9915,7 @@ ErrorTrap:
                     '
                     ParentContentID = cpCore.docProperties.getInteger("ParentContentID")
                     If ParentContentID = 0 Then
-                        ParentContentID = cpCore.metaData.getContentId("Page Content")
+                        ParentContentID = Models.Complex.cdefModel.getContentId(cpCore, "Page Content")
                     End If
                     AddAdminMenuEntry = True
                     GroupID = 0
@@ -9924,7 +9924,7 @@ ErrorTrap:
                     ' Process input
                     '
                     ParentContentID = cpCore.docProperties.getInteger("ParentContentID")
-                    ParentContentName = cpCore.metaData.getContentNameByID(ParentContentID)
+                    ParentContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ParentContentID)
                     ChildContentName = cpCore.docProperties.getText("ChildContentName")
                     AddAdminMenuEntry = cpCore.docProperties.getBoolean("AddAdminMenuEntry")
                     GroupID = cpCore.docProperties.getInteger("GroupID")
@@ -9940,8 +9940,8 @@ ErrorTrap:
                         Description = Description _
                             & "<div>&nbsp;</div>" _
                             & "<div>Creating content [" & ChildContentName & "] from [" & ParentContentName & "]</div>"
-                        Call cpCore.metaData.createContentChild(ChildContentName, ParentContentName, cpCore.doc.authContext.user.id)
-                        ChildContentID = cpCore.metaData.getContentId(ChildContentName)
+                        Call Models.Complex.cdefModel.createContentChild(cpCore, ChildContentName, ParentContentName, cpCore.doc.authContext.user.id)
+                        ChildContentID = Models.Complex.cdefModel.getContentId(cpCore, ChildContentName)
                         '
                         ' Create Group and Rule
                         '
@@ -10050,7 +10050,7 @@ ErrorTrap:
                         ButtonList = ButtonCancel
                         BlockForm = True
                     End If
-                    cpCore.metaData.clear()
+                    cpCore.doc.clearMetaData()
                     cpCore.cache.invalidateAll()
                 End If
                 '
@@ -10478,9 +10478,9 @@ ErrorTrap:
             Call cpCore.db.csClose(CS)
             '
             If RecordID <> 0 Then
-                EditIcon = "<a href=""?cid=" & cpCore.metaData.getContentId(ContentName) & "&id=" & RecordID & "&" & RequestNameAdminForm & "=4"" target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
+                EditIcon = "<a href=""?cid=" & Models.Complex.cdefModel.getContentId(cpCore, ContentName) & "&id=" & RecordID & "&" & RequestNameAdminForm & "=4"" target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
             Else
-                EditIcon = "<a href=""?cid=" & cpCore.metaData.getContentId(ContentName) & "&" & RequestNameAdminForm & "=4&" & RequestNameAdminAction & "=2&ad=1&wc=" & genericController.EncodeURL("name=" & CopyName) & """ target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
+                EditIcon = "<a href=""?cid=" & Models.Complex.cdefModel.getContentId(cpCore, ContentName) & "&" & RequestNameAdminForm & "=4&" & RequestNameAdminAction & "=2&ad=1&wc=" & genericController.EncodeURL("name=" & CopyName) & """ target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
             End If
             If Copy = "" Then
                 Copy = "&nbsp;"
@@ -10839,9 +10839,9 @@ ErrorTrap:
                             ElseIf Format = "CSV" Then
                                 CS = cpCore.db.csInsertRecord("Tasks")
                                 If cpCore.db.csOk(CS) Then
-                                    ContentName = cpCore.metaData.getContentNameByID(ContentID)
-                                    TableName = cpCore.metaData.getContentTablename(ContentName)
-                                    Criteria = cpCore.metaData.content_getContentControlCriteria(ContentName)
+                                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID)
+                                    TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName)
+                                    Criteria = Models.Complex.cdefModel.getContentControlCriteria(cpCore, ContentName)
                                     Name = "CSV Download, " & ContentName
                                     Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.doc.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
                                     Call cpCore.db.csSet(CS, "Name", Name)
@@ -10856,9 +10856,9 @@ ErrorTrap:
                             ElseIf Format = "XML" Then
                                 CS = cpCore.db.csInsertRecord("Tasks")
                                 If cpCore.db.csOk(CS) Then
-                                    ContentName = cpCore.metaData.getContentNameByID(ContentID)
-                                    TableName = cpCore.metaData.getContentTablename(ContentName)
-                                    Criteria = cpCore.metaData.content_getContentControlCriteria(ContentName)
+                                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID)
+                                    TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName)
+                                    Criteria = Models.Complex.cdefModel.getContentControlCriteria(cpCore, ContentName)
                                     Name = "XML Download, " & ContentName
                                     Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.doc.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".xml"
                                     Call cpCore.db.csSet(CS, "Name", Name)
@@ -11933,7 +11933,7 @@ ErrorTrap:
                                 For Each kvp In .FindWords
                                     Dim findWord As indexConfigFindWordClass = kvp.Value
                                     If Not String.IsNullOrEmpty(findWord.Name) Then
-                                        FieldCaption = genericController.encodeText(cpCore.metaData.GetContentFieldProperty(adminContent.Name, findWord.Name, "caption"))
+                                        FieldCaption = genericController.encodeText(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, adminContent.Name, findWord.Name, "caption"))
                                         Select Case findWord.MatchOption
                                             Case FindWordMatchEnum.MatchEmpty
                                                 SubTitle = SubTitle & ", " & FieldCaption & " is empty"
@@ -11956,7 +11956,7 @@ ErrorTrap:
                                     End If
                                 Next
                                 If .SubCDefID > 0 Then
-                                    ContentName = cpCore.metaData.getContentNameByID(.SubCDefID)
+                                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, .SubCDefID)
                                     If ContentName <> "" Then
                                         SubTitle = SubTitle & ", in Sub-content '" & ContentName & "'"
                                     End If
@@ -12511,7 +12511,7 @@ ErrorTrap:
                 IndexConfig = LoadIndexConfig(adminContent)
                 With IndexConfig
                     '
-                    ContentName = cpCore.metaData.getContentNameByID(adminContent.Id)
+                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, adminContent.Id)
                     IsAuthoringMode = True
                     RQS = "cid=" & adminContent.Id & "&af=1"
                     '
@@ -12565,7 +12565,7 @@ ErrorTrap:
                         Dim SubContentName As String
                         SubFilterList = ""
                         If .SubCDefID > 0 Then
-                            SubContentName = cpCore.metaData.getContentNameByID(.SubCDefID)
+                            SubContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, .SubCDefID)
                             QS = RQS
                             QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveCDef", CStr(.SubCDefID))
                             Link = "/" & cpCore.serverConfig.appConfig.adminRoute & "?" & QS
@@ -12614,7 +12614,7 @@ ErrorTrap:
                         '
                         For Each findWordKvp In .FindWords
                             Dim findWord As indexConfigFindWordClass = findWordKvp.Value
-                            FieldCaption = genericController.encodeText(cpCore.metaData.GetContentFieldProperty(ContentName, findWord.Name, "caption"))
+                            FieldCaption = genericController.encodeText(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, ContentName, findWord.Name, "caption"))
                             QS = RQS
                             QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name)
                             Link = "/" & cpCore.serverConfig.appConfig.adminRoute & "?" & QS
@@ -12681,7 +12681,7 @@ ErrorTrap:
                     ' Sub Content Definitions
                     '
                     SubFilterList = ""
-                    list = cpCore.metaData.content_getContentControlCriteria(ContentName)
+                    list = Models.Complex.cdefModel.getContentControlCriteria(cpCore, ContentName)
                     If list <> "" Then
                         ListSplit = Split(list, "=")
                         Cnt = UBound(ListSplit) + 1
@@ -12691,7 +12691,7 @@ ErrorTrap:
                                 If Pos > 0 Then
                                     subContentID = genericController.EncodeInteger(Mid(ListSplit(Ptr), 1, Pos - 1))
                                     If subContentID > 0 And (subContentID <> adminContent.Id) And (subContentID <> .SubCDefID) Then
-                                        Caption = "<span style=""white-space:nowrap;"">" & cpCore.metaData.getContentNameByID(subContentID) & "</span>"
+                                        Caption = "<span style=""white-space:nowrap;"">" & Models.Complex.cdefModel.getContentNameByID(cpCore, subContentID) & "</span>"
                                         QS = RQS
                                         QS = genericController.ModifyQueryString(QS, "IndexFilterAddCDef", CStr(subContentID), True)
                                         Link = "/" & cpCore.serverConfig.appConfig.adminRoute & "?" & QS
@@ -12707,7 +12707,7 @@ ErrorTrap:
                     '
                     ' people filters
                     '
-                    TableName = cpCore.metaData.getContentTablename(ContentName)
+                    TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName)
                     SubFilterList = ""
                     If genericController.vbLCase(TableName) = genericController.vbLCase("ccMembers") Then
                         SQL = cpCore.db.GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name")
@@ -13772,7 +13772,7 @@ ErrorTrap:
                     '
                     ' ----- List out all fields
                     '
-                    CDef = cpCore.metaData.getCdef(adminContent.Name)
+                    CDef = Models.Complex.cdefModel.getCdef(cpCore, adminContent.Name)
                     FieldSize = 100
                     ReDim Preserve FieldNames(FieldSize)
                     ReDim Preserve FieldCaption(FieldSize)
@@ -13804,7 +13804,7 @@ ErrorTrap:
                             If fieldTypeId(FieldPtr) = FieldTypeIdLookup Then
                                 ContentID = .lookupContentID
                                 If ContentID > 0 Then
-                                    FieldLookupContentName(FieldPtr) = cpCore.metaData.getContentNameByID(ContentID)
+                                    FieldLookupContentName(FieldPtr) = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID)
                                 End If
                                 FieldLookupList(FieldPtr) = .lookupList
                             End If
@@ -13843,7 +13843,7 @@ ErrorTrap:
                     '            If FieldType(FieldPtr) = 7 Then
                     '                ContentID = cpCore.app.cs_getInteger(CS, "LookupContentID")
                     '                If ContentID > 0 Then
-                    '                    FieldLookupContentName(FieldPtr) = cpCore.metaData.getContentNameByID(ContentID)
+                    '                    FieldLookupContentName(FieldPtr) = models.complex.cdefmodel.getContentNameByID(cpcore,ContentID)
                     '                End If
                     '                FieldLookupList(FieldPtr) = cpCore.db.cs_getText(CS, "LookupList")
                     '            End If
@@ -14061,7 +14061,7 @@ ErrorTrap:
                                 'Dim CurrentValue As String
                                 'If FieldLookupContentName(FieldPtr) <> "" Then
                                 '    ContentName = FieldLookupContentName(FieldPtr)
-                                '    DataSourceName = cpCore.metaData.GetContentDataSource(ContentName)
+                                '    DataSourceName = models.complex.cdefmodel.getContentDataSource(cpcore,ContentName)
                                 '    TableName = cpCore.main_GetContentTablename(ContentName)
                                 '    SQL = "select distinct Name from " & TableName & " where (name is not null) order by name"
                                 '    CS = cpCore.app.openCsSql_rev(DataSourceName, SQL)
@@ -14501,7 +14501,7 @@ ErrorTrap:
             '--------------------------------------------------------------------------------
             '
             ContentID = adminContent.Id
-            ContentName = cpCore.metaData.getContentNameByID(ContentID)
+            ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID)
             If Button = ButtonReset Then
                 Call cpCore.userProperty.setProperty(IndexConfigPrefix & CStr(ContentID), "")
             End If
@@ -14522,7 +14522,7 @@ ErrorTrap:
             '--------------------------------------------------------------------------------
             '
             If ContentID <> 0 Then
-                CDef = cpCore.metaData.getCdef(ContentName)
+                CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                 If ToolsAction <> 0 Then
                     '
                     ' Block contentautoload, then force a load at the end
@@ -14763,9 +14763,9 @@ ErrorTrap:
                     ' Reload CDef if it changed
                     '
                     If NeedToReloadCDef Then
-                        cpCore.metaData.clear()
+                        cpCore.doc.clearMetaData()
                         cpCore.cache.invalidateAll()
-                        CDef = cpCore.metaData.getCdef(ContentName)
+                        CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                     End If
                     '
                     ' save indexconfig
@@ -15942,7 +15942,7 @@ ErrorTrap:
                         AddonName = cpCore.db.csGet(CS, "Name")
                         AddonHelpCopy = cpCore.db.csGet(CS, "help")
                         AddonDateAdded = cpCore.db.csGetDate(CS, "dateadded")
-                        If cpCore.metaData.isContentFieldSupported(cnAddons, "lastupdated") Then
+                        If Models.Complex.cdefModel.isContentFieldSupported(cpCore, cnAddons, "lastupdated") Then
                             AddonLastUpdated = cpCore.db.csGetDate(CS, "lastupdated")
                         End If
                         If AddonLastUpdated = Date.MinValue Then
@@ -16020,10 +16020,10 @@ ErrorTrap:
                         Collectionname = cpCore.db.csGet(CS, "Name")
                         CollectionHelpCopy = cpCore.db.csGet(CS, "help")
                         CollectionDateAdded = cpCore.db.csGetDate(CS, "dateadded")
-                        If cpCore.metaData.isContentFieldSupported("Add-on Collections", "lastupdated") Then
+                        If Models.Complex.cdefModel.isContentFieldSupported(cpCore, "Add-on Collections", "lastupdated") Then
                             CollectionLastUpdated = cpCore.db.csGetDate(CS, "lastupdated")
                         End If
-                        If cpCore.metaData.isContentFieldSupported("Add-on Collections", "helplink") Then
+                        If Models.Complex.cdefModel.isContentFieldSupported(cpCore, "Add-on Collections", "helplink") Then
                             CollectionHelpLink = cpCore.db.csGet(CS, "helplink")
                         End If
                         If CollectionLastUpdated = Date.MinValue Then
@@ -16158,10 +16158,10 @@ ErrorTrap:
                             If .fieldTypeId = FieldTypeIdMemberSelect Then
                                 LookupContentName = "people"
                             Else
-                                LookupContentName = cpCore.metaData.getContentNameByID(.lookupContentID)
+                                LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, .lookupContentID)
                             End If
                             If LookupContentName <> "" Then
-                                JoinTablename = cpCore.metaData.getContentTablename(LookupContentName)
+                                JoinTablename = Models.Complex.cdefModel.getContentTablename(cpCore, LookupContentName)
                             End If
                             IncludedInLeftJoin = IncludedInColumns
                             If (IndexConfig.FindWords.Count > 0) Then
@@ -16209,8 +16209,8 @@ ErrorTrap:
                 '
                 With IndexConfig
                     If .SubCDefID > 0 Then
-                        ContentName = cpCore.metaData.getContentNameByID(.SubCDefID)
-                        return_SQLWhere &= "AND(" & cpCore.metaData.content_getContentControlCriteria(ContentName) & ")"
+                        ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, .SubCDefID)
+                        return_SQLWhere &= "AND(" & Models.Complex.cdefModel.getContentControlCriteria(cpCore, ContentName) & ")"
                     End If
                 End With
                 '
@@ -16251,7 +16251,7 @@ ErrorTrap:
                     '
                     ' This person can see all the records
                     '
-                    return_SQLWhere &= "AND(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
+                    return_SQLWhere &= "AND(" & Models.Complex.cdefModel.getContentControlCriteria(cpCore, adminContent.Name) & ")"
                 Else
                     '
                     ' Limit the Query to what they can see
@@ -16274,7 +16274,7 @@ ErrorTrap:
                                     ContentID = genericController.EncodeInteger(Mid(ListSplit(Ptr), 1, Pos - 1))
                                     If ContentID > 0 And (ContentID <> adminContent.Id) And userHasContentAccess(ContentID) Then
                                         SubQuery = SubQuery & "OR(" & adminContent.ContentTableName & ".ContentControlID=" & ContentID & ")"
-                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage & ", '<a href=""?cid=" & ContentID & """>" & cpCore.metaData.getContentNameByID(ContentID) & "</a>'"
+                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage & ", '<a href=""?cid=" & ContentID & """>" & Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID) & "</a>'"
                                         SubContactList &= "," & ContentID
                                         SubContentCnt = SubContentCnt + 1
                                     End If

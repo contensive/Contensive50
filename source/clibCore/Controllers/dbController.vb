@@ -573,7 +573,7 @@ Namespace Contensive.Core.Controllers
         Public Function isSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
             Dim returnOK As Boolean = False
             Try
-                Dim tableSchema As tableSchemaModel = cpCore.metaData.getTableSchema(TableName, DataSourceName)
+                Dim tableSchema As Models.Complex.tableSchemaModel = Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName)
                 If (tableSchema IsNot Nothing) Then
                     returnOK = tableSchema.columns.Contains(FieldName.ToLower)
                 End If
@@ -593,7 +593,7 @@ Namespace Contensive.Core.Controllers
         Public Function isSQLTable(ByVal DataSourceName As String, ByVal TableName As String) As Boolean
             Dim ReturnOK As Boolean = False
             Try
-                ReturnOK = (Not cpCore.metaData.getTableSchema(TableName, DataSourceName) Is Nothing)
+                ReturnOK = (Not Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName) Is Nothing)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -627,7 +627,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' Local table -- create if not in schema
                     '
-                    If (cpCore.metaData.getTableSchema(TableName, DataSourceName) Is Nothing) Then
+                    If (Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName) Is Nothing) Then
                         If Not AllowAutoIncrement Then
                             Dim SQL As String = "Create Table " & TableName & "(ID " & getSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) & ");"
                             executeQuery(SQL, DataSourceName).Dispose()
@@ -665,7 +665,7 @@ Namespace Contensive.Core.Controllers
                     Call createSQLIndex(DataSourceName, TableName, TableName & "ModifiedDate", "MODIFIEDDATE")
                     Call createSQLIndex(DataSourceName, TableName, TableName & "ccGuid", "CCGUID")
                 End If
-                cpCore.metaData.tableSchemaListClear()
+                Models.Complex.tableSchemaModel.tableSchemaListClear(cpCore)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -725,7 +725,7 @@ Namespace Contensive.Core.Controllers
                         '
                         If clearMetaCache Then
                             Call cpCore.cache.invalidateAll()
-                            Call cpCore.metaData.clear()
+                            Call cpCore.doc.clearMetaData()
                         End If
                     End If
                 End If
@@ -744,7 +744,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Call executeQuery("DROP TABLE " & TableName, DataSourceName).Dispose()
                 cpCore.cache.invalidateAll()
-                cpCore.metaData.clear()
+                cpCore.doc.clearMetaData()
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -795,15 +795,15 @@ Namespace Contensive.Core.Controllers
         ''' <param name="clearMetaCache"></param>
         Public Sub createSQLIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String, ByVal FieldNames As String, Optional clearMetaCache As Boolean = False)
             Try
-                Dim ts As tableSchemaModel
+                Dim ts As Models.Complex.tableSchemaModel
                 If Not (String.IsNullOrEmpty(TableName) And String.IsNullOrEmpty(IndexName) And String.IsNullOrEmpty(FieldNames)) Then
-                    ts = cpCore.metaData.getTableSchema(TableName, DataSourceName)
+                    ts = Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName)
                     If (ts IsNot Nothing) Then
                         If Not ts.indexes.Contains(IndexName.ToLower) Then
                             Call executeQuery("CREATE INDEX " & IndexName & " ON " & TableName & "( " & FieldNames & " );", DataSourceName)
                             If clearMetaCache Then
                                 cpCore.cache.invalidateAll()
-                                cpCore.metaData.clear()
+                                cpCore.doc.clearMetaData()
                             End If
                         End If
                     End If
@@ -935,11 +935,11 @@ Namespace Contensive.Core.Controllers
         ''' <param name="IndexName"></param>
         Public Sub deleteSqlIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String)
             Try
-                Dim ts As tableSchemaModel
+                Dim ts As Models.Complex.tableSchemaModel
                 Dim DataSourceType As Integer
                 Dim sql As String
                 '
-                ts = cpCore.metaData.getTableSchema(TableName, DataSourceName)
+                ts = Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName)
                 If (Not ts Is Nothing) Then
                     If ts.indexes.Contains(IndexName.ToLower) Then
                         DataSourceType = getDataSourceType(DataSourceName)
@@ -953,7 +953,7 @@ Namespace Contensive.Core.Controllers
                         End Select
                         Call executeQuery(sql, DataSourceName)
                         cpCore.cache.invalidateAll()
-                        cpCore.metaData.clear()
+                        cpCore.doc.clearMetaData()
                     End If
                 End If
 
@@ -1141,7 +1141,7 @@ Namespace Contensive.Core.Controllers
                 If String.IsNullOrEmpty(ContentName) Then
                     Throw New ApplicationException("ContentName cannot be blank")
                 Else
-                    CDef = cpCore.metaData.getCdef(ContentName)
+                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                     If (CDef Is Nothing) Then
                         Throw (New ApplicationException("No content found For [" & ContentName & "]"))
                     ElseIf (CDef.Id <= 0) Then
@@ -1618,7 +1618,7 @@ Namespace Contensive.Core.Controllers
                                             returnValue = .readCache(ColumnPointer, 0)
                                             If .Updateable And (.ContentName <> "") And (FieldName <> "") Then
                                                 If .CDef.fields(FieldName.ToLower()).Scramble Then
-                                                    returnValue = cpCore.metaData.TextDeScramble(genericController.encodeText(returnValue))
+                                                    returnValue = genericController.TextDeScramble(cpCore, genericController.encodeText(returnValue))
                                                 End If
                                             End If
                                             Exit For
@@ -1882,7 +1882,7 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' CS is SQL-based, use the contentname
                                 '
-                                TableName = cpCore.metaData.getContentTablename(ContentName)
+                                TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName)
                             Else
                                 '
                                 ' no Contentname given
@@ -2107,7 +2107,7 @@ Namespace Contensive.Core.Controllers
                 ElseIf String.IsNullOrEmpty(Criteria.Trim()) Then
                     Throw New ArgumentException("criteria cannot be blank")
                 Else
-                    CDef = cpCore.metaData.getCdef(ContentName)
+                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                     If CDef Is Nothing Then
                         Throw New ArgumentException("ContentName [" & ContentName & "] was Not found")
                     ElseIf CDef.Id = 0 Then
@@ -2180,7 +2180,7 @@ Namespace Contensive.Core.Controllers
                 If String.IsNullOrEmpty(ContentName.Trim()) Then
                     Throw New ArgumentException("ContentName cannot be blank")
                 Else
-                    CDef = cpCore.metaData.getCdef(ContentName)
+                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                     If (CDef Is Nothing) Then
                         Throw New ApplicationException("content [" & ContentName & "] could Not be found.")
                     ElseIf (CDef.Id <= 0) Then
@@ -2238,7 +2238,7 @@ Namespace Contensive.Core.Controllers
                                                                 DefaultValueText = "null"
                                                             Else
                                                                 If .lookupContentID <> 0 Then
-                                                                    LookupContentName = cpCore.metaData.getContentNameByID(.lookupContentID)
+                                                                    LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, .lookupContentID)
                                                                     If LookupContentName <> "" Then
                                                                         DefaultValueText = getRecordID(LookupContentName, DefaultValueText).ToString()
                                                                     End If
@@ -2504,8 +2504,8 @@ Namespace Contensive.Core.Controllers
                                     If .CDef.fields.ContainsKey("id") Then
                                         RecordID = genericController.EncodeInteger(cs_getValue(CSPointer, "id"))
                                         With field
-                                            ContentName = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
-                                            DbTable = cpCore.metaData.getContentTablename(ContentName)
+                                            ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, .manyToManyRuleContentID)
+                                            DbTable = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName)
                                             SQL = "Select " & .ManyToManyRuleSecondaryField & " from " & DbTable & " where " & .ManyToManyRulePrimaryField & "=" & RecordID
                                             rs = executeQuery(SQL)
                                             If (genericController.isDataTableOk(rs)) Then
@@ -2554,7 +2554,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 If genericController.vbIsNumeric(FieldValueVariant) Then
                                                     fieldLookupId = field.lookupContentID
-                                                    LookupContentName = cpCore.metaData.getContentNameByID(fieldLookupId)
+                                                    LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, fieldLookupId)
                                                     LookupList = field.lookupList
                                                     If (LookupContentName <> "") Then
                                                         '
@@ -2959,7 +2959,7 @@ Namespace Contensive.Core.Controllers
                         '
                         LiveRecordID = csGetInteger(CSPointer, "ID")
                         LiveRecordContentControlID = csGetInteger(CSPointer, "CONTENTCONTROLID")
-                        LiveRecordContentName = cpCore.metaData.getContentNameByID(LiveRecordContentControlID)
+                        LiveRecordContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, LiveRecordContentControlID)
                         LiveRecordInactive = Not csGetBoolean(CSPointer, "ACTIVE")
                         '
                         '
@@ -3019,7 +3019,7 @@ Namespace Contensive.Core.Controllers
                                         Case FieldTypeIdText
                                             Copy = Left(genericController.encodeText(writeCacheValue), 255)
                                             If .Scramble Then
-                                                Copy = cpCore.metaData.TextScramble(Copy)
+                                                Copy = genericController.TextScramble(cpCore, Copy)
                                             End If
                                             SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
                                         Case FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTML
@@ -3370,7 +3370,7 @@ Namespace Contensive.Core.Controllers
                 ElseIf (RecordID <= 0) Then
                     Throw New ArgumentException("recordid is not valid")
                 Else
-                    CDef = cpCore.metaData.getCdef(ContentName)
+                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName)
                     If CDef.Id = 0 Then
                         Throw New ApplicationException("contentname [" & ContentName & "] is not a valid content")
                     Else
@@ -3530,12 +3530,12 @@ Namespace Contensive.Core.Controllers
                 Else
                     ContentRecordKey = CStr(ContentID) & "." & CStr(RecordID)
                     Criteria = "(ContentRecordKey=" & encodeSQLText(ContentRecordKey) & ")"
-                    ContentName = cpCore.metaData.getContentNameByID(ContentID)
-                    TableName = cpCore.metaData.getContentTablename(ContentName)
+                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID)
+                    TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName)
                     ''
                     '' ----- Delete CalendarEventRules and CalendarEvents
                     ''
-                    'If cpCore.metaData.isContentFieldSupported("calendar events", "ID") Then
+                    'If models.complex.cdefmodel.isContentFieldSupported(cpcore,"calendar events", "ID") Then
                     '    Call deleteContentRecords("Calendar Events", Criteria)
                     'End If
                     ''
@@ -3898,7 +3898,7 @@ Namespace Contensive.Core.Controllers
         '                        '
         '                        Call handleLegacyClassError3(MethodName, "The Lookup Content Definition [" & fieldLookupId & "] for this field [" & FieldName & "] is not valid.")
         '                    Else
-        '                        LookupContentName = cpCore.metaData.getContentNameByID(fieldLookupId)
+        '                        LookupContentName = models.complex.cdefmodel.getContentNameByID(cpcore,fieldLookupId)
         '                        returnResult = cs_open(LookupContentName, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
         '                        'CDefLookup = appEnvironment.GetCDefByID(FieldLookupID)
         '                        'csv_OpenCSJoin = csOpen(CDefLookup.Name, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
@@ -4018,7 +4018,7 @@ Namespace Contensive.Core.Controllers
                                                 Call csSet(CS, FieldName, "null")
                                                 If DefaultValueText <> "" Then
                                                     If .lookupContentID <> 0 Then
-                                                        LookupContentName = cpCore.metaData.getContentNameByID(.lookupContentID)
+                                                        LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, .lookupContentID)
                                                         If LookupContentName <> "" Then
                                                             Call csSet(CS, FieldName, getRecordID(LookupContentName, DefaultValueText))
                                                         End If
@@ -4117,7 +4117,7 @@ Namespace Contensive.Core.Controllers
         Public Function getSQLIndexList(ByVal DataSourceName As String, ByVal TableName As String) As String
             Dim returnList As String = ""
             Try
-                Dim ts As tableSchemaModel = cpCore.metaData.getTableSchema(TableName, DataSourceName)
+                Dim ts As Models.Complex.tableSchemaModel = Models.Complex.tableSchemaModel.getTableSchema(cpCore, TableName, DataSourceName)
                 If (ts IsNot Nothing) Then
                     For Each entry As String In ts.indexes
                         returnList &= "," & entry
@@ -4370,13 +4370,13 @@ Namespace Contensive.Core.Controllers
                     ' --- Find/Create the Content Definition
                     '----------------------------------------------------------------
                     '
-                    ContentID = cpCore.metaData.getContentId(ContentName)
+                    ContentID = Models.Complex.cdefModel.getContentId(cpCore, ContentName)
                     If (ContentID <= 0) Then
                         '
                         ' ----- Content definition not found, create it
                         '
                         ContentIsNew = True
-                        Call cpCore.metaData.createContent(True, DataSource, TableName, ContentName)
+                        Call Models.Complex.cdefModel.addContent(cpCore, True, DataSource, TableName, ContentName)
                         'ContentID = csv_GetContentID(ContentName)
                         SQL = "Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName)
                         dt = cpCore.db.executeQuery(SQL)
@@ -4388,7 +4388,7 @@ Namespace Contensive.Core.Controllers
                         End If
                         dt.Dispose()
                         cpCore.cache.invalidateAll()
-                        cpCore.metaData.clear()
+                        cpCore.doc.clearMetaData()
                     End If
                     '
                     '-----------------------------------------------------------
@@ -4439,7 +4439,7 @@ Namespace Contensive.Core.Controllers
                 '       Leave Autoload false during load so more do not trigger
                 '
                 cpCore.cache.invalidateAll()
-                cpCore.metaData.clear()
+                cpCore.doc.clearMetaData()
                 dt.Dispose()
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -4617,7 +4617,7 @@ Namespace Contensive.Core.Controllers
                         field.editSortPriority = 5010
                         field.defaultValue = "0"
                 End Select
-                Call cpCore.metaData.verifyCDefField_ReturnID(ContentName, field)
+                Call Models.Complex.cdefModel.verifyCDefField_ReturnID(cpCore, ContentName, field)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -4774,10 +4774,10 @@ Namespace Contensive.Core.Controllers
                         If UBound(KeySplit) = 1 Then
                             ContentID = genericController.EncodeInteger(KeySplit(0))
                             If ContentID <> 0 Then
-                                ContentName = cpCore.metaData.getContentNameByID(ContentID)
+                                ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID)
                                 RecordID = genericController.EncodeInteger(KeySplit(1))
                                 If ContentName <> "" And RecordID <> 0 Then
-                                    If cpCore.metaData.getContentTablename(ContentName) = "ccPageContent" Then
+                                    If Models.Complex.cdefModel.getContentTablename(cpCore, ContentName) = "ccPageContent" Then
                                         CSPointer = cpCore.db.csOpenRecord(ContentName, RecordID, , , "TemplateID,ParentID")
                                         If csOk(CSPointer) Then
                                             recordfound = True
@@ -4790,7 +4790,7 @@ Namespace Contensive.Core.Controllers
                                             ' This content record does not exist - remove any records with this ContentRecordKey pointer
                                             '
                                             Call deleteContentRecords("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                            Call cpCore.db.deleteContentRules(cpCore.metaData.getContentId(ContentName), RecordID)
+                                            Call cpCore.db.deleteContentRules(Models.Complex.cdefModel.getContentId(cpCore, ContentName), RecordID)
                                         Else
 
                                             If templateId <> 0 Then
@@ -4801,8 +4801,8 @@ Namespace Contensive.Core.Controllers
                                                 Call csClose(CSPointer)
                                             End If
                                             If result = "" And ParentID <> 0 Then
-                                                TableName = cpCore.metaData.getContentTablename(ContentName)
-                                                DataSource = cpCore.metaData.getContentDataSource(ContentName)
+                                                TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName)
+                                                DataSource = Models.Complex.cdefModel.getContentDataSource(cpCore, ContentName)
                                                 CSPointer = csOpenSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
                                                 If csOk(CSPointer) Then
                                                     ParentContentID = genericController.EncodeInteger(csGetText(CSPointer, "ContentControlID"))
@@ -4959,7 +4959,7 @@ Namespace Contensive.Core.Controllers
                     RecordID = (cpCore.db.csGetInteger(iCSPointer, "ID"))
                     RecordName = cpCore.db.csGetText(iCSPointer, "Name")
                     ContentControlID = (cpCore.db.csGetInteger(iCSPointer, "contentcontrolid"))
-                    ContentName = cpCore.metaData.getContentNameByID(ContentControlID)
+                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentControlID)
                     If ContentName <> "" Then
                         result = cpCore.html.main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), RecordName, cpCore.doc.authContext.isEditing(ContentName))
                     End If

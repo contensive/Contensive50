@@ -327,7 +327,7 @@ Namespace Contensive.Core.Controllers
                             If (recordsAffected = 0) Then
                                 SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" _
                             & SQLTrue _
-                            & "," & cpCore.db.encodeSQLNumber(cpCore.metaData.getContentId("site properties")) _
+                            & "," & cpCore.db.encodeSQLNumber(models.complex.cdefmodel.getcontentid(cpcore,"site properties")) _
                             & "," & cpCore.db.encodeSQLText(UCase(propertyName)) _
                             & "," & cpCore.db.encodeSQLText(Value) _
                             & "," & SQLNow _

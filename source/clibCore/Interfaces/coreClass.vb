@@ -379,17 +379,6 @@ Namespace Contensive.Core
         Private _cache As Controllers.cacheController = Nothing
         '
         '===================================================================================================
-        Public ReadOnly Property metaData As metaDataController
-            Get
-                If _metaData Is Nothing Then
-                    _metaData = New metaDataController(Me)
-                End If
-                Return _metaData
-            End Get
-        End Property
-        Private _metaData As metaDataController = Nothing
-        '
-        '===================================================================================================
         Public ReadOnly Property db As dbController
             Get
                 If (_db Is Nothing) Then
@@ -978,7 +967,7 @@ Namespace Contensive.Core
                                             If Pos > 0 Then
                                                 Dim FieldValue As String = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
                                                 Dim FieldName As String = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
-                                                If Not metaData.isContentFieldSupported(ContentName, FieldName) Then
+                                                If Not Models.Complex.cdefModel.isContentFieldSupported(Me, ContentName, FieldName) Then
                                                     Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
                                                     Throw (New ApplicationException(errorMessage))
                                                 Else
@@ -1229,7 +1218,7 @@ Namespace Contensive.Core
                                         & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
                                         & "," & db.encodeSQLDate(doc.profileStartTime) _
                                         & "," & db.encodeSQLBoolean(doc.authContext.visit_stateOK) _
-                                        & "," & db.encodeSQLNumber(metaData.getContentId("Viewings")) _
+                                        & "," & db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(Me, "Viewings")) _
                                         & "," & db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) _
                                         & ",1" _
                                         & "," & db.encodeSQLNumber(0) _
@@ -1253,11 +1242,6 @@ Namespace Contensive.Core
                     If Not (_db Is Nothing) Then
                         Call _db.Dispose()
                         _db = Nothing
-                    End If
-                    '
-                    If Not (_metaData Is Nothing) Then
-                        Call _metaData.Dispose()
-                        _metaData = Nothing
                     End If
                     '
                     If Not (_cache Is Nothing) Then
@@ -1339,11 +1323,6 @@ Namespace Contensive.Core
                     If Not (_db Is Nothing) Then
                         Call _db.Dispose()
                         _db = Nothing
-                    End If
-                    '
-                    If Not (_metaData Is Nothing) Then
-                        _metaData.Dispose()
-                        _metaData = Nothing
                     End If
                 End If
                 '
