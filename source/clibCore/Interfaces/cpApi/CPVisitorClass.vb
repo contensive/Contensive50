@@ -53,7 +53,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property ForceBrowserMobile() As Boolean 'Inherits BaseClasses.CPVisitorBaseClass.ForceBrowserMobile
             Get
                 If True Then
-                    Return cpCore.authContext.visitor.forceBrowserMobile
+                    Return cpCore.doc.authContext.visitor.forceBrowserMobile
                 Else
                     Return False
                 End If
@@ -111,7 +111,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Id() As Integer 'Inherits BaseClasses.CPVisitorBaseClass.Id
             Get
                 If True Then
-                    Return cpCore.authContext.visitor.id
+                    Return cpCore.doc.authContext.visitor.id
                 Else
                     Return 0
                 End If
@@ -121,7 +121,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsNew() As Boolean 'Inherits BaseClasses.CPVisitorBaseClass.IsNew
             Get
                 If True Then
-                    Return cpCore.authContext.visit.VisitorNew
+                    Return cpCore.doc.authContext.visit.VisitorNew
                 Else
                     Return False
                 End If
@@ -139,7 +139,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property UserId() As Integer
             Get
                 If True Then
-                    Return cpCore.authContext.visitor.memberID
+                    Return cpCore.doc.authContext.visitor.memberID
                 Else
                     Return 0
                 End If

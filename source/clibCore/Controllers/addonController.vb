@@ -55,7 +55,7 @@ Namespace Contensive.Core.Controllers
         ''' <returns></returns>
         Public Function execute(addon As Models.Entity.addonModel, executeContext As CPUtilsBaseClass.addonExecuteContext) As String
             Dim result As String = String.Empty
-
+            Dim rootLevelAddon As Boolean = cpCore.doc.addonsCurrentlyRunningIdList.Count.Equals(0)
             Try
                 If (addon Is Nothing) Then
                     '
@@ -70,7 +70,7 @@ Namespace Contensive.Core.Controllers
                     ' -- addons with activeX components are deprecated
                     Dim addonDescription As String = getAddonDescription(cpCore, addon)
                     Throw New ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " & addonDescription & ".")
-                ElseIf cpCore.addonsCurrentlyRunningIdList.Contains(addon.id) Then
+                ElseIf cpCore.doc.addonsCurrentlyRunningIdList.Contains(addon.id) Then
                     '
                     ' -- cannot call an addon within an addon
                     Throw New ApplicationException("Addon cannot be called by itself [#" & addon.id & ", " & addon.name & "].")
@@ -79,7 +79,7 @@ Namespace Contensive.Core.Controllers
                     ' -- ok to execute
                     Dim parentInstanceId As String = cpCore.docProperties.getText("instanceId")
                     cpCore.docProperties.setProperty("instanceId", executeContext.instanceGuid)
-                    cpCore.addonsCurrentlyRunningIdList.Add(addon.id)
+                    cpCore.doc.addonsCurrentlyRunningIdList.Add(addon.id)
                     '
                     ' -- run included add-ons before their parent
                     Dim addonIncludeRules As List(Of Models.Entity.addonIncludeRuleModel) = Models.Entity.addonIncludeRuleModel.createList(cpCore, "(addonid=" & addon.id & ")")
@@ -429,8 +429,8 @@ Namespace Contensive.Core.Controllers
                         End If
                         '
                         ' -- html assets (js,styles,head tags), set flag to block duplicates 
-                        If Not cpCore.addonIdListRunInThisDoc.Contains(addon.id) Then
-                            cpCore.addonIdListRunInThisDoc.Add(addon.id)
+                        If Not cpCore.doc.addonIdListRunInThisDoc.Contains(addon.id) Then
+                            cpCore.doc.addonIdListRunInThisDoc.Add(addon.id)
                             Dim AddedByName As String = addon.name & " addon"
                             Call cpCore.html.addTitle(addon.PageTitle, AddedByName)
                             Call cpCore.html.addMetaDescription(addon.MetaDescription, AddedByName)
@@ -513,11 +513,11 @@ Namespace Contensive.Core.Controllers
                             And (executeContext.addonType <> CPUtilsBaseClass.addonContext.ContextSimple) _
                             And (Not executeContext.isIncludeAddon)
                         If IncludeEditWrapper Then
-                            IncludeEditWrapper = IncludeEditWrapper And (allowAdvanceEditor And ((executeContext.addonType = CPUtilsBaseClass.addonContext.ContextAdmin) Or cpCore.authContext.isEditing(executeContext.hostRecord.contentName)))
+                            IncludeEditWrapper = IncludeEditWrapper And (allowAdvanceEditor And ((executeContext.addonType = CPUtilsBaseClass.addonContext.ContextAdmin) Or cpCore.doc.authContext.isEditing(executeContext.hostRecord.contentName)))
                             If IncludeEditWrapper Then
                                 '
                                 ' Edit Icon
-                                Dim EditWrapperHTMLID As String = "eWrapper" & cpCore.pageAddonCnt
+                                Dim EditWrapperHTMLID As String = "eWrapper" & cpCore.doc.pageAddonCnt
                                 Dim DialogList As String = String.Empty
                                 Dim HelpIcon As String = getHelpBubble(addon.id, addon.Help, addon.CollectionID, DialogList)
                                 If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
@@ -557,11 +557,17 @@ Namespace Contensive.Core.Controllers
                     ' -- this completes the execute of this cpcore.addon. remove it from the 'running' list
                     ' -- restore the parent's instanceId
                     cpCore.docProperties.setProperty("instanceId", parentInstanceId)
-                    cpCore.addonsCurrentlyRunningIdList.Remove(addon.id)
-                    cpCore.pageAddonCnt = cpCore.pageAddonCnt + 1
+                    cpCore.doc.addonsCurrentlyRunningIdList.Remove(addon.id)
+                    cpCore.doc.pageAddonCnt = cpCore.doc.pageAddonCnt + 1
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
+            Finally
+                If (addon IsNot Nothing) Then
+                    If (rootLevelAddon) And (addon.htmlDocument) Then
+                        result = cpCore.html.getHtmlDoc(result, "<body>") ' "<body class=""ccBodyAdmin ccCon"">"
+                    End If
+                End If
             End Try
             Return result
         End Function
@@ -633,7 +639,7 @@ Namespace Contensive.Core.Controllers
                     '
                     return_ExitAddonBlankWithResponse = True
                     Return String.Empty
-                ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Not Admin Error
                     '
@@ -770,7 +776,7 @@ Namespace Contensive.Core.Controllers
                                                                     CS = cpCore.db.csOpen("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
                                                                     If Not cpCore.db.csOk(CS) Then
                                                                         Call cpCore.db.csClose(CS)
-                                                                        CS = cpCore.db.csInsertRecord("Copy Content", cpCore.authContext.user.id)
+                                                                        CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.authContext.user.id)
                                                                     End If
                                                                     If cpCore.db.csOk(CS) Then
                                                                         Call cpCore.db.csSet(CS, "name", FieldName)
@@ -1014,7 +1020,7 @@ Namespace Contensive.Core.Controllers
                                                                 CS = cpCore.db.csOpen("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
                                                                 If Not cpCore.db.csOk(CS) Then
                                                                     Call cpCore.db.csClose(CS)
-                                                                    CS = cpCore.db.csInsertRecord("Copy Content", cpCore.authContext.user.id)
+                                                                    CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.authContext.user.id)
                                                                     If cpCore.db.csOk(CS) Then
                                                                         RecordID = cpCore.db.csGetInteger(CS, "ID")
                                                                         Call cpCore.db.csSet(CS, "name", FieldName)
@@ -1891,7 +1897,7 @@ Namespace Contensive.Core.Controllers
         ''=============================================================================================================
         ''
         'Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef ignore As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-        '    execute_legacy2 = execute_legacy6(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, False, nothingObject, AddonInUseIdList, Nothing, cpCore.doc.includedAddonIDList, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
+        '    execute_legacy2 = execute_legacy6(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, False, nothingObject, AddonInUseIdList, Nothing, cpCore.doc.includedAddonIDList, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated)
         'End Function
         '
         '===============================================================================================================================================
@@ -1926,8 +1932,8 @@ Namespace Contensive.Core.Controllers
             Dim Ptr As Integer
             Dim Pos As Integer
             '
-            If cpCore.authContext.isAuthenticated() And ((ACInstanceID = "-2") Or (ACInstanceID = "-1") Or (ACInstanceID = "0") Or (RecordID <> 0)) Then
-                If cpCore.authContext.isEditingAnything() Then
+            If cpCore.doc.authContext.isAuthenticated() And ((ACInstanceID = "-2") Or (ACInstanceID = "-1") Or (ACInstanceID = "0") Or (RecordID <> 0)) Then
+                If cpCore.doc.authContext.isEditingAnything() Then
                     CopyHeader = CopyHeader _
                         & "<div class=""ccHeaderCon"">" _
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
@@ -2177,8 +2183,8 @@ ErrorTrap:
                 Dim BubbleJS As String
                 'Dim AddonName As String = String.Empty
                 '
-                If cpCore.authContext.isAuthenticated() And True Then
-                    If cpCore.authContext.isEditingAnything() Then
+                If cpCore.doc.authContext.isAuthenticated() And True Then
+                    If cpCore.doc.authContext.isEditingAnything() Then
                         Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpCore, addonId)
                         CopyHeader = CopyHeader _
                             & "<div class=""ccHeaderCon"">" _
@@ -2260,8 +2266,8 @@ ErrorTrap:
             Dim InnerCopy As String
             Dim CollectionCopy As String = String.Empty
             '
-            If cpCore.authContext.isAuthenticated() Then
-                If cpCore.authContext.isEditingAnything() Then
+            If cpCore.doc.authContext.isAuthenticated() Then
+                If cpCore.doc.authContext.isEditingAnything() Then
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
                     'cpCore.html.html_HelpViewerButtonID = "HelpBubble" & doccontroller.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy
@@ -2365,8 +2371,8 @@ ErrorTrap:
             Dim StyleSN As Integer
             Dim HTMLViewerBubbleID As String
             '
-            If cpCore.authContext.isAuthenticated() Then
-                If cpCore.authContext.isEditingAnything() Then
+            If cpCore.doc.authContext.isAuthenticated() Then
+                If cpCore.doc.authContext.isEditingAnything() Then
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
                     HTMLViewerBubbleID = "HelpBubble" & cpCore.doc.helpCodeCount
                     '
@@ -2480,7 +2486,7 @@ ErrorTrap:
                     '
                     return_ExitRequest = True
                     Return String.Empty
-                ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Not Admin Error
                     '

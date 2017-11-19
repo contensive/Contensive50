@@ -33,7 +33,7 @@ Namespace Contensive.Addons.Core
                     If ContentName <> "" Then
                         Call iisController.main_RedirectByRecord_ReturnStatus(cpCore, ContentName, cpCore.doc.redirectRecordID)
                         result = ""
-                        cpCore.continueProcessing = False
+                        cpCore.doc.continueProcessing = False
                     End If
                 End If
             Catch ex As Exception

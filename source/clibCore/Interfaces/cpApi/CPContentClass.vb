@@ -38,13 +38,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, Optional ByVal DefaultContent As String = "") As String
-            GetCopy = cpCore.html.html_GetContentCopy(CopyName, DefaultContent, cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
+            GetCopy = cpCore.html.html_GetContentCopy(CopyName, DefaultContent, cpCore.doc.authContext.user.id, True, cpCore.doc.authContext.isAuthenticated)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, ByVal DefaultContent As String, ByVal personalizationPeopleId As Integer) As String
-            GetCopy = cpCore.html.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, True, cpCore.authContext.isAuthenticated)
+            GetCopy = cpCore.html.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, True, cpCore.doc.authContext.isAuthenticated)
         End Function
         '
         '====================================================================================================
@@ -260,7 +260,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function AddContentField(ContentName As String, FieldName As String, FieldType As Integer) As Integer
-            Dim field As New CDefFieldModel()
+            Dim field As New Models.Complex.CDefFieldModel()
             field.active = True
             field.adminOnly = False
             field.authorable = True

@@ -99,7 +99,8 @@
     <Import Include="System.Web.UI.HtmlControls" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="adminSite\styles.css" />
+    <Content Include="adminSite\adminSite.js" />
+    <Content Include="adminSite\adminSite.css" />
     <Content Include="ccLib\ClientSide\AdminMenu.js" />
     <Content Include="ccLib\ClientSide\ccDynamicTab-display.js" />
     <Content Include="ccLib\ClientSide\ccDynamicTab-positioned.js" />
@@ -580,8 +581,8 @@
     <Content Include="Global.asax" />
     <Content Include="helloworld.aspx" />
     <Content Include="helloworld.html" />
-    <Content Include="pageManager\pageManager.css" />
     <Content Include="pageManager\pageManager.js" />
+    <Content Include="pageManager\pageManager.css" />
     <Content Include="quickEditor\styles.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

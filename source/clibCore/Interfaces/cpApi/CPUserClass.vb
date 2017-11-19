@@ -59,7 +59,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Email() As String 'Inherits BaseClasses.CPUserBaseClass.Email
             Get
                 If True Then
-                    Return CP.core.authContext.user.Email
+                    Return CP.core.doc.authContext.user.Email
                 Else
                     Return ""
                 End If
@@ -70,7 +70,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function GetIdByLogin(ByVal Username As String, ByVal Password As String) As Integer 'Inherits BaseClasses.CPUserBaseClass.GetIdByLogin
             If True Then
-                Return CP.core.authContext.authenticateGetId(cpCore, Username, Password)
+                Return CP.core.doc.authContext.authenticateGetId(cpCore, Username, Password)
             Else
                 Return 0
             End If
@@ -83,10 +83,10 @@ Namespace Contensive.Core
                 Dim localId As Integer = 0
                 '
                 If True Then
-                    localId = CP.core.authContext.user.id
+                    localId = CP.core.doc.authContext.user.id
                     If (localId = 0) Then
                         localId = CP.core.db.insertContentRecordGetID("people", 0)
-                        Call CP.core.authContext.recognizeById(cpCore, localId, CP.core.authContext)
+                        Call CP.core.doc.authContext.recognizeById(cpCore, localId, CP.core.doc.authContext)
                     End If
                 End If
                 Return localId
@@ -98,7 +98,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsAdmin() As Boolean 'Inherits BaseClasses.CPUserBaseClass.admin
             Get
                 If True Then
-                    Return CP.core.authContext.isAuthenticatedAdmin(cpCore)
+                    Return CP.core.doc.authContext.isAuthenticatedAdmin(cpCore)
                 Else
                     Return False
                 End If
@@ -109,7 +109,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function IsAdvancedEditing(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAdvancedEditing
             If True Then
-                Return CP.core.authContext.isAdvancedEditing(cpCore, ContentName)
+                Return CP.core.doc.authContext.isAdvancedEditing(cpCore, ContentName)
             Else
                 Return False
             End If
@@ -120,7 +120,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsAuthenticated() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAuthenticated
             Get
                 If True Then
-                    Return (CP.core.authContext.isAuthenticated())
+                    Return (CP.core.doc.authContext.isAuthenticated())
                 Else
                     Return False
                 End If
@@ -131,7 +131,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function IsAuthoring(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAuthoring
             If True Then
-                Return CP.core.authContext.isEditing(ContentName)
+                Return CP.core.doc.authContext.isEditing(ContentName)
             Else
                 Return False
             End If
@@ -141,7 +141,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function IsContentManager(Optional ByVal ContentName As String = "Page Content") As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsContentManager
             If True Then
-                Return CP.core.authContext.isAuthenticatedContentManager(cpCore, ContentName)
+                Return CP.core.doc.authContext.isAuthenticatedContentManager(cpCore, ContentName)
             Else
                 Return False
             End If
@@ -152,7 +152,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsDeveloper() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsDeveloper
             Get
                 If True Then
-                    Return CP.core.authContext.isAuthenticatedDeveloper(cpCore)
+                    Return CP.core.doc.authContext.isAuthenticatedDeveloper(cpCore)
                 Else
                     Return False
                 End If
@@ -163,7 +163,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function IsEditing(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsEditing
             If True Then
-                Return CP.core.authContext.isEditing(ContentName)
+                Return CP.core.doc.authContext.isEditing(ContentName)
             Else
                 Return False
             End If
@@ -174,7 +174,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsEditingAnything() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsEditingAnything
             Get
                 If True Then
-                    Return CP.core.authContext.isEditingAnything()
+                    Return CP.core.doc.authContext.isEditingAnything()
                 Else
                     Return False
                 End If
@@ -186,7 +186,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsGuest() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsGuest
             Get
                 If True Then
-                    Return CP.core.authContext.isGuest(cpCore)
+                    Return CP.core.doc.authContext.isGuest(cpCore)
                 Else
                     Return False
                 End If
@@ -225,7 +225,7 @@ Namespace Contensive.Core
                 If userId = 0 Then
                     userId = Id
                 End If
-                result = CP.core.authContext.isMemberOfGroupIdList(cpCore, userId, IsAuthenticated(), GroupIDList, False)
+                result = CP.core.doc.authContext.isMemberOfGroupIdList(cpCore, userId, IsAuthenticated(), GroupIDList, False)
             Catch ex As Exception
                 Call CP.core.handleException(ex, "Unexpected error in cs.user.IsInGroupList")
                 result = False
@@ -239,7 +239,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsMember() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsMember
             Get
                 If True Then
-                    Return CP.core.authContext.isAuthenticatedMember(cpCore)
+                    Return CP.core.doc.authContext.isAuthenticatedMember(cpCore)
                 Else
                     Return False
                 End If
@@ -249,14 +249,14 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsQuickEditing(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsQuickEditing
-            Return CP.core.authContext.isQuickEditing(cpCore, ContentName)
+            Return CP.core.doc.authContext.isQuickEditing(cpCore, ContentName)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides ReadOnly Property IsRecognized() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsRecognized
             Get
-                Return CP.core.authContext.isRecognized(cpCore)
+                Return CP.core.doc.authContext.isRecognized(cpCore)
             End Get
         End Property
         '
@@ -264,7 +264,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property IsWorkflowRendering() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsWorkflowRendering
             Get
-                Return CP.core.authContext.isWorkflowRendering
+                Return CP.core.doc.authContext.isWorkflowRendering
             End Get
         End Property
         '
@@ -272,8 +272,8 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property Language() As String 'Inherits BaseClasses.CPUserBaseClass.Language
             Get
-                If (CP.core.authContext.userLanguage IsNot Nothing) Then
-                    Return CP.core.authContext.userLanguage.name
+                If (CP.core.doc.authContext.userLanguage IsNot Nothing) Then
+                    Return CP.core.doc.authContext.userLanguage.name
                 End If
                 Return String.Empty
             End Get
@@ -283,56 +283,56 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property LanguageID() As Integer 'Inherits BaseClasses.CPUserBaseClass.LanguageId
             Get
-                Return CP.core.authContext.user.LanguageID
+                Return CP.core.doc.authContext.user.LanguageID
             End Get
         End Property
         '
         '====================================================================================================
         '
         Public Overrides Function Login(ByVal UsernameOrEmail As String, ByVal Password As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean 'Inherits BaseClasses.CPUserBaseClass.Login
-            Return CP.core.authContext.authenticate(cpCore, UsernameOrEmail, Password, SetAutoLogin)
+            Return CP.core.doc.authContext.authenticate(cpCore, UsernameOrEmail, Password, SetAutoLogin)
         End Function
         '
         '====================================================================================================
         '
         <Obsolete("Use LoginById(integer) instead", False)>
         Public Overrides Function LoginByID(ByVal RecordID As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean
-            Return CP.core.authContext.authenticateById(cpCore, EncodeInteger(RecordID), CP.core.authContext)
+            Return CP.core.doc.authContext.authenticateById(cpCore, EncodeInteger(RecordID), CP.core.doc.authContext)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function LoginByID(ByVal RecordID As Integer) As Boolean
-            Return CP.core.authContext.authenticateById(cpCore, RecordID, CP.core.authContext)
+            Return CP.core.doc.authContext.authenticateById(cpCore, RecordID, CP.core.doc.authContext)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function LoginByID(ByVal RecordID As Integer, ByVal SetAutoLogin As Boolean) As Boolean
-            Return CP.core.authContext.authenticateById(cpCore, RecordID, CP.core.authContext)
-            If Not CP.core.authContext.user.AutoLogin Then
-                CP.core.authContext.user.AutoLogin = True
-                CP.core.authContext.user.save(cpCore)
+            Return CP.core.doc.authContext.authenticateById(cpCore, RecordID, CP.core.doc.authContext)
+            If Not CP.core.doc.authContext.user.AutoLogin Then
+                CP.core.doc.authContext.user.AutoLogin = True
+                CP.core.doc.authContext.user.save(cpCore)
             End If
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function LoginIsOK(ByVal UsernameOrEmail As String, ByVal Password As String) As Boolean
-            Return CP.core.authContext.isLoginOK(cpCore, UsernameOrEmail, Password)
+            Return CP.core.doc.authContext.isLoginOK(cpCore, UsernameOrEmail, Password)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Sub Logout()
-            Call CP.core.authContext.logout(cpCore)
+            Call CP.core.doc.authContext.logout(cpCore)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides ReadOnly Property Name() As String
             Get
-                Return CP.core.authContext.user.Name
+                Return CP.core.doc.authContext.user.name
             End Get
         End Property
         '
@@ -340,7 +340,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property IsNew() As Boolean
             Get
-                Return CP.core.authContext.visit.MemberNew
+                Return CP.core.doc.authContext.visit.MemberNew
             End Get
         End Property
         '
@@ -349,14 +349,14 @@ Namespace Contensive.Core
         Public Overrides Function IsNewLoginOK(ByVal Username As String, ByVal Password As String) As Boolean
             Dim errorMessage As String = ""
             Dim errorCode As Integer = 0
-            Return CP.core.authContext.isNewLoginOK(cpCore, Username, Password, errorMessage, errorCode)
+            Return CP.core.doc.authContext.isNewLoginOK(cpCore, Username, Password, errorMessage, errorCode)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides ReadOnly Property OrganizationID() As Integer
             Get
-                Return CP.core.authContext.user.OrganizationID
+                Return CP.core.doc.authContext.user.OrganizationID
             End Get
         End Property
         '
@@ -364,21 +364,21 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property Password() As String 'Inherits BaseClasses.CPUserBaseClass.Password
             Get
-                Return CP.core.authContext.user.Password
+                Return CP.core.doc.authContext.user.Password
             End Get
         End Property
         '
         '====================================================================================================
         '
         Public Overrides Function Recognize(ByVal UserID As Integer) As Boolean 'Inherits BaseClasses.CPUserBaseClass.Recognize
-            Return CP.core.authContext.recognizeById(cpCore, UserID, CP.core.authContext)
+            Return CP.core.doc.authContext.recognizeById(cpCore, UserID, CP.core.doc.authContext)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides ReadOnly Property Username() As String 'Inherits BaseClasses.CPUserBaseClass.Username
             Get
-                Return CP.core.authContext.user.Username
+                Return CP.core.doc.authContext.user.Username
             End Get
         End Property
         '

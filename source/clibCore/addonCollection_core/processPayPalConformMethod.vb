@@ -33,7 +33,7 @@ Namespace Contensive.Addons.Core
                     Dim CS As Integer = cpCore.db.csOpen("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
                     If cpCore.db.csOk(CS) Then
                         Call cpCore.db.csSet(CS, "OrderCompleted", True)
-                        Call cpCore.db.csSet(CS, "DateCompleted", cpCore.profileStartTime)
+                        Call cpCore.db.csSet(CS, "DateCompleted", cpCore.doc.profileStartTime)
                         Call cpCore.db.csSet(CS, "ccAuthCode", cpCore.docProperties.getText("txn_id"))
                         Call cpCore.db.csSet(CS, "ccActionCode", cpCore.docProperties.getText("payment_status"))
                         Call cpCore.db.csSet(CS, "ccRefCode", cpCore.docProperties.getText("pending_reason"))
@@ -70,7 +70,7 @@ Namespace Contensive.Addons.Core
                         Call cpCore.email.send_Legacy(Recipient, Sender, subject, Message, , False, True)
                     End If
                 End If
-                cpCore.continueProcessing = False
+                cpCore.doc.continueProcessing = False
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try

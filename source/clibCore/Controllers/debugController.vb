@@ -24,14 +24,14 @@ Namespace Contensive.Core.Controllers
             Dim ElapsedTime As Double
             Dim iMessage As String
             '
-            If cpcore.testPointPrinting Then
+            If cpcore.doc.testPointPrinting Then
                 '
                 ' write to stream
                 '
-                ElapsedTime = CSng(cpcore.appStopWatch.ElapsedMilliseconds) / 1000
+                ElapsedTime = CSng(cpcore.doc.appStopWatch.ElapsedMilliseconds) / 1000
                 iMessage = genericController.encodeText(Message)
                 iMessage = Format((ElapsedTime), "00.000") & " - " & iMessage
-                cpcore.testPointMessage = cpcore.testPointMessage & "<nobr>" & iMessage & "</nobr><br >"
+                cpcore.doc.testPointMessage = cpcore.doc.testPointMessage & "<nobr>" & iMessage & "</nobr><br >"
                 'writeAltBuffer ("<nobr>" & iMessage & "</nobr><br >")
             End If
             If cpcore.siteProperties.allowTestPointLogging Then
@@ -42,7 +42,7 @@ Namespace Contensive.Core.Controllers
                 iMessage = genericController.vbReplace(iMessage, vbCrLf, " ")
                 iMessage = genericController.vbReplace(iMessage, vbCr, " ")
                 iMessage = genericController.vbReplace(iMessage, vbLf, " ")
-                iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & cpcore.authContext.visit.id & vbTab & iMessage
+                iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & cpCore.doc.authContext.visit.id & vbTab & iMessage
                 '
                 logController.appendLog(cpcore, iMessage, "", "testPoints_" & cpcore.serverConfig.appConfig.name)
             End If

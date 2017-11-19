@@ -30,11 +30,11 @@ Namespace Contensive.Addons.Core
                     '
                     Call cpCore.webServer.setResponseStatus("404 Not Found")
                     Call cpCore.webServer.setResponseContentType("image/gif")
-                    cpCore.continueProcessing = False
+                    cpCore.doc.continueProcessing = False
                     Return String.Empty
                 Else
                     Call cpCore.webServer.redirect(genericController.getCdnFileLink(cpCore, Filename), "favicon request", False)
-                    cpCore.continueProcessing = False
+                    cpCore.doc.continueProcessing = False
                     Return String.Empty
                 End If
             Catch ex As Exception

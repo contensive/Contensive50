@@ -31,7 +31,7 @@ Namespace Contensive.Addons.AdminSite
                 If ContentID = 0 Then
                     result = "No filter is available"
                 Else
-                    Dim cdef As cdefModel = cpCore.metaData.getCdef(ContentID)
+                    Dim cdef As Models.Complex.cdefModel = cpCore.metaData.getCdef(ContentID)
                     result = adminSite.GetForm_IndexFilterContent(cdef)
                 End If
                 adminSite = Nothing

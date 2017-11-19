@@ -60,7 +60,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsIE() As Boolean
             Get
                 If True Then
-                    Return cpCore.authContext.visit_browserIsIE
+                    Return cpCore.doc.authContext.visit_browserIsIE
                 Else
                     Return False
                 End If
@@ -70,7 +70,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsMac() As Boolean
             Get
                 If True Then
-                    Return cpCore.authContext.visit_browserIsMac
+                    Return cpCore.doc.authContext.visit_browserIsMac
                 Else
                     Return False
                 End If
@@ -80,7 +80,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsMobile() As Boolean
             Get
                 If True Then
-                    Return cpCore.authContext.visit.Mobile
+                    Return cpCore.doc.authContext.visit.Mobile
                 Else
                     Return False
                 End If
@@ -90,7 +90,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsWindows() As Boolean
             Get
                 If True Then
-                    Return cpCore.authContext.visit_browserIsWindows
+                    Return cpCore.doc.authContext.visit_browserIsWindows
                 Else
                     Return False
                 End If
@@ -100,7 +100,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserVersion() As String
             Get
                 If True Then
-                    Return cpCore.authContext.visit_browserVersion
+                    Return cpCore.doc.authContext.visit_browserVersion
                 Else
                     Return ""
                 End If
@@ -196,10 +196,10 @@ Namespace Contensive.Core
 
         Public Overrides ReadOnly Property Language() As String
             Get
-                If (cpCore.authContext.userLanguage Is Nothing) Then
+                If (cpCore.doc.authContext.userLanguage Is Nothing) Then
                     Return ""
                 End If
-                Dim userLanguage As Models.Entity.LanguageModel = Models.Entity.LanguageModel.create(cpCore, cpCore.authContext.user.LanguageID, New List(Of String))
+                Dim userLanguage As Models.Entity.LanguageModel = Models.Entity.LanguageModel.create(cpCore, cpCore.doc.authContext.user.LanguageID, New List(Of String))
                 If (userLanguage IsNot Nothing) Then
                     Return userLanguage.Name
                 End If

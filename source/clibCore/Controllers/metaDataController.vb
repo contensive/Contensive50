@@ -21,7 +21,7 @@ Namespace Contensive.Core.Controllers
         ' objects to destruct during dispose
         '------------------------------------------------------------------------------------------------------------------------
         '
-        Private cdefDict As Dictionary(Of String, cdefModel)
+        Private cdefDict As Dictionary(Of String, Models.Complex.cdefModel)
         Private tableSchemaList As Dictionary(Of String, tableSchemaModel)
         '
         Private ReadOnly Property contentNameIdDictionary As Dictionary(Of String, Integer)
@@ -29,10 +29,10 @@ Namespace Contensive.Core.Controllers
                 If (_contentNameIdDictionary Is Nothing) Then
                     _contentNameIdDictionary = New Dictionary(Of String, Integer)
                     For Each kvp As KeyValuePair(Of Integer, contentModel) In contentIdDict
-                        Dim key As String = kvp.Value.Name.Trim().ToLower()
+                        Dim key As String = kvp.Value.name.Trim().ToLower()
                         If Not String.IsNullOrEmpty(key) Then
                             If (Not _contentNameIdDictionary.ContainsKey(key)) Then
-                                _contentNameIdDictionary.Add(key, kvp.Value.ID)
+                                _contentNameIdDictionary.Add(key, kvp.Value.id)
                             End If
                         End If
                     Next
@@ -66,7 +66,7 @@ Namespace Contensive.Core.Controllers
             '
             ' reset metaData
             '
-            cdefDict = New Dictionary(Of String, cdefModel)
+            cdefDict = New Dictionary(Of String, Models.Complex.cdefModel)
             'contentNameIdDictionary = Nothing
             tableSchemaList = Nothing
         End Sub
@@ -95,8 +95,8 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="contentName"></param>
         ''' <returns></returns>
-        Public Function getCdef(contentName As String) As cdefModel
-            Dim returnCdef As cdefModel = Nothing
+        Public Function getCdef(contentName As String) As Models.Complex.cdefModel
+            Dim returnCdef As Models.Complex.cdefModel = Nothing
             Try
                 Dim ContentId As Integer = getContentId(contentName)
                 If (ContentId > 0) Then
@@ -114,8 +114,8 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="contentId"></param>
         ''' <returns></returns>
-        Public Function getCdef(contentId As Integer, Optional forceDbLoad As Boolean = False, Optional loadInvalidFields As Boolean = False) As cdefModel
-            Dim returnCdef As cdefModel = Nothing
+        Public Function getCdef(contentId As Integer, Optional forceDbLoad As Boolean = False, Optional loadInvalidFields As Boolean = False) As Models.Complex.cdefModel
+            Dim returnCdef As Models.Complex.cdefModel = Nothing
             Try
                 If (contentId <= 0) Then
                     '
@@ -137,7 +137,7 @@ Namespace Contensive.Core.Controllers
                     Dim dependantCacheNameList As New List(Of String)
                     If (Not forceDbLoad) Then
                         Try
-                            returnCdef = cpCore.cache.getObject(Of cdefModel)(cacheName)
+                            returnCdef = cpCore.cache.getObject(Of Models.Complex.cdefModel)(cacheName)
                         Catch ex As Exception
                             cpCore.handleException(ex)
                         End Try
@@ -186,13 +186,13 @@ Namespace Contensive.Core.Controllers
                             ' cdef not found
                             '
                         Else
-                            returnCdef = New cdefModel
+                            returnCdef = New Models.Complex.cdefModel
                             With returnCdef
-                                .fields = New Dictionary(Of String, CDefFieldModel)
+                                .fields = New Dictionary(Of String, Models.Complex.CDefFieldModel)
                                 .childIdList(cpCore) = New List(Of Integer)
                                 .selectList = New List(Of String)
                                 ' -- !!!!! changed to string because dotnet json cannot serialize an integer key
-                                .adminColumns = New SortedList(Of String, cdefModel.CDefAdminColumnClass)
+                                .adminColumns = New SortedList(Of String, Models.Complex.cdefModel.CDefAdminColumnClass)
                                 '
                                 ' ----- save values in definition
                                 '
@@ -230,11 +230,11 @@ Namespace Contensive.Core.Controllers
                                 If .parentID = 0 Then
                                     .parentID = -1
                                 Else
-                                    Dim parentCdef As cdefModel = getCdef(.parentID, forceDbLoad)
+                                    Dim parentCdef As Models.Complex.cdefModel = getCdef(.parentID, forceDbLoad)
                                     For Each keyvaluepair In parentCdef.fields
-                                        Dim parentField As CDefFieldModel = keyvaluepair.Value
-                                        Dim childField As New CDefFieldModel
-                                        childField = DirectCast(parentField.Clone, CDefFieldModel)
+                                        Dim parentField As Models.Complex.CDefFieldModel = keyvaluepair.Value
+                                        Dim childField As New Models.Complex.CDefFieldModel
+                                        childField = DirectCast(parentField.Clone, Models.Complex.CDefFieldModel)
                                         childField.inherited = True
                                         .fields.Add(childField.nameLc.ToLower, childField)
                                         If Not ((parentField.fieldTypeId = FieldTypeIdManyToMany) Or (parentField.fieldTypeId = FieldTypeIdRedirect)) Then
@@ -360,7 +360,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 .fields.Remove(fieldNameLower)
                                             End If
-                                            Dim field As CDefFieldModel = New CDefFieldModel
+                                            Dim field As Models.Complex.CDefFieldModel = New Models.Complex.CDefFieldModel
                                             With field
                                                 Dim fieldIndexColumn As Integer = -1
                                                 Dim fieldTypeId As Integer = genericController.EncodeInteger(row.Item(15))
@@ -531,7 +531,7 @@ Namespace Contensive.Core.Controllers
                         returnCriteria = "(" & contentTableName & ".contentcontrolId=" & contentId & ")"
                         For Each kvp As KeyValuePair(Of Integer, contentModel) In contentIdDict
                             If (kvp.Value.ParentID = contentId) Then
-                                returnCriteria &= "OR" & getContentControlCriteria(kvp.Value.ID, contentTableName, contentDAtaSourceName, parentIdList)
+                                returnCriteria &= "OR" & getContentControlCriteria(kvp.Value.id, contentTableName, contentDAtaSourceName, parentIdList)
                             End If
                         Next
                         parentIdList.Remove(contentId)
@@ -554,7 +554,7 @@ Namespace Contensive.Core.Controllers
         Function isWithinContent(ByVal ChildContentID As Integer, ByVal ParentContentID As Integer) As Boolean
             Dim returnOK As Boolean = False
             Try
-                Dim cdef As cdefModel
+                Dim cdef As Models.Complex.cdefModel
                 If (ChildContentID = ParentContentID) Then
                     returnOK = True
                 Else
@@ -587,7 +587,7 @@ Namespace Contensive.Core.Controllers
         '
         '=================================================================================
         '
-        Public Sub getCdef_SetAdminColumns(cdef As cdefModel)
+        Public Sub getCdef_SetAdminColumns(cdef As Models.Complex.cdefModel)
             Try
                 '
                 'Dim DestPtr As Integer
@@ -595,18 +595,18 @@ Namespace Contensive.Core.Controllers
                 Dim FieldActive As Boolean
                 Dim FieldWidth As Integer
                 Dim FieldWidthTotal As Integer
-                Dim adminColumn As cdefModel.CDefAdminColumnClass
+                Dim adminColumn As Models.Complex.cdefModel.CDefAdminColumnClass
                 '
                 With cdef
                     If .Id > 0 Then
                         Dim cnt As Integer = 0
-                        For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In cdef.fields
-                            Dim field As CDefFieldModel = keyValuePair.Value
+                        For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In cdef.fields
+                            Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                             FieldActive = field.active
                             FieldWidth = genericController.EncodeInteger(field.indexWidth)
                             If FieldActive And (FieldWidth > 0) Then
                                 FieldWidthTotal = FieldWidthTotal + FieldWidth
-                                adminColumn = New cdefModel.CDefAdminColumnClass
+                                adminColumn = New Models.Complex.cdefModel.CDefAdminColumnClass
                                 With adminColumn
                                     .Name = field.nameLc
                                     .SortDirection = field.indexSortDirection
@@ -628,7 +628,7 @@ Namespace Contensive.Core.Controllers
                                 ' Force the Name field as the only column
                                 '
                                 If .fields.ContainsKey("name") Then
-                                    adminColumn = New cdefModel.CDefAdminColumnClass
+                                    adminColumn = New Models.Complex.cdefModel.CDefAdminColumnClass
                                     With adminColumn
                                         .Name = "Name"
                                         .SortDirection = 1
@@ -730,7 +730,7 @@ Namespace Contensive.Core.Controllers
         '            dt = cpCore.db.executeSql("select id,name from ccContent where active<>0")
         '            If Not (dt Is Nothing) Then
         '                For Each row As DataRow In dt.Rows
-        '                    Dim cdef As cdefModel = getCdef(EncodeInteger(row("id")))
+        '                    Dim cdef As Models.Complex.cdefModel = getCdef(EncodeInteger(row("id")))
         '                    'If genericController.vbUCase(cdef.Name) = "PAGE CONTENT" Then
         '                    '    Copy = Copy
         '                    '    End If
@@ -790,7 +790,7 @@ Namespace Contensive.Core.Controllers
         '                                            LiveRecordID = LiveRecordID
         '                                        End If
         '                                        For Each keyValuePair In cdef.fields
-        '                                            Dim field As CDefFieldModel = keyValuePair.Value
+        '                                            Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
         '                                            Select Case field.fieldTypeId
         '                                                Case FieldTypeIdManyToMany, FieldTypeIdRedirect
         '                                                    '
@@ -918,7 +918,7 @@ Namespace Contensive.Core.Controllers
                 Dim cidDataTable As DataTable
                 Dim CIDCount As Integer
                 Dim CIDPointer As Integer
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 Dim ContentID As Integer
                 '
                 SQL = "Select ccGroupRules.ContentID as ID" _
@@ -926,7 +926,7 @@ Namespace Contensive.Core.Controllers
                 & " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)" _
                 & " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)" _
                 & " WHERE" _
-                    & " (ccMemberRules.MemberID=" & cpCore.authContext.user.id & ")" _
+                    & " (ccMemberRules.MemberID=" & cpCore.doc.authContext.user.id & ")" _
                     & " AND(ccGroupRules.Active<>0)" _
                     & " AND(ccContent.Active<>0)" _
                     & " AND(ccMemberRules.Active<>0)"
@@ -1342,7 +1342,7 @@ Namespace Contensive.Core.Controllers
         Public Function getContentTablename(ByVal ContentName As String) As String
             Dim returnTableName As String = ""
             Try
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 '
                 CDef = getCdef(ContentName)
                 If (CDef IsNot Nothing) Then
@@ -1360,7 +1360,7 @@ Namespace Contensive.Core.Controllers
         Public Function getContentDataSource(ContentName As String) As String
             Dim returnDataSource As String = ""
             Try
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 '
                 CDef = getCdef(ContentName)
                 If (CDef Is Nothing) Then
@@ -1382,7 +1382,7 @@ Namespace Contensive.Core.Controllers
         Public Function getContentNameByID(ByVal ContentID As Integer) As String
             Dim returnName As String = ""
             Try
-                Dim cdef As cdefModel
+                Dim cdef As Models.Complex.cdefModel
                 '
                 cdef = getCdef(ContentID)
                 If cdef IsNot Nothing Then
@@ -1415,7 +1415,7 @@ Namespace Contensive.Core.Controllers
                 Dim CDefFound As Boolean
                 Dim InstalledByCollectionID As Integer
                 Dim sqlList As sqlFieldListClass
-                Dim field As CDefFieldModel
+                Dim field As Models.Complex.CDefFieldModel
                 Dim ContentIDofContent As Integer
                 '
                 If String.IsNullOrEmpty(contentName) Then
@@ -1609,7 +1609,7 @@ Namespace Contensive.Core.Controllers
                                 ' CDef does not inherit its fields, create what is needed for a non-inherited CDef
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "ID") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "id"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdAutoIdIncrement
@@ -1622,7 +1622,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "name") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "name"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdText
@@ -1635,7 +1635,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "active") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "active"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdBoolean
@@ -1648,7 +1648,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "sortorder") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "sortorder"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdText
@@ -1661,7 +1661,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "dateadded") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "dateadded"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdDate
@@ -1673,7 +1673,7 @@ Namespace Contensive.Core.Controllers
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "createdby") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "createdby"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdLookup
@@ -1686,7 +1686,7 @@ Namespace Contensive.Core.Controllers
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "modifieddate") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "modifieddate"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdDate
@@ -1698,7 +1698,7 @@ Namespace Contensive.Core.Controllers
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "modifiedby") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "modifiedby"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdLookup
@@ -1711,7 +1711,7 @@ Namespace Contensive.Core.Controllers
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ContentControlId") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "contentcontrolid"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdLookup
@@ -1724,7 +1724,7 @@ Namespace Contensive.Core.Controllers
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "CreateKey") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "createkey"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdInteger
@@ -1736,7 +1736,7 @@ Namespace Contensive.Core.Controllers
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ccGuid") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "ccguid"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdText
@@ -1749,7 +1749,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                                 ' -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
                                 If Not cpCore.db.isCdefField(returnContentId, "ContentCategoryId") Then
-                                    field = New CDefFieldModel
+                                    field = New Models.Complex.CDefFieldModel
                                     field.nameLc = "contentcategoryid"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdInteger
@@ -1765,8 +1765,8 @@ Namespace Contensive.Core.Controllers
                             ' ----- Load CDef
                             '
                             If clearMetaCache Then
-                                cpCore.cache.invalidateObject_Content("content")
-                                cpCore.cache.invalidateObject_Content("content fields")
+                                cpCore.cache.invalidateAllObjectsInContent(Models.Entity.contentModel.contentName.ToLower())
+                                cpCore.cache.invalidateAllObjectsInContent(Models.Entity.contentFieldModel.contentName.ToLower())
                                 cpCore.metaData.clear()
                             End If
                         End If
@@ -1787,7 +1787,7 @@ Namespace Contensive.Core.Controllers
         '
         ' ====================================================================================================================
         '
-        Public Function verifyCDefField_ReturnID(ByVal ContentName As String, field As CDefFieldModel) As Integer ' , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
+        Public Function verifyCDefField_ReturnID(ByVal ContentName As String, field As Models.Complex.CDefFieldModel) As Integer ' , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
             Dim returnId As Integer = 0
             Try
                 '
@@ -2107,7 +2107,7 @@ Namespace Contensive.Core.Controllers
         Public Function isContentFieldSupported(ByVal ContentName As String, ByVal FieldName As String) As Boolean
             Dim returnOk As Boolean = False
             Try
-                Dim cdef As cdefModel
+                Dim cdef As Models.Complex.cdefModel
                 '
                 cdef = getCdef(ContentName)
                 If (cdef IsNot Nothing) Then
@@ -2221,12 +2221,12 @@ Namespace Contensive.Core.Controllers
             Dim result As String = String.Empty
             Try
                 Dim UcaseFieldName As String = genericController.vbUCase(genericController.encodeText(FieldName))
-                Dim Contentdefinition As cdefModel = getCdef(genericController.encodeText(ContentName))
+                Dim Contentdefinition As Models.Complex.cdefModel = getCdef(genericController.encodeText(ContentName))
                 If (UcaseFieldName = "") Or (Contentdefinition.fields.Count < 1) Then
                     Throw (New ApplicationException("Content Name [" & genericController.encodeText(ContentName) & "] or FieldName [" & genericController.encodeText(FieldName) & "] was not valid")) ' handleLegacyError14(MethodName, "")
                 Else
-                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In Contentdefinition.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In Contentdefinition.fields
+                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         With field
                             If UcaseFieldName = genericController.vbUCase(.nameLc) Then
                                 Select Case genericController.vbUCase(genericController.encodeText(PropertyName))
@@ -2275,7 +2275,7 @@ Namespace Contensive.Core.Controllers
         '
         Public Function GetContentProperty(ByVal ContentName As String, ByVal PropertyName As String) As String
             Dim result As String = ""
-            Dim Contentdefinition As cdefModel
+            Dim Contentdefinition As Models.Complex.cdefModel
             '
             Contentdefinition = getCdef(genericController.encodeText(ContentName))
             Select Case genericController.vbUCase(genericController.encodeText(PropertyName))

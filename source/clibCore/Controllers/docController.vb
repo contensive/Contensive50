@@ -80,6 +80,33 @@ Namespace Contensive.Core.Controllers
         Public Property redirectReason As String = ""
         Public Property redirectBecausePageNotFound As Boolean = False
         '
+        ' -- set true if any addon executed is set  htmlDocument=true. When true, the initial addon executed is returned in the html wrapper (html with head)
+        Public Property htmlDocument As Boolean = False
+        ''
+        '' -- addon call depth. When an addon is called, it saves the value interanlly and increments. When level0 exits and htmlDocument is true, the output is wrapped with an html doc
+        'Public Property addonDepth As Integer = 0
+        Friend Property errList As List(Of String)                                   ' exceptions collected during document construction
+        Public Property errorCount As Integer = 0
+        Friend Property userErrorList As List(Of String)                           ' user messages
+        Public Property debug_iUserError As String = ""                              ' User Error String
+        Public Property trapLogMessage As String = ""                           ' The content of the current traplog (keep for popups if no Csv)
+        Public Property testPointMessage As String = ""                         '
+        Public Property testPointPrinting As Boolean = False                         ' if true, send main_TestPoint messages to the stream
+        Public Property authContext As Models.Context.authContextModel
+        Friend Property appStopWatch As Stopwatch = Stopwatch.StartNew()
+        Public Property profileStartTime As Date                                        ' set in constructor
+        Public Property profileStartTickCount As Integer = 0
+        Public Property allowDebugLog As Boolean = False                       ' turn on in script -- use to write /debug.log in content files for whatever is needed
+        Public Property blockExceptionReporting As Boolean = False                   ' used so error reporting can not call itself
+        'Public Property pageErrorWithoutCsv As Boolean = False                  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
+        'Public Property closePageCounter As Integer = 0
+        Public Property continueProcessing As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
+        Public Property upgradeInProgress() As Boolean
+        Public Property docGuid As String                        ' Random number (semi) unique to this hit
+        Friend Property addonIdListRunInThisDoc As New List(Of Integer)
+        Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
+        Public Property pageAddonCnt As Integer = 0
+        '
         '====================================================================================================
         ''' <summary>
         ''' this will eventuall be an addon, but lets do this first to keep the converstion complexity down
@@ -319,7 +346,7 @@ Namespace Contensive.Core.Controllers
                     & "AND ((ccContentWatch.Active)<>0)" _
                     & "AND (ccContentWatch.Link is not null)" _
                     & "AND (ccContentWatch.LinkLabel is not null)" _
-                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & Me.cpcore.db.encodeSQLDate(cpcore.profileStartTime) & "))" _
+                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & Me.cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime) & "))" _
                     & ")" _
                 & " ORDER BY " & iSortFieldList & ";"
                 result = Me.cpcore.db.csOpenSql(SQL, , PageSize, PageNumber)
@@ -420,7 +447,7 @@ Namespace Contensive.Core.Controllers
                         Call Me.cpcore.db.csGoNext(CS)
                     Loop
                     If result <> "" Then
-                        result = Me.cpcore.html.html_GetContentCopy("Watch List Caption: " & ListName, ListName, Me.cpcore.authContext.user.id, True, Me.cpcore.authContext.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & htmlIndent(result) & cr & "</ul>"
+                        result = Me.cpcore.html.html_GetContentCopy("Watch List Caption: " & ListName, ListName, Me.cpcore.doc.authContext.user.id, True, Me.cpcore.doc.authContext.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & htmlIndent(result) & cr & "</ul>"
                     End If
                 End If
                 Call Me.cpcore.db.csClose(CS)
@@ -474,7 +501,7 @@ Namespace Contensive.Core.Controllers
                 Dim allowSave As Boolean
                 Dim AllowDelete As Boolean
                 Dim AllowMarkReviewed As Boolean
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 Dim readOnlyField As Boolean
                 Dim IsEditLocked As Boolean
                 Dim main_EditLockMemberName As String = String.Empty
@@ -508,7 +535,7 @@ Namespace Contensive.Core.Controllers
                 Call getAuthoringStatus(LiveRecordContentName, page.id, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
                 Call getAuthoringPermissions(LiveRecordContentName, page.id, AllowInsert, AllowCancel, allowSave, AllowDelete, False, False, False, False, readOnlyField)
                 AllowMarkReviewed = cpcore.metaData.isContentFieldSupported(Models.Entity.pageContentModel.contentName, "DateReviewed")
-                OptionsPanelAuthoringStatus = cpcore.authContext.main_GetAuthoringStatusMessage(cpcore, False, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
+                OptionsPanelAuthoringStatus = cpcore.doc.authContext.main_GetAuthoringStatusMessage(cpcore, False, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
                 '
                 ' Set Editing Authoring Control
                 '
@@ -545,7 +572,7 @@ Namespace Contensive.Core.Controllers
                 '        & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
                 '        & cr & "</tr>"
                 'End If
-                If (cpcore.debug_iUserError <> "") Then
+                If (cpcore.doc.debug_iUserError <> "") Then
                     result = result & "" _
                         & cr & "<tr>" _
                         & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & errorController.error_GetUserError(cpcore) & "</div></td>" _
@@ -725,9 +752,9 @@ Namespace Contensive.Core.Controllers
             RecordModified = False
             RecordID = (cpcore.docProperties.getInteger("ID"))
             Button = cpcore.docProperties.getText("Button")
-            iIsAdmin = cpcore.authContext.isAuthenticatedAdmin(cpcore)
+            iIsAdmin = cpcore.doc.authContext.isAuthenticatedAdmin(cpcore)
             '
-            If (Button <> "") And (RecordID <> 0) And (pageContentModel.contentName <> "") And (cpcore.authContext.isAuthenticatedContentManager(cpcore, pageContentModel.contentName)) Then
+            If (Button <> "") And (RecordID <> 0) And (pageContentModel.contentName <> "") And (cpcore.doc.authContext.isAuthenticatedContentManager(cpcore, pageContentModel.contentName)) Then
                 ' main_WorkflowSupport = cpcore.siteProperties.allowWorkflowAuthoring And cpcore.workflow.isWorkflowAuthoringCompatible(pageContentModel.contentName)
                 Dim SubmittedMemberName As String = ""
                 Dim ApprovedMemberName As String = ""
@@ -792,7 +819,7 @@ Namespace Contensive.Core.Controllers
                         '
                         If Not SaveButNoChanges Then
                             Call cpcore.doc.processAfterSave(False, pageContentModel.contentName, page.id, page.name, page.ParentID, False)
-                            Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
+                            Call cpcore.cache.invalidateAllObjectsInContent(pageContentModel.contentName)
                         End If
                     End If
                 End If
@@ -804,8 +831,8 @@ Namespace Contensive.Core.Controllers
                     If cpcore.db.csOk(CSBlock) Then
                         Call cpcore.db.csSet(CSBlock, "active", True)
                         Call cpcore.db.csSet(CSBlock, "ParentID", RecordID)
-                        Call cpcore.db.csSet(CSBlock, "contactmemberid", cpcore.authContext.user.id)
-                        Call cpcore.db.csSet(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.name)
+                        Call cpcore.db.csSet(CSBlock, "contactmemberid", cpcore.doc.authContext.user.id)
+                        Call cpcore.db.csSet(CSBlock, "name", "New Page added " & cpcore.doc.profileStartTime & " by " & cpcore.doc.authContext.user.name)
                         Call cpcore.db.csSet(CSBlock, "copyFilename", "")
                         RecordID = cpcore.db.csGetInteger(CSBlock, "ID")
                         Call cpcore.db.csSave2(CSBlock)
@@ -813,7 +840,7 @@ Namespace Contensive.Core.Controllers
                         Link = getPageLink(RecordID, "", True, False)
                         'Link = main_GetPageLink(RecordID)
                         'If main_WorkflowSupport Then
-                        '    If Not cpcore.authContext.isWorkflowRendering() Then
+                        '    If Not cpCore.doc.authContext.isWorkflowRendering() Then
                         '        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
                         '        Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
                         '    End If
@@ -822,7 +849,7 @@ Namespace Contensive.Core.Controllers
                     End If
                     Call cpcore.db.csClose(CSBlock)
                     '
-                    Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
+                    Call cpcore.cache.invalidateAllObjectsInContent(pageContentModel.contentName)
                 End If
                 If (Button = ButtonAddSiblingPage) Then
                     '
@@ -838,8 +865,8 @@ Namespace Contensive.Core.Controllers
                         If cpcore.db.csOk(CSBlock) Then
                             Call cpcore.db.csSet(CSBlock, "active", True)
                             Call cpcore.db.csSet(CSBlock, "ParentID", ParentID)
-                            Call cpcore.db.csSet(CSBlock, "contactmemberid", cpcore.authContext.user.id)
-                            Call cpcore.db.csSet(CSBlock, "name", "New Page added " & cpcore.profileStartTime & " by " & cpcore.authContext.user.name)
+                            Call cpcore.db.csSet(CSBlock, "contactmemberid", cpcore.doc.authContext.user.id)
+                            Call cpcore.db.csSet(CSBlock, "name", "New Page added " & cpcore.doc.profileStartTime & " by " & cpcore.doc.authContext.user.name)
                             Call cpcore.db.csSet(CSBlock, "copyFilename", "")
                             RecordID = cpcore.db.csGetInteger(CSBlock, "ID")
                             Call cpcore.db.csSave2(CSBlock)
@@ -847,7 +874,7 @@ Namespace Contensive.Core.Controllers
                             Link = getPageLink(RecordID, "", True, False)
                             'Link = main_GetPageLink(RecordID)
                             'If main_WorkflowSupport Then
-                            '    If Not cpcore.authContext.isWorkflowRendering() Then
+                            '    If Not cpCore.doc.authContext.isWorkflowRendering() Then
                             '        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
                             '        Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
                             '    End If
@@ -856,7 +883,7 @@ Namespace Contensive.Core.Controllers
                         End If
                         Call cpcore.db.csClose(CSBlock)
                     End If
-                    Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
+                    Call cpcore.cache.invalidateAllObjectsInContent(pageContentModel.contentName)
                 End If
                 If (Button = ButtonDelete) Then
                     CSBlock = cpcore.db.csOpenRecord(pageContentModel.contentName, RecordID)
@@ -869,7 +896,7 @@ Namespace Contensive.Core.Controllers
                     Call cpcore.db.deleteContentRecord(pageContentModel.contentName, RecordID)
                     '
                     If Not False Then
-                        Call cpcore.cache.invalidateObject_Content(pageContentModel.contentName)
+                        Call cpcore.cache.invalidateAllObjectsInContent(pageContentModel.contentName)
                     End If
                     '
                     If Not False Then
@@ -881,13 +908,13 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
                 'If (Button = ButtonAbortEdit) Then
-                '    Call cpcore.workflow.abortEdit2(pageContentModel.contentName, RecordID, cpcore.authContext.user.id)
+                '    Call cpcore.workflow.abortEdit2(pageContentModel.contentName, RecordID, cpCore.doc.authContext.user.id)
                 'End If
                 'If (Button = ButtonPublishSubmit) Then
                 '    Call cpcore.workflow.main_SubmitEdit(pageContentModel.contentName, RecordID)
                 '    Call sendPublishSubmitNotice(pageContentModel.contentName, RecordID, "")
                 'End If
-                If (Not (cpcore.debug_iUserError <> "")) And ((Button = ButtonOK) Or (Button = ButtonCancel)) Then
+                If (Not (cpcore.doc.debug_iUserError <> "")) And ((Button = ButtonOK) Or (Button = ButtonCancel)) Then
                     '
                     ' ----- Turn off Quick Editor if not save or add child
                     '
@@ -918,7 +945,7 @@ Namespace Contensive.Core.Controllers
                 If (String.IsNullOrEmpty(ContentName)) Then
                     ContentName = pageContentModel.contentName
                 End If
-                Dim isAuthoring = cpcore.authContext.isEditing(ContentName)
+                Dim isAuthoring = cpcore.doc.authContext.isEditing(ContentName)
                 '
                 Dim ChildListCount As Integer = 0
                 Dim UcaseRequestedListName As String = genericController.vbUCase(RequestedListName)
@@ -945,7 +972,7 @@ Namespace Contensive.Core.Controllers
                         End If
                     End If
                     Dim pageEditLink As String = ""
-                    If cpcore.authContext.isEditing(ContentName) Then
+                    If cpcore.doc.authContext.isEditing(ContentName) Then
                         pageEditLink = cpcore.html.main_GetRecordEditLink2(ContentName, childPage.id, True, childPage.name, True)
                     End If
                     '
@@ -1000,7 +1027,7 @@ Namespace Contensive.Core.Controllers
                             inactiveList = inactiveList & "[Hidden (Inactive): " & LinkedText & "]"
                             inactiveList = inactiveList & "</li>"
                         End If
-                    ElseIf (childPage.PubDate <> Date.MinValue) And (childPage.PubDate > cpcore.profileStartTime) Then
+                    ElseIf (childPage.PubDate <> Date.MinValue) And (childPage.PubDate > cpcore.doc.profileStartTime) Then
                         '
                         ' ----- Child page has not been published
                         '
@@ -1010,7 +1037,7 @@ Namespace Contensive.Core.Controllers
                             inactiveList = inactiveList & "[Hidden (To be published " & childPage.PubDate & "): " & LinkedText & "]"
                             inactiveList = inactiveList & "</li>"
                         End If
-                    ElseIf (childPage.DateExpires <> Date.MinValue) And (childPage.DateExpires < cpcore.profileStartTime) Then
+                    ElseIf (childPage.DateExpires <> Date.MinValue) And (childPage.DateExpires < cpcore.doc.profileStartTime) Then
                         '
                         ' ----- Child page has expired
                         '
@@ -1061,18 +1088,18 @@ Namespace Contensive.Core.Controllers
                 If (Not ArchivePages) Then
                     Dim AddLink As String = cpcore.html.main_GetRecordAddLink(ContentName, "parentid=" & parentPageID & ",ParentListName=" & UcaseRequestedListName, True)
                     If AddLink <> "" Then
-                        InactiveList = InactiveList & cr & "<li class=""ccListItem"">" & AddLink & "</LI>"
+                        inactiveList = inactiveList & cr & "<li class=""ccListItem"">" & AddLink & "</LI>"
                     End If
                 End If
                 '
                 ' ----- If there is a list, add the list start and list end
                 '
                 result = ""
-                If ActiveList <> "" Then
-                    result = result & cr & "<ul id=""childPageList_" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & genericController.htmlIndent(ActiveList) & cr & "</ul>"
+                If activeList <> "" Then
+                    result = result & cr & "<ul id=""childPageList_" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & genericController.htmlIndent(activeList) & cr & "</ul>"
                 End If
-                If InactiveList <> "" Then
-                    result = result & cr & "<ul id=""childPageList_" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & genericController.htmlIndent(InactiveList) & cr & "</ul>"
+                If inactiveList <> "" Then
+                    result = result & cr & "<ul id=""childPageList_" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & genericController.htmlIndent(inactiveList) & cr & "</ul>"
                 End If
                 '
                 ' ----- if non-orphan list, authoring and none found, print none message
@@ -1097,9 +1124,9 @@ Namespace Contensive.Core.Controllers
             Dim CS As Integer
             Dim SQL As String
             '
-            If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+            If cpcore.doc.authContext.isAuthenticatedAdmin(cpcore) Then
                 bypassContentBlock = True
-            ElseIf cpcore.authContext.isAuthenticatedContentManager(cpcore, cpcore.metaData.getContentNameByID(ContentID)) Then
+            ElseIf cpcore.doc.authContext.isAuthenticatedContentManager(cpcore, cpcore.metaData.getContentNameByID(ContentID)) Then
                 bypassContentBlock = True
             Else
                 SQL = "SELECT ccMemberRules.MemberID" _
@@ -1108,8 +1135,8 @@ Namespace Contensive.Core.Controllers
                     & " AND ((ccPageContentBlockRules.Active)<>0)" _
                     & " AND ((ccgroups.Active)<>0)" _
                     & " AND ((ccMemberRules.Active)<>0)" _
-                    & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.profileStartTime) & ")" _
-                    & " AND ((ccMemberRules.MemberID)=" & cpcore.authContext.user.id & "));"
+                    & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime) & ")" _
+                    & " AND ((ccMemberRules.MemberID)=" & cpcore.doc.authContext.user.id & "));"
                 CS = cpcore.db.csOpenSql(SQL)
                 bypassContentBlock = cpcore.db.csOk(CS)
                 Call cpcore.db.csClose(CS)
@@ -1178,7 +1205,7 @@ ErrorTrap:
                         IDs = Split(result, ",")
                         IDCnt = UBound(IDs) + 1
                         SingleEntry = (IDCnt = 1)
-                        QuickEditing = cpcore.authContext.isQuickEditing(cpcore, "page content")
+                        QuickEditing = cpcore.doc.authContext.isQuickEditing(cpcore, "page content")
                         For Ptr = 0 To IDCnt - 1
                             Call cpcore.db.deleteContentRecord("page content", genericController.EncodeInteger(IDs(Ptr)))
                         Next
@@ -1243,7 +1270,7 @@ ErrorTrap:
             Dim SubmittedName As String = String.Empty
             Dim ApprovedName As String = String.Empty
             Dim ModifiedName As String = String.Empty
-            Dim CDef As cdefModel
+            Dim CDef As Models.Complex.cdefModel
             Dim ModifiedDate As Date
             Dim SubmittedDate As Date
             Dim ApprovedDate As Date
@@ -1280,7 +1307,7 @@ ErrorTrap:
                 If (CDef.AllowAdd) And (Not IsInserted) Then
                     AllowInsert = True
                 End If
-                'ElseIf cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                'ElseIf cpCore.doc.authContext.isAuthenticatedAdmin(cpcore) Then
                 '    '
                 '    ' Workflow, Admin
                 '    '
@@ -1430,7 +1457,7 @@ ErrorTrap:
             'If Not (true) Then Exit Sub
             '
             Dim MethodName As String
-            Dim CDef As cdefModel
+            Dim CDef As Models.Complex.cdefModel
             Dim Copy As String
             Dim Link As String
             Dim FromAddress As String
@@ -1445,10 +1472,10 @@ ErrorTrap:
             Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName)
             Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName)
             Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString)
-            Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", cpcore.profileStartTime.ToString)
-            Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpcore.authContext.user.name)
+            Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", cpcore.doc.profileStartTime.ToString)
+            Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpcore.doc.authContext.user.name)
             '
-            Call cpcore.email.sendGroup(cpcore.siteProperties.getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
+            Call cpcore.email.sendGroup(cpcore.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
             '
             Exit Sub
             '
@@ -1670,7 +1697,7 @@ ErrorTrap:
         Public Function main_IsChildRecord(ByVal ContentName As String, ByVal ChildRecordID As Integer, ByVal ParentRecordID As Integer) As Boolean
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsChildRecord")
             '
-            Dim CDef As cdefModel
+            Dim CDef As Models.Complex.cdefModel
             '
             main_IsChildRecord = (ChildRecordID = ParentRecordID)
             If Not main_IsChildRecord Then
@@ -1755,7 +1782,7 @@ ErrorTrap:
                 '
                 ' Add the Admin Message to the link
                 '
-                If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                If cpcore.doc.authContext.isAuthenticatedAdmin(cpcore) Then
                     If PageNotFoundLink = "" Then
                         PageNotFoundLink = cpcore.webServer.requestUrl
                     End If
@@ -2350,7 +2377,7 @@ ErrorTrap:
                             End If
                             Dim linkAliasId As Integer = cpcore.db.csGetInteger(CS, "id")
                             Call cpcore.db.csClose(CS)
-                            cpcore.cache.invalidateObject_Entity(linkAliasModel.contentTableName, linkAliasId)
+                            cpcore.cache.invalidateObject_Entity(cpcore, linkAliasModel.contentTableName, linkAliasId)
                         End If
                     End If
                 End If
@@ -2574,7 +2601,7 @@ ErrorTrap:
             markRecordReviewed(ContentName, RecordID)
             '
             ' -- invalidate the specific cache for this record
-            cpcore.cache.invalidateObject_Entity(TableName, RecordID)
+            cpcore.cache.invalidateObject_Entity(cpcore, TableName, RecordID)
             '
             ' -- invalidate the tablename -- meaning any cache consumer that cannot itemize its entity records, can depend on this, which will invalidate anytime any record clears
             cpcore.cache.invalidateObject(TableName)
@@ -2582,13 +2609,13 @@ ErrorTrap:
             Select Case genericController.vbLCase(TableName)
                 Case linkForwardModel.contentTableName
                     '
-                    cpcore.cache.invalidateObject_RouteDictionary()
+                    Models.Complex.routeDictionaryModel.invalidateCache(cpcore)
                 Case linkAliasModel.contentTableName
                     '
-                    cpcore.cache.invalidateObject_RouteDictionary()
+                    Models.Complex.routeDictionaryModel.invalidateCache(cpcore)
                 Case addonModel.contentTableName
                     '
-                    cpcore.cache.invalidateObject_RouteDictionary()
+                    Models.Complex.routeDictionaryModel.invalidateCache(cpcore)
                 Case personModel.contentTableName
                     '
                     ' Log Activity for changes to people and organizattions
@@ -2621,11 +2648,11 @@ ErrorTrap:
                     'hint = hint & ",130"
                     Select Case genericController.vbLCase(RecordName)
                         Case "allowlinkalias"
-                            Call cpcore.cache.invalidateObject_Content("Page Content")
+                            Call cpcore.cache.invalidateAllObjectsInContent("Page Content")
                         Case "sectionlandinglink"
-                            Call cpcore.cache.invalidateObject_Content("Page Content")
+                            Call cpcore.cache.invalidateAllObjectsInContent("Page Content")
                         Case siteproperty_serverPageDefault_name
-                            Call cpcore.cache.invalidateObject_Content("Page Content")
+                            Call cpcore.cache.invalidateAllObjectsInContent("Page Content")
                     End Select
                 Case "ccpagecontent"
                     '
@@ -2832,9 +2859,9 @@ ErrorTrap:
                 If cpcore.metaData.isContentFieldSupported(ContentName, "DateReviewed") Then
                     Dim DataSourceName As String = cpcore.metaData.getContentDataSource(ContentName)
                     Dim TableName As String = cpcore.metaData.getContentTablename(ContentName)
-                    Dim SQL As String = "update " & TableName & " set DateReviewed=" & cpcore.db.encodeSQLDate(cpcore.profileStartTime)
+                    Dim SQL As String = "update " & TableName & " set DateReviewed=" & cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime)
                     If cpcore.metaData.isContentFieldSupported(ContentName, "ReviewedBy") Then
-                        SQL &= ",ReviewedBy=" & cpcore.authContext.user.id
+                        SQL &= ",ReviewedBy=" & cpcore.doc.authContext.user.id
                     End If
                     '
                     ' -- Mark the live record

@@ -93,7 +93,7 @@ Namespace Contensive.Core.Controllers
                 main_EditLockStatus_Local = False
                 '
                 main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), ReturnMemberID, ReturnDateExpires)
-                If main_EditLockStatus_Local And (ReturnMemberID <> cpCore.authContext.user.id) Then
+                If main_EditLockStatus_Local And (ReturnMemberID <> cpCore.doc.authContext.user.id) Then
                     main_EditLockStatus_Local = True
                     main_EditLockDateExpires_Local = ReturnDateExpires
                     main_EditLockMemberID_Local = ReturnMemberID
@@ -161,7 +161,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Sub SetEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call setEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
+            Call setEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
         End Sub
         '
         '========================================================================
@@ -169,7 +169,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Sub ClearEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call clearEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
+            Call clearEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
         End Sub
         ''
         ''========================================================================
@@ -177,7 +177,7 @@ Namespace Contensive.Core.Controllers
         ''========================================================================
         ''
         'Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        '    Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
+        '    Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
         'End Sub
         '
         ''========================================================================
@@ -185,7 +185,7 @@ Namespace Contensive.Core.Controllers
         ''========================================================================
         ''
         'Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        '    Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
+        '    Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
         'End Sub
         ''
         ''========================================================================
@@ -193,7 +193,7 @@ Namespace Contensive.Core.Controllers
         ''========================================================================
         ''
         'Public Sub main_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        '    Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
+        '    Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
         'End Sub
         ''
         ''=========================================================================================
@@ -256,7 +256,7 @@ Namespace Contensive.Core.Controllers
         '        Dim FieldArraySize As Integer
         '        Dim PublishingDelete As Boolean
         '        Dim PublishingInactive As Boolean
-        '        Dim CDef As cdefModel
+        '        Dim CDef As Models.Complex.cdefModel
         '        Dim FieldList As String
         '        '
         '        MethodName = "csv_PublishEdit"
@@ -324,8 +324,8 @@ Namespace Contensive.Core.Controllers
         '                                    ' ----- create update arrays
         '                                    '
         '                                    FieldPointer = 0
-        '                                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
-        '                                        Dim field As CDefFieldModel = keyValuePair.Value
+        '                                    For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In CDef.fields
+        '                                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
         '                                        With field
         '                                            FieldName = .nameLc
         '                                            fieldTypeId = .fieldTypeId
@@ -558,7 +558,7 @@ Namespace Contensive.Core.Controllers
         '        Dim FieldCount As Integer
         '        Dim FieldName As String
         '        Dim fieldTypeId As Integer
-        '        Dim CDef As cdefModel
+        '        Dim CDef As Models.Complex.cdefModel
         '        Dim sqlFieldList As New sqlFieldListClass
         '        '
         '        CDef = cpCore.metaData.getCdef(ContentName)
@@ -607,8 +607,8 @@ Namespace Contensive.Core.Controllers
         '                                ' create update arrays
         '                                '
         '                                FieldPointer = 0
-        '                                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
-        '                                    Dim field As CDefFieldModel = keyValuePair.Value
+        '                                For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In CDef.fields
+        '                                    Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
         '                                    With field
         '                                        FieldName = .nameLc
         '                                        If cpCore.db.isSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
@@ -684,7 +684,7 @@ Namespace Contensive.Core.Controllers
         'Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
         '    Try
         '        '
-        '        Dim CDef As cdefModel
+        '        Dim CDef As Models.Complex.cdefModel
         '        '
         '        CDef = cpCore.metaData.getCdef(ContentName)
         '        If CDef.Id > 0 Then
@@ -704,7 +704,7 @@ Namespace Contensive.Core.Controllers
         'Public Sub submitEdit2(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
         '    Try
         '        '
-        '        Dim CDef As cdefModel
+        '        Dim CDef As Models.Complex.cdefModel
         '        '
         '        CDef = cpCore.metaData.getCdef(ContentName)
         '        If CDef.Id > 0 Then
@@ -820,7 +820,7 @@ Namespace Contensive.Core.Controllers
                 Dim sqlCriteria As String
                 Dim EditLockTimeoutDays As Double
                 Dim EditLockTimeoutMinutes As Double
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 '
                 MethodName = "csv_SetAuthoringControl"
                 '
@@ -907,7 +907,7 @@ Namespace Contensive.Core.Controllers
         Public Sub getAuthoringStatus(ByVal ContentName As String, ByVal RecordID As Integer, ByRef IsSubmitted As Boolean, ByRef IsApproved As Boolean, ByRef SubmittedName As String, ByRef ApprovedName As String, ByRef IsInserted As Boolean, ByRef IsDeleted As Boolean, ByRef IsModified As Boolean, ByRef ModifiedName As String, ByRef ModifiedDate As Date, ByRef SubmittedDate As Date, ByRef ApprovedDate As Date)
             Try
                 Dim ContentID As Integer
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 '
                 IsModified = False
                 ModifiedName = ""

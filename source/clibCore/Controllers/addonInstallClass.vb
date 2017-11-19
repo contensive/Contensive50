@@ -1543,7 +1543,7 @@ Namespace Contensive.Core
                                                                                     '
                                                                                     ' create or update the record
                                                                                     '
-                                                                                    Dim CDef As cdefModel = cpCore.metaData.getCdef(ContentName)
+                                                                                    Dim CDef As Models.Complex.cdefModel = cpCore.metaData.getCdef(ContentName)
                                                                                     Dim cs As Integer = -1
                                                                                     If ContentRecordGuid <> "" Then
                                                                                         cs = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
@@ -1619,7 +1619,7 @@ Namespace Contensive.Core
                                                                                 Dim ContentRecordGuid As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "guid", "")
                                                                                 Dim ContentRecordName As String = GetXMLAttribute(cpCore, IsFound, ContentNode, "name", "")
                                                                                 If (ContentRecordGuid <> "") Or (ContentRecordName <> "") Then
-                                                                                    Dim CDef As cdefModel = cpCore.metaData.getCdef(ContentName)
+                                                                                    Dim CDef As Models.Complex.cdefModel = cpCore.metaData.getCdef(ContentName)
                                                                                     Dim cs As Integer = -1
                                                                                     If ContentRecordGuid <> "" Then
                                                                                         cs = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
@@ -1636,7 +1636,7 @@ Namespace Contensive.Core
                                                                                                 Dim fieldTypeId As Integer = -1
                                                                                                 Dim FieldLookupContentID As Integer = -1
                                                                                                 For Each keyValuePair In CDef.fields
-                                                                                                    Dim field As CDefFieldModel = keyValuePair.Value
+                                                                                                    Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                                                                                                     If genericController.vbLCase(field.nameLc) = FieldName Then
                                                                                                         fieldTypeId = field.fieldTypeId
                                                                                                         FieldLookupContentID = field.lookupContentID
@@ -3742,8 +3742,8 @@ Namespace Contensive.Core
         Private Shared Function installCollection_LoadXmlToMiniCollection(cpCore As coreClass, ByVal srcCollecionXml As String, ByVal IsccBaseFile As Boolean, ByVal setAllDataChanged As Boolean, IsNewBuild As Boolean, defaultCollection As miniCollectionModel) As miniCollectionModel
             Dim result As miniCollectionModel
             Try
-                Dim DefaultCDef As cdefModel
-                Dim DefaultCDefField As CDefFieldModel
+                Dim DefaultCDef As Models.Complex.cdefModel
+                Dim DefaultCDefField As Models.Complex.CDefFieldModel
                 Dim contentNameLc As String
                 Dim XMLTools As New xmlController(cpCore)
                 'Dim AddonClass As New addonInstallClass(cpCore)
@@ -3841,7 +3841,7 @@ Namespace Contensive.Core
                                             If defaultCollection.CDef.ContainsKey(contentNameLc) Then
                                                 DefaultCDef = defaultCollection.CDef(contentNameLc)
                                             Else
-                                                DefaultCDef = New cdefModel
+                                                DefaultCDef = New Models.Complex.cdefModel
                                             End If
                                             '
                                             ContentTableName = GetXMLAttribute(cpCore, Found, CDef_Node, "ContentTableName", DefaultCDef.ContentTableName)
@@ -3857,7 +3857,7 @@ Namespace Contensive.Core
                                                 ' ----- Add CDef if not already there
                                                 '
                                                 If Not result.CDef.ContainsKey(ContentName.ToLower) Then
-                                                    result.CDef.Add(ContentName.ToLower, New cdefModel())
+                                                    result.CDef.Add(ContentName.ToLower, New Models.Complex.cdefModel())
                                                 End If
                                                 '
                                                 ' Get CDef attributes
@@ -3899,7 +3899,7 @@ Namespace Contensive.Core
                                                     .DeveloperOnly = GetXMLAttributeBoolean(cpCore, Found, CDef_Node, "DeveloperOnly", DefaultCDef.DeveloperOnly)
                                                     .DropDownFieldList = GetXMLAttribute(cpCore, Found, CDef_Node, "DropDownFieldList", DefaultCDef.DropDownFieldList)
                                                     .EditorGroupName = GetXMLAttribute(cpCore, Found, CDef_Node, "EditorGroupName", DefaultCDef.EditorGroupName)
-                                                    .fields = New Dictionary(Of String, CDefFieldModel)
+                                                    .fields = New Dictionary(Of String, Models.Complex.CDefFieldModel)
                                                     .IconLink = GetXMLAttribute(cpCore, Found, CDef_Node, "IconLink", DefaultCDef.IconLink)
                                                     .IconHeight = GetXMLAttributeInteger(cpCore, Found, CDef_Node, "IconHeight", DefaultCDef.IconHeight)
                                                     .IconWidth = GetXMLAttributeInteger(cpCore, Found, CDef_Node, "IconWidth", DefaultCDef.IconWidth)
@@ -3931,11 +3931,11 @@ Namespace Contensive.Core
                                                         If (DefaultCDef.fields.ContainsKey(FieldName)) Then
                                                             DefaultCDefField = DefaultCDef.fields(FieldName)
                                                         Else
-                                                            DefaultCDefField = New CDefFieldModel()
+                                                            DefaultCDefField = New Models.Complex.CDefFieldModel()
                                                         End If
                                                         '
                                                         If Not result.CDef(ContentName.ToLower).fields.ContainsKey(FieldName.ToLower()) Then
-                                                            result.CDef(ContentName.ToLower).fields.Add(FieldName.ToLower, New CDefFieldModel)
+                                                            result.CDef(ContentName.ToLower).fields.Add(FieldName.ToLower, New Models.Complex.CDefFieldModel)
                                                         End If
                                                         With result.CDef(ContentName.ToLower).fields(FieldName.ToLower)
                                                             .nameLc = FieldName.ToLower
@@ -4334,7 +4334,7 @@ Namespace Contensive.Core
                     If True Then
                         Dim UsedTables As String = ""
                         For Each keypairvalue In .CDef
-                            Dim workingCdef As cdefModel = keypairvalue.Value
+                            Dim workingCdef As Models.Complex.cdefModel = keypairvalue.Value
                             ContentName = workingCdef.Name
                             With workingCdef
                                 If .dataChanged Then
@@ -4436,10 +4436,10 @@ Namespace Contensive.Core
                     '
                     FieldHelpCID = cpCore.db.getRecordID("content", "Content Field Help")
                     For Each keypairvalue In .CDef
-                        Dim workingCdef As cdefModel = keypairvalue.Value
+                        Dim workingCdef As Models.Complex.cdefModel = keypairvalue.Value
                         ContentName = workingCdef.Name
                         For Each fieldKeyValuePair In workingCdef.fields
-                            Dim field As CDefFieldModel = fieldKeyValuePair.Value
+                            Dim field As Models.Complex.CDefFieldModel = fieldKeyValuePair.Value
                             FieldName = field.nameLc
                             With .CDef(ContentName.ToLower).fields(FieldName.ToLower)
                                 If .HelpChanged Then
@@ -4708,7 +4708,7 @@ Namespace Contensive.Core
         ' ----- Load the archive file application
         '========================================================================
         '
-        Private Shared Sub installCollection_BuildDbFromCollection_AddCDefToDb(cpCore As coreClass, cdef As cdefModel, ByVal BuildVersion As String)
+        Private Shared Sub installCollection_BuildDbFromCollection_AddCDefToDb(cpCore As coreClass, cdef As Models.Complex.cdefModel, ByVal BuildVersion As String)
             Try
                 '
                 Dim FieldHelpCID As Integer
@@ -4831,7 +4831,7 @@ Namespace Contensive.Core
                             FieldSize = 0
                             FieldCount = 0
                             For Each nameValuePair In .fields
-                                Dim field As CDefFieldModel = nameValuePair.Value
+                                Dim field As Models.Complex.CDefFieldModel = nameValuePair.Value
                                 With field
                                     If (.dataChanged) Then
                                         fieldId = cpCore.metaData.verifyCDefField_ReturnID(ContentName, field)
@@ -4906,9 +4906,9 @@ Namespace Contensive.Core
                 Dim HelpChanged As Boolean
                 Dim Copy As String
                 Dim n As String
-                Dim srcCollectionCdefField As CDefFieldModel
-                Dim dstCollectionCdef As cdefModel
-                Dim dstCollectionCdefField As CDefFieldModel
+                Dim srcCollectionCdefField As Models.Complex.CDefFieldModel
+                Dim dstCollectionCdef As Models.Complex.cdefModel
+                Dim dstCollectionCdefField As Models.Complex.CDefFieldModel
                 Dim IsMatch As Boolean
                 Dim DstKey As String
                 Dim SrcKey As String
@@ -4919,7 +4919,7 @@ Namespace Contensive.Core
                 Dim DstName As String
                 Dim SrcFieldName As String
                 Dim okToUpdateDstFromSrc As Boolean
-                Dim srcCollectionCdef As cdefModel
+                Dim srcCollectionCdef As Models.Complex.cdefModel
                 Dim DebugSrcFound As Boolean
                 Dim DebugDstFound As Boolean
                 '
@@ -4928,7 +4928,7 @@ Namespace Contensive.Core
                 '
                 If srcCollection.isBaseCollection Then
                     For Each dstKeyValuePair In dstCollection.CDef
-                        Dim dstWorkingCdef As cdefModel = dstKeyValuePair.Value
+                        Dim dstWorkingCdef As Models.Complex.cdefModel = dstKeyValuePair.Value
                         Dim contentName As String
                         contentName = dstWorkingCdef.Name
                         If dstCollection.CDef(contentName.ToLower).IsBaseContent Then
@@ -4943,7 +4943,7 @@ Namespace Contensive.Core
                                     .IsBaseContent = False
                                     .dataChanged = True
                                     For Each dstFieldKeyValuePair In .fields
-                                        Dim field As CDefFieldModel = dstFieldKeyValuePair.Value
+                                        Dim field As Models.Complex.CDefFieldModel = dstFieldKeyValuePair.Value
                                         If field.isBaseField Then
                                             field.isBaseField = False
                                             'field.Changed = True
@@ -4985,7 +4985,7 @@ Namespace Contensive.Core
                         '
                         ' add src to dst
                         '
-                        dstCollection.CDef.Add(SrcContentName.ToLower, New cdefModel)
+                        dstCollection.CDef.Add(SrcContentName.ToLower, New Models.Complex.cdefModel)
                         okToUpdateDstFromSrc = True
                     Else
                         dstCollectionCdef = dstCollection.CDef(SrcContentName.ToLower)
@@ -5319,7 +5319,7 @@ Namespace Contensive.Core
                                     '
                                     ' field was not found in dst, add it and populate
                                     '
-                                    dstCollectionCdef.fields.Add(SrcFieldName.ToLower, New CDefFieldModel)
+                                    dstCollectionCdef.fields.Add(SrcFieldName.ToLower, New Models.Complex.CDefFieldModel)
                                     dstCollectionCdefField = dstCollectionCdef.fields(SrcFieldName.ToLower)
                                     okToUpdateDstFromSrc = True
                                     HelpChanged = True

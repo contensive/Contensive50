@@ -646,9 +646,9 @@ Namespace Contensive.Core.Controllers
         ''' update the dbTablename cache entry. Do this anytime any record is updated in the table
         ''' </summary>
         ''' <param name="ContentName"></param>
-        Public Sub invalidateObject_Content(ByVal ContentName As String)
+        Public Sub invalidateAllObjectsInContent(ByVal ContentName As String)
             Try
-                invalidateObject_Table(cpCore.metaData.getContentTablename(ContentName))
+                invalidateAllObjectsInTable(cpCore.metaData.getContentTablename(ContentName))
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -660,7 +660,7 @@ Namespace Contensive.Core.Controllers
         ''' when any cache is saved, it should include a dependancy on a cachename=dbtablename
         ''' </summary>
         ''' <param name="dbTableName"></param>
-        Public Sub invalidateObject_Table(ByVal dbTableName As String)
+        Public Sub invalidateAllObjectsInTable(ByVal dbTableName As String)
             Try
                 invalidateObject(dbTableName.ToLower().Replace(" ", "_"))
             Catch ex As Exception
@@ -752,38 +752,19 @@ Namespace Contensive.Core.Controllers
             Return ("complexobject-" & objectName & "-" & uniqueObjectIdentifier).ToLower().Replace(" ", "_")
         End Function
         '
-        '====================================================================================================
-        '
-        Private Const cacheNameRouteDictionary As String = "routeDictionary"
-        '
-        '====================================================================================================
-        Public Sub setObject_RouteDictionary(routeDictionary As Dictionary(Of String, Contensive.BaseClasses.CPSiteBaseClass.routeClass))
-            Call setObject(cacheNameRouteDictionary, routeDictionary)
-        End Sub
-        '
-        '====================================================================================================
-        Public Function getObject_RouteDictionary() As Dictionary(Of String, Contensive.BaseClasses.CPSiteBaseClass.routeClass)
-            Return getObject(Of Dictionary(Of String, Contensive.BaseClasses.CPSiteBaseClass.routeClass))(cacheNameRouteDictionary)
-        End Function
-        '
-        '====================================================================================================
-        Public Sub invalidateObject_RouteDictionary()
-            invalidateObject(cacheNameRouteDictionary)
-        End Sub
-        '
-        Public Sub invalidateObject_Entity(tableName As String, recordId As Integer)
+        Public Sub invalidateObject_Entity(cpcore As coreClass, tableName As String, recordId As Integer)
             '
             invalidateObject(getCacheName_Entity(tableName, recordId))
             Select Case tableName.ToLower
                 Case Models.Entity.linkAliasModel.contentTableName.ToLower
                     '
-                    invalidateObject_RouteDictionary()
+                    Models.Complex.routeDictionaryModel.invalidateCache(cpcore)
                 Case Models.Entity.linkForwardModel.contentTableName.ToLower
                     '
-                    invalidateObject_RouteDictionary()
+                    Models.Complex.routeDictionaryModel.invalidateCache(cpcore)
                 Case Models.Entity.addonModel.contentTableName.ToLower
                     '
-                    invalidateObject_RouteDictionary()
+                    Models.Complex.routeDictionaryModel.invalidateCache(cpcore)
             End Select
         End Sub
         '

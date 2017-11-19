@@ -53,7 +53,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property CookieSupport() As Boolean 'Inherits BaseClasses.CPVisitBaseClass.CookieSupport
             Get
                 If True Then
-                    Return cpCore.authContext.visit.cookieSupport
+                    Return cpCore.doc.authContext.visit.cookieSupport
                 Else
                     Return False
                 End If
@@ -75,7 +75,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Id() As Integer
             Get
                 If True Then
-                    Return cpCore.authContext.visit.id
+                    Return cpCore.doc.authContext.visit.id
                 Else
                     Return 0
                 End If
@@ -85,7 +85,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LastTime() As Date 'Inherits BaseClasses.CPVisitBaseClass.LastTime
             Get
                 If True Then
-                    Return cpCore.authContext.visit.lastvisitTime
+                    Return cpCore.doc.authContext.visit.lastvisitTime
                 Else
                     Return New Date()
                 End If
@@ -95,7 +95,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LoginAttempts() As Integer 'Inherits BaseClasses.CPVisitBaseClass.LoginAttempts
             Get
                 If True Then
-                    Return cpCore.authContext.visit.loginAttempts
+                    Return cpCore.doc.authContext.visit.loginAttempts
                 Else
                     Return 0
                 End If
@@ -105,7 +105,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Name() As String 'Inherits BaseClasses.CPVisitBaseClass.Name
             Get
                 If True Then
-                    Return cpCore.authContext.visit.name
+                    Return cpCore.doc.authContext.visit.name
                 Else
                     Return ""
                 End If
@@ -115,7 +115,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Pages() As Integer 'Inherits BaseClasses.CPVisitBaseClass.Pages
             Get
                 If True Then
-                    Return cpCore.authContext.visit.pagevisits
+                    Return cpCore.doc.authContext.visit.pagevisits
                 Else
                     Return 0
                 End If
@@ -125,7 +125,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Referer() As String 'Inherits BaseClasses.CPVisitBaseClass.Referer
             Get
                 If True Then
-                    Return cpCore.authContext.visit.http_referer
+                    Return cpCore.doc.authContext.visit.http_referer
                 Else
                     Return ""
                 End If
@@ -185,7 +185,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property StartDateValue() As Integer 'Inherits BaseClasses.CPVisitBaseClass.StartDateValue
             Get
                 If True Then
-                    Return cpCore.authContext.visit.startDateValue
+                    Return cpCore.doc.authContext.visit.startDateValue
                 Else
                     Return 0
                 End If
@@ -195,7 +195,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property StartTime() As Date 'Inherits BaseClasses.CPVisitBaseClass.StartTime
             Get
                 If True Then
-                    Return cpCore.authContext.visit.startTime
+                    Return cpCore.doc.authContext.visit.startTime
                 Else
                     Return New Date()
                 End If

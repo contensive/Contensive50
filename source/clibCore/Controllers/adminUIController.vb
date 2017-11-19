@@ -56,7 +56,7 @@ Namespace Contensive.Core
             '
             ' Add Errors
             '
-            If (cpcore.debug_iUserError <> "") Then
+            If (cpCore.doc.debug_iUserError <> "") Then
                 Copy = Copy & "<div>" & errorController.error_GetUserError(cpCore) & "</div>"
             End If
             '
@@ -210,7 +210,7 @@ ErrorTrap:
             Dim s As String
             '
             If RightSideMessage = "" Then
-                RightSideMessage = FormatDateTime(cpCore.profileStartTime)
+                RightSideMessage = FormatDateTime(cpCore.doc.profileStartTime)
             End If
             '
             If isInStr(1, HeaderMessage & RightSideMessage, vbCrLf) Then

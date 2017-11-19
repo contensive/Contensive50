@@ -237,7 +237,7 @@ Namespace Contensive.Core.Models.Entity
                 Else
                     Dim instanceType As Type = GetType(T)
                     Dim contentName As String = derivedContentName(instanceType)
-                    result = create(Of T)(cpCore, cpCore.db.insertContentRecordGetID(contentName, cpCore.authContext.user.id), callersCacheNameList)
+                    result = create(Of T)(cpCore, cpCore.db.insertContentRecordGetID(contentName, cpCore.doc.authContext.user.id), callersCacheNameList)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -967,7 +967,7 @@ Namespace Contensive.Core.Models.Entity
                     cpcore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     Dim contentName As String = derivedContentName(instanceType)
-                    Dim CDef As cdefModel = cpcore.metaData.getCdef(contentName)
+                    Dim CDef As Models.Complex.cdefModel = cpcore.metaData.getCdef(contentName)
                     If (CDef Is Nothing) Then
                         Throw New ApplicationException("content [" & contentName & "] could Not be found.")
                     ElseIf (CDef.Id <= 0) Then

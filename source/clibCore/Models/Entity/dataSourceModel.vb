@@ -63,7 +63,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As dataSourceModel
             Dim result As dataSourceModel = Nothing
             Try
-                result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.authContext.user.id), callersCacheNameList)
+                result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.doc.authContext.user.id), callersCacheNameList)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
                 Throw

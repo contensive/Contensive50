@@ -56,7 +56,7 @@ Namespace Contensive.Core
         Public Overrides Sub Clear(ByVal ContentNameList As String)
             If (String.IsNullOrEmpty(ContentNameList)) Then
                 For Each contentName In New List(Of String)(ContentNameList.Split(","c))
-                    cpCore.cache.invalidateObject_Content(contentName)
+                    cpCore.cache.invalidateAllObjectsInContent(contentName)
                 Next
             End If
         End Sub
@@ -209,7 +209,7 @@ Namespace Contensive.Core
         End Sub
         '
         Public Overrides Sub InvalidateContentRecord(ByVal contentName As String, recordId As Integer)
-            cpCore.cache.invalidateObject_Entity(contentName, recordId)
+            cpCore.cache.invalidateObject_Entity(cp.core, contentName, recordId)
         End Sub
 #Region " IDisposable Support "
         '

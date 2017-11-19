@@ -15,9 +15,9 @@ Namespace Contensive.Core.Models.Entity
         '
         '====================================================================================================
         '-- const
-        Public Const contentName As String = "add-ons" '<------ set content name
-        Public Const contentTableName As String = "ccaggregatefunctions" '<------ set to tablename for the primary content (used for cache names)
-        Private Shadows Const contentDataSource As String = "default" '<----- set to datasource if not default
+        Public Const contentName As String = "add-ons"
+        Public Const contentTableName As String = "ccaggregatefunctions"
+        Private Shadows Const contentDataSource As String = "default"
         '
         '====================================================================================================
         ' -- instance properties
@@ -57,6 +57,7 @@ Namespace Contensive.Core.Models.Entity
         Public Property OnNewVisitEvent As Boolean
         Public Property OnPageEndEvent As Boolean
         Public Property OnPageStartEvent As Boolean
+        Public Property htmlDocument As Boolean
         Public Property OtherHeadTags As String
         Public Property PageTitle As String
         Public Property ProcessInterval As Integer
@@ -85,12 +86,24 @@ Namespace Contensive.Core.Models.Entity
         '
         '====================================================================================================
         Public Overloads Shared Function create(cpCore As coreClass, recordId As Integer) As addonModel
-            Return create(Of addonModel)(cpCore, recordId)
+            Dim result As addonModel = create(Of addonModel)(cpCore, recordId)
+            If (result IsNot Nothing) Then
+                If (String.IsNullOrEmpty(result.ccguid)) Then
+                    result.ccguid = genericController.createGuid()
+                End If
+            End If
+            Return result
         End Function
         '
         '====================================================================================================
         Public Overloads Shared Function create(cpCore As coreClass, recordId As Integer, ByRef callersCacheNameList As List(Of String)) As addonModel
-            Return create(Of addonModel)(cpCore, recordId, callersCacheNameList)
+            Dim result As addonModel = create(Of addonModel)(cpCore, recordId, callersCacheNameList)
+            If (result IsNot Nothing) Then
+                If (String.IsNullOrEmpty(result.ccguid)) Then
+                    result.ccguid = genericController.createGuid()
+                End If
+            End If
+            Return result
         End Function
         '
         '====================================================================================================
@@ -144,8 +157,9 @@ Namespace Contensive.Core.Models.Entity
         End Function
         '
         '====================================================================================================
-        Public Overloads Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
+        Public Overloads Shared Sub invalidateCache(cpCore As coreClass, recordId As Integer)
             invalidateCacheSingleRecord(Of addonModel)(cpCore, recordId)
+            Models.Complex.routeDictionaryModel.invalidateCache(cpCore)
         End Sub
         '
         '====================================================================================================
@@ -251,17 +265,21 @@ Namespace Contensive.Core.Models.Entity
             Private OnPageStartIdList As New List(Of Integer)
             Public robotsTxt As String = ""
             '
-            Public Sub add(addon As addonModel)
+            Public Sub add(cpcore As coreClass, addon As addonModel)
                 If (Not dictIdAddon.ContainsKey(addon.id)) Then
+                    dictIdAddon.Add(addon.id, addon)
+                    If (String.IsNullOrEmpty(addon.ccguid)) Then
+                        addon.ccguid = genericController.createGuid()
+                        addon.save(cpcore)
+                    End If
                     If (Not dictGuidId.ContainsKey(addon.ccguid.ToLower())) Then
+                        dictGuidId.Add(addon.ccguid.ToLower(), addon.id)
+                        If (String.IsNullOrEmpty(addon.name.Trim())) Then
+                            addon.name = "addon " & addon.id.ToString()
+                            addon.save(cpcore)
+                        End If
                         If (Not dictNameId.ContainsKey(addon.name.ToLower())) Then
-                            Try
-                                dictIdAddon.Add(addon.id, addon)
-                                dictGuidId.Add(addon.ccguid.ToLower(), addon.id)
-                                dictNameId.Add(addon.name.ToLower(), addon.id)
-                            Catch ex As Exception
-                                ' - this cannot fail or the system will not load.
-                            End Try
+                            dictNameId.Add(addon.name.ToLower(), addon.id)
                         End If
                     End If
                 End If

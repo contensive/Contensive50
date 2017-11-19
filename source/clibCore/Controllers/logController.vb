@@ -220,14 +220,14 @@ ErrorTrap:
         '
         '
         Public Shared Sub logActivity2(cpcore As coreClass, Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call logActivity(cpcore, Message, cpcore.authContext.user.id, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.requestUrl, cpcore.authContext.visitor.ID, cpcore.authContext.visit.id)
+            Call logActivity(cpcore, Message, cpCore.doc.authContext.user.id, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.requestUrl, cpCore.doc.authContext.visitor.ID, cpCore.doc.authContext.visit.id)
         End Sub
         '
         '
         '
         Friend Shared Sub log_appendLogPageNotFound(cpCore As coreClass, PageNotFoundLink As String)
             Try
-                Call appendLog(cpCore, """" & FormatDateTime(cpCore.profileStartTime, vbGeneralDate) & """,""App=" & cpCore.serverConfig.appConfig.name & """,""main_VisitId=" & cpCore.authContext.visit.id & """,""" & PageNotFoundLink & """,""Referrer=" & cpCore.webServer.requestReferrer & """", "performance", "pagenotfound")
+                Call appendLog(cpCore, """" & FormatDateTime(cpCore.doc.profileStartTime, vbGeneralDate) & """,""App=" & cpCore.serverConfig.appConfig.name & """,""main_VisitId=" & cpCore.doc.authContext.visit.id & """,""" & PageNotFoundLink & """,""Referrer=" & cpCore.webServer.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 Throw (ex)
             End Try

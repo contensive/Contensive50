@@ -93,7 +93,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Sub Close() 'Inherits BaseClasses.CPResponseBaseClass.Close
-            cpCore.continueProcessing = False
+            cpCore.doc.continueProcessing = False
         End Sub
 
         Public Overrides Sub AddHeader(ByVal HeaderName As String, ByVal HeaderValue As String) 'Inherits BaseClasses.CPResponseBaseClass.AddHeader
@@ -152,7 +152,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property isOpen() As Boolean
             Get
                 If True Then
-                    Return cpCore.continueProcessing
+                    Return cpCore.doc.continueProcessing
                 Else
                     Return False
                 End If

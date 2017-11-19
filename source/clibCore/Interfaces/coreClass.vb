@@ -15,37 +15,10 @@ Namespace Contensive.Core
         '======================================================================
         '
         ' core 
-        '   -- carries objects For services that need initialization (non Static)
-        '   -- (no output buffer) html 'buffer' should be an object created, head added, body added then released
-        '       -- methods like cp.html.addhead add things to this html object
+        '   -- provides object dependancy injection
         '
-        ' -- objects passed by constructor - do not dispose
-        ' -- yes, cp is needed to pass int addon execution and script execution - but DO NOT call if from anything else
-        ' -- no, cpCore should never call up to cp. cp is the api that calls core.
-        Friend Property cp_forAddonExecutionOnly As CPClass                                   ' constructor -- top-level cp
+        Friend Property cp_forAddonExecutionOnly As CPClass
         Public Property serverConfig As Models.Entity.serverConfigModel
-        Friend Property errList As List(Of String)                                   ' exceptions collected during document construction
-        Public Property errorCount As Integer = 0
-        Friend Property userErrorList As List(Of String)                           ' user messages
-        Public Property debug_iUserError As String = ""                              ' User Error String
-        Public Property trapLogMessage As String = ""                           ' The content of the current traplog (keep for popups if no Csv)
-        Public Property testPointMessage As String = ""                         '
-        Public Property testPointPrinting As Boolean = False                         ' if true, send main_TestPoint messages to the stream
-        Public Property authContext As authContextModel
-        Friend Property appStopWatch As Stopwatch = Stopwatch.StartNew()
-        Public Property profileStartTime As Date                                        ' set in constructor
-        Public Property profileStartTickCount As Integer = 0
-        Public Property allowDebugLog As Boolean = False                       ' turn on in script -- use to write /debug.log in content files for whatever is needed
-        Public Property blockExceptionReporting As Boolean = False                   ' used so error reporting can not call itself
-        'Public Property pageErrorWithoutCsv As Boolean = False                  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
-        'Public Property closePageCounter As Integer = 0
-        Public Property continueProcessing As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
-        Public Property upgradeInProgress() As Boolean
-        Public Property docGuid As String                        ' Random number (semi) unique to this hit
-        Friend Property addonIdListRunInThisDoc As New List(Of Integer)
-        Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
-        Public Property pageAddonCnt As Integer = 0
-
         '
         '===================================================================================================
         ''' <summary>
@@ -345,7 +318,7 @@ Namespace Contensive.Core
                     If (_addonCache Is Nothing) Then
                         _addonCache = New addonModel.addonCacheClass
                         For Each addon As addonModel In addonModel.createList(Me, "")
-                            _addonCache.add(addon)
+                            _addonCache.add(Me, addon)
                         Next
                         Call cache.setObject("addonCache", _addonCache)
                     End If
@@ -449,7 +422,7 @@ Namespace Contensive.Core
             cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel(Me)
+            doc.authContext = New authContextModel(Me)
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me)
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -468,7 +441,7 @@ Namespace Contensive.Core
             Me.cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel(Me)
+            doc.authContext = New authContextModel(Me)
             '
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -488,7 +461,7 @@ Namespace Contensive.Core
             Me.cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel(Me)
+            doc.authContext = New authContextModel(Me)
             '
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -508,7 +481,7 @@ Namespace Contensive.Core
             Me.cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel(Me)
+            doc.authContext = New authContextModel(Me)
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -530,7 +503,7 @@ Namespace Contensive.Core
             Me.cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel(Me)
+            doc.authContext = New authContextModel(Me)
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -581,57 +554,57 @@ Namespace Contensive.Core
                             Case ajaxGetFieldEditorPreferenceForm
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.getFieldEditorPreference).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxGetDefaultAddonOptionString
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.getAjaxDefaultAddonOptionStringClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxSetVisitProperty
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.setAjaxVisitPropertyClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxGetVisitProperty
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.getAjaxVisitPropertyClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxData
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.processAjaxDataClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxPing
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.getOKClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxOpenIndexFilter
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.openAjaxIndexFilterClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxOpenIndexFilterGetContent
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.openAjaxIndexFilterGetContentClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxCloseIndexFilter
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.closeAjaxIndexFilterClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case AjaxOpenAdminNav
                                 '
                                 ' moved to Addons.AdminSite
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return (New Addons.AdminSite.openAjaxAdminNavClass).execute(cp_forAddonExecutionOnly).ToString()
                             Case Else
                                 '
                                 ' -- unknown method, log warning
-                                continueProcessing = False
+                                doc.continueProcessing = False
                                 Return String.Empty
                         End Select
                     End If
@@ -640,19 +613,19 @@ Namespace Contensive.Core
                     If docProperties.getInteger(rnEmailOpenFlag) > 0 Then
                         '
                         ' -- Process Email Open
-                        continueProcessing = False
+                        doc.continueProcessing = False
                         Return (New Addons.Core.openEmailClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     If docProperties.getInteger(rnEmailClickFlag) > 0 Then
                         '
                         ' -- Process Email click
-                        continueProcessing = False
+                        doc.continueProcessing = False
                         Return (New Addons.Core.clickEmailClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     If docProperties.getInteger(rnEmailBlockRecipientEmail) > 0 Then
                         '
                         ' -- Process Email block
-                        continueProcessing = False
+                        doc.continueProcessing = False
                         Return (New Addons.Core.blockEmailClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     '
@@ -771,8 +744,8 @@ Namespace Contensive.Core
                                             .fieldName = "",
                                             .recordId = docProperties.getInteger("HostRecordID")
                                         },
-                                        .personalizationAuthenticated = authContext.isAuthenticated,
-                                        .personalizationPeopleId = authContext.user.id
+                                        .personalizationAuthenticated = doc.authContext.isAuthenticated,
+                                        .personalizationPeopleId = doc.authContext.user.id
                                     }
                                     Return Me.addon.execute(addon, executeContext)
                                 End If
@@ -808,13 +781,13 @@ Namespace Contensive.Core
                     If (normalizedRoute.Equals("favicon.ico")) Then
                         '
                         ' -- Favicon.ico
-                        continueProcessing = False
+                        doc.continueProcessing = False
                         Return (New Addons.Core.faviconIcoClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     If (normalizedRoute.Equals("robots.txt")) Then
                         '
                         ' -- Favicon.ico
-                        continueProcessing = False
+                        doc.continueProcessing = False
                         Return (New Addons.Core.robotsTxtClass).execute(cp_forAddonExecutionOnly).ToString()
                     End If
                     '
@@ -832,8 +805,8 @@ Namespace Contensive.Core
                                 .fieldName = "",
                                 .recordId = 0
                             },
-                            .personalizationAuthenticated = authContext.visit.VisitAuthenticated,
-                            .personalizationPeopleId = authContext.user.id
+                            .personalizationAuthenticated = doc.authContext.visit.VisitAuthenticated,
+                            .personalizationPeopleId = doc.authContext.user.id
                         }
                         Return Me.addon.execute(Models.Entity.addonModel.create(Me, defaultAddonId), executeContext)
                     End If
@@ -870,6 +843,10 @@ Namespace Contensive.Core
                     Case Else 'jsontable
                         RemoteFormat = RemoteFormatEnum.RemoteFormatJsonTable
                 End Select
+                '
+                handleException(New ApplicationException("executeRoute_ProcessAjaxData deprecated, remoteKey [" & RemoteKey & "], responseformat [" & docProperties.getText("responseformat") & "], PageNumber [" & PageNumber & "], PageSize [" & PageSize & "], EncodedArgs [" & EncodedArgs & "]"))
+                Return ""
+                '
                 '
                 ' Handle common work
                 '
@@ -914,7 +891,7 @@ Namespace Contensive.Core
                     Dim SortFieldList As String = ""
                     Dim AllowInactiveRecords2 As Boolean = False
                     Dim SelectFieldList As String = ""
-                    Dim CS As Integer = db.csOpen("Remote Queries", "((VisitId=" & authContext.visit.id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
+                    Dim CS As Integer = db.csOpen("Remote Queries", "((VisitId=" & doc.authContext.visit.id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
                     If db.csOk(CS) Then
                         '
                         ' Use user definied query
@@ -937,7 +914,7 @@ Namespace Contensive.Core
                                 '
                                 ' developers editing field help
                                 '
-                                If Not authContext.user.Developer Then
+                                If Not doc.authContext.user.Developer Then
                                     gv.status = GoogleVisualizationStatusEnum.ErrorStatus
                                     Dim Ptr As Integer = 0
                                     If IsArray(gv.errors) Then
@@ -1078,13 +1055,13 @@ Namespace Contensive.Core
                 '
                 ' add to doc exception list to display at top of webpage
                 '
-                If errList Is Nothing Then
-                    errList = New List(Of String)
+                If doc.errList Is Nothing Then
+                    doc.errList = New List(Of String)
                 End If
-                If errList.Count = 10 Then
-                    errList.Add("Exception limit exceeded")
-                ElseIf errList.Count < 10 Then
-                    errList.Add(errMsg)
+                If doc.errList.Count = 10 Then
+                    doc.errList.Add("Exception limit exceeded")
+                ElseIf doc.errList.Count < 10 Then
+                    doc.errList.Add(errMsg)
                 End If
                 '
                 ' write consol for debugging
@@ -1117,27 +1094,27 @@ Namespace Contensive.Core
         Private Sub constructorInitialize()
             Try
                 '
-                docGuid = genericController.createGuid()
-                allowDebugLog = True
-                profileStartTime = DateTime.Now()
-                testPointPrinting = True
+                doc.docGuid = genericController.createGuid()
+                doc.allowDebugLog = True
+                doc.profileStartTime = DateTime.Now()
+                doc.testPointPrinting = True
                 '
                 ' -- attempt auth load
                 If (serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- server mode, there is no application
-                    authContext = Models.Context.authContextModel.create(Me, False)
+                    doc.authContext = Models.Context.authContextModel.create(Me, False)
                 ElseIf ((serverConfig.appConfig.appMode <> Models.Entity.serverConfigModel.appModeEnum.normal) Or (serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.appStatusEnum.OK)) Then
                     '
                     ' -- application is not ready, might be error, or in maintainence mode
-                    authContext = Models.Context.authContextModel.create(Me, False)
+                    doc.authContext = Models.Context.authContextModel.create(Me, False)
                 Else
-                    authContext = Models.Context.authContextModel.create(Me, siteProperties.allowVisitTracking)
+                    doc.authContext = Models.Context.authContextModel.create(Me, siteProperties.allowVisitTracking)
                     '
                     ' debug printed defaults on, so if not on, set it off and clear what was collected
                     If Not visitProperty.getBoolean("AllowDebugging") Then
-                        testPointPrinting = False
-                        testPointMessage = ""
+                        doc.testPointPrinting = False
+                        doc.testPointMessage = ""
                     End If
                 End If
             Catch ex As Exception
@@ -1162,85 +1139,15 @@ Namespace Contensive.Core
         '===================================================================================================
         Public ReadOnly Property routeDictionary As Dictionary(Of String, CPSiteBaseClass.routeClass)
             Get
-                If (_routeListCache Is Nothing) Then
-                    _routeListCache = cache.getObject_RouteDictionary()
-                    If (_routeListCache Is Nothing) Then
-                        _routeListCache = New Dictionary(Of String, CPSiteBaseClass.routeClass)
-                        Dim physicalFile As String = "~/" & siteProperties.getText("serverpagedefault", "default.aspx")
-                        Dim routesAdded As New List(Of String)
-                        Dim uniqueRouteList As New List(Of String)
-                        '
-                        ' -- admin route
-                        Dim adminRoute As String = genericController.normalizeRoute(serverConfig.appConfig.adminRoute)
-                        If (Not String.IsNullOrEmpty(adminRoute)) Then
-                            _routeListCache.Add(adminRoute, New CPSiteBaseClass.routeClass() With {
-                                .physicalRoute = physicalFile,
-                                .virtualRoute = adminRoute,
-                                .routeType = CPSiteBaseClass.routeTypeEnum.admin
-                            })
-                            uniqueRouteList.Add(adminRoute)
-                        End If
-                        '
-                        ' -- remote methods
-                        Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.createList_RemoteMethods(Me, New List(Of String))
-                        For Each remoteMethod As Contensive.Core.Models.Entity.addonModel In remoteMethods
-                            Dim route As String = genericController.normalizeRoute(remoteMethod.name)
-                            If (Not String.IsNullOrEmpty(route)) Then
-                                If (uniqueRouteList.Contains(route)) Then
-                                    handleException(New ApplicationException("Route [" & route & "] cannot be added because it is a matches the Admin Route or another Remote Method."))
-                                Else
-                                    _routeListCache.Add(route, New CPSiteBaseClass.routeClass() With {
-                                        .physicalRoute = physicalFile,' & "?remoteMethodAddon=" & genericController.EncodeURL(remoteMethod.name),
-                                        .virtualRoute = route,
-                                        .routeType = CPSiteBaseClass.routeTypeEnum.remoteMethod,
-                                        .remoteMethodAddonId = remoteMethod.id
-                                    })
-                                End If
-                            End If
-                        Next
-                        '
-                        ' -- link forwards
-                        Dim linkForwards As List(Of Models.Entity.linkForwardModel) = Models.Entity.linkForwardModel.createList(Me, "name Is Not null")
-                        For Each linkForward As Models.Entity.linkForwardModel In linkForwards
-                            Dim route As String = genericController.normalizeRoute(linkForward.name)
-                            If (Not String.IsNullOrEmpty(route)) Then
-                                If (uniqueRouteList.Contains(route)) Then
-                                    handleException(New ApplicationException("Link Foward Route [" & route & "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."))
-                                Else
-                                    _routeListCache.Add(route, New CPSiteBaseClass.routeClass() With {
-                                        .physicalRoute = physicalFile,' & "?linkForward=" & genericController.EncodeURL(linkForward.name),
-                                        .virtualRoute = route,
-                                        .routeType = CPSiteBaseClass.routeTypeEnum.linkForward,
-                                        .linkForwardId = linkForward.id
-                                    })
-                                End If
-                            End If
-                        Next
-                        '
-                        ' -- link aliases
-                        Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(Me, "name Is Not null")
-                        For Each linkAlias As Models.Entity.linkAliasModel In linkAliasList
-                            Dim route As String = genericController.normalizeRoute(linkAlias.name)
-                            If (Not String.IsNullOrEmpty(route)) Then
-                                If (uniqueRouteList.Contains(route)) Then
-                                    handleException(New ApplicationException("Link Alias route [" & route & "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."))
-                                Else
-                                    _routeListCache.Add(route, New CPSiteBaseClass.routeClass() With {
-                                        .physicalRoute = physicalFile,' & "?linkAlias=" & genericController.EncodeURL(linkAlias.name),
-                                        .virtualRoute = route,
-                                        .routeType = CPSiteBaseClass.routeTypeEnum.linkAlias,
-                                        .linkAliasId = linkAlias.id
-                                    })
-                                End If
-                            End If
-                        Next
-                        Call cache.setObject_RouteDictionary(_routeListCache)
-                    End If
-                End If
-                Return _routeListCache
+                ' -- when an addon changes, the route map has to reload on page exit so it is ready on the next hit. lazy cache here clears on page load, so this does work
+                Return Models.Complex.routeDictionaryModel.create(Me)
+                'If (_routeDictionary Is Nothing) Then
+                '    _routeDictionary = Models.Complex.routeDictionaryModel.create(Me)
+                'End If
+                'Return _routeDictionary
             End Get
         End Property
-        Private _routeListCache As Dictionary(Of String, CPSiteBaseClass.routeClass) = Nothing
+        'Private _routeDictionary As Dictionary(Of String, CPSiteBaseClass.routeClass) = Nothing
         '
         '====================================================================================================
 #Region " IDisposable Support "
@@ -1279,8 +1186,8 @@ Namespace Contensive.Core
                     '
                     ' ----- Block all output from underlying routines
                     '
-                    blockExceptionReporting = True
-                    continueProcessing = False
+                    doc.blockExceptionReporting = True
+                    doc.continueProcessing = False
                     '
                     ' -- save addoncache
                     If (_assemblySkipList IsNot Nothing) Then
@@ -1298,7 +1205,7 @@ Namespace Contensive.Core
                                     '
                                     ' If visit tracking, save the viewing record
                                     '
-                                    Dim ViewingName As String = Left(authContext.visit.id & "." & authContext.visit.PageVisits, 10)
+                                    Dim ViewingName As String = Left(doc.authContext.visit.id & "." & doc.authContext.visit.PageVisits, 10)
                                     Dim PageID As Integer = 0
                                     If (_doc IsNot Nothing) Then
                                         If (doc.page IsNot Nothing) Then
@@ -1312,18 +1219,18 @@ Namespace Contensive.Core
                                         & "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID,ExcludeFromAnalytics,pagetitle" _
                                         & ")VALUES(" _
                                         & " " & db.encodeSQLText(ViewingName) _
-                                        & "," & db.encodeSQLNumber(authContext.visit.id) _
-                                        & "," & db.encodeSQLNumber(authContext.user.id) _
+                                        & "," & db.encodeSQLNumber(doc.authContext.visit.id) _
+                                        & "," & db.encodeSQLNumber(doc.authContext.user.id) _
                                         & "," & db.encodeSQLText(webServer.requestDomain) _
                                         & "," & db.encodeSQLText(webServer.requestPath) _
                                         & "," & db.encodeSQLText(webServer.requestPage) _
                                         & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
                                         & "," & db.encodeSQLText(Left(requestFormSerialized, 255)) _
                                         & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
-                                        & "," & db.encodeSQLDate(profileStartTime) _
-                                        & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
+                                        & "," & db.encodeSQLDate(doc.profileStartTime) _
+                                        & "," & db.encodeSQLBoolean(doc.authContext.visit_stateOK) _
                                         & "," & db.encodeSQLNumber(metaData.getContentId("Viewings")) _
-                                        & "," & db.encodeSQLNumber(appStopWatch.ElapsedMilliseconds) _
+                                        & "," & db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) _
                                         & ",1" _
                                         & "," & db.encodeSQLNumber(0) _
                                         & "," & db.encodeSQLNumber(PageID)

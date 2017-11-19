@@ -183,7 +183,7 @@ Namespace Contensive.Core
             '
             ' ----- Check permissions
             '
-            If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' You must be admin to use this feature
                 '
@@ -388,7 +388,7 @@ ErrorTrap:
         '
         Private Class fieldSortClass
             Public sort As String
-            Public field As CDefFieldModel
+            Public field As Models.Complex.CDefFieldModel
         End Class
         '
         '=============================================================================
@@ -520,7 +520,7 @@ ErrorTrap:
                 '
                 SQLFilename = cpCore.userProperty.getText("SQLArchive")
                 If SQLFilename = "" Then
-                    SQLFilename = "SQLArchive" & Format(cpCore.authContext.user.id, "000000000") & ".txt"
+                    SQLFilename = "SQLArchive" & Format(cpCore.doc.authContext.user.id, "000000000") & ".txt"
                     Call cpCore.userProperty.setProperty("SQLArchive", SQLFilename)
                 End If
                 SQLArchive = cpCore.cdnFiles.readFile(SQLFilename)
@@ -830,7 +830,7 @@ ErrorTrap:
             Dim CSPointer As Integer
             Dim RecordID As Integer
             Dim ContentID As Integer
-            Dim CDef As cdefModel
+            Dim CDef As Models.Complex.cdefModel
             'Dim AdminColumn As appServices_metaDataClass.CDefAdminColumnClass
             Dim RowFieldID() As Integer
             Dim RowFieldWidth() As Integer
@@ -915,7 +915,7 @@ ErrorTrap:
                     '
                     If (FieldIDToAdd <> 0) Then
                         For Each keyValuePair In CDef.fields
-                            Dim field As CDefFieldModel = keyValuePair.Value
+                            Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                             If field.id = FieldIDToAdd Then
                                 'If field.Name = FieldNameToAdd Then
                                 If field.inherited Then
@@ -942,8 +942,8 @@ ErrorTrap:
                     '
                     ColumnNumberMax = 0
                     For Each keyValuePair In CDef.adminColumns
-                        Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
-                        Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
+                        Dim adminColumn As Models.Complex.cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                        Dim field As Models.Complex.CDefFieldModel = CDef.fields(adminColumn.Name)
                         If field.inherited Then
                             SourceContentID = field.contentId
                             SourceName = field.nameLc
@@ -978,8 +978,8 @@ ErrorTrap:
                                 columnPtr = 0
                                 If CDef.adminColumns.Count > 1 Then
                                     For Each keyValuePair In CDef.adminColumns
-                                        Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
-                                        Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
+                                        Dim adminColumn As Models.Complex.cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                                        Dim field As Models.Complex.CDefFieldModel = CDef.fields(adminColumn.Name)
                                         CSPointer = cpCore.db.csOpenRecord("Content Fields", field.id)
                                         Call cpCore.db.csSet(CSPointer, "IndexColumn", (columnPtr) * 10)
                                         Call cpCore.db.csSet(CSPointer, "IndexWidth", Int((adminColumn.Width * 80) / ColumnWidthTotal))
@@ -1005,8 +1005,8 @@ ErrorTrap:
                             If CDef.adminColumns.Count > 1 Then
                                 columnPtr = 0
                                 For Each keyValuePair In CDef.adminColumns
-                                    Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
-                                    Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
+                                    Dim adminColumn As Models.Complex.cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                                    Dim field As Models.Complex.CDefFieldModel = CDef.fields(adminColumn.Name)
                                     CSPointer = cpCore.db.csOpenRecord("Content Fields", field.id)
                                     If fieldId = TargetFieldID Then
                                         Call cpCore.db.csSet(CSPointer, "IndexColumn", 0)
@@ -1030,8 +1030,8 @@ ErrorTrap:
                                 MoveNextColumn = False
                                 columnPtr = 0
                                 For Each keyValuePair In CDef.adminColumns
-                                    Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
-                                    Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
+                                    Dim adminColumn As Models.Complex.cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                                    Dim field As Models.Complex.CDefFieldModel = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
                                     CS1 = cpCore.db.csOpenRecord("Content Fields", field.id)
                                     If (CDef.fields(FieldName.ToLower()).id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
@@ -1066,8 +1066,8 @@ ErrorTrap:
                                 MoveNextColumn = False
                                 columnPtr = 0
                                 For Each keyValuePair In CDef.adminColumns.Reverse
-                                    Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
-                                    Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
+                                    Dim adminColumn As Models.Complex.cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                                    Dim field As Models.Complex.CDefFieldModel = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
                                     CS1 = cpCore.db.csOpenRecord("Content Fields", field.id)
                                     If (field.id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
@@ -1291,7 +1291,7 @@ ErrorTrap:
                     '
                     ' Calc total width
                     '
-                    For Each kvp As KeyValuePair(Of String, cdefModel.CDefAdminColumnClass) In CDef.adminColumns
+                    For Each kvp As KeyValuePair(Of String, Models.Complex.cdefModel.CDefAdminColumnClass) In CDef.adminColumns
                         ColumnWidthTotal += kvp.Value.Width
                     Next
                     'For ColumnCount = 0 To CDef.adminColumns.Count - 1
@@ -1300,7 +1300,7 @@ ErrorTrap:
                     If ColumnWidthTotal > 0 Then
                         Stream.Add("<table border=""0"" cellpadding=""5"" cellspacing=""0"" width=""90%"">")
                         Dim ColumnCount As Integer = 0
-                        For Each kvp As KeyValuePair(Of String, cdefModel.CDefAdminColumnClass) In CDef.adminColumns
+                        For Each kvp As KeyValuePair(Of String, Models.Complex.cdefModel.CDefAdminColumnClass) In CDef.adminColumns
                             '
                             ' print column headers - anchored so they sort columns
                             '
@@ -1345,8 +1345,8 @@ ErrorTrap:
                 Else
                     Stream.Add(SpanClassAdminNormal & "<br>")
                     Dim skipField As Boolean
-                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In CDef.fields
+                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         With field
                             '
                             ' test if this column is in use
@@ -1354,7 +1354,7 @@ ErrorTrap:
                             skipField = False
                             'ColumnPointer = CDef.adminColumns.Count
                             If CDef.adminColumns.Count > 0 Then
-                                For Each kvp As KeyValuePair(Of String, cdefModel.CDefAdminColumnClass) In CDef.adminColumns
+                                For Each kvp As KeyValuePair(Of String, Models.Complex.cdefModel.CDefAdminColumnClass) In CDef.adminColumns
                                     If .nameLc = kvp.Value.Name Then
                                         skipField = True
                                         Exit For
@@ -1743,9 +1743,9 @@ ErrorTrap:
                                                     ' ----- redirect type, check redirect contentid
                                                     '
                                                     RedirectContentID = cpCore.db.csGetInteger(CSFields, "RedirectContentID")
-                                                    ErrorCount = cpCore.errorCount
+                                                    ErrorCount = cpCore.doc.errorCount
                                                     bitBucket = Local_GetContentNameByID(RedirectContentID)
-                                                    If IsNull(bitBucket) Or (ErrorCount <> cpCore.errorCount) Then
+                                                    If IsNull(bitBucket) Or (ErrorCount <> cpCore.doc.errorCount) Then
                                                         DiagProblem = "PROBLEM: Content Field [" & ContentName & "].[" & FieldName & "] is a Redirection type, but the ContentID [" & RedirectContentID & "] is not valid."
                                                         If FieldName = "" Then
                                                             DiagProblem = DiagProblem & " Also, the field has no name attribute so these diagnostics can not automatically mark the field inactive."
@@ -1766,9 +1766,9 @@ ErrorTrap:
                                                     '
                                                     ' ----- lookup type, read value and check lookup contentid
                                                     '
-                                                    ErrorCount = cpCore.errorCount
+                                                    ErrorCount = cpCore.doc.errorCount
                                                     bitBucket = cpCore.db.cs_getValue(CSTestRecord, FieldName)
-                                                    If ErrorCount <> cpCore.errorCount Then
+                                                    If ErrorCount <> cpCore.doc.errorCount Then
                                                         DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" & ContentName & "].[" & FieldName & "]"
                                                         ReDim DiagActions(1)
                                                         DiagActions(0).Name = "Ignore, or handle this issue manually"
@@ -1779,10 +1779,10 @@ ErrorTrap:
                                                         LookupList = cpCore.db.csGetText(CSFields, "Lookuplist")
                                                         LookupContentID = cpCore.db.csGetInteger(CSFields, "LookupContentID")
                                                         If LookupContentID <> 0 Then
-                                                            ErrorCount = cpCore.errorCount
+                                                            ErrorCount = cpCore.doc.errorCount
                                                             bitBucket = Local_GetContentNameByID(LookupContentID)
                                                         End If
-                                                        If (LookupList = "") And ((LookupContentID = 0) Or (bitBucket = "") Or (ErrorCount <> cpCore.errorCount)) Then
+                                                        If (LookupList = "") And ((LookupContentID = 0) Or (bitBucket = "") Or (ErrorCount <> cpCore.doc.errorCount)) Then
                                                             DiagProblem = "Content Field [" & ContentName & "].[" & FieldName & "] is a Lookup type, but LookupList is blank and LookupContentID [" & LookupContentID & "] is not valid."
                                                             ReDim DiagActions(2)
                                                             DiagActions(0).Name = "Ignore, or handle this issue manually"
@@ -1796,9 +1796,9 @@ ErrorTrap:
                                                     '
                                                     ' ----- check for value in database
                                                     '
-                                                    ErrorCount = cpCore.errorCount
+                                                    ErrorCount = cpCore.doc.errorCount
                                                     bitBucket = cpCore.db.cs_getValue(CSTestRecord, FieldName)
-                                                    If (ErrorCount <> cpCore.errorCount) Then
+                                                    If (ErrorCount <> cpCore.doc.errorCount) Then
                                                         DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" & ContentName & "].[" & FieldName & "]"
                                                         ReDim DiagActions(3)
                                                         DiagActions(0).Name = "Ignore, or handle this issue manually"
@@ -2050,7 +2050,7 @@ ErrorTrap:
                     ' Create Definition
                     '
                     Stream.Add("<P>Creating content [" & ChildContentName & "] from [" & ParentContentName & "]")
-                    Call cpCore.metaData.createContentChild(ChildContentName, ParentContentName, cpCore.authContext.user.id)
+                    Call cpCore.metaData.createContentChild(ChildContentName, ParentContentName, cpCore.doc.authContext.user.id)
                     '
                     Stream.Add("<br>Reloading Content Definitions...")
                     cpCore.cache.invalidateAll()
@@ -2153,7 +2153,7 @@ ErrorTrap:
             Dim returnValue As String = ""
             Try
                 Dim CSContent As Integer
-                Dim CD As cdefModel
+                Dim CD As Models.Complex.cdefModel
                 Dim Stream As New stringBuilderLegacyController
                 Dim ContentNameArray As String(,)
                 Dim ContentNameCount As Integer
@@ -2178,7 +2178,7 @@ ErrorTrap:
                             Call cpCore.db.createSQLTable(CD.ContentDataSourceName, TableName)
                             If CD.fields.Count > 0 Then
                                 For Each keyValuePair In CD.fields
-                                    Dim field As CDefFieldModel
+                                    Dim field As Models.Complex.CDefFieldModel
                                     field = keyValuePair.Value
                                     Call Stream.Add("...Field " & field.nameLc & "<br>")
                                     Call cpCore.db.createSQLTableField(CD.ContentDataSourceName, TableName, field.nameLc, field.fieldTypeId)
@@ -2316,7 +2316,7 @@ ErrorTrap:
                 Call Stream.Add("<br>")
                 '
                 Stream.Add(SpanClassAdminNormal)
-                TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                 TestCount = 100
                 PageSize = 50
                 PageNumber = 1
@@ -2342,22 +2342,22 @@ ErrorTrap:
                 ReadTicks = 0
                 NextTicks = 0
                 For TestPointer = 1 To TestCount
-                    TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                    TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                     RS = cpCore.db.executeQuery(SQL)
-                    OpenTicks = OpenTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                    OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                     RecordCount = 0
-                    TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                    TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                     For Each dr As DataRow In RS.Rows
-                        NextTicks = NextTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                        NextTicks = NextTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                         '
-                        TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                         TestCopy = genericController.encodeText(dr("NAME"))
-                        ReadTicks = ReadTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                        ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                         '
                         RecordCount = RecordCount + 1
-                        TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                     Next
-                    NextTicks = NextTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                    NextTicks = NextTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                 Next
                 Stream.Add(Now & " Finished<br>")
                 Stream.Add("Records = " & RecordCount & "<br>")
@@ -2375,25 +2375,25 @@ ErrorTrap:
                 NextTicks = 0
                 For TestPointer = 1 To TestCount
                     '
-                    TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                    TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                     CS = cpCore.db.csOpen("Site Properties", , , , , , ,, PageSize, PageNumber)
-                    OpenTicks = OpenTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                    OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                     '
                     RecordCount = 0
                     Do While cpCore.db.csOk(CS)
                         '
-                        TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                         TestCopy = genericController.encodeText(cpCore.db.cs_getValue(CS, "Name"))
-                        ReadTicks = ReadTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                        ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                         '
-                        TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                         Call cpCore.db.csGoNext(CS)
-                        NextTicks = NextTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                        NextTicks = NextTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                         '
                         RecordCount = RecordCount + 1
                     Loop
                     Call cpCore.db.csClose(CS)
-                    ReadTicks = ReadTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                    ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                 Next
                 Stream.Add(Now & " Finished<br>")
                 Stream.Add("Records = " & RecordCount & "<br>")
@@ -2411,25 +2411,25 @@ ErrorTrap:
                 NextTicks = 0
                 For TestPointer = 1 To TestCount
                     '
-                    TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                    TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                     CS = cpCore.db.csOpen("Site Properties", , , , , , , "name", PageSize, PageNumber)
-                    OpenTicks = OpenTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                    OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                     '
                     RecordCount = 0
                     Do While cpCore.db.csOk(CS)
                         '
-                        TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                         TestCopy = genericController.encodeText(cpCore.db.cs_getValue(CS, "Name"))
-                        ReadTicks = ReadTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                        ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                         '
-                        TestTicks = cpCore.appStopWatch.ElapsedMilliseconds
+                        TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds
                         Call cpCore.db.csGoNext(CS)
-                        NextTicks = NextTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                        NextTicks = NextTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                         '
                         RecordCount = RecordCount + 1
                     Loop
                     Call cpCore.db.csClose(CS)
-                    ReadTicks = ReadTicks + cpCore.appStopWatch.ElapsedMilliseconds - TestTicks
+                    ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks
                 Next
                 Stream.Add(Now & " Finished<br>")
                 Stream.Add("Records = " & RecordCount & "<br>")
@@ -2873,7 +2873,7 @@ ErrorTrap:
                 Dim CSPointer As Integer
                 Dim formFieldId As Integer
                 Dim ContentName As String = String.Empty
-                Dim CDef As cdefModel = Nothing
+                Dim CDef As Models.Complex.cdefModel = Nothing
                 Dim formFieldName As String
                 Dim formFieldTypeId As Integer
                 Dim TableName As String = String.Empty
@@ -2888,7 +2888,7 @@ ErrorTrap:
                 Dim AllowCDefInherit As Boolean
                 Dim ParentContentID As Integer
                 Dim ParentContentName As String
-                Dim ParentCDef As cdefModel = Nothing
+                Dim ParentCDef As Models.Complex.cdefModel = Nothing
                 Dim NeedFootNote1 As Boolean
                 Dim NeedFootNote2 As Boolean
                 Dim FormPanel As String = ""
@@ -2899,7 +2899,7 @@ ErrorTrap:
                 Dim TypeSelectTemplate As String
                 Dim TypeSelect As String
                 Dim FieldCount As Integer
-                Dim parentField As CDefFieldModel = Nothing
+                Dim parentField As Models.Complex.CDefFieldModel = Nothing
                 '
                 ButtonList = ButtonCancel & "," & ButtonSelect
                 '
@@ -2938,7 +2938,7 @@ ErrorTrap:
                                     ' problem - looking for the name in the Db using the form's name, but it could have changed.
                                     ' have to look field up by id
                                     '
-                                    For Each cdefFieldKvp As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
+                                    For Each cdefFieldKvp As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In CDef.fields
                                         If cdefFieldKvp.Value.id = formFieldId Then
                                             '
                                             ' Field was found in CDef
@@ -3029,10 +3029,10 @@ ErrorTrap:
                                                     & ",EditTab=" & cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." & RecordPointer)) _
                                                     & ",Scramble=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." & RecordPointer)) _
                                                     & ""
-                                                        If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                                                        If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                                                             SQL &= ",adminonly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." & RecordPointer))
                                                         End If
-                                                        If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                                                        If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                                                             SQL &= ",DeveloperOnly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." & RecordPointer))
                                                         End If
                                                         SQL &= " where ID=" & formFieldId
@@ -3242,7 +3242,7 @@ ErrorTrap:
                                     ' CDef has a parent, but the field is non-inherited, test for a matching Parent Field
                                     '
                                     If (ParentCDef Is Nothing) Then
-                                        For Each kvp As KeyValuePair(Of String, CDefFieldModel) In ParentCDef.fields
+                                        For Each kvp As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In ParentCDef.fields
                                             If kvp.Value.nameLc = .nameLc Then
                                                 parentField = kvp.Value
                                                 Exit For
@@ -3371,13 +3371,13 @@ ErrorTrap:
                                 '
                                 ' Admin Only
                                 '
-                                If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                                If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                                     streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." & RecordCount, genericController.encodeText(.adminOnly), .inherited))
                                 End If
                                 '
                                 ' Developer Only
                                 '
-                                If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                                If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                                     streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." & RecordCount, genericController.encodeText(.developerOnly), .inherited))
                                 End If
                                 '
@@ -3792,7 +3792,7 @@ ErrorTrap:
                     '
                     Call cpCore.webServer.setResponseContentType("text/text")
                     result = cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile"))
-                    cpCore.continueProcessing = False
+                    cpCore.doc.continueProcessing = False
                 Else
                     result = result & GetTableStart
                     '
@@ -3945,7 +3945,7 @@ ErrorTrap:
             ButtonList = ButtonCancel & "," & ButtonRestartContensiveApplication
             Stream.Add(GetTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."))
             '
-            If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 GetForm_Restart = "<P>You must be an administrator to use this tool.</P>"
                 '
@@ -3957,7 +3957,7 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.authContext.user.Name & " (" & cpCore.authContext.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.requestUrl, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.doc.authContext.user.Name & " (" & cpCore.doc.authContext.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.requestUrl, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
@@ -3995,7 +3995,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function GetCDef(ByVal ContentName As String) As cdefModel
+        Private Function GetCDef(ByVal ContentName As String) As Models.Complex.cdefModel
             Return cpCore.metaData.getCdef(ContentName)
         End Function
 
@@ -4466,7 +4466,7 @@ ErrorTrap:
             '
             Button = cpCore.docProperties.getText("button")
             '
-            IsDeveloper = cpCore.authContext.isAuthenticatedDeveloper(cpCore)
+            IsDeveloper = cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)
             If Button = ButtonFindAndReplace Then
                 RowCnt = cpCore.docProperties.getInteger("CDefRowCnt")
                 If RowCnt > 0 Then
@@ -4581,7 +4581,7 @@ ErrorTrap:
                 '
                 '
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.authContext.user.Name & " (" & cpCore.authContext.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.requestUrl, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.doc.authContext.user.Name & " (" & cpCore.doc.authContext.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.requestUrl, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)

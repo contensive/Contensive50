@@ -130,7 +130,7 @@ Namespace Contensive.Core.Controllers
                         Throw (New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
                     Else
                         If userid = 0 Then
-                            userid = cpCore.authContext.user.id
+                            userid = cpCore.doc.authContext.user.id
                         End If
                         Using cs As New csController(cpCore)
                             cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & groupId.ToString & ")", , False)
@@ -177,7 +177,7 @@ Namespace Contensive.Core.Controllers
                         Throw (New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
                     Else
                         If userid = 0 Then
-                            userid = cpCore.authContext.user.id
+                            userid = cpCore.doc.authContext.user.id
                         End If
                         Using cs As New csController(cpCore)
                             cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)

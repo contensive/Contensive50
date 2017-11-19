@@ -25,7 +25,7 @@ Namespace Contensive.Addons.Core
                 Dim cpCore As coreClass = processor.core
                 '
                 ' -- logout the current member
-                Call cpCore.authContext.logout(cpCore)
+                Call cpCore.doc.authContext.logout(cpCore)
                 Return String.Empty
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

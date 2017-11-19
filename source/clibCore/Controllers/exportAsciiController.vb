@@ -61,7 +61,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- People and member content export
                         '
-                        If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                        If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                             Call sb.Append("Warning: You must be a site administrator to export this information.")
                         Else
                             CSPointer = cpCore.db.csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
@@ -88,7 +88,7 @@ Namespace Contensive.Core.Controllers
                             '
                             Do While cpCore.db.csOk(CSPointer)
                                 If Not (cpCore.db.csGetBoolean(CSPointer, "Developer")) Then
-                                    Copy = cpCore.security.encodeToken((cpCore.db.csGetInteger(CSPointer, "ID")), cpCore.profileStartTime)
+                                    Copy = cpCore.security.encodeToken((cpCore.db.csGetInteger(CSPointer, "ID")), cpCore.doc.profileStartTime)
                                     Call sb.Append("""" & Copy & """")
                                     Delimiter = ","
                                     FieldNameVariant = cpCore.db.cs_getFirstFieldName(CSPointer)
@@ -119,7 +119,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- All other content
                         '
-                        If Not cpCore.authContext.isAuthenticatedContentManager(cpCore, iContentName) Then
+                        If Not cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, iContentName) Then
                             Call sb.Append("Error: You must be a content manager to export this data.")
                         Else
                             CSPointer = cpCore.db.csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)

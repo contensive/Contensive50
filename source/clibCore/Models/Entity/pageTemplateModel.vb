@@ -61,7 +61,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As pageTemplateModel
             Dim result As pageTemplateModel = Nothing
             Try
-                result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.authContext.user.id), callersCacheNameList)
+                result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.doc.authContext.user.id), callersCacheNameList)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
                 Throw
@@ -471,7 +471,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function createDefault(cpcore As coreClass) As pageTemplateModel
             Dim instance As New pageTemplateModel
             Try
-                Dim CDef As cdefModel = cpcore.metaData.getCdef(primaryContentName)
+                Dim CDef As Models.Complex.cdefModel = cpcore.metaData.getCdef(primaryContentName)
                 If (CDef Is Nothing) Then
                     Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
                 ElseIf (CDef.Id <= 0) Then

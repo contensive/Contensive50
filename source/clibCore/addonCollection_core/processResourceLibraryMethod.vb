@@ -51,7 +51,7 @@ Namespace Contensive.Addons.Core
                         & ""
                     Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                     result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False)
-                    cpCore.continueProcessing = False
+                    cpCore.doc.continueProcessing = False
                 ElseIf LinkObjectName <> "" Then
                     '
                     ' Open a page compatible with a dialog
@@ -68,7 +68,7 @@ Namespace Contensive.Addons.Core
                         & ""
                     Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                     result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False)
-                    cpCore.continueProcessing = False
+                    cpCore.doc.continueProcessing = False
                 End If
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

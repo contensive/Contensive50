@@ -753,7 +753,7 @@ ErrorTrap:
                 '
                 ' -- content extras like tool panel
                 If (Not BlockNonContentExtras) Then
-                    If cpCore.authContext.isAuthenticatedContentManager(cpCore) And cpCore.authContext.user.AllowToolsPanel Then
+                    If cpCore.doc.authContext.isAuthenticatedContentManager(cpCore) And cpCore.doc.authContext.user.AllowToolsPanel Then
                         If AllowTools Then
                             result &= cpCore.html.main_GetToolsPanel()
                         End If
@@ -767,8 +767,8 @@ ErrorTrap:
                     If cpCore.doc.htmlForEndOfBody <> "" Then
                         result = result & cpCore.doc.htmlForEndOfBody
                     End If
-                    If cpCore.testPointMessage <> "" Then
-                        result = result & "<div class=""ccTestPointMessageCon"">" & cpCore.testPointMessage & "</div>"
+                    If cpCore.doc.testPointMessage <> "" Then
+                        result = result & "<div class=""ccTestPointMessageCon"">" & cpCore.doc.testPointMessage & "</div>"
                     End If
                 End If
                 '
@@ -885,7 +885,7 @@ ErrorTrap:
             Try
                 Const MenuNameFPO = "<MenuName>"
                 Const NoneCaptionFPO = "<NoneCaption>"
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 Dim ContentControlCriteria As String
                 Dim LcaseCriteria As String
                 Dim CSPointer As Integer
@@ -1605,7 +1605,7 @@ ErrorTrap:
                 If cpCore.siteProperties.getBoolean("AllowLoginIcon", True) Then
                     result = result & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
                     result = result & "<tr><td align=""right"">"
-                    If cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
+                    If cpCore.doc.authContext.isAuthenticatedContentManager(cpCore) Then
                         result = result & "<a href=""" & encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute) & """ target=""_blank"">"
                     Else
                         Link = cpCore.webServer.requestPage & "?" & cpCore.doc.refreshQueryString
@@ -1671,7 +1671,7 @@ ErrorTrap:
         '        Public Sub writeAltBuffer(ByVal Message As Object)
         '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("WriteStream")
         '            '
-        '            If cpCore.continueProcessing Then
+        '            If cpCore.doc.continueProcessing Then
         '                Select Case cpCore.webServer.outStreamDevice
         '                    Case htmlDoc_OutStreamJavaScript
         '                        Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
@@ -1789,7 +1789,7 @@ ErrorTrap:
             'If Not (true) Then Exit Function
             '
             html_GetAdminHintWrapper = ""
-            If cpCore.authContext.isEditing("") Or cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            If cpCore.doc.authContext.isEditing("") Or cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 html_GetAdminHintWrapper = html_GetAdminHintWrapper & html_GetLegacySiteStyles()
                 html_GetAdminHintWrapper = html_GetAdminHintWrapper _
                     & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapper"">" _
@@ -2287,7 +2287,7 @@ ErrorTrap:
             Dim GroupName As String
             Dim GroupCaption As String
             Dim CanSeeHiddenFields As Boolean
-            Dim SecondaryCDef As cdefModel
+            Dim SecondaryCDef As Models.Complex.cdefModel
             Dim ContentIDList As String = String.Empty
             Dim Found As Boolean
             Dim RecordID As Integer
@@ -2319,7 +2319,7 @@ ErrorTrap:
             If cpCore.db.csOk(CS) Then
                 SectionName = ""
                 GroupCount = 0
-                CanSeeHiddenFields = cpCore.authContext.isAuthenticatedDeveloper(cpCore)
+                CanSeeHiddenFields = cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)
                 Do While cpCore.db.csOk(CS)
                     GroupName = cpCore.db.csGetText(CS, "GroupName")
                     If (Mid(GroupName, 1, 1) <> "_") Or CanSeeHiddenFields Then
@@ -2389,7 +2389,7 @@ ErrorTrap:
                 Dim FieldLookupContentID As Integer
                 Dim FieldMemberSelectGroupID As Integer
                 Dim FieldLookupContentName As String
-                Dim Contentdefinition As cdefModel
+                Dim Contentdefinition As Models.Complex.cdefModel
                 Dim FieldHTMLContent As Boolean
                 Dim CSLookup As Integer
                 Dim FieldLookupList As String = String.Empty
@@ -2400,8 +2400,8 @@ ErrorTrap:
                 If True Then
                     fieldFound = False
                     Contentdefinition = cpCore.metaData.getCdef(ContentName)
-                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In Contentdefinition.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In Contentdefinition.fields
+                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         With field
                             If genericController.vbUCase(.nameLc) = genericController.vbUCase(FieldName) Then
                                 FieldValueVariant = .defaultValue
@@ -2818,7 +2818,7 @@ ErrorTrap:
                 Dim fieldType As Integer
                 Dim InputName As String
                 Dim GroupID As Integer
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 Dim MTMContent0 As String
                 Dim MTMContent1 As String
                 Dim MTMRuleContent As String
@@ -2941,8 +2941,8 @@ ErrorTrap:
                         CDef = cpCore.metaData.getCdef(ContentName)
                         LookupContentName = ""
                         With CDef
-                            For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
-                                Dim field As CDefFieldModel = keyValuePair.Value
+                            For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In CDef.fields
+                                Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                                 With field
                                     If genericController.vbUCase(.nameLc) = genericController.vbUCase(FieldName) Then
                                         If .lookupContentID <> 0 Then
@@ -3338,7 +3338,7 @@ ErrorTrap:
         ''========================================================================
         ''
         'Public Function html_EncodeActiveContent4(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String) As String
-        '    html_EncodeActiveContent4 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.authContext.isAuthenticated)
+        '    html_EncodeActiveContent4 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.doc.authContext.isAuthenticated)
         'End Function
         ''
         ''========================================================================
@@ -3346,7 +3346,7 @@ ErrorTrap:
         ''========================================================================
         ''
         'Public Function html_EncodeActiveContent5(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, ByVal Context As CPUtilsBaseClass.addonContext) As String
-        '    html_EncodeActiveContent5 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.authContext.isAuthenticated, Context)
+        '    html_EncodeActiveContent5 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.doc.authContext.isAuthenticated, Context)
         'End Function
         '
         '========================================================================
@@ -3957,7 +3957,7 @@ ErrorTrap:
                                                                 '
                                                                 Copy = ""
                                                                 GroupIDList = htmlController.csv_GetAddonOptionStringValue("AllowGroups", addonOptionString)
-                                                                If (Not cpCore.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, True, GroupIDList, True)) Then
+                                                                If (Not cpCore.doc.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, True, GroupIDList, True)) Then
                                                                     '
                                                                     ' Block content if not allowed
                                                                     '
@@ -5418,15 +5418,15 @@ ErrorTrap:
                 '
                 ' ----- Read in and save the Member profile values from the tools panel
                 '
-                If (cpCore.authContext.user.id > 0) Then
-                    If Not (cpCore.debug_iUserError <> "") Then
+                If (cpCore.doc.authContext.user.id > 0) Then
+                    If Not (cpCore.doc.debug_iUserError <> "") Then
                         Button = cpCore.docProperties.getText(legacyFormSn & "mb")
                         Select Case Button
                             Case ButtonLogout
                                 '
                                 ' Logout - This can only come from the Horizonal Tool Bar
                                 '
-                                Call cpCore.authContext.logout(cpCore)
+                                Call cpCore.doc.authContext.logout(cpCore)
                             Case ButtonLogin
                                 '
                                 ' Login - This can only come from the Horizonal Tool Bar
@@ -5797,7 +5797,7 @@ ErrorTrap:
                 ' Clear Caches
                 '
                 If ContentName <> "" Then
-                    Call cpCore.cache.invalidateObject_Content(ContentName)
+                    Call cpCore.cache.invalidateAllObjectsInContent(ContentName)
                 End If
             End If
         End Sub
@@ -5852,14 +5852,14 @@ ErrorTrap:
         '====================================================================================================
         '
         Public Function convertActiveContentToJsonForRemoteMethod(Source As String, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, ProtocolHostString As String, DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, addonContext As CPUtilsBaseClass.addonContext) As String
-            Return convertActiveContent_internal(Source, cpCore.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, False, False, True, True, False, True, "", ProtocolHostString, False, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything())
+            Return convertActiveContent_internal(Source, cpCore.doc.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, False, False, True, True, False, True, "", ProtocolHostString, False, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.doc.authContext.isAuthenticated, Nothing, cpCore.doc.authContext.isEditingAnything())
             'False, False, True, True, False, True, ""
         End Function
         '
         '====================================================================================================
         '
         Public Function convertActiveContentToHtmlForWebRender(Source As String, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, ProtocolHostString As String, DefaultWrapperID As Integer, addonContext As CPUtilsBaseClass.addonContext) As String
-            Return convertActiveContent_internal(Source, cpCore.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, False, False, True, True, False, True, "", ProtocolHostString, False, DefaultWrapperID, "", addonContext, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything())
+            Return convertActiveContent_internal(Source, cpCore.doc.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, False, False, True, True, False, True, "", ProtocolHostString, False, DefaultWrapperID, "", addonContext, cpCore.doc.authContext.isAuthenticated, Nothing, cpCore.doc.authContext.isEditingAnything())
             'False, False, True, True, False, True, ""
         End Function
         '
@@ -5936,7 +5936,7 @@ ErrorTrap:
                 Dim OptionCaption As String
                 Dim optionCaptionHtmlEncoded As String
                 Dim CanSeeHiddenFields As Boolean
-                Dim SecondaryCDef As cdefModel
+                Dim SecondaryCDef As Models.Complex.cdefModel
                 Dim ContentIDList As New List(Of Integer)
                 Dim Found As Boolean
                 Dim RecordID As Integer
@@ -6076,7 +6076,7 @@ ErrorTrap:
                                 CheckBoxCnt = 0
                                 DivCheckBoxCnt = 0
                                 DivCnt = 0
-                                CanSeeHiddenFields = cpCore.authContext.isAuthenticatedDeveloper(cpCore)
+                                CanSeeHiddenFields = cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)
                                 DivName = TagName & ".All"
                                 Do While cpCore.db.csOk(CS)
                                     OptionName = cpCore.db.csGetText(CS, "OptionName")
@@ -6251,7 +6251,7 @@ ErrorTrap:
         '                '
         '                ' + Add Category
         '                '
-        '                If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
+        '                If cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
         '                    LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & "/" & cpCore.serverconfig.appconfig.adminRoute & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
         '                End If
         '                '
@@ -6562,7 +6562,7 @@ ErrorTrap:
         Public Function getEditWrapper(ByVal Caption As String, ByVal Content As String) As String
             Dim result As String = Content
             Try
-                If cpCore.authContext.isEditingAnything() Then
+                If cpCore.doc.authContext.isEditingAnything() Then
                     result = html_GetLegacySiteStyles() _
                         & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">"
                     If Caption <> "" Then
@@ -6626,7 +6626,7 @@ ErrorTrap:
                 Dim iPersonalizationPeopleId As Integer
                 iPersonalizationPeopleId = personalizationPeopleId
                 If iPersonalizationPeopleId = 0 Then
-                    iPersonalizationPeopleId = cpCore.authContext.user.id
+                    iPersonalizationPeopleId = cpCore.doc.authContext.user.id
                 End If
                 '
 
@@ -7375,7 +7375,7 @@ ErrorTrap:
                     'returnCopy = convertActiveContent_internal(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, False, Nothing, False)
                     '
                     If True Then
-                        If cpCore.authContext.isEditingAnything() Then
+                        If cpCore.doc.authContext.isEditingAnything() Then
                             returnCopy = cpCore.db.csGetRecordEditLink(CS, False) & returnCopy
                             If AllowEditWrapper Then
                                 returnCopy = getEditWrapper("copy content", returnCopy)
@@ -7794,7 +7794,7 @@ ErrorTrap:
                 End If
             End If
             If RuleContentChanged Then
-                Call cpCore.cache.invalidateObject_Content(RulesContentName)
+                Call cpCore.cache.invalidateAllObjectsInContent(RulesContentName)
             End If
         End Sub
 
@@ -7817,7 +7817,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordEditLink(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal AllowCut As Boolean = False) As String
-            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), "", cpCore.authContext.isEditing(ContentName))
+            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), "", cpCore.doc.authContext.isEditing(ContentName))
         End Function
         '
         '========================================================================
@@ -8003,7 +8003,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordAddLink(ByVal ContentName As String, ByVal PresetNameValueList As String, Optional ByVal AllowPaste As Boolean = False) As String
-            main_GetRecordAddLink = main_GetRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, cpCore.authContext.isEditing(ContentName))
+            main_GetRecordAddLink = main_GetRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, cpCore.doc.authContext.isEditing(ContentName))
         End Function
         '
         '========================================================================
@@ -8234,7 +8234,7 @@ ErrorTrap:
                     ' ----- Select the Content Record for the Menu Entry selected
                     '
                     ContentRecordFound = False
-                    If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                    If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                         '
                         ' ----- admin member, they have access, main_Get ContentID and set markers true
                         '
@@ -8272,10 +8272,10 @@ ErrorTrap:
                             & " AND(ccContent.active<>0)" _
                             & " AND(ccGroupRules.active<>0)" _
                             & " AND(ccMemberRules.active<>0)" _
-                            & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "))" _
+                            & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) & "))" _
                             & " AND(ccgroups.active<>0)" _
                             & " AND(ccMembers.active<>0)" _
-                            & " AND(ccMembers.ID=" & cpCore.authContext.user.id & ")" _
+                            & " AND(ccMembers.ID=" & cpCore.doc.authContext.user.id & ")" _
                             & " );"
                         CS = cpCore.db.csOpenSql(SQL)
                         If cpCore.db.csOk(CS) Then
@@ -8290,7 +8290,7 @@ ErrorTrap:
                             MemberRulesAllow = False
                             If MemberRulesDateExpires = Date.MinValue Then
                                 MemberRulesAllow = True
-                            ElseIf (MemberRulesDateExpires > cpCore.profileStartTime) Then
+                            ElseIf (MemberRulesDateExpires > cpCore.doc.profileStartTime) Then
                                 MemberRulesAllow = True
                             End If
                         Else
@@ -8467,7 +8467,7 @@ ErrorTrap:
             'If Not (true) Then Exit Function
             '
             iHeaderMessage = genericController.encodeText(HeaderMessage)
-            iRightSideMessage = genericController.encodeEmptyText(RightSideMessage, FormatDateTime(cpCore.profileStartTime))
+            iRightSideMessage = genericController.encodeEmptyText(RightSideMessage, FormatDateTime(cpCore.doc.profileStartTime))
             main_GetPanelHeader = Adminui.GetHeader(iHeaderMessage, iRightSideMessage)
         End Function
 
@@ -8617,7 +8617,7 @@ ErrorTrap:
                 '
                 MethodName = "main_GetToolsPanel"
                 '
-                If cpCore.authContext.user.AllowToolsPanel Then
+                If cpCore.doc.authContext.user.AllowToolsPanel Then
                     ShowLegacyToolsPanel = cpCore.siteProperties.getBoolean("AllowLegacyToolsPanel", True)
                     '
                     ' --- Link Panel - used for both Legacy Tools Panel, and without it
@@ -8625,13 +8625,13 @@ ErrorTrap:
                     LinkPanel = New stringBuilderLegacyController
                     LinkPanel.Add(SpanClassAdminSmall)
                     LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
-                    LinkPanel.Add(FormatDateTime(cpCore.profileStartTime) & " | ")
+                    LinkPanel.Add(FormatDateTime(cpCore.doc.profileStartTime) & " | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute) & """>Admin Home</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("http://" & cpCore.webServer.requestDomain) & """>Public Home</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & genericController.encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                     If cpCore.siteProperties.getBoolean("AllowMobileTemplates", False) Then
-                        If cpCore.authContext.visit.Mobile Then
+                        If cpCore.doc.authContext.visit.Mobile Then
                             QS = cpCore.doc.refreshQueryString
                             QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile")
                             LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Non-Mobile Version</A> | ")
@@ -8737,7 +8737,7 @@ ErrorTrap:
                             ''
                             '' Create Path Block Row
                             ''
-                            'If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                            'If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                             '    TagID = "CreatePathBlock"
                             '    If cpCore.siteProperties.allowPathBlocking Then
                             '        '
@@ -8780,10 +8780,10 @@ ErrorTrap:
                         '
                         ' ----- Create the Login Panel
                         '
-                        If Trim(cpCore.authContext.user.name) = "" Then
-                            Copy = "You are logged in as member #" & cpCore.authContext.user.id & "."
+                        If Trim(cpCore.doc.authContext.user.name) = "" Then
+                            Copy = "You are logged in as member #" & cpCore.doc.authContext.user.id & "."
                         Else
-                            Copy = "You are logged in as " & cpCore.authContext.user.name & "."
+                            Copy = "You are logged in as " & cpCore.doc.authContext.user.name & "."
                         End If
                         LoginPanel = LoginPanel & "" _
                         & cr & "<div class=""ccAdminSmall"">" _
@@ -8820,7 +8820,7 @@ ErrorTrap:
                         ' Autologin checkbox
                         '
                         If cpCore.siteProperties.getBoolean("AllowAutoLogin", False) Then
-                            If cpCore.authContext.visit.CookieSupport Then
+                            If cpCore.doc.authContext.visit.CookieSupport Then
                                 TagID = "autologin"
                                 LoginPanel = LoginPanel & "" _
                                 & cr & "<div class=""ccAdminSmall"">" _
@@ -8872,7 +8872,7 @@ ErrorTrap:
                         LinkPanel.Add(SpanClassAdminSmall)
                         'LinkPanel.Add( "WebClient " & main_WebClientVersion & " | "
                         LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
-                        LinkPanel.Add(FormatDateTime(cpCore.profileStartTime) & " | ")
+                        LinkPanel.Add(FormatDateTime(cpCore.doc.profileStartTime) & " | ")
                         LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute) & """>Admin Home</A> | ")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("http://" & cpCore.webServer.requestDomain) & """>Public Home</A> | ")
@@ -8924,12 +8924,12 @@ ErrorTrap:
                                 Copy = Copy & cr & "<br>" & genericController.encodeHTML(docProperty.NameValue)
                             End If
                         Next
-                        DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((cpCore.appStopWatch.ElapsedMilliseconds) / 1000, "0.000") & " sec")
+                        DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000, "0.000") & " sec")
                         If True Then
-                            VisitHrs = CInt(cpCore.authContext.visit.TimeToLastHit / 3600)
-                            VisitMin = CInt(cpCore.authContext.visit.TimeToLastHit / 60) - (60 * VisitHrs)
-                            VisitSec = cpCore.authContext.visit.TimeToLastHit Mod 60
-                            DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(cpCore.authContext.visit.TimeToLastHit) & " sec, (" & VisitHrs & " hrs " & VisitMin & " mins " & VisitSec & " secs)")
+                            VisitHrs = CInt(cpCore.doc.authContext.visit.TimeToLastHit / 3600)
+                            VisitMin = CInt(cpCore.doc.authContext.visit.TimeToLastHit / 60) - (60 * VisitHrs)
+                            VisitSec = cpCore.doc.authContext.visit.TimeToLastHit Mod 60
+                            DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(cpCore.doc.authContext.visit.TimeToLastHit) & " sec, (" & VisitHrs & " hrs " & VisitMin & " mins " & VisitSec & " secs)")
                             'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(main_VisitTimeToLastHit) & " sec, (" & Int(main_VisitTimeToLastHit / 60) & " min " & (main_VisitTimeToLastHit Mod 60) & " sec)")
                         End If
                         DebugPanel = DebugPanel & main_DebugPanelRow("Addon Profile", "<hr><ul class=""ccPanel"">" & "<li>tbd</li>" & cr & "</ul>")

@@ -450,7 +450,7 @@ Namespace Contensive.Core
         Public Overrides Function adminHint(innerHtml As String) As String
             Dim returnString As String = innerHtml
             Try
-                If cpCore.authContext.isEditingAnything() Or cpCore.authContext.user.Admin Then
+                If cpCore.doc.authContext.isEditingAnything() Or cpCore.doc.authContext.user.Admin Then
                     returnString = "" _
                         & "<div class=""ccHintWrapper"">" _
                             & "<div  class=""ccHintWrapperContent"">" _

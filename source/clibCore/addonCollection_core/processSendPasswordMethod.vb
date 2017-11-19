@@ -33,7 +33,7 @@ Namespace Contensive.Addons.Core
                         & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
                         & "<p><a href=""?" & cpCore.doc.refreshQueryString & """>Return to the Site.</a></p>" _
                         & "</div>"
-                    cpCore.continueProcessing = False
+                    cpCore.doc.continueProcessing = False
                 End If
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

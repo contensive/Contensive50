@@ -25,11 +25,11 @@ Namespace Contensive.Addons.Core
                 Dim cpCore As coreClass = processor.core
                 '
                 ' -- Should be a remote method in commerce
-                If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Administrator required
                     '
-                    cpCore.userErrorList.Add("Error: You must be an administrator to use the ExportAscii method")
+                    cpCore.doc.userErrorList.Add("Error: You must be an administrator to use the ExportAscii method")
                 Else
                     Dim ContentName As String = cpCore.docProperties.getText("content")
                     Dim PageSize As Integer = cpCore.docProperties.getInteger("PageSize")
@@ -41,10 +41,10 @@ Namespace Contensive.Addons.Core
                         PageNumber = 1
                     End If
                     If (ContentName = "") Then
-                        cpCore.userErrorList.Add("Error: ExportAscii method requires ContentName")
+                        cpCore.doc.userErrorList.Add("Error: ExportAscii method requires ContentName")
                     Else
                         result = Controllers.exportAsciiController.exportAscii_GetAsciiExport(cpCore, ContentName, PageSize, PageNumber)
-                        cpCore.continueProcessing = False
+                        cpCore.doc.continueProcessing = False
                     End If
                 End If
             Catch ex As Exception

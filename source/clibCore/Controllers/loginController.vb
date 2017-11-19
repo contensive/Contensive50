@@ -166,7 +166,7 @@ Namespace Contensive.Core.Controllers
                         & ""
                     loginForm = loginForm _
                         & cpcore.html.html_GetFormInputHidden("Type", FormTypeLogin) _
-                        & cpcore.html.html_GetFormInputHidden("email", cpcore.authContext.user.Email) _
+                        & cpcore.html.html_GetFormInputHidden("email", cpCore.doc.authContext.user.Email) _
                         & cpcore.html.main_GetPanelButtons(ButtonLogin, "Button") _
                         & ""
                     loginForm = "" _
@@ -264,7 +264,7 @@ Namespace Contensive.Core.Controllers
                     & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>" _
-                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & genericController.encodeHTML(cpcore.authContext.user.Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
+                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & genericController.encodeHTML(cpCore.doc.authContext.user.Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
                     & cr2 & "</tr>" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td colspan=""2"">&nbsp;</td>" _
@@ -336,17 +336,17 @@ Namespace Contensive.Core.Controllers
                     loginForm_Password = cpcore.docProperties.getText("password")
                     loginForm_AutoLogin = cpcore.docProperties.getBoolean("autologin")
                     '
-                    If (cpcore.authContext.visit.LoginAttempts < cpcore.siteProperties.maxVisitLoginAttempts) And cpcore.authContext.visit.CookieSupport Then
-                        LocalMemberID = cpcore.authContext.authenticateGetId(cpcore, loginForm_Username, loginForm_Password)
+                    If (cpCore.doc.authContext.visit.LoginAttempts < cpcore.siteProperties.maxVisitLoginAttempts) And cpCore.doc.authContext.visit.CookieSupport Then
+                        LocalMemberID = cpCore.doc.authContext.authenticateGetId(cpcore, loginForm_Username, loginForm_Password)
                         If LocalMemberID = 0 Then
-                            cpcore.authContext.visit.LoginAttempts = cpcore.authContext.visit.LoginAttempts + 1
-                            cpcore.authContext.visit.saveObject(cpcore)
+                            cpCore.doc.authContext.visit.LoginAttempts = cpCore.doc.authContext.visit.LoginAttempts + 1
+                            cpCore.doc.authContext.visit.saveObject(cpcore)
                         Else
-                            returnREsult = cpcore.authContext.authenticateById(cpcore, LocalMemberID, cpcore.authContext)
+                            returnREsult = cpCore.doc.authContext.authenticateById(cpcore, LocalMemberID, cpCore.doc.authContext)
                             If returnREsult Then
-                                Call logController.logActivity2(cpcore, "successful username/password login", cpcore.authContext.user.id, cpcore.authContext.user.OrganizationID)
+                                Call logController.logActivity2(cpcore, "successful username/password login", cpCore.doc.authContext.user.id, cpCore.doc.authContext.user.OrganizationID)
                             Else
-                                Call logController.logActivity2(cpcore, "bad username/password login", cpcore.authContext.user.id, cpcore.authContext.user.OrganizationID)
+                                Call logController.logActivity2(cpcore, "bad username/password login", cpCore.doc.authContext.user.id, cpCore.doc.authContext.user.OrganizationID)
                             End If
                         End If
                     End If
@@ -394,11 +394,11 @@ Namespace Contensive.Core.Controllers
                 If Not genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("AllowMemberJoin", False)) Then
                     errorController.error_AddUserError(cpcore, "This site does not accept public main_MemberShip.")
                 Else
-                    If Not cpcore.authContext.isNewLoginOK(cpcore, loginForm_Username, loginForm_Password, ErrorMessage, errorCode) Then
+                    If Not cpCore.doc.authContext.isNewLoginOK(cpcore, loginForm_Username, loginForm_Password, ErrorMessage, errorCode) Then
                         Call errorController.error_AddUserError(cpcore, ErrorMessage)
                     Else
-                        If Not (cpcore.debug_iUserError <> "") Then
-                            CS = cpcore.db.csOpen("people", "ID=" & cpcore.db.encodeSQLNumber(cpcore.authContext.user.id))
+                        If Not (cpCore.doc.debug_iUserError <> "") Then
+                            CS = cpcore.db.csOpen("people", "ID=" & cpcore.db.encodeSQLNumber(cpCore.doc.authContext.user.id))
                             If Not cpcore.db.csOk(CS) Then
                                 cpcore.handleException(New Exception("Could not open the current members account to set the username and password."))
                             Else
@@ -406,7 +406,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' if the current account can be logged into, you can not join 'into' it
                                     '
-                                    Call cpcore.authContext.logout(cpcore)
+                                    Call cpCore.doc.authContext.logout(cpcore)
                                 End If
                                 FirstName = cpcore.docProperties.getText("firstname")
                                 LastName = cpcore.docProperties.getText("firstname")
@@ -417,13 +417,13 @@ Namespace Contensive.Core.Controllers
                                 Call cpcore.db.csSet(CS, "Name", FullName)
                                 Call cpcore.db.csSet(CS, "username", loginForm_Username)
                                 Call cpcore.db.csSet(CS, "password", loginForm_Password)
-                                Call cpcore.authContext.authenticateById(cpcore, cpcore.authContext.user.id, cpcore.authContext)
+                                Call cpCore.doc.authContext.authenticateById(cpcore, cpCore.doc.authContext.user.id, cpCore.doc.authContext)
                             End If
                             Call cpcore.db.csClose(CS)
                         End If
                     End If
                 End If
-                Call cpcore.cache.invalidateObject_Content("People")
+                Call cpcore.cache.invalidateAllObjectsInContent("People")
             Catch ex As Exception
                 cpcore.handleException(ex) : Throw
             End Try

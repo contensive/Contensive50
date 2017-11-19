@@ -23,7 +23,7 @@ Namespace Contensive.Core.Models.Entity
         '
         Public name As String
         Public isBaseCollection As Boolean                     ' true only for the one collection created from the base file. This property does not transfer during addSrcToDst
-        Public CDef As New Dictionary(Of String, cdefModel)
+        Public CDef As New Dictionary(Of String, Models.Complex.cdefModel)
         Public SQLIndexCnt As Integer
         Public SQLIndexes() As SQLIndexType
         Public Structure SQLIndexType

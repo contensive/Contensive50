@@ -63,7 +63,7 @@ Namespace Contensive.Core.Controllers
             Dim Updateable As Boolean               ' Can not update an csv_OpenCSSQL because Fields are not accessable
             Dim NewRecord As Boolean                ' true if it was created here
             Dim ContentName As String
-            Dim CDef As cdefModel
+            Dim CDef As Models.Complex.cdefModel
             Dim OwnerMemberID As Integer               ' ID of the member who opened the csv_ContentSet
             '
             ' Write Cache
@@ -1134,7 +1134,7 @@ Namespace Contensive.Core.Controllers
                 Dim iMemberID As Integer
                 Dim iCriteria As String
                 Dim iSelectFieldList As String
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 Dim TestUcaseFieldList As String
                 Dim SQL As String
                 '
@@ -1322,7 +1322,7 @@ Namespace Contensive.Core.Controllers
                             ' delete any files (only if filename is part of select)
                             '
                             Dim fieldName As String
-                            Dim field As CDefFieldModel
+                            Dim field As Models.Complex.CDefFieldModel
                             For Each selectedFieldName In .selectList
                                 If (.fields.ContainsKey(selectedFieldName.ToLower())) Then
                                     field = .fields(selectedFieldName.ToLower())
@@ -1394,7 +1394,7 @@ Namespace Contensive.Core.Controllers
         Public Function csOpenSql(ByVal SQL As String, Optional ByVal DataSourceName As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
             Dim returnCs As Integer = -1
             Try
-                returnCs = cs_init(cpCore.authContext.user.id)
+                returnCs = cs_init(cpCore.doc.authContext.user.id)
                 With contentSetStore(returnCs)
                     .Updateable = False
                     .ContentName = ""
@@ -2100,7 +2100,7 @@ Namespace Contensive.Core.Controllers
             Try
                 '
                 Dim CSPointer As Integer
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 '
                 If String.IsNullOrEmpty(ContentName.Trim()) Then
                     Throw New ArgumentException("contentName cannot be blank")
@@ -2169,7 +2169,7 @@ Namespace Contensive.Core.Controllers
                 Dim DataSourceName As String
                 Dim FieldName As String
                 Dim TableName As String
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 Dim DefaultValueText As String
                 Dim LookupContentName As String
                 Dim Ptr As Integer
@@ -2187,7 +2187,7 @@ Namespace Contensive.Core.Controllers
                         Throw New ApplicationException("content [" & ContentName & "] could Not be found.")
                     Else
                         If MemberID = -1 Then
-                            MemberID = cpCore.authContext.user.id
+                            MemberID = cpCore.doc.authContext.user.id
                         End If
                         With CDef
                             '
@@ -2196,8 +2196,8 @@ Namespace Contensive.Core.Controllers
                             DataSourceName = .ContentDataSourceName
                             TableName = .ContentTableName
                             If .fields.Count > 0 Then
-                                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In .fields
-                                    Dim field As CDefFieldModel = keyValuePair.Value
+                                For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In .fields
+                                    Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                                     With field
                                         FieldName = .nameLc
                                         If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
@@ -2353,7 +2353,7 @@ Namespace Contensive.Core.Controllers
                 Dim DestRecordID As Integer
                 Dim DestFilename As String
                 Dim SourceFilename As String
-                Dim DestCDef As cdefModel
+                Dim DestCDef As Models.Complex.cdefModel
                 '
                 If Not csOk(CSSource) Then
                     Throw New ArgumentException("source dataset is not valid")
@@ -2482,7 +2482,7 @@ Namespace Contensive.Core.Controllers
                             ' Updateable -- enterprete the value
                             '
                             'ContentName = .ContentName
-                            Dim field As CDefFieldModel
+                            Dim field As Models.Complex.CDefFieldModel
                             If Not .CDef.fields.ContainsKey(FieldName.ToLower()) Then
                                 Try
                                     fieldValue = genericController.encodeText(cs_getValue(CSPointer, FieldName))
@@ -2670,7 +2670,7 @@ Namespace Contensive.Core.Controllers
                             End If
                             With .CDef
                                 If .Name <> "" Then
-                                    Dim field As CDefFieldModel
+                                    Dim field As Models.Complex.CDefFieldModel
                                     If Not .fields.ContainsKey(FieldNameLc) Then
                                         Throw New ArgumentException("The field [" & FieldName & "] could Not be found In content [" & .Name & "]")
                                     Else
@@ -2998,7 +2998,7 @@ Namespace Contensive.Core.Controllers
                                 '
                                 LiveRecordInactive = (UcaseFieldName = "ACTIVE" And (Not genericController.EncodeBoolean(writeCacheValue)))
                                 FieldFoundCount += 1
-                                Dim field As CDefFieldModel = .CDef.fields(FieldName.ToLower())
+                                Dim field As Models.Complex.CDefFieldModel = .CDef.fields(FieldName.ToLower())
                                 With field
                                     SQLSetPair = ""
                                     FieldReadOnly = (.ReadOnly)
@@ -3361,7 +3361,7 @@ Namespace Contensive.Core.Controllers
                 Dim fieldTypeId As Integer
                 Dim TableName As String
                 'Dim iOriginalFilename As String
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 '
                 If String.IsNullOrEmpty(ContentName.Trim()) Then
                     Throw New ArgumentException("contentname cannot be blank")
@@ -3992,8 +3992,8 @@ Namespace Contensive.Core.Controllers
                 If Not csOk(CS) Then
                     Throw New ArgumentException("dataset is not valid")
                 Else
-                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In contentSetStore(CS).CDef.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In contentSetStore(CS).CDef.fields
+                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         With field
                             FieldName = .nameLc
                             If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
@@ -4356,7 +4356,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' --- no records were found, add a blank if we can
                     '
-                    dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.authContext.user.id)
+                    dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.doc.authContext.user.id)
                     If dt.Rows.Count > 0 Then
                         RecordID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                         Call cpCore.db.executeQuery("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSource.Name)
@@ -4456,7 +4456,7 @@ Namespace Contensive.Core.Controllers
         Public Sub createContentFieldFromTableField(ByVal ContentName As String, ByVal FieldName As String, ByVal ADOFieldType As Integer)
             Try
                 '
-                Dim field As New CDefFieldModel
+                Dim field As New Models.Complex.CDefFieldModel
                 '
                 field.fieldTypeId = cpCore.db.getFieldTypeIdByADOType(ADOFieldType)
                 field.caption = FieldName
@@ -4901,13 +4901,13 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Function csOpenRecord(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
-            Return csOpen(genericController.encodeText(ContentName), "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            Return csOpen(genericController.encodeText(ContentName), "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.doc.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
         End Function
         '
         '========================================================================
         '
         Public Function cs_open2(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
-            Return csOpen(ContentName, "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            Return csOpen(ContentName, "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.doc.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
         End Function
         '
         '========================================================================
@@ -4961,7 +4961,7 @@ Namespace Contensive.Core.Controllers
                     ContentControlID = (cpCore.db.csGetInteger(iCSPointer, "contentcontrolid"))
                     ContentName = cpCore.metaData.getContentNameByID(ContentControlID)
                     If ContentName <> "" Then
-                        result = cpCore.html.main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), RecordName, cpCore.authContext.isEditing(ContentName))
+                        result = cpCore.html.main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), RecordName, cpCore.doc.authContext.isEditing(ContentName))
                     End If
                 End If
             End If

@@ -38,9 +38,9 @@ Namespace Contensive.Addons.AdminSite
                 ' -- log request
                 Dim SaveContent As String = "" _
                         & Now() _
-                        & vbCrLf & "member.name:" & cpCore.authContext.user.name _
-                        & vbCrLf & "member.id:" & cpCore.authContext.user.id _
-                        & vbCrLf & "visit.id:" & cpCore.authContext.visit.id _
+                        & vbCrLf & "member.name:" & cpCore.doc.authContext.user.name _
+                        & vbCrLf & "member.id:" & cpCore.doc.authContext.user.id _
+                        & vbCrLf & "visit.id:" & cpCore.doc.authContext.visit.id _
                         & vbCrLf & "url:" & cpCore.webServer.requestUrl _
                         & vbCrLf & "url source:" & cpCore.webServer.requestUrlSource _
                         & vbCrLf & "----------" _
@@ -62,8 +62,7 @@ Namespace Contensive.Addons.AdminSite
                 End If
                 logController.appendLog(cpCore, SaveContent, "admin", cpCore.serverConfig.appConfig.name & "-request-")
                 '
-                Dim adminBody As String = ""
-                If Not cpCore.authContext.isAuthenticated Then
+                If Not cpCore.doc.authContext.isAuthenticated Then
                     '
                     ' --- must be authenticated to continue. Force a local login
                     '
@@ -74,11 +73,11 @@ Namespace Contensive.Addons.AdminSite
                             .addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                         }
                     )
-                ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
+                ElseIf Not cpCore.doc.authContext.isAuthenticatedContentManager(cpCore) Then
                     '
                     ' --- member must have proper access to continue
                     '
-                    adminBody = "" _
+                    returnHtml = "" _
                         & "<p>" & SpanClassAdminNormal _
                         & "You are attempting to enter an area which your account does not have access." _
                         & cr & "<ul class=""ccList"">" _
@@ -87,32 +86,33 @@ Namespace Contensive.Addons.AdminSite
                         & cr & "<li class=""ccListItem"">To have your account access changed to include this area, please contact the <a href=""mailto:" & cpCore.siteProperties.getText("EmailAdmin") & """>system administrator</A>. " _
                         & cr & "</ul>" _
                         & "</span></p>"
-                    adminBody = "" _
+                    returnHtml = "" _
                         & cpCore.html.main_GetPanelHeader("Unauthorized Access") _
-                        & cpCore.html.main_GetPanel(adminBody, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15)
-                    adminBody = "" _
+                        & cpCore.html.main_GetPanel(returnHtml, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15)
+                    returnHtml = "" _
                         & cr & "<div style=""display:table;margin:100px auto auto auto;"">" _
-                        & genericController.htmlIndent(adminBody) _
+                        & genericController.htmlIndent(returnHtml) _
                         & cr & "</div>"
                     '
                     Call cpCore.doc.setMetaContent(0, 0)
                     Call cpCore.html.addTitle("Unauthorized Access", "adminSite")
-                    returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False)
+                    returnHtml = "<div class=""ccBodyAdmin ccCon"">" & returnHtml & "</div>"
+                    'returnHtml = cpCore.html.getHtmlDoc(returnHtml, "<body class=""ccBodyAdmin ccCon"">", True, True, False)
                 Else
                     '
                     ' get admin content
                     '
-                    adminBody = getAdminBody()
-                    returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False)
+                    returnHtml = "<div class=""ccBodyAdmin ccCon"">" & getAdminBody() & "</div>"
+                    'returnHtml = cpCore.html.getHtmlDoc(adminBody, "<body class=""ccBodyAdmin ccCon"">", True, True, False)
                 End If
                 '
                 ' Log response
                 '
                 SaveContent &= "" _
                         & Now() _
-                        & vbCrLf & "member.name:" & cpCore.authContext.user.name _
-                        & vbCrLf & "member.id:" & cpCore.authContext.user.id _
-                        & vbCrLf & "visit.id:" & cpCore.authContext.visit.id _
+                        & vbCrLf & "member.name:" & cpCore.doc.authContext.user.name _
+                        & vbCrLf & "member.id:" & cpCore.doc.authContext.user.id _
+                        & vbCrLf & "visit.id:" & cpCore.doc.authContext.visit.id _
                         & vbCrLf & "url:" & cpCore.webServer.requestUrl _
                         & vbCrLf & "url source:" & cpCore.webServer.requestUrlSource _
                         & vbCrLf & "----------" _
@@ -169,7 +169,7 @@ Namespace Contensive.Addons.AdminSite
                 Dim AddonName As String = ""
                 Dim UseContentWatchLink As Boolean
                 Dim editRecord As New editRecordClass
-                Dim AdminContent As New cdefModel
+                Dim AdminContent As New Models.Complex.cdefModel
                 '
                 '-------------------------------------------------------------------------------
                 ' Setup defaults
@@ -190,11 +190,11 @@ Namespace Contensive.Addons.AdminSite
                 ' Do CheckMember here because we need to know who is there to create proper blocked menu
                 '-------------------------------------------------------------------------------
                 '
-                If Not cpCore.continueProcessing Then
+                If Not cpCore.doc.continueProcessing Then
                     '
                     ' ----- no stream anyway, do nothing
                     '
-                    'ElseIf Not cpCore.authContext.isAuthenticated Then
+                    'ElseIf Not cpCore.doc.authContext.isAuthenticated Then
                     '    '
                     '    ' --- must be authenticated to continue
                     '    '
@@ -274,7 +274,7 @@ Namespace Contensive.Addons.AdminSite
                     '-------------------------------------------------------------------------------
                     '
                     If (AdminSourceForm = AdminFormEdit) Then
-                        If (Not (cpCore.debug_iUserError <> "")) And cpCore.html.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete)) Then
+                        If (Not (cpCore.doc.debug_iUserError <> "")) And cpCore.html.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete)) Then
                             EditReferer = cpCore.docProperties.getText("EditReferer")
                             CurrentLink = genericController.modifyLinkQuery(cpCore.webServer.requestUrl, "editreferer", "", False)
                             CurrentLink = genericController.vbLCase(CurrentLink)
@@ -479,7 +479,7 @@ Namespace Contensive.Addons.AdminSite
                             End If
 
                         End If
-                            Else
+                    Else
                         '
                         ' nothing so far, display desktop
                         '
@@ -496,7 +496,7 @@ Namespace Contensive.Addons.AdminSite
                     '
                     ' Pickup user errors
                     '
-                    If (cpCore.debug_iUserError <> "") Then
+                    If (cpCore.doc.debug_iUserError <> "") Then
                         ContentCell = "<div class=""ccAdminMsg"">" & errorController.error_GetUserError(cpCore) & "</div>" & ContentCell
                     End If
                     ''
@@ -539,7 +539,7 @@ Namespace Contensive.Addons.AdminSite
         '       the upl collection
         '========================================================================
         '
-        Private Sub GetForm_LoadControl(ByRef adminContent As cdefModel, editRecord As editRecordClass)
+        Private Sub GetForm_LoadControl(ByRef adminContent As Models.Complex.cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogAdminMethodEnter( "GetForm_LoadControl")
             '
             Dim editorpreferences As String
@@ -590,14 +590,14 @@ Namespace Contensive.Addons.AdminSite
             If requestedContentId <> 0 Then
                 adminContent = cpCore.metaData.getCdef(requestedContentId)
                 If adminContent Is Nothing Then
-                    adminContent = New cdefModel
+                    adminContent = New Models.Complex.cdefModel
                     adminContent.Id = 0
                     errorController.error_AddUserError(cpCore, "There is no content with the requested id [" & requestedContentId & "]")
                     requestedContentId = 0
                 End If
             End If
             If adminContent Is Nothing Then
-                adminContent = New cdefModel
+                adminContent = New Models.Complex.cdefModel
             End If
             '
             ' determine user rights to this content
@@ -605,7 +605,7 @@ Namespace Contensive.Addons.AdminSite
             UserAllowContentEdit = True
             UserAllowContentAdd = True
             UserAllowContentDelete = True
-            If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 If (adminContent.Id > 0) Then
                     UserAllowContentEdit = userHasContentAccess(adminContent.Id)
                 End If
@@ -690,14 +690,14 @@ Namespace Contensive.Addons.AdminSite
             '
             AdminMenuModeID = cpCore.docProperties.getInteger("mm")
             If AdminMenuModeID = 0 Then
-                AdminMenuModeID = cpCore.authContext.user.AdminMenuModeID
+                AdminMenuModeID = cpCore.doc.authContext.user.AdminMenuModeID
             End If
             If AdminMenuModeID = 0 Then
                 AdminMenuModeID = AdminMenuModeLeft
             End If
-            If cpCore.authContext.user.AdminMenuModeID <> AdminMenuModeID Then
-                cpCore.authContext.user.AdminMenuModeID = AdminMenuModeID
-                Call cpCore.authContext.user.save(cpCore)
+            If cpCore.doc.authContext.user.AdminMenuModeID <> AdminMenuModeID Then
+                cpCore.doc.authContext.user.AdminMenuModeID = AdminMenuModeID
+                Call cpCore.doc.authContext.user.save(cpCore)
             End If
             '    '
             '    ' ----- FieldName
@@ -846,7 +846,7 @@ ErrorTrap:
         '       Email - (not done) Sends "body" field to "email" field in adminContent.id
         '========================================================================
         '
-        Private Sub ProcessActions(adminContent As cdefModel, editRecord As editRecordClass, UseContentWatchLink As Boolean)
+        Private Sub ProcessActions(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, UseContentWatchLink As Boolean)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "ProcessActions")
             '
             'Dim Upload As KMAUpload3.UploadClass
@@ -961,7 +961,7 @@ ErrorTrap:
                         '        Call LoadEditRecord(adminContent, editRecord)
                         '        Call LoadEditResponse(adminContent, editRecord)
                         '        Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                        '        If Not (cpCore.debug_iUserError <> "") Then
+                        '        If Not (cpCore.doc.debug_iUserError <> "") Then
                         '            'no - if WF, on process on publish
                         '            'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
                         '            Call cpCore.workflow.approveEdit(adminContent.Name, editRecord.id)
@@ -980,7 +980,7 @@ ErrorTrap:
                         '        Call LoadEditRecord(adminContent, editRecord)
                         '        Call LoadEditResponse(adminContent, editRecord)
                         '        Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                        '        If Not (cpCore.debug_iUserError <> "") Then
+                        '        If Not (cpCore.doc.debug_iUserError <> "") Then
                         '            'no - if WF, on process on publish
                         '            'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
                         '            Call cpCore.workflow.main_SubmitEdit(adminContent.Name, editRecord.id)
@@ -997,7 +997,7 @@ ErrorTrap:
                         '    Call LoadEditRecord(adminContent, editRecord)
                         '    Call LoadEditResponse(adminContent, editRecord)
                         '    Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                        '    If Not (cpCore.debug_iUserError <> "") Then
+                        '    If Not (cpCore.doc.debug_iUserError <> "") Then
                         '        Call cpCore.workflow.publishEdit(adminContent.Name, editRecord.id)
                         '        CS = cpCore.db.csOpenRecord(adminContent.Name, editRecord.id)
                         '        Dim IsDeleted As Boolean
@@ -1012,7 +1012,7 @@ ErrorTrap:
                         '    '
                         '    ' --- copy live record over edit record
                         '    '
-                        '    Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.authContext.user.id)
+                        '    Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.doc.authContext.user.id)
                         '    Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                         '    If MenuDepth > 0 Then
                         '        '
@@ -1141,7 +1141,7 @@ ErrorTrap:
                                 Call LoadEditRecord_Request(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                If Not (cpCore.debug_iUserError <> "") Then
+                                If Not (cpCore.doc.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Group Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The send action only supports Group Email.")
                                     Else
@@ -1156,7 +1156,7 @@ ErrorTrap:
                                             Call cpCore.db.csSet(CS, "submitted", True)
                                             Call cpCore.db.csSet(CS, "ConditionID", 0)
                                             If cpCore.db.csGetDate(CS, "ScheduleDate") = Date.MinValue Then
-                                                Call cpCore.db.csSet(CS, "ScheduleDate", cpCore.profileStartTime)
+                                                Call cpCore.db.csSet(CS, "ScheduleDate", cpCore.doc.profileStartTime)
                                             End If
                                         End If
                                         Call cpCore.db.csClose(CS)
@@ -1174,7 +1174,7 @@ ErrorTrap:
                             Else
                                 ' no save, page was read only - Call ProcessActionSave
                                 Call LoadEditRecord(adminContent, editRecord)
-                                If Not (cpCore.debug_iUserError <> "") Then
+                                If Not (cpCore.doc.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The deactivate action only supports Conditional Email.")
                                     Else
@@ -1200,7 +1200,7 @@ ErrorTrap:
                                 Call LoadEditRecord_Request(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                If Not (cpCore.debug_iUserError <> "") Then
+                                If Not (cpCore.doc.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The activate action only supports Conditional Email.")
                                     Else
@@ -1212,7 +1212,7 @@ ErrorTrap:
                                         Else
                                             Call cpCore.db.csSet(CS, "submitted", True)
                                             If cpCore.db.csGetDate(CS, "ScheduleDate") = Date.MinValue Then
-                                                Call cpCore.db.csSet(CS, "ScheduleDate", cpCore.profileStartTime)
+                                                Call cpCore.db.csSet(CS, "ScheduleDate", cpCore.doc.profileStartTime)
                                             End If
                                         End If
                                         Call cpCore.db.csClose(CS)
@@ -1230,7 +1230,7 @@ ErrorTrap:
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                                 Call cpCore.doc.processAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 '
-                                If Not (cpCore.debug_iUserError <> "") Then
+                                If Not (cpCore.doc.debug_iUserError <> "") Then
                                     '
                                     EmailToConfirmationMemberID = 0
                                     If editRecord.fieldsLc.ContainsKey("testmemberid") Then
@@ -1238,8 +1238,8 @@ ErrorTrap:
                                         Call cpCore.email.sendConfirmationTest(editRecord.id, EmailToConfirmationMemberID)
                                         '
                                         If editRecord.fieldsLc.ContainsKey("lastsendtestdate") Then
-                                            editRecord.fieldsLc.Item("lastsendtestdate").value = cpCore.profileStartTime
-                                            Call cpCore.db.executeQuery("update ccemail Set lastsendtestdate=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & " where id=" & editRecord.id)
+                                            editRecord.fieldsLc.Item("lastsendtestdate").value = cpCore.doc.profileStartTime
+                                            Call cpCore.db.executeQuery("update ccemail Set lastsendtestdate=" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) & " where id=" & editRecord.id)
                                         End If
                                     End If
                                 End If
@@ -1311,7 +1311,7 @@ ErrorTrap:
             '
 ErrorTrap:
             Call handleLegacyClassError2("ProcessActions")
-            Call errorController.error_AddUserError(cpCore, "There was an unknown error processing this page at " & cpCore.profileStartTime & ". Please try again, Or report this error To the site administrator.")
+            Call errorController.error_AddUserError(cpCore, "There was an unknown error processing this page at " & cpCore.doc.profileStartTime & ". Please try again, Or report this error To the site administrator.")
         End Sub
         '
         '========================================================================
@@ -1404,7 +1404,7 @@ ErrorTrap:
                 Call cpCore.db.executeQuery(SQL)
             End If
             If RecordChanged Then
-                Call cpCore.cache.invalidateObject_Content("Group Rules")
+                Call cpCore.cache.invalidateAllObjectsInContent("Group Rules")
             End If
             Exit Sub
             '
@@ -1543,7 +1543,7 @@ ErrorTrap:
             End If
             Call cpCore.db.csClose(CSPointer)
             If RecordChanged Then
-                Call cpCore.cache.invalidateObject_Content("Group Rules")
+                Call cpCore.cache.invalidateAllObjectsInContent("Group Rules")
             End If
             Exit Sub
             '
@@ -1557,7 +1557,7 @@ ErrorTrap:
         '   Then load in any response elements
         '========================================================================
         '
-        Private Sub LoadEditRecord(adminContent As cdefModel, editRecord As editRecordClass, Optional ByVal CheckUserErrors As Boolean = False)
+        Private Sub LoadEditRecord(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, Optional ByVal CheckUserErrors As Boolean = False)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadEditRecord")
             '
             ' converted array to dictionary - Dim FieldPointer As Integer
@@ -1657,7 +1657,7 @@ ErrorTrap:
                 ' ----- Set Read Only: if non-developer tries to edit a developer record
                 '
                 If genericController.vbUCase(adminContent.ContentTableName) = genericController.vbUCase("ccMembers") Then
-                    If Not cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                    If Not cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                         If editRecord.fieldsLc.ContainsKey("developer") Then
                             If genericController.EncodeBoolean(editRecord.fieldsLc.Item("developer").value) Then
                                 editRecord.Read_Only = True
@@ -1720,7 +1720,7 @@ ErrorTrap:
         '   Load both Live and Edit Record values from definition defaults
         '========================================================================
         '
-        Private Sub LoadEditRecord_Default(adminContent As cdefModel, editrecord As editRecordClass)
+        Private Sub LoadEditRecord_Default(adminContent As Models.Complex.cdefModel, editrecord As editRecordClass)
             Try
                 Dim DefaultValueText As String
                 Dim LookupContentName As String
@@ -1732,7 +1732,7 @@ ErrorTrap:
                 Dim defaultValue As String
                 Dim MethodName As String
                 Dim editRecordField As editRecordFieldClass
-                Dim field As CDefFieldModel
+                Dim field As Models.Complex.CDefFieldModel
                 '
                 MethodName = "Admin.Method()"
                 '
@@ -1804,11 +1804,11 @@ ErrorTrap:
                             '    .readonlyfield = True
                             '    .Required = False
                             Case "MODIFIEDBY"
-                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.user.id
+                                editrecord.fieldsLc(field.nameLc).value = cpCore.doc.authContext.user.id
                                 '    .readonlyfield = True
                                 '    .Required = False
                             Case "CREATEDBY"
-                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.user.id
+                                editrecord.fieldsLc(field.nameLc).value = cpCore.doc.authContext.user.id
                                 '    .readonlyfield = True
                                 '    .Required = False
                                 'Case "DATEADDED"
@@ -1831,7 +1831,7 @@ ErrorTrap:
         '   Load both Live and Edit Record values from definition defaults
         '========================================================================
         '
-        Private Sub LoadEditRecord_WherePairs(Admincontent As cdefModel, editRecord As editRecordClass)
+        Private Sub LoadEditRecord_WherePairs(Admincontent As Models.Complex.cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadEditRecord_WherePairs")
             '
             ' converted array to dictionary - Dim FieldPointer As Integer
@@ -1842,7 +1842,7 @@ ErrorTrap:
             MethodName = "Admin.LoadEditRecord_WherePairs(adminContent, editRecord)"
             '
             For Each keyValuePair In Admincontent.fields
-                Dim field As CDefFieldModel = keyValuePair.Value
+                Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                 With field
                     DefaultValueText = GetWherePairValue(.nameLc)
                     If .active And (DefaultValueText <> "") Then
@@ -1883,7 +1883,7 @@ ErrorTrap:
         '   Load Records from the database
         '========================================================================
         '
-        Private Sub LoadEditRecord_Dbase(ByVal adminContent As cdefModel, ByRef editrecord As editRecordClass, Optional ByVal CheckUserErrors As Boolean = False)
+        Private Sub LoadEditRecord_Dbase(ByVal adminContent As Models.Complex.cdefModel, ByRef editrecord As editRecordClass, Optional ByVal CheckUserErrors As Boolean = False)
             Try
                 '
                 Dim DBValueVariant As Object
@@ -1960,7 +1960,7 @@ ErrorTrap:
                         '
                         NullVariant = Nothing
                         For Each keyValuePair In adminContent.fields
-                            Dim adminContentField As CDefFieldModel = keyValuePair.Value
+                            Dim adminContentField As Models.Complex.CDefFieldModel = keyValuePair.Value
                             Dim fieldNameLc As String = adminContentField.nameLc
                             Dim editRecordField As editRecordFieldClass
                             '
@@ -2071,7 +2071,7 @@ ErrorTrap:
         '   Read the Form into the fields array
         '========================================================================
         '
-        Private Sub LoadEditRecord_Request(adminContent As cdefModel, editRecord As editRecordClass)
+        Private Sub LoadEditRecord_Request(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass)
             Try
                 Dim PageNotFoundPageID As Integer
                 Dim FormFieldListToBeLoaded As String
@@ -2107,7 +2107,7 @@ ErrorTrap:
                     Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
                     'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
                     For Each keyValuePair In adminContent.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
+                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         Call LoadEditRecord_RequestField(adminContent, editRecord, field, datasource.Name, FormFieldListToBeLoaded, FormEmptyFieldList)
                     Next
                     '
@@ -2193,7 +2193,7 @@ ErrorTrap:
         '   Read the Form into the fields array
         '========================================================================
         '
-        Private Sub LoadEditRecord_RequestField(adminContent As cdefModel, editRecord As editRecordClass, field As CDefFieldModel, ignore As String, ByRef FormFieldListToBeLoaded As String, FormEmptyFieldList As String)
+        Private Sub LoadEditRecord_RequestField(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, field As Models.Complex.CDefFieldModel, ignore As String, ByRef FormFieldListToBeLoaded As String, FormEmptyFieldList As String)
             Try
                 Const LoopPtrMax = 100
                 Dim blockDuplicateUsername As Boolean
@@ -2264,7 +2264,7 @@ ErrorTrap:
                                 '
                                 If AllowAdminFieldCheck() Then
                                     If (Not cpCore.docProperties.containsKey(FieldName)) Then
-                                        If Not (cpCore.debug_iUserError <> "") Then
+                                        If Not (cpCore.doc.debug_iUserError <> "") Then
                                             '
                                             ' Add user error only for the first missing field
                                             '
@@ -2360,12 +2360,12 @@ ErrorTrap:
                                     ' (many to many is handled during save)
                                     '
                                     ResponseFieldValueIsOKToSave = False
-                                ElseIf (.adminOnly) And (Not cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
+                                ElseIf (.adminOnly) And (Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) Then
                                     '
                                     ' non-admin and admin only field, leave current value
                                     '
                                     ResponseFieldValueIsOKToSave = False
-                                ElseIf (.developerOnly) And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore)) Then
+                                ElseIf (.developerOnly) And (Not cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)) Then
                                     '
                                     ' non-developer and developer only field, leave current value
                                     '
@@ -2497,7 +2497,7 @@ ErrorTrap:
                                                     End If
                                                     '
                                                     ' If the response is only white space, remove it
-                                                    ' this is a fix for when content editors leave white space in the editor, and do not realize it
+                                                    ' this is a fix for when Site Managers leave white space in the editor, and do not realize it
                                                     '   then cannot fixgure out how to remove it
                                                     '
                                                     ResponseFieldValueText = cpCore.html.convertEditorResponseToActiveContent(ResponseFieldValueText)
@@ -2655,7 +2655,7 @@ ErrorTrap:
         '   does NOT check AuthoringLocked -- you must check before calling
         '========================================================================
         '
-        Private Sub SaveContentTracking(adminContent As cdefModel, editRecord As editRecordClass)
+        Private Sub SaveContentTracking(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "SaveContentTracking")
             '
             Dim ContentID As Integer
@@ -2743,7 +2743,7 @@ ErrorTrap:
         '   Read in Whats New values if present
         '========================================================================
         '
-        Private Sub LoadContentTrackingResponse(adminContent As cdefModel, editRecord As editRecordClass)
+        Private Sub LoadContentTrackingResponse(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadContentTrackingResponse")
             '
             Dim CSContentWatchList As Integer
@@ -2857,7 +2857,7 @@ ErrorTrap:
         '   if not, it appears in the LinkAlias tab, and must be saved here
         '========================================================================
         '
-        Private Sub SaveLinkAlias(adminContent As cdefModel, editRecord As editRecordClass)
+        Private Sub SaveLinkAlias(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass)
             Try
                 '
                 ' --use field ptr to test if the field is supported yet
@@ -2908,7 +2908,7 @@ ErrorTrap:
         '   Field values must be loaded
         '========================================================================
         '
-        Private Sub LoadContentTrackingDataBase(adminContent As cdefModel, editRecord As editRecordClass)
+        Private Sub LoadContentTrackingDataBase(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadContentTrackingDataBase")
             '
             Dim ContentID As Integer
@@ -2944,370 +2944,327 @@ ErrorTrap:
         End Sub
         '
         '========================================================================
-        '   Save the field array to the database
         '
-        '   The ResponseFormID is needed in case there is an upload file in the stream -- the content is not pre-processed
-        '========================================================================
-        '
-        Private Sub SaveEditRecord(adminContent As cdefModel, editRecord As editRecordClass)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "SaveEditRecord")
-            '
-            Dim testStr As String
-            Dim CS As Integer
-            Dim ActivityLogOrganizationID As Integer
-            Dim FieldChanged As Boolean
-            '
-            Dim CSEditRecord As Integer
-            Dim FieldName As String
-            Dim UcaseFieldName As String
-            Dim SQL As String
-            ' converted array to dictionary - Dim FieldPointer As Integer
-            Dim Filename As String
-            Dim fieldValueObject As Object
-            Dim FieldValueText As String
-            Dim MethodName As String
-            Dim NewRecord As Boolean
-            Dim RecordChanged As Boolean
-            Dim AbortSave As Boolean
-            Dim MTMContent0 As String
-            Dim MTMContent1 As String
-            Dim MTMRuleContent As String
-            Dim MTMRuleField0 As String
-            Dim MTMRuleField1 As String
-            Dim RecordValueText As String
-            Dim RecordValueInteger As Integer
-            Dim RecordValueFloat As Double
-            Dim RecordValueDate As Date
-            Dim RecordValueBoolean As Boolean
-            Dim SQLUnique As String
-            'Dim RSUnique as datatable
-            Dim SaveCCIDValue As Integer
-            'Dim DataSource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
-            '
-            MethodName = "SaveEditRecord"
-            '
-            SaveCCIDValue = 0
-            ActivityLogOrganizationID = -1
-            If (cpCore.debug_iUserError <> "") Then
-                '
-                ' If There is an error, block the save
-                '
-                AdminAction = AdminActionNop
-            ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore, adminContent.Name) Then
-                '
-                ' save blocked by BlockCurrentRecord
-                '
-            ElseIf editRecord.Read_Only Then
-                '
-                ' save blocked by BlockCurrentRecord
-                ' no error message -- this happens when an admin publishes over an approved record
-                '
-                '    Call cpCore.htmldoc.main_AddUserError(editrecord.read_onlyUserError)
-            Else
-                '
-                ' ----- Record will be saved, create a new one if this is an add
-                '
-                If editRecord.id = 0 Then
-                    NewRecord = True
-                    RecordChanged = True
-                    CSEditRecord = cpCore.db.csInsertRecord(adminContent.Name)
+        Private Sub SaveEditRecord(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass)
+            Try
+                Dim SaveCCIDValue As Integer = 0
+                Dim ActivityLogOrganizationID As Integer = -1
+                If (cpCore.doc.debug_iUserError <> "") Then
+                    '
+                    ' -- If There is an error, block the save
+                    AdminAction = AdminActionNop
+                ElseIf Not cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, adminContent.Name) Then
+                    '
+                    ' -- must be content manager
+                ElseIf editRecord.Read_Only Then
+                    '
+                    ' -- read only block
                 Else
-                    NewRecord = False
-                    CSEditRecord = cpCore.db.cs_open2(adminContent.Name, editRecord.id, True, True)
-                End If
-                If Not cpCore.db.csOk(CSEditRecord) Then
                     '
-                    ' ----- Error: new record could not be created
-                    '
-                    If NewRecord Then
+                    ' -- Record will be saved, create a new one if this is an add
+                    Dim NewRecord As Boolean = False
+                    Dim RecordChanged As Boolean = False
+                    Dim CSEditRecord As Integer = -1
+                    If editRecord.id = 0 Then
+                        NewRecord = True
+                        RecordChanged = True
+                        CSEditRecord = cpCore.db.csInsertRecord(adminContent.Name)
+                    Else
+                        NewRecord = False
+                        CSEditRecord = cpCore.db.cs_open2(adminContent.Name, editRecord.id, True, True)
+                    End If
+                    If Not cpCore.db.csOk(CSEditRecord) Then
                         '
-                        ' Could not insert record
+                        ' ----- Error: new record could not be created
                         '
-                        Call handleLegacyClassError(MethodName, "A new record could not be inserted for content [" & adminContent.Name & "]. Verify the Database table and field DateAdded, CreateKey, and ID.")
+                        If NewRecord Then
+                            '
+                            ' Could not insert record
+                            '
+                            cpCore.handleException(New ApplicationException("A new record could not be inserted for content [" & adminContent.Name & "]. Verify the Database table and field DateAdded, CreateKey, and ID."))
+                        Else
+                            '
+                            ' Could not locate record you requested
+                            '
+                            cpCore.handleException(New ApplicationException("The record you requested (ID=" & editRecord.id & ") could not be found for content [" & adminContent.Name & "]"))
+                        End If
                     Else
                         '
-                        ' Could not locate record you requested
+                        ' ----- Get the ID of the current record
                         '
-                        Call handleLegacyClassError(MethodName, "The record you requested (ID=" & editRecord.id & ") could not be found for content [" & adminContent.Name & "]")
-                    End If
-                Else
-                    '
-                    ' ----- Get the ID of the current record
-                    '
-                    editRecord.id = cpCore.db.csGetInteger(CSEditRecord, "ID")
-                    '
-                    ' ----- Create the update sql
-                    '
-                    For Each keyValuePair In adminContent.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
-                        With field
-                            Dim editRecordField As editRecordFieldClass = editRecord.fieldsLc(.nameLc)
-                            fieldValueObject = editRecordField.value
-                            FieldValueText = genericController.encodeText(fieldValueObject)
-                            FieldChanged = False
-                            FieldName = .nameLc
-                            UcaseFieldName = genericController.vbUCase(FieldName)
-                            '
-                            ' ----- Handle special case fields
-                            '
-                            Select Case UcaseFieldName
-                                Case "NAME"
-                                    '
-                                    editRecord.nameLc = genericController.encodeText(fieldValueObject)
-                                Case "CCGUID"
-                                    Dim saveValue As String = genericController.encodeText(fieldValueObject)
-                                    If cpCore.db.csGetText(CSEditRecord, FieldName) <> saveValue Then
-                                        FieldChanged = True
-                                        RecordChanged = True
-                                        Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
-                                    End If
+                        editRecord.id = cpCore.db.csGetInteger(CSEditRecord, "ID")
+                        '
+                        ' ----- Create the update sql
+                        '
+                        Dim FieldChanged As Boolean = False
+                        For Each keyValuePair In adminContent.fields
+                            Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
+                            With field
+                                Dim editRecordField As editRecordFieldClass = editRecord.fieldsLc(.nameLc)
+                                Dim fieldValueObject As Object = editRecordField.value
+                                Dim FieldValueText As String = genericController.encodeText(fieldValueObject)
+                                Dim FieldName As String = .nameLc
+                                Dim UcaseFieldName As String = genericController.vbUCase(FieldName)
+                                '
+                                ' ----- Handle special case fields
+                                '
+                                Select Case UcaseFieldName
+                                    Case "NAME"
+                                        '
+                                        editRecord.nameLc = genericController.encodeText(fieldValueObject)
+                                    Case "CCGUID"
+                                        Dim saveValue As String = genericController.encodeText(fieldValueObject)
+                                        If cpCore.db.csGetText(CSEditRecord, FieldName) <> saveValue Then
+                                            FieldChanged = True
+                                            RecordChanged = True
+                                            Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
+                                        End If
                                         'RecordChanged = True
                                         'Call cpCore.app.SetCS(CSEditRecord, FieldName, FieldValueVariant)
-                                Case "CONTENTCONTROLID"
-                                    '
-                                    ' run this after the save, so it will be blocked if the save fails
-                                    ' block the change from this save
-                                    ' Update the content control ID here, for all the children, and all the edit and archive records of both
-                                    '
-                                    Dim saveValue As Integer = genericController.EncodeInteger(fieldValueObject)
-                                    If editRecord.contentControlId <> saveValue Then
-                                        SaveCCIDValue = saveValue
-                                        RecordChanged = True
-                                    End If
-                                Case "ACTIVE"
-                                    Dim saveValue As Boolean = genericController.EncodeBoolean(fieldValueObject)
-                                    If cpCore.db.csGetBoolean(CSEditRecord, FieldName) <> saveValue Then
-                                        FieldChanged = True
-                                        RecordChanged = True
-                                        Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
-                                    End If
-                                Case "DATEEXPIRES"
-                                    '
-                                    ' ----- make sure content watch expires before content expires
-                                    '
-                                    If (Not genericController.IsNull(fieldValueObject)) Then
-                                        If IsDate(fieldValueObject) Then
-                                            Dim saveValue As Date = genericController.EncodeDate(fieldValueObject)
-                                            If ContentWatchExpires <= Date.MinValue Then
-                                                ContentWatchExpires = saveValue
-                                            ElseIf ContentWatchExpires > saveValue Then
-                                                ContentWatchExpires = saveValue
-                                            End If
-                                        End If
-                                    End If
+                                    Case "CONTENTCONTROLID"
                                         '
-                                Case "DATEARCHIVE"
-                                    '
-                                    ' ----- make sure content watch expires before content archives
-                                    '
-                                    If (Not genericController.IsNull(fieldValueObject)) Then
-                                        If IsDate(fieldValueObject) Then
-                                            Dim saveValue As Date = genericController.EncodeDate(fieldValueObject)
-                                            If (ContentWatchExpires) <= Date.MinValue Then
-                                                ContentWatchExpires = saveValue
-                                            ElseIf ContentWatchExpires > saveValue Then
-                                                ContentWatchExpires = saveValue
+                                        ' run this after the save, so it will be blocked if the save fails
+                                        ' block the change from this save
+                                        ' Update the content control ID here, for all the children, and all the edit and archive records of both
+                                        '
+                                        Dim saveValue As Integer = genericController.EncodeInteger(fieldValueObject)
+                                        If editRecord.contentControlId <> saveValue Then
+                                            SaveCCIDValue = saveValue
+                                            RecordChanged = True
+                                        End If
+                                    Case "ACTIVE"
+                                        Dim saveValue As Boolean = genericController.EncodeBoolean(fieldValueObject)
+                                        If cpCore.db.csGetBoolean(CSEditRecord, FieldName) <> saveValue Then
+                                            FieldChanged = True
+                                            RecordChanged = True
+                                            Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
+                                        End If
+                                    Case "DATEEXPIRES"
+                                        '
+                                        ' ----- make sure content watch expires before content expires
+                                        '
+                                        If (Not genericController.IsNull(fieldValueObject)) Then
+                                            If IsDate(fieldValueObject) Then
+                                                Dim saveValue As Date = genericController.EncodeDate(fieldValueObject)
+                                                If ContentWatchExpires <= Date.MinValue Then
+                                                    ContentWatchExpires = saveValue
+                                                ElseIf ContentWatchExpires > saveValue Then
+                                                    ContentWatchExpires = saveValue
+                                                End If
                                             End If
                                         End If
-                                    End If
-                            End Select
-                            '
-                            ' ----- Put the field in the SQL to be saved
-                            '
-                            If IsVisibleUserField(.adminOnly, .developerOnly, .active, .authorable, .nameLc, adminContent.ContentTableName) And (NewRecord Or (Not .ReadOnly)) And (NewRecord Or (Not .NotEditable)) Then
+                                        '
+                                    Case "DATEARCHIVE"
+                                        '
+                                        ' ----- make sure content watch expires before content archives
+                                        '
+                                        If (Not genericController.IsNull(fieldValueObject)) Then
+                                            If IsDate(fieldValueObject) Then
+                                                Dim saveValue As Date = genericController.EncodeDate(fieldValueObject)
+                                                If (ContentWatchExpires) <= Date.MinValue Then
+                                                    ContentWatchExpires = saveValue
+                                                ElseIf ContentWatchExpires > saveValue Then
+                                                    ContentWatchExpires = saveValue
+                                                End If
+                                            End If
+                                        End If
+                                End Select
                                 '
-                                ' ----- save the value by field type
+                                ' ----- Put the field in the SQL to be saved
                                 '
-                                Select Case .fieldTypeId
-                                    Case FieldTypeIdAutoIdIncrement, FieldTypeIdRedirect
+                                If IsVisibleUserField(.adminOnly, .developerOnly, .active, .authorable, .nameLc, adminContent.ContentTableName) And (NewRecord Or (Not .ReadOnly)) And (NewRecord Or (Not .NotEditable)) Then
+                                    '
+                                    ' ----- save the value by field type
+                                    '
+                                    Select Case .fieldTypeId
+                                        Case FieldTypeIdAutoIdIncrement, FieldTypeIdRedirect
                                             '
                                             ' do nothing with these
                                             '
-                                    Case FieldTypeIdFile, FieldTypeIdFileImage
-                                        '
-                                        ' filenames, upload to cdnFiles
-                                        '
-                                        If cpCore.docProperties.getBoolean(FieldName & ".DeleteFlag") Then
-                                            RecordChanged = True
-                                            FieldChanged = True
-                                            Call cpCore.db.csSet(CSEditRecord, FieldName, "")
-                                        End If
-                                        FieldValueText = genericController.encodeText(fieldValueObject)
-                                        If FieldValueText <> "" Then
-                                            Filename = encodeFilename(FieldValueText)
-                                            Dim unixPathFilename As String = cpCore.db.csGetFilename(CSEditRecord, FieldName, Filename, adminContent.Name)
-                                            Dim dosPathFilename As String = genericController.convertToDosSlash(unixPathFilename)
-                                            Dim dosPath As String = genericController.getPath(dosPathFilename)
-                                            cpCore.cdnFiles.upload(FieldName, dosPath, Filename)
-                                            Call cpCore.db.csSet(CSEditRecord, FieldName, unixPathFilename)
-                                            RecordChanged = True
-                                            FieldChanged = True
-                                        End If
-                                    Case FieldTypeIdBoolean
-                                        '
-                                        ' boolean
-                                        '
-                                        Dim saveValue As Boolean = genericController.EncodeBoolean(fieldValueObject)
-                                        If cpCore.db.csGetBoolean(CSEditRecord, FieldName) <> saveValue Then
-                                            RecordChanged = True
-                                            FieldChanged = True
-                                            Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
-                                        End If
-                                    Case FieldTypeIdCurrency, FieldTypeIdFloat
-                                        '
-                                        ' Floating pointer numbers
-                                        '
-                                        Dim saveValue As Double = genericController.EncodeNumber(fieldValueObject)
-                                        If cpCore.db.csGetNumber(CSEditRecord, FieldName) <> saveValue Then
-                                            RecordChanged = True
-                                            FieldChanged = True
-                                            Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
-                                        End If
-                                    Case FieldTypeIdDate
-                                        '
-                                        ' Date
-                                        '
-                                        Dim saveValue As Date = genericController.EncodeDate(fieldValueObject)
-                                        If cpCore.db.csGetDate(CSEditRecord, FieldName) <> saveValue Then
-                                            FieldChanged = True
-                                            RecordChanged = True
-                                            Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
-                                        End If
-                                    Case FieldTypeIdInteger, FieldTypeIdLookup
-                                        '
-                                        ' Integers
-                                        '
-                                        Dim saveValue As Integer = genericController.EncodeInteger(fieldValueObject)
-                                        If saveValue <> cpCore.db.csGetInteger(CSEditRecord, FieldName) Then
-                                            FieldChanged = True
-                                            RecordChanged = True
-                                            Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
-                                        End If
-                                    Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTML
-                                        '
-                                        ' Text
-                                        '
-                                        Dim saveValue As String = genericController.encodeText(fieldValueObject)
-                                        If cpCore.db.csGet(CSEditRecord, FieldName) <> saveValue Then
-                                            FieldChanged = True
-                                            RecordChanged = True
-                                            Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
-                                        End If
-                                    Case FieldTypeIdManyToMany
-                                        '
-                                        ' Many to Many checklist
-                                        '
-                                        MTMContent0 = cpCore.metaData.getContentNameByID(.contentId)
-                                        MTMContent1 = cpCore.metaData.getContentNameByID(.manyToManyContentID)
-                                        MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
-                                        MTMRuleField0 = .ManyToManyRulePrimaryField
-                                        MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                        Call cpCore.html.main_ProcessCheckList("ManyToMany" & .id, MTMContent0, CStr(editRecord.id), MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1)
-                                    Case Else
-                                        '
-                                        ' Unknown other types
-                                        '
+                                        Case FieldTypeIdFile, FieldTypeIdFileImage
+                                            '
+                                            ' filenames, upload to cdnFiles
+                                            '
+                                            If cpCore.docProperties.getBoolean(FieldName & ".DeleteFlag") Then
+                                                RecordChanged = True
+                                                FieldChanged = True
+                                                Call cpCore.db.csSet(CSEditRecord, FieldName, "")
+                                            End If
+                                            FieldValueText = genericController.encodeText(fieldValueObject)
+                                            If FieldValueText <> "" Then
+                                                Dim Filename As String = encodeFilename(FieldValueText)
+                                                Dim unixPathFilename As String = cpCore.db.csGetFilename(CSEditRecord, FieldName, Filename, adminContent.Name)
+                                                Dim dosPathFilename As String = genericController.convertToDosSlash(unixPathFilename)
+                                                Dim dosPath As String = genericController.getPath(dosPathFilename)
+                                                cpCore.cdnFiles.upload(FieldName, dosPath, Filename)
+                                                Call cpCore.db.csSet(CSEditRecord, FieldName, unixPathFilename)
+                                                RecordChanged = True
+                                                FieldChanged = True
+                                            End If
+                                        Case FieldTypeIdBoolean
+                                            '
+                                            ' boolean
+                                            '
+                                            Dim saveValue As Boolean = genericController.EncodeBoolean(fieldValueObject)
+                                            If cpCore.db.csGetBoolean(CSEditRecord, FieldName) <> saveValue Then
+                                                RecordChanged = True
+                                                FieldChanged = True
+                                                Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
+                                            End If
+                                        Case FieldTypeIdCurrency, FieldTypeIdFloat
+                                            '
+                                            ' Floating pointer numbers
+                                            '
+                                            Dim saveValue As Double = genericController.EncodeNumber(fieldValueObject)
+                                            If cpCore.db.csGetNumber(CSEditRecord, FieldName) <> saveValue Then
+                                                RecordChanged = True
+                                                FieldChanged = True
+                                                Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
+                                            End If
+                                        Case FieldTypeIdDate
+                                            '
+                                            ' Date
+                                            '
+                                            Dim saveValue As Date = genericController.EncodeDate(fieldValueObject)
+                                            If cpCore.db.csGetDate(CSEditRecord, FieldName) <> saveValue Then
+                                                FieldChanged = True
+                                                RecordChanged = True
+                                                Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
+                                            End If
+                                        Case FieldTypeIdInteger, FieldTypeIdLookup
+                                            '
+                                            ' Integers
+                                            '
+                                            Dim saveValue As Integer = genericController.EncodeInteger(fieldValueObject)
+                                            If saveValue <> cpCore.db.csGetInteger(CSEditRecord, FieldName) Then
+                                                FieldChanged = True
+                                                RecordChanged = True
+                                                Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
+                                            End If
+                                        Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileText, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTML
+                                            '
+                                            ' Text
+                                            '
+                                            Dim saveValue As String = genericController.encodeText(fieldValueObject)
+                                            If cpCore.db.csGet(CSEditRecord, FieldName) <> saveValue Then
+                                                FieldChanged = True
+                                                RecordChanged = True
+                                                Call cpCore.db.csSet(CSEditRecord, FieldName, saveValue)
+                                            End If
+                                        Case FieldTypeIdManyToMany
+                                            '
+                                            ' Many to Many checklist
+                                            '
+                                            'MTMContent0 = cpCore.metaData.getContentNameByID(.contentId)
+                                            'MTMContent1 = cpCore.metaData.getContentNameByID(.manyToManyContentID)
+                                            'MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
+                                            'MTMRuleField0 = .ManyToManyRulePrimaryField
+                                            'MTMRuleField1 = .ManyToManyRuleSecondaryField
+                                            Call cpCore.html.main_ProcessCheckList("ManyToMany" & .id _
+                                                , cpCore.metaData.getContentNameByID(.contentId) _
+                                                , CStr(editRecord.id) _
+                                                , cpCore.metaData.getContentNameByID(.manyToManyContentID) _
+                                                , cpCore.metaData.getContentNameByID(.manyToManyRuleContentID) _
+                                                , .ManyToManyRulePrimaryField _
+                                                , .ManyToManyRuleSecondaryField)
+                                        Case Else
+                                            '
+                                            ' Unknown other types
+                                            '
 
-                                        Dim saveValue As String = genericController.encodeText(fieldValueObject)
-                                        FieldChanged = True
-                                        RecordChanged = True
-                                        Call cpCore.db.csSet(CSEditRecord, UcaseFieldName, saveValue)
-                                        'sql &=  "," & .Name & "=" & cpCore.app.EncodeSQL(FieldValueVariant, .FieldType)
-                                End Select
+                                            Dim saveValue As String = genericController.encodeText(fieldValueObject)
+                                            FieldChanged = True
+                                            RecordChanged = True
+                                            Call cpCore.db.csSet(CSEditRecord, UcaseFieldName, saveValue)
+                                            'sql &=  "," & .Name & "=" & cpCore.app.EncodeSQL(FieldValueVariant, .FieldType)
+                                    End Select
+                                End If
+                                '
+                                ' -- put any changes back in array for the next page to display
+                                editRecordField.value = fieldValueObject
+                                '
+                                ' -- Log Activity for changes to people and organizattions
+                                If FieldChanged Then
+                                    Select Case genericController.vbLCase(adminContent.ContentTableName)
+                                        Case "ccmembers"
+                                            '
+                                            If ActivityLogOrganizationID < 0 Then
+                                                Dim person As Models.Entity.personModel = Models.Entity.personModel.create(cpCore, editRecord.id)
+                                                If (person IsNot Nothing) Then
+                                                    ActivityLogOrganizationID = person.OrganizationID
+                                                End If
+                                            End If
+                                            logController.logActivity2(cpCore, "modifying field " & FieldName, editRecord.id, ActivityLogOrganizationID)
+                                        Case "organizations"
+                                            '
+                                            Call logController.logActivity2(cpCore, "modifying field " & FieldName, 0, editRecord.id)
+                                        Case "cclibraryfiles"
+                                            '
+                                            If cpCore.docProperties.getText("filename") <> "" Then
+                                                Call cpCore.db.csSet(CSEditRecord, "altsizelist", "")
+                                            End If
+                                    End Select
+                                End If
+                            End With
+                        Next
+                        '
+                        Call cpCore.db.csClose(CSEditRecord)
+                        If RecordChanged Then
+                            '
+                            ' -- clear cache
+                            Dim tableName As String = ""
+                            If editRecord.contentControlId = 0 Then
+                                tableName = cpCore.metaData.getContentTablename(adminContent.Name)
+                            Else
+                                tableName = cpCore.metaData.getContentTablename(editRecord.contentControlId_Name)
                             End If
-                            '
-                            ' ----- put any changes back in array for the next page to display
-                            '
-                            editRecordField.value = fieldValueObject
-                        End With
-                        '
-                        ' Log Activity for changes to people and organizattions
-                        '
-                        If FieldChanged Then
-                            Select Case genericController.vbLCase(adminContent.ContentTableName)
-                                Case genericController.vbLCase("ccMembers")
-                                    'Case "ccmembers"
+                            Select Case tableName.ToLower()
+                                Case linkAliasModel.contentTableName.ToLower()
                                     '
-                                    ' Log people
+                                    linkAliasModel.invalidateCache(cpCore, editRecord.id)
+                                    'Models.Complex.routeDictionaryModel.invalidateCache(cpCore)
+                                Case addonModel.contentTableName.ToLower()
                                     '
-                                    If ActivityLogOrganizationID < 0 Then
-                                        CS = cpCore.db.cs_open2("people", editRecord.id, , , "OrganizationID")
-                                        If cpCore.db.csOk(CS) Then
-                                            ActivityLogOrganizationID = cpCore.db.csGetInteger(CS, "OrganizationID")
-                                        End If
-                                        Call cpCore.db.csClose(CS)
-                                    End If
-                                    logController.logActivity2(cpCore, "modifying field " & FieldName, editRecord.id, ActivityLogOrganizationID)
-                                Case "organizations"
-                                    '
-                                    ' Log organization
-                                    '
-                                    Call logController.logActivity2(cpCore, "modifying field " & FieldName, 0, editRecord.id)
-                                Case "cclibraryfiles"
-                                    '
-                                    ' if new upload to files, clear AltSizeList
-                                    '
-                                    If True Then ' 3.4.200" Then
-                                        If cpCore.docProperties.getText("filename") <> "" Then
-                                            Call cpCore.db.csSet(CSEditRecord, "altsizelist", "")
-                                        End If
-                                    End If
+                                    addonModel.invalidateCache(cpCore, editRecord.id)
+                                    'Models.Complex.routeDictionaryModel.invalidateCache(cpCore)
+                                Case Else
+                                    linkAliasModel.invalidateCache(cpCore, editRecord.id)
                             End Select
+
                         End If
-                    Next
-                    '
-                    Call cpCore.db.csClose(CSEditRecord)
-                    '            If RecordChanged And SaveCCIDValue <> 0 Then
-                    '                Call cpCore.main_SetContentControl(EditRecord.ContentID, EditRecord.ID, SaveCCIDValue)
-                    '            End If
-                    If RecordChanged And Not False Then
                         '
-                        ' if record is changed, and not workflow, clear the contenttimestamp
+                        ' ----- Clear/Set PageNotFound
                         '
-                        If editRecord.contentControlId = 0 Then
-                            Call cpCore.cache.invalidateObject_Content(adminContent.Name)
-                        Else
-                            Call cpCore.cache.invalidateObject_Content(editRecord.contentControlId_Name)
-                            'call cpCore.main_ClearBake (cpCore.metaData.getContentNameByID(EditRecord.ContentID))
+                        If editRecord.SetPageNotFoundPageID Then
+                            Call cpCore.siteProperties.setProperty("PageNotFoundPageID", genericController.encodeText(editRecord.id))
+                        End If
+                        '
+                        ' ----- Clear/Set LandingPageID
+                        '
+                        If editRecord.SetLandingPageID Then
+                            Call cpCore.siteProperties.setProperty("LandingPageID", genericController.encodeText(editRecord.id))
+                        End If
+                        '
+                        ' ----- clear/set authoring controls
+                        '
+                        Call cpCore.workflow.ClearEditLock(adminContent.Name, editRecord.id)
+                        '
+                        ' ----- if admin content is changed, reload the admincontent data in case this is a save, and not an OK
+                        '
+                        If RecordChanged And SaveCCIDValue <> 0 Then
+                            Call cpCore.metaData.content_SetContentControl(editRecord.contentControlId, editRecord.id, SaveCCIDValue)
+                            editRecord.contentControlId_Name = cpCore.metaData.getContentNameByID(SaveCCIDValue)
+                            adminContent = cpCore.metaData.getCdef(editRecord.contentControlId_Name)
+                            adminContent.Id = adminContent.Id
+                            adminContent.Name = adminContent.Name
+                            ' false = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
                         End If
                     End If
-                    '
-                    ' ----- Clear/Set PageNotFound
-                    '
-                    If editRecord.SetPageNotFoundPageID Then
-                        Call cpCore.siteProperties.setProperty("PageNotFoundPageID", genericController.encodeText(editRecord.id))
-                    End If
-                    '
-                    ' ----- Clear/Set LandingPageID
-                    '
-                    If editRecord.SetLandingPageID Then
-                        Call cpCore.siteProperties.setProperty("LandingPageID", genericController.encodeText(editRecord.id))
-                    End If
-                    '
-                    ' ----- clear/set authoring controls
-                    '
-                    Call cpCore.workflow.ClearEditLock(adminContent.Name, editRecord.id)
-                    '
-                    ' ----- if admin content is changed, reload the admincontent data in case this is a save, and not an OK
-                    '
-                    If RecordChanged And SaveCCIDValue <> 0 Then
-                        Call cpCore.metaData.content_SetContentControl(editRecord.contentControlId, editRecord.id, SaveCCIDValue)
-                        editRecord.contentControlId_Name = cpCore.metaData.getContentNameByID(SaveCCIDValue)
-                        adminContent = cpCore.metaData.getCdef(editRecord.contentControlId_Name)
-                        adminContent.Id = adminContent.Id
-                        adminContent.Name = adminContent.Name
-                        ' false = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
-                    End If
+                    editRecord.Saved = True
                 End If
-                editRecord.Saved = True
-            End If
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("SaveEditRecord")
-            '
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
         '========================================================================
@@ -3347,7 +3304,7 @@ ErrorTrap:
                 '
                 ContentName = cpCore.metaData.getContentNameByID(ContentID)
                 If ContentName <> "" Then
-                    returnHas = cpCore.authContext.isAuthenticatedContentManager(cpCore, ContentName)
+                    returnHas = cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, ContentName)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -3359,7 +3316,7 @@ ErrorTrap:
         '   Display a field in the admin index form
         '========================================================================
         '
-        Private Function GetForm_Index_GetCell(adminContent As cdefModel, editRecord As editRecordClass, fieldName As String, ByVal CS As Integer, ByVal IsLookupFieldValid As Boolean, ByVal IsEmailContent As Boolean) As String
+        Private Function GetForm_Index_GetCell(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, fieldName As String, ByVal CS As Integer, ByVal IsLookupFieldValid As Boolean, ByVal IsEmailContent As Boolean) As String
             Dim return_formIndexCell As String = ""
             Try
                 Dim FieldText As String
@@ -3432,7 +3389,7 @@ ErrorTrap:
                             If Filename <> "" Then
                                 Copy = cpCore.cdnFiles.readFile(Filename)
                                 ' 20171103 - dont see why this is being converted, not html
-                                'Copy = cpCore.html.convertActiveContent_internal(Copy, cpCore.authContext.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything())
+                                'Copy = cpCore.html.convertActiveContent_internal(Copy, cpCore.doc.authContext.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.doc.authContext.isAuthenticated, Nothing, cpCore.doc.authContext.isEditingAnything())
                                 Stream.Add(Copy)
                             End If
                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany
@@ -3460,7 +3417,7 @@ ErrorTrap:
         '   used on Normal Edit and others
         '========================================================================
         '
-        Private Function GetForm_Edit_ButtonBar(adminContent As cdefModel, editRecord As editRecordClass, ByVal AllowDelete As Boolean, ByVal allowSave As Boolean, ByVal AllowAdd As Boolean, Optional ByVal AllowRefresh As Boolean = False) As String
+        Private Function GetForm_Edit_ButtonBar(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, ByVal AllowDelete As Boolean, ByVal allowSave As Boolean, ByVal AllowAdd As Boolean, Optional ByVal AllowRefresh As Boolean = False) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "GetForm_Edit_ButtonBar")
             '
             Dim Adminui As New adminUIController(cpCore)
@@ -3497,7 +3454,7 @@ ErrorTrap:
         '   AdminContent.type is not longer used
         '========================================================================
         '
-        Private Function GetForm_Edit(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             Dim returnHtml As String = ""
             Try
                 Dim ContentType As csv_contentTypeEnum
@@ -3560,7 +3517,7 @@ ErrorTrap:
                 CustomDescription = ""
                 AllowajaxTabs = (cpCore.siteProperties.getBoolean("AllowAjaxEditTabBeta", False))
                 '
-                If ((cpCore.debug_iUserError <> "") And editRecord.Loaded) Then
+                If ((cpCore.doc.debug_iUserError <> "") And editRecord.Loaded) Then
                     '
                     ' block load if there was a user error and it is already loaded (assume error was from response )
                     '
@@ -3582,7 +3539,7 @@ ErrorTrap:
                     ' xx  I do not know why the following section says "reload even if it is loaded", but lets try this
                     '
                     For Each keyValuePair In adminContent.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
+                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         Select Case field.fieldTypeId
                             Case FieldTypeIdFile, FieldTypeIdFileImage
                                 editRecord.fieldsLc(field.nameLc).value = editRecord.fieldsLc(field.nameLc).dbValue
@@ -3601,7 +3558,7 @@ ErrorTrap:
                     '
                     Call LoadEditRecord(adminContent, editRecord, True)
                     If (editRecord.contentControlId = 0) Then
-                        If (cpCore.debug_iUserError <> "") Then
+                        If (cpCore.doc.debug_iUserError <> "") Then
                             '
                             ' known user error, just return
                             '
@@ -3880,7 +3837,7 @@ ErrorTrap:
                 '
                 ' ----- determine access details
                 '
-                Call cpCore.authContext.getContentAccessRights(cpCore, adminContent.Name, allowCMEdit, allowCMAdd, allowCMDelete)
+                Call cpCore.doc.authContext.getContentAccessRights(cpCore, adminContent.Name, allowCMEdit, allowCMAdd, allowCMDelete)
                 AllowAdd = adminContent.AllowAdd And allowCMAdd
                 AllowDelete = adminContent.AllowDelete And allowCMDelete And (editRecord.id <> 0)
                 allowSave = allowCMEdit
@@ -3972,7 +3929,7 @@ ErrorTrap:
                 '
                 Select Case genericController.vbUCase(adminContent.ContentTableName)
                     Case genericController.vbUCase("ccMembers")
-                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
+                        If Not (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) Then
                             '
                             ' Must be admin
                             '
@@ -4009,7 +3966,7 @@ ErrorTrap:
                                 LastSendTestDate = genericController.EncodeDate(editRecord.fieldsLc("lastsendtestdate").value)
                             End If
                         End If
-                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
+                        If Not (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) Then
                             '
                             ' Must be admin
                             '
@@ -4024,7 +3981,7 @@ ErrorTrap:
                             EmailSubmitted = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.user.id
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.doc.authContext.user.id
                                 End If
                             End If
                             EditSectionButtonBar = ""
@@ -4033,7 +3990,7 @@ ErrorTrap:
                             Else
                                 EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonCancel, , , "Return processSubmit(this)")
                             End If
-                            If (AllowDelete) And (cpCore.authContext.isAuthenticatedDeveloper(cpCore)) Then
+                            If (AllowDelete) And (cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)) Then
                                 EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonDeleteEmail, , , "If(!DeleteCheck())Return False;")
                             End If
                             If (Not EmailSubmitted) And (Not EmailSent) Then
@@ -4048,8 +4005,8 @@ ErrorTrap:
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                             Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
-                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore))), allowAdminTabs))
-                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore))), allowAdminTabs))
+                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore))), allowAdminTabs))
+                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore))), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
@@ -4064,7 +4021,7 @@ ErrorTrap:
                             EmailSubmitted = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.user.id
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.doc.authContext.user.id
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
                                     EmailSubmitted = genericController.EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
@@ -4118,7 +4075,7 @@ ErrorTrap:
                             EmailSent = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.user.id
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.doc.authContext.user.id
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
                                     EmailSubmitted = genericController.EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
@@ -4163,7 +4120,7 @@ ErrorTrap:
                             Call Stream.Add(EditSectionButtonBar)
                         End If
                     Case "CCCONTENT"
-                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
+                        If Not (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) Then
                             '
                             ' Must be admin
                             '
@@ -4410,7 +4367,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "StaticPublishControl, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
                 '
@@ -4657,7 +4614,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "Admin Publish, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
                 '
@@ -4952,7 +4909,7 @@ ErrorTrap:
         '   Generate the content of a tab in the Edit Screen
         '========================================================================
         '
-        Private Function GetForm_Edit_Tab(adminContent As cdefModel, editRecord As editRecordClass, ByVal RecordID As Integer, ByVal ContentID As Integer, ByVal ForceReadOnly As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditTab As String, ByVal EditorContext As csv_contentTypeEnum, ByRef return_NewFieldList As String, ByVal TemplateIDForStyles As Integer, ByVal HelpCnt As Integer, ByVal HelpIDCache() As Integer, ByVal helpDefaultCache() As String, ByVal HelpCustomCache() As String, ByVal AllowHelpMsgCustom As Boolean, ByVal helpIdIndex As keyPtrController, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
+        Private Function GetForm_Edit_Tab(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, ByVal RecordID As Integer, ByVal ContentID As Integer, ByVal ForceReadOnly As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditTab As String, ByVal EditorContext As csv_contentTypeEnum, ByRef return_NewFieldList As String, ByVal TemplateIDForStyles As Integer, ByVal HelpCnt As Integer, ByVal HelpIDCache() As Integer, ByVal helpDefaultCache() As String, ByVal HelpCustomCache() As String, ByVal AllowHelpMsgCustom As Boolean, ByVal helpIdIndex As keyPtrController, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
             Dim returnHtml As String = ""
             Try
                 '
@@ -5048,10 +5005,10 @@ ErrorTrap:
                     '
                     ' ----- Build an index to sort the fields by EditSortOrder
                     '
-                    Dim sortingFields As New Dictionary(Of String, CDefFieldModel)
+                    Dim sortingFields As New Dictionary(Of String, Models.Complex.CDefFieldModel)
                     '
                     For Each keyValuePair In adminContent.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
+                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         With field
                             If .editTabName.ToLower() = EditTab.ToLower() Then
                                 If IsVisibleUserField(.adminOnly, .developerOnly, .active, .authorable, .nameLc, adminContent.ContentTableName) Then
@@ -5066,7 +5023,7 @@ ErrorTrap:
                     '
                     AllowHelpIcon = cpCore.visitProperty.getBoolean("AllowHelpIcon")
                     For Each kvp In sortingFields
-                        Dim field As CDefFieldModel = kvp.Value
+                        Dim field As Models.Complex.CDefFieldModel = kvp.Value
                         With field
                             fieldId = .id
                             WhyReadOnlyMsg = ""
@@ -5966,7 +5923,7 @@ ErrorTrap:
                             ' field help
                             '------------------------------------------------------------------------------------------------------------
                             '
-                            If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                            If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                                 '
                                 ' Admin view
                                 '
@@ -6121,7 +6078,7 @@ ErrorTrap:
         '   Display field in the admin/edit
         '========================================================================
         '
-        Private Function GetForm_Edit_ContentTracking(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_ContentTracking(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_ContentTracking")
             '
             Dim CSRules As Integer
@@ -6259,7 +6216,7 @@ ErrorTrap:
         '   Display field in the admin/edit
         '========================================================================
         '
-        Private Function GetForm_Edit_Control(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_Control(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_Control")
             '
             Dim s As String
@@ -6325,7 +6282,7 @@ ErrorTrap:
                 ''
                 'FieldHelp = "In immediate authoring mode, the live site is changed when each record is saved. In Workflow authoring mode, there are several steps to publishing a change. This field displays the current stage of this record."
                 'FieldRequired = False
-                'AuthoringStatusMessage = cpCore.authContext.main_GetAuthoringStatusMessage(cpCore, false, editRecord.EditLock, editRecord.EditLockMemberName, editRecord.EditLockExpires, editRecord.ApproveLock, editRecord.ApprovedName, editRecord.SubmitLock, editRecord.SubmittedName, editRecord.IsDeleted, editRecord.IsInserted, editRecord.IsModified, editRecord.LockModifiedName)
+                'AuthoringStatusMessage = cpCore.doc.authContext.main_GetAuthoringStatusMessage(cpCore, false, editRecord.EditLock, editRecord.EditLockMemberName, editRecord.EditLockExpires, editRecord.ApproveLock, editRecord.ApprovedName, editRecord.SubmitLock, editRecord.SubmittedName, editRecord.IsDeleted, editRecord.IsInserted, editRecord.IsModified, editRecord.LockModifiedName)
                 'Call FastString.Add(Adminui.GetEditRow(AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
                 ''Call FastString.Add(AdminUI.GetEditRow( AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
                 '
@@ -6353,7 +6310,7 @@ ErrorTrap:
                     '
                     Copy = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docpCore.main_"
                     Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.siteProperties.getinteger("LandingPageID", 0))))
-                    If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                    If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                         HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("LandingPageID", Checked)
                     Else
                         HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.html.html_GetFormInputHidden("LandingPageID", Checked)
@@ -6365,7 +6322,7 @@ ErrorTrap:
                     '
                     Copy = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked."
                     Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0))))
-                    If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                    If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                         HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("PageNotFound", Checked)
                     Else
                         HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.html.html_GetFormInputHidden("PageNotFound", Checked)
@@ -6432,7 +6389,7 @@ ErrorTrap:
                 ' ----- GUID
                 '
                 If editRecord.fieldsLc.ContainsKey("ccguid") Then
-                    Dim contentField As CDefFieldModel = adminContent.fields.Item("ccguid")
+                    Dim contentField As Models.Complex.CDefFieldModel = adminContent.fields.Item("ccguid")
                     HTMLFieldString = genericController.encodeText(editRecord.fieldsLc.Item("ccguid").value)
                     FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid."
                     If HTMLFieldString = "" Then
@@ -6446,7 +6403,7 @@ ErrorTrap:
                         '
                         ' field is read-only except for developers
                         '
-                        If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                        If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                             HTMLFieldString = cpCore.html.html_GetFormInputText2("ccguid", HTMLFieldString, , , , , False) & ""
                         Else
                             HTMLFieldString = cpCore.html.html_GetFormInputText2("ccguid", HTMLFieldString, , , , , True) & cpCore.html.html_GetFormInputHidden("ccguid", HTMLFieldString)
@@ -6465,7 +6422,7 @@ ErrorTrap:
                     ElseIf editRecord.id = 0 Then
                         HTMLFieldString = "(available after save)"
                     Else
-                        EID = genericController.encodeText(cpCore.security.encodeToken(editRecord.id, cpCore.profileStartTime))
+                        EID = genericController.encodeText(cpCore.security.encodeToken(editRecord.id, cpCore.doc.profileStartTime))
                         If (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Then
                             HTMLFieldString = EID
                             'HTMLFieldString = EID _
@@ -6487,7 +6444,7 @@ ErrorTrap:
                 '
                 HTMLFieldString = ""
                 FieldHelp = "The content in which this record is stored. This is similar to a database table."
-                Dim field As CDefFieldModel
+                Dim field As Models.Complex.CDefFieldModel
                 If adminContent.fields.ContainsKey("contentcontrolid") Then
                     field = adminContent.fields("contentcontrolid")
                     With field
@@ -6500,11 +6457,11 @@ ErrorTrap:
                         '
                         '
                         '
-                        If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                        If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                             HTMLFieldString = HTMLFieldString & cpCore.html.html_GetFormInputHidden("ContentControlID", FieldValueInteger)
                         Else
                             RecordContentName = editRecord.contentControlId_Name
-                            Dim RecordCDef As cdefModel
+                            Dim RecordCDef As Models.Complex.cdefModel
                             TableName2 = cpCore.metaData.getContentTablename(RecordContentName)
                             TableID = cpCore.db.getRecordID("Tables", TableName2)
                             '
@@ -6540,7 +6497,7 @@ ErrorTrap:
                                 End If
 
                             End If
-                            If cpCore.authContext.isAuthenticatedAdmin(cpCore) And (LimitContentSelectToThisID = 0) Then
+                            If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) And (LimitContentSelectToThisID = 0) Then
                                 '
                                 ' administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 '
@@ -6557,7 +6514,7 @@ ErrorTrap:
                                 Do While cpCore.db.csOk(CSPointer)
                                     ChildCID = cpCore.db.csGetInteger(CSPointer, "ID")
                                     If (cpCore.metaData.isWithinContent(ChildCID, LimitContentSelectToThisID)) Then
-                                        If (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Or (cpCore.authContext.isAuthenticatedContentManager(cpCore, cpCore.metaData.getContentNameByID(ChildCID))) Then
+                                        If (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) Or (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, cpCore.metaData.getContentNameByID(ChildCID))) Then
                                             CIDList = CIDList & "," & ChildCID
                                         End If
                                     End If
@@ -6669,7 +6626,7 @@ ErrorTrap:
         '   Display field in the admin/edit
         '========================================================================
         '
-        Private Function GetForm_Edit_SiteProperties(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_SiteProperties(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SiteProperties")
             '
             Dim ExpandedSelector As String = ""
@@ -6721,8 +6678,8 @@ ErrorTrap:
             SitePropertyName = ""
             SitePropertyValue = ""
             selector = ""
-            For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                Dim field As CDefFieldModel = keyValuePair.Value
+            For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                 '
                 FieldName = field.nameLc
                 If genericController.vbLCase(FieldName) = "name" Then
@@ -6861,7 +6818,7 @@ ErrorTrap:
                 ' This is really messy -- there must be a better way
                 '
                 addonId = 0
-                If (cpCore.authContext.visit.id = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
+                If (cpCore.doc.authContext.visit.id = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
                     '$$$$$ cache this
                     CS = cpCore.db.csOpen(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(addonGuidDashboard))
                     If cpCore.db.csOk(CS) Then
@@ -6920,7 +6877,7 @@ ErrorTrap:
                     '
                     ' Display the Addon
                     '
-                    If (cpCore.debug_iUserError <> "") Then
+                    If (cpCore.doc.debug_iUserError <> "") Then
                         returnHtml = returnHtml _
                         & "<div style=""clear:both;margin-top:20px;"">&nbsp;</div>" _
                         & "<div style=""clear:both;margin-top:20px;"">" & errorController.error_GetUserError(cpCore) & "</div>"
@@ -6937,12 +6894,12 @@ ErrorTrap:
                     & vbCrLf & "<div><a href=http://www.Contensive.com target=_blank><img style=""border:1px solid #000;"" src=""/ccLib/images/ContensiveAdminLogo.GIF"" border=0 ></A></div>" _
                     & vbCrLf & "<div><strong>Contensive/" & cpCore.codeVersion & "</strong></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.webServer.requestDomain & "</div></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.authContext.user.name & "</div></div>" _
+                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.doc.authContext.user.name & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Quick Reports</div><div style=""float:left;""><a Href=""?" & RequestNameAdminForm & "=" & AdminFormQuickStats & """>Real-Time Activity</A></div></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.id & """>Run Dashboard</A></div></div>" _
+                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.doc.authContext.visit.id & """>Run Dashboard</A></div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?addonguid=" & addonGuidAddonManager & """>Add-on Manager</A></div></div>"
                     '
-                    If (cpCore.debug_iUserError <> "") Then
+                    If (cpCore.doc.debug_iUserError <> "") Then
                         returnHtml = returnHtml _
                         & "<div style=""clear:both;margin-top:20px;"">&nbsp;</div>" _
                         & "<div style=""clear:both;margin-top:20px;"">" & errorController.error_GetUserError(cpCore) & "</div>"
@@ -6998,14 +6955,14 @@ ErrorTrap:
             '
             ' ----- All Visits Today
             '
-            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE ((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date) & ");"
+            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE ((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date) & ");"
             CS = cpCore.db.csOpenSql(SQL)
             If cpCore.db.csOk(CS) Then
                 VisitCount = cpCore.db.csGetInteger(CS, "VisitCount")
                 PageCount = cpCore.db.csGetNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "All Visits</span></td>")
-                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.profileStartTime & "&DateTo=" & cpCore.profileStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.doc.profileStartTime & "&DateTo=" & cpCore.doc.profileStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7013,14 +6970,14 @@ ErrorTrap:
             '
             ' ----- Non-Bot Visits Today
             '
-            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date) & ");"
+            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date) & ");"
             CS = cpCore.db.csOpenSql(SQL)
             If cpCore.db.csOk(CS) Then
                 VisitCount = cpCore.db.csGetInteger(CS, "VisitCount")
                 PageCount = cpCore.db.csGetNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Non-bot Visits</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.profileStartTime.ToShortDateString & "&DateTo=" & cpCore.profileStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.doc.profileStartTime.ToShortDateString & "&DateTo=" & cpCore.doc.profileStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7028,14 +6985,14 @@ ErrorTrap:
             '
             ' ----- Visits Today by new visitors
             '
-            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and(ccVisits.StartTime>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date) & ")AND(ccVisits.VisitorNew<>0);"
+            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and(ccVisits.StartTime>" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date) & ")AND(ccVisits.VisitorNew<>0);"
             CS = cpCore.db.csOpenSql(SQL)
             If cpCore.db.csOk(CS) Then
                 VisitCount = cpCore.db.csGetInteger(CS, "VisitCount")
                 PageCount = cpCore.db.csGetNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Visits by New Visitors</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.profileStartTime.ToShortDateString & "&DateTo=" & cpCore.profileStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.doc.profileStartTime.ToShortDateString & "&DateTo=" & cpCore.doc.profileStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7050,7 +7007,7 @@ ErrorTrap:
                 Stream.Add("<h2>Current Visits</h2>")
                 SQL = "SELECT ccVisits.HTTP_REFERER as referer,ccVisits.remote_addr as Remote_Addr, ccVisits.LastVisitTime as LastVisitTime, ccVisits.PageVisits as PageVisits, ccMembers.Name as MemberName, ccVisits.ID as VisitID, ccMembers.ID as MemberID" _
                     & " FROM ccVisits LEFT JOIN ccMembers ON ccVisits.MemberID = ccMembers.ID" _
-                    & " WHERE (((ccVisits.LastVisitTime)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.AddHours(-1)) & "))" _
+                    & " WHERE (((ccVisits.LastVisitTime)>" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.AddHours(-1)) & "))" _
                     & " ORDER BY ccVisits.LastVisitTime DESC;"
                 CS = cpCore.db.csOpenSql(SQL)
                 If cpCore.db.csOk(CS) Then
@@ -7231,7 +7188,7 @@ ErrorTrap:
         '   Print the Topic Rules section of any edit form
         '========================================================================
         '
-        Private Function GetForm_Edit_LinkAliases(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
+        Private Function GetForm_Edit_LinkAliases(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_LinkAliases")
             '
             Dim LinkCnt As Integer
@@ -7316,7 +7273,7 @@ ErrorTrap:
         '        '   Print the Topic Rules section of any edit form
         '        '========================================================================
         '        '
-        '        Private Function GetForm_Edit_MetaContent(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
+        '        Private Function GetForm_Edit_MetaContent(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
         '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_MetaContent")
         '            '
         '            Dim s As String
@@ -7431,7 +7388,7 @@ ErrorTrap:
         '   Content must conform to ccMember fields
         '========================================================================
         '
-        Private Function GetForm_Edit_EmailRules(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
+        Private Function GetForm_Edit_EmailRules(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_EmailRules")
             '
             Dim f As New stringBuilderLegacyController
@@ -7511,7 +7468,7 @@ ErrorTrap:
         '   Content must conform to ccMember fields
         '========================================================================
         '
-        Private Function GetForm_Edit_EmailTopics(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
+        Private Function GetForm_Edit_EmailTopics(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_EmailTopics")
             '
             Dim f As New stringBuilderLegacyController
@@ -7630,7 +7587,7 @@ ErrorTrap:
         '   Content must conform to ccMember fields
         '========================================================================
         '
-        Private Function GetForm_Edit_MemberGroups(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_MemberGroups(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_MemberGroups")
             '
             Dim f As New stringBuilderLegacyController
@@ -7711,7 +7668,7 @@ ErrorTrap:
                 f.Add(Adminui.EditTableOpen)
                 SectionName = ""
                 GroupCount = 0
-                CanSeeHiddenGroups = cpCore.authContext.isAuthenticatedDeveloper(cpCore)
+                CanSeeHiddenGroups = cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)
                 Do While cpCore.db.csOk(CS)
                     GroupName = cpCore.db.csGet(CS, "GroupName")
                     If (Mid(GroupName, 1, 1) <> "_") Or CanSeeHiddenGroups Then
@@ -7792,7 +7749,7 @@ ErrorTrap:
         '   Special case tab for Layout records
         '========================================================================
         '
-        Private Function GetForm_Edit_LayoutReports(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_LayoutReports(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_LayoutReports")
             '
             Dim FastString As stringBuilderLegacyController
@@ -7820,7 +7777,7 @@ ErrorTrap:
         '   Special case tab for People records
         '========================================================================
         '
-        Private Function GetForm_Edit_MemberReports(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_MemberReports(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_MemberReports")
             '
             Dim FastString As stringBuilderLegacyController
@@ -7831,8 +7788,8 @@ ErrorTrap:
             Call FastString.Add("<td valign=""top"" align=""right"">&nbsp;</td>")
             Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal)
             Call FastString.Add("<ul class=""ccList"">")
-            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""/" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&MemberID=" & editRecord.id & "&DateTo=" & Int(cpCore.profileStartTime.ToOADate) & "&DateFrom=" & Int(cpCore.profileStartTime.ToOADate) - 365 & """>All visits from this person</A></LI>")
-            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""/" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=13&MemberID=" & editRecord.id & "&DateTo=" & Int(CDbl(cpCore.profileStartTime.ToOADate)) & "&DateFrom=" & Int(CDbl(cpCore.profileStartTime.ToOADate) - 365) & """>All orders from this person</A></LI>")
+            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""/" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&MemberID=" & editRecord.id & "&DateTo=" & Int(cpCore.doc.profileStartTime.ToOADate) & "&DateFrom=" & Int(cpCore.doc.profileStartTime.ToOADate) - 365 & """>All visits from this person</A></LI>")
+            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""/" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=13&MemberID=" & editRecord.id & "&DateTo=" & Int(CDbl(cpCore.doc.profileStartTime.ToOADate)) & "&DateFrom=" & Int(CDbl(cpCore.doc.profileStartTime.ToOADate) - 365) & """>All orders from this person</A></LI>")
             Call FastString.Add("</ul>")
             Call FastString.Add("</span></td></tr>")
             GetForm_Edit_MemberReports = Adminui.GetEditPanel((Not allowAdminTabs), "Contensive Reporting", "", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
@@ -7849,7 +7806,7 @@ ErrorTrap:
         '        '   Print the path Rules section of the path edit form
         '        '========================================================================
         '        '
-        '        Private Function GetForm_Edit_PathRules(adminContent As cdefModel, editRecord As editRecordClass) As String
+        '        Private Function GetForm_Edit_PathRules(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
         '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_PathRules")
         '            '
         '            Dim FastString As stringBuilderLegacyController
@@ -7875,7 +7832,7 @@ ErrorTrap:
         '   Print the path Rules section of the path edit form
         '========================================================================
         '
-        Private Function GetForm_Edit_PageContentBlockRules(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_PageContentBlockRules(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_PageContentBlockRules")
             '
             Dim f As New stringBuilderLegacyController
@@ -7922,7 +7879,7 @@ ErrorTrap:
         '   Print the path Rules section of the path edit form
         '========================================================================
         '
-        Private Function GetForm_Edit_LibraryFolderRules(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_LibraryFolderRules(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_LibraryFolderRules")
             '
             Dim Copy As String
@@ -7975,7 +7932,7 @@ ErrorTrap:
         '   EditRecord.ContentID is the ContentControlID of the Edit Record
         '========================================================================
         '
-        Private Function GetForm_Edit_GroupRules(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_GroupRules(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_GroupRules")
             '
             Dim SQL As String
@@ -8108,7 +8065,7 @@ ErrorTrap:
         '   Get all content authorable by the current group
         '========================================================================
         '
-        Private Function GetForm_Edit_ContentGroupRules(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_ContentGroupRules(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_ContentGroupRules")
             '
             Dim SQL As String
@@ -8123,7 +8080,7 @@ ErrorTrap:
             Dim FastString As stringBuilderLegacyController
             Dim Adminui As New adminUIController(cpCore)
             '
-            If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' ----- Open the panel
                 '
@@ -8387,7 +8344,7 @@ ErrorTrap:
         '        '
         '        CS = GetMenuCSPointer("(ccMenuEntries.ParentID is null)or(ccMenuEntries.ParentID=0)", MenuEntryContentName)
         '        If cpCore.db.csOk(CS) Then
-        '            IsAdminLocal = cpcore.authContext.user.user_isAdmin
+        '            IsAdminLocal = cpCore.doc.authContext.user.user_isAdmin
         '            If Not IsAdminLocal Then
         '                ContentManagementList.AddRange(cpCore.metaData.getEditableCdefIdList())
         '            End If
@@ -8642,7 +8599,7 @@ ErrorTrap:
                 ' create the with-menu version
                 '
                 LeftSide = cpCore.siteProperties.getText("AdminHeaderHTML", "Contensive Administration Site")
-                RightSide = cpCore.profileStartTime & "&nbsp;"
+                RightSide = cpCore.doc.profileStartTime & "&nbsp;"
                 '
                 ' AdminTabs
                 '
@@ -8833,11 +8790,11 @@ ErrorTrap:
                 Criteria = Criteria & "AND" & cpCore.metaData.content_getContentControlCriteria(MenuContentName)
             End If
             iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "")
-            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+            If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                 '
                 ' ----- Developer
                 '
-            ElseIf cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            ElseIf cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' ----- Administrator
                 '
@@ -8936,7 +8893,7 @@ ErrorTrap:
         '
         '
         '
-        Private Sub ProcessForms(adminContent As cdefModel, editRecord As editRecordClass)
+        Private Sub ProcessForms(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap
             'Dim th as integer
             'th = profileLogAdminMethodEnter("ProcessForms")
@@ -9150,7 +9107,7 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Private Function GetForm_EditTitle(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_EditTitle(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_EditTitle")
             '
             If (editRecord.id = 0) Then
@@ -9171,7 +9128,7 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Private Function GetForm_EditTitleBar(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_EditTitleBar(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_EditTitleBar")
             '
             Dim Adminui As New adminUIController(cpCore)
@@ -9293,8 +9250,8 @@ ErrorTrap:
                             '
                             ' field has some kind of restriction
                             '
-                            If Not cpCore.authContext.user.Developer Then
-                                If Not cpCore.authContext.user.Admin Then
+                            If Not cpCore.doc.authContext.user.Developer Then
+                                If Not cpCore.doc.authContext.user.Admin Then
                                     '
                                     ' you are not admin
                                     '
@@ -9326,7 +9283,7 @@ ErrorTrap:
         ' true if the field is an editable user field (can edit on edit form and save to database)
         '=============================================================================================
         '
-        Private Function IsFieldEditable(adminContent As cdefModel, editRecord As editRecordClass, Field As CDefFieldModel) As Boolean
+        Private Function IsFieldEditable(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, Field As Models.Complex.CDefFieldModel) As Boolean
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("IsFieldEditable")
             '
             With Field
@@ -9369,7 +9326,7 @@ ErrorTrap:
         '
         '=============================================================================================
         '
-        Private Sub ProcessActionSave(adminContent As cdefModel, editRecord As editRecordClass, UseContentWatchLink As Boolean)
+        Private Sub ProcessActionSave(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, UseContentWatchLink As Boolean)
             Try
                 Dim EditorStyleRulesFilename As String
                 '
@@ -9377,7 +9334,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    If Not (cpCore.debug_iUserError <> "") Then
+                    If Not (cpCore.doc.debug_iUserError <> "") Then
                         Select Case genericController.vbUCase(adminContent.ContentTableName)
                             Case genericController.vbUCase("ccMembers")
                                 '
@@ -9517,7 +9474,7 @@ ErrorTrap:
                 '
                 ' If the content supports datereviewed, mark it
                 '
-                If (cpCore.debug_iUserError <> "") Then
+                If (cpCore.doc.debug_iUserError <> "") Then
                     AdminForm = AdminSourceForm
                 End If
                 AdminAction = AdminActionNop ' convert so action can be used in as a refresh
@@ -9530,11 +9487,11 @@ ErrorTrap:
         '   Create a duplicate record
         '=============================================================================================
         '
-        Private Sub ProcessActionDuplicate(adminContent As cdefModel, editRecord As editRecordClass)
+        Private Sub ProcessActionDuplicate(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("ProcessActionDuplicate")
             ' converted array to dictionary - Dim FieldPointer As Integer
             '
-            If Not (cpCore.debug_iUserError <> "") Then
+            If Not (cpCore.doc.debug_iUserError <> "") Then
                 Select Case genericController.vbUCase(adminContent.ContentTableName)
                     Case "CCEMAIL"
                         '
@@ -9543,7 +9500,7 @@ ErrorTrap:
                         Call LoadEditRecord(adminContent, editRecord)
                         Call LoadEditRecord_Request(adminContent, editRecord)
                         '
-                        If Not (cpCore.debug_iUserError <> "") Then
+                        If Not (cpCore.doc.debug_iUserError <> "") Then
                             '
                             ' ----- Convert this to the Duplicate
                             '
@@ -9567,7 +9524,7 @@ ErrorTrap:
                         Call LoadEditRecord(adminContent, editRecord)
                         Call LoadEditRecord_Request(adminContent, editRecord)
                         '
-                        If Not (cpCore.debug_iUserError <> "") Then
+                        If Not (cpCore.doc.debug_iUserError <> "") Then
                             '
                             ' ----- Convert this to the Duplicate
                             '
@@ -9593,8 +9550,8 @@ ErrorTrap:
                             '
                             ' block fields that must be unique
                             '
-                            For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                                Dim field As CDefFieldModel = keyValuePair.Value
+                            For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                                Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                                 With field
                                     If genericController.vbLCase(.nameLc) = "email" Then
                                         If (LCase(adminContent.ContentTableName) = "ccmembers") And (genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowemaillogin", False))) Then
@@ -9666,7 +9623,7 @@ ErrorTrap:
                 '
                 ' ----- Get the baked version
                 '
-                BakeName = "AdminMenu" & Format(cpCore.authContext.user.id, "00000000")
+                BakeName = "AdminMenu" & Format(cpCore.doc.authContext.user.id, "00000000")
                 GetMenuTopMode = genericController.encodeText(cpCore.cache.getObject(Of String)(BakeName))
                 MenuDelimiterPosition = genericController.vbInstr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
                 If MenuDelimiterPosition > 1 Then
@@ -9683,7 +9640,7 @@ ErrorTrap:
                         '
                         ' There are menu items to bake
                         '
-                        IsAdminLocal = cpCore.authContext.isAuthenticatedAdmin(cpCore)
+                        IsAdminLocal = cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)
                         If Not IsAdminLocal Then
                             '
                             ' content managers, need the ContentManagementList
@@ -9944,7 +9901,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "GetContentChildTool, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
                 '
@@ -9983,7 +9940,7 @@ ErrorTrap:
                         Description = Description _
                             & "<div>&nbsp;</div>" _
                             & "<div>Creating content [" & ChildContentName & "] from [" & ParentContentName & "]</div>"
-                        Call cpCore.metaData.createContentChild(ChildContentName, ParentContentName, cpCore.authContext.user.id)
+                        Call cpCore.metaData.createContentChild(ChildContentName, ParentContentName, cpCore.doc.authContext.user.id)
                         ChildContentID = cpCore.metaData.getContentId(ChildContentName)
                         '
                         ' Create Group and Rule
@@ -10262,7 +10219,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "HouseKeepingControl, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
                 '
@@ -10326,7 +10283,7 @@ ErrorTrap:
                     DateValue = cpCore.db.csGetDate(CSServers, "DateAdded")
                     If DateValue <> Date.MinValue Then
                         Copy = genericController.encodeText(DateValue)
-                        AgeInDays = genericController.encodeText(Int(cpCore.profileStartTime - DateValue))
+                        AgeInDays = genericController.encodeText(Int(cpCore.doc.profileStartTime - DateValue))
                     End If
                 End If
                 Call cpCore.db.csClose(CSServers)
@@ -10452,7 +10409,7 @@ ErrorTrap:
             '                '
             '                '
             '                Call cpCore.webServer.redirect("/" & cpCore.serverconfig.appconfig.adminRoute, "StyleEditor, Cancel Button Pressed", False)
-            '            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            '            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
             '                '
             '                '
             '                '
@@ -10812,7 +10769,7 @@ ErrorTrap:
                 Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "Downloads, Cancel Button Pressed", False)
             End If
             '
-            If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Must be a developer
                 '
@@ -10859,10 +10816,10 @@ ErrorTrap:
                                                 Call cpCore.db.csSet(CSDst, "Name", cpCore.db.csGetText(CSSrc, "name"))
                                                 Call cpCore.db.csSet(CSDst, SQLFieldName, cpCore.db.csGetText(CSSrc, SQLFieldName))
                                                 If genericController.vbLCase(cpCore.db.csGetText(CSSrc, "command")) = "xml" Then
-                                                    Call cpCore.db.csSet(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".xml")
+                                                    Call cpCore.db.csSet(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.doc.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".xml")
                                                     Call cpCore.db.csSet(CSDst, "Command", "BUILDXML")
                                                 Else
-                                                    Call cpCore.db.csSet(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv")
+                                                    Call cpCore.db.csSet(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.doc.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv")
                                                     Call cpCore.db.csSet(CSDst, "Command", "BUILDCSV")
                                                 End If
                                             End If
@@ -10886,7 +10843,7 @@ ErrorTrap:
                                     TableName = cpCore.metaData.getContentTablename(ContentName)
                                     Criteria = cpCore.metaData.content_getContentControlCriteria(ContentName)
                                     Name = "CSV Download, " & ContentName
-                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
+                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.doc.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
                                     Call cpCore.db.csSet(CS, "Name", Name)
                                     Call cpCore.db.csSet(CS, "Filename", Filename)
                                     Call cpCore.db.csSet(CS, "Command", "BUILDCSV")
@@ -10903,7 +10860,7 @@ ErrorTrap:
                                     TableName = cpCore.metaData.getContentTablename(ContentName)
                                     Criteria = cpCore.metaData.content_getContentControlCriteria(ContentName)
                                     Name = "XML Download, " & ContentName
-                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".xml"
+                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.doc.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".xml"
                                     Call cpCore.db.csSet(CS, "Name", Name)
                                     Call cpCore.db.csSet(CS, "Filename", Filename)
                                     Call cpCore.db.csSet(CS, "Command", "BUILDXML")
@@ -11153,7 +11110,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function GetForm_Edit_Tabs(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditorContext As csv_contentTypeEnum, ByVal allowAjaxTabs As Boolean, ByVal TemplateIDForStyles As Integer, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
+        Private Function GetForm_Edit_Tabs(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditorContext As csv_contentTypeEnum, ByVal allowAjaxTabs As Boolean, ByVal TemplateIDForStyles As Integer, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
             Dim returnHtml As String = ""
             Try
                 '
@@ -11180,8 +11137,8 @@ ErrorTrap:
                 ' ----- read in help
                 '
                 IDList = ""
-                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                    Dim field As CDefFieldModel = keyValuePair.Value
+                For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                    Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                     IDList = IDList & "," & field.id
                 Next
                 If IDList <> "" Then
@@ -11210,8 +11167,8 @@ ErrorTrap:
                 End If
                 '
                 FormFieldList = ","
-                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                    Dim field As CDefFieldModel = keyValuePair.Value
+                For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                    Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                     If (field.authorable) And (field.active) And (Not TabsFound.Contains(field.editTabName.ToLower())) Then
                         TabsFound.Add(field.editTabName.ToLower())
                         fieldNameLc = field.nameLc
@@ -11488,7 +11445,7 @@ ErrorTrap:
                 SQLFieldName = "SQLQuery"
             End If
             '
-            If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Must be a developer
                 '
@@ -11543,7 +11500,7 @@ ErrorTrap:
                                         CS = cpCore.db.csInsertRecord("Tasks")
                                         If cpCore.db.csOk(CS) Then
                                             RecordName = "CSV Download, Custom Report [" & Name & "]"
-                                            Filename = "CustomReport_" & CStr(genericController.dateToSeconds(cpCore.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
+                                            Filename = "CustomReport_" & CStr(genericController.dateToSeconds(cpCore.doc.profileStartTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
                                             Call cpCore.db.csSet(CS, "Name", RecordName)
                                             Call cpCore.db.csSet(CS, "Filename", Filename)
                                             If Format = "XML" Then
@@ -11693,7 +11650,7 @@ ErrorTrap:
         '       Findstring( ColumnPointer )
         '========================================================================
         '
-        Private Function GetForm_Index(adminContent As cdefModel, editRecord As editRecordClass, ByVal IsEmailContent As Boolean) As String
+        Private Function GetForm_Index(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, ByVal IsEmailContent As Boolean) As String
             Dim returnForm As String = ""
             Try
                 Const FilterClosedLabel = "<div style=""font-size:9px;text-align:center;"">&nbsp;<br>F<br>i<br>l<br>t<br>e<br>r<br>s</div>"
@@ -11808,7 +11765,7 @@ ErrorTrap:
                         "This content [" & adminContent.Name & "] cannot be accessed because it has no fields. Please contact your application developer for more assistance." _
                         , "Content [" & adminContent.Name & "] has no field records."
                         ))
-                ElseIf (adminContent.DeveloperOnly And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore))) Then
+                ElseIf (adminContent.DeveloperOnly And (Not cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore))) Then
                     '
                     ' Developer Content and not developer
                     '
@@ -11821,7 +11778,7 @@ ErrorTrap:
                     '
                     ' get access rights
                     '
-                    Call cpCore.authContext.getContentAccessRights(cpCore, adminContent.Name, allowCMEdit, allowCMAdd, allowCMDelete)
+                    Call cpCore.doc.authContext.getContentAccessRights(cpCore, adminContent.Name, allowCMEdit, allowCMAdd, allowCMDelete)
                     '
                     ' detemine which subform to disaply
                     '
@@ -11959,7 +11916,7 @@ ErrorTrap:
                                 End If
                                 SubTitlePart = ""
                                 If .LastEditedByMe Then
-                                    SubTitlePart = SubTitlePart & " by " & cpCore.authContext.user.name
+                                    SubTitlePart = SubTitlePart & " by " & cpCore.doc.authContext.user.name
                                 End If
                                 If .LastEditedPast30Days Then
                                     SubTitlePart = SubTitlePart & " in the past 30 days"
@@ -12526,7 +12483,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="adminContent"></param>
         ''' <returns></returns>
-        Public Function GetForm_IndexFilterContent(adminContent As cdefModel) As String
+        Public Function GetForm_IndexFilterContent(adminContent As Models.Complex.cdefModel) As String
             Dim returnContent As String = ""
             Try
                 Dim RecordID As Integer
@@ -12858,7 +12815,7 @@ ErrorTrap:
         '       if it is empty, setup defaults
         '=================================================================================
         '
-        Private Function LoadIndexConfig(adminContent As cdefModel) As indexConfigClass
+        Private Function LoadIndexConfig(adminContent As Models.Complex.cdefModel) As indexConfigClass
             Dim returnIndexConfig As New indexConfigClass
             Try
                 '
@@ -13029,7 +12986,7 @@ ErrorTrap:
                         'ReDim .Columns(.Columns.Count - 1)
                         'Ptr = 0
                         For Each keyValuepair In adminContent.adminColumns
-                            Dim cdefAdminColumn As cdefModel.CDefAdminColumnClass = keyValuepair.Value
+                            Dim cdefAdminColumn As Models.Complex.cdefModel.CDefAdminColumnClass = keyValuepair.Value
                             Dim column As New indexConfigColumnClass
                             column.Name = cdefAdminColumn.Name
                             column.Width = cdefAdminColumn.Width
@@ -13105,7 +13062,7 @@ ErrorTrap:
         '   Process request input on the IndexConfig
         '========================================================================================
         '
-        Private Sub SetIndexSQL_ProcessIndexConfigRequests(adminContent As cdefModel, editRecord As editRecordClass, ByRef IndexConfig As indexConfigClass)
+        Private Sub SetIndexSQL_ProcessIndexConfigRequests(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, ByRef IndexConfig As indexConfigClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("ProcessIndexConfigRequests")
             '
             Dim TestInteger As Integer
@@ -13211,7 +13168,7 @@ ErrorTrap:
                                                     If (.FindWords.ContainsKey(FindName)) Then
                                                         .FindWords.Item(FindName).Value = FindValue
                                                     Else
-                                                        Dim field As CDefFieldModel = adminContent.fields(FindName.ToLower)
+                                                        Dim field As Models.Complex.CDefFieldModel = adminContent.fields(FindName.ToLower)
                                                         Dim findWord As New indexConfigFindWordClass
                                                         findWord.Name = FindName
                                                         findWord.Value = FindValue
@@ -13702,7 +13659,7 @@ ErrorTrap:
         '
         '=================================================================================
         '
-        Private Function GetForm_Index_AdvancedSearch(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Index_AdvancedSearch(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             Dim returnForm As String = ""
             Try
                 '
@@ -13710,7 +13667,7 @@ ErrorTrap:
                 Dim MatchOption As FindWordMatchEnum
                 Dim FormFieldPtr As Integer
                 Dim FormFieldCnt As Integer
-                Dim CDef As cdefModel
+                Dim CDef As Models.Complex.cdefModel
                 Dim FieldName As String
                 Dim Stream As New stringBuilderLegacyController
                 Dim FieldPtr As Integer
@@ -13825,8 +13782,8 @@ ErrorTrap:
                     ReDim Preserve FieldMatchOptions(FieldSize)
                     ReDim Preserve FieldLookupContentName(FieldSize)
                     ReDim Preserve FieldLookupList(FieldSize)
-                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         If FieldPtr >= FieldSize Then
                             FieldSize = FieldSize + 100
                             ReDim Preserve FieldNames(FieldSize)
@@ -14214,7 +14171,7 @@ ErrorTrap:
         '   Export the Admin List form results
         '=============================================================================
         '
-        Private Function GetForm_Index_Export(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Index_Export(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap
             '
             Dim AllowContentAccess As Boolean
@@ -14261,9 +14218,9 @@ ErrorTrap:
                 '
                 ' get content access rights
                 '
-                Call cpCore.authContext.getContentAccessRights(cpCore, adminContent.Name, allowContentEdit, allowContentAdd, allowContentDelete)
+                Call cpCore.doc.authContext.getContentAccessRights(cpCore, adminContent.Name, allowContentEdit, allowContentAdd, allowContentDelete)
                 If Not allowContentEdit Then
-                    'If Not cpcore.authContext.user.main_IsContentManager2(AdminContent.Name) Then
+                    'If Not cpCore.doc.authContext.user.main_IsContentManager2(AdminContent.Name) Then
                     '
                     ' You must be a content manager of this content to use this tool
                     '
@@ -14292,7 +14249,7 @@ ErrorTrap:
                         End If
                     End If
                     If ExportName = "" Then
-                        ExportName = adminContent.Name & " export for " & cpCore.authContext.user.name
+                        ExportName = adminContent.Name & " export for " & cpCore.doc.authContext.user.name
                     End If
                     '
                     ' Get the SQL parts
@@ -14385,7 +14342,7 @@ ErrorTrap:
                                 & cr2 & "<td class=""exportTblCaption"">Record Limit</td>" _
                                 & cr2 & "<td class=""exportTblInput"">" & cpCore.html.html_GetFormInputText2("RecordLimit", RecordLimitText) & "</td>" _
                                 & cr & "</tr>"
-                            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                            If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                                 Content = Content _
                                     & cr & "<tr>" _
                                     & cr2 & "<td class=""exportTblCaption"">Results SQL</td>" _
@@ -14409,7 +14366,7 @@ ErrorTrap:
                                 & cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
                                 & ""
                             ButtonList = ButtonCancel & "," & ButtonRequestDownload
-                            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                            If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                                 ButtonList = ButtonList & "," & ButtonRefresh
                             End If
                         End If
@@ -14430,7 +14387,7 @@ ErrorTrap:
         '   Print the Configure Index Form
         '=============================================================================
         '
-        Private Function GetForm_Index_SetColumns(adminContent As cdefModel, editRecord As editRecordClass) As String
+        Private Function GetForm_Index_SetColumns(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap
             '
             Dim Button As String
@@ -14472,7 +14429,7 @@ ErrorTrap:
             Dim CSPointer As Integer
             Dim RecordID As Integer
             Dim ContentID As Integer
-            Dim CDef As cdefModel
+            Dim CDef As Models.Complex.cdefModel
             'Dim AdminColumn As appServices_metaDataClass.CDefAdminColumnType
             Dim RowFieldID() As Integer
             Dim RowFieldWidth() As Integer
@@ -14576,8 +14533,8 @@ ErrorTrap:
                     ' Make sure the FieldNameToAdd is not-inherited, if not, create new field
                     '
                     If (FieldIDToAdd <> 0) Then
-                        For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                            Dim field As CDefFieldModel = keyValuePair.Value
+                        For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                            Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                             If field.id = FieldIDToAdd Then
                                 'If CDef.fields(FieldPtr).Name = FieldNameToAdd Then
                                 If field.inherited Then
@@ -14604,7 +14561,7 @@ ErrorTrap:
                     '
                     For Each kvp In IndexConfig.Columns
                         Dim column As indexConfigColumnClass = kvp.Value
-                        Dim field As CDefFieldModel = adminContent.fields(column.Name.ToLower())
+                        Dim field As Models.Complex.CDefFieldModel = adminContent.fields(column.Name.ToLower())
                         If field.inherited Then
                             SourceContentID = field.contentId
                             SourceName = field.nameLc
@@ -14872,7 +14829,7 @@ ErrorTrap:
                             ' print column headers - anchored so they sort columns
                             '
                             ColumnWidth = CInt(100 * (column.Width / ColumnWidthTotal))
-                            Dim field As CDefFieldModel
+                            Dim field As Models.Complex.CDefFieldModel
                             field = adminContent.fields(column.Name.ToLower())
                             With field
                                 fieldId = .id
@@ -14911,8 +14868,8 @@ ErrorTrap:
                     Stream.Add(SpanClassAdminNormal & "This Content Definition has no fields</span><br>")
                 Else
                     Stream.Add(SpanClassAdminNormal & "<br>")
-                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                         With field
                             '
                             ' display the column if it is not in use
@@ -15056,7 +15013,7 @@ ErrorTrap:
             Dim ErrorList As String
             Dim linkAlias As String
             '
-            If (cpCore.debug_iUserError <> "") Then
+            If (cpCore.doc.debug_iUserError <> "") Then
                 Call errorController.error_AddUserError(cpCore, "Existing pages could not be checked for Link Alias names because there was another error on this page. Correct this error, and turn Link Alias on again to rerun the verification.")
             Else
                 CS = cpCore.db.csOpen("Page Content")
@@ -15083,7 +15040,7 @@ ErrorTrap:
                     Call cpCore.db.csGoNext(CS)
                 Loop
                 Call cpCore.db.csClose(CS)
-                If (cpCore.debug_iUserError <> "") Then
+                If (cpCore.doc.debug_iUserError <> "") Then
                     '
                     ' Throw out all the details of what happened, and add one simple error
                     '
@@ -15157,7 +15114,7 @@ ErrorTrap:
                 '
                 ' From here down will return a form
                 '
-                If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Does not have permission
                     '
@@ -15316,7 +15273,7 @@ ErrorTrap:
                 ' Cancel just exits with no content
                 '
                 Exit Function
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Not Admin Error
                 '
@@ -15783,7 +15740,7 @@ ErrorTrap:
                     ' Cancel just exits with no content
                     '
                     Return ""
-                ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Not Admin Error
                     '
@@ -15866,7 +15823,7 @@ ErrorTrap:
                 ' Cancel just exits with no content
                 '
                 Exit Function
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Not Admin Error
                 '
@@ -16128,7 +16085,7 @@ ErrorTrap:
         '
         '
         '
-        Private Sub SetIndexSQL(adminContent As cdefModel, editRecord As editRecordClass, IndexConfig As indexConfigClass, ByRef Return_AllowAccess As Boolean, ByRef return_sqlFieldList As String, ByRef return_sqlFrom As String, ByRef return_SQLWhere As String, ByRef return_SQLOrderBy As String, ByRef return_IsLimitedToSubContent As Boolean, ByRef return_ContentAccessLimitMessage As String, ByRef FieldUsedInColumns As Dictionary(Of String, Boolean), IsLookupFieldValid As Dictionary(Of String, Boolean))
+        Private Sub SetIndexSQL(adminContent As Models.Complex.cdefModel, editRecord As editRecordClass, IndexConfig As indexConfigClass, ByRef Return_AllowAccess As Boolean, ByRef return_sqlFieldList As String, ByRef return_sqlFrom As String, ByRef return_SQLWhere As String, ByRef return_SQLOrderBy As String, ByRef return_IsLimitedToSubContent As Boolean, ByRef return_ContentAccessLimitMessage As String, ByRef FieldUsedInColumns As Dictionary(Of String, Boolean), IsLookupFieldValid As Dictionary(Of String, Boolean))
             Try
                 Dim LookupQuery As String
                 Dim ContentName As String
@@ -16169,8 +16126,8 @@ ErrorTrap:
                 ' ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
                 '
                 return_sqlFrom = adminContent.ContentTableName
-                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                    Dim field As CDefFieldModel = keyValuePair.Value
+                For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                    Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                     With field
                         FieldPtr = .id ' quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                         IncludedInColumns = False
@@ -16346,25 +16303,25 @@ ErrorTrap:
                 ' Where Clause: edited by me
                 '
                 If IndexConfig.LastEditedByMe Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedBy=" & cpCore.authContext.user.id & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedBy=" & cpCore.doc.authContext.user.id & ")"
                 End If
                 '
                 ' Where Clause: edited today
                 '
                 If IndexConfig.LastEditedToday Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date) & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date) & ")"
                 End If
                 '
                 ' Where Clause: edited past week
                 '
                 If IndexConfig.LastEditedPast7Days Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date.AddDays(-7)) & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date.AddDays(-7)) & ")"
                 End If
                 '
                 ' Where Clause: edited past month
                 '
                 If IndexConfig.LastEditedPast30Days Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.profileStartTime.Date.AddDays(-30)) & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date.AddDays(-30)) & ")"
                 End If
                 '
                 ' Where Clause: Where Pairs
@@ -16375,8 +16332,8 @@ ErrorTrap:
                         ' Verify that the fieldname called out is in this table
                         '
                         If adminContent.fields.Count > 0 Then
-                            For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                                Dim field As CDefFieldModel = keyValuePair.Value
+                            For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                                Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                                 With field
                                     If genericController.vbUCase(.nameLc) = genericController.vbUCase(WherePair(0, WCount)) Then
                                         '
@@ -16409,8 +16366,8 @@ ErrorTrap:
                             ' Get FieldType
                             '
                             If adminContent.fields.Count > 0 Then
-                                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
-                                    Dim field As CDefFieldModel = keyValuePair.Value
+                                For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In adminContent.fields
+                                    Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
                                     With field
                                         FieldPtr = .id ' quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                                         If genericController.vbLCase(.nameLc) = FindWordName Then

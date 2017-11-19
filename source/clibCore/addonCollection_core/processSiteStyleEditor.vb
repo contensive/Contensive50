@@ -23,7 +23,7 @@ Namespace Contensive.Addons.Core
             Try
                 Dim processor As CPClass = DirectCast(cp, CPClass)
                 Dim cpCore As coreClass = processor.core
-                If cpCore.authContext.isAuthenticated() And cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                If cpCore.doc.authContext.isAuthenticated() And cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Save the site sites
                     '

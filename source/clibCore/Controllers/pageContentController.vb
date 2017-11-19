@@ -48,7 +48,7 @@ Namespace Contensive.Core.Controllers
                 Dim PageNotFoundSource As String = ""
                 Dim IsPageNotFound As Boolean = False
                 '
-                If cpCore.continueProcessing Then
+                If cpCore.doc.continueProcessing Then
                     '
                     ' -- load requested page/template
                     cpCore.doc.loadPage(cpCore.docProperties.getInteger(rnPageId), cpCore.webServer.requestDomain)
@@ -64,8 +64,8 @@ Namespace Contensive.Core.Controllers
                             .recordId = cpCore.doc.page.id
                         },
                         .isIncludeAddon = False,
-                        .personalizationAuthenticated = cpCore.authContext.visit.VisitAuthenticated,
-                        .personalizationPeopleId = cpCore.authContext.user.id
+                        .personalizationAuthenticated = cpCore.doc.authContext.visit.VisitAuthenticated,
+                        .personalizationPeopleId = cpCore.doc.authContext.user.id
                     }
 
                     '
@@ -74,7 +74,7 @@ Namespace Contensive.Core.Controllers
                     For Each addon As addonModel In templateAddonList
                         Dim AddonStatusOK As Boolean = True
                         returnHtml &= cpCore.addon.executeDependency(addon, executeContext)
-                        'returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.authContext.user.id, cpCore.authContext.visit.VisitAuthenticated)
+                        'returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.doc.authContext.user.id, cpCore.doc.authContext.visit.VisitAuthenticated)
                     Next
                     '
                     ' -- execute page Dependencies
@@ -82,7 +82,7 @@ Namespace Contensive.Core.Controllers
                     For Each addon As addonModel In pageAddonList
                         Dim AddonStatusOK As Boolean = True
                         returnHtml &= cpCore.addon.executeDependency(addon, executeContext)
-                        'returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.authContext.user.id, cpCore.authContext.visit.VisitAuthenticated)
+                        'returnHtml &= cpCore.addon.executeDependency(addon.id, CPUtilsBaseClass.addonContext.ContextSimple, pageContentModel.contentName, cpCore.doc.page.id, "copyFilename", "", 0, AddonStatusOK, cpCore.doc.authContext.user.id, cpCore.doc.authContext.visit.VisitAuthenticated)
                     Next
                     '
                     cpCore.doc.adminWarning = cpCore.docProperties.getText("main_AdminWarningMsg")
@@ -91,9 +91,9 @@ Namespace Contensive.Core.Controllers
                     ' todo move cookie test to htmlDoc controller
                     ' -- Add cookie test
                     Dim AllowCookieTest As Boolean
-                    AllowCookieTest = cpCore.siteProperties.allowVisitTracking And (cpCore.authContext.visit.PageVisits = 1)
+                    AllowCookieTest = cpCore.siteProperties.allowVisitTracking And (cpCore.doc.authContext.visit.PageVisits = 1)
                     If AllowCookieTest Then
-                        Call cpCore.html.addOnLoadJs("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.authContext.visit.id, cpCore.profileStartTime) & "')};", "Cookie Test")
+                        Call cpCore.html.addOnLoadJs("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.doc.authContext.visit.id, cpCore.doc.profileStartTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -116,7 +116,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                             Next
                             Call cpCore.db.csSet(cs, "copy", Copy)
-                            Call cpCore.db.csSet(cs, "VisitId", cpCore.authContext.visit.id)
+                            Call cpCore.db.csSet(cs, "VisitId", cpCore.doc.authContext.visit.id)
                         End If
                         Call cpCore.db.csClose(cs)
                     End If
@@ -146,7 +146,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     'Call AppendLog("main_init(), 3210 - exit for rc/ri redirect ")
                                     '
-                                    cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
+                                    cpCore.doc.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                     Return String.Empty
                                 Else
                                     cpCore.doc.adminWarning = "<p>The site attempted to automatically jump to another page, but there was a problem with the page that included the link.<p>"
@@ -175,8 +175,8 @@ Namespace Contensive.Core.Controllers
                                     Dim log As Models.Entity.libraryFileLogModel = Models.Entity.libraryFileLogModel.add(cpCore)
                                     If (log IsNot Nothing) Then
                                         log.FileID = file.id
-                                        log.VisitID = cpCore.authContext.visit.id
-                                        log.MemberID = cpCore.authContext.user.id
+                                        log.VisitID = cpCore.doc.authContext.visit.id
+                                        log.MemberID = cpCore.doc.authContext.user.id
                                     End If
                                     '
                                     ' -- and go
@@ -217,7 +217,7 @@ Namespace Contensive.Core.Controllers
                         ElseIf (ClipBoard = "") Then
                             ' state not working...
                         Else
-                            If Not cpCore.authContext.isAuthenticatedContentManager(cpCore, ClipParentContentName) Then
+                            If Not cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, ClipParentContentName) Then
                                 Call errorController.error_AddUserError(cpCore, "The paste operation failed because you are not a content manager of the Clip Parent")
                             Else
                                 '
@@ -313,8 +313,8 @@ Namespace Contensive.Core.Controllers
                                                     '
                                                     ' Live Editing
                                                     '
-                                                    Call cpCore.cache.invalidateObject_Content(ClipChildContentName)
-                                                    Call cpCore.cache.invalidateObject_Content(ClipParentContentName)
+                                                    Call cpCore.cache.invalidateAllObjectsInContent(ClipChildContentName)
+                                                    Call cpCore.cache.invalidateAllObjectsInContent(ClipParentContentName)
                                                 End If
                                             End If
                                         End If
@@ -474,7 +474,7 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
                                 '
-                                If (cpCore.errorCount = 0) And cpCore.siteProperties.getBoolean("LinkForwardAutoInsert") And (Not IsInLinkForwardTable) Then
+                                If (cpCore.doc.errorCount = 0) And cpCore.siteProperties.getBoolean("LinkForwardAutoInsert") And (Not IsInLinkForwardTable) Then
                                     '
                                     ' Add a new Link Forward entry
                                     '
@@ -498,7 +498,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' ----- do anonymous access blocking
                     '
-                    If Not cpCore.authContext.isAuthenticated() Then
+                    If Not cpCore.doc.authContext.isAuthenticated() Then
                         If (cpCore.webServer.requestPath <> "/") And genericController.vbInstr(1, "/" & cpCore.serverConfig.appConfig.adminRoute, cpCore.webServer.requestPath, vbTextCompare) <> 0 Then
                             '
                             ' admin page is excluded from custom blocking
@@ -509,7 +509,7 @@ Namespace Contensive.Core.Controllers
                                 Case 1
                                     '
                                     ' -- block with login
-                                    cpCore.continueProcessing = False
+                                    cpCore.doc.continueProcessing = False
                                     Return cpCore.addon.execute(
                                         addonModel.create(cpCore, addonGuidLoginPage),
                                         New CPUtilsBaseClass.addonExecuteContext() With {
@@ -519,11 +519,11 @@ Namespace Contensive.Core.Controllers
                                 Case 2
                                     '
                                     ' -- block with custom content
-                                    cpCore.continueProcessing = False
+                                    cpCore.doc.continueProcessing = False
                                     Call cpCore.doc.setMetaContent(0, 0)
                                     Call cpCore.html.addOnLoadJs("document.body.style.overflow='scroll'", "Anonymous User Block")
                                     Return cpCore.html.getHtmlDoc(
-                                        cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated),
+                                        cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.doc.authContext.user.id, True, cpCore.doc.authContext.isAuthenticated),
                                         TemplateDefaultBodyTag,
                                         True,
                                         True,
@@ -677,7 +677,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                             End If
                             Call cpCore.webServer.redirect(linkDst, Copy, False)
-                            cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
+                            cpCore.doc.continueProcessing = False '--- should be disposed by caller --- Call dispose
                         End If
                     End If
                 End If
@@ -696,7 +696,7 @@ Namespace Contensive.Core.Controllers
                             Call cpCore.webServer.setResponseStatus("404 Not Found")
                             cpCore.docProperties.setProperty(rnPageId, cpCore.doc.main_GetPageNotFoundPageId())
                             'Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
-                            If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                            If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                                 cpCore.doc.adminWarning = PageNotFoundReason
                                 cpCore.doc.adminWarningPageID = 0
                             End If
@@ -759,11 +759,11 @@ Namespace Contensive.Core.Controllers
                     ' Load the instructions
                     '
                     f = loadFormPageInstructions(cpcore, FormInstructions, Formhtml)
-                    If f.AuthenticateOnFormProcess And Not cpcore.authContext.isAuthenticated() And cpcore.authContext.isRecognized(cpcore) Then
+                    If f.AuthenticateOnFormProcess And Not cpCore.doc.authContext.isAuthenticated() And cpCore.doc.authContext.isRecognized(cpcore) Then
                         '
                         ' If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                         '
-                        Call cpcore.authContext.logout(cpcore)
+                        Call cpCore.doc.authContext.logout(cpcore)
                     End If
                     CSPeople = -1
                     Success = True
@@ -791,7 +791,7 @@ Namespace Contensive.Core.Controllers
                                         errorController.error_AddUserError(cpcore, "The field [" & genericController.encodeHTML(.Caption) & "] is required.")
                                     Else
                                         If Not cpcore.db.csOk(CSPeople) Then
-                                            CSPeople = cpcore.db.csOpenRecord("people", cpcore.authContext.user.id)
+                                            CSPeople = cpcore.db.csOpenRecord("people", cpCore.doc.authContext.user.id)
                                         End If
                                         If cpcore.db.csOk(CSPeople) Then
                                             Select Case genericController.vbUCase(.PeopleField)
@@ -823,7 +823,7 @@ Namespace Contensive.Core.Controllers
                                     ' Group main_MemberShip
                                     '
                                     IsInGroup = cpcore.docProperties.getBoolean("Group" & .GroupName)
-                                    WasInGroup = cpcore.authContext.IsMemberOfGroup2(cpcore, .GroupName)
+                                    WasInGroup = cpCore.doc.authContext.IsMemberOfGroup2(cpcore, .GroupName)
                                     If WasInGroup And Not IsInGroup Then
                                         groupController.group_DeleteGroupMember(cpcore, .GroupName)
                                     ElseIf IsInGroup And Not WasInGroup Then
@@ -849,7 +849,7 @@ Namespace Contensive.Core.Controllers
                         ' Authenticate
                         '
                         If f.AuthenticateOnFormProcess Then
-                            Call cpcore.authContext.authenticateById(cpcore, cpcore.authContext.user.id, cpcore.authContext)
+                            Call cpCore.doc.authContext.authenticateById(cpcore, cpCore.doc.authContext.user.id, cpCore.doc.authContext)
                         End If
                         '
                         ' Join Group requested by page that created form
@@ -1011,7 +1011,7 @@ Namespace Contensive.Core.Controllers
             Dim CaptionSpan As String
             Dim Caption As String
             Dim IsRequiredByCDef As Boolean
-            Dim PeopleCDef As cdefModel
+            Dim PeopleCDef As Models.Complex.cdefModel
             '
             IsRetry = (cpcore.docProperties.getInteger("ContensiveFormPageID") <> 0)
             '
@@ -1041,7 +1041,7 @@ Namespace Contensive.Core.Controllers
                                 CaptionSpan = "<span>"
                             End If
                             If Not cpcore.db.csOk(CSPeople) Then
-                                CSPeople = cpcore.db.csOpenRecord("people", cpcore.authContext.user.id)
+                                CSPeople = cpcore.db.csOpenRecord("people", cpCore.doc.authContext.user.id)
                             End If
                             Caption = .Caption
                             If .REquired Or genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("People", .PeopleField, "Required")) Then
@@ -1058,7 +1058,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' Group main_MemberShip
                             '
-                            GroupValue = cpcore.authContext.IsMemberOfGroup2(cpcore, .GroupName)
+                            GroupValue = cpCore.doc.authContext.IsMemberOfGroup2(cpcore, .GroupName)
                             Body = f.RepeatCell
                             Body = genericController.vbReplace(Body, "{{CAPTION}}", cpcore.html.html_GetFormInputCheckBox2("Group" & .GroupName, GroupValue), 1, 99, vbTextCompare)
                             Body = genericController.vbReplace(Body, "{{FIELD}}", .Caption)
@@ -1080,7 +1080,7 @@ Namespace Contensive.Core.Controllers
             & errorController.error_GetUserError(cpcore) _
             & cpcore.html.html_GetUploadFormStart() _
             & cpcore.html.html_GetFormInputHidden("ContensiveFormPageID", FormPageID) _
-            & cpcore.html.html_GetFormInputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpcore.profileStartTime)) _
+            & cpcore.html.html_GetFormInputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpCore.doc.profileStartTime)) _
             & f.PreRepeat _
             & RepeatBody _
             & f.PostRepeat _
@@ -1152,11 +1152,11 @@ ErrorTrap:
                 '
                 ' ----- Content Blocking
                 If (BlockedRecordIDList <> "") Then
-                    If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                    If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                         '
                         ' Administrators are never blocked
                         '
-                    ElseIf (Not cpCore.authContext.isAuthenticated()) Then
+                    ElseIf (Not cpCore.doc.authContext.isAuthenticated()) Then
                         '
                         ' non-authenticated are always blocked
                         '
@@ -1169,12 +1169,12 @@ ErrorTrap:
                             & " FROM (ccPageContentBlockRules" _
                             & " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)" _
                             & " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID" _
-                            & " WHERE (((ccMemberRules.MemberID)=" & cpCore.db.encodeSQLNumber(cpCore.authContext.user.id) & ")" _
+                            & " WHERE (((ccMemberRules.MemberID)=" & cpCore.db.encodeSQLNumber(cpCore.doc.authContext.user.id) & ")" _
                             & " AND ((ccPageContentBlockRules.RecordID) In (" & BlockedRecordIDList & "))" _
                             & " AND ((ccPageContentBlockRules.Active)<>0)" _
                             & " AND ((ccgroups.Active)<>0)" _
                             & " AND ((ccMemberRules.Active)<>0)" _
-                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & "));"
+                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) & "));"
                         CS = cpCore.db.csOpenSql(SQL)
                         BlockedRecordIDList = "," & BlockedRecordIDList
                         Do While cpCore.db.csOk(CS)
@@ -1197,8 +1197,8 @@ ErrorTrap:
                                 & " AND ((ccGroupRules.Active)<>0)" _
                                 & " AND ((ManagementGroups.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.Active)<>0)" _
-                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.profileStartTime) & ")" _
-                                & " AND ((ManagementMemberRules.MemberID)=" & cpCore.authContext.user.id & " ));"
+                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) & ")" _
+                                & " AND ((ManagementMemberRules.MemberID)=" & cpCore.doc.authContext.user.id & " ));"
                             CS = cpCore.db.csOpenSql(SQL)
                             Do While cpCore.db.csOk(CS)
                                 BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpCore.db.csGetText(CS, "RecordID"), "")
@@ -1245,8 +1245,8 @@ ErrorTrap:
                             ' ----- Login page
                             '
                             Dim BlockForm As String = ""
-                            If Not cpCore.authContext.isAuthenticated() Then
-                                If Not cpCore.authContext.isRecognized(cpCore) Then
+                            If Not cpCore.doc.authContext.isAuthenticated() Then
+                                If Not cpCore.doc.authContext.isRecognized(cpCore) Then
                                     '
                                     ' -- not recognized
                                     BlockForm = "" _
@@ -1257,7 +1257,7 @@ ErrorTrap:
                                     '
                                     ' -- recognized, not authenticated
                                     BlockForm = "" _
-                                        & "<p>This content has limited access. You were recognized as ""<b>" & cpCore.authContext.user.name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
+                                        & "<p>This content has limited access. You were recognized as ""<b>" & cpCore.doc.authContext.user.name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
                                         & cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), New CPUtilsBaseClass.addonExecuteContext With {.addonType = CPUtilsBaseClass.addonContext.ContextPage}) _
                                         & ""
                                 End If
@@ -1265,7 +1265,7 @@ ErrorTrap:
                                 '
                                 ' -- authenticated
                                 BlockForm = "" _
-                                    & "<p>You are currently logged in as ""<b>" & cpCore.authContext.user.name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                    & "<p>You are currently logged in as ""<b>" & cpCore.doc.authContext.user.name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
                                     & cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), New CPUtilsBaseClass.addonExecuteContext With {.addonType = CPUtilsBaseClass.addonContext.ContextPage}) _
                                     & ""
@@ -1292,12 +1292,12 @@ ErrorTrap:
                                 '
                                 ' Register Form
                                 '
-                                If Not cpCore.authContext.isAuthenticated() And cpCore.authContext.isRecognized(cpCore) Then
+                                If Not cpCore.doc.authContext.isAuthenticated() And cpCore.doc.authContext.isRecognized(cpCore) Then
                                     '
                                     ' -- Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
-                                    Call cpCore.authContext.logout(cpCore)
+                                    Call cpCore.doc.authContext.logout(cpCore)
                                 End If
-                                If Not cpCore.authContext.isAuthenticated() Then
+                                If Not cpCore.doc.authContext.isAuthenticated() Then
                                     '
                                     ' -- Not Authenticated
                                     Call cpCore.doc.verifyRegistrationFormPage(cpCore)
@@ -1311,7 +1311,7 @@ ErrorTrap:
                                     ' -- Authenticated
                                     Call cpCore.doc.verifyRegistrationFormPage(cpCore)
                                     BlockCopy = "" _
-                                        & "<p>You are currently logged in as ""<b>" & cpCore.authContext.user.name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                        & "<p>You are currently logged in as ""<b>" & cpCore.doc.authContext.user.name & "</b>"". If this is not you, please <a href=""?" & cpCore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                         & "<p>This account does not have access to this content. To view this content, please complete this form.</p>" _
                                         & getFormPage(cpCore, "Registration Form", RegistrationGroupID) _
                                         & ""
@@ -1337,7 +1337,7 @@ ErrorTrap:
                     '
                     ' Encode the copy
                     '
-                    returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                    returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, layoutError)
                     returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
                     If cpCore.doc.refreshQueryString <> "" Then
                         returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" & cpCore.doc.refreshQueryString, 1, 99, vbTextCompare)
@@ -1355,30 +1355,30 @@ ErrorTrap:
                         '
                     Else
                         pageViewings = cpCore.doc.page.Viewings
-                        If cpCore.authContext.isEditing(pageContentModel.contentName) Or cpCore.visitProperty.getBoolean("AllowWorkflowRendering") Then
+                        If cpCore.doc.authContext.isEditing(pageContentModel.contentName) Or cpCore.visitProperty.getBoolean("AllowWorkflowRendering") Then
                             '
                             ' Link authoring, workflow rendering -> do encoding, but no tracking
                             '
-                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, layoutError)
                             returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
                         ElseIf cpCore.doc.isPrintVersion Then
                             '
                             ' Printer Version -> personalize and count viewings, no tracking
                             '
-                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, layoutError)
                             returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
                             Call cpCore.db.executeQuery("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpCore.doc.page.id)
                         Else
                             '
                             ' Live content
-                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, layoutError)
                             returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
                             Call cpCore.db.executeQuery("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpCore.doc.page.id)
                         End If
                         '
                         ' Page Hit Notification
                         '
-                        If (Not cpCore.authContext.visit.ExcludeFromAnalytics) And (cpCore.doc.page.ContactMemberID <> 0) And (InStr(1, cpCore.webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
+                        If (Not cpCore.doc.authContext.visit.ExcludeFromAnalytics) And (cpCore.doc.page.ContactMemberID <> 0) And (InStr(1, cpCore.webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
                             If cpCore.doc.page.AllowHitNotification Then
                                 PageName = cpCore.doc.page.name
                                 If PageName = "" Then
@@ -1398,15 +1398,15 @@ ErrorTrap:
                                 Body = Body & getTableRow("Domain", cpCore.webServer.requestDomain, True)
                                 Body = Body & getTableRow("Link", cpCore.webServer.requestUrl, False)
                                 Body = Body & getTableRow("Page Name", PageName, True)
-                                Body = Body & getTableRow("Member Name", cpCore.authContext.user.name, False)
-                                Body = Body & getTableRow("Member #", CStr(cpCore.authContext.user.id), True)
-                                Body = Body & getTableRow("Visit Start Time", CStr(cpCore.authContext.visit.StartTime), False)
-                                Body = Body & getTableRow("Visit #", CStr(cpCore.authContext.visit.id), True)
+                                Body = Body & getTableRow("Member Name", cpCore.doc.authContext.user.name, False)
+                                Body = Body & getTableRow("Member #", CStr(cpCore.doc.authContext.user.id), True)
+                                Body = Body & getTableRow("Visit Start Time", CStr(cpCore.doc.authContext.visit.StartTime), False)
+                                Body = Body & getTableRow("Visit #", CStr(cpCore.doc.authContext.visit.id), True)
                                 Body = Body & getTableRow("Visit IP", cpCore.webServer.requestRemoteIP, False)
                                 Body = Body & getTableRow("Browser ", cpCore.webServer.requestBrowser, True)
-                                Body = Body & getTableRow("Visitor #", CStr(cpCore.authContext.visitor.ID), False)
-                                Body = Body & getTableRow("Visit Authenticated", CStr(cpCore.authContext.visit.VisitAuthenticated), True)
-                                Body = Body & getTableRow("Visit Referrer", cpCore.authContext.visit.HTTP_REFERER, False)
+                                Body = Body & getTableRow("Visitor #", CStr(cpCore.doc.authContext.visitor.ID), False)
+                                Body = Body & getTableRow("Visit Authenticated", CStr(cpCore.doc.authContext.visit.VisitAuthenticated), True)
+                                Body = Body & getTableRow("Visit Referrer", cpCore.doc.authContext.visit.HTTP_REFERER, False)
                                 Body = Body & kmaEndTable
                                 Call cpCore.email.sendPerson(cpCore.doc.page.ContactMemberID, cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServer.requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
                             End If
@@ -1424,7 +1424,7 @@ ErrorTrap:
                                 ' Always
                                 '
                                 If SystemEMailID <> 0 Then
-                                    Call cpCore.email.sendSystem_Legacy(cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.authContext.user.id)
+                                    Call cpCore.email.sendSystem_Legacy(cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id)
                                 End If
                                 If main_AddGroupID <> 0 Then
                                     Call groupController.group_AddGroupMember(cpCore, groupController.group_GetGroupName(cpCore, main_AddGroupID))
@@ -1437,9 +1437,9 @@ ErrorTrap:
                                 ' If in Condition Group
                                 '
                                 If ConditionGroupID <> 0 Then
-                                    If cpCore.authContext.IsMemberOfGroup2(cpCore, groupController.group_GetGroupName(cpCore, ConditionGroupID)) Then
+                                    If cpCore.doc.authContext.IsMemberOfGroup2(cpCore, groupController.group_GetGroupName(cpCore, ConditionGroupID)) Then
                                         If SystemEMailID <> 0 Then
-                                            Call cpCore.email.sendSystem_Legacy(cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.authContext.user.id)
+                                            Call cpCore.email.sendSystem_Legacy(cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id)
                                         End If
                                         If main_AddGroupID <> 0 Then
                                             Call groupController.group_AddGroupMember(cpCore, groupController.group_GetGroupName(cpCore, main_AddGroupID))
@@ -1454,7 +1454,7 @@ ErrorTrap:
                                 ' If not in Condition Group
                                 '
                                 If ConditionGroupID <> 0 Then
-                                    If Not cpCore.authContext.IsMemberOfGroup2(cpCore, groupController.group_GetGroupName(cpCore, ConditionGroupID)) Then
+                                    If Not cpCore.doc.authContext.IsMemberOfGroup2(cpCore, groupController.group_GetGroupName(cpCore, ConditionGroupID)) Then
                                         If main_AddGroupID <> 0 Then
                                             Call groupController.group_AddGroupMember(cpCore, groupController.group_GetGroupName(cpCore, main_AddGroupID))
                                         End If
@@ -1462,7 +1462,7 @@ ErrorTrap:
                                             Call groupController.group_DeleteGroupMember(cpCore, groupController.group_GetGroupName(cpCore, RemoveGroupID))
                                         End If
                                         If SystemEMailID <> 0 Then
-                                            Call cpCore.email.sendSystem_Legacy(cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.authContext.user.id)
+                                            Call cpCore.email.sendSystem_Legacy(cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id)
                                         End If
                                     End If
                                 End If
@@ -1545,7 +1545,7 @@ ErrorTrap:
                 If cpCore.doc.adminWarning <> "" Then
                     '
                     If cpCore.doc.adminWarningPageID <> 0 Then
-                        cpCore.doc.adminWarning = cpCore.doc.adminWarning & "</p>" & cpCore.html.main_GetRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, True, "Page " & cpCore.doc.adminWarningPageID, cpCore.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the page<p>"
+                        cpCore.doc.adminWarning = cpCore.doc.adminWarning & "</p>" & cpCore.html.main_GetRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, True, "Page " & cpCore.doc.adminWarningPageID, cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the page<p>"
                         cpCore.doc.adminWarningPageID = 0
                     End If
                     returnHtml = "" _
@@ -1582,14 +1582,14 @@ ErrorTrap:
                 Dim isEditing As Boolean
                 Dim LiveBody As String
                 '
-                If cpcore.continueProcessing Then
+                If cpCore.doc.continueProcessing Then
                     If cpcore.doc.redirectLink = "" Then
-                        isEditing = cpcore.authContext.isEditing(pageContentModel.contentName)
+                        isEditing = cpCore.doc.authContext.isEditing(pageContentModel.contentName)
                         '
                         ' ----- Render the Body
                         LiveBody = getContentBox_content_Body(cpcore, OrderByClause, AllowChildPageList, False, cpcore.doc.pageToRootList.Last.id, AllowReturnLink, pageContentModel.contentName, ArchivePages)
                         Dim isRootPage As Boolean = (cpcore.doc.pageToRootList.Count = 1)
-                        If cpcore.authContext.isAdvancedEditing(cpcore, "") Then
+                        If cpCore.doc.authContext.isAdvancedEditing(cpcore, "") Then
                             result = result & cpcore.html.main_GetRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (Not isRootPage)) & LiveBody
                         ElseIf isEditing Then
                             result = result & cpcore.html.getEditWrapper("", cpcore.html.main_GetRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (Not isRootPage)) & LiveBody)
@@ -1646,7 +1646,7 @@ ErrorTrap:
                 '
                 If (Not cpcore.doc.isPrintVersion) Then
                     Dim IconRow As String = ""
-                    If (Not cpcore.authContext.visit.Bot) And (cpcore.doc.page.AllowPrinterVersion Or cpcore.doc.page.AllowEmailPage) Then
+                    If (Not cpCore.doc.authContext.visit.Bot) And (cpcore.doc.page.AllowPrinterVersion Or cpcore.doc.page.AllowEmailPage) Then
                         '
                         ' not a bot, and either print or email allowed
                         '
@@ -1680,7 +1680,7 @@ ErrorTrap:
                 ' ----- Start Text Search
                 '
                 Dim Cell As String = ""
-                If cpcore.authContext.isQuickEditing(cpcore, pageContentModel.contentName) Then
+                If cpCore.doc.authContext.isQuickEditing(cpcore, pageContentModel.contentName) Then
                     Cell = Cell & cpcore.doc.getQuickEditing(rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, cpcore.doc.page.ContactMemberID, cpcore.doc.page.ChildListSortMethodID, allowChildListComposite, ArchivePage)
                 Else
                     '
@@ -1698,7 +1698,7 @@ ErrorTrap:
                     If bodyCopy = "" Then
                         '
                         ' Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
-                        If cpcore.authContext.isEditing(pageContentModel.contentName) Then
+                        If cpCore.doc.authContext.isEditing(pageContentModel.contentName) Then
                             bodyCopy = cr & "<p><!-- Empty Content Placeholder --></p>"
                         End If
                     Else
@@ -1712,7 +1712,7 @@ ErrorTrap:
                         & cr & "<!-- ContentBoxBodyEnd -->"
                     '
                     ' ----- Child pages
-                    If allowChildListComposite Or cpcore.authContext.isEditingAnything() Then
+                    If allowChildListComposite Or cpCore.doc.authContext.isEditingAnything() Then
                         If Not allowChildListComposite Then
                             Cell = Cell & cpcore.html.html_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.")
                         End If
@@ -1761,7 +1761,7 @@ ErrorTrap:
                 ' ----- Last Modified line
                 If (cpcore.doc.page.ModifiedDate <> Date.MinValue) And cpcore.doc.page.AllowLastModifiedFooter Then
                     result = result & cr & "<p>This page was last modified " & FormatDateTime(cpcore.doc.page.ModifiedDate)
-                    If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                    If cpCore.doc.authContext.isAuthenticatedAdmin(cpcore) Then
                         If cpcore.doc.page.ModifiedBy = 0 Then
                             result = result & " (admin only: modified by unknown)"
                         Else
@@ -1779,7 +1779,7 @@ ErrorTrap:
                 ' ----- Last Reviewed line
                 If (cpcore.doc.page.DateReviewed <> Date.MinValue) And cpcore.doc.page.AllowReviewedFooter Then
                     result = result & cr & "<p>This page was last reviewed " & FormatDateTime(cpcore.doc.page.DateReviewed, vbLongDate)
-                    If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                    If cpCore.doc.authContext.isAuthenticatedAdmin(cpcore) Then
                         If cpcore.doc.page.ReviewedBy = 0 Then
                             result = result & " (by unknown)"
                         Else
@@ -1839,7 +1839,7 @@ ErrorTrap:
                         '
                         ' ----- Set authoring only for valid ContentName
                         '
-                        IsEditingLocal = cpcore.authContext.isEditing(iContentName)
+                        IsEditingLocal = cpCore.doc.authContext.isEditing(iContentName)
                     Else
                         '
                         ' ----- if iContentName was bad, maybe they put table in, no authoring
@@ -1857,7 +1857,7 @@ ErrorTrap:
                                     SeeAlsoLink = cpcore.webServer.requestProtocol & SeeAlsoLink
                                 End If
                                 If IsEditingLocal Then
-                                    result = result & cpcore.html.main_GetRecordEditLink2("See Also", (cpcore.db.csGetInteger(CS, "ID")), False, "", cpcore.authContext.isEditing("See Also"))
+                                    result = result & cpcore.html.main_GetRecordEditLink2("See Also", (cpcore.db.csGetInteger(CS, "ID")), False, "", cpCore.doc.authContext.isEditing("See Also"))
                                 End If
                                 result = result & "<a href=""" & genericController.encodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.csGetText(CS, "Name")) & "</A>"
                                 Copy = (cpcore.db.csGetText(CS, "Brief"))
@@ -1990,14 +1990,14 @@ ErrorTrap:
                         '
                         ' ----- From Name
                         '
-                        Copy = cpcore.authContext.user.name
+                        Copy = cpCore.doc.authContext.user.name
                         Panel = Panel & "<td align=""right"" width=""100""><p>Your Name</p></td>"
                         Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & genericController.encodeHTML(Copy) & """></span></td>"
                         Panel = Panel & "</tr><tr>"
                         '
                         ' ----- From Email address
                         '
-                        Copy = cpcore.authContext.user.Email
+                        Copy = cpCore.doc.authContext.user.Email
                         Panel = Panel & "<td align=""right"" width=""100""><p>Your Email</p></td>"
                         Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & genericController.encodeHTML(Copy) & """></span></td>"
                         Panel = Panel & "</tr><tr>"
@@ -2064,7 +2064,7 @@ ErrorTrap:
                         & genericController.htmlIndent(PageContent) _
                         & cr & "</div>" _
                         & ""
-                ElseIf Not cpCore.continueProcessing Then
+                ElseIf Not cpCore.doc.continueProcessing Then
                     '
                     ' exit if stream closed during main_GetSectionpage
                     '
@@ -2085,7 +2085,7 @@ ErrorTrap:
                     ' ----- Encode Template
                     '
                     If Not cpCore.doc.isPrintVersion Then
-                        LocalTemplateBody = cpCore.html.executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                        LocalTemplateBody = cpCore.html.executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, layoutError)
                         returnBody = returnBody & cpCore.html.convertActiveContentToHtmlForWebRender(LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
@@ -2100,7 +2100,7 @@ ErrorTrap:
                     '
                     ' ----- Add tools Panel
                     '
-                    If Not cpCore.authContext.isAuthenticated() Then
+                    If Not cpCore.doc.authContext.isAuthenticated() Then
                         '
                         ' not logged in
                         '
@@ -2108,8 +2108,8 @@ ErrorTrap:
                         '
                         ' Add template editing
                         '
-                        If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") And cpCore.authContext.isEditing("Page Templates") Then
-                            returnBody = cpCore.html.getEditWrapper("Page Template [" & LocalTemplateName & "]", cpCore.html.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, cpCore.authContext.isEditing("Page Templates")) & returnBody)
+                        If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") And cpCore.doc.authContext.isEditing("Page Templates") Then
+                            returnBody = cpCore.html.getEditWrapper("Page Template [" & LocalTemplateName & "]", cpCore.html.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, cpCore.doc.authContext.isEditing("Page Templates")) & returnBody)
                         End If
                     End If
                     '
@@ -2265,12 +2265,12 @@ ErrorTrap:
                 End If
                 '
                 ' -- Add admin warning to the top of the content
-                If cpCore.authContext.isAuthenticatedAdmin(cpCore) And cpCore.doc.adminWarning <> "" Then
+                If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) And cpCore.doc.adminWarning <> "" Then
                     '
                     ' Display Admin Warnings with Edits for record errors
                     '
                     If cpCore.doc.adminWarningPageID <> 0 Then
-                        cpCore.doc.adminWarning = cpCore.doc.adminWarning & "</p>" & cpCore.html.main_GetRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, True, "Page " & cpCore.doc.adminWarningPageID, cpCore.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the page<p>"
+                        cpCore.doc.adminWarning = cpCore.doc.adminWarning & "</p>" & cpCore.html.main_GetRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, True, "Page " & cpCore.doc.adminWarningPageID, cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the page<p>"
                         cpCore.doc.adminWarningPageID = 0
                     End If
                     '

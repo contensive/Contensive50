@@ -33,9 +33,9 @@ Namespace Contensive.Core.Controllers
                 Call cpCore.db.csSet(CS, "datasourceid", DataSourceID)
                 Call cpCore.db.csSet(CS, "sqlquery", SQL)
                 Call cpCore.db.csSet(CS, "maxRows", maxRows)
-                Call cpCore.db.csSet(CS, "dateexpires", cpCore.db.encodeSQLDate(cpCore.profileStartTime.AddDays(1)))
+                Call cpCore.db.csSet(CS, "dateexpires", cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.AddDays(1)))
                 Call cpCore.db.csSet(CS, "QueryTypeID", QueryTypeSQL)
-                Call cpCore.db.csSet(CS, "VisitId", cpCore.authContext.visit.id)
+                Call cpCore.db.csSet(CS, "VisitId", cpCore.doc.authContext.visit.id)
             End If
             Call cpCore.db.csClose(CS)
             '

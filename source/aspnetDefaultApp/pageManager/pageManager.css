@@ -1,4 +1,316 @@
-﻿
+
+body {overflow:auto;}
+/*
+Body Class Selectors 
+*/
+.ccBodyWeb{}
+.ccBodyPrint{}
+.ccBodyEmail{}
+.ccBodyAdmin {margin:0;padding:0;COLOR:black;BACKGROUND-COLOR:#C3D9FF;FONT-WEIGHT:normal}
+/*
+Contensive Container Resets 
+*/
+.ccCon div,.ccCon p,.ccCon td,.ccCon ul,.ccCon li {color:#222;font-size:11px;font-family:verdana,arial,sans-serif;line-height:1.2;}
+.ccCon p {margin:1.12em 0;}
+.ccCon li {margin:0.3em 0;}
+.ccCon ul {list-style:disc outside;margin:0;padding-left:20px}
+.ccCon ol {list-style:decimal inside;margin:0;padding-left:20px}
+.ccCon td {vertical-align:top;line-height:1.2;}
+.ccCon h1,.ccCon H2,.ccCon H3,.ccCon H4,.ccCon H5,.ccCon H6 {MARGIN-TOP:15PX;MARGIN-BOTTOM:10PX;PADDING:0PX;FONT-WEIGHT:bold;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccCon h2 {FONT-SIZE:17px;}
+.ccCon h2 {FONT-SIZE:14px;}
+.ccCon h3 {FONT-SIZE:13px;}
+.ccCon h4 {FONT-SIZE:12px;}
+.ccCon h5,.ccCon h6 {FONT-SIZE:12px;}
+/*
+Contensive Admin 
+*/
+#desktop { color:#222;Background-color:#C3D9FF}
+.ccCon .ccHeaderCon {width:100%;COLOR:white;BACKGROUND-COLOR:#1F70BD;clear:both;vertical-align:middle;}
+.ccCon .ccHeaderCon .cchLeft {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;}
+.ccCon .ccHeaderCon .cchRight {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;}
+.ccCon .ccHeaderCon .cchSingle {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;vertical-align:middle;}
+.ccCon .ccHeaderCon .cchClosed {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px}
+.ccCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
+.ccCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
+/**/
+.ccCon .ccToolsCon {margin:0;padding:0;Background-color:white;border-right:1px solid black;min-height:400px;}
+.ccCon .ccToolsCon .ccHeaderCon {COLOR:white;BACKGROUND-COLOR:#1F70BD;}
+.ccCon .ccToolsCon .ccHeaderCon .closed {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;}
+.ccCon .ccToolsCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left}
+.ccCon .ccToolsCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right}
+.ccCon .ccToolsCon .ccContentCon {width:100%;margin:0;Background-color:white;min-height:400px;}
+.ccCon .ccToolsCon .ccContentCon .opened {width:100%;margin:0;Background-color:white;min-height:400px;padding-top:10px;padding-bottom:20px;}
+.ccCon .ccToolsCon .ccContentCon .closed {width:100%;margin:0;Background-color:white;min-height:400px;}
+/**/
+.ccCon .ccContentCon {margin:0;padding:0;Background-color:#C3D9FF;width:100%;}
+.ccCon .ccControlsCon {color:black;background-color:#fff8d0;padding:5px ! important;border-top:1px solid #808080;border-left:1px solid #808080;border-bottom:1px solid #f8f8f8;border-right:1px solid #f8f8f8;}
+.ccCon .ccControlsCon .left {text-align:right;}
+.ccCon .ccControlsCon .right {text-align:right;}
+.ccCon .ccEditCaptionCon {color:black;white-space:nowrap;text-align:right;font-size:9px;vertical-align:top;padding-top:4px;}
+.ccCon .ccEditCaptionCon {padding-top:5px;}
+.ccCon .ccEditCaptionCon .textexpandable {padding-top:25px;}
+.ccCon .ccEditCaptionCon .htmleditor {padding-top:100px;}
+.ccCon .ccEditFieldCon {padding:5px;border-top:1px solid #fffdf1;border-bottom:1px solid #dad4b2;color:black;background-color:#fff8d0;text-align:left;font-weight:normal;font-size:9px;vertical-align:baseline;}
+.ccCon .ccEditFieldCon .ccEditorCon {}
+.ccCon .ccEditFieldCon .ccEditorCon .checkBox {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .text {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .select {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .file {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .date {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .number {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .password {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .styles {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .link {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorCon .resourceLink {border: 1px solid #ccc;padding:4px;}
+.ccCon .ccEditFieldCon .ccEditorHelpCon {color:#888;font-size:9px;padding:10px;width:80%;}
+.ccCon .ccEditFieldCon .ccEditorHelpCon .opened {display:none;}
+.ccCon .ccEditFieldCon .ccEditorHelpCon .opened .header {font-weight:bold;padding-top:5px;color:#444;}
+.ccCon .ccEditFieldCon .ccEditorHelpCon .opened .body {color:#444;}
+.ccCon .ccHelpCon {width:95%;padding:10px;margin:10px;border: 2px solid #808080;background-color:white}
+.ccCon .ccHelpCon .title {font-size:120%;color:black;FONT-WEIGHT:bold;}
+.ccCon .ccHelpCon .byline {font-size:90%;color:#606060;padding-top:5px;padding-bottom:1px;}
+.ccCon .ccHelpCon .body {font-size:100%;color:#404040;padding-top:5px;border-top:1px solid #808080}
+.ccCon .ccAdminEditHeading {padding:6px;COLOR:black;FONT-WEIGHT:bold;FONT-SIZE:14px;}
+.ccCon .ccAdminEditSubHeader {margin-left:20px;border-bottom:1px solid black;padding:6px;COLOR:black;FONT-WEIGHT:bold;FONT-SIZE:13px;}
+.ccCon .ccAdminEditDescription {COLOR:black;padding:10px;FONT-SIZE:11px;FONT-WEIGHT:normal;}
+.ccCon .ccAdminEditBody {BACKGROUND-COLOR:#E8EEF7;padding:5px;}
+.ccCon .ccAdminEditCaption {COLOR:black;WHITE-SPACE:nowrap;TEXT-ALIGN:right;FONT-WEIGHT:normal;FONT-SIZE:9px;}
+.ccCon .ccAdminEditField {border-top:1px solid #FFFDF1;border-bottom:1px solid #DAD4B2;COLOR:black;Background-color:#fff8d0;TEXT-ALIGN:left;FONT-WEIGHT:normal;FONT-SIZE:9px;vertical-align:baseline;}
+.ccCon .ccAdminListCaption {padding:4px;background-color:#669ACC;COLOR:white;FONT-WEIGHT:normal;FONT-SIZE:11px;border-right:1px solid white;border-bottom:1px solid black;border-top:0px solid white;Text-Decoration:none ! important;}
+.ccCon A.ccAdminListCaption {Display:block;COLOR:white;Text-Decoration:none;border:0px;padding:0px;}
+.ccCon A.ccAdminListCaption:Hover {Text-Decoration:none;}
+.ccCon A.ccAdminListCaption:Visited {Text-Decoration:none;}
+.ccCon .ccAdminListRowEven {BACKGROUND-COLOR:#E8EEF7;padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
+.ccCon .ccAdminListRowOdd {BACKGROUND-COLOR:#ffffff;padding:4px;border:0px;border-right:1px solid white;vertical-align:middle;}
+.ccCon .ccAdminTab {background-color:#669ACC;color:white;white-space:nowrap;}
+.ccCon A.ccAdminTabLink {color:white;TEXT-DECORATION:none;}
+.ccCon A.ccAdminTabLink:visited {color:white;TEXT-DECORATION:none;}
+.ccCon A.ccAdminTabLink:hover {color:white;TEXT-DECORATION:none;}
+.ccCon .ccAdminTabHit {background-color:white;color:black;white-space:nowrap;}
+.ccCon A.ccAdminTabHitLink {color:black;TEXT-DECORATION:none;}
+.ccCon A.ccAdminTabHitLink:visited {color:black;TEXT-DECORATION:none;}
+.ccCon A.ccAdminTabHitLink:hover {color:black;TEXT-DECORATION:none;}
+.ccCon .ccAdminTabEnd {width:100%;border-bottom:1px solid black;} 
+.ccCon .ccAdminTabEdge {background-color:black;} 
+.ccCon .ccAdminTabBodyCollectionWrap{}
+.ccCon .ccAdminTabBodyWrapShow { display:block;}
+.ccCon .ccAdminTabBodyWrapHide { display:none;}
+.ccCon .ccAdminTabBodyWrap{}
+.ccCon .ccAdminTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;}
+.ccCon .ccAdminTabHitSpacer { width: 5px; }
+.ccCon .ccAdminTabHitFiller { width: 100%; }
+.ccCon A.ccAdminButton {COLOR:#000000;BACKGROUND-COLOR:#e0e0e0;}
+.ccCon A.ccAdminButton:hover {COLOR:#000000;BACKGROUND-COLOR:#ffffff;TEXT-DECORATION:none}
+.ccCon .ccAdminNormal {FONT-WEIGHT:normal;FONT-SIZE:11px;COLOR:#000000;TEXT-DECORATION:none}
+.ccCon .ccAdminSmall {FONT-WEIGHT:normal;FONT-SIZE:9px;COLOR:#000000;TEXT-DECORATION:none}
+.ccCon A.ccAdminNormal {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminSmall {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminSmall:hover {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminSmall:visited {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminLink {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminLink:hover {COLOR:blue;TEXT-DECORATION:underline}
+.ccCon A.ccAdminLink:visited{COLOR:blue;TEXT-DECORATION:underline}
+.ccCon .ccAdvSearchText {width:250px}
+.ccCon .ccEditorPreferenceCon {width:400px;height:400px;padding:20px;border: 1px solid #ccc;}
+.ccCon .ccEditorPreferenceCon h1 {}
+.ccCon .ccEditorPreferenceCon p {}
+.ccCon .ccEditorPreferenceCon  .radioCon {padding:0 0 0 10px}
+.ccCon .ccEditorPreferenceCon .buttonCon {padding:20px 0 20px 0}
+/*
+styles used publicly by Contensive 
+*/
+.ccButtonCon {COLOR:black;Background-color:#567694;Padding:5px ! important;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
+div.ccJumpCon {Background-color:#579;Padding:2px;margin:0;}
+.ccJumpCon ul {vertical-align:middle;text-align:right;white-space:nowrap;COLOR:#fff;Padding:5px;margin:0;}
+.ccJumpCon ul li {display:inline;width:30px;vertical-align:middle;text-align:center;cursor:pointer;list-style:none inside none;Padding:5px ! important;color:#ccc;Background-Color:#68a;border-left:1px solid #579;}
+.ccJumpCon ul li:hover {color:#fff;}
+.ccJumpCon ul li.caption {Background-Color:transparent;color:#ccc;border:0;cursor:default;}
+.ccJumpCon ul li.delim {Background-Color:transparent;color:#ccc;border:0;cursor:default;}
+.ccJumpCon ul li.hit {cursor:default;Background-Color:#468;color:#fff;border:1px solid #fff;}
+.ccBubbleCon {position:absolute; border: 2px solid #1F70BD;margin:0;padding:0;Background-color:#C3D9FF;z-index:1;}
+.ccBubbleCon .ccHeaderCon {position:static;width:100%;COLOR:white;BACKGROUND-COLOR:#1F70BD;}
+.ccBubbleCon .ccHeaderCon .bbLeft {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;white-space:nowrap;width:99%}
+.ccBubbleCon .ccHeaderCon .bbRight {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:23px}
+.ccBubbleCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
+.ccBubbleCon .ccContentCon {margin:0;padding:10px;Background-color:#C3D9FF;vertical-align:middle;}
+.ccBubbleCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
+.ccBubbleCon .ccContentCon td.bbLeft {text-align:right;white-space:nowrap;}
+.ccBubbleCon .ccContentCon td.bbRight {text-align:left;}
+.ccDialogCon {margin:0;padding:0;Background-color:#C3D9FF;}
+.ccDialogCon .ccButtonCon {margin:0;padding:0;BACKGROUND-COLOR:#567694;Border-Top:1px solid #246;Border-Left:1px solid #246;Border-Bottom:1px solid #8be;Border-right:1px solid #8be;}
+.ccDialogCon .ccContentCon {margin:0;padding:10px;Background-color:#C3D9FF;vertical-align:middle;}
+.ccDialogCon .ccContentCon td {margin:0;padding:5px;vertical-align:middle;}
+.ccDialogCon .ccContentCon td.left {text-align:right;white-space:nowrap;}
+.ccDialogCon .ccContentCon td.right {text-align:left;}
+.ccAddonFrameCon {width:100%;border:0;overflow:auto;}
+.ccAddonAjaxCon {}
+.ccAddonEditCaption {white-space:nowrap;clear:left;padding:2px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;line-height:1.2;}
+.ccAddonEditTools {clear:left;padding:0px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;line-height:1.2;}
+.ccHelpIcon a {cursor:help}
+ul.ccChildList {text-align:left}
+ul.ccChildList li.ccListItem {text-align:left}
+ul.ccChildList li.ccListItem a {}
+ul.ccChildList li.ccListItem a:hover {}
+ul.ccChildList li.ccListItem a:visited {}
+ul.ccChildListInactive {text-align:left;border-top:1px solid #444;}
+ul.ccChildListInactive li.ccListItem {text-align:left}
+ul.ccChildListInactive li.ccListItem a {}
+ul.ccChildListInactive li.ccListItem a:hover {}
+ul.ccChildListInactive li.ccListItem a:visited {}
+.ccImgA {width:18px;height:18px;border:0;vertical-align:middle;}
+.ccCategoryListCon {}
+.ccCategoryListCon .caption {padding-top:5px;}
+.ccCategoryListCon .caption a {}
+.ccCategoryListCon UL {margin:0;padding:0;padding-left:20px;}
+.ccCategoryListCon ul li {margin:0;padding:0;padding-left:2px;padding-top:5px;}
+.ccFilterHead {font-size:12px;margin-top:10px;font-weight:bold;color:black}
+.ccFilterSubHead {font-size:10px;margin-top:10px;color:black}
+.ccFilterList {font-size:10px;color:black;}
+A.ccFilterLink {text-decoration:none ! important;color:black ! important;}
+.ccFilterIndent {margin-left:10px;}
+ul.ccFilterList {list-style:none;margin:0;padding:0;}
+ul.ccFilterList li {margin:0;padding:0;padding-left:10px;}
+ul.ccFilterList li a {text-decoration:none ! important;color:black ! important;}
+.ccRecordLinkCon { position: absolute; z-index: 999; }
+.ccListItem .ccRecordLinkCon { position: static; }
+.ccRecordLinkCon a.ccRecordEditLink { }
+.ccRecordLinkCon a.ccRecordCutLink { }
+.ccEditWrapper {border:1px dashed #808080;}
+.ccEditWrapperCaption {FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;line-height:1.2;text-align:left;border-bottom:1px solid #808080;padding:4px;color:black;background-color:#4c4;}
+.ccEditWrapperContent{padding:4px;}
+.ccDisabledReason {color:gray;}
+.ccEditorTextROCon {padding:20px;background-color:#fff;border:1px solid #aaa;}
+.ccAdminMsg {padding:10px;margin:10px;background-color:white;border:1px solid #888}
+.ccAdminButtonBar {COLOR:black;Background-color:#567694;Padding:5px}
+.ccCon  div.ccAdminTitleBar {COLOR:black;Background-color:transparent;FONT-WEIGHT:bold;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;Padding:10px}
+.ccAdminInfoBar {COLOR:black;Background-color:#E8EEF7;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;Padding:10px;Margin:10px;Margin-Top:0px;}
+.ccAuthoringLink {FONT-WEIGHT:normal;FONT-SIZE:9px;COLOR:#ffffff;FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#89ab22;TEXT-DECORATION:none}
+.ccNavLink {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;margin-top:3px;}
+.ccNavLinkEmpty {text-indent:-19px;margin-left:29px;margin-right:10px;white-space:nowrap;}
+.ccNavLinkChild {margin-left:19px;}
+.ccHeadline {FONT-WEIGHT:bold;FONT-SIZE:14px;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccList {}
+.ccWatchList {}
+.ccListCopy {}
+.ccSmall {FONT-SIZE:9px;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccNormal {FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccLarge {FONT-SIZE:14px;FONT-FAMILY:verdana,arial,sans-serif;}
+.ccSurveyHeadline {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;FONT-WEIGHT:bold;FONT-SIZE:14px;FONT-FAMILY:verdana,arial,sans-serif}
+.ccSurveyQuestion {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif}
+.ccSurveyCopy {MARGIN-TOP:4px;MARGIN-BOTTOM:2px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif}
+.ccError {FONT-WEIGHT:bold;FONT-SIZE:11px;COLOR:#c02020;FONT-FAMILY:verdana,arial,sans-serif}
+.ccPanel3D{BACKGROUND-COLOR:#e0e0e0;Border-Top:1px solid #f8f8f8;Border-Left:1px solid #f8f8f8;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
+.ccPanel3DReverse{BACKGROUND-COLOR:#e0e0e0;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
+.ccPanel3DInput{BACKGROUND-COLOR:#f0f0f0;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
+.ccPanel {BACKGROUND-COLOR:#e0e0e0}
+.ccPanelHilite {BACKGROUND-COLOR:#f8f8f8}
+.ccPanelShadow {BACKGROUND-COLOR:#808080}
+.ccPanelInput {BACKGROUND-COLOR:#f0f0f0;}
+.ccPanelBackground {BACKGROUND-COLOR:#f0f0f0}
+.ccPanelButtons {BACKGROUND-COLOR:#a0a0a0}
+.ccPanelDark {BACKGROUND-COLOR:#d0d0d0}
+.ccPanelHeader {FONT-SIZE:11px;COLOR:#ffffff;FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#0320b0}
+.ccPanelHeaderHilite {FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#8080ff}
+.ccPanelHeaderShadow {FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#000000}
+.ccPanelReverse {BACKGROUND-COLOR:#0320c0}
+.ccPanelIndexRow {BACKGROUND-COLOR:#d6dfed}
+.ccPanelRowEven {BACKGROUND-COLOR:#f0f0f0}
+.ccPanelRowOdd {BACKGROUND-COLOR:#ffffff}
+.ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:0px;PADDING-LEFT:0px;PADDING-BOTTOM:4px;PADDING-TOP:4px;white-space:nowrap;}
+A.ccFlyoutButton {MARGIN:0px;PADDING-RIGHT:6px;PADDING-LEFT:6px;PADDING-BOTTOM:4px;PADDING-TOP:4px;FONT-WEIGHT:normal;FONT-SIZE:11px;Z-INDEX:100;COLOR:black;FONT-STYLE:normal;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;white-space:nowrap;}
+A.ccFlyoutButton:hover {TEXT-DECORATION:none;color:white;Background-color:#669ACC;}
+A.ccFlyoutButton:visited {TEXT-DECORATION:none;}
+A.ccFlyoutButtonDown {TEXT-DECORATION:none;color:white;Background-color:#669ACC;}
+A.ccFlyoutButtonDown:hover {TEXT-DECORATION:none;}
+A.ccFlyoutButtonDown:visited {TEXT-DECORATION:none;}
+.ccFlyoutDelimiter {color:#808080;padding:0px;margin:0px;}
+.ccFlyoutPanel {BORDER:white 1px solid;Z-INDEX:101;VISIBILITY:hidden;POSITION:absolute;BACKGROUND-COLOR:#e0e0e0;TEXT-DECORATION:none;}
+A.ccFlyoutPanelButton {DISPLAY:block;BORDER-BOTTOM:#f0f0f0 1px solid;PADDING:4px;PADDING-LEFT:10px;PADDING-RIGHT:10px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-STYLE:normal;FONT-FAMILY:verdana,arial,sans-serif;WHITE-SPACE:nowrap;TEXT-DECORATION:none;COLOR:black;}
+A.ccFlyoutPanelButton:hover {TEXT-DECORATION:none;COLOR:white;BACKGROUND-COLOR:#669ACC;}
+A.ccFlyoutPanelButton:visited {TEXT-DECORATION:none;}
+A.ccFlyoutPanelButtonDown {TEXT-DECORATION:none;COLOR:white;BACKGROUND-COLOR:#669ACC;}
+.ccReport {padding:20px;Background-Color:white;Border-bottom:1px solid black;Border-left:1px solid black;Border-right:1px solid black;} 
+.ccReportRowTop {padding:4px;Background-Color:white;} 
+.ccReportRowOdd {padding:4px;Border-top:1px solid black;Background-Color:#F0F0F0;} 
+.ccReportRowEven {padding:4px;Border-top:1px solid black;Background-Color:white;} 
+.ccTab {background-color:#1F70BD;color:white;}
+A.ccTabLink:Link {color:white;TEXT-DECORATION:none;}
+A.ccTabLink:visited {color:white;TEXT-DECORATION:none;}
+A.ccTabLink:hover {color:white;TEXT-DECORATION:none;}
+.ccTabHit {background-color:white;color:black;}
+A.ccTabHitLink:link {color:black;TEXT-DECORATION:none;}
+A.ccTabHitLink:visited {color:black;TEXT-DECORATION:none;}
+A.ccTabHitLink:hover {color:black;TEXT-DECORATION:none;}
+.ccTabEnd {width:100%;border-bottom:1px solid black;} 
+.ccTabEdge {background-color:black;} 
+.ccTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;border-bottom:1px solid black;margin:0px;}
+.ccTabHitSpacer { width: 5px; }
+.ccTabHitFiller { width: 100%; }
+.ccLiveTab {background-color:#A0A0A0;color:white;}
+A.ccLiveTabLink {color:white;TEXT-DECORATION:none;}
+A.ccLiveTabLink:visited {color:white;TEXT-DECORATION:none;}
+A.ccLiveTabLink:hover {color:white;TEXT-DECORATION:none;}
+.ccLiveTabHit {background-color:white;color:black;}
+A.ccLiveTabHitLink {color:black;TEXT-DECORATION:none;}
+A.ccLiveTabHitLink:visited {color:black;TEXT-DECORATION:none;}
+A.ccLiveTabHitLink:hover {color:black;TEXT-DECORATION:none;}
+.ccLiveTabEnd {width:100%;border-bottom:1px solid black;} 
+.ccLiveTabEdge {background-color:black;} 
+.ccLiveTabBody {background-color:white;padding:10px;border-left:1px solid black;border-right:1px solid black;}
+.ccLiveTabHitSpacer { width: 5px; }
+.ccLiveTabHitFiller { width: 100%; }
+.ccLiveTabBodyCollectionWrap { position:relative;background-color:white;}
+.ccWizardHeader{COLOR:white;BACKGROUND-COLOR:#1F70BD;Padding:5px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;Border-Top:1px solid #1330c0;Border-Left:1px solid #1330c0;Border-Bottom:1px solid #0210a0;Border-right:1px solid #0210a0;}
+.ccWizardPanel{COLOR:black;BACKGROUND-COLOR:#E8EEF7;Border-Top:1px solid #ffffff;Border-Left:1px solid #ffffff;Border-Bottom:1px solid #808080;Border-right:1px solid #808080;}
+.ccTextArea {width:100%;overflow:auto;}
+.ccTextArea textarea {padding:0;margin:0;border:none}
+.ccTextAreaOpened {position:absolute;top:24px;left:0px;;width:100%;overflow:auto;}
+.ccTextAreaHead {COLOR:white;BACKGROUND-COLOR:#669ACC;padding:5px;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif}
+div.ccTextAreaHead A:link {COLOR:white;TEXT-DECORATION:none;}
+div.ccTextAreaHead A:visited {COLOR:white;TEXT-DECORATION:none;}
+div.ccTextAreaHead A:hover {COLOR:white;TEXT-DECORATION:none;}
+.ccTextAreaHeadOpened {position:absolute;top:0px;left:0px;height:24px;width:100%;background-color:#669ACC;margin:0px;padding:5px;border-bottom:2px solid #d0d0d0;}
+div.ccTextAreaHeadOpened A:link {COLOR:white;TEXT-DECORATION:none;}
+div.ccTextAreaHeadOpened A:visited {COLOR:white;TEXT-DECORATION:none;}
+div.ccTextAreaHeadOpened A:hover {COLOR:white;TEXT-DECORATION:none;}
+div.ccTestPointMessageCon { margin:10px;border:1px solid #444;padding:20px;background-color:#eee;}
+/*
+for hints created with getAdminHintWrapper
+*/
+.ccEditWrapper {border:1px dashed #808080;}
+.ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}
+.ccEditWrapperContent{padding:4px;}
+.ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}
+.ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}
+/*
+help dialog for addon options, etc.
+*/
+.helpDialogCon {/* blows advanced edit page out - width:420px; */}
+/*
+Container for the login panel when the section is blocked
+*/
+.ccLoginPageCon 
+{
+	width: 400px;
+	margin: 100px auto 0 auto;
+}
+/*
+Container for the default login form
+*/
+.ccLoginFormCon
+{
+	width: 350px;
+	margin: 0 auto;
+}
+/*
+Exception list
+*/
+ul.ccExceptionList { padding: 10px 20px;margin:0;background-color:red;list-style-type: none;}
+li.ccExceptionListRow { padding:0;margin: 10px auto;}
+/*
+* page manager verified styles
+*/
 .ccChildList li {
     min-height:30px;
     vertical-align:middle;

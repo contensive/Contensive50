@@ -764,7 +764,7 @@ ErrorTrap:
                     Message = "Subject: " & iSendSubject
                     Message = Message & vbCrLf
                 End If
-                Message = Message & "The form was submitted " & cpcore.profileStartTime & vbCrLf
+                Message = Message & "The form was submitted " & cpCore.doc.profileStartTime & vbCrLf
                 Message = Message & vbCrLf
                 Message = Message & "All text fields are included, completed or not." & vbCrLf
                 Message = Message & "Only those checkboxes that are checked are included." & vbCrLf
@@ -851,7 +851,7 @@ ErrorTrap:
                 '
                 SQL = "SELECT DISTINCT ccMembers.ID" _
                     & " FROM (ccMembers LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID) LEFT JOIN ccgroups ON ccMemberRules.GroupID = ccgroups.ID" _
-                    & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpcore.db.encodeSQLDate(cpcore.profileStartTime) & ")) AND ("
+                    & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpcore.db.encodeSQLDate(cpCore.doc.profileStartTime) & ")) AND ("
                 For GroupPointer = 0 To GroupCount - 1
                     If GroupPointer = 0 Then
                         SQL &= "(ccgroups.Name=" & cpcore.db.encodeSQLText(Groups(GroupPointer)) & ")"
@@ -893,7 +893,7 @@ ErrorTrap:
             Dim EmailStatus As String
             '
             EmailStatus = sendSystem(genericController.encodeText(EMailName), genericController.encodeText(AdditionalCopy), genericController.EncodeInteger(AdditionalMemberID))
-            If cpcore.authContext.isAuthenticatedAdmin(cpcore) And (EmailStatus <> "") Then
+            If cpCore.doc.authContext.isAuthenticatedAdmin(cpcore) And (EmailStatus <> "") Then
                 errorController.error_AddUserError(cpcore,"Administrator: There was a problem sending the confirmation email, " & EmailStatus)
             End If
             Exit Sub
@@ -945,7 +945,7 @@ ErrorTrap:
                         'hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1)
                         '
-                        Call logController.logActivity2(cpcore, "password request for email " & workingEmail, cpcore.authContext.user.id, cpcore.authContext.user.OrganizationID)
+                        Call logController.logActivity2(cpcore, "password request for email " & workingEmail, cpCore.doc.authContext.user.id, cpCore.doc.authContext.user.OrganizationID)
                         '
                         allowEmailLogin = cpcore.siteProperties.getBoolean("allowEmailLogin", False)
                         recordCnt = 0
@@ -1030,7 +1030,7 @@ ErrorTrap:
                                         Do While Not usernameOK And (Ptr < 100)
                                             'hint = "240"
                                             Username = EMailName & Int(Rnd() * 9999)
-                                            usernameOK = Not cpcore.authContext.isLoginOK(cpcore, Username, "test")
+                                            usernameOK = Not cpCore.doc.authContext.isLoginOK(cpcore, Username, "test")
                                             Ptr = Ptr + 1
                                         Loop
                                         'hint = "250"

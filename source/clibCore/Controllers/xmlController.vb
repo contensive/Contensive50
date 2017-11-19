@@ -139,13 +139,13 @@ Namespace Contensive.Core.Controllers
             Dim ContentID As Integer
             Dim CSDataSources As Integer
             Dim sb As New System.Text.StringBuilder
-            Dim CDef As cdefModel
+            Dim CDef As Models.Complex.cdefModel
             Dim CDefPointer As Integer
             ' converted array to dictionary - Dim FieldPointer As Integer
             Dim iContentName As String
             Dim CDefPointerMin As Integer
             Dim CDefPointerMax As Integer
-            Dim CDefArray() As cdefModel
+            Dim CDefArray() As Models.Complex.cdefModel
             Dim CDefArrayCount As Integer
             Dim AllowContentChildTool As Boolean
             Dim CSField As Integer

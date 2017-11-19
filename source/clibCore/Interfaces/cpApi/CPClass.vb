@@ -175,7 +175,7 @@ Namespace Contensive.Core
             Try
                 core.addon.execute(Models.Entity.addonModel.create(core, addonId), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = "id:" & addonId.ToString()})
                 'If Response.isOpen Then
-                '    result = core.addon.execute_legacy6(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.authContext.user.id, core.authContext.visit.VisitAuthenticated)
+                '    result = core.addon.execute_legacy6(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.doc.authContext.user.id, core.doc.authContext.visit.VisitAuthenticated)
                 'End If
                 '
             Catch ex As Exception

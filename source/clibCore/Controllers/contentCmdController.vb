@@ -586,7 +586,7 @@ Namespace Contensive.Core.Controllers
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.html.html_GetContentCopy(ArgName, "copy content", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
+                                    CmdAccumulator = cpCore.html.html_GetContentCopy(ArgName, "copy content", cpCore.doc.authContext.user.id, True, cpCore.doc.authContext.isAuthenticated)
                                 End If
                             Case "opencopy"
                                 '
@@ -606,7 +606,7 @@ Namespace Contensive.Core.Controllers
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.html.html_GetContentCopy(ArgName, "copy content", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
+                                    CmdAccumulator = cpCore.html.html_GetContentCopy(ArgName, "copy content", cpCore.doc.authContext.user.id, True, cpCore.doc.authContext.isAuthenticated)
                                 End If
                             Case "openlayout"
                                 '

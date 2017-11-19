@@ -25,8 +25,8 @@ Namespace Contensive.Addons.Core
                 Dim cpCore As coreClass = processor.core
                 '
                 ' -- login
-                Call cpCore.authContext.logout(cpCore)
-                cpCore.continueProcessing = False
+                Call cpCore.doc.authContext.logout(cpCore)
+                cpCore.doc.continueProcessing = False
                 Dim addonArguments As New Dictionary(Of String, String)
                 addonArguments.Add("Force Default Login", "false")
                 Return cpCore.addon.execute(

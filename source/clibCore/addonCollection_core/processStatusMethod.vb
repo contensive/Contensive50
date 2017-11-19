@@ -51,13 +51,13 @@ Namespace Contensive.Addons.Core
                 ' Close page
                 '
                 Call cpCore.webServer.clearResponseBuffer()
-                If cpCore.errorCount = 0 Then
+                If cpCore.doc.errorCount = 0 Then
                     result = "Contensive OK"
                 Else
-                    result = "Contensive Error Count = " & cpCore.errorCount
+                    result = "Contensive Error Count = " & cpCore.doc.errorCount
                 End If
                 result = cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False)
-                cpCore.continueProcessing = False
+                cpCore.doc.continueProcessing = False
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try

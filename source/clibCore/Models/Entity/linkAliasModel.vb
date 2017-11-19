@@ -96,8 +96,9 @@ Namespace Contensive.Core.Models.Entity
         End Function
         '
         '====================================================================================================
-        Public Overloads Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
+        Public Overloads Shared Sub invalidateCache(cpCore As coreClass, recordId As Integer)
             invalidateCacheSingleRecord(Of linkAliasModel)(cpCore, recordId)
+            Models.Complex.routeDictionaryModel.invalidateCache(cpCore)
         End Sub
         '
         '====================================================================================================

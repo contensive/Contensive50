@@ -48,7 +48,7 @@ Namespace Contensive.Addons.Core
                         & cr & "</td></tr></table>" _
                         & ""
                     result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False)
-                    cpCore.continueProcessing = False
+                    cpCore.doc.continueProcessing = False
                 End If
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

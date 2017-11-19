@@ -49,7 +49,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property fromAddressDefault() As String
             Get
                 If True Then
-                    Return cpCore.authContext.isAuthenticatedMember(cpCore)
+                    Return cpCore.doc.authContext.isAuthenticatedMember(cpCore)
                 Else
                     Return False
                 End If

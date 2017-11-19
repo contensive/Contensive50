@@ -395,6 +395,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="addonCollection_adminSite\getAjaxDefaultAddonOptionString.vb" />
+    <Compile Include="addonCollection_adminSite\setAdminSiteFieldHelp.vb" />
     <Compile Include="addonCollection_adminSite\setAjaxVisitPropertyClass.vb" />
     <Compile Include="addonCollection_adminSite\getAjaxVisitProperty.vb" />
     <Compile Include="addonCollection_adminSite\processAjaxDataClass.vb" />
@@ -456,6 +457,7 @@
     <Compile Include="Controllers\addonController.vb" />
     <Compile Include="Controllers\cacheController.vb" />
     <Compile Include="Controllers\docPropertyController.vb" />
+    <Compile Include="Models\Complex\routeDictionaryModel.vb" />
     <Compile Include="Models\Context\authContextModel.vb" />
     <Compile Include="Models\Context\stylesheetContextModel.vb" />
     <Compile Include="Models\Context\_blankModel.vb" />
@@ -481,12 +483,14 @@
     <Compile Include="Models\Entity\personModel.vb" />
     <Compile Include="Models\Entity\languageModel.vb" />
     <Compile Include="Models\Entity\domainModel.vb" />
+    <Compile Include="Models\Entity\contentFieldModel.vb" />
+    <Compile Include="Models\Entity\contentFieldHelpModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />
     <Compile Include="Models\Entity\tableSchemeModel.vb" />
-    <Compile Include="Models\Entity\cdefFieldModel.vb" />
-    <Compile Include="Models\Entity\cdefModel.vb" />
+    <Compile Include="Models\Complex\cdefFieldModel.vb" />
+    <Compile Include="Models\Complex\cdefModel.vb" />
     <Compile Include="Models\Entity\domainLegacyModel.vb" />
     <Compile Include="Controllers\docController.vb" />
     <Compile Include="addonCollection_tools\addon_toolConfigureEdit.vb" />
@@ -641,6 +645,7 @@
   <ItemGroup>
     <Content Include="aoBase5.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Models\dataModelFields.txt" />
   </ItemGroup>

@@ -22,8 +22,8 @@ Namespace Contensive.Core.Controllers
         '==========================================================================
         '
         Public Shared Sub error_AddUserError(cpCore As coreClass, ByVal Message As String)
-            If (InStr(1, cpCore.debug_iUserError, Message, vbTextCompare) = 0) Then
-                cpCore.debug_iUserError = cpCore.debug_iUserError & cr & "<li class=""ccError"">" & genericController.encodeText(Message) & "</LI>"
+            If (InStr(1, cpCore.doc.debug_iUserError, Message, vbTextCompare) = 0) Then
+                cpCore.doc.debug_iUserError = cpCore.doc.debug_iUserError & cr & "<li class=""ccError"">" & genericController.encodeText(Message) & "</LI>"
             End If
         End Sub
         '
@@ -33,11 +33,11 @@ Namespace Contensive.Core.Controllers
         '==========================================================================
         '
         Public Shared Function error_GetUserError(cpcore As coreClass) As String
-            error_GetUserError = genericController.encodeText(cpcore.debug_iUserError)
+            error_GetUserError = genericController.encodeText(cpCore.doc.debug_iUserError)
             If error_GetUserError <> "" Then
                 error_GetUserError = "<ul class=""ccError"">" & genericController.htmlIndent(error_GetUserError) & cr & "</ul>"
                 error_GetUserError = UserErrorHeadline & "" & error_GetUserError
-                cpcore.debug_iUserError = ""
+                cpCore.doc.debug_iUserError = ""
             End If
         End Function
 
@@ -51,9 +51,9 @@ Namespace Contensive.Core.Controllers
         Public Shared Function getDocExceptionHtmlList(cpcore As coreClass) As String
             Dim returnHtmlList As String = ""
             Try
-                If Not cpcore.errList Is Nothing Then
-                    If cpcore.errList.Count > 0 Then
-                        For Each exMsg As String In cpcore.errList
+                If Not cpcore.doc.errList Is Nothing Then
+                    If cpcore.doc.errList.Count > 0 Then
+                        For Each exMsg As String In cpcore.doc.errList
                             returnHtmlList &= cr2 & "<li class=""ccExceptionListRow"">" & cr3 & cpcore.html.convertTextToHTML(exMsg) & cr2 & "</li>"
                         Next
                         returnHtmlList = cr & "<ul class=""ccExceptionList"">" & returnHtmlList & cr & "</ul>"

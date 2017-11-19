@@ -53,10 +53,10 @@ Namespace Contensive.Core
         '
         Public Property allowDebugLog() As Boolean
             Get
-                Return cp.core.allowDebugLog
+                Return cp.core.doc.allowDebugLog
             End Get
             Set(ByVal value As Boolean)
-                cp.core.allowDebugLog = value
+                cp.core.doc.allowDebugLog = value
             End Set
         End Property
         '

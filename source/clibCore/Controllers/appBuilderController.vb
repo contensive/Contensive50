@@ -271,10 +271,10 @@ Namespace Contensive.Core.Controllers
         '
         Public Shared Sub upgrade(cpcore As coreClass, isNewBuild As Boolean)
             Try
-                If cpcore.upgradeInProgress Then
+                If cpcore.doc.upgradeInProgress Then
                     ' leftover from 4.1
                 Else
-                    cpcore.upgradeInProgress = True
+                    cpcore.doc.upgradeInProgress = True
                     Dim DataBuildVersion As String = cpcore.siteProperties.dataBuildVersion
                     Dim nonCriticalErrorList As New List(Of String)
                     '
@@ -670,7 +670,7 @@ Namespace Contensive.Core.Controllers
                     '
                     cpcore.cache.invalidateAll()
                     logController.appendInstallLog(cpcore, "Upgrade Complete")
-                    cpcore.upgradeInProgress = False
+                    cpcore.doc.upgradeInProgress = False
                 End If
             Catch ex As Exception
                 cpcore.handleException(ex) : Throw
@@ -1318,7 +1318,7 @@ Namespace Contensive.Core.Controllers
                 Dim sql3 As String
                 '
                 Active = Not InActive
-                Dim cdef As cdefModel = cpcore.metaData.getCdef(ContentName)
+                Dim cdef As Models.Complex.cdefModel = cpcore.metaData.getCdef(ContentName)
                 Dim tableName As String = cdef.ContentTableName
                 Dim cid As Integer = cdef.Id
                 '
@@ -1909,7 +1909,7 @@ Namespace Contensive.Core.Controllers
                 '
                 Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups")
                 '
-                GroupID = groupController.group_add(cpCore, "Content Editors")
+                GroupID = groupController.group_add(cpCore, "Site Managers")
                 SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.encodeSQLNumber(GroupID) & " where EditorGroupID is null;"
                 Call cpCore.db.executeQuery(SQL)
             Catch ex As Exception

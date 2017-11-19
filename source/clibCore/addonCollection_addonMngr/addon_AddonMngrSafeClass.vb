@@ -135,7 +135,7 @@ Namespace Contensive.Core
                     '
                     Call cpCore.webServer.redirect("/" & cpCore.serverconfig.appconfig.adminRoute, "Addon Manager, Cancel Button Pressed", False)
                 Else
-                    If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                    If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                         '
                         ' ----- Put up error message
                         '
@@ -455,7 +455,7 @@ Namespace Contensive.Core
                             ' Reinstall core collection
                             '---------------------------------------------------------------------------------------------
                             '
-                            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) And cpCore.docProperties.getBoolean("InstallCore") Then
+                            If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) And cpCore.docProperties.getBoolean("InstallCore") Then
                                 UpgradeOK = addonInstallClass.installCollectionFromRemoteRepo(cpCore, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ErrorMessage, "", False, nonCriticalErrorList)
                             End If
                             '
@@ -548,7 +548,7 @@ Namespace Contensive.Core
                         '   Forward to help page
                         ' --------------------------------------------------------------------------------
                         '
-                        If (InstalledCollectionIDList.Count > 0) And (Not (cpcore.debug_iUserError <> "")) Then
+                        If (InstalledCollectionIDList.Count > 0) And (Not (cpCore.doc.debug_iUserError <> "")) Then
                             Call cpCore.webServer.redirect("/" & cpCore.serverconfig.appconfig.adminRoute & "?helpcollectionid=" & InstalledCollectionIDList(0).ToString(), "Redirecting to help page after collection installation", False)
                         End If
                         '
@@ -792,7 +792,7 @@ Namespace Contensive.Core
                                     ' before system attribute
                                     '
                                     CS = cpCore.db.csOpen("Add-on Collections", , "Name")
-                                ElseIf Not cpcore.authContext.isAuthenticatedDeveloper(cpcore) Then
+                                ElseIf Not cpCore.doc.authContext.isAuthenticatedDeveloper(cpcore) Then
                                     '
                                     ' non-developers
                                     '
@@ -833,7 +833,7 @@ Namespace Contensive.Core
                                         Call Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>")
                                     Else
                                         Call Body.Add(Adminui.EditTableOpen)
-                                    If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                                    If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                                         Call Body.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", False, False, ""))
                                     End If
                                     Call Body.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))

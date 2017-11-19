@@ -50,7 +50,7 @@
 '        Public Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As sitePropertyModel
 '            Dim result As sitePropertyModel = Nothing
 '            Try
-'                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), callersCacheNameList)
+'                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.doc.authContext.user.ID), callersCacheNameList)
 '            Catch ex As Exception
 '                cpCore.handleExceptionAndContinue(ex) : Throw
 '                Throw

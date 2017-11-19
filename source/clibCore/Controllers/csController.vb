@@ -446,8 +446,8 @@ Namespace Contensive.Core
                 ContentName = cpcore.metaData.getContentNameByID(cpcore.db.csGetInteger(CSPointer, "contentcontrolId"))
             End If
             Dim source As String = cpcore.db.csGet(CSPointer, FieldName)
-            Return cpcore.html.convertActiveContentToHtmlForWebRender(source, ContentName, RecordID, cpcore.authContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage)
-            'Return cpcore.html.convertActiveContent_internal(source, cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything())
+            Return cpcore.html.convertActiveContentToHtmlForWebRender(source, ContentName, RecordID, cpCore.doc.authContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage)
+            'Return cpcore.html.convertActiveContent_internal(source, cpCore.doc.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.isAuthenticated, Nothing, cpCore.doc.authContext.isEditingAnything())
         End Function
         '
         '========================================================================

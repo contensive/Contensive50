@@ -286,7 +286,7 @@ Namespace Contensive.Core.Controllers
                     'initCounter += 1
                     '
                     Call cpCore.html.enableOutputBuffer(True)
-                    cpCore.continueProcessing = True
+                    cpCore.doc.continueProcessing = True
                     Call setResponseContentType("text/html")
                     '
                     '--------------------------------------------------------------------------
@@ -324,7 +324,7 @@ Namespace Contensive.Core.Controllers
                         requestProtocol = "http://"
                     End If
                     '
-                    cpCore.blockExceptionReporting = False
+                    cpCore.doc.blockExceptionReporting = False
                     '
                     '   javascript cookie detect on page1 of all visits
                     Dim CookieDetectKey As String = cpCore.docProperties.getText(RequestNameCookieDetectVisitID)
@@ -335,8 +335,8 @@ Namespace Contensive.Core.Controllers
                         Call cpCore.security.decodeToken(CookieDetectKey, CookieDetectVisitId, cookieDetectDate)
                         If CookieDetectVisitId <> 0 Then
                             Call cpCore.db.executeQuery("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
-                            cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                            Return cpCore.continueProcessing
+                            cpCore.doc.continueProcessing = False '--- should be disposed by caller --- Call dispose
+                            Return cpCore.doc.continueProcessing
                         End If
                     End If
                     '
@@ -477,7 +477,7 @@ Namespace Contensive.Core.Controllers
                             cpCore.domainLegacyCache.domainDetails.forwardUrl = "http://" & cpCore.domainLegacyCache.domainDetails.forwardUrl
                         End If
                         Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
-                        Return cpCore.continueProcessing
+                        Return cpCore.doc.continueProcessing
                     ElseIf (cpCore.domainLegacyCache.domainDetails.typeId = 3) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> 0) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> cpCore.domainLegacyCache.domainDetails.id) Then
                         '
                         ' forward to a replacement domain
@@ -488,7 +488,7 @@ Namespace Contensive.Core.Controllers
                             If (pos > 0) Then
                                 cpCore.domainLegacyCache.domainDetails.forwardUrl = Mid(requestUrlSource, 1, pos - 1) & forwardDomain & Mid(requestUrlSource, pos + Len(requestDomain))
                                 Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
-                                Return cpCore.continueProcessing
+                                Return cpCore.doc.continueProcessing
                             End If
                         End If
                     End If
@@ -543,8 +543,8 @@ Namespace Contensive.Core.Controllers
                         Else
                             Call redirect(requestProtocol & requestDomain & requestPath & requestPage, Copy, False)
                         End If
-                        cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                        Return cpCore.continueProcessing
+                        cpCore.doc.continueProcessing = False '--- should be disposed by caller --- Call dispose
+                        Return cpCore.doc.continueProcessing
                     End If
                     '
                     ' ----- Create cpcore.main_ServerFormActionURL if it has not been overridden manually
@@ -557,7 +557,7 @@ Namespace Contensive.Core.Controllers
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
-            Return cpCore.continueProcessing
+            Return cpCore.doc.continueProcessing
         End Function
         '
         '========================================================================
@@ -619,8 +619,8 @@ Namespace Contensive.Core.Controllers
                 '
                 MethodName = "main_addResponseCookie"
                 '
-                If cpCore.continueProcessing Then
-                    'If cpCore.continueProcessing And cpCore.doc.outputBufferEnabled Then
+                If cpCore.doc.continueProcessing Then
+                    'If cpCore.doc.continueProcessing And cpCore.doc.outputBufferEnabled Then
                     If (False) Then
                         ''
                         '' no domain provided, new mode
@@ -790,7 +790,7 @@ Namespace Contensive.Core.Controllers
         Public Sub addResponseHeader(HeaderName As Object, HeaderValue As Object)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetStreamHeader")
             '
-            If cpCore.continueProcessing Then
+            If cpCore.doc.continueProcessing Then
                 If bufferResponseHeader <> "" Then
                     bufferResponseHeader = bufferResponseHeader & vbCrLf
                 End If
@@ -825,7 +825,7 @@ ErrorTrap:
                 Dim FullLink As String
                 Dim redirectCycles As Integer
                 '
-                If cpCore.continueProcessing Then
+                If cpCore.doc.continueProcessing Then
                     redirectCycles = cpCore.docProperties.getInteger(rnRedirectCycleFlag)
                     '
                     ' convert link to a long link on this domain
@@ -876,7 +876,7 @@ ErrorTrap:
                             Call cpCore.db.executeQuery("Update ccContentWatch set link=null where link=" & cpCore.db.encodeSQLText(ShortLink))
                         End If
                         '
-                        If cpCore.testPointPrinting Then
+                        If cpCore.doc.testPointPrinting Then
                             '
                             ' -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink
@@ -888,10 +888,10 @@ ErrorTrap:
                         '
                         ' Go ahead and redirect
                         '
-                        Copy = """" & FormatDateTime(cpCore.profileStartTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestUrlSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
+                        Copy = """" & FormatDateTime(cpCore.doc.profileStartTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestUrlSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
                         logController.appendLog(cpCore, Copy, "performance", "redirects")
                         '
-                        If cpCore.testPointPrinting Then
+                        If cpCore.doc.testPointPrinting Then
                             '
                             ' -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink
@@ -912,7 +912,7 @@ ErrorTrap:
                     End If
                     '
                     ' -- close the output stream
-                    cpCore.continueProcessing = False
+                    cpCore.doc.continueProcessing = False
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)

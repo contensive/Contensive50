@@ -25,7 +25,7 @@ Namespace Contensive.Addons.Core
                 Dim cpCore As coreClass = processor.core
                 '
                 ' save custom styles
-                If cpCore.authContext.isAuthenticated() And cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                If cpCore.doc.authContext.isAuthenticated() And cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                     Dim addonId As Integer
                     addonId = cpCore.docProperties.getInteger("AddonID")
                     If (addonId > 0) Then
@@ -36,7 +36,7 @@ Namespace Contensive.Addons.Core
                             '
                             ' Clear Caches
                             '
-                            Call cpCore.cache.invalidateObject_Content(addonModel.contentName)
+                            Call cpCore.cache.invalidateAllObjectsInContent(addonModel.contentName)
                         End If
                     End If
                 End If

@@ -25,7 +25,7 @@ Namespace Contensive.Addons.Core
                 Dim cpCore As coreClass = processor.core
                 '
                 ' -- default login page
-                cpCore.continueProcessing = False
+                cpCore.doc.continueProcessing = False
                 Dim addonArguments As New Dictionary(Of String, String)
                 addonArguments.Add("Force Default Login", "true")
                 Return cpCore.addon.execute(

@@ -39,7 +39,7 @@ Namespace Contensive.Addons.Core
                 End If
                 result = result & cpCore.addonCache.robotsTxt
                 Call cpCore.webServer.setResponseContentType("text/plain")
-                cpCore.continueProcessing = False
+                cpCore.doc.continueProcessing = False
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try
