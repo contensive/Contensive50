@@ -29,9 +29,11 @@ Namespace Contensive.Addons.Core
                 Dim addonArguments As New Dictionary(Of String, String)
                 addonArguments.Add("Force Default Login", "false")
                 Return cpCore.addon.execute(
-                addonModel.create(cpCore, addonGuidLoginPage),
+                    addonModel.create(cpCore, addonGuidLoginPage),
                     New CPUtilsBaseClass.addonExecuteContext() With {
-                        .addonType = CPUtilsBaseClass.addonContext.ContextPage
+                        .addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                        .instanceArguments = addonArguments,
+                        .forceHtmlDocument = True
                     }
                 )
             Catch ex As Exception

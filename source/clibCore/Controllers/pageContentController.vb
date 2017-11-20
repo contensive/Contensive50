@@ -93,7 +93,7 @@ Namespace Contensive.Core.Controllers
                     Dim AllowCookieTest As Boolean
                     AllowCookieTest = cpCore.siteProperties.allowVisitTracking And (cpCore.doc.authContext.visit.PageVisits = 1)
                     If AllowCookieTest Then
-                        Call cpCore.html.addOnLoadJs("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.doc.authContext.visit.id, cpCore.doc.profileStartTime) & "')};", "Cookie Test")
+                        Call cpCore.html.addScript_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.doc.authContext.visit.id, cpCore.doc.profileStartTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -521,7 +521,7 @@ Namespace Contensive.Core.Controllers
                                     ' -- block with custom content
                                     cpCore.doc.continueProcessing = False
                                     Call cpCore.doc.setMetaContent(0, 0)
-                                    Call cpCore.html.addOnLoadJs("document.body.style.overflow='scroll'", "Anonymous User Block")
+                                    Call cpCore.html.addScript_onLoad("document.body.style.overflow='scroll'", "Anonymous User Block")
                                     Return cpCore.html.getHtmlDoc(
                                         cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.doc.authContext.user.id, True, cpCore.doc.authContext.isAuthenticated),
                                         TemplateDefaultBodyTag,
@@ -1489,12 +1489,12 @@ ErrorTrap:
                     ' ----- Store page javascript
                     '---------------------------------------------------------------------------------
                     '
-                    Call cpCore.html.addOnLoadJs(cpCore.doc.page.JSOnLoad, "page content")
-                    Call cpCore.html.addHeadJavascriptCode(cpCore.doc.page.JSHead, "page content")
+                    Call cpCore.html.addScript_onLoad(cpCore.doc.page.JSOnLoad, "page content")
+                    Call cpCore.html.addScriptCode_Head(cpCore.doc.page.JSHead, "page content")
                     If cpCore.doc.page.JSFilename <> "" Then
-                        Call cpCore.html.addHeadJsLink(genericController.getCdnFileLink(cpCore, cpCore.doc.page.JSFilename), "page content")
+                        Call cpCore.html.addScriptLink_Head(genericController.getCdnFileLink(cpCore, cpCore.doc.page.JSFilename), "page content")
                     End If
-                    Call cpCore.html.addBodyJavascriptCode(cpCore.doc.page.JSEndBody, "page content")
+                    Call cpCore.html.addScriptCode_Body(cpCore.doc.page.JSEndBody, "page content")
                     '
                     '---------------------------------------------------------------------------------
                     ' Set the Meta Content flag

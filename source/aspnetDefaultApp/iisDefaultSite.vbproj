@@ -577,6 +577,7 @@
     <Content Include="ccLib\Popup\WaitForIISReset.htm" />
     <Content Include="ccLib\Popup\WaitPageClose.htm" />
     <Content Include="ccLib\Popup\WaitPageOpen.htm" />
+    <Content Include="contensiveBase\TemplateHomeDefault.html" />
     <Content Include="default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -636,6 +637,7 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </None>
+    <None Include="My Project\PublishProfiles\app20171015132206.pubxml" />
     <None Include="My Project\PublishProfiles\aspxtest.pubxml" />
     <None Include="My Project\PublishProfiles\c-pf-kma-c5-resources-iisDefaultSite.pubxml" />
     <None Include="My Project\PublishProfiles\deployToLocalAppPatternsAspnet.pubxml" />

@@ -33,10 +33,10 @@ Namespace Contensive.Addons.Core
                     ' Open a page compatible with a dialog
                     '
                     Call cpCore.doc.addRefreshQueryString("EditorObjectName", EditorObjectName)
-                    Call cpCore.html.addHeadJsLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                    Call cpCore.html.addScriptLink_Head("/ccLib/ClientSide/dialogs.js", "Resource Library")
                     'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                     Call cpCore.doc.setMetaContent(0, 0)
-                    Call cpCore.html.addOnLoadJs("document.body.style.overflow='scroll';", "Resource Library")
+                    Call cpCore.html.addScript_onLoad("document.body.style.overflow='scroll';", "Resource Library")
                     Dim Copy As String = cpCore.html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                     Dim htmlBody As String = "" _
                         & genericController.htmlIndent(cpCore.html.main_GetPanelHeader("Contensive Resource Library")) _
@@ -56,9 +56,9 @@ Namespace Contensive.Addons.Core
                     '
                     ' Open a page compatible with a dialog
                     Call cpCore.doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
-                    Call cpCore.html.addHeadJsLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                    Call cpCore.html.addScriptLink_Head("/ccLib/ClientSide/dialogs.js", "Resource Library")
                     Call cpCore.doc.setMetaContent(0, 0)
-                    Call cpCore.html.addOnLoadJs("document.body.style.overflow='scroll';", "Resource Library")
+                    Call cpCore.html.addScript_onLoad("document.body.style.overflow='scroll';", "Resource Library")
                     Dim htmlBody As String = "" _
                         & cpCore.html.main_GetPanelHeader("Contensive Resource Library") _
                         & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _

@@ -128,7 +128,8 @@ Namespace Contensive.Core
         '
         Public Const defaultLandingPageHtml As String = ""
         Public Const defaultTemplateName As String = "Default"
-        Public Const defaultTemplateHtml As String = "{% {""addon"":{""addon"":""menu"",""name"":""Default""}} %}{% ""Content Box"" %}"
+        'Public Const defaultTemplateHtml As String = "{% {""addon"":{""addon"":""menu pages"",""name"":""Default""}} %}{% ""Content Box"" %}"
+        Public Const defaultTemplateHomeFilename As String = "ContensiveBase\TemplateHomeDefault.html"
         '
         '
         '
@@ -1929,7 +1930,7 @@ Namespace Contensive.Core
         '
         ' block of js code that goes into a script tag
         '
-        Public Structure jsBufferClass
+        Public Structure scriptAssetClass
             Dim IsLink As Boolean
             Dim Text As String
             Dim addedByMessage As String

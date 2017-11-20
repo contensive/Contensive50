@@ -32,7 +32,7 @@ Namespace Contensive.BaseClasses
         '
         Public Class addonExecuteContext
             ''' <summary>
-            ''' This caption is only used for error reporting in case there is a problem locating it.
+            ''' This caption is used if the addon cannot be executed.
             ''' </summary>
             ''' <returns></returns>
             Public Property errorCaption As String
@@ -86,6 +86,11 @@ Namespace Contensive.BaseClasses
             ''' </summary>
             ''' <returns></returns>
             Public Property isIncludeAddon As Boolean = False
+            ''' <summary>
+            ''' Optional. If set true, the addon being called will be delivered as ah html document, with head, body and html tags. This forces the addon's htmlDocument setting.
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property forceHtmlDocument As Boolean = False
         End Class
 
         Public MustOverride Function ConvertHTML2Text(ByVal Source As String) As String

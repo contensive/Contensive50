@@ -817,7 +817,7 @@ Namespace Contensive.Core
                                     ' If another xml files shows up, and process OK it will cover this error
                                     '
                                     'hint = hint & ",330"
-                                    return_ErrorMessage = "<p>There was a problem with the Collection File for this cpcore.addon.</p>"
+                                    return_ErrorMessage = "<p>There was a problem installing the Collection File [" & tmpInstallPath & Filename & "].</p>"
                                     Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, error reading collection [" & collectionPathFilename & "]")
                                     'StatusOK = False
                                     loadOk = False
@@ -1122,7 +1122,7 @@ Namespace Contensive.Core
         '=========================================================================================================================
         '
         Public Shared Function installCollectionFromLocalRepo(cpCore As coreClass, ByVal CollectionGuid As String, ByVal ignore_BuildVersion As String, ByRef return_ErrorMessage As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean, ByRef nonCriticalErrorList As List(Of String)) As Boolean
-            Dim result As Boolean = False
+            Dim result As Boolean = True
             Try
                 Dim CollectionVersionFolderName As String = ""
                 Dim CollectionLastChangeDate As Date = Nothing

@@ -25,7 +25,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Dim Body As String
                 'Dim head As String
-                Dim bodyTag As String
+                'Dim bodyTag As String
                 '
                 ' ----- Default Login
                 '
@@ -55,10 +55,11 @@ Namespace Contensive.Core.Controllers
                     & htmlIndent(Body) _
                     & "</div>"
                 '
-                Call cpcore.doc.setMetaContent(0, 0)
-                Call cpcore.html.addTitle("Login", "loginPage")
-                bodyTag = TemplateDefaultBodyTag
-                returnREsult = cpcore.html.getHtmlDoc(Body, bodyTag, True, True, False)
+                returnREsult = Body
+                'Call cpcore.doc.setMetaContent(0, 0)
+                'Call cpcore.html.addTitle("Login", "loginPage")
+                'bodyTag = TemplateDefaultBodyTag
+                'returnREsult = cpcore.html.getHtmlDoc(Body, bodyTag, True, True, False)
             Catch ex As Exception
                 cpcore.handleException(ex) : Throw
             End Try
@@ -96,7 +97,7 @@ Namespace Contensive.Core.Controllers
                     '
                     Call cpcore.doc.addRefreshQueryString("method", "")
                     loginForm = ""
-                    Call cpcore.html.addOnLoadJs("document.getElementById('LoginUsernameInput').focus()", "login")
+                    Call cpcore.html.addScript_onLoad("document.getElementById('LoginUsernameInput').focus()", "login")
                     '
                     ' ----- Error Messages
                     '

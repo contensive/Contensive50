@@ -439,21 +439,21 @@ Namespace Contensive.Core.Controllers
                             '
                             ' -- js head links
                             If addon.JSHeadScriptSrc <> "" Then
-                                Call cpCore.html.addHeadJsLink(addon.JSHeadScriptSrc, AddedByName & " Javascript Head Src")
+                                Call cpCore.html.addScriptLink_Head(addon.JSHeadScriptSrc, AddedByName & " Javascript Head Src")
                             End If
                             '
                             ' -- js head code
                             If addon.JSFilename.filename <> "" Then
-                                Call cpCore.html.addHeadJsLink(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.JSFilename.filename), AddedByName & " Javascript Head Code")
+                                Call cpCore.html.addScriptLink_Head(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, addon.JSFilename.filename), AddedByName & " Javascript Head Code")
                             End If
                             '
                             ' -- js body links
                             If addon.JSBodyScriptSrc <> "" Then
-                                Call cpCore.html.addBodyJsLink(addon.JSBodyScriptSrc, AddedByName & " Javascript Body Src")
+                                Call cpCore.html.addScriptLink_Body(addon.JSBodyScriptSrc, AddedByName & " Javascript Body Src")
                             End If
                             '
                             ' -- js body code
-                            Call cpCore.html.addBodyJavascriptCode(addon.JavaScriptBodyEnd, AddedByName & " Javascript Body Code")
+                            Call cpCore.html.addScriptCode_Body(addon.JavaScriptBodyEnd, AddedByName & " Javascript Body Code")
                             '
                             ' -- styles
                             If addon.StylesFilename.filename <> "" Then
@@ -564,7 +564,7 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleException(ex)
             Finally
                 If (addon IsNot Nothing) Then
-                    If (rootLevelAddon) And (addon.htmlDocument) Then
+                    If (executeContext.forceHtmlDocument) Or ((rootLevelAddon) And (addon.htmlDocument)) Then
                         result = cpCore.html.getHtmlDoc(result, "<body>") ' "<body class=""ccBodyAdmin ccCon"">"
                     End If
                 End If
@@ -2156,7 +2156,7 @@ Namespace Contensive.Core.Controllers
                     cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.addOnLoadJs("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addScript_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                 End If
@@ -2325,7 +2325,7 @@ ErrorTrap:
                     cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.addOnLoadJs("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addScript_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                     result = "" _
@@ -2415,7 +2415,7 @@ ErrorTrap:
                     'SiteStylesBubbleCache = "x"
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.addOnLoadJs("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addScript_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                     getHTMLViewerBubble = "" _
@@ -3437,14 +3437,14 @@ ErrorTrap:
                 If WrapperSourceForComment <> "" Then
                     SourceComment = SourceComment & " for " & WrapperSourceForComment
                 End If
-                Call cpCore.html.addOnLoadJs(cpCore.db.csGetText(CS, "javascriptonload"), SourceComment)
-                Call cpCore.html.addBodyJavascriptCode(cpCore.db.csGetText(CS, "javascriptbodyend"), SourceComment)
+                Call cpCore.html.addScript_onLoad(cpCore.db.csGetText(CS, "javascriptonload"), SourceComment)
+                Call cpCore.html.addScriptCode_Body(cpCore.db.csGetText(CS, "javascriptbodyend"), SourceComment)
                 Call cpCore.html.addHeadTag(cpCore.db.csGetText(CS, "OtherHeadTags"), SourceComment)
                 '
                 JSFilename = cpCore.db.csGetText(CS, "jsfilename")
                 If JSFilename <> "" Then
                     JSFilename = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
-                    Call cpCore.html.addHeadJsLink(JSFilename, SourceComment)
+                    Call cpCore.html.addScriptLink_Head(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.csGetText(CS, "stylesfilename")
                 If Copy <> "" Then

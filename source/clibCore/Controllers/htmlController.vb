@@ -39,18 +39,13 @@ Namespace Contensive.Core.Controllers
         Public Function insertOuterHTML(ignore As Object, layout As String, Key As String, textToInsert As String) As String
             Dim returnValue As String = ""
             Try
-                Dim posStart As Integer
-                Dim posEnd As Integer
-                '
-                ' short-cut for now, get the outerhtml, find the position, then remove the wrapping tags
-                '
-                If Key = "" Then
+                If String.IsNullOrEmpty(Key) Then
                     returnValue = textToInsert
                 Else
                     returnValue = layout
-                    posStart = getTagStartPos2(ignore, layout, 1, Key)
+                    Dim posStart As Integer = getTagStartPos2(ignore, layout, 1, Key)
                     If posStart <> 0 Then
-                        posEnd = getTagEndPos(ignore, layout, posStart)
+                        Dim posEnd As Integer = getTagEndPos(ignore, layout, posStart)
                         If posEnd > 0 Then
                             '
                             ' seems like these are the correct positions here.
@@ -852,7 +847,7 @@ ErrorTrap:
                 '
                 ' -- body Javascript
                 Dim allowDebugging As Boolean = cpCore.visitProperty.getBoolean("AllowDebugging")
-                For Each jsBody In cpCore.doc.jsBodyList
+                For Each jsBody In cpCore.doc.scriptList_body
                     With jsBody
                         If (.addedByMessage <> "") And allowDebugging Then
                             result &= cr & "<!-- from " & .addedByMessage & " -->"
@@ -2128,8 +2123,8 @@ ErrorTrap:
                     & vbCrLf & "var cal = new CalendarPopup();" _
                     & vbCrLf & "cal.showNavigationDropdowns();" _
                     & vbCrLf & "</SCRIPT>"
-                    Call addHeadJsLink("/ccLib/mktree/CalendarPopup.js", "Calendar Popup")
-                    Call addHeadJavascriptCode("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup")
+                    Call addScriptLink_Head("/ccLib/mktree/CalendarPopup.js", "Calendar Popup")
+                    Call addScriptCode_Head("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup")
                 End If
 
                 If IsDate(iDefaultValue) Then
@@ -2783,29 +2778,18 @@ ErrorTrap:
         '=========================================================================================
         '
         Public Sub html_AddEvent(ByVal HtmlId As String, ByVal DOMEvent As String, ByVal Javascript As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AddEvent")
-            '
-            Dim JSCodeAsString As String
-            '
-            JSCodeAsString = Javascript
+            Dim JSCodeAsString As String = Javascript
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, "'", "'+""'""+'")
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCrLf, "\n")
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCr, "\n")
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbLf, "\n")
             JSCodeAsString = "'" & JSCodeAsString & "'"
-            '
-            Call addOnLoadJs("" _
+            Call addScript_onLoad("" _
                 & "cj.addListener(" _
                     & "document.getElementById('" & HtmlId & "')" _
                     & ",'" & DOMEvent & "'" _
                     & ",function(){eval(" & JSCodeAsString & ")}" _
                 & ")", "")
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("AddEvent")
         End Sub
         '
         '
@@ -3769,7 +3753,7 @@ ErrorTrap:
                                                 ACField = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"))
                                                 If ACField = "" Then
                                                     ' compatibility for old personalization type
-                                                    ACField = htmlController.csv_GetAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"))
+                                                    ACField = htmlController.getAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"))
                                                 End If
                                                 FieldName = genericController.EncodeInitialCaps(ACField)
                                                 If (FieldName = "") Then
@@ -3956,7 +3940,7 @@ ErrorTrap:
                                                                 ' This must be done out on the page because the csv does not know about authenticated
                                                                 '
                                                                 Copy = ""
-                                                                GroupIDList = htmlController.csv_GetAddonOptionStringValue("AllowGroups", addonOptionString)
+                                                                GroupIDList = htmlController.getAddonOptionStringValue("AllowGroups", addonOptionString)
                                                                 If (Not cpCore.doc.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, True, GroupIDList, True)) Then
                                                                     '
                                                                     ' Block content if not allowed
@@ -4106,7 +4090,7 @@ ErrorTrap:
                                                                 ' all Src and Instance vars are already encoded correctly
                                                                 If SrcOptionName <> "" Then
                                                                     ' since AddonOptionString is encoded, InstanceOptionValue will be also
-                                                                    InstanceOptionValue = htmlController.csv_GetAddonOptionStringValue(SrcOptionName, addonOptionString)
+                                                                    InstanceOptionValue = htmlController.getAddonOptionStringValue(SrcOptionName, addonOptionString)
                                                                     'InstanceOptionValue = cpcore.csv_GetAddonOption(SrcOptionName, AddonOptionString)
                                                                     ResultOptionSelector = getAddonSelector(SrcOptionName, genericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector)
                                                                     'ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
@@ -4287,9 +4271,9 @@ ErrorTrap:
                                                     '
                                                     '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                     'test - encoding changed
-                                                    NewName = htmlController.csv_GetAddonOptionStringValue("new", addonOptionString)
+                                                    NewName = htmlController.getAddonOptionStringValue("new", addonOptionString)
                                                     'NewName =  genericController.DecodeResponseVariable(getSimpleNameValue("new", AddonOptionString, "", "&"))
-                                                    TextName = htmlController.csv_GetAddonOptionStringValue("name", addonOptionString)
+                                                    TextName = htmlController.getAddonOptionStringValue("name", addonOptionString)
                                                     'TextName = getSimpleNameValue("name", AddonOptionString)
                                                     If TextName = "" Then
                                                         TextName = "Default"
@@ -6158,7 +6142,7 @@ ErrorTrap:
                             End If
                         End If
                         cpCore.db.csClose(CS)
-                        Call addHeadJavascriptCode(javaScriptRequired, "CheckList Categories")
+                        Call addScriptCode_Head(javaScriptRequired, "CheckList Categories")
                     End If
                     'End If
                     cpCore.doc.checkListCnt = cpCore.doc.checkListCnt + 1
@@ -6294,7 +6278,7 @@ ErrorTrap:
         '
         '
         '
-        Public Sub addOnLoadJs(NewCode As String, addedByMessage As String)
+        Public Sub addScript_onLoad(NewCode As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
             Dim s As String
@@ -6318,7 +6302,7 @@ ErrorTrap:
         '
         '
         '
-        Public Sub addBodyJavascriptCode(NewCode As String, addedByMessage As String)
+        Public Sub addScriptCode_Body(NewCode As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
             Dim s As String
@@ -6341,7 +6325,7 @@ ErrorTrap:
         '
         '
         '
-        Public Sub addHeadJavascriptCode(NewCode As String, addedByMessage As String)
+        Public Sub addScriptCode_Head(NewCode As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
             Dim s As String
@@ -6372,10 +6356,10 @@ ErrorTrap:
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf, cr2)
-                ReDim Preserve cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count)
-                cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).IsLink = False
-                cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).Text = NewCode
-                cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).addedByMessage = genericController.vbLCase(addedByMessage)
+                ReDim Preserve cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count)
+                cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).IsLink = False
+                cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).Text = NewCode
+                cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).addedByMessage = genericController.vbLCase(addedByMessage)
                 'cpCore.doc.headScriptCnt = cpCore.doc.headScriptCnt + 1
             End If
             '    If NewCode <> "" And genericController.vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
@@ -6407,25 +6391,27 @@ ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadScriptCode")
         End Sub
         '
+        '=========================================================================================================
         '
-        '
-        Public Sub addHeadJsLink(Filename As String, addedByMessage As String)
+        Public Sub addScriptLink_Head(Filename As String, addedByMessage As String)
             Try
                 If Filename <> "" Then
-                    ReDim Preserve cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count)
-                    cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).IsLink = True
-                    cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).Text = Filename
-                    cpCore.doc.htmlMetaContent_jsHead(cpCore.doc.htmlMetaContent_jsHead.Count - 1).addedByMessage = addedByMessage
+                    ReDim Preserve cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count)
+                    cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).IsLink = True
+                    cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).Text = Filename
+                    cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).addedByMessage = addedByMessage
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
             End Try
         End Sub
         '
-        Public Sub addBodyJsLink(Filename As String, addedByMessage As String)
+        '=========================================================================================================
+        '
+        Public Sub addScriptLink_Body(Filename As String, addedByMessage As String)
             Try
                 If Filename <> "" Then
-                    cpCore.doc.jsBodyList.Add(New jsBufferClass With {
+                    cpCore.doc.scriptList_body.Add(New scriptAssetClass With {
                         .addedByMessage = addedByMessage,
                         .IsLink = True,
                         .Text = Filename
@@ -6935,7 +6921,7 @@ ErrorTrap:
                         '
                         Copy = cpCore.doc.getNextJavascriptBodyEnd()
                         Do While Copy <> ""
-                            Call addBodyJavascriptCode(Copy, "embedded content")
+                            Call addScriptCode_Body(Copy, "embedded content")
                             Copy = cpCore.doc.getNextJavascriptBodyEnd()
                         Loop
                         '
@@ -6948,7 +6934,7 @@ ErrorTrap:
                             Else
                                 Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
                             End If
-                            Call addHeadJsLink(Copy, "embedded content")
+                            Call addScriptLink_Head(Copy, "embedded content")
                             Copy = cpCore.doc.getNextJSFilename()
                         Loop
                         ''
@@ -8890,15 +8876,15 @@ ErrorTrap:
                         & cr3 & "<td width=""100%"" class=""ccPanel""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td>" _
                         & cr2 & "</tr>"
                         '
-                        DebugPanel = DebugPanel & main_DebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/ccLib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
-                        DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", genericController.encodeHTML(cpCore.siteProperties.trapErrors.ToString))
-                        DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", genericController.encodeHTML(cpCore.siteProperties.getText("TrapEmail")))
-                        DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", genericController.encodeHTML(cpCore.webServer.requestUrl))
-                        DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", genericController.encodeHTML(cpCore.webServer.requestDomain))
-                        DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", genericController.encodeHTML(cpCore.webServer.requestProtocol))
-                        DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerHost", genericController.encodeHTML(cpCore.webServer.requestDomain))
-                        DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", genericController.encodeHTML(cpCore.webServer.requestPath))
-                        DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", genericController.encodeHTML(cpCore.webServer.requestPage))
+                        DebugPanel = DebugPanel & getDebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/ccLib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
+                        DebugPanel = DebugPanel & getDebugPanelRow("Trap Errors", genericController.encodeHTML(cpCore.siteProperties.trapErrors.ToString))
+                        DebugPanel = DebugPanel & getDebugPanelRow("Trap Email", genericController.encodeHTML(cpCore.siteProperties.getText("TrapEmail")))
+                        DebugPanel = DebugPanel & getDebugPanelRow("main_ServerLink", genericController.encodeHTML(cpCore.webServer.requestUrl))
+                        DebugPanel = DebugPanel & getDebugPanelRow("main_ServerDomain", genericController.encodeHTML(cpCore.webServer.requestDomain))
+                        DebugPanel = DebugPanel & getDebugPanelRow("main_ServerProtocol", genericController.encodeHTML(cpCore.webServer.requestProtocol))
+                        DebugPanel = DebugPanel & getDebugPanelRow("main_ServerHost", genericController.encodeHTML(cpCore.webServer.requestDomain))
+                        DebugPanel = DebugPanel & getDebugPanelRow("main_ServerPath", genericController.encodeHTML(cpCore.webServer.requestPath))
+                        DebugPanel = DebugPanel & getDebugPanelRow("main_ServerPage", genericController.encodeHTML(cpCore.webServer.requestPage))
                         Copy = ""
                         If cpCore.webServer.requestQueryString <> "" Then
                             CopySplit = Split(cpCore.webServer.requestQueryString, "&")
@@ -8916,7 +8902,7 @@ ErrorTrap:
                             Next
                             Copy = Mid(Copy, 8)
                         End If
-                        DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerQueryString", Copy)
+                        DebugPanel = DebugPanel & getDebugPanelRow("main_ServerQueryString", Copy)
                         Copy = ""
                         For Each key As String In cpCore.docProperties.getKeyList()
                             Dim docProperty As docPropertiesClass = cpCore.docProperties.getProperty(key)
@@ -8924,15 +8910,15 @@ ErrorTrap:
                                 Copy = Copy & cr & "<br>" & genericController.encodeHTML(docProperty.NameValue)
                             End If
                         Next
-                        DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000, "0.000") & " sec")
+                        DebugPanel = DebugPanel & getDebugPanelRow("Render Time &gt;= ", Format((cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000, "0.000") & " sec")
                         If True Then
                             VisitHrs = CInt(cpCore.doc.authContext.visit.TimeToLastHit / 3600)
                             VisitMin = CInt(cpCore.doc.authContext.visit.TimeToLastHit / 60) - (60 * VisitHrs)
                             VisitSec = cpCore.doc.authContext.visit.TimeToLastHit Mod 60
-                            DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(cpCore.doc.authContext.visit.TimeToLastHit) & " sec, (" & VisitHrs & " hrs " & VisitMin & " mins " & VisitSec & " secs)")
+                            DebugPanel = DebugPanel & getDebugPanelRow("Visit Length", CStr(cpCore.doc.authContext.visit.TimeToLastHit) & " sec, (" & VisitHrs & " hrs " & VisitMin & " mins " & VisitSec & " secs)")
                             'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(main_VisitTimeToLastHit) & " sec, (" & Int(main_VisitTimeToLastHit / 60) & " min " & (main_VisitTimeToLastHit Mod 60) & " sec)")
                         End If
-                        DebugPanel = DebugPanel & main_DebugPanelRow("Addon Profile", "<hr><ul class=""ccPanel"">" & "<li>tbd</li>" & cr & "</ul>")
+                        DebugPanel = DebugPanel & getDebugPanelRow("Addon Profile", "<hr><ul class=""ccPanel"">" & "<li>tbd</li>" & cr & "</ul>")
                         '
                         DebugPanel = DebugPanel & "</table>"
                         '
@@ -8962,7 +8948,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function main_DebugPanelRow(Label As String, Value As String) As String
+        Private Function getDebugPanelRow(Label As String, Value As String) As String
             Return cr2 & "<tr><td valign=""top"" class=""ccPanel ccAdminSmall"">" & Label & "</td><td valign=""top"" class=""ccPanel ccAdminSmall"">" & Value & "</td></tr>"
         End Function
 
@@ -8975,18 +8961,13 @@ ErrorTrap:
         '   InstanceOptionstring is an "AddonEncoded" name=AddonEncodedValue[selector]descriptor&name=value string
         '=================================================================================================================
         '
-        Public Shared Function csv_GetAddonOptionStringValue(OptionName As String, addonOptionString As String) As String
-            Dim Pos As Integer
-            Dim s As String
-            '
-            s = genericController.getSimpleNameValue(OptionName, addonOptionString, "", "&")
-            Pos = genericController.vbInstr(1, s, "[")
+        Public Shared Function getAddonOptionStringValue(OptionName As String, addonOptionString As String) As String
+            Dim result As String = genericController.getSimpleNameValue(OptionName, addonOptionString, "", "&")
+            Dim Pos As Integer = genericController.vbInstr(1, result, "[")
             If Pos > 0 Then
-                s = Left(s, Pos - 1)
+                result = Left(result, Pos - 1)
             End If
-            s = genericController.decodeNvaArgument(s)
-            '
-            csv_GetAddonOptionStringValue = Trim(s)
+            Return Trim(genericController.decodeNvaArgument(result))
         End Function
         '
         '====================================================================================================

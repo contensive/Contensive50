@@ -472,7 +472,7 @@ Namespace Contensive.Core.Controllers
                             landingPage.Copyfilename.content = constants.defaultLandingPageHtml
                             landingPage.save(cpcore)
                             '
-                            defaultTemplate.BodyHTML = constants.defaultTemplateHtml
+                            defaultTemplate.BodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename)
                             defaultTemplate.save(cpcore)
                             '
                             If cpcore.siteProperties.getinteger("LandingPageID", landingPage.id) = 0 Then

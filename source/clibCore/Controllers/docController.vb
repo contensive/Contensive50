@@ -59,8 +59,8 @@ Namespace Contensive.Core.Controllers
         Public Property onLoadJavascript As String = ""
         Public Property endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
         Public Property endOfBodyString As String = ""
-        Public Property jsBodyList As New List(Of jsBufferClass)
-        Public Property htmlMetaContent_jsHead As jsBufferClass() = {}
+        Public Property scriptList_body As New List(Of scriptAssetClass)
+        Public Property scriptList_head As scriptAssetClass() = {}
         Public Property inputDateCnt As Integer = 0
         Public Property inputSelectCacheCnt As Integer = 0
         Public Property inputSelectCache As main_InputSelectCacheType()
@@ -239,7 +239,7 @@ Namespace Contensive.Core.Controllers
                             ' -- ceate new template named Default
                             template = Models.Entity.pageTemplateModel.add(cpcore, New List(Of String))
                             template.Name = defaultTemplateName
-                            template.BodyHTML = defaultTemplateHtml
+                            template.BodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename)
                             template.save(cpcore)
                         End If
                     End If
@@ -2521,9 +2521,9 @@ ErrorTrap:
                 '
                 ' -- head Javascript
                 ' -- must be added as addon. result &= cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & "/ccLib/ClientSide/Core.js""></script>"
-                If cpcore.doc.htmlMetaContent_jsHead.Count > 0 Then
-                    For Ptr = 0 To cpcore.doc.htmlMetaContent_jsHead.Count - 1
-                        With cpcore.doc.htmlMetaContent_jsHead(Ptr)
+                If cpcore.doc.scriptList_head.Count > 0 Then
+                    For Ptr = 0 To cpcore.doc.scriptList_head.Count - 1
+                        With cpcore.doc.scriptList_head(Ptr)
                             If (.addedByMessage <> "") And cpcore.visitProperty.getBoolean("AllowDebugging") Then
                                 result &= cr & "<!-- from " & .addedByMessage & " -->"
                             End If
@@ -2534,7 +2534,7 @@ ErrorTrap:
                             End If
                         End With
                     Next
-                    cpcore.doc.htmlMetaContent_jsHead = {}
+                    cpcore.doc.scriptList_head = {}
                 End If
                 '
                 ' -- other head tags - always last

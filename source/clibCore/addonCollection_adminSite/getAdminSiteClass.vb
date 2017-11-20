@@ -182,7 +182,7 @@ Namespace Contensive.Addons.AdminSite
                 ContentWatchLoaded = False
                 editRecord.Loaded = False
                 UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
-                Call cpCore.html.addOnLoadJs("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
+                Call cpCore.html.addScript_onLoad("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
                 Call cpCore.doc.setMetaContent(0, 0)
                 '
                 '-------------------------------------------------------------------------------
@@ -491,7 +491,7 @@ Namespace Contensive.Addons.AdminSite
                     If includeFancyBox Then
                         Call cpCore.addon.executeDependency(addonModel.create(cpCore, addonGuidjQueryFancyBox), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin})
                         'Call cpCore.addon.execute_legacy4(addonGuidjQueryFancyBox)
-                        Call cpCore.html.addHeadJavascriptCode("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});", "")
+                        Call cpCore.html.addScriptCode_Head("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});", "")
                     End If
                     '
                     ' Pickup user errors
@@ -3808,30 +3808,30 @@ ErrorTrap:
                     End If
                     '
                     HeaderDescription = HeaderDescription & "</td></tr>"
-                    '
-                    If Not False Then
-                        HeaderDescription = HeaderDescription & "<tr><td colspan=2>Authoring Mode: Immediate</td></tr>"
-                    Else
-                        HeaderDescription = HeaderDescription & "<tr><td style=""vertical-align:top;"">Authoring Mode: Workflow</td>"
-                        If editRecord.EditLock Then
-                            WFMessage = WFMessage & "<div>Locked: Currently being edited by " & editRecord.EditLockMemberName & "</div>"
-                        End If
-                        If editRecord.LockModifiedDate <> Date.MinValue Then
-                            WFMessage = WFMessage & "<div>Modified: " & editRecord.LockModifiedDate & " by " & editRecord.LockModifiedName & " and has not been published</div>"
-                        End If
-                        If editRecord.SubmitLock Then
-                            WFMessage = WFMessage & "<div>Submitted for Publishing: " & editRecord.SubmittedDate & " by " & editRecord.SubmittedName & "</div>"
-                        End If
-                        If editRecord.ApproveLock Then
-                            WFMessage = WFMessage & "<div>Approved for Publishing: " & editRecord.SubmittedDate & " by " & editRecord.SubmittedName & "</div>"
-                        End If
-                        If WFMessage <> "" Then
-                            HeaderDescription = HeaderDescription & "<td>" & WFMessage & "</td></tr>"
-                        Else
-                            HeaderDescription = HeaderDescription & "<td>&nbsp;</td></tr>"
-                        End If
-                    End If
-                    '
+                    ''
+                    'If Not False Then
+                    '    HeaderDescription = HeaderDescription & "<tr><td colspan=2>Authoring Mode: Immediate</td></tr>"
+                    'Else
+                    '    HeaderDescription = HeaderDescription & "<tr><td style=""vertical-align:top;"">Authoring Mode: Workflow</td>"
+                    '    If editRecord.EditLock Then
+                    '        WFMessage = WFMessage & "<div>Locked: Currently being edited by " & editRecord.EditLockMemberName & "</div>"
+                    '    End If
+                    '    If editRecord.LockModifiedDate <> Date.MinValue Then
+                    '        WFMessage = WFMessage & "<div>Modified: " & editRecord.LockModifiedDate & " by " & editRecord.LockModifiedName & " and has not been published</div>"
+                    '    End If
+                    '    If editRecord.SubmitLock Then
+                    '        WFMessage = WFMessage & "<div>Submitted for Publishing: " & editRecord.SubmittedDate & " by " & editRecord.SubmittedName & "</div>"
+                    '    End If
+                    '    If editRecord.ApproveLock Then
+                    '        WFMessage = WFMessage & "<div>Approved for Publishing: " & editRecord.SubmittedDate & " by " & editRecord.SubmittedName & "</div>"
+                    '    End If
+                    '    If WFMessage <> "" Then
+                    '        HeaderDescription = HeaderDescription & "<td>" & WFMessage & "</td></tr>"
+                    '    Else
+                    '        HeaderDescription = HeaderDescription & "<td>&nbsp;</td></tr>"
+                    '    End If
+                    'End If
+                    ''
                     HeaderDescription = HeaderDescription & "</table>"
                 End If
                 '
@@ -9190,8 +9190,8 @@ ErrorTrap:
             '        & "}" _
             '        & ""
             '
-            Call cpCore.html.addHeadJavascriptCode("var docLoaded=false", "Form loader")
-            Call cpCore.html.addOnLoadJs("docLoaded=true;", "Form loader")
+            Call cpCore.html.addScriptCode_Head("var docLoaded=false", "Form loader")
+            Call cpCore.html.addScript_onLoad("docLoaded=true;", "Form loader")
             s = cpCore.html.html_GetUploadFormStart()
             s = genericController.vbReplace(s, ">", " onSubmit=""cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');"">")
             s = genericController.vbReplace(s, ">", " autocomplete=""off"">")

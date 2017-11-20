@@ -882,7 +882,12 @@ Namespace Contensive.Core.Controllers
                                     .instanceArguments = addonArgDict
                                 }
                                 Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, addonName)
-                                CmdAccumulator = cpCore.addon.execute(addon, executeContext)
+                                If (addon Is Nothing) Then
+                                    cpCore.handleException(New ApplicationException("Add-on [" & addonName & "] could not be found executing command in content [" & cmdSrc & "]"))
+                                Else
+                                    CmdAccumulator = cpCore.addon.execute(addon, executeContext)
+                                End If
+
                             Case Else
                                 '
                                 ' execute an add-on

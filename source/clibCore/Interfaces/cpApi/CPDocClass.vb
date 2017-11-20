@@ -218,7 +218,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="NewCode"></param>
         Public Overrides Sub addHeadJavascript(ByVal NewCode As String)
-            Call cpCore.html.addHeadJavascriptCode(NewCode, "")
+            Call cpCore.html.addScriptCode_Head(NewCode, "")
         End Sub
         '
         '====================================================================================================
@@ -252,7 +252,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addOnLoadJavascript(ByVal NewCode As String)
             If True Then
-                Call cpCore.html.addOnLoadJs(NewCode, "")
+                Call cpCore.html.addScript_onLoad(NewCode, "")
             End If
         End Sub
         '

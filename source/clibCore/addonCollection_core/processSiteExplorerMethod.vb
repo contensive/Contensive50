@@ -39,7 +39,7 @@ Namespace Contensive.Addons.Core
                             .addonType = CPUtilsBaseClass.addonContext.ContextPage
                         }
                     )
-                    Call cpCore.html.addOnLoadJs("document.body.style.overflow='scroll';", "Site Explorer")
+                    Call cpCore.html.addScript_onLoad("document.body.style.overflow='scroll';", "Site Explorer")
                     Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                     Dim htmlBody As String = "" _
                         & genericController.htmlIndent(cpCore.html.main_GetPanelHeader("Contensive Site Explorer")) _
