@@ -320,7 +320,7 @@ Namespace Contensive.Core
                         For Each addon As addonModel In addonModel.createList(Me, "")
                             _addonCache.add(Me, addon)
                         Next
-                        Call cache.setObject("addonCache", _addonCache)
+                        Call cache.setContent("addonCache", _addonCache)
                     End If
                 End If
                 Return _addonCache
@@ -1181,7 +1181,7 @@ Namespace Contensive.Core
                     ' -- save addoncache
                     If (_assemblySkipList IsNot Nothing) Then
                         If (_assemblySkipList.Count > _assemblySkipList_CountWhenLoaded) Then
-                            cache.setObject(cacheNameAssemblySkipList, _assemblySkipList)
+                            cache.setContent(cacheNameAssemblySkipList, _assemblySkipList)
                         End If
                     End If
                     '

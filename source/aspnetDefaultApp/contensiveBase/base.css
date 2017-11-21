@@ -317,16 +317,11 @@ li.ccExceptionListRow { padding:0;margin: 10px auto;}
 .ccChildList li {
     min-height:30px;
     vertical-align:middle;
-    border:1px dashed #262;
-    padding-right:40px !important;
-    background:white url(/contensiveBase/arrowUpDown.png) no-repeat right;
 }
 /*
     child list
 */
 .ccEditWrapper .ccChildList li {
-	min-height:30px;
-	vertical-align:middle;
 	border:1px dashed #262;
 	padding-right:40px !important;background:white url(/contensiveBase/arrowUpDown.png) no-repeat right;
 }	

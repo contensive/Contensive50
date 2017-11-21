@@ -1355,7 +1355,7 @@ Namespace Contensive.Core.Controllers
                             '
                             Call deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName)
                             If workflowController.csv_AllowAutocsv_ClearContentTimeStamp Then
-                                Call cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(ContentTableName, "id", LiveRecordID.ToString()))
+                                Call cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(ContentTableName, "id", LiveRecordID.ToString()))
                                 'Call cpCore.cache.invalidateObject(ContentName)
                             End If
                             Call deleteContentRules(ContentID, LiveRecordID)
@@ -2120,12 +2120,12 @@ Namespace Contensive.Core.Controllers
                         Dim invaldiateObjectList As New List(Of String)
                         CSPointer = csOpen(ContentName, Criteria, , False, MemberID, True, True)
                         Do While csOk(CSPointer)
-                            invaldiateObjectList.Add(Controllers.cacheController.getCacheName_Entity(CDef.ContentTableName, "id", csGetInteger(CSPointer, "id").ToString()))
+                            invaldiateObjectList.Add(Controllers.cacheController.getCacheKey_Entity(CDef.ContentTableName, "id", csGetInteger(CSPointer, "id").ToString()))
                             Call csDeleteRecord(CSPointer)
                             Call csGoNext(CSPointer)
                         Loop
                         Call csClose(CSPointer)
-                        Call cpCore.cache.invalidateObjectList(invaldiateObjectList)
+                        Call cpCore.cache.invalidateContent(invaldiateObjectList)
 
                         '    ElseIf cpCore.siteProperties.allowWorkflowAuthoring And (false) Then
                         '    '
@@ -3128,7 +3128,7 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' ----- reset the ContentTimeStamp to csv_ClearBake
                                 '
-                                Call cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(LiveTableName, "id", LiveRecordID.ToString()))
+                                Call cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(LiveTableName, "id", LiveRecordID.ToString()))
                                 '
                                 ' ----- mark the record NOT UpToDate for SpiderDocs
                                 '

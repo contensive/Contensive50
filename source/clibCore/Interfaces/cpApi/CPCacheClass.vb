@@ -89,9 +89,9 @@ Namespace Contensive.Core
                     invalidationTagList.AddRange(invalidationTagCommaList.Split(","c))
                 End If
                 If (invalidationDate = #12:00:00 AM#) Then
-                    Call cpCore.cache.setObject(key, Value, invalidationTagList)
+                    Call cpCore.cache.setContent(key, Value, invalidationTagList)
                 Else
-                    Call cpCore.cache.setObject(key, Value, invalidationDate, invalidationTagList)
+                    Call cpCore.cache.setContent(key, Value, invalidationDate, invalidationTagList)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -143,13 +143,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub InvalidateTag(tag As String)
-            cpCore.cache.invalidateObject(tag)
+            cpCore.cache.invalidateContent(tag)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Sub InvalidateTagList(tagList As List(Of String))
-            cpCore.cache.invalidateObjectList(tagList)
+            cpCore.cache.invalidateContent(tagList)
         End Sub
         '
         '====================================================================================================
@@ -159,7 +159,7 @@ Namespace Contensive.Core
         ''' <param name="key"></param>
         ''' <param name="value"></param>
         Public Overrides Sub SetKey(key As String, value As Object)
-            cpCore.cache.setObject(key, value)
+            cpCore.cache.setContent(key, value)
         End Sub
         '
         '====================================================================================================
@@ -170,7 +170,7 @@ Namespace Contensive.Core
         ''' <param name="value"></param>
         ''' <param name="invalidationDate"></param>
         Public Overrides Sub SetKey(key As String, value As Object, invalidationDate As Date)
-            cpCore.cache.setObject(key, value, invalidationDate, "")
+            cpCore.cache.setContent(key, value, invalidationDate, "")
         End Sub
         '
         '====================================================================================================
@@ -181,7 +181,7 @@ Namespace Contensive.Core
         ''' <param name="value"></param>
         ''' <param name="tagList"></param>
         Public Overrides Sub SetKey(key As String, value As Object, tagList As List(Of String))
-            cpCore.cache.setObject(key, value, tagList)
+            cpCore.cache.setContent(key, value, tagList)
         End Sub
         '
         '====================================================================================================
@@ -193,23 +193,23 @@ Namespace Contensive.Core
         ''' <param name="tagList"></param>
         ''' <param name="invalidationDate"></param>
         Public Overrides Sub SetKey(key As String, value As Object, invalidationDate As Date, tagList As List(Of String))
-            cpCore.cache.setObject(key, value, invalidationDate, tagList)
+            cpCore.cache.setContent(key, value, invalidationDate, tagList)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Sub setKey(key As String, value As Object, tag As String)
-            cpCore.cache.setObject(key, value, tag)
+            cpCore.cache.setContent(key, value, tag)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Sub setKey(key As String, Value As Object, invalidationDate As Date, tag As String)
-            cpCore.cache.setObject(key, Value, invalidationDate, tag)
+            cpCore.cache.setContent(key, Value, invalidationDate, tag)
         End Sub
         '
         Public Overrides Sub InvalidateContentRecord(ByVal contentName As String, recordId As Integer)
-            cpCore.cache.invalidateObject_Entity(cp.core, contentName, recordId)
+            cpCore.cache.invalidateContent_Entity(cp.core, contentName, recordId)
         End Sub
 #Region " IDisposable Support "
         '

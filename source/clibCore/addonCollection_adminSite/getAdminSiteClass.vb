@@ -1263,7 +1263,7 @@ ErrorTrap:
                                                 ' non-Workflow Delete
                                                 '
                                                 ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, cpCore.db.csGetInteger(CSEditRecord, "ContentControlID"))
-                                                Call cpCore.cache.invalidateObject(cacheController.getCacheName_Entity(adminContent.ContentTableName, RecordID))
+                                                Call cpCore.cache.invalidateContent(cacheController.getCacheKey_Entity(adminContent.ContentTableName, RecordID))
                                                 Call cpCore.doc.processAfterSave(True, ContentName, RecordID, "", 0, UseContentWatchLink)
                                             End If
                                             '
@@ -9723,7 +9723,7 @@ ErrorTrap:
                     '
                     MenuClose = cpCore.menuFlyout.menu_GetClose()
                     'GetMenuTopMode = GetMenuTopMode & cpCore.main_GetMenuClose
-                    Call cpCore.cache.setObject(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Navigator Entries,People,Content,Groups,Group Rules")
+                    Call cpCore.cache.setContent(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Navigator Entries,People,Content,Groups,Group Rules")
                 End If
                 cpCore.doc.htmlForEndOfBody = cpCore.doc.htmlForEndOfBody & MenuClose
             End If

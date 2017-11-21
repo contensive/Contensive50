@@ -456,7 +456,7 @@ Namespace Contensive.Core.Controllers
                         ' set visited true
                         '
                         Call cpCore.db.executeQuery("update ccdomains set visited=1 where name=" & cpCore.db.encodeSQLText(requestDomain))
-                        Call cpCore.cache.setObject("domainContentList", "", "domains")
+                        Call cpCore.cache.setContent("domainContentList", "", "domains")
                     End If
                     If cpCore.domainLegacyCache.domainDetails.typeId = 1 Then
                         '
@@ -499,7 +499,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' if there was a change, update the cache
                         '
-                        Call cpCore.cache.setObject("domainContentList", cpCore.domainLegacyCache.domainDetailsList, "domains")
+                        Call cpCore.cache.setContent("domainContentList", cpCore.domainLegacyCache.domainDetailsList, "domains")
                         'domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
                         'Call cpCore.cache.setObject("domainContentList", domainDetailsListText, "domains")
                     End If

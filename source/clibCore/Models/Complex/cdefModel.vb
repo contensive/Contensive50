@@ -1793,7 +1793,7 @@ Namespace Contensive.Core.Models.Complex
             Dim result As cdefModel = Nothing
             Try
                 Try
-                    Dim cacheName As String = Controllers.cacheController.getCacheName_ComplexObject("cdef", contentId.ToString)
+                    Dim cacheName As String = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString)
                     result = cpcore.cache.getObject(Of Models.Complex.cdefModel)(cacheName)
                 Catch ex As Exception
                     cpcore.handleException(ex)
@@ -1807,25 +1807,25 @@ Namespace Contensive.Core.Models.Complex
         '====================================================================================================
         '
         Public Shared Sub setCache(cpcore As coreClass, contentId As Integer, cdef As cdefModel)
-            Dim cacheName As String = Controllers.cacheController.getCacheName_ComplexObject("cdef", contentId.ToString)
+            Dim cacheName As String = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString)
             '
             ' -- make it dependant on cacheNameInvalidateAll. If invalidated, all cdef will invalidate
             Dim dependantList As New List(Of String)
             dependantList.Add(cacheNameInvalidateAll)
-            Call cpcore.cache.setObject(cacheName, cdef, dependantList)
+            Call cpcore.cache.setContent(cacheName, cdef, dependantList)
         End Sub
         '
         '====================================================================================================
         '
         Public Shared Sub invalidateCache(cpCore As coreClass, contentId As Integer)
-            Dim cacheName As String = Controllers.cacheController.getCacheName_ComplexObject("cdef", contentId.ToString)
-            cpCore.cache.invalidateObject(cacheName)
+            Dim cacheName As String = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString)
+            cpCore.cache.invalidateContent(cacheName)
         End Sub
         '
         '====================================================================================================
         '
         Public Shared Sub invalidateCacheAll(cpCore As coreClass)
-            cpCore.cache.invalidateObject(cacheNameInvalidateAll)
+            cpCore.cache.invalidateContent(cacheNameInvalidateAll)
         End Sub
     End Class
 End Namespace

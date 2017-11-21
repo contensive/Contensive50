@@ -421,7 +421,7 @@ Namespace Contensive.Core.Models.Context
                                     & ""
                                         Call cpCore.privateFiles.saveFile(Filename, botFileContent)
                                     End If
-                                    Call cpCore.cache.setObject("DefaultBotNameList", botFileContent, Now.AddHours(1), New List(Of String))
+                                    Call cpCore.cache.setContent("DefaultBotNameList", botFileContent, Now.AddHours(1), New List(Of String))
                                 End If
                                 '
                                 If botFileContent <> "" Then
@@ -1492,7 +1492,7 @@ Namespace Contensive.Core.Models.Context
                     'Call app.publicFiles.SaveFile(Filename, result)
                 End If
                 datetext = DateTime.Now.AddHours(1).ToString
-                Call cpCore.cache.setObject("MobileBrowserList", datetext & vbCrLf & result)
+                Call cpCore.cache.setContent("MobileBrowserList", datetext & vbCrLf & result)
             End If
             Return result
         End Function

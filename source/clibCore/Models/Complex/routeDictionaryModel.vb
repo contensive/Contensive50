@@ -98,7 +98,7 @@ Namespace Contensive.Core.Models.Complex
         '
         '====================================================================================================
         Public Shared Sub setCache(cpCore As coreClass, routeDictionary As Dictionary(Of String, BaseClasses.CPSiteBaseClass.routeClass))
-            Call cpCore.cache.setObject(cacheNameRouteDictionary, routeDictionary)
+            Call cpCore.cache.setContent(cacheNameRouteDictionary, routeDictionary)
         End Sub
         '
         '====================================================================================================
@@ -108,7 +108,7 @@ Namespace Contensive.Core.Models.Complex
         '
         '====================================================================================================
         Public Shared Sub invalidateCache(cpCore As coreClass)
-            cpCore.cache.invalidateObject(cacheNameRouteDictionary)
+            cpCore.cache.invalidateContent(cacheNameRouteDictionary)
         End Sub
     End Class
 End Namespace

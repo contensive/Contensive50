@@ -80,7 +80,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As pageTemplateModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, recordId)
+                    Dim cacheName As String = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId)
                     result = cpCore.cache.getObject(Of pageTemplateModel)(cacheName)
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
@@ -107,7 +107,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As pageTemplateModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "ccguid", recordGuid)
+                    Dim cacheName As String = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", recordGuid)
                     result = cpCore.cache.getObject(Of pageTemplateModel)(cacheName)
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
@@ -134,7 +134,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As pageTemplateModel = Nothing
             Try
                 If ((foreignKey1Id > 0) And (foreignKey2Id > 0)) Then
-                    result = cpCore.cache.getObject(Of pageTemplateModel)(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
+                    result = cpCore.cache.getObject(Of pageTemplateModel)(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "foreignKey1", foreignKey1Id, "foreignKey2", foreignKey2Id))
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
                             If cs.open(primaryContentName, "(foreignKey1=" & foreignKey1Id.ToString() & ")and(foreignKey1=" & foreignKey1Id.ToString() & ")") Then
@@ -160,14 +160,18 @@ Namespace Contensive.Core.Models.Entity
             Dim result As pageTemplateModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordName) Then
-                    Dim cacheName As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "name", recordName)
-                    result = cpCore.cache.getObject(Of pageTemplateModel)(cacheName)
+                    Dim nameKey As String = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "name", recordName)
+                    result = cpCore.cache.getObject(Of pageTemplateModel)(nameKey)
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
                             If cs.open(primaryContentName, "(name=" & cpCore.db.encodeSQLText(recordName) & ")", "id") Then
                                 result = loadRecord(cpCore, cs, callersCacheNameList)
+                                Dim primaryKey As String = cacheController.getCacheKey_Entity(primaryContentTableName, result.ID)
+                                cpCore.cache.setContent(primaryKey, result)
+                                cpCore.cache.setPointer(nameKey, primaryKey)
                             End If
                         End Using
+
                     End If
                 End If
             Catch ex As Exception
@@ -224,13 +228,13 @@ Namespace Contensive.Core.Models.Entity
                         ' -- set primary cache to the object created
                         ' -- set secondary caches to the primary cache
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", result.ID.ToString())
-                        callersCacheNameList.Add(cacheName0)
-                        cpCore.cache.setObject(cacheName0, result)
+                        Dim key As String = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", result.ID.ToString())
+                        callersCacheNameList.Add(key)
+                        cpCore.cache.setContent(key, result)
                         '
-                        Dim cacheName1 As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "ccguid", result.ccGuid)
-                        callersCacheNameList.Add(cacheName1)
-                        cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
+                        Dim pointerKey As String = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", result.ccGuid)
+                        callersCacheNameList.Add(pointerKey)
+                        cpCore.cache.setPointer(pointerKey, key)
                         '
                         'Dim cacheName2 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", result.foreignKey1Id.ToString(), "foreignKey2", result.foreignKey2Id.ToString())
                         'callersCacheNameList.Add(cacheName2)
@@ -307,7 +311,7 @@ Namespace Contensive.Core.Models.Entity
                 '
                 ' -- object is here, but the cache was invalidated, setting
                 ' -- added tablename as depedant object - any change to any template flushes this cache
-                cpCore.cache.setObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", Me.ID.ToString()), Me, primaryContentTableName)
+                cpCore.cache.setContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", Me.ID.ToString()), Me, primaryContentTableName)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
                 Throw
@@ -325,7 +329,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 If (recordId > 0) Then
                     cpCore.db.deleteContentRecords(primaryContentName, "id=" & recordId.ToString)
-                    cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, recordId))
+                    cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId))
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
@@ -412,10 +416,10 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="recordId"></param>
         Public Shared Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
-            cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, recordId))
+            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId))
             '
             ' -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-            cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", "0"))
+            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"))
         End Sub
         ''
         ''====================================================================================================
@@ -441,7 +445,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="recordId"></param>record
         ''' <returns></returns>
         Public Shared Function getRecordName(cpcore As coreClass, recordId As Integer) As String
-            Return pageTemplateModel.create(cpcore, recordId, New List(Of String)).name
+            Return pageTemplateModel.create(cpcore, recordId, New List(Of String)).Name
         End Function
         '
         '====================================================================================================
@@ -452,7 +456,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="ccGuid"></param>record
         ''' <returns></returns>
         Public Shared Function getRecordName(cpcore As coreClass, ccGuid As String) As String
-            Return pageTemplateModel.create(cpcore, ccGuid, New List(Of String)).name
+            Return pageTemplateModel.create(cpcore, ccGuid, New List(Of String)).Name
         End Function
         '
         '====================================================================================================
@@ -463,7 +467,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="ccGuid"></param>record
         ''' <returns></returns>
         Public Shared Function getRecordId(cpcore As coreClass, ccGuid As String) As Integer
-            Return pageTemplateModel.create(cpcore, ccGuid, New List(Of String)).id
+            Return pageTemplateModel.create(cpcore, ccGuid, New List(Of String)).ID
         End Function
         '
         '====================================================================================================

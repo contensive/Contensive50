@@ -61,7 +61,7 @@ Namespace Contensive.Core.Controllers
                 dataStore.loaded = False
                 dataStore.dataList.Clear()
                 dataStore.keyPtrIndex = New keyPtrController
-                Call cpCore.cache.setObject(cacheName & "-dataList", dataStore.dataList)
+                Call cpCore.cache.setContent(cacheName & "-dataList", dataStore.dataList)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
             End Try
@@ -236,7 +236,7 @@ Namespace Contensive.Core.Controllers
             Try
                 If dataStore.loaded Then
                     Call dataStore.keyPtrIndex.getPtr("test")
-                    Call cpCore.cache.setObject(cacheName, dataStore, cacheInvalidationTagCommaList)
+                    Call cpCore.cache.setContent(cacheName, dataStore, cacheInvalidationTagCommaList)
                 End If
             Catch ex As Exception
                 Throw New ApplicationException("Exception in cacheKeyPtrClass.save", ex)

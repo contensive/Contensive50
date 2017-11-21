@@ -2348,7 +2348,7 @@ ErrorTrap:
                             End If
                             Dim linkAliasId As Integer = cpcore.db.csGetInteger(CS, "id")
                             Call cpcore.db.csClose(CS)
-                            cpcore.cache.invalidateObject_Entity(cpcore, linkAliasModel.contentTableName, linkAliasId)
+                            cpcore.cache.invalidateContent_Entity(cpcore, linkAliasModel.contentTableName, linkAliasId)
                         End If
                     End If
                 End If
@@ -2572,10 +2572,10 @@ ErrorTrap:
             markRecordReviewed(ContentName, RecordID)
             '
             ' -- invalidate the specific cache for this record
-            cpcore.cache.invalidateObject_Entity(cpcore, TableName, RecordID)
+            cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID)
             '
             ' -- invalidate the tablename -- meaning any cache consumer that cannot itemize its entity records, can depend on this, which will invalidate anytime any record clears
-            cpcore.cache.invalidateObject(TableName)
+            cpcore.cache.invalidateContent(TableName)
             '
             Select Case genericController.vbLCase(TableName)
                 Case linkForwardModel.contentTableName
@@ -2653,6 +2653,7 @@ ErrorTrap:
                         '
                         Call cpcore.db.executeQuery("delete from cclinkAliases where PageID=" & RecordID)
                     End If
+                    cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID)
                 'Case "cctemplates" ', "ccsharedstyles"
                 '    '
                 '    ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
@@ -2665,7 +2666,8 @@ ErrorTrap:
                 Case "ccaggregatefunctions"
                     '
                     ' -- add-ons, rebuild addonCache
-                    cpcore.cache.invalidateObject("addonCache")
+                    cpcore.cache.invalidateContent("addonCache")
+                    cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID)
                 Case "cclibraryfiles"
                     '
                     ' if a AltSizeList is blank, make large,medium,small and thumbnails
@@ -2800,9 +2802,12 @@ ErrorTrap:
                     End If
                 Case Else
                     '
-                    '
-                    '
+                    ' -- edit and delete for records -- clear entity cache
+                    cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID)
             End Select
+            '
+            ' -- edit and delete for records -- clear entity cache
+            cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID)
             '
             ' Process Addons marked to trigger a process call on content change
             '

@@ -98,7 +98,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As visitModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, recordId)
+                    Dim cacheName As String = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId)
                     result = cpCore.cache.getObject(Of visitModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "id=" & recordId.ToString(), cacheNameList)
@@ -121,7 +121,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As visitModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "ccguid", recordGuid)
+                    Dim cacheName As String = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", recordGuid)
                     result = cpCore.cache.getObject(Of visitModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid), cacheNameList)
@@ -194,13 +194,13 @@ Namespace Contensive.Core.Models.Entity
                         '
                         ' -- set primary and secondary caches
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", result.id.ToString())
+                        Dim cacheName0 As String = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", result.id.ToString())
                         cacheNameList.Add(cacheName0)
-                        cpCore.cache.setObject(cacheName0, result)
+                        cpCore.cache.setContent(cacheName0, result)
                         '
-                        Dim cacheName1 As String = Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "ccguid", result.ccGuid)
+                        Dim cacheName1 As String = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", result.ccGuid)
                         cacheNameList.Add(cacheName1)
-                        cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
+                        cpCore.cache.setPointer(cacheName1, cacheName0)
                     End If
                 End If
                 Call cs.Close()
@@ -283,7 +283,7 @@ Namespace Contensive.Core.Models.Entity
                 Call cs.Close()
                 '
                 ' -- object is here, but the cache was invalidated, setting
-                cpCore.cache.setObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "id", Me.id.ToString()), Me)
+                cpCore.cache.setContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", Me.id.ToString()), Me)
             Catch ex As Exception
                 cpCore.handleException(ex) : Throw
                 Throw
@@ -361,7 +361,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="recordId"></param>
         Public Shared Sub invalidateIdCache(cpCore As coreClass, recordId As Integer)
-            cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, recordId))
+            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId))
             '
             ' -- always clear the cache with the content name
             '?? '?? cpCore.cache.invalidateObject(primaryContentName)
@@ -374,7 +374,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="guid"></param>
         Public Shared Sub invalidateGuidCache(cpCore As coreClass, guid As String)
-            cpCore.cache.invalidateObject(Controllers.cacheController.getCacheName_Entity(primaryContentTableName, "ccguid", guid))
+            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", guid))
             '
             ' -- always clear the cache with the content name
             '?? cpCore.cache.invalidateObject(primaryContentName)
