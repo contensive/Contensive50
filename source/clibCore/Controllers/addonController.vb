@@ -453,7 +453,7 @@ Namespace Contensive.Core.Controllers
                             End If
                             '
                             ' -- js body code
-                            Call cpCore.html.addScriptCode_Body(addon.JavaScriptBodyEnd, AddedByName & " Javascript Body Code")
+                            Call cpCore.html.addScriptCode_body(addon.JavaScriptBodyEnd, AddedByName & " Javascript Body Code")
                             '
                             ' -- styles
                             If addon.StylesFilename.filename <> "" Then
@@ -485,7 +485,7 @@ Namespace Contensive.Core.Controllers
                             & cpCore.siteProperties.docTypeDeclaration() _
                             & vbCrLf & "<html>" _
                             & cr & "<head>" _
-                            & vbCrLf & htmlIndent(cpCore.doc.getHtmlHead()) _
+                            & vbCrLf & htmlIndent(cpCore.html.getHtmlHead()) _
                             & cr & "</head>" _
                             & cr & TemplateDefaultBodyTag _
                             & cr & "</body>" _
@@ -2156,7 +2156,7 @@ Namespace Contensive.Core.Controllers
                     cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.addScript_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                 End If
@@ -2325,7 +2325,7 @@ ErrorTrap:
                     cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.addScript_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                     result = "" _
@@ -2415,7 +2415,7 @@ ErrorTrap:
                     'SiteStylesBubbleCache = "x"
                     '
                     If cpCore.doc.helpDialogCnt = 0 Then
-                        Call cpCore.html.addScript_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.doc.helpDialogCnt = cpCore.doc.helpDialogCnt + 1
                     getHTMLViewerBubble = "" _
@@ -3437,8 +3437,8 @@ ErrorTrap:
                 If WrapperSourceForComment <> "" Then
                     SourceComment = SourceComment & " for " & WrapperSourceForComment
                 End If
-                Call cpCore.html.addScript_onLoad(cpCore.db.csGetText(CS, "javascriptonload"), SourceComment)
-                Call cpCore.html.addScriptCode_Body(cpCore.db.csGetText(CS, "javascriptbodyend"), SourceComment)
+                Call cpCore.html.addScriptCode_onLoad(cpCore.db.csGetText(CS, "javascriptonload"), SourceComment)
+                Call cpCore.html.addScriptCode_body(cpCore.db.csGetText(CS, "javascriptbodyend"), SourceComment)
                 Call cpCore.html.addHeadTag(cpCore.db.csGetText(CS, "OtherHeadTags"), SourceComment)
                 '
                 JSFilename = cpCore.db.csGetText(CS, "jsfilename")

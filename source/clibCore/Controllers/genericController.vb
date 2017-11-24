@@ -5388,5 +5388,22 @@ ErrorTrap:
             End Try
             Return returnCopy
         End Function
+        '
+        '====================================================================================================
+        '
+        Friend Shared Function removeScriptTag(source As String) As String
+            Dim result As String = source
+            Dim StartPos As Integer = genericController.vbInstr(1, result, "<script", vbTextCompare)
+            If StartPos <> 0 Then
+                Dim EndPos As Integer = genericController.vbInstr(StartPos, result, "</script", vbTextCompare)
+                If EndPos <> 0 Then
+                    EndPos = genericController.vbInstr(EndPos, result, ">", vbTextCompare)
+                    If EndPos <> 0 Then
+                        result = Left(result, StartPos - 1) & Mid(result, EndPos + 1)
+                    End If
+                End If
+            End If
+            Return result
+        End Function
     End Class
 End Namespace

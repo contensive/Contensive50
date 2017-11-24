@@ -109,7 +109,7 @@ Namespace Contensive.Core
         End Sub
         Public Overrides Sub Redirect(ByVal Link As String)
             If True Then
-                Call cpCore.webServer.redirect(Link)
+                Call cpCore.webServer.redirect(Link,,, False)
             End If
         End Sub
 

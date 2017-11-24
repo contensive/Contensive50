@@ -33,9 +33,8 @@ Namespace Contensive.Addons.Core
                     cpCore.doc.continueProcessing = False
                     Return String.Empty
                 Else
-                    Call cpCore.webServer.redirect(genericController.getCdnFileLink(cpCore, Filename), "favicon request", False)
                     cpCore.doc.continueProcessing = False
-                    Return String.Empty
+                    Return cpCore.webServer.redirect(genericController.getCdnFileLink(cpCore, Filename), "favicon request", False, False)
                 End If
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

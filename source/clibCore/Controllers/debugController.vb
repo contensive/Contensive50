@@ -24,7 +24,7 @@ Namespace Contensive.Core.Controllers
             Dim ElapsedTime As Double
             Dim iMessage As String
             '
-            If cpcore.doc.testPointPrinting Then
+            If cpcore.doc.visitPropertyAllowDebugging Then
                 '
                 ' write to stream
                 '

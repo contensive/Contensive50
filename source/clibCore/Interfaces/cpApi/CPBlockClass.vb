@@ -123,7 +123,12 @@ Namespace Contensive.Core
                     If accum <> "" Then
                         headTags = Controllers.htmlController.getTagInnerHTML(accum, "head", False)
                         If headTags <> "" Then
-                            Call cpCore.doc.addHeadTags(headTags)
+                            For Each asset As String In headTags.Split(vbCrLf)
+                                cpCore.doc.htmlMetaContent_OtherTags.Add(New htmlMetaClass() With {
+                                    .addedByMessage = "block.importFile",
+                                    .content = asset
+                                })
+                            Next
                         End If
                         accum = Controllers.htmlController.getTagInnerHTML(accum, "body", False)
                     End If

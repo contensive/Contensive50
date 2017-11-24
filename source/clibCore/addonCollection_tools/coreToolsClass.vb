@@ -178,7 +178,7 @@ Namespace Contensive.Core
                 '
                 ' Cancel to the admin site
                 '
-                Call cpCore.webServer.redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
+                Return cpCore.webServer.redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
             End If
             '
             ' ----- Check permissions
@@ -215,7 +215,7 @@ Namespace Contensive.Core
                 If (Button = ButtonCancel) Then
                     '
                     ' -- Cancel
-                    Call cpCore.webServer.redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
+                    Return cpCore.webServer.redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
                 Else
                     '
                     ' -- Print out the page
@@ -1245,7 +1245,7 @@ ErrorTrap:
                 If (Button = ButtonSaveandInvalidateCache) Then
                     cpCore.cache.invalidateAll()
                     cpCore.doc.clearMetaData()
-                    Call cpCore.webServer.redirect("?af=" & AdminFormToolConfigureListing & "&ContentID=" & ContentID)
+                    Return cpCore.webServer.redirect("?af=" & AdminFormToolConfigureListing & "&ContentID=" & ContentID)
                 End If
                 '
                 '--------------------------------------------------------------------------------
@@ -3082,7 +3082,7 @@ ErrorTrap:
                             '
                             ' ----- Exit back to menu
                             '
-                            Call cpCore.webServer.redirect(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & cpCore.webServer.requestPath & cpCore.webServer.requestPage & "?af=" & AdminFormTools)
+                            Return cpCore.webServer.redirect(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & cpCore.webServer.requestPath & cpCore.webServer.requestPage & "?af=" & AdminFormTools)
                         End If
                     End If
                 End If
@@ -3959,7 +3959,7 @@ ErrorTrap:
                 '
                 logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.doc.authContext.user.name & " (" & cpCore.doc.authContext.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.requestUrl, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
-                Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm")
+                Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm",,, False)
                 Call Threading.Thread.Sleep(2000)
                 '
                 '
@@ -4583,7 +4583,7 @@ ErrorTrap:
                 '
                 logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.doc.authContext.user.name & " (" & cpCore.doc.authContext.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.requestUrl, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
-                Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm")
+                Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm",,, False)
                 Call Threading.Thread.Sleep(2000)
 
 

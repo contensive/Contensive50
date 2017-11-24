@@ -1405,11 +1405,11 @@ Namespace Contensive.Core.Models.Context
                     'Call debugController.debug_testPoint(cpCore, "...is in main_IsNotEditingContentList")
                 Else
                     If isAuthenticated() Then
-                        If Not cpcore.doc.isPrintVersion Then
+                        If True Then
                             If (cpCore.visitProperty.getBoolean("AllowEditing") Or cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) Then
                                 If localContentNameOrId <> "" Then
                                     If genericController.vbIsNumeric(localContentNameOrId) Then
-                                        localContentNameOrId = models.complex.cdefmodel.getContentNameByID(cpcore,EncodeInteger(localContentNameOrId))
+                                        localContentNameOrId = Models.Complex.cdefModel.getContentNameByID(cpCore, EncodeInteger(localContentNameOrId))
                                     End If
                                 End If
                                 returnResult = isAuthenticatedContentManager(cpCore, localContentNameOrId)
@@ -1437,7 +1437,7 @@ Namespace Contensive.Core.Models.Context
         Public Function isQuickEditing(cpCore As coreClass, ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpcore.doc.isPrintVersion) Then
+                If True Then
                     If isAuthenticatedContentManager(cpCore, ContentName) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowQuickEditor")
                     End If
@@ -1458,7 +1458,7 @@ Namespace Contensive.Core.Models.Context
         Public Function isAdvancedEditing(cpCore As coreClass, ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpcore.doc.isPrintVersion) Then
+                If True Then
                     If isAuthenticatedContentManager(cpCore, ContentName) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowAdvancedEditor")
                     End If

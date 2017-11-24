@@ -56,7 +56,7 @@ Namespace Contensive.Addons.Core
                 Else
                     result = "Contensive Error Count = " & cpCore.doc.errorCount
                 End If
-                result = cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False)
+                result = cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False)
                 cpCore.doc.continueProcessing = False
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

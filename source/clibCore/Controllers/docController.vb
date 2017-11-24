@@ -17,12 +17,39 @@ Namespace Contensive.Core.Controllers
         ' -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
         '
         Private cpcore As coreClass
+        '
+        ' -- this documents unique guid (created on the fly)
+        Public Property docGuid As String
+        '
+        ' -- set true if any addon executed is set  htmlDocument=true. When true, the initial addon executed is returned in the html wrapper (html with head)
+        Public Property htmlDocument As Boolean = False
+        '
+        ' -- head tags, script tags, style tags, etc
+        Public Property htmlAssetList As New List(Of htmlAssetClass)
+        '
+        ' -- head meta tag list (convert to list object)
+        Public Property htmlMetaContent_OtherTags As New List(Of htmlMetaClass)
+        Public Property htmlMetaContent_TitleList As New List(Of htmlMetaClass)
+        Public Property htmlMetaContent_Description As New List(Of htmlMetaClass)
+        Public Property htmlMetaContent_KeyWordList As New List(Of htmlMetaClass)
+        '
+        ' -- current domain
         Public Property domain As Models.Entity.domainModel
+        '
+        ' -- current page
         Public Property page As Models.Entity.pageContentModel
+        '
+        ' -- current page to it's root
         Public Property pageToRootList As List(Of Models.Entity.pageContentModel)
-        Friend Property headTags As String = ""
+        '
+        ' -- current template
         Public Property template As Models.Entity.pageTemplateModel
         Public Property templateReason As String = ""
+        '
+        ' -- Anything that needs to be written to the Page during main_GetClosePage
+        Public Property htmlForEndOfBody As String = ""
+        '
+        ' -- others to be sorted
         Public Property editWrapperCnt As Integer = 0
         Public Property docBodyFilter As String = ""
         Public Property legacySiteStyles_Loaded As Boolean = False
@@ -32,46 +59,24 @@ Namespace Contensive.Core.Controllers
         Friend Property helpCodes As String() = {}
         Friend Property helpCaptions As String() = {}
         Friend Property helpDialogCnt As Integer = 0
-        Public Property htmlForEndOfBody As String = ""             ' Anything that needs to be written to the Page during main_GetClosePage
-        Public Property isPrintVersion As Boolean = False
         Public Property refreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
         Public Property redirectContentID As Integer = 0
         Public Property redirectRecordID As Integer = 0
-        Public Property javascriptStreamHolder As String() = {}
-        Public Property javascriptStreamSize As Integer = 0
-        Public Property javascriptStreamCount As Integer = 0
         'Public Property isStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
         Public Property outputBufferEnabled As Boolean = True          ' when true (default), stream is buffered until page is done
         ' Public Property docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
-        Public Property htmlMetaContent_Title As String = ""
-        Public Property htmlMetaContent_Description As String = ""
-        Public Property htmlMetaContent_OtherHeadTags As String = ""
-        Public Property htmlMetaContent_KeyWordList As String = ""
-        Public Property htmlMetaContent_StyleSheetTags As String = ""
         'Public Property metaContent_TemplateStyleSheetTag As String = ""
-        Public Property metaContent_SharedStyleIDList As String = ""
         Public Property menuComboTab As menuComboTabController
         Public Property menuLiveTab As menuLiveTabController
         Public Property adminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
         Public Property adminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
         Public Property checkListCnt As Integer = 0                    ' cnt of the main_GetFormInputCheckList calls - used for javascript
         Public Property includedAddonIDList As String = ""
-        Public Property onLoadJavascript As String = ""
-        Public Property endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
-        Public Property endOfBodyString As String = ""
-        Public Property scriptList_body As New List(Of scriptAssetClass)
-        Public Property scriptList_head As scriptAssetClass() = {}
         Public Property inputDateCnt As Integer = 0
         Public Property inputSelectCacheCnt As Integer = 0
         Public Property inputSelectCache As main_InputSelectCacheType()
         Public Property formInputTextCnt As Integer = 0
         Public Property quickEditCopy As String = ""
-        Private Property javascriptOnLoad As String() = {}
-        Private Property javascriptReferenceFilename_Cnt As Integer
-        Private Property javascriptReferenceFilename As String() = {}
-        Friend Property javascriptBodyEnd As String() = {}
-        Friend Property styleFilenames_Cnt As Integer
-        Friend Property styleFilenames As String() = {}
         Public Property siteStructure As String = ""
         Public Property siteStructure_LocalLoaded As Boolean = False
         Public Property bodyContent As String = ""                      ' stored here so cp.doc.content valid during bodyEnd event
@@ -79,9 +84,6 @@ Namespace Contensive.Core.Controllers
         Public Property redirectLink As String = ""
         Public Property redirectReason As String = ""
         Public Property redirectBecausePageNotFound As Boolean = False
-        '
-        ' -- set true if any addon executed is set  htmlDocument=true. When true, the initial addon executed is returned in the html wrapper (html with head)
-        Public Property htmlDocument As Boolean = False
         ''
         '' -- addon call depth. When an addon is called, it saves the value interanlly and increments. When level0 exits and htmlDocument is true, the output is wrapped with an html doc
         'Public Property addonDepth As Integer = 0
@@ -91,7 +93,7 @@ Namespace Contensive.Core.Controllers
         Public Property debug_iUserError As String = ""                              ' User Error String
         Public Property trapLogMessage As String = ""                           ' The content of the current traplog (keep for popups if no Csv)
         Public Property testPointMessage As String = ""                         '
-        Public Property testPointPrinting As Boolean = False                         ' if true, send main_TestPoint messages to the stream
+        Public Property visitPropertyAllowDebugging As Boolean = False                         ' if true, send main_TestPoint messages to the stream
         Public Property authContext As Models.Context.authContextModel
         Friend Property appStopWatch As Stopwatch = Stopwatch.StartNew()
         Public Property profileStartTime As Date                                        ' set in constructor
@@ -102,7 +104,6 @@ Namespace Contensive.Core.Controllers
         'Public Property closePageCounter As Integer = 0
         Public Property continueProcessing As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
         Public Property upgradeInProgress() As Boolean
-        Public Property docGuid As String                        ' Random number (semi) unique to this hit
         Friend Property addonIdListRunInThisDoc As New List(Of Integer)
         Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
         Public Property pageAddonCnt As Integer = 0
@@ -212,7 +213,12 @@ Namespace Contensive.Core.Controllers
                     For Each page As Models.Entity.pageContentModel In pageToRootList
                         If page.TemplateID > 0 Then
                             template = Models.Entity.pageTemplateModel.create(cpcore, page.TemplateID, New List(Of String))
-                            If (template IsNot Nothing) Then
+                            If (template Is Nothing) Then
+                                '
+                                ' -- templateId is not valid
+                                page.TemplateID = 0
+                                page.save(cpcore)
+                            Else
                                 If (page Is pageToRootList.First) Then
                                     templateReason = "This template was used because it is selected by the current page."
                                 Else
@@ -227,7 +233,15 @@ Namespace Contensive.Core.Controllers
                         '
                         ' -- get template from domain
                         If (domain IsNot Nothing) Then
-                            template = Models.Entity.pageTemplateModel.create(cpcore, domain.DefaultTemplateId, New List(Of String))
+                            If (domain.DefaultTemplateId > 0) Then
+                                template = Models.Entity.pageTemplateModel.create(cpcore, domain.DefaultTemplateId, New List(Of String))
+                                If (template Is Nothing) Then
+                                    '
+                                    ' -- domain templateId is not valid
+                                    domain.DefaultTemplateId = 0
+                                    domain.save(cpcore)
+                                End If
+                            End If
                         End If
                         If (template Is Nothing) Then
                             '
@@ -816,7 +830,7 @@ Namespace Contensive.Core.Controllers
                         '        Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
                         '    End If
                         'End If
-                        Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", False)
+                        Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.",, False)
                     End If
                     Call cpcore.db.csClose(CSBlock)
                     '
@@ -850,7 +864,7 @@ Namespace Contensive.Core.Controllers
                             '        Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
                             '    End If
                             'End If
-                            Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", False)
+                            Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", False, False)
                         End If
                         Call cpcore.db.csClose(CSBlock)
                     End If
@@ -873,7 +887,7 @@ Namespace Contensive.Core.Controllers
                     If Not False Then
                         Link = getPageLink(ParentID, "", True, False)
                         Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "The page has been deleted, and you have been redirected to the parent of the deleted page.", True)
-                        Call cpcore.webServer.redirect(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", redirectBecausePageNotFound)
+                        Call cpcore.webServer.redirect(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", redirectBecausePageNotFound, False)
                         Exit Sub
                     End If
                 End If
@@ -2354,23 +2368,23 @@ ErrorTrap:
                 End If
             End If
         End Sub
-        '
-        '   Returns the next entry in the array, empty when there are no more
-        '
-        Public Function getNextStyleFilenames() As String
-            Dim result As String = ""
-            Dim Ptr As Integer
-            If styleFilenames_Cnt >= 0 Then
-                For Ptr = 0 To styleFilenames_Cnt - 1
-                    If styleFilenames(Ptr) <> "" Then
-                        result = styleFilenames(Ptr)
-                        styleFilenames(Ptr) = ""
-                        Exit For
-                    End If
-                Next
-            End If
-            Return result
-        End Function
+        ''
+        ''   Returns the next entry in the array, empty when there are no more
+        ''
+        'Public Function getNextStyleFilenames() As String
+        '    Dim result As String = ""
+        '    Dim Ptr As Integer
+        '    If styleFilenames_Cnt >= 0 Then
+        '        For Ptr = 0 To styleFilenames_Cnt - 1
+        '            If styleFilenames(Ptr) <> "" Then
+        '                result = styleFilenames(Ptr)
+        '                styleFilenames(Ptr) = ""
+        '                Exit For
+        '            End If
+        '        Next
+        '    End If
+        '    Return result
+        'End Function
         ''
         ''   Returns the next entry in the array, empty when there are no more
         ''
@@ -2388,40 +2402,40 @@ ErrorTrap:
         '    End If
         '    Return result
         'End Function
-        '
-        '   Returns the next entry in the array, empty when there are no more
-        '
-        Public Function getNextJavascriptBodyEnd() As String
-            Dim result As String = ""
-            Dim Ptr As Integer
-            If javascriptBodyEnd.Count >= 0 Then
-                For Ptr = 0 To javascriptBodyEnd.Count - 1
-                    If javascriptBodyEnd(Ptr) <> "" Then
-                        result = javascriptBodyEnd(Ptr)
-                        javascriptBodyEnd(Ptr) = ""
-                        Exit For
-                    End If
-                Next
-            End If
-            Return result
-        End Function
-        '
-        '   Returns the next entry in the array, empty when there are no more
-        '
-        Public Function getNextJSFilename() As String
-            Dim result As String = ""
-            Dim Ptr As Integer
-            If javascriptReferenceFilename_Cnt >= 0 Then
-                For Ptr = 0 To javascriptReferenceFilename_Cnt - 1
-                    If javascriptReferenceFilename(Ptr) <> "" Then
-                        result = javascriptReferenceFilename(Ptr)
-                        javascriptReferenceFilename(Ptr) = ""
-                        Exit For
-                    End If
-                Next
-            End If
-            Return result
-        End Function
+        ''
+        ''   Returns the next entry in the array, empty when there are no more
+        ''
+        'Public Function getNextJavascriptBodyEnd() As String
+        '    Dim result As String = ""
+        '    Dim Ptr As Integer
+        '    If javascriptBodyEnd.Count >= 0 Then
+        '        For Ptr = 0 To javascriptBodyEnd.Count - 1
+        '            If javascriptBodyEnd(Ptr) <> "" Then
+        '                result = javascriptBodyEnd(Ptr)
+        '                javascriptBodyEnd(Ptr) = ""
+        '                Exit For
+        '            End If
+        '        Next
+        '    End If
+        '    Return result
+        'End Function
+        ''
+        ''   Returns the next entry in the array, empty when there are no more
+        ''
+        'Public Function getNextJSFilename() As String
+        '    Dim result As String = ""
+        '    Dim Ptr As Integer
+        '    If javascriptReferenceFilename_Cnt >= 0 Then
+        '        For Ptr = 0 To javascriptReferenceFilename_Cnt - 1
+        '            If javascriptReferenceFilename(Ptr) <> "" Then
+        '                result = javascriptReferenceFilename(Ptr)
+        '                javascriptReferenceFilename(Ptr) = ""
+        '                Exit For
+        '            End If
+        '        Next
+        '    End If
+        '    Return result
+        'End Function
         '
         '
         '
@@ -2440,111 +2454,6 @@ ErrorTrap:
             End Try
 
         End Sub
-        '
-        '========================================================================================================
-        '   Add a block on html to the head
-        '       if this is called from cpCoreClass activeContent
-        '       probably should find a better place in cpCoreClass to pick it up
-        '       or screw it and maybe everything will migrate to one class anyway
-        '       this was added to let contentCmdClass in aoPrimitives import an html file
-        '       all the others (javascript, css, etc) may be added later if this works
-        '========================================================================================================
-        '
-        Public Sub addHeadTags(headTags As String)
-            Me.headTags &= vbCrLf & vbTab & headTags
-        End Sub
-
-
-        ' main_Get the Head innerHTML for any page
-        '
-        Public Function getHtmlHead() As String
-            Dim result As String = ""
-            Try
-                '
-                ' -- meta content
-                result &= cr & "<title>" & cpcore.doc.htmlMetaContent_Title & "</title>"
-                If cpcore.doc.htmlMetaContent_KeyWordList <> "" Then
-                    result &= cr & "<meta name=""keywords"" content=""" & cpcore.doc.htmlMetaContent_KeyWordList & """ >"
-                End If
-                If cpcore.doc.htmlMetaContent_Description <> "" Then
-                    result &= cr & "<meta name=""description"" content=""" & cpcore.doc.htmlMetaContent_Description & """ >"
-                End If
-                '
-                ' -- favicon
-                Dim VirtualFilename As String = cpcore.siteProperties.getText("faviconfilename")
-                If VirtualFilename <> "" Then
-                    Dim Pos As Integer = InStrRev(VirtualFilename, ".")
-                    If Pos > 0 Then
-                        Select Case Mid(VirtualFilename, Pos).ToLower()
-                            Case ".ico"
-                                result &= cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & genericController.getCdnFileLink(cpcore, VirtualFilename) & """ >"
-                            Case ".png"
-                                result &= cr & "<link rel=""icon"" type=""image/png"" href=""" & genericController.getCdnFileLink(cpcore, VirtualFilename) & """ >"
-                            Case ".gif"
-                                result &= cr & "<link rel=""icon"" type=""image/gif"" href=""" & genericController.getCdnFileLink(cpcore, VirtualFilename) & """ >"
-                            Case ".jpg"
-                                result &= cr & "<link rel=""icon"" type=""image/jpg"" href=""" & genericController.getCdnFileLink(cpcore, VirtualFilename) & """ >"
-                        End Select
-                    End If
-                End If
-                '
-                ' -- misc caching, etc
-                Dim encoding As String = genericController.encodeHTML(cpcore.siteProperties.getText("Site Character Encoding", "utf-8"))
-                result = result _
-                    & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
-                    & cr & "<meta http-equiv=""content-language"" content=""en-us"" >" _
-                    & cr & "<meta http-equiv=""cache-control"" content=""no-cache"" >" _
-                    & cr & "<meta http-equiv=""expires"" content=""-1"" >" _
-                    & cr & "<meta http-equiv=""pragma"" content=""no-cache"" >" _
-                    & cr & "<meta name=""generator"" content=""Contensive"" >"
-                '
-                ' -- no-follow
-                If cpcore.webServer.response_NoFollow Then
-                    result = result _
-                    & cr & "<meta name=""robots"" content=""nofollow"" >" _
-                    & cr & "<meta name=""mssmarttagspreventparsing"" content=""true"" >"
-                End If
-                '
-                ' -- base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
-                If (Not String.IsNullOrEmpty(cpcore.webServer.serverFormActionURL)) Then
-                    'If (Not main_IsAdminSite) And (Not String.IsNullOrEmpty(cpcore.webServer.serverFormActionURL)) Then
-                    Dim BaseHref As String = cpcore.webServer.serverFormActionURL
-                    If cpcore.doc.refreshQueryString <> "" Then
-                        BaseHref &= "?" & cpcore.doc.refreshQueryString
-                    End If
-                    result &= cr & "<base href=""" & BaseHref & """ >"
-                End If
-                '
-                ' -- Styles
-                result &= cpcore.doc.htmlMetaContent_StyleSheetTags
-                cpcore.doc.htmlMetaContent_StyleSheetTags = String.Empty
-                '
-                ' -- head Javascript
-                ' -- must be added as addon. result &= cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpcore.webServer.requestProtocol & cpcore.webServer.requestDomain & "/ccLib/ClientSide/Core.js""></script>"
-                If cpcore.doc.scriptList_head.Count > 0 Then
-                    For Ptr = 0 To cpcore.doc.scriptList_head.Count - 1
-                        With cpcore.doc.scriptList_head(Ptr)
-                            If (.addedByMessage <> "") And cpcore.visitProperty.getBoolean("AllowDebugging") Then
-                                result &= cr & "<!-- from " & .addedByMessage & " -->"
-                            End If
-                            If Not .IsLink Then
-                                result &= cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
-                            Else
-                                result &= cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
-                            End If
-                        End With
-                    Next
-                    cpcore.doc.scriptList_head = {}
-                End If
-                '
-                ' -- other head tags - always last
-                result &= cpcore.doc.htmlMetaContent_OtherHeadTags
-                cpcore.doc.htmlMetaContent_OtherHeadTags = String.Empty
-            Catch ex As Exception
-                cpcore.handleException(ex)
-            End Try
-            Return result
-        End Function
         '
         '========================================================================
         '   Process manual changes needed for Page Content Special Cases

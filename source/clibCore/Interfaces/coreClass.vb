@@ -763,8 +763,7 @@ Namespace Contensive.Core
                                 '
                                 ' -- link forward
                                 Dim linkForward As Models.Entity.linkForwardModel = Models.Entity.linkForwardModel.create(Me, route.linkForwardId)
-                                Call webServer.redirect(linkForward.DestinationLink, "Link Forward #" & linkForward.id & ", " & linkForward.name)
-                                Return String.Empty
+                                Return webServer.redirect(linkForward.DestinationLink, "Link Forward #" & linkForward.id & ", " & linkForward.name)
                         End Select
                     End If
                     If (normalizedRoute.Equals("favicon.ico")) Then
@@ -1086,7 +1085,7 @@ Namespace Contensive.Core
                 doc.docGuid = genericController.createGuid()
                 doc.allowDebugLog = True
                 doc.profileStartTime = DateTime.Now()
-                doc.testPointPrinting = True
+                doc.visitPropertyAllowDebugging = True
                 '
                 ' -- attempt auth load
                 If (serverConfig.appConfig Is Nothing) Then
@@ -1100,9 +1099,9 @@ Namespace Contensive.Core
                 Else
                     doc.authContext = Models.Context.authContextModel.create(Me, siteProperties.allowVisitTracking)
                     '
-                    ' debug printed defaults on, so if not on, set it off and clear what was collected
-                    If Not visitProperty.getBoolean("AllowDebugging") Then
-                        doc.testPointPrinting = False
+                    ' -- debug printed defaults on, so if not on, set it off and clear what was collected
+                    doc.visitPropertyAllowDebugging = visitProperty.getBoolean("AllowDebugging")
+                    If Not doc.visitPropertyAllowDebugging Then
                         doc.testPointMessage = ""
                     End If
                 End If
@@ -1204,9 +1203,13 @@ Namespace Contensive.Core
                                     '
                                     ' -- convert requestFormDict to a name=value string for Db storage
                                     Dim requestFormSerialized As String = genericController.convertNameValueDictToREquestString(webServer.requestFormDict)
-                                    Dim SQL As String = "INSERT INTO ccViewings (" _
+                                    Dim pagetitle As String = ""
+                                    If (Not doc.htmlMetaContent_TitleList.Count.Equals(0)) Then
+                                        pagetitle = doc.htmlMetaContent_TitleList.First.content
+                                    End If
+                                    Dim SQL As String = "insert into ccviewings (" _
                                         & "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID,ExcludeFromAnalytics,pagetitle" _
-                                        & ")VALUES(" _
+                                        & ")values(" _
                                         & " " & db.encodeSQLText(ViewingName) _
                                         & "," & db.encodeSQLNumber(doc.authContext.visit.id) _
                                         & "," & db.encodeSQLNumber(doc.authContext.user.id) _
@@ -1224,7 +1227,7 @@ Namespace Contensive.Core
                                         & "," & db.encodeSQLNumber(0) _
                                         & "," & db.encodeSQLNumber(PageID)
                                     SQL &= "," & db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
-                                    SQL &= "," & db.encodeSQLText(doc.htmlMetaContent_Title)
+                                    SQL &= "," & db.encodeSQLText(pagetitle)
                                     SQL &= ");"
                                     Call db.executeQuery(SQL)
                                 End If

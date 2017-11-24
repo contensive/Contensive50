@@ -182,7 +182,7 @@ Namespace Contensive.Addons.AdminSite
                 ContentWatchLoaded = False
                 editRecord.Loaded = False
                 UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
-                Call cpCore.html.addScript_onLoad("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
+                Call cpCore.html.addScriptCode_onLoad("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
                 Call cpCore.doc.setMetaContent(0, 0)
                 '
                 '-------------------------------------------------------------------------------
@@ -274,7 +274,7 @@ Namespace Contensive.Addons.AdminSite
                     '-------------------------------------------------------------------------------
                     '
                     If (AdminSourceForm = AdminFormEdit) Then
-                        If (Not (cpCore.doc.debug_iUserError <> "")) And cpCore.html.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete)) Then
+                        If (Not (cpCore.doc.debug_iUserError <> "")) And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete)) Then
                             EditReferer = cpCore.docProperties.getText("EditReferer")
                             CurrentLink = genericController.modifyLinkQuery(cpCore.webServer.requestUrl, "editreferer", "", False)
                             CurrentLink = genericController.vbLCase(CurrentLink)
@@ -285,8 +285,7 @@ Namespace Contensive.Addons.AdminSite
                                 '
                                 ' return to the page it came from
                                 '
-                                Call cpCore.webServer.redirect(EditReferer, "Admin Edit page returning to the EditReferer setting", False)
-                                Return ""
+                                Return cpCore.webServer.redirect(EditReferer, "Admin Edit page returning to the EditReferer setting")
                             Else
                                 '
                                 ' return to the index page for this content
@@ -415,7 +414,7 @@ Namespace Contensive.Addons.AdminSite
                             Case AdminFormDownloads
                                 ContentCell = (GetForm_Downloads())
                             Case AdminformRSSControl
-                                Call cpCore.webServer.redirect("?cid=" & Models.Complex.cdefModel.getContentId(cpCore, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
+                                ContentCell = cpCore.webServer.redirect("?cid=" & Models.Complex.cdefModel.getContentId(cpCore, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.")
                             Case AdminFormImportWizard
                                 ContentCell = cpCore.addon.execute(addonModel.create(cpCore, addonGuidImportWizard), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, .errorCaption = "Import Wizard"})
                                 'ContentCell = cpCore.addon.execute_legacy4(addonGuidImportWizard, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
@@ -491,7 +490,7 @@ Namespace Contensive.Addons.AdminSite
                     If includeFancyBox Then
                         Call cpCore.addon.executeDependency(addonModel.create(cpCore, addonGuidjQueryFancyBox), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin})
                         'Call cpCore.addon.execute_legacy4(addonGuidjQueryFancyBox)
-                        Call cpCore.html.addScriptCode_Head("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});", "")
+                        Call cpCore.html.addScriptCode_head("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});", "")
                     End If
                     '
                     ' Pickup user errors
@@ -511,16 +510,9 @@ Namespace Contensive.Addons.AdminSite
                     '    'ContentCell = "<div class=""ccAdminMsg"">The form you requested did not return a valid response.</div>"
                     'End If
                     '
-                    If cpCore.doc.isPrintVersion Then
-                        '
-                        ' For print version, just add content
-                        '
-                        Call Stream.Add(ContentCell)
-                    Else
-                        Call Stream.Add(cr & GetForm_Top())
-                        Call Stream.Add(genericController.htmlIndent(ContentCell))
-                        Call Stream.Add(cr & AdminFormBottom)
-                    End If
+                    Call Stream.Add(cr & GetForm_Top())
+                    Call Stream.Add(genericController.htmlIndent(ContentCell))
+                    Call Stream.Add(cr & AdminFormBottom)
                     Call Stream.Add(cr & "<script language=""javascript1.2"" type=""text/javascript"">" & JavaScriptString)
                     Call Stream.Add(cr & "ButtonObjectCount = " & ButtonObjectCount & ";")
                     Call Stream.Add(cr & "</script>")
@@ -716,7 +708,7 @@ Namespace Contensive.Addons.AdminSite
             If (AdminButton = ButtonDeleteEmail) Or (AdminButton = ButtonDeletePage) Or (AdminButton = ButtonDeletePerson) Or (AdminButton = ButtonDeleteRecord) Then
                 AdminButton = ButtonDelete
             End If
-            If (AdminForm = AdminFormEdit) And cpCore.html.main_ReturnAfterEdit Then
+            If (AdminForm = AdminFormEdit) Then
                 MenuDepth = 0
             Else
                 MenuDepth = cpCore.docProperties.getInteger(RequestNameAdminDepth)
@@ -4366,7 +4358,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "StaticPublishControl, Cancel Button Pressed", False)
+                Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "StaticPublishControl, Cancel Button Pressed")
             ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
@@ -4613,7 +4605,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "Admin Publish, Cancel Button Pressed", False)
+                Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "Admin Publish, Cancel Button Pressed")
             ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
@@ -9190,8 +9182,8 @@ ErrorTrap:
             '        & "}" _
             '        & ""
             '
-            Call cpCore.html.addScriptCode_Head("var docLoaded=false", "Form loader")
-            Call cpCore.html.addScript_onLoad("docLoaded=true;", "Form loader")
+            Call cpCore.html.addScriptCode_head("var docLoaded=false", "Form loader")
+            Call cpCore.html.addScriptCode_onLoad("docLoaded=true;", "Form loader")
             s = cpCore.html.html_GetUploadFormStart()
             s = genericController.vbReplace(s, ">", " onSubmit=""cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');"">")
             s = genericController.vbReplace(s, ">", " autocomplete=""off"">")
@@ -9900,7 +9892,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "GetContentChildTool, Cancel Button Pressed", False)
+                Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "GetContentChildTool, Cancel Button Pressed")
             ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
@@ -10218,7 +10210,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "HouseKeepingControl, Cancel Button Pressed", False)
+                Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "HouseKeepingControl, Cancel Button Pressed")
             ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
@@ -10253,7 +10245,7 @@ ErrorTrap:
                 End Select
                 '
                 If Button = ButtonOK Then
-                    Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "StaticPublishControl, OK Button Pressed", False)
+                    Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "StaticPublishControl, OK Button Pressed")
                 End If
                 '
                 ' ----- Status
@@ -10766,7 +10758,7 @@ ErrorTrap:
             '
             Button = cpCore.docProperties.getText(RequestNameButton)
             If Button = ButtonCancel Then
-                Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "Downloads, Cancel Button Pressed", False)
+                Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "Downloads, Cancel Button Pressed")
             End If
             '
             If Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
@@ -11457,7 +11449,7 @@ ErrorTrap:
                 If Button <> "" Then
                     Select Case Button
                         Case ButtonCancel
-                            Call cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "CustomReports, Cancel Button Pressed", False)
+                            Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "CustomReports, Cancel Button Pressed")
                             'Call cpCore.main_Redirect2(encodeAppRootPath(cpCore.main_GetSiteProperty2("AdminURL"), cpCore.main_ServerVirtualPath, cpCore.app.RootPath, cpCore.main_ServerHost))
                         Case ButtonDelete
                             RowCnt = cpCore.docProperties.getInteger("RowCnt")
@@ -14213,7 +14205,7 @@ ErrorTrap:
                 '
                 ' Cancel out to the main page
                 '
-                Call cpCore.webServer.redirect("?", "CancelAll button pressed on Index Export", False)
+                Return cpCore.webServer.redirect("?", "CancelAll button pressed on Index Export")
             ElseIf Button <> ButtonCancel Then
                 '
                 ' get content access rights

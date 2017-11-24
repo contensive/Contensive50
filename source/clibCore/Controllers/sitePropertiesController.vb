@@ -488,7 +488,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="PropertyName"></param>
         ''' <returns></returns>
         Public Function getText(ByVal PropertyName As String) As String
-            Return getText(PropertyName, Nothing)
+            Return getText(PropertyName, String.Empty)
         End Function
         '
         '========================================================================

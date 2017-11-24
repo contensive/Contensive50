@@ -36,7 +36,7 @@ Namespace Contensive.Addons.Core
                     Call cpCore.html.addScriptLink_Head("/ccLib/ClientSide/dialogs.js", "Resource Library")
                     'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                     Call cpCore.doc.setMetaContent(0, 0)
-                    Call cpCore.html.addScript_onLoad("document.body.style.overflow='scroll';", "Resource Library")
+                    Call cpCore.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library")
                     Dim Copy As String = cpCore.html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                     Dim htmlBody As String = "" _
                         & genericController.htmlIndent(cpCore.html.main_GetPanelHeader("Contensive Resource Library")) _
@@ -45,12 +45,12 @@ Namespace Contensive.Addons.Core
                         & genericController.htmlIndent(Copy) _
                         & cr & "</td></tr>" _
                         & cr & "<tr><td>" _
-                        & genericController.htmlIndent(cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False)) _
+                        & genericController.htmlIndent(cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False)) _
                         & cr & "</td></tr></table>" _
                         & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
                         & ""
                     Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
-                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False)
+                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False)
                     cpCore.doc.continueProcessing = False
                 ElseIf LinkObjectName <> "" Then
                     '
@@ -58,7 +58,7 @@ Namespace Contensive.Addons.Core
                     Call cpCore.doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
                     Call cpCore.html.addScriptLink_Head("/ccLib/ClientSide/dialogs.js", "Resource Library")
                     Call cpCore.doc.setMetaContent(0, 0)
-                    Call cpCore.html.addScript_onLoad("document.body.style.overflow='scroll';", "Resource Library")
+                    Call cpCore.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Resource Library")
                     Dim htmlBody As String = "" _
                         & cpCore.html.main_GetPanelHeader("Contensive Resource Library") _
                         & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
@@ -67,7 +67,7 @@ Namespace Contensive.Addons.Core
                         & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
                         & ""
                     Dim htmlBodyTag As String = "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
-                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False, False)
+                    result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, False, False)
                     cpCore.doc.continueProcessing = False
                 End If
             Catch ex As Exception

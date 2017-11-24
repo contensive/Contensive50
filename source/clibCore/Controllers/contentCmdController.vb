@@ -654,61 +654,9 @@ Namespace Contensive.Core.Controllers
                                     CmdAccumulator = cpCore.appRootFiles.readFile(ArgName)
                                 End If
                             Case "import"
-                                '
-                                ' Opens an html file in the wwwPath and imports the head and returns the body
-                                '
-                                ' arguments
-                                '   name: filename
-                                ' default argument
-                                '   name
-                                '
-                                CmdAccumulator = ""
-                                ArgName = ""
-                                For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
-                                    Select Case kvp.Key.ToLower()
-                                        Case "name", "default"
-                                            ArgName = DirectCast(kvp.Value, String)
-                                    End Select
-                                Next
-                                If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.appRootFiles.readFile(ArgName)
-                                    If CmdAccumulator <> "" Then
-                                        importHead = Controllers.htmlController.getTagInnerHTML(CmdAccumulator, "head", False)
-                                        If importHead <> "" Then
-                                            ' try this, but it may not be implemented yet
-                                            Call cpCore.doc.addHeadTags(importHead)
-                                        End If
-                                        CmdAccumulator = Controllers.htmlController.getTagInnerHTML(CmdAccumulator, "body", False)
-                                    End If
-                                End If
+                                Throw New NotImplementedException("import contentCmd")
                             Case "user"
                                 Throw New NotImplementedException("user contentCmd")
-                                '
-                                ' returns the value of the current users field
-                                '
-                                ' arguments
-                                '   field: fieldName
-                                ' default
-                                '   field
-                                '
-                                'CmdAccumulator = ""
-                                'argField = ""
-                                'For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
-                                '    Select Case kvp.Key.ToLower()
-                                '        Case "field", "default"
-                                '            argField = DirectCast(kvp.Value, String)
-                                '    End Select
-                                'Next
-                                'If argField = "" Then
-                                '    argField = "name"
-                                'End If
-                                'If Not CSPeopleSet Then
-                                '    CSPeople.Open("People", "id=" & personalizationPeopleId)
-                                '    CSPeopleSet = True
-                                'End If
-                                'If CSPeople.OK() And CSPeople.FieldOK(argField) Then
-                                '    CmdAccumulator = CSPeople.GetText(argField)
-                                'End If
                             Case "site"
                                 Throw New NotImplementedException("site contentCmd")
                                 ''

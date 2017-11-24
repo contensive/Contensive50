@@ -476,7 +476,7 @@ Namespace Contensive.Core.Controllers
                         If genericController.vbInstr(1, cpCore.domainLegacyCache.domainDetails.forwardUrl, "://") = 0 Then
                             cpCore.domainLegacyCache.domainDetails.forwardUrl = "http://" & cpCore.domainLegacyCache.domainDetails.forwardUrl
                         End If
-                        Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
+                        Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False, False)
                         Return cpCore.doc.continueProcessing
                     ElseIf (cpCore.domainLegacyCache.domainDetails.typeId = 3) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> 0) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> cpCore.domainLegacyCache.domainDetails.id) Then
                         '
@@ -487,7 +487,7 @@ Namespace Contensive.Core.Controllers
                             Dim pos As Integer = genericController.vbInstr(1, requestUrlSource, requestDomain, vbTextCompare)
                             If (pos > 0) Then
                                 cpCore.domainLegacyCache.domainDetails.forwardUrl = Mid(requestUrlSource, 1, pos - 1) & forwardDomain & Mid(requestUrlSource, pos + Len(requestDomain))
-                                Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
+                                Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False, False)
                                 Return cpCore.doc.continueProcessing
                             End If
                         End If
@@ -539,9 +539,9 @@ Namespace Contensive.Core.Controllers
                     If (LCase(requestDomain) <> genericController.vbLCase(requestDomain)) Then
                         Dim Copy As String = "Redirecting to domain [" & requestDomain & "] because this site is configured to run on the current domain [" & requestDomain & "]"
                         If requestQueryString <> "" Then
-                            Call redirect(requestProtocol & requestDomain & requestPath & requestPage & "?" & requestQueryString, Copy, False)
+                            Call redirect(requestProtocol & requestDomain & requestPath & requestPage & "?" & requestQueryString, Copy, False, False)
                         Else
-                            Call redirect(requestProtocol & requestDomain & requestPath & requestPage, Copy, False)
+                            Call redirect(requestProtocol & requestDomain & requestPath & requestPage, Copy, False, False)
                         End If
                         cpCore.doc.continueProcessing = False '--- should be disposed by caller --- Call dispose
                         Return cpCore.doc.continueProcessing
@@ -815,7 +815,8 @@ ErrorTrap:
         ''' <param name="NonEncodedLink"></param>
         ''' <param name="RedirectReason"></param>
         ''' <param name="IsPageNotFound"></param>
-        Public Function redirect(ByVal NonEncodedLink As String, Optional ByVal RedirectReason As String = "No explaination provided", Optional ByVal IsPageNotFound As Boolean = False) As String
+        ''' <param name="allowDebugMessage">If true, when visit property debugging is enabled, the routine returns </param>
+        Public Function redirect(ByVal NonEncodedLink As String, Optional ByVal RedirectReason As String = "No explaination provided", Optional ByVal IsPageNotFound As Boolean = False, Optional allowDebugMessage As Boolean = True) As String
             Dim result As String = ""
             Try
                 Const rnRedirectCycleFlag = "cycleFlag"
@@ -876,7 +877,7 @@ ErrorTrap:
                             Call cpCore.db.executeQuery("Update ccContentWatch set link=null where link=" & cpCore.db.encodeSQLText(ShortLink))
                         End If
                         '
-                        If cpCore.doc.testPointPrinting Then
+                        If allowDebugMessage And cpCore.doc.visitPropertyAllowDebugging Then
                             '
                             ' -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink
@@ -891,7 +892,7 @@ ErrorTrap:
                         Copy = """" & FormatDateTime(cpCore.doc.profileStartTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestUrlSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
                         logController.appendLog(cpCore, Copy, "performance", "redirects")
                         '
-                        If cpCore.doc.testPointPrinting Then
+                        If allowDebugMessage And cpCore.doc.visitPropertyAllowDebugging Then
                             '
                             ' -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink
@@ -1207,7 +1208,7 @@ ErrorTrap:
                     If cpcore.db.cs_isFieldSupported(CSPointer, "Clicks") Then
                         Call cpcore.db.csSet(CSPointer, "Clicks", (cpcore.db.csGetNumber(CSPointer, "Clicks")) + 1)
                     End If
-                    Call cpcore.webServer.redirect(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
+                    Call cpcore.webServer.redirect(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False, False)
                     main_RedirectByRecord_ReturnStatus = True
                 End If
             End If

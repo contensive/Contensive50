@@ -97,7 +97,7 @@ Namespace Contensive.Core.Controllers
                     '
                     Call cpcore.doc.addRefreshQueryString("method", "")
                     loginForm = ""
-                    Call cpcore.html.addScript_onLoad("document.getElementById('LoginUsernameInput').focus()", "login")
+                    Call cpcore.html.addScriptCode_onLoad("document.getElementById('LoginUsernameInput').focus()", "login")
                     '
                     ' ----- Error Messages
                     '
@@ -234,7 +234,7 @@ Namespace Contensive.Core.Controllers
                             QS = genericController.ModifyQueryString(QS, "method", "")
                             QS = genericController.ModifyQueryString(QS, "RequestBinary", "")
                             '
-                            Call cpcore.webServer.redirect("?" & QS, "Login form success", False)
+                            Return cpcore.webServer.redirect("?" & QS, "Login form success")
                         End If
                     End If
                 End If

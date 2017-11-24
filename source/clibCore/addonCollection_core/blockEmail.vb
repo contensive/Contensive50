@@ -50,7 +50,7 @@ Namespace Contensive.Addons.Core
                                     }
                                 End If
                             End If
-                            Call cpCore.webServer.redirect(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
+                            Return cpCore.webServer.redirect(cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.")
                         Next
                     End If
                 End If

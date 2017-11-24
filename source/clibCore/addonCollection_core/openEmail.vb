@@ -41,7 +41,8 @@ Namespace Contensive.Addons.Core
                         Call cpCore.webServer.redirect(
                             NonEncodedLink:=cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & "/ccLib/images/spacer.gif",
                             RedirectReason:="Group Email Open hit, redirecting to a dummy image",
-                            IsPageNotFound:=False
+                            IsPageNotFound:=False,
+                            allowDebugMessage:=False
                         )
                     End If
                 End If

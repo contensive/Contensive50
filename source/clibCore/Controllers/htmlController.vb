@@ -742,127 +742,57 @@ ErrorTrap:
         '
         '====================================================================================================
         '
-        Public Function getHtmlDoc_beforeEndOfBodyHtml(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean) As String
-            Dim result As String = ""
+        Public Function getHtmlDoc_beforeEndOfBodyHtml(AllowLogin As Boolean, AllowTools As Boolean) As String
+            Dim result As New List(Of String)
             Try
+                Dim bodyScript As New List(Of String)
                 '
                 ' -- content extras like tool panel
-                If (Not BlockNonContentExtras) Then
-                    If cpCore.doc.authContext.isAuthenticatedContentManager(cpCore) And cpCore.doc.authContext.user.AllowToolsPanel Then
-                        If AllowTools Then
-                            result &= cpCore.html.main_GetToolsPanel()
-                        End If
-                    Else
-                        If AllowLogin Then
-                            result &= main_GetLoginLink()
-                        End If
+                If cpCore.doc.authContext.isAuthenticatedContentManager(cpCore) And cpCore.doc.authContext.user.AllowToolsPanel Then
+                    If AllowTools Then
+                        result.Add(cpCore.html.main_GetToolsPanel())
                     End If
-                    '
-                    ' -- Include any other close page
-                    If cpCore.doc.htmlForEndOfBody <> "" Then
-                        result = result & cpCore.doc.htmlForEndOfBody
+                Else
+                    If AllowLogin Then
+                        result.Add(main_GetLoginLink())
                     End If
-                    If cpCore.doc.testPointMessage <> "" Then
-                        result = result & "<div class=""ccTestPointMessageCon"">" & cpCore.doc.testPointMessage & "</div>"
-                    End If
+                End If
+                '
+                ' -- Include any other close page
+                If cpCore.doc.htmlForEndOfBody <> "" Then
+                    result.Add(cpCore.doc.htmlForEndOfBody)
+                End If
+                If cpCore.doc.testPointMessage <> "" Then
+                    result.Add("<div class=""ccTestPointMessageCon"">" & cpCore.doc.testPointMessage & "</div>")
                 End If
                 '
                 ' TODO -- closing the menu attaches the flyout panels -- should be done when the menu is returned, not at page end
                 ' -- output the menu system
                 If Not (cpCore.menuFlyout Is Nothing) Then
-                    result &= cpCore.menuFlyout.menu_GetClose()
-                End If
-                ''
-                '' -- Add Script Code
-                'JS = ""
-                'If cpCore.doc.jsHead.Count > 0 Then
-                '    For Ptr = 0 To cpCore.doc.jsHead.Count - 1
-                '        With cpCore.doc.jsHead(Ptr)
-                '            If .addedByMessage <> "" Then
-                '                JS = JS & vbCrLf & "/* from " & .addedByMessage & " */ "
-                '            End If
-                '            If Not .IsLink Then
-                '                JSCodeAsString = .Text
-                '                JSCodeAsString = genericController.vbReplace(JSCodeAsString, "'", "'+""'""+'")
-                '                JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCrLf, "\n")
-                '                JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCr, "\n")
-                '                JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbLf, "\n")
-                '                JS = JS & vbCrLf & "cj.addHeadScriptCode('" & JSCodeAsString & "');"
-                '                'JS = JS & vbCrLf & "cjAddHeadScriptCode('" & JSCodeAsString & "');"
-                '            Else
-                '                JS = JS & vbCrLf & "cj.addHeadScriptLink('" & .Text & "');"
-                '                'JS = JS & vbCrLf & "cjAddHeadScriptLink('" & .Text & "');"
-                '            End If
-                '        End With
-                '    Next
-                '    cpCore.doc.jsHead = {}
-                'End If
-                '
-                ' ----- Add any left over style links
-                '
-                Dim headTags As String
-                headTags = ""
-                '
-                If (cpCore.doc.htmlMetaContent_StyleSheetTags <> "") Then
-                    headTags = headTags & cr & cpCore.doc.htmlMetaContent_StyleSheetTags
-                    'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_StyleSheetTags) & "');"
-                    cpCore.doc.htmlMetaContent_StyleSheetTags = ""
+                    result.Add(cpCore.menuFlyout.menu_GetClose())
                 End If
                 '
-                ' ----- Add onload javascript
-                Dim JS As String = ""
-                If (cpCore.doc.onLoadJavascript <> "") Then
-                    JS = JS & vbCrLf & vbTab & "window.addEventListener('load', function(){" & cpCore.doc.onLoadJavascript & "});"
-                    ' JS = JS & vbCrLf & vbTab & "cj.addLoadEvent(function(){" & cpCore.doc.onLoadJavascript & "});" 'object.addEventListener("load", myScript);
-                End If
-                '
-                ' -- Add any left over head tags
-                If (cpCore.doc.htmlMetaContent_OtherHeadTags <> "") Then
-                    headTags = headTags & cr & cpCore.doc.htmlMetaContent_OtherHeadTags
-                    cpCore.doc.htmlMetaContent_OtherHeadTags = ""
-                End If
-                If (headTags <> "") Then
-                    JS = JS & vbCrLf & vbTab & "cj.addHeadTag('" & genericController.EncodeJavascript(headTags) & "');"
-                End If
-                '
-                ' -- Add end of body javascript
-                If (cpCore.doc.endOfBodyJavascript <> "") Then
-                    JS = JS & vbCrLf & cpCore.doc.endOfBodyJavascript
-                    cpCore.doc.endOfBodyJavascript = ""
-                End If
-                If JS <> "" Then
-                    result = result _
-                            & vbCrLf & "<script Language=""javascript"" type=""text/javascript"">" _
-                            & vbCrLf & "if(cj){" _
-                            & JS _
-                            & vbCrLf & "}" _
-                            & vbCrLf & "</script>"
-                    JS = ""
-                End If
-                '
-                ' -- end-of-body string -- include it without csv because it may have error strings
-                If (Not BlockNonContentExtras) And (cpCore.doc.endOfBodyString <> "") Then
-                    result = result & cpCore.doc.endOfBodyString
-                End If
+                ' -- Add onload javascript
+                For Each asset As htmlAssetClass In cpCore.doc.htmlAssetList.FindAll(Function(a) (a.assetType = htmlAssetTypeEnum.OnLoadScript) And (Not String.IsNullOrEmpty(a.content)))
+                    result.Add("<script Language=""JavaScript"" type=""text/javascript"">window.addEventListener('load', function(){" & asset.content & "});</script>")
+                Next
                 '
                 ' -- body Javascript
                 Dim allowDebugging As Boolean = cpCore.visitProperty.getBoolean("AllowDebugging")
-                For Each jsBody In cpCore.doc.scriptList_body
-                    With jsBody
-                        If (.addedByMessage <> "") And allowDebugging Then
-                            result &= cr & "<!-- from " & .addedByMessage & " -->"
-                        End If
-                        If Not .IsLink Then
-                            result &= cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
-                        Else
-                            result &= cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
-                        End If
-                    End With
+                For Each jsBody In cpCore.doc.htmlAssetList.FindAll(Function(a) (a.assetType = htmlAssetTypeEnum.script) And (Not a.inHead) And (Not String.IsNullOrEmpty(a.content)))
+                    If (jsBody.addedByMessage <> "") And allowDebugging Then
+                        result.Add("<!-- from " & jsBody.addedByMessage & " -->")
+                    End If
+                    If Not jsBody.isLink Then
+                        result.Add("<script Language=""JavaScript"" type=""text/javascript"">" & jsBody.content & "</script>")
+                    Else
+                        result.Add("<script type=""text/javascript"" src=""" & jsBody.content & """></script>")
+                    End If
                 Next
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
-            Return result
+            Return String.Join(cr, result)
         End Function
         '
         '========================================================================
@@ -1702,24 +1632,24 @@ ErrorTrap:
         'ErrorTrap:
         '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_JavaStream_Add")
         '        End Sub
-        '
-        '
-        '
-        Public ReadOnly Property webServerIO_JavaStream_Text() As String
-            Get
-                Dim MsgLabel As String
-                '
-                MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                '
-                webServerIO_JavaStream_Text = Join(cpCore.doc.javascriptStreamHolder, "")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, "'", "'+""'""+'")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCrLf, "\n")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCr, "\n")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbLf, "\n")
-                webServerIO_JavaStream_Text = "var " & MsgLabel & " = '" & webServerIO_JavaStream_Text & "'; document.write( " & MsgLabel & " ); " & vbCrLf
 
-            End Get
-        End Property
+
+
+        'Public ReadOnly Property webServerIO_JavaStream_Text() As String
+        '    Get
+        '        Dim MsgLabel As String
+
+        '        MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
+
+        '        webServerIO_JavaStream_Text = Join(cpCore.doc.javascriptStreamHolder, "")
+        '        webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, "'", "'+""'""+'")
+        '        webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCrLf, "\n")
+        '        webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCr, "\n")
+        '        webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbLf, "\n")
+        '        webServerIO_JavaStream_Text = "var " & MsgLabel & " = '" & webServerIO_JavaStream_Text & "'; document.write( " & MsgLabel & " ); " & vbCrLf
+
+        '    End Get
+        'End Property
         ''
         ''
         ''
@@ -2124,7 +2054,7 @@ ErrorTrap:
                     & vbCrLf & "cal.showNavigationDropdowns();" _
                     & vbCrLf & "</SCRIPT>"
                     Call addScriptLink_Head("/ccLib/mktree/CalendarPopup.js", "Calendar Popup")
-                    Call addScriptCode_Head("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup")
+                    Call addScriptCode_head("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup")
                 End If
 
                 If IsDate(iDefaultValue) Then
@@ -2784,7 +2714,7 @@ ErrorTrap:
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCr, "\n")
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbLf, "\n")
             JSCodeAsString = "'" & JSCodeAsString & "'"
-            Call addScript_onLoad("" _
+            Call addScriptCode_onLoad("" _
                 & "cj.addListener(" _
                     & "document.getElementById('" & HtmlId & "')" _
                     & ",'" & DOMEvent & "'" _
@@ -6142,7 +6072,7 @@ ErrorTrap:
                             End If
                         End If
                         cpCore.db.csClose(CS)
-                        Call addScriptCode_Head(javaScriptRequired, "CheckList Categories")
+                        Call addScriptCode_head(javaScriptRequired, "CheckList Categories")
                     End If
                     'End If
                     cpCore.doc.checkListCnt = cpCore.doc.checkListCnt + 1
@@ -6152,254 +6082,71 @@ ErrorTrap:
             End Try
             Return returnHtml
         End Function
-        ''
-        ''==========================================================================================================================================
-        ''   main_GetFormInputCheckList - with two panes
-        ''       Content Category view on the left
-        ''       Checkboxes for content on the right that match the left folder
-        ''==========================================================================================================================================
-        ''
-        'Public Function getInputCheckListCategories(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal readOnlyField As Boolean = False, Optional ByVal RightSideHeader As String = "", Optional ByVal DefaultSecondaryIDList As String = "") As String
-        '    Dim result As String = ""
-        '    Try
-        '        Dim AllNode As String
-        '        Dim LeftPane As String
-        '        Dim RightPane As String
-        '        Dim CS As Integer
-        '        Dim SQL As String
-        '        Dim BakeName As String
-        '        Dim Caption As String
-        '        Dim Id As Integer
-        '        Dim CurrentFolderID As Integer
-        '        Dim IsAuthoringMode As Boolean
-        '        Dim LinkBase As String
-        '        Dim JSCaption As String
-        '        Dim JSSwitch As String
-        '        Dim JSSwitchFirst As String = String.Empty
-        '        Dim FirstCaption As String = String.Empty
-        '        Dim EmptyDivID As String
-        '        Dim JSSwitchAll As String
-        '        Dim IsContentCategoriesSupported As Boolean
-        '        '
-        '        IsContentCategoriesSupported = models.complex.cdefmodel.isContentFieldSupported(cpcore,SecondaryContentName, "ContentCategoryID")
-        '        If Not IsContentCategoriesSupported Then
-        '            result = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
-        '        Else
-        '            IsAuthoringMode = True
-        '            LinkBase = cpCore.doc.refreshQueryString
-        '            BakeName = "ContentFolderNav"
-        '            If Not IsAuthoringMode Then
-        '                '          main_GetFormInputCheckListCategories = cache.cache_readBake(BakeName)
-        '            End If
-
-        '            Dim s As String = String.Empty
-
-        '            If result = "" Then
-        '                EmptyDivID = TagName & ".empty"
-        '                SQL = cpCore.db.GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
-        '                CS = cpCore.db.cs_openSql(SQL)
-        '                Do While cpCore.db.cs_ok(CS)
-        '                    Caption = cpCore.db.cs_getText(CS, "name")
-        '                    Id = cpCore.db.cs_getInteger(CS, "ID")
-        '                    CurrentFolderID = cpCore.db.cs_getInteger(CS, "ContentCategoryID")
-        '                    '
-        '                    Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
-        '                    If FirstCaption = "" Then
-        '                        FirstCaption = Caption
-        '                    End If
-        '                    JSCaption = genericController.EncodeJavascript(Caption)
-        '                    JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & cpCore.doc.checkListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.checkListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
-        '                    If JSSwitchFirst = "" Then
-        '                        JSSwitchFirst = JSSwitch
-        '                    End If
-        '                    s = s & cr & "<li class=""ccAdminSmall ccPanel""><a href=""#"" onclick=""" & JSSwitch & """>" & Caption & "</a></li>"
-        '                    'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption, JSSwitch)
-        '                    'Call Tree.AddEntry(CStr(ID), CStr(CurrentFolderID), , , Link, Caption, "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & ID & "', OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption'," & JSCaption & "); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & ID & "';")
-        '                    Call cpCore.db.cs_goNext(CS)
-        '                Loop
-        '                Call cpCore.db.cs_Close(CS)
-        '                LeftPane = cr & "<ul>" & genericController.htmlIndent(s) & cr & "</ul>"
-        '                'LeftPane = Tree.GetTree(CStr(0), OpenMenuName)
-        '                '
-        '                ' Add the top 'All' node
-        '                '
-        '                JSCaption = "All"
-        '                JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & cpCore.doc.checkListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.checkListCnt & "='" & TagName & ".All';"
-        '                If genericController.vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
-        '                    AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
-        '                    LeftPane = cr & AllNode & LeftPane
-        '                Else
-        '                    AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
-        '                    LeftPane = cr & AllNode & LeftPane
-        '                End If
-        '                '
-        '                ' + Add Category
-        '                '
-        '                If cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
-        '                    LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & "/" & cpCore.serverconfig.appconfig.adminRoute & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & models.complex.cdefmodel.getcontentid(cpcore,"Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
-        '                End If
-        '                '
-        '                LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.htmlIndent(LeftPane) & cr & "</div>"
-        '                '
-        '                ' open the current node
-        '                '
-        '                RightPane = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, True, DefaultSecondaryIDList)
-        '                '
-        '                result = "" _
-        '                & "<div style=""border:1px solid #A0A0A0;"">" _
-        '                & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%;"">" _
-        '                & "<tr>" _
-        '                & "<td class=""ccAdminTab"" style=""width:100px;padding:5px;text-align:left"">Categories<br ><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=90 height=1></td>" _
-        '                & "<td class=""ccAdminTab"" style=""width:1px;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=1></td>" _
-        '                & "<td class=""ccAdminTab"" style=""width:90%;padding:5px;text-align:left"" ID=""" & TagName & ".ContentCaption"">" & genericController.encodeEmptyText(RightSideHeader, "&nbsp;") & "</td>" _
-        '                & "</td></tr>" _
-        '                & "<tr>" _
-        '                & "<td style=""width:100px;padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & LeftPane & "</td>" _
-        '                & "<td class=""ccAdminTab"" style=""width:1px;""></td>" _
-        '                & "<td style=""width:90%;padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & RightPane & "</td>" _
-        '                & "</td></tr>" _
-        '                & "</table>" _
-        '                & "</div>"
-        '                If Not IsAuthoringMode Then
-        '                    Call cpCore.cache.setObject(BakeName, result, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
-        '                End If
-        '                '
-        '                ' initialize with all open
-        '                '
-        '                Call addOnLoadJavascript(JSSwitchAll, "Checklist Categories")
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        '    Return result
-        'End Function
-
         '
+        '====================================================================================================
         '
-        '
-        Public Sub addScript_onLoad(NewCode As String, addedByMessage As String)
-            On Error GoTo ErrorTrap
-            '
-            Dim s As String
-            '
-            s = cpCore.doc.onLoadJavascript
-            If NewCode <> "" And genericController.vbInstr(1, s, NewCode, vbTextCompare) = 0 Then
-                If s <> "" Then
-                    s = s & ";"
+        Public Sub addScriptCode_onLoad(code As String, addedByMessage As String)
+            Try
+                If (Not String.IsNullOrEmpty(code)) Then
+                    cpCore.doc.htmlAssetList.Add(New htmlAssetClass() With {
+                        .assetType = htmlAssetTypeEnum.OnLoadScript,
+                        .addedByMessage = addedByMessage,
+                        .isLink = False,
+                        .content = code
+                    })
                 End If
-                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    s = s & " /* from " & addedByMessage & " */ "
-                End If
-                s = s & NewCode
-                cpCore.doc.onLoadJavascript = s
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddOnLoadJavascript2")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
+        '====================================================================================================
         '
-        '
-        Public Sub addScriptCode_Body(NewCode As String, addedByMessage As String)
-            On Error GoTo ErrorTrap
-            '
-            Dim s As String
-            '
-            s = ""
-            If NewCode <> "" And genericController.vbInstr(1, cpCore.doc.endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
-                's = s & vbCrLf
-                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    s = s & "/* from " & addedByMessage & "*/"
+        Public Sub addScriptCode_body(code As String, addedByMessage As String)
+            Try
+                If (Not String.IsNullOrEmpty(code)) Then
+                    cpCore.doc.htmlAssetList.Add(New htmlAssetClass() With {
+                        .assetType = htmlAssetTypeEnum.script,
+                        .addedByMessage = addedByMessage,
+                        .isLink = False,
+                        .content = genericController.removeScriptTag(code)
+                    })
                 End If
-                s = s & NewCode
-                cpCore.doc.endOfBodyJavascript = cpCore.doc.endOfBodyJavascript & vbCrLf & s
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddEndOfBodyJavascript2")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
-
         '
+        '====================================================================================================
         '
-        '
-        Public Sub addScriptCode_Head(NewCode As String, addedByMessage As String)
-            On Error GoTo ErrorTrap
-            '
-            Dim s As String
-            Dim StartPos As Integer
-            Dim EndPos As Integer
-            '
-            If NewCode <> "" Then
-                s = NewCode
-                StartPos = genericController.vbInstr(1, s, "<script", vbTextCompare)
-                If StartPos <> 0 Then
-                    EndPos = genericController.vbInstr(StartPos, s, "</script", vbTextCompare)
-                    If EndPos <> 0 Then
-                        EndPos = genericController.vbInstr(EndPos, s, ">", vbTextCompare)
-                        If EndPos <> 0 Then
-                            s = Left(s, StartPos - 1) & Mid(s, EndPos + 1)
-                        End If
-                    End If
+        Public Sub addScriptCode_head(code As String, addedByMessage As String)
+            Try
+                If (Not String.IsNullOrEmpty(code)) Then
+                    cpCore.doc.htmlAssetList.Add(New htmlAssetClass() With {
+                        .assetType = htmlAssetTypeEnum.script,
+                        .inHead = True,
+                        .addedByMessage = addedByMessage,
+                        .isLink = False,
+                        .content = genericController.removeScriptTag(code)
+                    })
                 End If
-                '
-                ' I am going to regret this...
-                '
-                Do While genericController.vbInstr(1, NewCode, vbTab & vbTab) <> 0
-                    NewCode = genericController.vbReplace(NewCode, vbTab & vbTab, vbTab)
-                Loop
-                Do While genericController.vbInstr(1, NewCode, cr) <> 0
-                    NewCode = genericController.vbReplace(NewCode, cr, vbCrLf)
-                Loop
-                NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
-                NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
-                NewCode = genericController.vbReplace(NewCode, vbCrLf, cr2)
-                ReDim Preserve cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count)
-                cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).IsLink = False
-                cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).Text = NewCode
-                cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).addedByMessage = genericController.vbLCase(addedByMessage)
-                'cpCore.doc.headScriptCnt = cpCore.doc.headScriptCnt + 1
-            End If
-            '    If NewCode <> "" And genericController.vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
-            '        s = NewCode
-            '        StartPos = genericController.vbInstr(1, s, "<script", vbTextCompare)
-            '        If StartPos <> 0 Then
-            '            EndPos = genericController.vbInstr(StartPos, s, "</script", vbTextCompare)
-            '            If EndPos <> 0 Then
-            '                EndPos = genericController.vbInstr(EndPos, s, ">", vbTextCompare)
-            '                If EndPos <> 0 Then
-            '                    s = Left(s, StartPos - 1) & Mid(s, EndPos + 1)
-            '                End If
-            '            End If
-            '        End If
-            '        main_HeadScriptCode = main_HeadScriptCode & cr
-            '        If AddedByMessage <> "" Then
-            '            main_HeadScriptCode = main_HeadScriptCode & "/* from " & AddedByMessage & " */" & cr
-            '        End If
-            '        main_HeadScriptCode = main_HeadScriptCode & s
-            ''        If Pos = 0 Then
-            ''            main_HeadScriptCode = main_HeadScriptCode & "<script Language=""JavaScript"" type=""text/javascript"">" & NewCode & "</script>"
-            ''        Else
-            ''            main_HeadScriptCode = main_HeadScriptCode & NewCode
-            ''        End If
-            '    End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadScriptCode")
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
         '=========================================================================================================
         '
         Public Sub addScriptLink_Head(Filename As String, addedByMessage As String)
             Try
-                If Filename <> "" Then
-                    ReDim Preserve cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count)
-                    cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).IsLink = True
-                    cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).Text = Filename
-                    cpCore.doc.scriptList_head(cpCore.doc.scriptList_head.Count - 1).addedByMessage = addedByMessage
+                If (Not String.IsNullOrEmpty(Filename)) Then
+                    cpCore.doc.htmlAssetList.Add(New htmlAssetClass With {
+                        .assetType = htmlAssetTypeEnum.script,
+                        .addedByMessage = addedByMessage,
+                        .isLink = True,
+                        .inHead = True,
+                        .content = Filename
+                    })
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -6410,11 +6157,12 @@ ErrorTrap:
         '
         Public Sub addScriptLink_Body(Filename As String, addedByMessage As String)
             Try
-                If Filename <> "" Then
-                    cpCore.doc.scriptList_body.Add(New scriptAssetClass With {
+                If (Not String.IsNullOrEmpty(Filename)) Then
+                    cpCore.doc.htmlAssetList.Add(New htmlAssetClass With {
+                        .assetType = htmlAssetTypeEnum.script,
                         .addedByMessage = addedByMessage,
-                        .IsLink = True,
-                        .Text = Filename
+                        .isLink = True,
+                        .content = Filename
                     })
                 End If
             Catch ex As Exception
@@ -6424,23 +6172,13 @@ ErrorTrap:
         '
         '=========================================================================================================
         '
-        Public Sub addTitle(PageTitle As String)
-            Call addTitle(PageTitle, "")
-        End Sub
-        '
-        '=========================================================================================================
-        '
-        Public Sub addTitle(PageTitle As String, addedByMessage As String)
+        Public Sub addTitle(pageTitle As String, Optional addedByMessage As String = "")
             Try
-                If PageTitle <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_Title, PageTitle, vbTextCompare) = 0 Then
-                    If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                        Call addHeadTag("<!-- title from " & addedByMessage & " -->", "")
-                    End If
-                    If cpCore.doc.htmlMetaContent_Title <> "" Then
-                        cpCore.doc.htmlMetaContent_Title = cpCore.doc.htmlMetaContent_Title & ", "
-                    End If
-                    cpCore.doc.htmlMetaContent_Title = cpCore.doc.htmlMetaContent_Title & PageTitle
-                    'main_MetaContent_Title_ToBeAdded = True
+                If (Not String.IsNullOrEmpty(pageTitle.Trim())) Then
+                    cpCore.doc.htmlMetaContent_TitleList.Add(New htmlMetaClass() With {
+                        .addedByMessage = addedByMessage,
+                        .content = pageTitle
+                    })
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -6449,22 +6187,13 @@ ErrorTrap:
         '
         '=========================================================================================================
         '
-        Public Sub addMetaDescription(MetaDescription As String)
-            Call addMetaDescription(MetaDescription, "")
-        End Sub
-        '
-        '=========================================================================================================
-        '
-        Public Sub addMetaDescription(MetaDescription As String, addedByMessage As String)
+        Public Sub addMetaDescription(MetaDescription As String, Optional addedByMessage As String = "")
             Try
-                If MetaDescription <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
-                    If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                        Call addHeadTag("<!-- meta description from " & addedByMessage & " -->", "")
-                    End If
-                    If cpCore.doc.htmlMetaContent_Description <> "" Then
-                        cpCore.doc.htmlMetaContent_Description = cpCore.doc.htmlMetaContent_Description & ", "
-                    End If
-                    cpCore.doc.htmlMetaContent_Description = cpCore.doc.htmlMetaContent_Description & MetaDescription
+                If (Not String.IsNullOrEmpty(MetaDescription.Trim())) Then
+                    cpCore.doc.htmlMetaContent_Description.Add(New htmlMetaClass() With {
+                        .addedByMessage = addedByMessage,
+                        .content = MetaDescription
+                    })
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -6475,12 +6204,14 @@ ErrorTrap:
         '
         Public Sub addStyleLink(StyleSheetLink As String, addedByMessage As String)
             Try
-                If StyleSheetLink <> "" Then
-                    cpCore.doc.htmlMetaContent_StyleSheetTags = cpCore.doc.htmlMetaContent_StyleSheetTags & cr
-                    If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                        cpCore.doc.htmlMetaContent_StyleSheetTags = cpCore.doc.htmlMetaContent_StyleSheetTags & "<!-- from " & addedByMessage & " -->"
-                    End If
-                    cpCore.doc.htmlMetaContent_StyleSheetTags = cpCore.doc.htmlMetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
+                If (Not String.IsNullOrEmpty(StyleSheetLink.Trim())) Then
+                    cpCore.doc.htmlAssetList.Add(New htmlAssetClass() With {
+                        .addedByMessage = addedByMessage,
+                        .assetType = htmlAssetTypeEnum.style,
+                        .inHead = True,
+                        .isLink = True,
+                        .content = StyleSheetLink
+                    })
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -6489,22 +6220,16 @@ ErrorTrap:
         '
         '=========================================================================================================
         '
-        Public Sub addMetaKeywordList(MetaKeywordList As String)
-            Call addMetaKeywordList(MetaKeywordList, "")
-        End Sub
-        '
-        '=========================================================================================================
-        '
-        Public Sub addMetaKeywordList(MetaKeywordList As String, addedByMessage As String)
+        Public Sub addStyleCode(code As String, Optional addedByMessage As String = "")
             Try
-                If MetaKeywordList <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
-                    If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                        Call addHeadTag("<!-- meta keyword list from " & addedByMessage & " -->", "")
-                    End If
-                    If cpCore.doc.htmlMetaContent_KeyWordList <> "" Then
-                        cpCore.doc.htmlMetaContent_KeyWordList = cpCore.doc.htmlMetaContent_KeyWordList & ", "
-                    End If
-                    cpCore.doc.htmlMetaContent_KeyWordList = cpCore.doc.htmlMetaContent_KeyWordList & MetaKeywordList
+                If (Not String.IsNullOrEmpty(code.Trim())) Then
+                    cpCore.doc.htmlAssetList.Add(New htmlAssetClass() With {
+                        .addedByMessage = addedByMessage,
+                        .assetType = htmlAssetTypeEnum.style,
+                        .inHead = True,
+                        .isLink = False,
+                        .content = code
+                    })
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -6513,35 +6238,33 @@ ErrorTrap:
         '
         '=========================================================================================================
         '
-        Public Sub addHeadTag(HeadTag As String)
-            Call addHeadTag(HeadTag, "")
+        Public Sub addMetaKeywordList(MetaKeywordList As String, Optional addedByMessage As String = "")
+            Try
+                For Each keyword As String In MetaKeywordList.Split(","c)
+                    If (Not String.IsNullOrEmpty(keyword)) Then
+                        cpCore.doc.htmlMetaContent_KeyWordList.Add(New htmlMetaClass() With {
+                            .addedByMessage = addedByMessage,
+                            .content = keyword
+                        })
+                    End If
+                Next
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
         '=========================================================================================================
         '
-        Public Sub addHeadTag(HeadTag As String, addedByMessage As String)
-            On Error GoTo ErrorTrap
-            '
-            If HeadTag <> "" And genericController.vbInstr(1, cpCore.doc.htmlMetaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
-                If cpCore.doc.htmlMetaContent_OtherHeadTags <> "" Then
-                    cpCore.doc.htmlMetaContent_OtherHeadTags = cpCore.doc.htmlMetaContent_OtherHeadTags & vbCrLf
-                End If
-                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    cpCore.doc.htmlMetaContent_OtherHeadTags = cpCore.doc.htmlMetaContent_OtherHeadTags & "<!-- from " & addedByMessage & " -->" & vbCrLf
-                End If
-                cpCore.doc.htmlMetaContent_OtherHeadTags = cpCore.doc.htmlMetaContent_OtherHeadTags & HeadTag
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadTag")
+        Public Sub addHeadTag(HeadTag As String, Optional addedByMessage As String = "")
+            Try
+                cpCore.doc.htmlMetaContent_OtherTags.Add(New htmlMetaClass() With {
+                    .addedByMessage = addedByMessage,
+                    .content = HeadTag
+                })
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
-        '
-        Friend ReadOnly Property main_ReturnAfterEdit() As Boolean
-            Get
-                Return True
-            End Get
-        End Property
         '
         '===================================================================================================
         '
@@ -6906,37 +6629,27 @@ ErrorTrap:
                         If genericController.vbInstr(1, result, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
                             result = genericController.vbReplace(result, FeedbackFormNotSupportedComment, pageContentController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
                         End If
-                        '
-                        ' if call from webpage, push addon js and css out to cpCoreClass
-                        '
-                        Copy = cpCore.doc.headTags
-                        If Copy <> "" Then
-                            '
-                            ' headtags generated from csv_EncodeContent
-                            '
-                            Call addHeadTag(Copy, "embedded content")
-                        End If
-                        '
-                        ' If any javascript or styles were added during encode, pick them up now
-                        '
-                        Copy = cpCore.doc.getNextJavascriptBodyEnd()
-                        Do While Copy <> ""
-                            Call addScriptCode_Body(Copy, "embedded content")
-                            Copy = cpCore.doc.getNextJavascriptBodyEnd()
-                        Loop
-                        '
-                        ' current
-                        '
-                        Copy = cpCore.doc.getNextJSFilename()
-                        Do While Copy <> ""
-                            If genericController.vbInstr(1, Copy, "://") <> 0 Then
-                            ElseIf Left(Copy, 1) = "/" Then
-                            Else
-                                Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
-                            End If
-                            Call addScriptLink_Head(Copy, "embedded content")
-                            Copy = cpCore.doc.getNextJSFilename()
-                        Loop
+                        ''
+                        '' If any javascript or styles were added during encode, pick them up now
+                        ''
+                        'Copy = cpCore.doc.getNextJavascriptBodyEnd()
+                        'Do While Copy <> ""
+                        '    Call addScriptCode_body(Copy, "embedded content")
+                        '    Copy = cpCore.doc.getNextJavascriptBodyEnd()
+                        'Loop
+                        ''
+                        '' current
+                        ''
+                        'Copy = cpCore.doc.getNextJSFilename()
+                        'Do While Copy <> ""
+                        '    If genericController.vbInstr(1, Copy, "://") <> 0 Then
+                        '    ElseIf Left(Copy, 1) = "/" Then
+                        '    Else
+                        '        Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
+                        '    End If
+                        '    Call addScriptLink_Head(Copy, "embedded content")
+                        '    Copy = cpCore.doc.getNextJSFilename()
+                        'Loop
                         ''
                         'Copy = cpCore.doc.getJavascriptOnLoad()
                         'Do While Copy <> ""
@@ -6944,16 +6657,16 @@ ErrorTrap:
                         '    Copy = cpCore.doc.getJavascriptOnLoad()
                         'Loop
                         '
-                        Copy = cpCore.doc.getNextStyleFilenames()
-                        Do While Copy <> ""
-                            If genericController.vbInstr(1, Copy, "://") <> 0 Then
-                            ElseIf Left(Copy, 1) = "/" Then
-                            Else
-                                Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
-                            End If
-                            Call addStyleLink(Copy, "")
-                            Copy = cpCore.doc.getNextStyleFilenames()
-                        Loop
+                        'Copy = cpCore.doc.getNextStyleFilenames()
+                        'Do While Copy <> ""
+                        '    If genericController.vbInstr(1, Copy, "://") <> 0 Then
+                        '    ElseIf Left(Copy, 1) = "/" Then
+                        '    Else
+                        '        Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
+                        '    End If
+                        '    Call addStyleLink(Copy, "")
+                        '    Copy = cpCore.doc.getNextStyleFilenames()
+                        'Loop
                     End If
                 End If
                 '
@@ -7870,9 +7583,6 @@ ErrorTrap:
                             & " class=""ccRecordEditLink"" " _
                             & " TabIndex=-1" _
                             & " href=""" & genericController.encodeHTML("/" & cpCore.serverConfig.appConfig.adminRoute & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
-                        If Not cpCore.html.main_ReturnAfterEdit Then
-                            main_GetRecordEditLink2 = main_GetRecordEditLink2 & " target=""_blank"""
-                        End If
                         main_GetRecordEditLink2 = main_GetRecordEditLink2 _
                             & "><img" _
                             & " src=""/ccLib/images/IconContentEdit.gif""" _
@@ -8063,9 +7773,6 @@ ErrorTrap:
                             & "<a" _
                             & " TabIndex=-1" _
                             & " href=""" & genericController.encodeHTML(Link) & """"
-                        If Not cpCore.html.main_ReturnAfterEdit Then
-                            main_GetRecordAddLink2 = main_GetRecordAddLink2 & " target=""_blank"""
-                        End If
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 _
                             & "><img" _
                             & " src=""/ccLib/images/IconContentAdd.gif""" _
@@ -8156,10 +7863,7 @@ ErrorTrap:
                             main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "IconContentAdd.gif"" ", "IconContentAdd.gif"" align=""absmiddle"" ")
                         End If
                     End If
-                    If cpCore.html.main_ReturnAfterEdit Then
-                        main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "target=", "xtarget=", 1, 99, vbTextCompare)
-                    End If
-                    'End If
+                    main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "target=", "xtarget=", 1, 99, vbTextCompare)
                 End If
             End If
             '
@@ -8981,11 +8685,11 @@ ErrorTrap:
         ''' <param name="blockNonContentExtras"></param>
         ''' <param name="isAdminSite"></param>
         ''' <returns></returns>
-        Public Function getHtmlDoc(htmlBody As String, htmlBodyTag As String, Optional allowLogin As Boolean = True, Optional allowTools As Boolean = True, Optional blockNonContentExtras As Boolean = False) As String
+        Public Function getHtmlDoc(htmlBody As String, htmlBodyTag As String, Optional allowLogin As Boolean = True, Optional allowTools As Boolean = True) As String
             Dim result As String = ""
             Try
-                Dim htmlHead As String = cpCore.doc.getHtmlHead()
-                Dim htmlBeforeEndOfBody As String = getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools, blockNonContentExtras)
+                Dim htmlHead As String = getHtmlHead()
+                Dim htmlBeforeEndOfBody As String = getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools)
 
                 result = "" _
                     & cpCore.siteProperties.docTypeDeclaration _
@@ -9078,6 +8782,126 @@ ErrorTrap:
                 cpCore.handleException(ex)
             End Try
             Return result
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Function getHtmlHead() As String
+            Dim headList As New List(Of String)
+            Try
+                '
+                ' -- meta content
+                If (cpCore.doc.htmlMetaContent_TitleList.Count > 0) Then
+                    Dim content As String = ""
+                    For Each asset In cpCore.doc.htmlMetaContent_TitleList
+                        If (cpCore.doc.visitPropertyAllowDebugging) And (Not String.IsNullOrEmpty(asset.addedByMessage)) Then
+                            headList.Add("<!-- added by " & asset.addedByMessage & " -->")
+                        End If
+                        content &= " | " & asset.content
+                    Next
+                    headList.Add("<title>" & encodeHTML(content.Substring(3)) & "</title>")
+                End If
+                If (cpCore.doc.htmlMetaContent_KeyWordList.Count > 0) Then
+                    Dim content As String = ""
+                    For Each asset In cpCore.doc.htmlMetaContent_KeyWordList.FindAll(Function(a) (Not String.IsNullOrEmpty(a.content)))
+                        If (cpCore.doc.visitPropertyAllowDebugging) And (Not String.IsNullOrEmpty(asset.addedByMessage)) Then
+                            headList.Add("<!-- '" & encodeHTML(asset.content & "' added by " & asset.addedByMessage) & " -->")
+                        End If
+                        content &= "," & asset.content
+                    Next
+                    If (Not String.IsNullOrEmpty(content)) Then
+                        headList.Add("<meta name=""keywords"" content=""" & encodeHTML(content.Substring(1)) & """ >")
+                    End If
+                End If
+                If (cpCore.doc.htmlMetaContent_Description.Count > 0) Then
+                    Dim content As String = ""
+                    For Each asset In cpCore.doc.htmlMetaContent_Description
+                        If (cpCore.doc.visitPropertyAllowDebugging) And (Not String.IsNullOrEmpty(asset.addedByMessage)) Then
+                            headList.Add("<!-- '" & encodeHTML(asset.content & "' added by " & asset.addedByMessage) & " -->")
+                        End If
+                        content &= "," & asset.content
+                    Next
+                    headList.Add("<meta name=""description"" content=""" & encodeHTML(content.Substring(1)) & """ >")
+                End If
+                '
+                ' -- favicon
+                Dim VirtualFilename As String = cpCore.siteProperties.getText("faviconfilename")
+                Select Case IO.Path.GetExtension(VirtualFilename).ToLower
+                    Case ".ico"
+                        headList.Add("<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >")
+                    Case ".png"
+                        headList.Add("<link rel=""icon"" type=""image/png"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >")
+                    Case ".gif"
+                        headList.Add("<link rel=""icon"" type=""image/gif"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >")
+                    Case ".jpg"
+                        headList.Add("<link rel=""icon"" type=""image/jpg"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >")
+                End Select
+                '
+                ' -- misc caching, etc
+                Dim encoding As String = genericController.encodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
+                headList.Add("<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """>")
+                headList.Add("<meta http-equiv=""content-language"" content=""en-us"">")
+                headList.Add("<meta http-equiv=""cache-control"" content=""no-cache"">")
+                headList.Add("<meta http-equiv=""expires"" content=""-1"">")
+                headList.Add("<meta http-equiv=""pragma"" content=""no-cache"">")
+                headList.Add("<meta name=""generator"" content=""Contensive"">")
+                '
+                ' -- no-follow
+                If cpCore.webServer.response_NoFollow Then
+                    headList.Add("<meta name=""robots"" content=""nofollow"" >")
+                    headList.Add("<meta name=""mssmarttagspreventparsing"" content=""true"" >")
+                End If
+                '
+                ' -- base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
+                If (Not String.IsNullOrEmpty(cpCore.webServer.serverFormActionURL)) Then
+                    Dim BaseHref As String = cpCore.webServer.serverFormActionURL
+                    If (Not String.IsNullOrEmpty(cpCore.doc.refreshQueryString)) Then
+                        BaseHref &= "?" & cpCore.doc.refreshQueryString
+                    End If
+                    headList.Add("<base href=""" & BaseHref & """ >")
+                End If
+                '
+                If (cpCore.doc.htmlAssetList.Count > 0) Then
+                    Dim styleList As New List(Of String)
+                    Dim scriptList As New List(Of String)
+                    For Each asset In cpCore.doc.htmlAssetList.FindAll(Function(item As htmlAssetClass) (item.inHead))
+                        If (cpCore.doc.allowDebugLog) Then
+                            If (cpCore.doc.visitPropertyAllowDebugging) And (Not String.IsNullOrEmpty(asset.addedByMessage)) Then
+                                headList.Add("<!-- '" & encodeHTML(asset.content & "' added by " & asset.addedByMessage) & " -->")
+                            End If
+                        End If
+                        If asset.assetType.Equals(htmlAssetTypeEnum.style) Then
+                            If asset.isLink Then
+                                scriptList.Add("<link rel=""stylesheet"" type=""text/css"" href=""" & asset.content & """ >")
+                            Else
+                                scriptList.Add("<style>" & asset.content & "</style>")
+                            End If
+                        ElseIf asset.assetType.Equals(htmlAssetTypeEnum.script) Then
+
+                            If asset.isLink Then
+                                styleList.Add("<script type=""text/javascript"" src=""" & asset.content & """></script>")
+                            Else
+                                styleList.Add("<script type=""text/javascript"">" & asset.content & "</script>")
+                            End If
+                        End If
+                    Next
+                    headList.AddRange(styleList)
+                    headList.AddRange(scriptList)
+                End If
+                '
+                ' -- other head tags - always last
+                For Each asset In cpCore.doc.htmlMetaContent_OtherTags.FindAll(Function(a) (Not String.IsNullOrEmpty(a.content)))
+                    If (cpCore.doc.allowDebugLog) Then
+                        If (cpCore.doc.visitPropertyAllowDebugging) And (Not String.IsNullOrEmpty(asset.addedByMessage)) Then
+                            headList.Add("<!-- '" & encodeHTML(asset.content & "' added by " & asset.addedByMessage) & " -->")
+                        End If
+                    End If
+                    headList.Add(asset.content)
+                Next
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return String.Join(cr, headList)
         End Function
     End Class
 End Namespace

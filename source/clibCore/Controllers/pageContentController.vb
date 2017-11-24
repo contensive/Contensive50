@@ -93,7 +93,7 @@ Namespace Contensive.Core.Controllers
                     Dim AllowCookieTest As Boolean
                     AllowCookieTest = cpCore.siteProperties.allowVisitTracking And (cpCore.doc.authContext.visit.PageVisits = 1)
                     If AllowCookieTest Then
-                        Call cpCore.html.addScript_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.doc.authContext.visit.id, cpCore.doc.profileStartTime) & "')};", "Cookie Test")
+                        Call cpCore.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.doc.authContext.visit.id, cpCore.doc.profileStartTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -140,7 +140,7 @@ Namespace Contensive.Core.Controllers
                     If (cpCore.doc.redirectContentID <> 0) Then
                         cpCore.doc.redirectRecordID = (cpCore.docProperties.getInteger(rnRedirectRecordId))
                         If (cpCore.doc.redirectRecordID <> 0) Then
-                            Dim contentName As String = models.complex.cdefmodel.getContentNameByID(cpcore,cpCore.doc.redirectContentID)
+                            Dim contentName As String = Models.Complex.cdefModel.getContentNameByID(cpCore, cpCore.doc.redirectContentID)
                             If contentName <> "" Then
                                 If iisController.main_RedirectByRecord_ReturnStatus(cpCore, contentName, cpCore.doc.redirectRecordID) Then
                                     '
@@ -181,7 +181,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' -- and go
                                     Dim link As String = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, file.Filename)
-                                    Call cpCore.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
+                                    Return cpCore.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.")
                                 End If
                             End If
                             '
@@ -211,7 +211,7 @@ Namespace Contensive.Core.Controllers
                         Call cpCore.visitProperty.setProperty("Clipboard", "")
                         Call genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNamePasteParentContentID, "")
                         Call genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNamePasteParentRecordID, "")
-                        ClipParentContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ClipParentContentID)
+                        ClipParentContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ClipParentContentID)
                         If (ClipParentContentName = "") Then
                             ' state not working...
                         ElseIf (ClipBoard = "") Then
@@ -239,7 +239,7 @@ Namespace Contensive.Core.Controllers
                                             '
                                             ' the content definition relationship is OK between the child and parent record
                                             '
-                                            ClipChildContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ClipChildContentID)
+                                            ClipChildContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ClipChildContentID)
                                             If Not ClipChildContentName <> "" Then
                                                 Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data content is undefined.")
                                             Else
@@ -521,13 +521,12 @@ Namespace Contensive.Core.Controllers
                                     ' -- block with custom content
                                     cpCore.doc.continueProcessing = False
                                     Call cpCore.doc.setMetaContent(0, 0)
-                                    Call cpCore.html.addScript_onLoad("document.body.style.overflow='scroll'", "Anonymous User Block")
+                                    Call cpCore.html.addScriptCode_onLoad("document.body.style.overflow='scroll'", "Anonymous User Block")
                                     Return cpCore.html.getHtmlDoc(
                                         cr & cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.doc.authContext.user.id, True, cpCore.doc.authContext.isAuthenticated),
                                         TemplateDefaultBodyTag,
                                         True,
-                                        True,
-                                        False
+                                        True
                                     )
                             End Select
                         End If
@@ -676,7 +675,7 @@ Namespace Contensive.Core.Controllers
                                     linkDst = linkDst & "?" & main_ServerReferrerQs
                                 End If
                             End If
-                            Call cpCore.webServer.redirect(linkDst, Copy, False)
+                            Return cpCore.webServer.redirect(linkDst, Copy)
                             cpCore.doc.continueProcessing = False '--- should be disposed by caller --- Call dispose
                         End If
                     End If
@@ -759,11 +758,11 @@ Namespace Contensive.Core.Controllers
                     ' Load the instructions
                     '
                     f = loadFormPageInstructions(cpcore, FormInstructions, Formhtml)
-                    If f.AuthenticateOnFormProcess And Not cpCore.doc.authContext.isAuthenticated() And cpCore.doc.authContext.isRecognized(cpcore) Then
+                    If f.AuthenticateOnFormProcess And Not cpcore.doc.authContext.isAuthenticated() And cpcore.doc.authContext.isRecognized(cpcore) Then
                         '
                         ' If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                         '
-                        Call cpCore.doc.authContext.logout(cpcore)
+                        Call cpcore.doc.authContext.logout(cpcore)
                     End If
                     CSPeople = -1
                     Success = True
@@ -1058,7 +1057,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' Group main_MemberShip
                             '
-                            GroupValue = cpCore.doc.authContext.IsMemberOfGroup2(cpcore, .GroupName)
+                            GroupValue = cpcore.doc.authContext.IsMemberOfGroup2(cpcore, .GroupName)
                             Body = f.RepeatCell
                             Body = genericController.vbReplace(Body, "{{CAPTION}}", cpcore.html.html_GetFormInputCheckBox2("Group" & .GroupName, GroupValue), 1, 99, vbTextCompare)
                             Body = genericController.vbReplace(Body, "{{FIELD}}", .Caption)
@@ -1080,7 +1079,7 @@ Namespace Contensive.Core.Controllers
             & errorController.error_GetUserError(cpcore) _
             & cpcore.html.html_GetUploadFormStart() _
             & cpcore.html.html_GetFormInputHidden("ContensiveFormPageID", FormPageID) _
-            & cpcore.html.html_GetFormInputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpCore.doc.profileStartTime)) _
+            & cpcore.html.html_GetFormInputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpcore.doc.profileStartTime)) _
             & f.PreRepeat _
             & RepeatBody _
             & f.PostRepeat _
@@ -1361,13 +1360,6 @@ ErrorTrap:
                             '
                             returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, layoutError)
                             returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
-                        ElseIf cpCore.doc.isPrintVersion Then
-                            '
-                            ' Printer Version -> personalize and count viewings, no tracking
-                            '
-                            returnHtml = cpCore.html.executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, layoutError)
-                            returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage)
-                            Call cpCore.db.executeQuery("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpCore.doc.page.id)
                         Else
                             '
                             ' Live content
@@ -1489,12 +1481,12 @@ ErrorTrap:
                     ' ----- Store page javascript
                     '---------------------------------------------------------------------------------
                     '
-                    Call cpCore.html.addScript_onLoad(cpCore.doc.page.JSOnLoad, "page content")
-                    Call cpCore.html.addScriptCode_Head(cpCore.doc.page.JSHead, "page content")
+                    Call cpCore.html.addScriptCode_onLoad(cpCore.doc.page.JSOnLoad, "page content")
+                    Call cpCore.html.addScriptCode_head(cpCore.doc.page.JSHead, "page content")
                     If cpCore.doc.page.JSFilename <> "" Then
                         Call cpCore.html.addScriptLink_Head(genericController.getCdnFileLink(cpCore, cpCore.doc.page.JSFilename), "page content")
                     End If
-                    Call cpCore.html.addScriptCode_Body(cpCore.doc.page.JSEndBody, "page content")
+                    Call cpCore.html.addScriptCode_body(cpCore.doc.page.JSEndBody, "page content")
                     '
                     '---------------------------------------------------------------------------------
                     ' Set the Meta Content flag
@@ -1529,15 +1521,11 @@ ErrorTrap:
                     returnHtml = cpCore.doc.bodyContent
                     '
                 End If
-                If cpCore.doc.htmlMetaContent_Title = "" Then
-                    '
-                    ' Set default page title
-                    '
-                    cpCore.doc.htmlMetaContent_Title = cpCore.doc.page.name
-                End If
                 '
-                ' add contentid and sectionid
+                ' -- title
+                cpCore.html.addTitle(cpCore.doc.page.name)
                 '
+                ' -- add contentid and sectionid
                 Call cpCore.html.addHeadTag("<meta name=""contentId"" content=""" & cpCore.doc.page.id & """ >", "page content")
                 '
                 ' Display Admin Warnings with Edits for record errors
@@ -1631,7 +1619,7 @@ ErrorTrap:
                 Dim BreadCrumbPrefix As String
                 Dim isRootPage As Boolean = cpcore.doc.pageToRootList.Count.Equals(1)
                 '
-                If allowReturnLinkComposite And (Not isRootPage) And (Not cpcore.doc.isPrintVersion) Then
+                If allowReturnLinkComposite And (Not isRootPage) Then
                     '
                     ' ----- Print Heading if not at root Page
                     '
@@ -1644,9 +1632,9 @@ ErrorTrap:
                 End If
                 result = result & breadCrumb
                 '
-                If (Not cpcore.doc.isPrintVersion) Then
+                If (True) Then
                     Dim IconRow As String = ""
-                    If (Not cpCore.doc.authContext.visit.Bot) And (cpcore.doc.page.AllowPrinterVersion Or cpcore.doc.page.AllowEmailPage) Then
+                    If (Not cpcore.doc.authContext.visit.Bot) And (cpcore.doc.page.AllowPrinterVersion Or cpcore.doc.page.AllowEmailPage) Then
                         '
                         ' not a bot, and either print or email allowed
                         '
@@ -1754,7 +1742,7 @@ ErrorTrap:
                 End If
                 '
                 ' ----- Feedback
-                If (Not cpcore.doc.isPrintVersion) And (cpcore.doc.page.ContactMemberID <> 0) And cpcore.doc.page.AllowFeedback Then
+                If (cpcore.doc.page.ContactMemberID <> 0) And cpcore.doc.page.AllowFeedback Then
                     result = result & cr & "<ac TYPE=""" & ACTypeFeedback & """>"
                 End If
                 '
@@ -2084,11 +2072,8 @@ ErrorTrap:
                     '
                     ' ----- Encode Template
                     '
-                    If Not cpCore.doc.isPrintVersion Then
-                        LocalTemplateBody = cpCore.html.executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, layoutError)
-                        returnBody = returnBody & cpCore.html.convertActiveContentToHtmlForWebRender(LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate)
-                        'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
-                    End If
+                    LocalTemplateBody = cpCore.html.executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, layoutError)
+                    returnBody = returnBody & cpCore.html.convertActiveContentToHtmlForWebRender(LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate)
                     '
                     ' If Content was not found, add it to the end
                     '
@@ -2285,7 +2270,7 @@ ErrorTrap:
                 '------------------------------------------------------------------------------------
                 '
                 If cpCore.doc.redirectLink <> "" Then
-                    Call cpCore.webServer.redirect(cpCore.doc.redirectLink, cpCore.doc.redirectReason, cpCore.doc.redirectBecausePageNotFound)
+                    Return cpCore.webServer.redirect(cpCore.doc.redirectLink, cpCore.doc.redirectReason, cpCore.doc.redirectBecausePageNotFound)
                 ElseIf AllowEditWrapper Then
                     returnHtml = cpCore.html.getEditWrapper("Page Content", returnHtml)
                 End If

@@ -1928,12 +1928,26 @@ Namespace Contensive.Core
             Dim CurrentValue As String
         End Structure
         '
-        ' block of js code that goes into a script tag
+        ' -- htmlAssetTypes
+        Public Enum htmlAssetTypeEnum
+            script          ' -- script at end of body (code or link)
+            style           ' -- css style at end of body (code or link)
+            OnLoadScript    ' -- special case, text is assumed to be script to run on load
+        End Enum
         '
-        Public Structure scriptAssetClass
-            Dim IsLink As Boolean
-            Dim Text As String
-            Dim addedByMessage As String
+        ' -- assets to be added to the head section (and end-of-body) of html documents
+        Public Structure htmlAssetClass
+            Dim assetType As htmlAssetTypeEnum  ' the type of asset
+            Dim inHead As Boolean               ' if true, asset goes in head else it goes at end of body
+            Dim isLink As Boolean               ' asset is a link, else it is content
+            Dim content As String               ' either link or content
+            Dim addedByMessage As String        ' message used during debug to show where the asset came from 
+        End Structure
+        '
+        ' -- metaDescription
+        Public Structure htmlMetaClass
+            Dim content As String               ' the description, title, etc.
+            Dim addedByMessage As String        ' message used during debug to show where the asset came from 
         End Structure
 
     End Module
