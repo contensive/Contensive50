@@ -797,17 +797,17 @@ Namespace Contensive.Core.Controllers
                                 ' execute an add-on
                                 '
                                 addonName = ""
-                                ArgInstanceId = ""
-                                ArgGuid = ""
+                                'ArgInstanceId = ""
+                                'ArgGuid = ""
                                 Dim addonArgDict As New Dictionary(Of String, String)
                                 For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
                                     Select Case kvp.Key.ToLower()
                                         Case "addon"
                                             addonName = kvp.Value.ToString()
-                                        Case "instanceid"
-                                            ArgInstanceId = kvp.Value.ToString()
-                                        Case "guid"
-                                            ArgGuid = kvp.Value.ToString()
+                                            'Case "instanceid"
+                                            '    ArgInstanceId = kvp.Value.ToString()
+                                            'Case "guid"
+                                            '    ArgGuid = kvp.Value.ToString()
                                         Case Else
                                             addonArgDict.Add(kvp.Key, kvp.Value.ToString())
                                             'ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
@@ -841,15 +841,15 @@ Namespace Contensive.Core.Controllers
                                 ' execute an add-on
                                 '
                                 addonName = cmdText
-                                ArgInstanceId = ""
-                                ArgGuid = ""
+                                'ArgInstanceId = ""
+                                'ArgGuid = ""
                                 Dim addonArgDict As New Dictionary(Of String, String)
                                 For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
                                     Select Case kvp.Key.ToLower()
-                                        Case "instanceid"
-                                            ArgInstanceId = kvp.Value.ToString()
-                                        Case "guid"
-                                            ArgGuid = kvp.Value.ToString()
+                                        'Case "instanceid"
+                                        '    ArgInstanceId = kvp.Value.ToString()
+                                        'Case "guid"
+                                        '    ArgGuid = kvp.Value.ToString()
                                         Case Else
                                             addonArgDict.Add(kvp.Key, kvp.Value.ToString())
                                             'ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))

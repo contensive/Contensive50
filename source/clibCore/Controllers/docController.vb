@@ -2720,23 +2720,30 @@ ErrorTrap:
             '
             ' Process Addons marked to trigger a process call on content change
             '
-            'hint = hint & ",190"
-            If True Then
-                'hint = hint & ",200 content=[" & ContentID & "]"
-                CS = cpcore.db.csOpen("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
+            CS = cpcore.db.csOpen("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
+            If (IsDelete) Then
+                Option_String = "" _
+                    & vbCrLf & "action=contentdelete" _
+                    & vbCrLf & "contentid=" & ContentID _
+                    & vbCrLf & "recordid=" & RecordID _
+                    & ""
+            Else
                 Option_String = "" _
                     & vbCrLf & "action=contentchange" _
                     & vbCrLf & "contentid=" & ContentID _
                     & vbCrLf & "recordid=" & RecordID _
                     & ""
-                Do While cpcore.db.csOk(CS)
-                    addonId = cpcore.db.csGetInteger(CS, "Addonid")
-                    'hint = hint & ",210 addonid=[" & addonId & "]"
-                    Call cpcore.addon.executeAddonAsProcess(CStr(addonId), Option_String)
-                    Call cpcore.db.csGoNext(CS)
-                Loop
-                Call cpcore.db.csClose(CS)
             End If
+            Do While cpcore.db.csOk(CS)
+                addonId = cpcore.db.csGetInteger(CS, "Addonid")
+                'hint = hint & ",210 addonid=[" & addonId & "]"
+                Call cpcore.addon.executeAddonAsProcess(CStr(addonId), Option_String)
+                Call cpcore.db.csGoNext(CS)
+            Loop
+            Call cpcore.db.csClose(CS)
+            '
+            ' -- ok, temp work-around for the damn cache not invalidating correctly -- the nuclear solution
+            cpcore.cache.invalidateAll()
         End Sub
         '
         Public Sub markRecordReviewed(ContentName As String, RecordID As Integer)

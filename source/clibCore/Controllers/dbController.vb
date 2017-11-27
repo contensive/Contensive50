@@ -2558,8 +2558,7 @@ Namespace Contensive.Core.Controllers
                                                     LookupList = field.lookupList
                                                     If (LookupContentName <> "") Then
                                                         '
-                                                        ' First try Lookup Content
-                                                        '
+                                                        ' -- First try Lookup Content
                                                         CSLookup = csOpen(LookupContentName, "ID=" & encodeSQLNumber(genericController.EncodeInteger(FieldValueVariant)), , , , , , "name", 1)
                                                         If csOk(CSLookup) Then
                                                             fieldValue = csGetText(CSLookup, "name")
@@ -2567,12 +2566,13 @@ Namespace Contensive.Core.Controllers
                                                         Call csClose(CSLookup)
                                                     ElseIf LookupList <> "" Then
                                                         '
-                                                        ' Next try lookup list
-                                                        '
+                                                        ' -- Next try lookup list
                                                         FieldValueInteger = genericController.EncodeInteger(FieldValueVariant) - 1
-                                                        lookups = Split(LookupList, ",")
-                                                        If UBound(lookups) >= FieldValueInteger Then
-                                                            fieldValue = lookups(FieldValueInteger)
+                                                        If (FieldValueInteger >= 0) Then
+                                                            lookups = Split(LookupList, ",")
+                                                            If UBound(lookups) >= FieldValueInteger Then
+                                                                fieldValue = lookups(FieldValueInteger)
+                                                            End If
                                                         End If
                                                     End If
                                                 End If

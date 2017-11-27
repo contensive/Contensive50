@@ -817,7 +817,7 @@ Namespace Contensive.Core
                                     ' If another xml files shows up, and process OK it will cover this error
                                     '
                                     'hint = hint & ",330"
-                                    return_ErrorMessage = "<p>There was a problem installing the Collection File [" & tmpInstallPath & Filename & "].</p>"
+                                    return_ErrorMessage = "There was a problem installing the Collection File [" & tmpInstallPath & Filename & "]. The error reported was [" & ex.Message & "]."
                                     Call logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, error reading collection [" & collectionPathFilename & "]")
                                     'StatusOK = False
                                     loadOk = False

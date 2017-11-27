@@ -8862,8 +8862,8 @@ ErrorTrap:
                 End If
                 '
                 If (cpCore.doc.htmlAssetList.Count > 0) Then
-                    Dim styleList As New List(Of String)
                     Dim scriptList As New List(Of String)
+                    Dim styleList As New List(Of String)
                     For Each asset In cpCore.doc.htmlAssetList.FindAll(Function(item As htmlAssetClass) (item.inHead))
                         If (cpCore.doc.allowDebugLog) Then
                             If (cpCore.doc.visitPropertyAllowDebugging) And (Not String.IsNullOrEmpty(asset.addedByMessage)) Then
@@ -8872,16 +8872,16 @@ ErrorTrap:
                         End If
                         If asset.assetType.Equals(htmlAssetTypeEnum.style) Then
                             If asset.isLink Then
-                                scriptList.Add("<link rel=""stylesheet"" type=""text/css"" href=""" & asset.content & """ >")
+                                styleList.Add("<link rel=""stylesheet"" type=""text/css"" href=""" & asset.content & """ >")
                             Else
-                                scriptList.Add("<style>" & asset.content & "</style>")
+                                styleList.Add("<style>" & asset.content & "</style>")
                             End If
                         ElseIf asset.assetType.Equals(htmlAssetTypeEnum.script) Then
 
                             If asset.isLink Then
-                                styleList.Add("<script type=""text/javascript"" src=""" & asset.content & """></script>")
+                                scriptList.Add("<script type=""text/javascript"" src=""" & asset.content & """></script>")
                             Else
-                                styleList.Add("<script type=""text/javascript"">" & asset.content & "</script>")
+                                scriptList.Add("<script type=""text/javascript"">" & asset.content & "</script>")
                             End If
                         End If
                     Next

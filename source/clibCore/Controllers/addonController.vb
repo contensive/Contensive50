@@ -86,7 +86,12 @@ Namespace Contensive.Core.Controllers
                     If addonIncludeRules.Count > 0 Then
                         For Each addonRule As Models.Entity.addonIncludeRuleModel In addonIncludeRules
                             If addonRule.IncludedAddonID > 0 Then
-                                result &= executeDependency(Models.Entity.addonModel.create(cpCore, addonRule.IncludedAddonID), executeContext)
+                                Dim dependentAddon As addonModel = addonModel.create(cpCore, addonRule.IncludedAddonID)
+                                If (dependentAddon Is Nothing) Then
+                                    cpCore.handleException(New ApplicationException("Addon not found. An included addon of [" & addon.name & "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" & addon.name & "] or manually correct the included addon selection."))
+                                Else
+                                    result &= executeDependency(dependentAddon, executeContext)
+                                End If
                             End If
                         Next
                     End If

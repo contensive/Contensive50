@@ -383,8 +383,8 @@ Namespace Contensive.Addons.AdminSite
                                 'ContentCell = cpCore.addon.execute_legacy4(AddonGuidPreferences, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                             Case AdminFormClearCache
                                 ContentCell = GetForm_ClearCache()
-                            Case AdminFormEDGControl
-                                ContentCell = GetForm_StaticPublishControl()
+                            'Case AdminFormEDGControl
+                            '    ContentCell = GetForm_StaticPublishControl()
                             Case AdminFormSpiderControl
                                 ContentCell = cpCore.addon.execute(addonModel.createByName(cpCore, "Content Spider Control"), New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {.addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, .errorCaption = "Content Spider Control"})
                                 'ContentCell = cpCore.addon.execute_legacy4("Content Spider Control", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
@@ -513,9 +513,11 @@ Namespace Contensive.Addons.AdminSite
                     Call Stream.Add(cr & GetForm_Top())
                     Call Stream.Add(genericController.htmlIndent(ContentCell))
                     Call Stream.Add(cr & AdminFormBottom)
-                    Call Stream.Add(cr & "<script language=""javascript1.2"" type=""text/javascript"">" & JavaScriptString)
-                    Call Stream.Add(cr & "ButtonObjectCount = " & ButtonObjectCount & ";")
-                    Call Stream.Add(cr & "</script>")
+                    'Call Stream.Add(cr & "<script language=""javascript1.2"" type=""text/javascript"">" & JavaScriptString)
+                    'Call Stream.Add(cr & "ButtonObjectCount = " & ButtonObjectCount & ";")
+                    'Call Stream.Add(cr & "</script>")
+                    JavaScriptString &= cr & "ButtonObjectCount = " & ButtonObjectCount & ";"
+                    cpCore.html.addScriptCode_body(JavaScriptString, "Admin Site")
                 End If
                 result = errorController.getDocExceptionHtmlList(cpCore) & Stream.Text
             Catch ex As Exception
@@ -2493,23 +2495,8 @@ ErrorTrap:
                                                     '   then cannot fixgure out how to remove it
                                                     '
                                                     ResponseFieldValueText = cpCore.html.convertEditorResponseToActiveContent(ResponseFieldValueText)
-                                                    ResponseFieldValueText = genericController.vbLCase(genericController.encodeText(ResponseFieldValueText))
-                                                    If Len(ResponseFieldValueText) < 20 Then
-                                                        HasInput = (InStr(1, ResponseFieldValueText, "<input ") <> 0)
-                                                        If Not HasInput Then
-                                                            HasImg = (InStr(1, ResponseFieldValueText, "<img ") <> 0)
-                                                            If Not HasImg Then
-                                                                HasAC = (InStr(1, ResponseFieldValueText, "<ac ") <> 0)
-                                                                If Not HasAC Then
-                                                                    HTMLDecode = New htmlToTextControllers(cpCore)
-                                                                    Copy = Trim(HTMLDecode.convert(genericController.encodeText(ResponseFieldValueText)))
-                                                                    If Copy = "" Then
-                                                                        ResponseFieldValueText = ""
-                                                                    End If
-                                                                    HTMLDecode = Nothing
-                                                                End If
-                                                            End If
-                                                        End If
+                                                    If (String.IsNullOrEmpty(ResponseFieldValueText.ToLower().Replace(" "c, "").Replace("&nbsp;", ""))) Then
+                                                        ResponseFieldValueText = String.Empty
                                                     End If
                                                 End If
                                             End If
@@ -4324,228 +4311,228 @@ ErrorTrap:
         '    Call HandleClassTrapErrorBubble("PrintDHTMLEditForm")
         '    '
         'End Function
-        '
-        '========================================================================
-        ' Print the DHTMLEdit form
-        '========================================================================
-        '
-        Private Function GetForm_StaticPublishControl() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "GetForm_StaticPublishControl")
-            '
-            Dim WhereCount As Integer
-            Dim Content As New stringBuilderLegacyController
-            Dim EDGPublishNow As Boolean
-            Dim Activity As String
-            Dim TargetDomain As String
-            Dim EDGCreateSnapShot As Boolean
-            Dim EDGPublishToProduction As Boolean
-            Dim CSPointer As Integer
-            Dim Copy As String
-            Dim StagingServer As String
-            Dim PagesFound As Integer
-            Dim PagesComplete As Integer
-            Dim SQL As String
-            Dim Button As String
-            Dim EDGAuthUsername As String
-            Dim EDGAuthPassword As String
-            Dim QueryString As String
-            Dim Adminui As New adminUIController(cpCore)
-            Dim Description As String
-            Dim ButtonList As String = ""
-            '
-            Button = cpCore.docProperties.getText(RequestNameButton)
-            If Button = ButtonCancel Then
-                '
-                '
-                '
-                Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "StaticPublishControl, Cancel Button Pressed")
-            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
-                '
-                '
-                '
-                ButtonList = ButtonCancel
-                Content.Add(Adminui.GetFormBodyAdminOnly())
-            Else
-                Content.Add(Adminui.EditTableOpen)
-                '
-                ' Set defaults
-                '
-                EDGCreateSnapShot = (cpCore.siteProperties.getBoolean("EDGCreateSnapShot", True))
-                EDGPublishToProduction = (cpCore.siteProperties.getBoolean("EDGPublishToProduction", True))
-                EDGPublishNow = (cpCore.siteProperties.getBoolean("EDGPublishNow"))
-                EDGAuthUsername = cpCore.siteProperties.getText("EDGAuthUsername", "")
-                EDGAuthPassword = cpCore.siteProperties.getText("EDGAuthPassword", "")
-                '
-                ' Process Requests
-                '
-                Select Case Button
-                    Case ButtonBegin
-                        '
-                        ' Save form values
-                        '
-                        EDGAuthUsername = cpCore.docProperties.getText("EDGAuthUsername")
-                        Call cpCore.siteProperties.setProperty("EDGAuthUsername", EDGAuthUsername)
-                        '
-                        EDGAuthPassword = cpCore.docProperties.getText("EDGAuthPassword")
-                        Call cpCore.siteProperties.setProperty("EDGAuthPassword", EDGAuthPassword)
-                        '
-                        EDGCreateSnapShot = cpCore.docProperties.getBoolean("EDGCreateSnapShot")
-                        Call cpCore.siteProperties.setProperty("EDGCreateSnapShot", genericController.encodeText(EDGCreateSnapShot))
-                        '
-                        EDGPublishToProduction = cpCore.docProperties.getBoolean("EDGPublishToProduction")
-                        Call cpCore.siteProperties.setProperty("EDGPublishToProduction", genericController.encodeText(EDGPublishToProduction))
-                        '
-                        ' Begin Publish
-                        '
-                        EDGPublishNow = (EDGCreateSnapShot Or EDGPublishToProduction)
-                        Call cpCore.siteProperties.setProperty("EDGPublishNow", genericController.encodeText(EDGPublishNow))
-                    Case ButtonAbort
-                        '
-                        ' Abort Publish
-                        '
-                        EDGPublishNow = False
-                        Call cpCore.siteProperties.setProperty("EDGPublishNow", genericController.encodeText(EDGPublishNow))
-                    Case ButtonRefresh
-                        '
-                        ' Refresh (no action)
-                        '
-                End Select
-                '
-                ' ----- Status
-                '
-                If EDGPublishNow Then
-                    Copy = "Started"
-                Else
-                    Copy = "Stopped"
-                End If
-                Call Content.Add(Adminui.GetEditRow(Copy, "Status", "", False, False, ""))
-                '
-                ' ----- activity
-                '
-                Copy = genericController.encodeText(cpCore.siteProperties.getText("EDGPublishStatus", "Waiting"))
-                Call Content.Add(Adminui.GetEditRow(Copy, "Activity", "", False, False, ""))
-                '
-                ' ----- Pages Found
-                '
-                Copy = "n/a"
-                SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs;"
-                CSPointer = cpCore.db.csOpenSql_rev("Default", SQL)
-                If cpCore.db.csOk(CSPointer) Then
-                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
-                End If
-                Call cpCore.db.csClose(CSPointer)
-                Call Content.Add(Adminui.GetEditRow(Copy, "Links Found", "", False, False, ""))
-                '
-                ' ----- Pages Complete
-                '
-                Copy = "n/a"
-                SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1);"
-                CSPointer = cpCore.db.csOpenSql_rev("Default", SQL)
-                If cpCore.db.csOk(CSPointer) Then
-                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
-                End If
-                Call cpCore.db.csClose(CSPointer)
-                Call Content.Add(Adminui.GetEditRow(Copy, "Pages Complete", "", False, False, ""))
-                '
-                ' ----- Bad Links
-                '
-                Copy = "n/a"
-                QueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
-                QueryString = genericController.ModifyQueryString(QueryString, RequestNameReportForm, ReportFormEDGDocErrors, True)
-                SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1) And (LinkAlias Is Not null) And ((HTTPResponse Is null) Or ((Not (HTTPResponse Like '% 200 %'))and (not (HTTPResponse like '% 302 %'))));"
-                CSPointer = cpCore.db.csOpenSql_rev("Default", SQL)
-                If cpCore.db.csOk(CSPointer) Then
-                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
-                End If
-                Call cpCore.db.csClose(CSPointer)
-                Call Content.Add(Adminui.GetEditRow("<a href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
-                '
-                ' ----- Options
-                '
+        '        '
+        '        '========================================================================
+        '        ' Print the DHTMLEdit form
+        '        '========================================================================
+        '        '
+        '        Private Function GetForm_StaticPublishControl() As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "GetForm_StaticPublishControl")
+        '            '
+        '            Dim WhereCount As Integer
+        '            Dim Content As New stringBuilderLegacyController
+        '            Dim EDGPublishNow As Boolean
+        '            Dim Activity As String
+        '            Dim TargetDomain As String
+        '            Dim EDGCreateSnapShot As Boolean
+        '            Dim EDGPublishToProduction As Boolean
+        '            Dim CSPointer As Integer
+        '            Dim Copy As String
+        '            Dim StagingServer As String
+        '            Dim PagesFound As Integer
+        '            Dim PagesComplete As Integer
+        '            Dim SQL As String
+        '            Dim Button As String
+        '            Dim EDGAuthUsername As String
+        '            Dim EDGAuthPassword As String
+        '            Dim QueryString As String
+        '            Dim Adminui As New adminUIController(cpCore)
+        '            Dim Description As String
+        '            Dim ButtonList As String = ""
+        '            '
+        '            Button = cpCore.docProperties.getText(RequestNameButton)
+        '            If Button = ButtonCancel Then
+        '                '
+        '                '
+        '                '
+        '                Return cpCore.webServer.redirect("/" & cpCore.serverConfig.appConfig.adminRoute, "StaticPublishControl, Cancel Button Pressed")
+        '            ElseIf Not cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
+        '                '
+        '                '
+        '                '
+        '                ButtonList = ButtonCancel
+        '                Content.Add(Adminui.GetFormBodyAdminOnly())
+        '            Else
+        '                Content.Add(Adminui.EditTableOpen)
+        '                '
+        '                ' Set defaults
+        '                '
+        '                EDGCreateSnapShot = (cpCore.siteProperties.getBoolean("EDGCreateSnapShot", True))
+        '                EDGPublishToProduction = (cpCore.siteProperties.getBoolean("EDGPublishToProduction", True))
+        '                EDGPublishNow = (cpCore.siteProperties.getBoolean("EDGPublishNow"))
+        '                EDGAuthUsername = cpCore.siteProperties.getText("EDGAuthUsername", "")
+        '                EDGAuthPassword = cpCore.siteProperties.getText("EDGAuthPassword", "")
+        '                '
+        '                ' Process Requests
+        '                '
+        '                Select Case Button
+        '                    Case ButtonBegin
+        '                        '
+        '                        ' Save form values
+        '                        '
+        '                        EDGAuthUsername = cpCore.docProperties.getText("EDGAuthUsername")
+        '                        Call cpCore.siteProperties.setProperty("EDGAuthUsername", EDGAuthUsername)
+        '                        '
+        '                        EDGAuthPassword = cpCore.docProperties.getText("EDGAuthPassword")
+        '                        Call cpCore.siteProperties.setProperty("EDGAuthPassword", EDGAuthPassword)
+        '                        '
+        '                        EDGCreateSnapShot = cpCore.docProperties.getBoolean("EDGCreateSnapShot")
+        '                        Call cpCore.siteProperties.setProperty("EDGCreateSnapShot", genericController.encodeText(EDGCreateSnapShot))
+        '                        '
+        '                        EDGPublishToProduction = cpCore.docProperties.getBoolean("EDGPublishToProduction")
+        '                        Call cpCore.siteProperties.setProperty("EDGPublishToProduction", genericController.encodeText(EDGPublishToProduction))
+        '                        '
+        '                        ' Begin Publish
+        '                        '
+        '                        EDGPublishNow = (EDGCreateSnapShot Or EDGPublishToProduction)
+        '                        Call cpCore.siteProperties.setProperty("EDGPublishNow", genericController.encodeText(EDGPublishNow))
+        '                    Case ButtonAbort
+        '                        '
+        '                        ' Abort Publish
+        '                        '
+        '                        EDGPublishNow = False
+        '                        Call cpCore.siteProperties.setProperty("EDGPublishNow", genericController.encodeText(EDGPublishNow))
+        '                    Case ButtonRefresh
+        '                        '
+        '                        ' Refresh (no action)
+        '                        '
+        '                End Select
+        '                '
+        '                ' ----- Status
+        '                '
+        '                If EDGPublishNow Then
+        '                    Copy = "Started"
+        '                Else
+        '                    Copy = "Stopped"
+        '                End If
+        '                Call Content.Add(Adminui.GetEditRow(Copy, "Status", "", False, False, ""))
+        '                '
+        '                ' ----- activity
+        '                '
+        '                Copy = genericController.encodeText(cpCore.siteProperties.getText("EDGPublishStatus", "Waiting"))
+        '                Call Content.Add(Adminui.GetEditRow(Copy, "Activity", "", False, False, ""))
+        '                '
+        '                ' ----- Pages Found
+        '                '
+        '                Copy = "n/a"
+        '                SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs;"
+        '                CSPointer = cpCore.db.csOpenSql_rev("Default", SQL)
+        '                If cpCore.db.csOk(CSPointer) Then
+        '                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
+        '                End If
+        '                Call cpCore.db.csClose(CSPointer)
+        '                Call Content.Add(Adminui.GetEditRow(Copy, "Links Found", "", False, False, ""))
+        '                '
+        '                ' ----- Pages Complete
+        '                '
+        '                Copy = "n/a"
+        '                SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1);"
+        '                CSPointer = cpCore.db.csOpenSql_rev("Default", SQL)
+        '                If cpCore.db.csOk(CSPointer) Then
+        '                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
+        '                End If
+        '                Call cpCore.db.csClose(CSPointer)
+        '                Call Content.Add(Adminui.GetEditRow(Copy, "Pages Complete", "", False, False, ""))
+        '                '
+        '                ' ----- Bad Links
+        '                '
+        '                Copy = "n/a"
+        '                QueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
+        '                QueryString = genericController.ModifyQueryString(QueryString, RequestNameReportForm, ReportFormEDGDocErrors, True)
+        '                SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1) And (LinkAlias Is Not null) And ((HTTPResponse Is null) Or ((Not (HTTPResponse Like '% 200 %'))and (not (HTTPResponse like '% 302 %'))));"
+        '                CSPointer = cpCore.db.csOpenSql_rev("Default", SQL)
+        '                If cpCore.db.csOk(CSPointer) Then
+        '                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
+        '                End If
+        '                Call cpCore.db.csClose(CSPointer)
+        '                Call Content.Add(Adminui.GetEditRow("<a href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
+        '                '
+        '                ' ----- Options
+        '                '
 
-                'Content.Add( "<tr><td align=""right"">" & SpanClassAdminSmall & "Options</span></td>")
-                If EDGPublishNow Then
-                    '
-                    ' Publishing
-                    '
-                    Call Content.Add(Adminui.GetEditRow(genericController.main_GetYesNo(EDGCreateSnapShot), "Create Staging Snap-Shot", "", False, False, ""))
-                    Call Content.Add(Adminui.GetEditRow(genericController.main_GetYesNo(EDGPublishToProduction), "Publish Snap-Shot to Production", "", False, False, ""))
-                Else
-                    '
-                    ' Ready
-                    '
-                    Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("EDGCreateSnapShot", EDGCreateSnapShot), "Create Staging Snap-Shot", "", False, False, ""))
-                    Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("EDGPublishToProduction", EDGPublishToProduction), "Publish Snap-Shot to Production", "", False, False, ""))
-                End If
-                '
-                ' Username
-                '
-                Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputText2("EDGAuthUsername", EDGAuthUsername), "Username", "", False, False, ""))
-                '
-                ' Password
-                '
-                Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputText2("EDGAuthPassword", EDGAuthPassword), "Password", "", False, False, ""))
-                '
-                ' Seed Documents
-                '
-                Copy = ""
-                CSPointer = cpCore.db.csOpen("EDG Publish Seeds")
-                Do While cpCore.db.csOk(CSPointer)
-                    If Copy <> "" Then
-                        Copy = Copy & "<br>"
-                    End If
-                    Copy = Copy & cpCore.db.csGetRecordEditLink(CSPointer) & cpCore.db.csGet(CSPointer, "Name")
-                    cpCore.db.csGoNext(CSPointer)
-                Loop
-                Call cpCore.db.csClose(CSPointer)
-                Copy = Copy & "<br>" & cpCore.html.main_cs_getRecordAddLink(CSPointer)
-                Call Content.Add(Adminui.GetEditRow(Copy, "Seed URLs", "", False, False, ""))
-                '
-                ' Production Servers
-                '
-                Copy = ""
-                CSPointer = cpCore.db.csOpen("EDG Publish Servers")
-                Do While cpCore.db.csOk(CSPointer)
-                    If Copy <> "" Then
-                        Copy = Copy & "<br>"
-                    End If
-                    Copy = Copy & cpCore.db.csGetRecordEditLink(CSPointer) & cpCore.db.csGet(CSPointer, "Name")
-                    cpCore.db.csGoNext(CSPointer)
-                Loop
-                Call cpCore.db.csClose(CSPointer)
-                'If cpCore.visitProperty_AllowEditing Then
-                '    If Copy <> "" Then
-                '        'Copy = Copy & "<br>"
-                '        End If
-                Copy = Copy & "<br>" & cpCore.html.main_cs_getRecordAddLink(CSPointer)
-                '    End If
-                Call Content.Add(Adminui.GetEditRow(Copy, "Production Servers", "", False, False, ""))
-                '
-                ' Buttons
-                '
-                If Not EDGPublishNow Then
-                    ButtonList = ButtonBegin
-                Else
-                    ButtonList = ButtonAbort & "," & ButtonRefresh
-                End If
-                '
-                Content.Add(Adminui.EditTableClose)
-                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEDGControl))
-            End If
-            '
-            Description = "Static Publishing lets you create a completely static version of your website on remote servers. Some dynamic features such as personalization will not work on a static site."
-            GetForm_StaticPublishControl = Adminui.GetBody("Static Publish Control", ButtonList, "", True, True, Description, "", 0, Content.Text)
-            Content = Nothing
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Content = Nothing
-            Call handleLegacyClassError3("PrintDHTMLEditForm")
-            '
-        End Function
+        '                'Content.Add( "<tr><td align=""right"">" & SpanClassAdminSmall & "Options</span></td>")
+        '                If EDGPublishNow Then
+        '                    '
+        '                    ' Publishing
+        '                    '
+        '                    Call Content.Add(Adminui.GetEditRow(genericController.main_GetYesNo(EDGCreateSnapShot), "Create Staging Snap-Shot", "", False, False, ""))
+        '                    Call Content.Add(Adminui.GetEditRow(genericController.main_GetYesNo(EDGPublishToProduction), "Publish Snap-Shot to Production", "", False, False, ""))
+        '                Else
+        '                    '
+        '                    ' Ready
+        '                    '
+        '                    Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("EDGCreateSnapShot", EDGCreateSnapShot), "Create Staging Snap-Shot", "", False, False, ""))
+        '                    Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("EDGPublishToProduction", EDGPublishToProduction), "Publish Snap-Shot to Production", "", False, False, ""))
+        '                End If
+        '                '
+        '                ' Username
+        '                '
+        '                Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputText2("EDGAuthUsername", EDGAuthUsername), "Username", "", False, False, ""))
+        '                '
+        '                ' Password
+        '                '
+        '                Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputText2("EDGAuthPassword", EDGAuthPassword), "Password", "", False, False, ""))
+        '                '
+        '                ' Seed Documents
+        '                '
+        '                Copy = ""
+        '                CSPointer = cpCore.db.csOpen("EDG Publish Seeds")
+        '                Do While cpCore.db.csOk(CSPointer)
+        '                    If Copy <> "" Then
+        '                        Copy = Copy & "<br>"
+        '                    End If
+        '                    Copy = Copy & cpCore.db.csGetRecordEditLink(CSPointer) & cpCore.db.csGet(CSPointer, "Name")
+        '                    cpCore.db.csGoNext(CSPointer)
+        '                Loop
+        '                Call cpCore.db.csClose(CSPointer)
+        '                Copy = Copy & "<br>" & cpCore.html.main_cs_getRecordAddLink(CSPointer)
+        '                Call Content.Add(Adminui.GetEditRow(Copy, "Seed URLs", "", False, False, ""))
+        '                '
+        '                ' Production Servers
+        '                '
+        '                Copy = ""
+        '                CSPointer = cpCore.db.csOpen("EDG Publish Servers")
+        '                Do While cpCore.db.csOk(CSPointer)
+        '                    If Copy <> "" Then
+        '                        Copy = Copy & "<br>"
+        '                    End If
+        '                    Copy = Copy & cpCore.db.csGetRecordEditLink(CSPointer) & cpCore.db.csGet(CSPointer, "Name")
+        '                    cpCore.db.csGoNext(CSPointer)
+        '                Loop
+        '                Call cpCore.db.csClose(CSPointer)
+        '                'If cpCore.visitProperty_AllowEditing Then
+        '                '    If Copy <> "" Then
+        '                '        'Copy = Copy & "<br>"
+        '                '        End If
+        '                Copy = Copy & "<br>" & cpCore.html.main_cs_getRecordAddLink(CSPointer)
+        '                '    End If
+        '                Call Content.Add(Adminui.GetEditRow(Copy, "Production Servers", "", False, False, ""))
+        '                '
+        '                ' Buttons
+        '                '
+        '                If Not EDGPublishNow Then
+        '                    ButtonList = ButtonBegin
+        '                Else
+        '                    ButtonList = ButtonAbort & "," & ButtonRefresh
+        '                End If
+        '                '
+        '                Content.Add(Adminui.EditTableClose)
+        '                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEDGControl))
+        '            End If
+        '            '
+        '            Description = "Static Publishing lets you create a completely static version of your website on remote servers. Some dynamic features such as personalization will not work on a static site."
+        '            GetForm_StaticPublishControl = Adminui.GetBody("Static Publish Control", ButtonList, "", True, True, Description, "", 0, Content.Text)
+        '            Content = Nothing
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Content = Nothing
+        '            Call handleLegacyClassError3("PrintDHTMLEditForm")
+        '            '
+        '        End Function
         '
         '========================================================================
         ' ----- Print the Normal Content Edit form
