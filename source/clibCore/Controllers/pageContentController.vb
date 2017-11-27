@@ -50,8 +50,11 @@ Namespace Contensive.Core.Controllers
                 '
                 If cpCore.doc.continueProcessing Then
                     '
+                    ' -- setup domain
+                    cpCore.doc.domain = Models.Entity.domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
+                    '
                     ' -- load requested page/template
-                    cpCore.doc.loadPage(cpCore.docProperties.getInteger(rnPageId), cpCore.webServer.requestDomain)
+                    cpCore.doc.loadPage(cpCore.docProperties.getInteger(rnPageId), cpCore.doc.domain)
                     '
                     ' -- execute context for included addons
                     Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
@@ -693,7 +696,7 @@ Namespace Contensive.Core.Controllers
                             '
                             Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource)
                             Call cpCore.webServer.setResponseStatus("404 Not Found")
-                            cpCore.docProperties.setProperty(rnPageId, cpCore.doc.main_GetPageNotFoundPageId())
+                            cpCore.docProperties.setProperty(rnPageId, cpCore.doc.getPageNotFoundPageId())
                             'Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
                             If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                                 cpCore.doc.adminWarning = PageNotFoundReason

@@ -168,28 +168,36 @@ Namespace Contensive.Core.Controllers
             tableSchemaDictionary = Nothing
         End Sub
         '
-        Public Sub loadPage(pageId As Integer, Optional domainName As String = "")
+        Public Sub loadPage(requestedPageId As Integer, domain As domainModel)
             Try
-                '
-                ' -- setup domain
-                domain = Models.Entity.domainModel.createByName(cpcore, domainName, New List(Of String))
                 If (domain Is Nothing) Then
                     '
-                    ' -- domain not configured
-                    cpcore.handleException(New ApplicationException("Domain [" & cpcore.webServer.requestDomain & "] has not been configured."))
+                    ' -- domain is not valid
+                    cpcore.handleException(New ApplicationException("Page could not be determined because the domain was not recognized."))
                 Else
-                    If (pageId = 0) Then
-                        '
-                        ' -- Nothing specified, use the Landing Page
-                        pageId = getLandingPageID()
+                    Dim requestedPage As pageContentModel = Nothing
+                    '
+                    ' -- attempt requested page
+                    If (Not requestedPageId.Equals(0)) Then
+                        requestedPage = pageContentModel.create(cpcore, requestedPageId)
+                        If (requestedPage Is Nothing) Then
+                            '
+                            ' -- requested page not found
+                            requestedPage = pageContentModel.create(cpcore, getPageNotFoundPageId())
+                        End If
                     End If
-                    Call cpcore.doc.addRefreshQueryString(rnPageId, CStr(pageId))
+                    If (requestedPage Is Nothing) Then
+                        '
+                        ' -- use the Landing Page
+                        requestedPage = getLandingPage(domain)
+                    End If
+                    Call cpcore.doc.addRefreshQueryString(rnPageId, CStr(requestedPage.id))
                     '
                     ' -- build parentpageList (first = current page, last = root)
                     ' -- add a 0, then repeat until another 0 is found, or there is a repeat
                     pageToRootList = New List(Of Models.Entity.pageContentModel)()
                     Dim usedPageIdList As New List(Of Integer)()
-                    Dim targetPageId = pageId
+                    Dim targetPageId = requestedPage.id
                     usedPageIdList.Add(0)
                     Do While (Not usedPageIdList.Contains(targetPageId))
                         usedPageIdList.Add(targetPageId)
@@ -203,7 +211,12 @@ Namespace Contensive.Core.Controllers
                     Loop
                     If (pageToRootList.Count = 0) Then
                         '
-                        page = New pageContentModel()
+                        ' -- attempt failed, create default page
+                        page = pageContentModel.add(cpcore)
+                        page.name = DefaultNewLandingPageName & ", " & domain.name
+                        page.Copyfilename.content = landingPageDefaultHtml
+                        page.save(cpcore)
+                        pageToRootList.Add(page)
                     Else
                         page = pageToRootList.First
                     End If
@@ -1651,7 +1664,7 @@ ErrorTrap:
         '        getStyleTagPublic = getStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.webServerIO_requestDomain & genericController.getCdnFileLink(cpcore, "templates/Public" & StyleSN & ".css") & """ >"
         '    End If
         'End Function
-        Public Function main_GetPageNotFoundPageId() As Integer
+        Public Function getPageNotFoundPageId() As Integer
             Dim pageId As Integer
             Try
                 pageId = cpcore.domainLegacyCache.domainDetails.pageNotFoundPageId
@@ -1741,7 +1754,7 @@ ErrorTrap:
                 Dim PageNotFoundPageID As Integer
                 Dim Link As String
                 '
-                PageNotFoundPageID = main_GetPageNotFoundPageId()
+                PageNotFoundPageID = getPageNotFoundPageId()
                 If PageNotFoundPageID = 0 Then
                     '
                     ' No PageNotFound was set -- use the backup link
@@ -1819,38 +1832,54 @@ ErrorTrap:
         '
         '---------------------------------------------------------------------------
         '
-        Public Function getLandingPageID() As Integer
-            Dim landingPageid As Integer = 0
+        Public Function getLandingPage(domain As domainModel) As pageContentModel
+            Dim landingPage As Models.Entity.pageContentModel = Nothing
             Try
                 If (domain Is Nothing) Then
                     '
                     ' -- domain not available
                     cpcore.handleException(New ApplicationException("Landing page could not be determined because the domain was not recognized."))
                 Else
-                    landingPageid = domain.RootPageID
-                    If landingPageid = 0 Then
+                    '
+                    ' -- attempt domain landing page
+                    If (Not domain.RootPageID.Equals(0)) Then
+                        landingPage = pageContentModel.create(cpcore, domain.RootPageID)
+                        If (landingPage Is Nothing) Then
+                            domain.RootPageID = 0
+                            domain.save(cpcore)
+                        End If
+                    End If
+                    If (landingPage Is Nothing) Then
                         '
-                        ' -- try the site property landing page id
-                        landingPageid = cpcore.siteProperties.getinteger("LandingPageID", 0)
-                        If landingPageid = 0 Then
+                        ' -- attempt site landing page
+                        Dim siteLandingPageID As Integer = cpcore.siteProperties.getinteger("LandingPageID", 0)
+                        If (Not siteLandingPageID.Equals(0)) Then
+                            landingPage = pageContentModel.create(cpcore, siteLandingPageID)
+                            If (landingPage Is Nothing) Then
+                                cpcore.siteProperties.setProperty("LandingPageID", 0)
+                                domain.RootPageID = 0
+                                domain.save(cpcore)
+                            End If
+                        End If
+                        If (landingPage Is Nothing) Then
                             '
-                            ' -- landing page could not be determined
-                            Dim landingPage As pageContentModel = pageContentModel.add(cpcore)
+                            ' -- create detault landing page
+                            landingPage = pageContentModel.add(cpcore)
+                            landingPage.name = DefaultNewLandingPageName & ", " & domain.name
+                            landingPage.Copyfilename.content = landingPageDefaultHtml
                             landingPage.save(cpcore)
-                            landingPageid = landingPage.id
-                            '
-                            Me.landingPageID = main_GetPageNotFoundPageId()
+                            landingPageID = landingPage.id
                         End If
                         '
                         ' -- save new page to the domain
-                        domain.RootPageID = landingPageid
+                        domain.RootPageID = landingPage.id
                         domain.save(cpcore)
                     End If
                 End If
             Catch ex As Exception
                 cpcore.handleException(ex) : Throw
             End Try
-            Return landingPageid
+            Return landingPage
         End Function
         '
         ' Verify a link from the template link field to be used as a Template Link

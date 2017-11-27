@@ -347,7 +347,7 @@ Namespace Contensive.Core.Controllers
                                      CPUtilsBaseClass.addonContext.ContextTemplate,
                                      CPUtilsBaseClass.addonContext.ContextAdmin,
                                      CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml
-                                    result = cpCore.html.convertActiveContentToHtmlForWebRender(result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType)
+                                    result = cpCore.html.convertActiveContentToHtmlForWebRender(result, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType)
                                 Case CPUtilsBaseClass.addonContext.ContextOnContentChange,
                                      CPUtilsBaseClass.addonContext.ContextSimple
                                     result = cpCore.html.convertActiveContentToHtmlForWebRender(result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType)
