@@ -622,10 +622,9 @@
     <None Include="signingKey.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CPBase\cpBase.vbproj">
-      <Project>{E873F18E-47EF-46A9-AEA1-5A8B0F8BEB01}</Project>
-      <Name>cpBase</Name>
-      <Private>True</Private>
+    <ProjectReference Include="..\cpBaseCs\cpBaseCs.csproj">
+      <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
+      <Name>cpBaseCs</Name>
     </ProjectReference>
     <ProjectReference Include="..\webClientExt\webClientExt.csproj">
       <Project>{41DC21C3-5FA4-43DD-9EEB-DA8964E5CD66}</Project>

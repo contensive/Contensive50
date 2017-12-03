@@ -4645,7 +4645,7 @@ ErrorTrap:
                         ContentID = cpCore.db.csGetInteger(CS, "contentID")
                         ContentName = cpCore.db.csGetText(CS, "contentname")
                         RecordID = cpCore.db.csGetInteger(CS, "recordid")
-                        Link = cpCore.doc.getPageLink(RecordID, "", True, False)
+                        Link = pageContentController.getPageLink(cpCore, RecordID, "", True, False)
                         'Link = cpCore.main_GetPageLink3(RecordID, "", True)
                         'If Link = "" Then
                         '    Link = cpCore.db.cs_getText(CS, "Link")

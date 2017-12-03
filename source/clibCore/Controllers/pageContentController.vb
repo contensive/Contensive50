@@ -51,10 +51,28 @@ Namespace Contensive.Core.Controllers
                 If cpCore.doc.continueProcessing Then
                     '
                     ' -- setup domain
-                    cpCore.doc.domain = Models.Entity.domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
+                    Dim domainTest As String = cpCore.webServer.requestDomain.Trim().ToLower().Replace("..", ".")
+                    cpCore.doc.domain = Nothing
+                    If (Not String.IsNullOrEmpty(domainTest)) Then
+                        Dim posDot As Integer = 0
+                        Dim loopCnt As Integer = 10
+                        Do
+                            cpCore.doc.domain = Models.Entity.domainModel.createByName(cpCore, domainTest, New List(Of String))
+                            posDot = domainTest.IndexOf("."c)
+                            If ((posDot >= 0) And (domainTest.Length > 1)) Then
+                                domainTest = domainTest.Substring(posDot + 1)
+                            End If
+                            loopCnt -= 1
+                        Loop While (cpCore.doc.domain Is Nothing) And (posDot >= 0) And (loopCnt > 0)
+                    End If
+
+
+                    If (cpCore.doc.domain Is Nothing) Then
+
+                    End If
                     '
                     ' -- load requested page/template
-                    cpCore.doc.loadPage(cpCore.docProperties.getInteger(rnPageId), cpCore.doc.domain)
+                    pageContentController.loadPage(cpCore, cpCore.docProperties.getInteger(rnPageId), cpCore.doc.domain)
                     '
                     ' -- execute context for included addons
                     Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
@@ -248,7 +266,7 @@ Namespace Contensive.Core.Controllers
                                             Else
                                                 If (ClipParentRecordID = 0) Then
                                                     Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data record is undefined.")
-                                                ElseIf cpCore.doc.main_IsChildRecord(ClipChildContentName, ClipParentRecordID, ClipChildRecordID) Then
+                                                ElseIf pageContentController.isChildRecord(cpCore, ClipChildContentName, ClipParentRecordID, ClipChildRecordID) Then
                                                     Call errorController.error_AddUserError(cpCore, "The paste operation failed because the destination location is a child of the clipboard data record.")
                                                 Else
                                                     '
@@ -696,7 +714,7 @@ Namespace Contensive.Core.Controllers
                             '
                             Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource)
                             Call cpCore.webServer.setResponseStatus("404 Not Found")
-                            cpCore.docProperties.setProperty(rnPageId, cpCore.doc.getPageNotFoundPageId())
+                            cpCore.docProperties.setProperty(rnPageId, getPageNotFoundPageId(cpCore))
                             'Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
                             If cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) Then
                                 cpCore.doc.adminWarning = PageNotFoundReason
@@ -707,7 +725,7 @@ Namespace Contensive.Core.Controllers
                             ' old way -- if a (real) 404 page is received, redirect to it to the 404 page with content
                             '
                             RedirectReason = PageNotFoundReason
-                            RedirectLink = cpCore.doc.main_ProcessPageNotFound_GetLink(PageNotFoundReason, , PageNotFoundSource)
+                            RedirectLink = pageContentController.main_ProcessPageNotFound_GetLink(cpCore, PageNotFoundReason, , PageNotFoundSource)
                         End If
                     End If
                 End If
@@ -1825,7 +1843,7 @@ ErrorTrap:
                 '
                 SeeAlsoCount = 0
                 If iRecordID > 0 Then
-                    ContentID = models.complex.cdefmodel.getcontentid(cpcore,iContentName)
+                    ContentID = models.complex.cdefmodel.getcontentid(cpcore, iContentName)
                     If (ContentID > 0) Then
                         '
                         ' ----- Set authoring only for valid ContentName
@@ -2156,7 +2174,7 @@ ErrorTrap:
                     Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource)
                     cpCore.doc.redirectBecausePageNotFound = True
                     cpCore.doc.redirectReason = "Redirecting because the page selected could not be found."
-                    cpCore.doc.redirectLink = cpCore.doc.main_ProcessPageNotFound_GetLink(cpCore.doc.redirectReason, , , PageID, 0)
+                    cpCore.doc.redirectLink = pageContentController.main_ProcessPageNotFound_GetLink(cpCore, cpCore.doc.redirectReason, , , PageID, 0)
                     cpCore.handleException(New ApplicationException("Page could not be determined. Error message displayed."))
                     Return "<div style=""width:300px; margin: 100px auto auto auto;text-align:center;"">This page is not valid.</div>"
                 End If
@@ -2439,6 +2457,462 @@ ErrorTrap:
             End If
             '
             getTableRow = genericController.GetTableCell("<nobr>" & CopyCaption & "</nobr>", "150", , EvenRow, "right") & genericController.GetTableCell(CopyResult, "100%", , EvenRow, "left") & kmaEndTableRow
+        End Function
+        '
+        Public Shared Sub loadPage(cpcore As coreClass, requestedPageId As Integer, domain As domainModel)
+            Try
+                If (domain Is Nothing) Then
+                    '
+                    ' -- domain is not valid
+                    cpcore.handleException(New ApplicationException("Page could not be determined because the domain was not recognized."))
+                Else
+                    '
+                    ' -- attempt requested page
+                    Dim requestedPage As pageContentModel = Nothing
+                    If (Not requestedPageId.Equals(0)) Then
+                        requestedPage = pageContentModel.create(cpcore, requestedPageId)
+                        If (requestedPage Is Nothing) Then
+                            '
+                            ' -- requested page not found
+                            requestedPage = pageContentModel.create(cpcore, getPageNotFoundPageId(cpcore))
+                        End If
+                    End If
+                    If (requestedPage Is Nothing) Then
+                        '
+                        ' -- use the Landing Page
+                        requestedPage = getLandingPage(cpcore, domain)
+                    End If
+                    Call cpcore.doc.addRefreshQueryString(rnPageId, CStr(requestedPage.id))
+                    '
+                    ' -- build parentpageList (first = current page, last = root)
+                    ' -- add a 0, then repeat until another 0 is found, or there is a repeat
+                    cpcore.doc.pageToRootList = New List(Of Models.Entity.pageContentModel)()
+                    Dim usedPageIdList As New List(Of Integer)()
+                    Dim targetPageId = requestedPage.id
+                    usedPageIdList.Add(0)
+                    Do While (Not usedPageIdList.Contains(targetPageId))
+                        usedPageIdList.Add(targetPageId)
+                        Dim targetpage As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpcore, targetPageId, New List(Of String))
+                        If (targetpage Is Nothing) Then
+                            Exit Do
+                        Else
+                            cpcore.doc.pageToRootList.Add(targetpage)
+                            targetPageId = targetpage.ParentID
+                        End If
+                    Loop
+                    If (cpcore.doc.pageToRootList.Count = 0) Then
+                        '
+                        ' -- attempt failed, create default page
+                        cpcore.doc.page = pageContentModel.add(cpcore)
+                        cpcore.doc.page.name = DefaultNewLandingPageName & ", " & domain.name
+                        cpcore.doc.page.Copyfilename.content = landingPageDefaultHtml
+                        cpcore.doc.page.save(cpcore)
+                        cpcore.doc.pageToRootList.Add(cpcore.doc.page)
+                    Else
+                        cpcore.doc.page = cpcore.doc.pageToRootList.First
+                    End If
+                    '
+                    ' -- get template from pages
+                    cpcore.doc.template = Nothing
+                    For Each page As Models.Entity.pageContentModel In cpcore.doc.pageToRootList
+                        If page.TemplateID > 0 Then
+                            cpcore.doc.template = Models.Entity.pageTemplateModel.create(cpcore, page.TemplateID, New List(Of String))
+                            If (cpcore.doc.template Is Nothing) Then
+                                '
+                                ' -- templateId is not valid
+                                page.TemplateID = 0
+                                page.save(cpcore)
+                            Else
+                                If (page Is cpcore.doc.pageToRootList.First) Then
+                                    cpcore.doc.templateReason = "This template was used because it is selected by the current page."
+                                Else
+                                    cpcore.doc.templateReason = "This template was used because it is selected one of this page's parents [" & page.name & "]."
+                                End If
+                                Exit For
+                            End If
+                        End If
+                    Next
+                    '
+                    If (cpcore.doc.template Is Nothing) Then
+                        '
+                        ' -- get template from domain
+                        If (domain IsNot Nothing) Then
+                            If (domain.DefaultTemplateId > 0) Then
+                                cpcore.doc.template = Models.Entity.pageTemplateModel.create(cpcore, domain.DefaultTemplateId, New List(Of String))
+                                If (cpcore.doc.template Is Nothing) Then
+                                    '
+                                    ' -- domain templateId is not valid
+                                    domain.DefaultTemplateId = 0
+                                    domain.save(cpcore)
+                                End If
+                            End If
+                        End If
+                        If (cpcore.doc.template Is Nothing) Then
+                            '
+                            ' -- get template named Default
+                            cpcore.doc.template = Models.Entity.pageTemplateModel.createByName(cpcore, defaultTemplateName, New List(Of String))
+                            If (cpcore.doc.template Is Nothing) Then
+                                '
+                                ' -- ceate new template named Default
+                                cpcore.doc.template = Models.Entity.pageTemplateModel.add(cpcore, New List(Of String))
+                                cpcore.doc.template.Name = defaultTemplateName
+                                cpcore.doc.template.BodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename)
+                                cpcore.doc.template.save(cpcore)
+                            End If
+                            '
+                            ' -- set this new template to all domains without a template
+                            For Each d As domainModel In domainModel.createList(cpcore, "((DefaultTemplateId=0)or(DefaultTemplateId is null))")
+                                d.DefaultTemplateId = cpcore.doc.template.ID
+                                d.save(cpcore)
+                            Next
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
+        End Sub
+        Public Shared Function getPageNotFoundPageId(cpcore As coreClass) As Integer
+            Dim pageId As Integer
+            Try
+                pageId = cpcore.domainLegacyCache.domainDetails.pageNotFoundPageId
+                If pageId = 0 Then
+                    '
+                    ' no domain page not found, use site default
+                    '
+                    pageId = cpcore.siteProperties.getinteger("PageNotFoundPageID", 0)
+                End If
+            Catch ex As Exception
+                cpcore.handleException(ex) : Throw
+            End Try
+            Return pageId
+        End Function
+        '
+        '---------------------------------------------------------------------------
+        '
+        '---------------------------------------------------------------------------
+        '
+        Public Shared Function getLandingPage(cpcore As coreClass, domain As domainModel) As pageContentModel
+            Dim landingPage As Models.Entity.pageContentModel = Nothing
+            Try
+                If (domain Is Nothing) Then
+                    '
+                    ' -- domain not available
+                    cpcore.handleException(New ApplicationException("Landing page could not be determined because the domain was not recognized."))
+                Else
+                    '
+                    ' -- attempt domain landing page
+                    If (Not domain.RootPageID.Equals(0)) Then
+                        landingPage = pageContentModel.create(cpcore, domain.RootPageID)
+                        If (landingPage Is Nothing) Then
+                            domain.RootPageID = 0
+                            domain.save(cpcore)
+                        End If
+                    End If
+                    If (landingPage Is Nothing) Then
+                        '
+                        ' -- attempt site landing page
+                        Dim siteLandingPageID As Integer = cpcore.siteProperties.getinteger("LandingPageID", 0)
+                        If (Not siteLandingPageID.Equals(0)) Then
+                            landingPage = pageContentModel.create(cpcore, siteLandingPageID)
+                            If (landingPage Is Nothing) Then
+                                cpcore.siteProperties.setProperty("LandingPageID", 0)
+                                domain.RootPageID = 0
+                                domain.save(cpcore)
+                            End If
+                        End If
+                        If (landingPage Is Nothing) Then
+                            '
+                            ' -- create detault landing page
+                            landingPage = pageContentModel.add(cpcore)
+                            landingPage.name = DefaultNewLandingPageName & ", " & domain.name
+                            landingPage.Copyfilename.content = landingPageDefaultHtml
+                            landingPage.save(cpcore)
+                            cpcore.doc.landingPageID = landingPage.id
+                        End If
+                        '
+                        ' -- save new page to the domain
+                        domain.RootPageID = landingPage.id
+                        domain.save(cpcore)
+                    End If
+                End If
+            Catch ex As Exception
+                cpcore.handleException(ex) : Throw
+            End Try
+            Return landingPage
+        End Function
+        '
+        ' Verify a link from the template link field to be used as a Template Link
+        '
+        Friend Shared Function verifyTemplateLink(cpcore As coreClass, ByVal linkSrc As String) As String
+            '
+            '
+            ' ----- Check Link Format
+            '
+            verifyTemplateLink = linkSrc
+            If verifyTemplateLink <> "" Then
+                If genericController.vbInstr(1, verifyTemplateLink, "://") <> 0 Then
+                    '
+                    ' protocol provided, do not fixup
+                    '
+                    verifyTemplateLink = genericController.EncodeAppRootPath(verifyTemplateLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+                Else
+                    '
+                    ' no protocol, convert to short link
+                    '
+                    If Left(verifyTemplateLink, 1) <> "/" Then
+                        '
+                        ' page entered without path, assume it is in root path
+                        '
+                        verifyTemplateLink = "/" & verifyTemplateLink
+                    End If
+                    verifyTemplateLink = genericController.ConvertLinkToShortLink(verifyTemplateLink, cpcore.webServer.requestDomain, cpcore.webServer.requestVirtualFilePath)
+                    verifyTemplateLink = genericController.EncodeAppRootPath(verifyTemplateLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+                End If
+            End If
+        End Function
+        '
+        '
+        '
+        Friend Shared Function main_ProcessPageNotFound_GetLink(cpcore As coreClass, ByVal adminMessage As String, Optional ByVal BackupPageNotFoundLink As String = "", Optional ByVal PageNotFoundLink As String = "", Optional ByVal EditPageID As Integer = 0, Optional ByVal EditSectionID As Integer = 0) As String
+            Dim result As String = String.Empty
+            Try
+                Dim Pos As Integer
+                Dim DefaultLink As String
+                Dim PageNotFoundPageID As Integer
+                Dim Link As String
+                '
+                PageNotFoundPageID = getPageNotFoundPageId(cpcore)
+                If PageNotFoundPageID = 0 Then
+                    '
+                    ' No PageNotFound was set -- use the backup link
+                    '
+                    If BackupPageNotFoundLink = "" Then
+                        adminMessage = adminMessage & " The Site Property 'PageNotFoundPageID' is not set so the Landing Page was used."
+                        Link = cpcore.doc.landingLink
+                    Else
+                        adminMessage = adminMessage & " The Site Property 'PageNotFoundPageID' is not set."
+                        Link = BackupPageNotFoundLink
+                    End If
+                Else
+                    '
+                    ' Set link
+                    '
+                    Link = getPageLink(cpcore, PageNotFoundPageID, "", True, False)
+                    DefaultLink = getPageLink(cpcore, 0, "", True, False)
+                    If Link <> DefaultLink Then
+                    Else
+                        adminMessage = adminMessage & "</p><p>The current 'Page Not Found' could not be used. It is not valid, or it is not associated with a valid site section. To configure a valid 'Page Not Found' page, first create the page as a child page on your site and check the 'Page Not Found' checkbox on it's control tab. The Landing Page was used."
+                    End If
+                End If
+                '
+                ' Add the Admin Message to the link
+                '
+                If cpcore.doc.authContext.isAuthenticatedAdmin(cpcore) Then
+                    If PageNotFoundLink = "" Then
+                        PageNotFoundLink = cpcore.webServer.requestUrl
+                    End If
+                    '
+                    ' Add the Link to the Admin Msg
+                    '
+                    adminMessage = adminMessage & "<p>The URL was " & PageNotFoundLink & "."
+                    '
+                    ' Add the Referrer to the Admin Msg
+                    '
+                    If cpcore.webServer.requestReferer <> "" Then
+                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningPageID=", vbTextCompare)
+                        If Pos <> 0 Then
+                            cpcore.webServer.requestReferrer = Left(cpcore.webServer.requestReferrer, Pos - 2)
+                        End If
+                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningMsg=", vbTextCompare)
+                        If Pos <> 0 Then
+                            cpcore.webServer.requestReferrer = Left(cpcore.webServer.requestReferrer, Pos - 2)
+                        End If
+                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "blockcontenttracking=", vbTextCompare)
+                        If Pos <> 0 Then
+                            cpcore.webServer.requestReferrer = Left(cpcore.webServer.requestReferrer, Pos - 2)
+                        End If
+                        adminMessage = adminMessage & " The referring page was " & cpcore.webServer.requestReferrer & "."
+                    End If
+                    '
+                    adminMessage = adminMessage & "</p>"
+                    '
+                    If EditPageID <> 0 Then
+                        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningPageID", CStr(EditPageID), True)
+                    End If
+                    '
+                    If EditSectionID <> 0 Then
+                        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningSectionID", CStr(EditSectionID), True)
+                    End If
+                    '
+                    Link = genericController.modifyLinkQuery(Link, RequestNameBlockContentTracking, "1", True)
+                    Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "<p>" & adminMessage & "</p>", True)
+                End If
+                '
+                result = Link
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Shared Function getPageLink(cpcore As coreClass, ByVal PageID As Integer, ByVal QueryStringSuffix As String, Optional ByVal AllowLinkAliasIfEnabled As Boolean = True, Optional ByVal UseContentWatchNotDefaultPage As Boolean = False) As String
+            Dim result As String = ""
+            Try
+                Dim linkPathPage As String = Nothing
+                '
+                ' -- set linkPathPath to linkAlias
+                If AllowLinkAliasIfEnabled And cpcore.siteProperties.allowLinkAlias Then
+                    linkPathPage = docController.getLinkAlias(cpcore, PageID, QueryStringSuffix, "")
+                End If
+                If (String.IsNullOrEmpty(linkPathPage)) Then
+                    '
+                    ' -- if not linkAlis, set default page and qs
+                    linkPathPage = cpcore.siteProperties.serverPageDefault
+                    If String.IsNullOrEmpty(linkPathPage) Then
+                        linkPathPage = "/" & getDefaultScript()
+                    Else
+                        Dim Pos As Integer = genericController.vbInstr(1, linkPathPage, "?")
+                        If Pos <> 0 Then
+                            linkPathPage = Mid(linkPathPage, 1, Pos - 1)
+                        End If
+                        If Left(linkPathPage, 1) <> "/" Then
+                            linkPathPage = "/" & linkPathPage
+                        End If
+                    End If
+                    '
+                    ' -- calc linkQS (cleared in come cases later)
+                    linkPathPage &= "?" & rnPageId & "=" & PageID
+                    If QueryStringSuffix <> "" Then
+                        linkPathPage &= "&" & QueryStringSuffix
+                    End If
+                End If
+                '
+                ' -- domain -- determine if the domain has any template requirements, and if so, is this template allowed
+                Dim SqlCriteria As String = "(domainId=" & cpcore.doc.domain.id & ")"
+                Dim allowTemplateRuleList As List(Of Models.Entity.TemplateDomainRuleModel) = Models.Entity.TemplateDomainRuleModel.createList(cpcore, SqlCriteria)
+                Dim templateAllowed As Boolean = False
+                For Each rule As TemplateDomainRuleModel In allowTemplateRuleList
+                    If (rule.templateId = cpcore.doc.template.ID) Then
+                        templateAllowed = True
+                        Exit For
+                    End If
+                Next
+                Dim linkDomain As String = ""
+                If (allowTemplateRuleList.Count = 0) Then
+                    '
+                    ' this template has no domain preference, use current domain
+                    '
+                    linkDomain = cpcore.webServer.requestDomain
+                ElseIf (cpcore.domainLegacyCache.domainDetails.id = 0) Then
+                    '
+                    ' the current domain is not recognized, or is default - use it
+                    '
+                    linkDomain = cpcore.webServer.requestDomain
+                ElseIf (templateAllowed) Then
+                    '
+                    ' current domain is in the allowed domain list
+                    '
+                    linkDomain = cpcore.webServer.requestDomain
+                Else
+                    '
+                    ' there is an allowed domain list and current domain is not on it, or use first
+                    '
+                    Dim setdomainId As Integer = allowTemplateRuleList.First.domainId
+                    linkDomain = cpcore.db.getRecordName("domains", setdomainId)
+                    If linkDomain = "" Then
+                        linkDomain = cpcore.webServer.requestDomain
+                    End If
+                End If
+                '
+                ' -- protocol
+                Dim linkprotocol As String = ""
+                If cpcore.doc.page.IsSecure Or cpcore.doc.template.IsSecure Then
+                    linkprotocol = "https://"
+                Else
+                    linkprotocol = "http://"
+                End If
+                '
+                ' -- assemble
+                result = linkprotocol & linkDomain & linkPathPage
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ' main_Get a page link if you know nothing about the page
+        '   If you already have all the info, lik the parents templateid, etc, call the ...WithArgs call
+        '====================================================================================================
+        '
+        Public Shared Function main_GetPageLink3(cpcore As coreClass, ByVal PageID As Integer, ByVal QueryStringSuffix As String, ByVal AllowLinkAlias As Boolean) As String
+            main_GetPageLink3 = getPageLink(cpcore, PageID, QueryStringSuffix, AllowLinkAlias, False)
+        End Function
+        '
+        '
+        Friend Shared Function getDefaultScript() As String
+            Return "default.aspx"
+        End Function
+        '
+        '========================================================================
+        '   main_IsChildRecord
+        '
+        '   Tests if this record is in the ParentID->ID chain for this content
+        '========================================================================
+        '
+        Public Shared Function isChildRecord(cpcore As coreClass, ByVal ContentName As String, ByVal ChildRecordID As Integer, ByVal ParentRecordID As Integer) As Boolean
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsChildRecord")
+            '
+            Dim CDef As Models.Complex.cdefModel
+            '
+            isChildRecord = (ChildRecordID = ParentRecordID)
+            If Not isChildRecord Then
+                CDef = Models.Complex.cdefModel.getCdef(cpcore, ContentName)
+                If genericController.IsInDelimitedString(UCase(CDef.SelectCommaList), "PARENTID", ",") Then
+                    isChildRecord = main_IsChildRecord_Recurse(cpcore, CDef.ContentDataSourceName, CDef.ContentTableName, ChildRecordID, ParentRecordID, "")
+                End If
+            End If
+            Exit Function
+            '
+            ' ----- Error Trap
+            '
+ErrorTrap:
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("cpCoreClass.IsChildRecord")
+            '
+        End Function
+        '
+        '========================================================================
+        '   main_IsChildRecord
+        '
+        '   Tests if this record is in the ParentID->ID chain for this content
+        '========================================================================
+        '
+        Friend Shared Function main_IsChildRecord_Recurse(cpcore As coreClass, ByVal DataSourceName As String, ByVal TableName As String, ByVal ChildRecordID As Integer, ByVal ParentRecordID As Integer, ByVal History As String) As Boolean
+            Dim result As Boolean = False
+            Try
+                Dim SQL As String
+                Dim CS As Integer
+                Dim ChildRecordParentID As Integer
+                '
+                SQL = "select ParentID from " & TableName & " where id=" & ChildRecordID
+                CS = cpcore.db.csOpenSql(SQL)
+                If cpcore.db.csOk(CS) Then
+                    ChildRecordParentID = cpcore.db.csGetInteger(CS, "ParentID")
+                End If
+                Call cpcore.db.csClose(CS)
+                If (ChildRecordParentID <> 0) And (Not genericController.IsInDelimitedString(History, CStr(ChildRecordID), ",")) Then
+                    result = (ParentRecordID = ChildRecordParentID)
+                    If Not result Then
+                        result = main_IsChildRecord_Recurse(cpcore, DataSourceName, TableName, ChildRecordParentID, ParentRecordID, History & "," & CStr(ChildRecordID))
+                    End If
+                End If
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
+            Return result
         End Function
 
         '

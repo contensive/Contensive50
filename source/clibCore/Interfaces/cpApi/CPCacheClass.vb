@@ -80,7 +80,15 @@ Namespace Contensive.Core
         ''' <param name="invalidationTagCommaList"></param>
         ''' <param name="ClearOnDate"></param>
         ''' <remarks></remarks>
-        Public Overrides Sub Save(ByVal key As String, ByVal Value As String, Optional ByVal invalidationTagCommaList As String = "", Optional ByVal invalidationDate As Date = #12:00:00 AM#)
+        Public Overrides Sub Save(ByVal key As String, ByVal Value As String)
+            Save(key, Value, "", Date.MinValue)
+        End Sub
+        '
+        Public Overrides Sub Save(ByVal key As String, ByVal Value As String, invalidationTagCommaList As String)
+            Save(key, Value, invalidationTagCommaList, Date.MinValue)
+        End Sub
+        '
+        Public Overrides Sub Save(ByVal key As String, ByVal Value As String, ByVal invalidationTagCommaList As String, ByVal invalidationDate As Date)
             Try
                 Dim invalidationTagList As New List(Of String)
                 If String.IsNullOrEmpty(invalidationTagCommaList.Trim) Then

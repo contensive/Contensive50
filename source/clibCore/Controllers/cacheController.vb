@@ -83,7 +83,7 @@ Namespace Contensive.Core.Controllers
         '
         '====================================================================================================
         ''' <summary>
-        ''' returns the system globalInvalidationDate. This is the date/time when the entire cache was last cleared 
+        ''' returns the system globalInvalidationDate. This is the date/time when the entire cache was last cleared. Every cache object saved before this date is considered invalid.
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
@@ -99,6 +99,13 @@ Namespace Contensive.Core.Controllers
                     If (_globalInvalidationDate Is Nothing) Then
                         _globalInvalidationDate = Now()
                         setWrappedContent("globalInvalidationDate", New cacheWrapperClass With {.saveDate = CDate(_globalInvalidationDate)})
+                    End If
+                End If
+                If (Not _globalInvalidationDate.HasValue) Then
+                    _globalInvalidationDate = Now.AddDays(invalidationDaysDefault)
+                Else
+                    If ((CDate(_globalInvalidationDate)).CompareTo(New Date(1990, 8, 7)) < 0) Then
+                        _globalInvalidationDate = New Date(1990, 8, 7)
                     End If
                 End If
                 Return CDate(_globalInvalidationDate)
@@ -152,7 +159,7 @@ Namespace Contensive.Core.Controllers
                     Throw New ArgumentException("cache key cannot be blank")
                 Else
                     Dim wrapperKey As String = getWrapperKey(cpCore.serverConfig.appConfig.name, key)
-                    If (cpCore.serverConfig.enableLocalMemoryCache) Then
+                    If (cpCore.serverConfig.enableRemoteCache) Then
                         If (remoteCacheInitialized) Then
                             '
                             ' -- save remote cache

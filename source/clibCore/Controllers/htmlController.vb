@@ -7813,7 +7813,7 @@ ErrorTrap:
                                         End If
 
 
-                                        If (ParentID <> 0) And (Not cpCore.doc.main_IsChildRecord(iContentName, ParentID, ClipChildRecordID)) Then
+                                        If (ParentID <> 0) And (Not pageContentController.isChildRecord(cpCore, iContentName, ParentID, ClipChildRecordID)) Then
                                             '
                                             ' Can not paste as child of itself
                                             '

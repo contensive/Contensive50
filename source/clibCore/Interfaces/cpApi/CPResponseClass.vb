@@ -132,15 +132,23 @@ Namespace Contensive.Core
         End Sub
 
         Public Overrides Sub SetType(ByVal ContentType As String) 'Inherits BaseClasses.CPResponseBaseClass.SetType
-            If True Then
-                Call cpCore.webServer.setResponseContentType(ContentType)
-            End If
+            Call cpCore.webServer.setResponseContentType(ContentType)
         End Sub
 
-        Public Overrides Sub SetCookie(ByVal CookieName As String, ByVal CookieValue As String, Optional ByVal DateExpires As Date = #12:00:00 AM#, Optional ByVal Domain As String = "", Optional ByVal Path As String = "", Optional ByVal Secure As Boolean = False) 'Inherits BaseClasses.CPResponseBaseClass.SetCookie
-            If True Then
-                Call cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure)
-            End If
+        Public Overrides Sub SetCookie(ByVal CookieName As String, ByVal CookieValue As String)
+            Call cpCore.webServer.addResponseCookie(CookieName, CookieValue, Date.MinValue, "", "", False)
+        End Sub
+        Public Overrides Sub SetCookie(ByVal CookieName As String, ByVal CookieValue As String, ByVal DateExpires As Date)
+            Call cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, "", "", False)
+        End Sub
+        Public Overrides Sub SetCookie(ByVal CookieName As String, ByVal CookieValue As String, ByVal DateExpires As Date, ByVal Domain As String)
+            Call cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, "", False)
+        End Sub
+        Public Overrides Sub SetCookie(ByVal CookieName As String, ByVal CookieValue As String, ByVal DateExpires As Date, ByVal Domain As String, ByVal Path As String)
+            Call cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, False)
+        End Sub
+        Public Overrides Sub SetCookie(ByVal CookieName As String, ByVal CookieValue As String, ByVal DateExpires As Date, ByVal Domain As String, ByVal Path As String, ByVal Secure As Boolean)
+            Call cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure)
         End Sub
 
         <Obsolete("The write buffer is deprecated")> Public Overrides Sub Write(ByVal message As String)

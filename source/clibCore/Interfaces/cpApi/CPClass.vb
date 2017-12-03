@@ -189,7 +189,7 @@ Namespace Contensive.Core
         Public Sub AddVar(ByVal OptionName As String, ByVal OptionValue As String)
             Try
                 If OptionName <> "" Then
-                    Me.Doc.Var(OptionName) = OptionValue
+                    Me.Doc.SetProperty(OptionName, OptionValue)
                 End If
             Catch ex As Exception
                 Site.ErrorReport(ex)

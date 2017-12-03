@@ -187,14 +187,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CPBase\cpBase.vbproj">
-      <Project>{E873F18E-47EF-46A9-AEA1-5A8B0F8BEB01}</Project>
-      <Name>cpBase</Name>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\clibCore\clibCore.vbproj">
       <Project>{9814c7bd-200c-4c57-859d-5d81899a3421}</Project>
       <Name>clibCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\cpBaseCs\cpBaseCs.csproj">
+      <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
+      <Name>cpBaseCs</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

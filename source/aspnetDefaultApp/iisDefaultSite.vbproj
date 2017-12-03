@@ -642,6 +642,7 @@
     <None Include="My Project\PublishProfiles\app20171123082754.pubxml" />
     <None Include="My Project\PublishProfiles\app20171125173016.pubxml" />
     <None Include="My Project\PublishProfiles\app20171126204922.pubxml" />
+    <None Include="My Project\PublishProfiles\app20171127012754.pubxml" />
     <None Include="My Project\PublishProfiles\aspxtest.pubxml" />
     <None Include="My Project\PublishProfiles\c-pf-kma-c5-resources-iisDefaultSite.pubxml" />
     <None Include="My Project\PublishProfiles\deployToLocalAppPatternsAspnet.pubxml" />
@@ -671,9 +672,9 @@
       <Project>{9814c7bd-200c-4c57-859d-5d81899a3421}</Project>
       <Name>clibCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\cpBase\cpBase.vbproj">
-      <Project>{e873f18e-47ef-46a9-aea1-5a8b0f8beb01}</Project>
-      <Name>cpBase</Name>
+    <ProjectReference Include="..\cpBaseCs\cpBaseCs.csproj">
+      <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
+      <Name>cpBaseCs</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

@@ -108,7 +108,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetPageLink(ByVal PageID As Integer, Optional ByVal QueryStringSuffix As String = "", Optional ByVal AllowLinkAlias As Boolean = True) As String
-            Return cpCore.doc.getPageLink(PageID, QueryStringSuffix, AllowLinkAlias, False)
+            Return pageContentController.getPageLink(cpCore, PageID, QueryStringSuffix, AllowLinkAlias, False)
         End Function
         '
         '====================================================================================================

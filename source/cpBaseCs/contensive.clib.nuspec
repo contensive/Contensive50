@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>contensive.clib</id>
+    <version>5.0.1</version>
+    <title>Contensive Addon API</title>
+    <authors>Contensive</authors>
+    <owners>Contensive</owners>
+    <licenseUrl>http://clib.io</licenseUrl>
+    <projectUrl>http://clib.io</projectUrl>
+    <iconUrl>http://clib.io/img/ContensiveLogo2-385x60.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This package adds a reference to the Contensive cp base classes. See project URL for how to configure a project.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags></tags>
+  </metadata>
+    <files>
+        <file src="bin\Debug\CPBase.dll" target="lib\net35\CPBase.dll" />
+        <file src="ReadMeNuget.txt" target="readme.txt" />
+    </files>
+</package>

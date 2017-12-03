@@ -410,143 +410,143 @@ Namespace Contensive.Core
         Public Overrides Sub SetProperty(FieldName As String, FieldValue As String)
             cpCore.docProperties.setProperty(FieldName, FieldValue)
         End Sub
-        '
-        '=======================================================================================================
-        ' Deprecated ------------ us GetProperty and Setproperty
-        ' IsVar
-        '   like GlobalVar, but it includes the OptionString
-        '   a set Var adds an etry to LocalVars
-        '=======================================================================================================
-        '
-        Public Overrides Property var(ByVal Name As String) As String
-            Get
-                Return cpCore.docProperties.getText(Name)
-                'Dim lcName As String
-                'If Name = "" Then
-                '    var = ""
-                'Else
-                '    lcName = Name.ToLower
-                '    If LocalVars.Contains(lcName) Then
-                '        var = LocalVars(lcName)
-                '    Else
-                '        var = globalVar(lcName)
-                '    End If
-                'End If
-                'Call tp("Property var get exit, " & Name & "=" & var)
-            End Get
-            Set(ByVal value As String)
-                cpCore.docProperties.setProperty(Name, value)
-                'Dim lcName As String
-                ''Dim valueObj As String = ""
-                ''If Not value Is Nothing Then
-                ''    valueObj = value
-                ''End If
-                'value = genericController.encodeText(value)
-                'Call appendDebugLog("var set, " & Name & "=" & value.ToString)
-                'If Name <> "" Then
-                '    lcName = Name.ToLower
-                '    If LocalVars.Contains(lcName) Then
-                '        Call LocalVars.Remove(lcName)
-                '        If value = "" Then
-                '            LocalVarNameList = genericController.vbReplace(LocalVarNameList, vbCrLf & lcName, "", , , CompareMethod.Text)
-                '        Else
-                '            Call LocalVars.Add(value, lcName)
-                '            Call tp("Property var set, name found in localVars, removed and re-added, LocalVarNameList=" & LocalVarNameList)
-                '        End If
-                '    ElseIf value <> "" Then
-                '        Call LocalVars.Add(value, lcName)
-                '        LocalVarNameList = LocalVarNameList & vbCrLf & lcName
-                '        Call tp("Property var set, name not found in localVars so it was added, LocalVarNameList=" & LocalVarNameList)
-                '    End If
-                'End If
-            End Set
-        End Property
-        '
-        '=======================================================================================================
-        ' Deprecated ------------ us GetProperty and Setproperty
-        ' GlobalVar
-        '   Like ViewingProperties but includes stream
-        '   returns
-        '       matches to ViewingProperties
-        '       then matches to Stream
-        '=======================================================================================================
-        '
-        Public Overrides Property globalVar(ByVal Name As String) As String
-            Get
-                Return cpCore.docProperties.getText(Name)
-                'Dim lcName As String
-                'If True Then
-                '    If Name = "" Then
-                '        globalVar = ""
-                '    Else
-                '        lcName = Name.ToLower
-                '        If cpCore.main_IsViewingProperty(lcName) Then
-                '            globalVar = cpCore.docProperties.getText(lcName)
-                '        Else
-                '            globalVar = cpCore.docProperties.getText(lcName)
-                '        End If
-                '    End If
-                'Else
-                '    globalVar = ""
-                'End If
-            End Get
-            Set(ByVal value As String)
-                cpCore.docProperties.setProperty(Name, value)
-                'If True Then
-                '    Call cpCore.docProperties.setProperty(Name.ToLower, value)
-                'End If
-            End Set
-        End Property
-        '
-        '=======================================================================================================
-        ' Deprecated ------------ us GetProperty and Setproperty
-        ' IsGlobalVar 
-        '   returns true if
-        '       IsViewingProperties is true or InStream is true
-        '=======================================================================================================
-        '
-        Public Overrides ReadOnly Property isGlobalVar(ByVal Name As String) As Boolean
-            Get
-                Return False
-                'Dim lcName As String
-                'If True Then
-                '    If Name = "" Then
-                '        isGlobalVar = ""
-                '    Else
-                '        lcName = Name.ToLower
-                '        isGlobalVar = cpCore.main_IsViewingProperty(lcName)
-                '        If Not isGlobalVar Then
-                '            isGlobalVar = cpCore.docProperties.containsKey(lcName)
-                '        End If
-                '    End If
-                'Else
-                '    isGlobalVar = False
-                'End If
-            End Get
-        End Property
-        '
-        '=======================================================================================================
-        ' Deprecated ------------ us GetProperty and Setproperty
-        ' IsVar
-        '   returns true if
-        '       matches to GlobalVars or LocalVars collections
-        '=======================================================================================================
-        '
-        Public Overrides ReadOnly Property isVar(ByVal Name As String) As Boolean
-            Get
-                Return cpCore.docProperties.containsKey(Name)
-                'Dim lcName As String
-                'If Name = "" Then
-                '    isVar = False
-                'Else
-                '    lcName = Name.ToLower
-                '    isVar = LocalVars.Contains(lcName)
-                '    If Not isVar Then
-                '        isVar = isGlobalVar(lcName)
-                '    End If
-                'End If
-            End Get
-        End Property
+        ''
+        ''=======================================================================================================
+        '' Deprecated ------------ us GetProperty and Setproperty
+        '' IsVar
+        ''   like GlobalVar, but it includes the OptionString
+        ''   a set Var adds an etry to LocalVars
+        ''=======================================================================================================
+        ''
+        'Public Overrides Property var(ByVal Name As String) As String
+        '    Get
+        '        Return cpCore.docProperties.getText(Name)
+        '        'Dim lcName As String
+        '        'If Name = "" Then
+        '        '    var = ""
+        '        'Else
+        '        '    lcName = Name.ToLower
+        '        '    If LocalVars.Contains(lcName) Then
+        '        '        var = LocalVars(lcName)
+        '        '    Else
+        '        '        var = globalVar(lcName)
+        '        '    End If
+        '        'End If
+        '        'Call tp("Property var get exit, " & Name & "=" & var)
+        '    End Get
+        '    Set(ByVal value As String)
+        '        cpCore.docProperties.setProperty(Name, value)
+        '        'Dim lcName As String
+        '        ''Dim valueObj As String = ""
+        '        ''If Not value Is Nothing Then
+        '        ''    valueObj = value
+        '        ''End If
+        '        'value = genericController.encodeText(value)
+        '        'Call appendDebugLog("var set, " & Name & "=" & value.ToString)
+        '        'If Name <> "" Then
+        '        '    lcName = Name.ToLower
+        '        '    If LocalVars.Contains(lcName) Then
+        '        '        Call LocalVars.Remove(lcName)
+        '        '        If value = "" Then
+        '        '            LocalVarNameList = genericController.vbReplace(LocalVarNameList, vbCrLf & lcName, "", , , CompareMethod.Text)
+        '        '        Else
+        '        '            Call LocalVars.Add(value, lcName)
+        '        '            Call tp("Property var set, name found in localVars, removed and re-added, LocalVarNameList=" & LocalVarNameList)
+        '        '        End If
+        '        '    ElseIf value <> "" Then
+        '        '        Call LocalVars.Add(value, lcName)
+        '        '        LocalVarNameList = LocalVarNameList & vbCrLf & lcName
+        '        '        Call tp("Property var set, name not found in localVars so it was added, LocalVarNameList=" & LocalVarNameList)
+        '        '    End If
+        '        'End If
+        '    End Set
+        'End Property
+        ''
+        ''=======================================================================================================
+        '' Deprecated ------------ us GetProperty and Setproperty
+        '' GlobalVar
+        ''   Like ViewingProperties but includes stream
+        ''   returns
+        ''       matches to ViewingProperties
+        ''       then matches to Stream
+        ''=======================================================================================================
+        ''
+        'Public Overrides Property globalVar(ByVal Name As String) As String
+        '    Get
+        '        Return cpCore.docProperties.getText(Name)
+        '        'Dim lcName As String
+        '        'If True Then
+        '        '    If Name = "" Then
+        '        '        globalVar = ""
+        '        '    Else
+        '        '        lcName = Name.ToLower
+        '        '        If cpCore.main_IsViewingProperty(lcName) Then
+        '        '            globalVar = cpCore.docProperties.getText(lcName)
+        '        '        Else
+        '        '            globalVar = cpCore.docProperties.getText(lcName)
+        '        '        End If
+        '        '    End If
+        '        'Else
+        '        '    globalVar = ""
+        '        'End If
+        '    End Get
+        '    Set(ByVal value As String)
+        '        cpCore.docProperties.setProperty(Name, value)
+        '        'If True Then
+        '        '    Call cpCore.docProperties.setProperty(Name.ToLower, value)
+        '        'End If
+        '    End Set
+        'End Property
+        ''
+        ''=======================================================================================================
+        '' Deprecated ------------ us GetProperty and Setproperty
+        '' IsGlobalVar 
+        ''   returns true if
+        ''       IsViewingProperties is true or InStream is true
+        ''=======================================================================================================
+        ''
+        'Public Overrides ReadOnly Property isGlobalVar(ByVal Name As String) As Boolean
+        '    Get
+        '        Return False
+        '        'Dim lcName As String
+        '        'If True Then
+        '        '    If Name = "" Then
+        '        '        isGlobalVar = ""
+        '        '    Else
+        '        '        lcName = Name.ToLower
+        '        '        isGlobalVar = cpCore.main_IsViewingProperty(lcName)
+        '        '        If Not isGlobalVar Then
+        '        '            isGlobalVar = cpCore.docProperties.containsKey(lcName)
+        '        '        End If
+        '        '    End If
+        '        'Else
+        '        '    isGlobalVar = False
+        '        'End If
+        '    End Get
+        'End Property
+        ''
+        ''=======================================================================================================
+        '' Deprecated ------------ us GetProperty and Setproperty
+        '' IsVar
+        ''   returns true if
+        ''       matches to GlobalVars or LocalVars collections
+        ''=======================================================================================================
+        ''
+        'Public Overrides ReadOnly Property isVar(ByVal Name As String) As Boolean
+        '    Get
+        '        Return cpCore.docProperties.containsKey(Name)
+        '        'Dim lcName As String
+        '        'If Name = "" Then
+        '        '    isVar = False
+        '        'Else
+        '        '    lcName = Name.ToLower
+        '        '    isVar = LocalVars.Contains(lcName)
+        '        '    If Not isVar Then
+        '        '        isVar = isGlobalVar(lcName)
+        '        '    End If
+        '        'End If
+        '    End Get
+        'End Property
         '
         '
         '

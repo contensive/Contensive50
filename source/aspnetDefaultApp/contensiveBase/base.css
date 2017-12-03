@@ -9,7 +9,7 @@ body {overflow:auto;}
 .ccBodyWeb{}
 .ccBodyPrint{}
 .ccBodyEmail{}
-.ccBodyAdmin {margin:0;padding:0;COLOR:black;BACKGROUND-COLOR:#C3D9FF;FONT-WEIGHT:normal}
+.ccBodyAdmin {margin:0;padding:0;COLOR:black;BACKGROUND-COLOR:#C3D9FF;FONT-WEIGHT:normal;min-height:100vh;}
 /*
     container resets 
 */
@@ -37,16 +37,16 @@ body {overflow:auto;}
 .ccCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
 .ccCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right;padding:5px;width:50%;vertical-align:middle;Float:none;} /*legacy*/
 /**/
-.ccCon .ccToolsCon {margin:0;padding:0;Background-color:white;border-right:1px solid black;min-height:400px;}
+.ccCon .ccToolsCon {margin:0;padding:0;Background-color:white;border-right:1px solid black;min-height:100vh;}
 .ccCon .ccToolsCon .ccHeaderCon {COLOR:white;BACKGROUND-COLOR:#1F70BD;}
 .ccCon .ccToolsCon .ccHeaderCon .closed {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left;padding:5px;}
 .ccCon .ccToolsCon .ccHeaderCon .left {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:left}
 .ccCon .ccToolsCon .ccHeaderCon .right {COLOR:white;BACKGROUND-COLOR:#1F70BD;text-align:right}
-.ccCon .ccToolsCon .ccContentCon {width:100%;margin:0;Background-color:white;min-height:400px;}
-.ccCon .ccToolsCon .ccContentCon .opened {width:100%;margin:0;Background-color:white;min-height:400px;padding-top:10px;padding-bottom:20px;}
-.ccCon .ccToolsCon .ccContentCon .closed {width:100%;margin:0;Background-color:white;min-height:400px;}
+.ccCon .ccToolsCon .ccContentCon {width:100%;margin:0;Background-color:white;min-height:100vh;}
+.ccCon .ccToolsCon .ccContentCon .opened {width:100%;margin:0;Background-color:white;min-height:100vh;padding-top:10px;padding-bottom:20px;}
+.ccCon .ccToolsCon .ccContentCon .closed {width:100%;margin:0;Background-color:white;min-height:100vh;}
 /**/
-.ccCon .ccContentCon {margin:0;padding:0;Background-color:#C3D9FF;width:100%;}
+.ccCon .ccContentCon {margin:0;padding:0;Background-color:#C3D9FF;width:100%;min-height:100vh;}
 .ccCon .ccControlsCon {color:black;background-color:#fff8d0;padding:5px ! important;border-top:1px solid #808080;border-left:1px solid #808080;border-bottom:1px solid #f8f8f8;border-right:1px solid #f8f8f8;}
 .ccCon .ccControlsCon .left {text-align:right;}
 .ccCon .ccControlsCon .right {text-align:right;}

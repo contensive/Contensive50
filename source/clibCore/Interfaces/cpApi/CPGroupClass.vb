@@ -63,7 +63,13 @@ Namespace Contensive.Core
         '
         ' Add User
         '
-        Public Overrides Sub AddUser(ByVal GroupNameIdOrGuid As String, Optional ByVal UserId As Integer = 0, Optional ByVal DateExpires As Date = #12:00:00 AM#)
+        Public Overrides Sub AddUser(ByVal GroupNameIdOrGuid As String)
+            Call groupController.group_AddUser(cpCore, GroupNameIdOrGuid, 0, DateTime.MinValue)
+        End Sub
+        Public Overrides Sub AddUser(ByVal GroupNameIdOrGuid As String, ByVal UserId As Integer)
+            Call groupController.group_AddUser(cpCore, GroupNameIdOrGuid, UserId, DateTime.MinValue)
+        End Sub
+        Public Overrides Sub AddUser(ByVal GroupNameIdOrGuid As String, ByVal UserId As Integer, ByVal DateExpires As Date)
             Try
                 Call groupController.group_AddUser(cpCore, GroupNameIdOrGuid, UserId, DateExpires)
             Catch ex As Exception
