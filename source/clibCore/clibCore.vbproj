@@ -294,7 +294,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -394,6 +394,12 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="addonCollection_adminSite\getAdminSiteClass - Copy - Copy %282%29.vb" />
+    <Compile Include="addonCollection_adminSite\getAdminSiteClass - Copy - Copy %283%29.vb" />
+    <Compile Include="addonCollection_adminSite\getAdminSiteClass - Copy - Copy %284%29.vb" />
+    <Compile Include="addonCollection_adminSite\getAdminSiteClass - Copy - Copy %285%29.vb" />
+    <Compile Include="addonCollection_adminSite\getAdminSiteClass - Copy - Copy %286%29.vb" />
+    <Compile Include="addonCollection_adminSite\getAdminSiteClass - Copy - Copy.vb" />
     <Compile Include="addonCollection_adminSite\getAjaxDefaultAddonOptionString.vb" />
     <Compile Include="addonCollection_adminSite\setAdminSiteFieldHelp.vb" />
     <Compile Include="addonCollection_adminSite\setAjaxVisitPropertyClass.vb" />

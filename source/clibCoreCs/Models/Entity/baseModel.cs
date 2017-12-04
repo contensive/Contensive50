@@ -1,0 +1,1344 @@
+﻿//========================================================================
+// This conversion was produced by the Free Edition of
+// Instant C# courtesy of Tangible Software Solutions.
+// Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
+//========================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Contensive.BaseClasses;
+using System.Reflection;
+using Contensive.Core.Controllers;
+using Newtonsoft.Json;
+
+namespace Contensive.Core.Models.Entity
+{
+	//
+	//====================================================================================================
+	// entity model pattern
+	//   factory pattern load because if a record is not found, must rturn nothing
+	//   new() - empty constructor to allow deserialization
+	//   saveObject() - saves instance properties (nonstatic method)
+	//   create() - loads instance properties and returns a model 
+	//   delete() - deletes the record that matches the argument
+	//   getObjectList() - a pattern for creating model lists.
+	//   invalidateFIELDNAMEcache() - method to invalide the model cache. One per cache
+	//
+	//	1) set the primary content name in const cnPrimaryContent. avoid constants Like cnAddons used outside model
+	//	2) find-And-replace "_blankModel" with the name for this model
+	//	3) when adding model fields, add in three places: the Public Property, the saveObject(), the loadObject()
+	//	4) when adding create() methods to support other fields/combinations of fields, 
+	//       - add a secondary cache For that new create method argument in loadObjec()
+	//       - add it to the injected cachename list in loadObject()
+	//       - add an invalidate
+	//
+	// Model Caching
+	//   caching applies to model objects only, not lists of models (for now)
+	//       - this is because of the challenge of invalidating the list object when individual records are added or deleted
+	//
+	//   a model should have 1 primary cache object which stores the data and can have other secondary cacheObjects which do not hold data
+	//    the cacheName of the 'primary' cacheObject for models and db records (cacheNamePrefix + ".id." + #id)
+	//    'secondary' cacheName is (cacheNamePrefix + . + fieldName + . + #)
+	//
+	//   cacheobjects can be used to hold data (primary cacheobjects), or to hold only metadata (secondary cacheobjects)
+	//       - primary cacheobjects are like 'personModel.id.99' that holds the model for id=99
+	//           - it is primary because the .primaryobject is null
+	//           - invalidationData. This cacheobject is invalid after this datetime
+	//           - dependentobjectlist() - this object is invalid if any of those objects are invalid
+	//       - secondary cachobjects are like 'person.ccguid.12345678'. It does not hold data, just a reference to the primary cacheobject
+	//
+	//   cacheNames spaces are replaced with underscores, so "addon collections" should be addon_collections
+	//
+	//   cacheNames that match content names are treated as caches of "any" record in the content, so invalidating "people" can be used to invalidate
+	//       any non-specific cache in the people table, by including "people" as a dependant cachename. the "people" cachename should not clear
+	//       specific people caches, like people.id.99, but can be used to clear lists of records like "staff_list_group"
+	//       - this can be used as a fallback strategy to cache record lists: a remote method list can be cached with a dependancy on "add-ons".
+	//       - models should always clear this content name cache entry on all cache clears
+	//
+	//   when a model is created, the code first attempts to read the model's cacheobject. if it fails, it builds it and saves the cache object and tags
+	//       - when building the model, is writes object to the primary cacheobject, and writes all the secondaries to be used
+	//       - when building the model, if a database record is opened, a dependantObject Tag is created for the tablename+'id'+id
+	//       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
+	//
+	//
+	public abstract class baseModel
+	{
+		//
+		//====================================================================================================
+		//-- const must be set in derived clases
+		//
+		//Public Const contentName As String = "" '<------ set content name
+		//Public Const contentTableName As String = "" '<------ set to tablename for the primary content (used for cache names)
+		//Public Const contentDataSource As String = "" '<----- set to datasource if not default
+		//
+		//====================================================================================================
+		//-- field types
+		//
+		public abstract class fieldCdnFile
+		{
+			//
+			// -- 
+			// during load
+			//   -- The filename is loaded into the model (blank or not). No content Is read from the file during load.
+			//   -- the internalCpCore must be set
+			//
+			// during a cache load, the internalCpCore must be set
+			//
+			// content property read:
+			//   -- If the filename Is blank, a blank Is returned
+			//   -- if the filename exists, the content is read into the model and returned to the consumer
+			//
+			// content property written:
+			//   -- content is stored in the model until save(). contentUpdated is set.
+			//
+			// filename property read: nothing special
+			//
+			// filename property written:
+			//   -- contentUpdated set true if it was previously set (content was written), or if the content is not empty
+			//
+			// contentLoaded property means the content in the model is valid
+			// contentUpdated property means the content needs to be saved on the next save
+			//
+			public string filename
+			{
+				set
+				{
+					_filename = value;
+					//
+					// -- mark content updated if the content was updated, or if the content is not blank (so old content is written to the new updated filename)
+					contentUpdated = contentUpdated || (!string.IsNullOrEmpty(_content));
+				}
+				get
+				{
+					return _filename;
+				}
+			}
+			private string _filename = "";
+			//
+			// -- content in the file. loaded as needed, not during model create. 
+			public string content
+			{
+				set
+				{
+					_content = value;
+					contentUpdated = true;
+				}
+				get
+				{
+					if (!contentLoaded)
+					{
+						if ((!string.IsNullOrEmpty(filename)) && (internalCpCore != null))
+						{
+							contentLoaded = true;
+							_content = internalCpCore.cdnFiles.readFile(filename);
+						}
+					}
+					return _content;
+				}
+			}
+			//
+			// -- internal storage for content
+			private string _content {get; set;} = "";
+			//
+			// -- When field is deserialized from cache, contentLoaded flag is used to deferentiate between unloaded content and blank conent.
+			public bool contentLoaded {get; set;} = false;
+			//
+			// -- When content is updated, the model.save() writes the file
+			public bool contentUpdated {get; set;} = false;
+			//
+			// -- set by load(). Used by field to read content from filename when needed
+			public coreClass internalCpCore {get; set;} = null;
+		}
+
+		//
+		public class fieldTypeTextFile : fieldCdnFile
+		{
+		}
+		public class fieldTypeJavascriptFile : fieldCdnFile
+		{
+		}
+		public class fieldTypeCSSFile : fieldCdnFile
+		{
+		}
+		public class fieldTypeHTMLFile : fieldCdnFile
+		{
+		}
+		//
+		//====================================================================================================
+		// -- instance properties
+		public int id {get; set;}
+		public string name {get; set;}
+		public string ccguid {get; set;}
+		public bool Active {get; set;}
+		public int ContentControlID {get; set;}
+		public int CreatedBy {get; set;}
+		public int CreateKey {get; set;}
+		public DateTime DateAdded {get; set;}
+		public int ModifiedBy {get; set;}
+		public DateTime ModifiedDate {get; set;}
+		public string SortOrder {get; set;}
+		//
+		//====================================================================================================
+		private static string derivedContentName(Type derivedType)
+		{
+			FieldInfo fieldInfo = derivedType.GetField("contentName");
+			if (fieldInfo == null)
+			{
+				throw new ApplicationException("Class [" + derivedType.Name + "] must declare constant [contentName].");
+			}
+			else
+			{
+				return fieldInfo.GetRawConstantValue().ToString();
+			}
+		}
+		//
+		//====================================================================================================
+		private static string derivedContentTableName(Type derivedType)
+		{
+			FieldInfo fieldInfo = derivedType.GetField("contentTableName");
+			if (fieldInfo == null)
+			{
+				throw new ApplicationException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
+			}
+			else
+			{
+				return fieldInfo.GetRawConstantValue().ToString();
+			}
+		}
+		//
+		//====================================================================================================
+		private static string contentDataSource(Type derivedType)
+		{
+			FieldInfo fieldInfo = derivedType.GetField("contentTableName");
+			if (fieldInfo == null)
+			{
+				throw new ApplicationException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
+			}
+			else
+			{
+				return fieldInfo.GetRawConstantValue().ToString();
+			}
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// Create an empty object. needed for deserialization
+		/// </summary>
+		public baseModel()
+		{
+			//
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// Add a new recod to the db and open it. Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="cpCore"></param>
+		/// <returns></returns>
+		protected static T add<T>(coreClass cpCore) where T: baseModel
+		{
+			object tempVar = new List<string>();
+			return add<T>(cpCore, ref tempVar);
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// Add a new recod to the db and open it. Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
+		/// include callersCacheNameList to get a list of cacheNames used to assemble this response
+		/// </summary>
+		/// <param name="cpCore"></param>
+		/// <param name="callersCacheNameList"></param>
+		/// <returns></returns>
+		protected static T add<T>(coreClass cpCore, ref List<string> callersCacheNameList) where T: baseModel
+		{
+			T result = default(T);
+			try
+			{
+				if (cpCore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpCore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					Type instanceType = typeof(T);
+					string contentName = derivedContentName(instanceType);
+					result = create<T>(cpCore, cpCore.db.insertContentRecordGetID(contentName, cpCore.doc.authContext.user.id), callersCacheNameList);
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+				throw;
+				throw;
+			}
+			return result;
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// return a new model with the data selected.
+		/// </summary>
+		/// <param name="cpCore"></param>
+		/// <param name="recordId"></param>
+		/// <returns></returns>
+		protected static T create<T>(coreClass cpCore, int recordId) where T: baseModel
+		{
+			object tempVar = new List<string>();
+			return create<T>(cpCore, recordId, ref tempVar);
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// return a new model with the data selected. All cacheNames related to the object will be added to the cacheNameList.
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="recordId">The id of the record to be read into the new object</param>
+		/// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
+		protected static T create<T>(coreClass cpCore, int recordId, ref List<string> callersCacheNameList) where T: baseModel
+		{
+			T result = default(T);
+			try
+			{
+				if (cpCore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpCore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					if (recordId > 0)
+					{
+						Type instanceType = typeof(T);
+						string contentName = derivedContentName(instanceType);
+						result = readModelCache<T>(cpCore, "id", recordId.ToString());
+						if (result == null)
+						{
+							using (csController cs = new csController(cpCore))
+							{
+								if (cs.open(contentName, "(id=" + recordId.ToString() + ")"))
+								{
+									result = loadRecord<T>(cpCore, cs, ref callersCacheNameList);
+								}
+							}
+						}
+						//
+						// -- store cpCore in all extended fields that need it (file fields so content read can happen on demand instead of at load)
+						if (result != null)
+						{
+							foreach (PropertyInfo instanceProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+							{
+								switch (instanceProperty.PropertyType.Name)
+								{
+									case "fieldTypeTextFile":
+									case "fieldTypeJavascriptFile":
+									case "fieldTypeCSSFile":
+									case "fieldTypeHTMLFile":
+										switch (instanceProperty.PropertyType.Name)
+										{
+											case "fieldTypeJavascriptFile":
+											{
+												fieldTypeJavascriptFile fileProperty = (fieldTypeJavascriptFile)instanceProperty.GetValue(result);
+												fileProperty.internalCpCore = cpCore;
+												break;
+											}
+											case "fieldTypeCSSFile":
+											{
+												fieldTypeCSSFile fileProperty = (fieldTypeCSSFile)instanceProperty.GetValue(result);
+												fileProperty.internalCpCore = cpCore;
+												break;
+											}
+											case "fieldTypeHTMLFile":
+											{
+												fieldTypeHTMLFile fileProperty = (fieldTypeHTMLFile)instanceProperty.GetValue(result);
+												fileProperty.internalCpCore = cpCore;
+												break;
+											}
+											default:
+											{
+												fieldTypeTextFile fileProperty = (fieldTypeTextFile)instanceProperty.GetValue(result);
+												fileProperty.internalCpCore = cpCore;
+												break;
+											}
+										}
+										break;
+								}
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+				throw;
+			}
+			return result;
+		}
+		//
+		//====================================================================================================
+		protected static T create<T>(coreClass cpCore, string recordGuid) where T: baseModel
+		{
+			object tempVar = new List<string>();
+			return create<T>(cpCore, recordGuid, ref tempVar);
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// open an existing object
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="recordGuid"></param>
+		protected static T create<T>(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList) where T: baseModel
+		{
+			T result = default(T);
+			try
+			{
+				if (cpCore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpCore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					if (!string.IsNullOrEmpty(recordGuid))
+					{
+						Type instanceType = typeof(T);
+						string contentName = derivedContentName(instanceType);
+						result = readModelCache<T>(cpCore, "ccguid", recordGuid);
+						if (result == null)
+						{
+							using (csController cs = new csController(cpCore))
+							{
+								if (cs.open(contentName, "(ccGuid=" + cpCore.db.encodeSQLText(recordGuid) + ")"))
+								{
+									result = loadRecord<T>(cpCore, cs, ref callersCacheNameList);
+								}
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+				throw;
+				throw;
+			}
+			return result;
+		}
+		//
+		//====================================================================================================
+		protected static T createByName<T>(coreClass cpCore, string recordName) where T: baseModel
+		{
+			object tempVar = new List<string>();
+			return createByName<T>(cpCore, recordName, ref tempVar);
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// open an existing object
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="recordName"></param>
+		protected static T createByName<T>(coreClass cpCore, string recordName, ref List<string> callersCacheNameList) where T: baseModel
+		{
+			T result = default(T);
+			try
+			{
+				if (cpCore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpCore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					if (!string.IsNullOrEmpty(recordName))
+					{
+						Type instanceType = typeof(T);
+						string contentName = derivedContentName(instanceType);
+						result = readModelCache<T>(cpCore, "name", recordName);
+						if (result == null)
+						{
+							using (csController cs = new csController(cpCore))
+							{
+								if (cs.open(contentName, "(name=" + cpCore.db.encodeSQLText(recordName) + ")", "id"))
+								{
+									result = loadRecord<T>(cpCore, cs, ref callersCacheNameList);
+								}
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+				throw;
+			}
+			return result;
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// open an existing object
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="sqlCriteria"></param>
+		private static T loadRecord<T>(coreClass cpCore, csController cs, ref List<string> callersCacheNameList) where T: baseModel
+		{
+			T modelInstance = default(T);
+			try
+			{
+				if (cs.ok())
+				{
+					Type instanceType = typeof(T);
+					string contentName = derivedContentName(instanceType);
+					string tableName = derivedContentTableName(instanceType);
+					int recordId = cs.getInteger("id");
+					modelInstance = (T)Activator.CreateInstance(instanceType);
+					foreach (PropertyInfo modelProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+					{
+						switch (modelProperty.Name.ToLower())
+						{
+							case "specialcasefield":
+							break;
+							default:
+								switch (modelProperty.PropertyType.Name)
+								{
+									case "Int32":
+									{
+										modelProperty.SetValue(modelInstance, cs.getInteger(modelProperty.Name), null);
+										break;
+									}
+									case "Boolean":
+									{
+										modelProperty.SetValue(modelInstance, cs.getBoolean(modelProperty.Name), null);
+										break;
+									}
+									case "DateTime":
+									{
+										modelProperty.SetValue(modelInstance, cs.getDate(modelProperty.Name), null);
+										break;
+									}
+									case "Double":
+									{
+										modelProperty.SetValue(modelInstance, cs.getNumber(modelProperty.Name), null);
+										break;
+									}
+									case "String":
+									{
+										modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), null);
+										break;
+									}
+									case "fieldTypeTextFile":
+									{
+										//
+										// -- cdn files
+										fieldTypeTextFile instanceFileType = new fieldTypeTextFile();
+										instanceFileType.filename = cs.getValue(modelProperty.Name);
+										//If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
+										//    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
+										//End If
+										modelProperty.SetValue(modelInstance, instanceFileType);
+										break;
+									}
+									case "fieldTypeJavascriptFile":
+									{
+										//
+										// -- cdn files
+										fieldTypeJavascriptFile instanceFileType = new fieldTypeJavascriptFile();
+										instanceFileType.filename = cs.getValue(modelProperty.Name);
+										//If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
+										//    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
+										//End If
+										modelProperty.SetValue(modelInstance, instanceFileType);
+										break;
+									}
+									case "fieldTypeCSSFile":
+									{
+										//
+										// -- cdn files
+										fieldTypeCSSFile instanceFileType = new fieldTypeCSSFile();
+										instanceFileType.filename = cs.getValue(modelProperty.Name);
+										//If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
+										//    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
+										//End If
+										modelProperty.SetValue(modelInstance, instanceFileType);
+										break;
+									}
+									case "fieldTypeHTMLFile":
+									{
+										//
+										// -- private files
+										fieldTypeHTMLFile instanceFileType = new fieldTypeHTMLFile();
+										instanceFileType.filename = cs.getValue(modelProperty.Name);
+										//If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
+										//    instanceFileType.content = cpCore.cdnFiles.readFile(instanceFileType.filename)
+										//End If
+										modelProperty.SetValue(modelInstance, instanceFileType);
+										break;
+									}
+									default:
+									{
+										modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), null);
+										break;
+									}
+								}
+								break;
+						}
+					}
+					if (modelInstance != null)
+					{
+						//
+						// -- set primary cache to the object created
+						// -- set secondary caches to the primary cache
+						// -- add all cachenames to the injected cachenamelist
+						baseModel baseInstance = modelInstance as baseModel;
+						if (baseInstance != null)
+						{
+							string cacheName0 = Controllers.cacheController.getCacheKey_Entity(tableName, "id", baseInstance.id.ToString());
+							callersCacheNameList.Add(cacheName0);
+							cpCore.cache.setContent(cacheName0, modelInstance);
+							//
+							string cacheName1 = Controllers.cacheController.getCacheKey_Entity(tableName, "ccguid", baseInstance.ccguid);
+							callersCacheNameList.Add(cacheName1);
+							cpCore.cache.setPointer(cacheName1, cacheName0);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+				throw;
+			}
+			return modelInstance;
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// save the instance properties to a record with matching id. If id is not provided, a new record is created.
+		/// </summary>
+		/// <param name="cpCore"></param>
+		/// <returns></returns>
+		protected int save(coreClass cpCore)
+		{
+			try
+			{
+				if (cpCore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpCore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					csController cs = new csController(cpCore);
+					Type instanceType = this.GetType();
+					string contentName = derivedContentName(instanceType);
+					string tableName = derivedContentTableName(instanceType);
+					if (id > 0)
+					{
+						if (!cs.open(contentName, "id=" + id))
+						{
+							string message = "Unable to open record in content [" + contentName + "], with id [" + id + "]";
+							cs.Close();
+							id = 0;
+							throw new ApplicationException(message);
+						}
+					}
+					else
+					{
+						if (!cs.Insert(contentName))
+						{
+							cs.Close();
+							id = 0;
+							throw new ApplicationException("Unable to insert record in content [" + contentName + "]");
+						}
+					}
+					int recordId = cs.getInteger("id");
+//INSTANT C# NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
+					int value = 0;
+//INSTANT C# NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
+					bool value = false;
+//INSTANT C# NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
+					DateTime value = default(DateTime);
+//INSTANT C# NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
+					double value = 0;
+					foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+					{
+						switch (instanceProperty.Name.ToLower())
+						{
+							case "id":
+								id = cs.getInteger("id");
+								break;
+							case "ccguid":
+								if (string.IsNullOrEmpty(ccguid))
+								{
+									ccguid = Controllers.genericController.getGUID();
+								}
+								string value = instanceProperty.GetValue(this, null).ToString();
+								cs.setField(instanceProperty.Name, value);
+								break;
+							default:
+								switch (instanceProperty.PropertyType.Name)
+								{
+									case "Int32":
+//										Dim value As Integer
+										int.TryParse(instanceProperty.GetValue(this, null).ToString(), out value);
+										cs.setField(instanceProperty.Name, value);
+										break;
+									case "Boolean":
+//										Dim value As Boolean
+										bool.TryParse(instanceProperty.GetValue(this, null).ToString(), out value);
+										cs.setField(instanceProperty.Name, value);
+										break;
+									case "DateTime":
+//										Dim value As Date
+										DateTime.TryParse(instanceProperty.GetValue(this, null).ToString(), out value);
+										cs.setField(instanceProperty.Name, value);
+										break;
+									case "Double":
+//										Dim value As Double
+										double.TryParse(instanceProperty.GetValue(this, null).ToString(), out value);
+										cs.setField(instanceProperty.Name, value);
+										break;
+									case "fieldTypeTextFile":
+									case "fieldTypeJavascriptFile":
+									case "fieldTypeCSSFile":
+									case "fieldTypeHTMLFile":
+										int fieldTypeId = 0;
+										PropertyInfo contentProperty = null;
+										PropertyInfo contentUpdatedProperty = null;
+										bool contentUpdated = false;
+										string content = "";
+										switch (instanceProperty.PropertyType.Name)
+										{
+											case "fieldTypeJavascriptFile":
+											{
+												fieldTypeId = FieldTypeIdFileJavascript;
+												fieldTypeJavascriptFile fileProperty = (fieldTypeJavascriptFile)instanceProperty.GetValue(this);
+												fileProperty.internalCpCore = cpCore;
+												contentProperty = instanceProperty.PropertyType.GetProperty("content");
+												contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+												contentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
+												content = (string)contentProperty.GetValue(fileProperty);
+												break;
+											}
+											case "fieldTypeCSSFile":
+											{
+												fieldTypeId = FieldTypeIdFileCSS;
+												fieldTypeCSSFile fileProperty = (fieldTypeCSSFile)instanceProperty.GetValue(this);
+												fileProperty.internalCpCore = cpCore;
+												contentProperty = instanceProperty.PropertyType.GetProperty("content");
+												contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+												contentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
+												content = (string)contentProperty.GetValue(fileProperty);
+												break;
+											}
+											case "fieldTypeHTMLFile":
+											{
+												fieldTypeId = FieldTypeIdFileHTML;
+												fieldTypeHTMLFile fileProperty = (fieldTypeHTMLFile)instanceProperty.GetValue(this);
+												fileProperty.internalCpCore = cpCore;
+												contentProperty = instanceProperty.PropertyType.GetProperty("content");
+												contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+												contentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
+												content = (string)contentProperty.GetValue(fileProperty);
+												break;
+											}
+											default:
+											{
+												fieldTypeId = FieldTypeIdFileText;
+												fieldTypeTextFile fileProperty = (fieldTypeTextFile)instanceProperty.GetValue(this);
+												fileProperty.internalCpCore = cpCore;
+												contentProperty = instanceProperty.PropertyType.GetProperty("content");
+												contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+												contentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
+												content = (string)contentProperty.GetValue(fileProperty);
+												break;
+											}
+										}
+										if (contentUpdated)
+										{
+											string filename = cs.getValue(instanceProperty.Name);
+											if (string.IsNullOrEmpty(content))
+											{
+												//
+												// -- empty content
+												if (!string.IsNullOrEmpty(filename))
+												{
+													cs.setField(instanceProperty.Name, "");
+													cpCore.cdnFiles.deleteFile(filename);
+												}
+											}
+											else
+											{
+												//
+												// -- save content
+												if (string.IsNullOrEmpty(filename))
+												{
+													filename = fileController.getVirtualRecordPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, fieldTypeId);
+												}
+												cs.setFile(instanceProperty.Name, content, contentName);
+											}
+										}
+										//Case "fieldTypeJavascriptFile"
+										//    Dim textFileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeJavascriptFile)
+										//    textFileProperty.internalCpCore = cpCore
+										//    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
+										//    Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
+										//    If (String.IsNullOrEmpty(copy)) Then
+										//        '
+										//        ' -- empty content
+										//        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+										//        If (Not String.IsNullOrEmpty(filename)) Then
+										//            cs.setField(instanceProperty.Name, "")
+										//            cpCore.cdnFiles.deleteFile(filename)
+										//        End If
+										//    Else
+										//        '
+										//        ' -- save content
+										//        cs.setFile(instanceProperty.Name, copy, contentName)
+										//    End If
+										//Case "fieldTypeCSSFile"
+										//    Dim textFileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeCSSFile)
+										//    textFileProperty.internalCpCore = cpCore
+										//    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
+										//    Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
+										//    If (String.IsNullOrEmpty(copy)) Then
+										//        '
+										//        ' -- empty content
+										//        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+										//        If (Not String.IsNullOrEmpty(filename)) Then
+										//            cs.setField(instanceProperty.Name, "")
+										//            cpCore.cdnFiles.deleteFile(filename)
+										//        End If
+										//    Else
+										//        '
+										//        ' -- save content
+										//        cs.setFile(instanceProperty.Name, copy, contentName)
+										//    End If
+										//Case "fieldTypeHTMLFile"
+										//    Dim textFileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeHTMLFile)
+										//    textFileProperty.internalCpCore = cpCore
+										//    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
+										//    Dim copy As String = DirectCast(copyProperty.GetValue(textFileProperty), String)
+										//    If (String.IsNullOrEmpty(copy)) Then
+										//        '
+										//        ' -- empty content
+										//        Dim filename As String = cs.getValue(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+										//        If (Not String.IsNullOrEmpty(filename)) Then
+										//            cs.setField(instanceProperty.Name, "")
+										//            cpCore.cdnFiles.deleteFile(filename)
+										//        End If
+										//    Else
+										//        '
+										//        ' -- save content
+										//        cs.setFile(instanceProperty.Name, copy, contentName)
+										//    End If
+										break;
+									default:
+										string value = instanceProperty.GetValue(this, null).ToString();
+										cs.setField(instanceProperty.Name, value);
+										break;
+								}
+								break;
+						}
+					}
+					cs.Close();
+					//
+					// -- invalidate objects
+					// -- no, the primary is invalidated by the cs.save()
+					//cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
+					// -- no, the secondary points to the pirmary, which is invalidated. Dont waste resources invalidating
+					//cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
+					//
+					// -- object is here, but the cache was invalidated, setting
+					cpCore.cache.setContent(Controllers.cacheController.getCacheKey_Entity(tableName, "id", this.id.ToString()), this);
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+				throw;
+			}
+			return id;
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// delete an existing database record by id
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="recordId"></param>
+		protected static void delete<T>(coreClass cpCore, int recordId) where T: baseModel
+		{
+			try
+			{
+				if (cpCore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpCore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					if (recordId > 0)
+					{
+						Type instanceType = typeof(T);
+						string contentName = derivedContentName(instanceType);
+						string tableName = derivedContentTableName(instanceType);
+						cpCore.db.deleteContentRecords(contentName, "id=" + recordId.ToString());
+						cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+				throw;
+			}
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// delete an existing database record by guid
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="ccguid"></param>
+		protected static void delete<T>(coreClass cpCore, string ccguid) where T: baseModel
+		{
+			try
+			{
+				if (cpCore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpCore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					if (!string.IsNullOrEmpty(ccguid))
+					{
+						Type instanceType = typeof(T);
+						string contentName = derivedContentName(instanceType);
+						baseModel instance = create<baseModel>(cpCore, ccguid);
+						if (instance != null)
+						{
+							invalidateCacheSingleRecord<T>(cpCore, instance.id);
+							cpCore.db.deleteContentRecords(contentName, "(ccguid=" + cpCore.db.encodeSQLText(ccguid) + ")");
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+				throw;
+			}
+		}
+		//
+		//====================================================================================================
+		protected static List<T> createList<T>(coreClass cpCore, string sqlCriteria) where T: baseModel
+		{
+			return createList<T>(cpCore, sqlCriteria, "id", new List<string>);
+		}
+		//
+		//====================================================================================================
+		protected static List<T> createList<T>(coreClass cpCore, string sqlCriteria, string sqlOrderBy) where T: baseModel
+		{
+			return createList<T>(cpCore, sqlCriteria, sqlOrderBy, new List<string>);
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// pattern get a list of objects from this model
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="sqlCriteria"></param>
+		/// <returns></returns>
+		protected static List<T> createList<T>(coreClass cpCore, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T: baseModel
+		{
+			List<T> result = new List<T>();
+			try
+			{
+				if (cpCore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpCore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					csController cs = new csController(cpCore);
+					string sql = getSelectSql<T>(null, sqlCriteria, sqlOrderBy);
+					//Dim ignoreCacheNames As New List(Of String)
+					//Dim instanceType As Type = GetType(T)
+					//Dim contentName As String = derivedContentName(instanceType)
+					if (cs.openSQL(sql))
+					{
+						//End If
+						//If (cs.open(contentName, sqlCriteria, sqlOrderBy)) Then
+						T instance = default(T);
+						do
+						{
+							instance = loadRecord<T>(cpCore, cs, ref callersCacheNameList);
+							if (instance != null)
+							{
+								result.Add(instance);
+							}
+							cs.goNext();
+						} while (cs.ok());
+					}
+					cs.Close();
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+				throw;
+			}
+			return result;
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// invalidate the primary key (which depends on all secondary keys)
+		/// </summary>
+		/// <param name="cpCore"></param>
+		/// <param name="recordId"></param>
+		protected static void invalidateCacheSingleRecord<T>(coreClass cpCore, int recordId) where T: baseModel
+		{
+			try
+			{
+				if (cpCore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpCore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpCore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					object instanceType = typeof(T);
+					string tableName = derivedContentTableName((Type)instanceType);
+					cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
+					//
+					// -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
+					cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(tableName, "id", "0"));
+				}
+			}
+			catch (Exception ex)
+			{
+				cpCore.handleException(ex);
+			}
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// get the name of the record by it's id
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="recordId"></param>record
+		/// <returns></returns>
+		protected static string getRecordName<T>(coreClass cpcore, int recordId) where T: baseModel
+		{
+			try
+			{
+				if (cpcore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpcore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpcore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpcore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					if (recordId > 0)
+					{
+						Type instanceType = typeof(T);
+						string tableName = derivedContentTableName(instanceType);
+						using (csController cs = new csController(cpcore))
+						{
+							if (cs.openSQL("select name from " + tableName + " where id=" + recordId.ToString()))
+							{
+								return cs.getText("name");
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpcore.handleException(ex);
+			}
+			return "";
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// get the name of the record by it's guid 
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="ccGuid"></param>record
+		/// <returns></returns>
+		protected static string getRecordName<T>(coreClass cpcore, string ccGuid) where T: baseModel
+		{
+			try
+			{
+				if (cpcore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpcore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpcore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpcore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					if (!string.IsNullOrEmpty(ccGuid))
+					{
+						Type instanceType = typeof(T);
+						string tableName = derivedContentTableName(instanceType);
+						using (csController cs = new csController(cpcore))
+						{
+							if (cs.openSQL("select name from " + tableName + " where ccguid=" + cpcore.db.encodeSQLText(ccGuid)))
+							{
+								return cs.getText("name");
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpcore.handleException(ex);
+			}
+			return "";
+		}
+		//
+		//====================================================================================================
+		/// <summary>
+		/// get the id of the record by it's guid 
+		/// </summary>
+		/// <param name="cp"></param>
+		/// <param name="ccGuid"></param>record
+		/// <returns></returns>
+		protected static int getRecordId<T>(coreClass cpcore, string ccGuid) where T: baseModel
+		{
+			try
+			{
+				if (cpcore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpcore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpcore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpcore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					if (!string.IsNullOrEmpty(ccGuid))
+					{
+						Type instanceType = typeof(T);
+						string tableName = derivedContentTableName(instanceType);
+						using (csController cs = new csController(cpcore))
+						{
+							if (cs.openSQL("select id from " + tableName + " where ccguid=" + cpcore.db.encodeSQLText(ccGuid)))
+							{
+								return cs.getInteger("id");
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpcore.handleException(ex);
+			}
+			return 0;
+		}
+		//
+		//====================================================================================================
+		//
+		protected static T createDefault<T>(coreClass cpcore) where T: baseModel
+		{
+			T instance = default(T);
+			try
+			{
+				Type instanceType = typeof(T);
+				instance = (T)Activator.CreateInstance(instanceType);
+				if (cpcore.serverConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpcore.handleException(new ApplicationException("Cannot use data models without a valid server configuration."));
+				}
+				else if (cpcore.serverConfig.appConfig == null)
+				{
+					//
+					// -- cannot use models without an application
+					cpcore.handleException(new ApplicationException("Cannot use data models without a valid application configuration."));
+				}
+				else
+				{
+					string contentName = derivedContentName(instanceType);
+					Models.Complex.cdefModel CDef = Models.Complex.cdefModel.getCdef(cpcore, contentName);
+					if (CDef == null)
+					{
+						throw new ApplicationException("content [" + contentName + "] could Not be found.");
+					}
+					else if (CDef.Id <= 0)
+					{
+						throw new ApplicationException("content [" + contentName + "] could Not be found.");
+					}
+					else
+					{
+						foreach (PropertyInfo resultProperty in instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+						{
+							switch (resultProperty.Name.ToLower())
+							{
+								case "id":
+									resultProperty.SetValue(instance, 0);
+									break;
+								default:
+									switch (resultProperty.PropertyType.Name)
+									{
+										case "Int32":
+											resultProperty.SetValue(instance, genericController.EncodeInteger(CDef.fields(resultProperty.Name).defaultValue), null);
+											break;
+										case "Boolean":
+											resultProperty.SetValue(instance, genericController.EncodeBoolean(CDef.fields(resultProperty.Name).defaultValue), null);
+											break;
+										case "DateTime":
+											resultProperty.SetValue(instance, genericController.EncodeDate(CDef.fields(resultProperty.Name).defaultValue), null);
+											break;
+										case "Double":
+											resultProperty.SetValue(instance, genericController.EncodeNumber(CDef.fields(resultProperty.Name).defaultValue), null);
+											break;
+										default:
+											resultProperty.SetValue(instance, CDef.fields(resultProperty.Name).defaultValue, null);
+											break;
+									}
+									break;
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				cpcore.handleException(ex);
+			}
+			return instance;
+		}
+		//
+		private static T readModelCache<T>(coreClass cpCore, string fieldName, string fieldValue) where T: baseModel
+		{
+			Type instanceType = typeof(T);
+			string tableName = derivedContentTableName(instanceType);
+			string cacheName = Controllers.cacheController.getCacheKey_Entity(tableName, fieldName, fieldValue);
+			return cpCore.cache.getObject<T>(cacheName);
+		}
+		//
+		private static string getSelectSql<T>(List<string> fieldList = null, string criteria = "", string orderBy = "") where T: baseModel
+		{
+			string result = "";
+			Type instanceType = typeof(T);
+			string tableName = derivedContentTableName(instanceType);
+			if (fieldList == null)
+			{
+				fieldList = new List<string>();
+				T modelInstance = (T)Activator.CreateInstance(instanceType);
+				foreach (PropertyInfo modelProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+				{
+					fieldList.Add(modelProperty.Name);
+				}
+			}
+			result = "select " + string.Join(",", fieldList.ToArray()) + " from " + tableName + " where (active>0)";
+			if (!string.IsNullOrEmpty(criteria))
+			{
+				result += "and(" + criteria + ")";
+			}
+			if (!string.IsNullOrEmpty(orderBy))
+			{
+				result += " order by " + orderBy;
+			}
+			return result;
+		}
+	}
+}
