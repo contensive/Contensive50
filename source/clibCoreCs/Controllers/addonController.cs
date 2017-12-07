@@ -2,12 +2,17 @@
 using System;
 using System.Reflection;
 using System.Xml;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using Contensive.Core;
 using Contensive.Core.Models.Entity;
-using Contensive.BaseClasses;
+using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
-using System.Collections.Generic;
-
+//
+using Contensive.BaseClasses;
+using System.IO;
+//
 namespace Contensive.Core.Controllers {
     //
     // replace mscript with https://github.com/Microsoft/ClearScript
@@ -82,7 +87,7 @@ namespace Contensive.Core.Controllers {
                     cpCore.doc.addonsCurrentlyRunningIdList.Add(addon.id);
                     //
                     // -- run included add-ons before their parent
-                    List<Models.Entity.addonIncludeRuleModel> addonIncludeRules = Models.Entity.addonIncludeRuleModel.createList(cpCore, "(addonid=" + addon.id + ")");
+                    List<Models.Entity.addonIncludeRuleModel> addonIncludeRules = addonIncludeRuleModel.createList(cpCore, "(addonid=" + addon.id + ")");
                     if (addonIncludeRules.Count > 0) {
                         foreach (Models.Entity.addonIncludeRuleModel addonRule in addonIncludeRules) {
                             if (addonRule.IncludedAddonID > 0) {
@@ -334,7 +339,7 @@ namespace Contensive.Core.Controllers {
                             result = addon.CopyText + addon.Copy;
                             if (!string.IsNullOrEmpty(result)) {
                                 string ignoreLayoutErrors = string.Empty;
-                                result = cpCore.html.executeContentCommands(null, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ignoreLayoutErrors);
+                                result = cpCore.html.executeContentCommands(null, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
                             }
                             switch (executeContext.addonType) {
                                 case CPUtilsBaseClass.addonContext.ContextEditor:
@@ -346,7 +351,7 @@ namespace Contensive.Core.Controllers {
                                 case CPUtilsBaseClass.addonContext.ContextFilter:
                                 case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
                                 case CPUtilsBaseClass.addonContext.ContextOnBodyStart:
-                                case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
+                                //case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
                                 case CPUtilsBaseClass.addonContext.ContextOnPageEnd:
                                 case CPUtilsBaseClass.addonContext.ContextOnPageStart:
                                 case CPUtilsBaseClass.addonContext.ContextPage:
@@ -390,7 +395,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- DotNet
                         if (addon.DotNetClass != "") {
-                            result += execute_Assembly(addon, Models.Entity.AddonCollectionModel.create(cpCore, addon.CollectionID));
+                            result += execute_Assembly(addon, AddonCollectionModel.create(cpCore, addon.CollectionID));
                         }
                         //
                         // -- RemoteAssetLink
@@ -407,7 +412,7 @@ namespace Contensive.Core.Controllers {
                             }
                             int PosStart = 0;
                             httpRequestController kmaHTTP = new httpRequestController();
-                            string RemoteAssetContent = kmaHTTP.getURL(RemoteAssetLink);
+                            string RemoteAssetContent = kmaHTTP.getURL(ref RemoteAssetLink);
                             int Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", Microsoft.VisualBasic.Constants.vbTextCompare);
                             if (Pos > 0) {
                                 Pos = genericController.vbInstr(Pos, RemoteAssetContent, ">");
@@ -525,15 +530,15 @@ namespace Contensive.Core.Controllers {
                                 // Edit Icon
                                 string EditWrapperHTMLID = "eWrapper" + cpCore.doc.pageAddonCnt;
                                 string DialogList = string.Empty;
-                                string HelpIcon = getHelpBubble(addon.id, addon.Help, addon.CollectionID, DialogList);
+                                string HelpIcon = getHelpBubble(addon.id, addon.Help, addon.CollectionID, ref DialogList);
                                 if (cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                     string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
                                     string AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                    AddonEditIcon = "<a href=\"" + "/" + cpCore.serverConfig.appConfig.adminRoute + "?cid=" + models.complex.cdefmodel.getcontentid(cpCore, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
-                                    string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, DialogList);
-                                    string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + cpCore.doc.editWrapperCnt, DialogList);
+                                    AddonEditIcon = "<a href=\"" + "/" + cpCore.serverConfig.appConfig.adminRoute + "?cid=" + cdefModel.getContentId(cpCore, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
+                                    string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
+                                    string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + cpCore.doc.editWrapperCnt, ref DialogList);
                                     string SiteStylesEditIcon = string.Empty; // ?????
-                                    string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
+                                    string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
                                     ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
                                     result = cpCore.html.getEditWrapper("<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
                                 } else if (cpCore.visitProperty.getBoolean("AllowEditing")) {
@@ -726,7 +731,7 @@ namespace Contensive.Core.Controllers {
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         Filename = FieldValue;
                                                                         VirtualFilePath = "Settings/" + FieldName + "/";
-                                                                        cpCore.cdnFiles.upload(FieldName, VirtualFilePath, Filename);
+                                                                        cpCore.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
                                                                         cpCore.siteProperties.setProperty(FieldName, VirtualFilePath + Filename);
                                                                     }
                                                                     break;
@@ -764,7 +769,7 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = EncodeNumber(FieldValue).ToString();
-                                                                        FieldValue = Microsoft.VisualBasic.Strings.FormatCurrency(FieldValue, -1, Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState.UseDefault);
+                                                                        FieldValue = String.Format("C", FieldValue);
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -963,7 +968,7 @@ namespace Contensive.Core.Controllers {
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
-                                                                                cpCore.privateFiles.splitPathFilename(FieldValue, FieldValuePath, FieldValuefilename);
+                                                                                cpCore.privateFiles.splitPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
                                                                                 + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.html_GetFormInputCheckBox2(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.html_GetFormInputFile(FieldName);
@@ -977,7 +982,7 @@ namespace Contensive.Core.Controllers {
                                                                             Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                                FieldValue = Microsoft.VisualBasic.Strings.FormatCurrency(FieldValue, -1, Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState.UseDefault);
+                                                                                FieldValue = String.Format("C", FieldValue);
                                                                             }
                                                                             Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
                                                                         }
@@ -1053,7 +1058,7 @@ namespace Contensive.Core.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
-                                                            CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID",,,,, "id,name,Copy");
+                                                            CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
                                                             if (!cpCore.db.csOk(CS)) {
                                                                 cpCore.db.csClose(ref CS);
                                                                 CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.authContext.user.id);
@@ -1133,15 +1138,15 @@ namespace Contensive.Core.Controllers {
                                                         DataTable dt = null;
                                                         if (!string.IsNullOrEmpty(FieldSQL)) {
                                                             try {
-                                                                dt = cpCore.db.executeQuery(FieldSQL, FieldDataSource,, SQLPageSize);
+                                                                dt = cpCore.db.executeQuery(FieldSQL, FieldDataSource, 0, SQLPageSize);
                                                                 //RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
 
                                                             } catch (Exception ex) {
 
                                                                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                ErrorNumber = Microsoft.VisualBasic.Information.Err().Number;
+                                                                ErrorNumber = 0;
                                                                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                ErrorDescription = Microsoft.VisualBasic.Information.Err().Description;
+                                                                ErrorDescription = "";
                                                                 loadOK = false;
                                                             }
                                                         }
@@ -1156,7 +1161,7 @@ namespace Contensive.Core.Controllers {
                                                                 // ----- Error
                                                                 //
                                                                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                Copy = "Error: " + Microsoft.VisualBasic.Information.Err().Description;
+                                                                Copy = "Error: " + "";
                                                             } else if (!isDataTableOk(dt)) {
                                                                 //
                                                                 // ----- no result
@@ -1173,7 +1178,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 if (dt.Rows.Count > 0) {
                                                                     if (dt.Rows.Count == 1 && dt.Columns.Count == 1) {
-                                                                        Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(something[0, 0]),,,,, true);
+                                                                        Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(something[0, 0]), 0, 0, "", false, true);
                                                                     } else {
                                                                         foreach (DataRow dr in dt.Rows) {
                                                                             //
@@ -1298,7 +1303,7 @@ namespace Contensive.Core.Controllers {
                 //
                 Dictionary<string, string> instanceOptions = new Dictionary<string, string>();
                 instanceOptions.Add(SitePropertyName, SitePropertyValue);
-                buildAddonOptionLists(addonInstanceProperties, ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
+                buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
                 Pos = genericController.vbInstr(1, ExpandedSelector, "[");
                 if (Pos != 0) {
                     //
@@ -1419,7 +1424,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="ReplaceValues"></param>
         /// <returns></returns>
         /// <remarks>long run, use either csscript.net, or use .net tools to build compile/run funtion</remarks>
-        private string execute_Script(ref Models.Entity.addonModel addon, string Language, string Code, string EntryPoint, int ScriptingTimeout, string ScriptName) {
+        private string execute_Script(ref addonModel addon, string Language, string Code, string EntryPoint, int ScriptingTimeout, string ScriptName) {
             string returnText = "";
             try {
                 string[] Lines = null;
@@ -1556,7 +1561,7 @@ namespace Contensive.Core.Controllers {
                                             returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8], Args[9]));
                                             break;
                                         default:
-                                            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
+                                            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
                                     }
                                 }
                             } catch (Exception ex) {
@@ -1587,7 +1592,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        private string execute_Assembly(Models.Entity.addonModel addon, Models.Entity.AddonCollectionModel addonCollection) {
+        private string execute_Assembly(Models.Entity.addonModel addon, AddonCollectionModel addonCollection) {
             string result = "";
             try {
                 bool AddonFound = false;
@@ -1599,8 +1604,8 @@ namespace Contensive.Core.Controllers {
                 // -- try development bypass folder (addonAssemblyBypass)
                 // -- purpose is to provide a path that can be hardcoded in visual studio after-build event to make development easier
                 string commonAssemblyPath = cpCore.programDataFiles.rootLocalPath + "AddonAssemblyBypass\\";
-                if (!IO.Directory.Exists(commonAssemblyPath)) {
-                    IO.Directory.CreateDirectory(commonAssemblyPath);
+                if (!Directory.Exists(commonAssemblyPath)) {
+                    Directory.CreateDirectory(commonAssemblyPath);
                 } else {
                     result = executeAssembly_byFilePath(addon.id, addon.name, commonAssemblyPath, addon.DotNetClass, true, ref AddonFound);
                 }
@@ -1618,7 +1623,9 @@ namespace Contensive.Core.Controllers {
                             throw new ApplicationException("The assembly for addon [" + addon.name + "] could not be executed because it's collection has an invalid guid.");
                         } else {
                             string AddonVersionPath = "";
-                            addonInstallClass.GetCollectionConfig(cpCore, addonCollection.ccguid, AddonVersionPath, new DateTime(), "");
+                            var tmpDate = new DateTime();
+                            string tmpName = "";
+                            addonInstallClass.GetCollectionConfig(cpCore, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
                             if (string.IsNullOrEmpty(AddonVersionPath)) {
                                 throw new ApplicationException("The assembly for addon [" + addon.name + "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.");
                             } else {
@@ -1659,8 +1666,8 @@ namespace Contensive.Core.Controllers {
             string returnValue = "";
             try {
                 AddonFound = false;
-                if (IO.Directory.Exists(fullPath)) {
-                    foreach (var TestFilePathname in IO.Directory.GetFileSystemEntries(fullPath, "*.dll")) {
+                if (Directory.Exists(fullPath)) {
+                    foreach (var TestFilePathname in Directory.GetFileSystemEntries(fullPath, "*.dll")) {
                         if (!cpCore.assemblySkipList.Contains(TestFilePathname)) {
                             bool testFileIsValidAddonAssembly = true;
                             Assembly testAssembly = null;
@@ -1847,7 +1854,7 @@ namespace Contensive.Core.Controllers {
         public string executeAddonAsProcess(string AddonIDGuidOrName, string OptionString = "") {
             string result = "";
             try {
-                Models.Entity.addonModel addon = null;
+                addonModel addon = null;
                 if (EncodeInteger(AddonIDGuidOrName) > 0) {
                     addon = cpCore.addonCache.getAddonById(EncodeInteger(AddonIDGuidOrName));
                 } else if (genericController.isGuid(AddonIDGuidOrName)) {
@@ -1859,7 +1866,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- addon found
                     //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Microsoft.VisualBasic.Information.Err().Number, Microsoft.VisualBasic.Information.Err().Source, Microsoft.VisualBasic.Information.Err().Description, false, true, "", "process", "");
+                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
                     //
                     string cmdQueryString = ""
                         + "appname=" + encodeNvaArgument(EncodeRequestVariable(cpCore.serverConfig.appConfig.name)) + "&AddonID=" + Convert.ToString(addon.id) + "&OptionString=" + encodeNvaArgument(EncodeRequestVariable(OptionString));
@@ -1871,7 +1878,7 @@ namespace Contensive.Core.Controllers {
                     taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
                     //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Microsoft.VisualBasic.Information.Err().Number, Microsoft.VisualBasic.Information.Err().Source, Microsoft.VisualBasic.Information.Err().Description, false, true, "", "process", "");
+                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -1918,7 +1925,7 @@ namespace Contensive.Core.Controllers {
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">Options for this instance of " + AddonName + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + cpCore.doc.helpCodeCount + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + cpCore.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";
@@ -2104,12 +2111,12 @@ namespace Contensive.Core.Controllers {
                                 + cpCore.html.html_GetFormInputHidden("Type", FormTypeAddonSettingsEditor) + cpCore.html.html_GetFormInputHidden("ContentName", ContentName) + cpCore.html.html_GetFormInputHidden("RecordID", RecordID) + cpCore.html.html_GetFormInputHidden("FieldName", FieldName) + cpCore.html.html_GetFormInputHidden("ACInstanceID", ACInstanceID);
                         }
                         //
-                        BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodeCount + "',this);return false;\"";
+                        BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodes.Count + "',this);return false;\"";
                         QueryString = cpCore.doc.refreshQueryString;
                         QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
-                            + cpCore.html.html_GetUploadFormStart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodeCount + "\" style=\"display:none;visibility:hidden;\">"
+                            + cpCore.html.html_GetUploadFormStart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
                             + "<tr><td class=\"ccButtonCon\">" + cpCore.html.html_GetFormButton("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
@@ -2137,7 +2144,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException( ex );
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetInstanceBubble")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetInstanceBubble")
             return tempgetInstanceBubble;
         }
         //
@@ -2159,12 +2166,12 @@ namespace Contensive.Core.Controllers {
                 //
                 if (cpCore.doc.authContext.isAuthenticated && true) {
                     if (cpCore.doc.authContext.isEditingAnything()) {
-                        Models.Entity.addonModel addon = Models.Entity.addonModel.create(cpCore, addonId);
+                        addonModel addon = addonModel.create(cpCore, addonId);
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">Stylesheet for " + addon.name + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + cpCore.doc.helpCodeCount + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + cpCore.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";
@@ -2183,14 +2190,14 @@ namespace Contensive.Core.Controllers {
                         + "</table>"
                         + cpCore.html.html_GetFormInputHidden("Type", FormTypeAddonStyleEditor) + cpCore.html.html_GetFormInputHidden("AddonID", addonId) + "";
                         //
-                        BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodeCount + "',this);return false;\"";
+                        BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodes.Count + "',this);return false;\"";
                         QueryString = cpCore.doc.refreshQueryString;
                         QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         string Dialog = string.Empty;
 
                         Dialog = Dialog + "<div class=\"ccCon helpDialogCon\">"
-                            + cpCore.html.html_GetUploadFormStart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodeCount + "\" style=\"display:none;visibility:hidden;\">"
+                            + cpCore.html.html_GetUploadFormStart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
                             + "<tr><td class=\"ccButtonCon\">" + cpCore.html.html_GetFormButton("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
@@ -2201,16 +2208,10 @@ namespace Contensive.Core.Controllers {
                         result = ""
                             + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + ">"
                             + GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " + addon.name + " Stylesheets", "Edit " + addon.name + " Stylesheets", "", true, "") + "</a>";
-                        if (cpCore.doc.helpCodeCount >= cpCore.doc.helpCodeSize) {
-                            cpCore.doc.helpCodeSize = cpCore.doc.helpCodeSize + 10;
-                            //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                            Array.Resize( ref asdf,asdf) // redim preserve  cpCore.doc.helpCodes(cpCore.doc.helpCodeSize);
-                            //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                            Array.Resize( ref asdf,asdf) // redim preserve  cpCore.doc.helpCaptions(cpCore.doc.helpCodeSize);
-                        }
-                        cpCore.doc.helpCodes[cpCore.doc.helpCodeCount] = LocalCode;
-                        cpCore.doc.helpCaptions[cpCore.doc.helpCodeCount] = addon.name;
-                        cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1;
+                        cpCore.doc.helpCodes.Add(new docController.helpStuff {
+                            caption = addon.name,
+                            code = LocalCode
+                        });
                     }
                 }
             } catch (Exception ex) {
@@ -2260,7 +2261,7 @@ namespace Contensive.Core.Controllers {
                         + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                         + "<tr>"
                         + "<td align=left class=\"bbLeft\">Help Viewer</td>"
-                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + cpCore.doc.helpCodeCount + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
+                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + cpCore.doc.helpCodes.Count + "');return false;\"><img alt=\"close\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
                         + "</tr>"
                         + "</table>"
                         + "</div>";
@@ -2276,7 +2277,7 @@ namespace Contensive.Core.Controllers {
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                     //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
-                        + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodeCount + "\" style=\"display:none;visibility:hidden;\">"
+                        + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                         + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
                         + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                         + "</table>"
@@ -2337,7 +2338,7 @@ namespace Contensive.Core.Controllers {
                 if (cpCore.doc.authContext.isAuthenticated) {
                     if (cpCore.doc.authContext.isEditingAnything()) {
                         StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"));
-                        HTMLViewerBubbleID = "HelpBubble" + cpCore.doc.helpCodeCount;
+                        HTMLViewerBubbleID = "HelpBubble" + cpCore.doc.helpCodes.Count;
                         //
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
@@ -2385,7 +2386,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException( ex );
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
             return tempgetHTMLViewerBubble;
         }
         //
@@ -2542,7 +2543,7 @@ namespace Contensive.Core.Controllers {
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         Filename = FieldValue;
                                                                         VirtualFilePath = "Settings/" + FieldName + "/";
-                                                                        cpCore.cdnFiles.upload(FieldName, VirtualFilePath, Filename);
+                                                                        cpCore.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
                                                                         cpCore.siteProperties.setProperty(FieldName, VirtualFilePath + "/" + Filename);
                                                                     }
                                                                     break;
@@ -2580,7 +2581,7 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         FieldValue = EncodeNumber(FieldValue).ToString();
-                                                                        FieldValue = Microsoft.VisualBasic.Strings.FormatCurrency(FieldValue, -1, Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState.UseDefault);
+                                                                        FieldValue = String.Format("C", FieldValue); 
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -2781,7 +2782,7 @@ namespace Contensive.Core.Controllers {
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
-                                                                                cpCore.privateFiles.splitPathFilename(FieldValue, FieldValuePath, FieldValuefilename);
+                                                                                cpCore.privateFiles.splitPathFilename(FieldValue,  ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
                                                                                 + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.html_GetFormInputCheckBox2(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.html_GetFormInputFile(FieldName);
@@ -2795,7 +2796,7 @@ namespace Contensive.Core.Controllers {
                                                                             Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                                FieldValue = Microsoft.VisualBasic.Strings.FormatCurrency(FieldValue, -1, Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState.UseDefault);
+                                                                                FieldValue = String.Format("C", FieldValue);
                                                                             }
                                                                             Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
                                                                         }
@@ -2968,7 +2969,7 @@ namespace Contensive.Core.Controllers {
                                                                 // ----- Error
                                                                 //
                                                                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                Copy = "Error: " + Microsoft.VisualBasic.Information.Err().Description;
+                                                                Copy = "Error: " + "";
                                                             } else if (dt.Rows.Count <= 0) {
                                                                 //
                                                                 // ----- no result
@@ -3234,7 +3235,7 @@ namespace Contensive.Core.Controllers {
             }
             //ErrorTrap:
             FastString = null;
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetFormContent_decodeSelector")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetFormContent_decodeSelector")
             return tempgetFormContent_decodeSelector;
         }
         //
@@ -3484,7 +3485,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException( ex );
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("WrapContent")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("WrapContent")
         }
         //
         //========================================================================
@@ -3672,11 +3673,11 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        private string getAddonDescription(coreClass cpcore, Models.Entity.addonModel addon) {
+        private string getAddonDescription(coreClass cpcore, addonModel addon) {
             string addonDescription = "[invalid addon]";
             if (addon != null) {
                 string collectionName = "invalid collection or collection not set";
-                Models.Entity.AddonCollectionModel collection = Models.Entity.AddonCollectionModel.create(cpcore, addon.CollectionID);
+                AddonCollectionModel collection = AddonCollectionModel.create(cpcore, addon.CollectionID);
                 if (collection != null) {
                     collectionName = collection.name;
                 }
@@ -3716,6 +3717,75 @@ namespace Contensive.Core.Controllers {
             }
             return addonManager;
         }
+
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Throw an addon event, which will call all addons registered to handle it
+        /// </summary>
+        /// <param name="eventNameIdOrGuid"></param>
+        /// <returns></returns>
+        public string throwEvent(string eventNameIdOrGuid) {
+            string returnString = "";
+            try {
+                string sql = null;
+                var cs = new csController(cpCore);
+                int addonid = 0;
+                //
+                sql = "select e.id,c.addonId"
+                    + " from (ccAddonEvents e"
+                    + " left join ccAddonEventCatchers c on c.eventId=e.id)"
+                    + " where ";
+                if (genericController.vbIsNumeric(eventNameIdOrGuid)) {
+                    sql += "e.id=" + cpCore.db.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
+                } else if (CP.Utils.isGuid(eventNameIdOrGuid)) {
+                    sql += "e.ccGuid=" + cpCore.db.encodeSQLText(eventNameIdOrGuid);
+                } else {
+                    sql += "e.name=" + cpCore.db.encodeSQLText(eventNameIdOrGuid);
+                }
+                if (!cs.openSQL(sql)) {
+                    //
+                    // event not found
+                    //
+                    if (genericController.vbIsNumeric(eventNameIdOrGuid)) {
+                        //
+                        // can not create an id
+                        //
+                    } else if ( genericController.isGuid(eventNameIdOrGuid)) {
+                        //
+                        // create event with Guid and id for name
+                        //
+                        cs.Close();
+                        cs.Insert("add-on Events");
+                        cs.setField("ccguid", eventNameIdOrGuid);
+                        cs.setField("name", "Event " + cs.getInteger("id").ToString());
+                    } else if (!string.IsNullOrEmpty(eventNameIdOrGuid)) {
+                        //
+                        // create event with name
+                        //
+                        cs.Close();
+                        cs.Insert("add-on Events");
+                        cs.setField("name", eventNameIdOrGuid);
+                    }
+                } else {
+                    while (cs.OK()) {
+                        addonid = cs.getInteger("addonid");
+                        if (addonid != 0) {
+                            var addon = addonModel.create(cpCore, addonid);
+                            returnString += cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                                 addonType = CPUtilsBaseClass.addonContext.ContextSimple,
+                            });
+                        }
+                        cs.goNext();
+                    }
+                }
+                cs.Close();
+                //
+            } catch (Exception ex) {
+                cpCore.handleException(ex );
+            }
+            return returnString;
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -3726,10 +3796,10 @@ namespace Contensive.Core.Controllers {
         /// <param name="args"></param>
         /// <returns></returns>
         public static Assembly myAssemblyResolve(object sender, ResolveEventArgs args) {
-            string sample_folderPath = IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string sample_folderPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
-            string assemblyPath = IO.Path.Combine(sample_folderPath, (new AssemblyName(args.Name)).Name + ".dll");
-            if (!IO.File.Exists(assemblyPath)) {
+            string assemblyPath = Path.Combine(sample_folderPath, (new AssemblyName(args.Name)).Name + ".dll");
+            if (!File.Exists(assemblyPath)) {
                 return null;
             }
             Assembly assembly = Assembly.LoadFrom(assemblyPath);

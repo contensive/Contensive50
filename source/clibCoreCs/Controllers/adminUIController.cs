@@ -1,7 +1,14 @@
 ﻿
 using System;
+using System.Reflection;
+using System.Xml;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
 //
 namespace Contensive.Core {
     //
@@ -177,7 +184,7 @@ namespace Contensive.Core {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.html_GetFormButton(ButtonCreateDuplicate, RequestNameButton,, "return processSubmit(this)");
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.html_GetFormButton(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
                 }
                 //
                 tempGetEditButtonBar2 = ""
@@ -255,7 +262,7 @@ namespace Contensive.Core {
                         }
                         //ORIGINAL LINE: Case Trim(ButtonClose)
                         else if (Buttons[Ptr].Trim(' ') == Convert.ToString(ButtonClose).Trim(' ')) {
-                            s = s + cpCore.html.html_GetFormButton(Buttons[Ptr],,, "window.close();");
+                            s = s + cpCore.html.html_GetFormButton(Buttons[Ptr], "", "", "window.close();");
                         }
                         //ORIGINAL LINE: Case Trim(ButtonAdd)
                         else if (Buttons[Ptr].Trim(' ') == Convert.ToString(ButtonAdd).Trim(' ')) {

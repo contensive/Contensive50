@@ -1,14 +1,19 @@
 ﻿
 using System;
-using Contensive.BaseClasses;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using Contensive.Core;
 using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
-using System.Diagnostics;
-using System.Collections.Generic;
 using static Contensive.Core.constants;
-using System.Linq;
+//
 //
 namespace Contensive.Core.Controllers {
     //
@@ -18,7 +23,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         // -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
         //
-        private coreClass cpcore;
+        private coreClass cpCore;
         //
         // -- this documents unique guid (created on the fly)
         public string docGuid { get; set; }
@@ -36,16 +41,16 @@ namespace Contensive.Core.Controllers {
         public List<htmlMetaClass> htmlMetaContent_KeyWordList { get; set; } = new List<htmlMetaClass>();
         //
         // -- current domain
-        public Models.Entity.domainModel domain { get; set; }
+        public domainModel domain { get; set; }
         //
         // -- current page
-        public Models.Entity.pageContentModel page { get; set; }
+        public pageContentModel page { get; set; }
         //
         // -- current page to it's root
         public List<Models.Entity.pageContentModel> pageToRootList { get; set; }
         //
         // -- current template
-        public Models.Entity.pageTemplateModel template { get; set; }
+        public pageTemplateModel template { get; set; }
         public string templateReason { get; set; } = "";
         //
         // -- Anything that needs to be written to the Page during main_GetClosePage
@@ -147,7 +152,7 @@ namespace Contensive.Core.Controllers {
         internal Dictionary<int, contentModel> contentIdDict {
             get {
                 if (_contentIdDict == null) {
-                    _contentIdDict = contentModel.createDict(cpcore, new List<string>());
+                    _contentIdDict = contentModel.createDict(cpCore, new List<string>());
                 }
                 return _contentIdDict;
             }
@@ -155,9 +160,9 @@ namespace Contensive.Core.Controllers {
         internal string landingLink {
             get {
                 if (_landingLink == "") {
-                    _landingLink = cpcore.siteProperties.getText("SectionLandingLink", requestAppRootPath + cpcore.siteProperties.serverPageDefault);
-                    _landingLink = genericController.ConvertLinkToShortLink(_landingLink, cpcore.webServer.requestDomain, cpcore.webServer.requestVirtualFilePath);
-                    _landingLink = genericController.EncodeAppRootPath(_landingLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain);
+                    _landingLink = cpCore.siteProperties.getText("SectionLandingLink", requestAppRootPath + cpCore.siteProperties.serverPageDefault);
+                    _landingLink = genericController.ConvertLinkToShortLink(_landingLink, cpCore.webServer.requestDomain, cpCore.webServer.requestVirtualFilePath);
+                    _landingLink = genericController.EncodeAppRootPath(_landingLink, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain);
                 }
                 return _landingLink;
             }
@@ -174,9 +179,9 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cpCore"></param>
         public docController(coreClass cpCore) {
-            this.cpcore = cpCore;
+            this.cpCore = cpCore;
             //
-            domain = new Models.Entity.domainModel();
+            domain = new domainModel();
             page = new pageContentModel();
             pageToRootList = new List<pageContentModel>();
             template = new pageTemplateModel();
@@ -246,32 +251,32 @@ namespace Contensive.Core.Controllers {
                 + " FROM (ccContentWatchLists"
                     + " LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID)"
                     + " LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID"
-                + " WHERE (((ccContentWatchLists.Name)=" + this.cpcore.db.encodeSQLText(ListName) + ")"
+                + " WHERE (((ccContentWatchLists.Name)=" + this.cpCore.db.encodeSQLText(ListName) + ")"
                     + "AND ((ccContentWatchLists.Active)<>0)"
                     + "AND ((ccContentWatchListRules.Active)<>0)"
                     + "AND ((ccContentWatch.Active)<>0)"
                     + "AND (ccContentWatch.Link is not null)"
                     + "AND (ccContentWatch.LinkLabel is not null)"
-                    + "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" + this.cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime) + "))"
+                    + "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" + this.cpCore.db.encodeSQLDate(cpcore.doc.profileStartTime) + "))"
                     + ")"
                 + " ORDER BY " + iSortFieldList + ";";
-                result = this.cpcore.db.csOpenSql(SQL,, PageSize, PageNumber);
-                if (!this.cpcore.db.csOk(result)) {
+                result = this.cpCore.db.csOpenSql(SQL, "", PageSize, PageNumber);
+                if (!this.cpCore.db.csOk(result)) {
                     //
                     // Check if listname exists
                     //
-                    CS = this.cpcore.db.csOpen("Content Watch Lists", "name=" + this.cpcore.db.encodeSQLText(ListName), "ID",,,,, "ID");
-                    if (!this.cpcore.db.csOk(CS)) {
-                        this.cpcore.db.csClose(ref CS);
-                        CS = this.cpcore.db.csInsertRecord("Content Watch Lists");
-                        if (this.cpcore.db.csOk(CS)) {
-                            this.cpcore.db.csSet(CS, "name", ListName);
+                    CS = this.cpCore.db.csOpen("Content Watch Lists", "name=" + this.cpCore.db.encodeSQLText(ListName), "ID", false, 0, false, false, "ID");
+                    if (!this.cpCore.db.csOk(CS)) {
+                        this.cpCore.db.csClose(ref CS);
+                        CS = this.cpCore.db.csInsertRecord("Content Watch Lists");
+                        if (this.cpCore.db.csOk(CS)) {
+                            this.cpCore.db.csSet(CS, "name", ListName);
                         }
                     }
-                    this.cpcore.db.csClose(ref CS);
+                    this.cpCore.db.csClose(ref CS);
                 }
             } catch (Exception ex) {
-                this.cpcore.handleException(ex);
+                this.cpCore.handleException(ex);
             }
             return result;
         }
@@ -292,12 +297,12 @@ namespace Contensive.Core.Controllers {
                 //
                 CSPointer = main_OpenCSWhatsNew(cpcore, SortFieldList);
                 //
-                if (this.cpcore.db.csOk(CSPointer)) {
+                if (this.cpCore.db.csOk(CSPointer)) {
                     ContentID = Models.Complex.cdefModel.getContentId(cpcore, "Content Watch");
-                    while (this.cpcore.db.csOk(CSPointer)) {
-                        Link = this.cpcore.db.csGetText(CSPointer, "link");
-                        LinkLabel = this.cpcore.db.csGetText(CSPointer, "LinkLabel");
-                        RecordID = this.cpcore.db.csGetInteger(CSPointer, "ID");
+                    while (this.cpCore.db.csOk(CSPointer)) {
+                        Link = this.cpCore.db.csGetText(CSPointer, "link");
+                        LinkLabel = this.cpCore.db.csGetText(CSPointer, "LinkLabel");
+                        RecordID = this.cpCore.db.csGetInteger(CSPointer, "ID");
                         if (!string.IsNullOrEmpty(LinkLabel)) {
                             result = result + "\r" + "<li class=\"ccListItem\">";
                             if (!string.IsNullOrEmpty(Link)) {
@@ -307,13 +312,13 @@ namespace Contensive.Core.Controllers {
                             }
                             result = result + "</li>";
                         }
-                        this.cpcore.db.csGoNext(CSPointer);
+                        this.cpCore.db.csGoNext(CSPointer);
                     }
                     result = "\r" + "<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r" + "</ul>";
                 }
-                this.cpcore.db.csClose(ref CSPointer);
+                this.cpCore.db.csClose(ref CSPointer);
             } catch (Exception ex) {
-                this.cpcore.handleException(ex);
+                this.cpCore.handleException(ex);
             }
             return result;
         }
@@ -335,34 +340,34 @@ namespace Contensive.Core.Controllers {
                     CS = main_OpenCSContentWatchList(cpCore, ListName, SortField, true);
                 }
                 //
-                if (this.cpcore.db.csOk(CS)) {
+                if (this.cpCore.db.csOk(CS)) {
                     ContentID = Models.Complex.cdefModel.getContentId(cpCore, "Content Watch");
-                    while (this.cpcore.db.csOk(CS)) {
-                        Link = this.cpcore.db.csGetText(CS, "link");
-                        LinkLabel = this.cpcore.db.csGetText(CS, "LinkLabel");
-                        RecordID = this.cpcore.db.csGetInteger(CS, "ID");
+                    while (this.cpCore.db.csOk(CS)) {
+                        Link = this.cpCore.db.csGetText(CS, "link");
+                        LinkLabel = this.cpCore.db.csGetText(CS, "LinkLabel");
+                        RecordID = this.cpCore.db.csGetInteger(CS, "ID");
                         if (!string.IsNullOrEmpty(LinkLabel)) {
                             result = result + "\r" + "<li id=\"main_ContentWatch" + RecordID + "\" class=\"ccListItem\">";
                             if (!string.IsNullOrEmpty(Link)) {
-                                result = result + "<a href=\"http://" + this.cpcore.webServer.requestDomain + requestAppRootPath + this.cpcore.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID + "\">" + LinkLabel + "</a>";
+                                result = result + "<a href=\"http://" + this.cpCore.webServer.requestDomain + requestAppRootPath + this.cpCore.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID + "\">" + LinkLabel + "</a>";
                             } else {
                                 result = result + LinkLabel;
                             }
                             result = result + "</li>";
                         }
-                        this.cpcore.db.csGoNext(CS);
+                        this.cpCore.db.csGoNext(CS);
                     }
                     if (!string.IsNullOrEmpty(result)) {
-                        result = this.cpcore.html.html_GetContentCopy("Watch List Caption: " + ListName, ListName, this.cpcore.doc.authContext.user.id, true, this.cpcore.doc.authContext.isAuthenticated) + "\r" + "<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r" + "</ul>";
+                        result = this.cpCore.html.html_GetContentCopy("Watch List Caption: " + ListName, ListName, this.cpCore.doc.authContext.user.id, true, this.cpCore.doc.authContext.isAuthenticated) + "\r" + "<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r" + "</ul>";
                     }
                 }
-                this.cpcore.db.csClose(ref CS);
+                this.cpCore.db.csClose(ref CS);
                 //
-                if (this.cpcore.visitProperty.getBoolean("AllowAdvancedEditor")) {
-                    result = this.cpcore.html.getEditWrapper("Watch List [" + ListName + "]", result);
+                if (this.cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                    result = this.cpCore.html.getEditWrapper("Watch List [" + ListName + "]", result);
                 }
             } catch (Exception ex) {
-                this.cpcore.handleException(ex);
+                this.cpCore.handleException(ex);
             }
             return result;
         }
@@ -377,7 +382,7 @@ namespace Contensive.Core.Controllers {
             bool returnStatus = false;
             if (!siteStructure_LocalLoaded) {
                 addonModel addon = addonModel.create(cpcore, addonGuidSiteStructureGuid);
-                siteStructure = this.cpcore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextSimple });
+                siteStructure = this.cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextSimple });
                 //siteStructure = Me.cpcore.addon.execute_legacy2(0, addonGuidSiteStructureGuid, "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
                 siteStructure_LocalLoaded = true;
             }
@@ -395,8 +400,8 @@ namespace Contensive.Core.Controllers {
         internal string getQuickEditing(int rootPageId, string OrderByClause, bool AllowPageList, bool AllowReturnLink, bool ArchivePages, int contactMemberID, int childListSortMethodId, bool main_AllowChildListComposite, bool ArchivePage) {
             string result = string.Empty;
             try {
-                string RootPageContentName = Models.Entity.pageContentModel.contentName;
-                string LiveRecordContentName = Models.Entity.pageContentModel.contentName;
+                string RootPageContentName = pageContentModel.contentName;
+                string LiveRecordContentName = pageContentModel.contentName;
                 string Link = null;
                 int page_ParentID = 0;
                 string PageList = null;
@@ -416,18 +421,18 @@ namespace Contensive.Core.Controllers {
                 DateTime ApprovedDate = default(DateTime);
                 DateTime ModifiedDate = default(DateTime);
                 //
-                cpcore.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
+                cpCore.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
                 //
                 // ----- First Active Record - Output Quick Editor form
                 //
-                CDef = Models.Complex.cdefModel.getCdef(cpcore, LiveRecordContentName);
+                CDef = Models.Complex.cdefModel.getCdef(cpCore, LiveRecordContentName);
                 //
                 // main_Get Authoring Status and permissions
                 //
-                IsEditLocked = cpcore.workflow.GetEditLockStatus(LiveRecordContentName, page.id);
+                IsEditLocked = cpCore.workflow.GetEditLockStatus(LiveRecordContentName, page.id);
                 if (IsEditLocked) {
-                    main_EditLockMemberName = cpcore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id);
-                    main_EditLockDateExpires = genericController.EncodeDate(cpcore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id));
+                    main_EditLockMemberName = cpCore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id);
+                    main_EditLockDateExpires = genericController.EncodeDate(cpCore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id));
                 }
                 bool IsModified = false;
                 bool IsSubmitted = false;
@@ -444,12 +449,12 @@ namespace Contensive.Core.Controllers {
                 bool tempVar3 = false;
                 bool tempVar4 = false;
                 getAuthoringPermissions(LiveRecordContentName, page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
-                AllowMarkReviewed = Models.Complex.cdefModel.isContentFieldSupported(cpcore, Models.Entity.pageContentModel.contentName, "DateReviewed");
-                OptionsPanelAuthoringStatus = cpcore.doc.authContext.main_GetAuthoringStatusMessage(cpcore, false, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
+                AllowMarkReviewed = Models.Complex.cdefModel.isContentFieldSupported(cpCore, pageContentModel.contentName, "DateReviewed");
+                OptionsPanelAuthoringStatus = cpCore.doc.authContext.main_GetAuthoringStatusMessage(cpCore, false, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
                 //
                 // Set Editing Authoring Control
                 //
-                cpcore.workflow.SetEditLock(LiveRecordContentName, page.id);
+                cpCore.workflow.SetEditLock(LiveRecordContentName, page.id);
                 //
                 // SubPanel: Authoring Status
                 //
@@ -474,7 +479,7 @@ namespace Contensive.Core.Controllers {
                 }
                 if (!string.IsNullOrEmpty(ButtonList)) {
                     ButtonList = ButtonList.Substring(1);
-                    ButtonList = cpcore.html.main_GetPanelButtons(ButtonList, "Button");
+                    ButtonList = cpCore.html.main_GetPanelButtons(ButtonList, "Button");
                 }
                 //If OptionsPanelAuthoringStatus <> "" Then
                 //    result = result & "" _
@@ -482,10 +487,10 @@ namespace Contensive.Core.Controllers {
                 //        & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
                 //        & cr & "</tr>"
                 //End If
-                if (cpcore.doc.debug_iUserError != "") {
+                if (cpCore.doc.debug_iUserError != "") {
                     result = result + ""
                         + "\r" + "<tr>"
-                        + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + errorController.error_GetUserError(cpcore) + "</div></td>"
+                        + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + errorController.error_GetUserError(cpCore) + "</div></td>"
                         + "\r" + "</tr>";
                 }
                 if (readOnlyField) {
@@ -501,7 +506,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = result + "\r" + "<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
-                    + cr2 + "<td class=\"qeRow qeRight\">" + cpcore.html.html_GetFormInputText2("name", page.name, 1,,,, readOnlyField) + "</td>"
+                    + cr2 + "<td class=\"qeRow qeRight\">" + cpCore.html.html_GetFormInputText2("name", page.name, 1, 0, "", false, readOnlyField) + "</td>"
                     + "\r" + "</tr>"
                     + "";
                 //
@@ -528,19 +533,19 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Child pages
                 //
-                Models.Entity.addonModel addon = Models.Entity.addonModel.create(cpcore, cpcore.siteProperties.childListAddonID);
+                addonModel addon = addonModel.create(cpCore, cpCore.siteProperties.childListAddonID);
                 CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                        contentName = Models.Entity.pageContentModel.contentName,
+                        contentName = pageContentModel.contentName,
                         fieldName = "",
                         recordId = page.id
                     },
-                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpcore, page.ChildListInstanceOptions),
+                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, page.ChildListInstanceOptions),
                     instanceGuid = PageChildListInstanceID
                 };
-                PageList = cpcore.addon.execute(addon, executeContext);
-                //PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+                PageList = cpCore.addon.execute(addon, executeContext);
+                //PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
                 if (genericController.vbInstr(1, PageList, "<ul", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
                     PageList = "(there are no child pages)";
                 }
@@ -553,12 +558,12 @@ namespace Contensive.Core.Controllers {
                     + genericController.htmlIndent(result) + "\r" + "</table>";
                 result = ""
                     + ButtonList + result + ButtonList;
-                result = cpcore.html.main_GetPanel(result);
+                result = cpCore.html.main_GetPanel(result);
                 //
                 // Form Wrapper
                 //
                 result = ""
-                    + '\r' + cpcore.html.html_GetUploadFormStart(cpcore.webServer.requestQueryString) + '\r' + cpcore.html.html_GetFormInputHidden("Type", FormTypePageAuthoring) + '\r' + cpcore.html.html_GetFormInputHidden("ID", page.id) + '\r' + cpcore.html.html_GetFormInputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + cpcore.html.html_GetUploadFormEnd();
+                    + '\r' + cpCore.html.html_GetUploadFormStart(cpCore.webServer.requestQueryString) + '\r' + cpCore.html.html_GetFormInputHidden("Type", FormTypePageAuthoring) + '\r' + cpCore.html.html_GetFormInputHidden("ID", page.id) + '\r' + cpCore.html.html_GetFormInputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + cpCore.html.html_GetUploadFormEnd();
 
                 //& cr & cpcore.html.main_GetPanelHeader("Contensive Quick Editor") _
 
@@ -566,7 +571,7 @@ namespace Contensive.Core.Controllers {
                     + "\r" + "<div class=\"ccCon\">"
                     + genericController.htmlIndent(result) + "\r" + "</div>";
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
             }
             return result;
         }
@@ -584,10 +589,10 @@ namespace Contensive.Core.Controllers {
             //
             // ----- Page Copy
             //
-            int FieldRows = cpcore.userProperty.getInteger(ContentName + ".copyFilename.PixelHeight", 500);
+            int FieldRows = cpCore.userProperty.getInteger(ContentName + ".copyFilename.PixelHeight", 500);
             if (FieldRows < 50) {
                 FieldRows = 50;
-                cpcore.userProperty.setProperty(ContentName + ".copyFilename.PixelHeight", FieldRows);
+                cpCore.userProperty.setProperty(ContentName + ".copyFilename.PixelHeight", FieldRows);
             }
             //
             // At this point we do now know the the template so we can not main_Get the stylelist.
@@ -610,7 +615,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(returnHtml)) {
                     returnHtml = pageCaption;
                 } else {
-                    returnHtml = "<a href=\"" + genericController.encodeHTML(pageContentController.getPageLink(cpcore, testpage.id, "", true, false)) + "\">" + pageCaption + "</a>" + BreadCrumbDelimiter + returnHtml;
+                    returnHtml = "<a href=\"" + genericController.encodeHTML(pageContentController.getPageLink(cpCore, testpage.id, "", true, false)) + "\">" + pageCaption + "</a>" + BreadCrumbDelimiter + returnHtml;
                 }
             }
             return returnHtml;
@@ -649,30 +654,30 @@ namespace Contensive.Core.Controllers {
             // Dim main_WorkflowSupport As Boolean
             //
             RecordModified = false;
-            RecordID = (cpcore.docProperties.getInteger("ID"));
-            Button = cpcore.docProperties.getText("Button");
-            iIsAdmin = cpcore.doc.authContext.isAuthenticatedAdmin(cpcore);
+            RecordID = (cpCore.docProperties.getInteger("ID"));
+            Button = cpCore.docProperties.getText("Button");
+            iIsAdmin = cpCore.doc.authContext.isAuthenticatedAdmin(cpCore);
             //
-            if ((!string.IsNullOrEmpty(Button)) & (RecordID != 0) & (pageContentModel.contentName != "") & (cpcore.doc.authContext.isAuthenticatedContentManager(cpcore, pageContentModel.contentName))) {
+            if ((!string.IsNullOrEmpty(Button)) & (RecordID != 0) & (pageContentModel.contentName != "") & (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, pageContentModel.contentName))) {
                 // main_WorkflowSupport = cpcore.siteProperties.allowWorkflowAuthoring And cpcore.workflow.isWorkflowAuthoringCompatible(pageContentModel.contentName)
                 string SubmittedMemberName = "";
                 string ApprovedMemberName = "";
                 string ModifiedMemberName = "";
                 getAuthoringStatus(pageContentModel.contentName, RecordID, ref IsSubmitted, ref IsApproved, ref SubmittedMemberName, ref ApprovedMemberName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedMemberName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
-                IsEditLocked = cpcore.workflow.GetEditLockStatus(pageContentModel.contentName, RecordID);
-                main_EditLockMemberName = cpcore.workflow.GetEditLockMemberName(pageContentModel.contentName, RecordID);
-                main_EditLockDateExpires = cpcore.workflow.GetEditLockDateExpires(pageContentModel.contentName, RecordID);
-                cpcore.workflow.ClearEditLock(pageContentModel.contentName, RecordID);
+                IsEditLocked = cpCore.workflow.GetEditLockStatus(pageContentModel.contentName, RecordID);
+                main_EditLockMemberName = cpCore.workflow.GetEditLockMemberName(pageContentModel.contentName, RecordID);
+                main_EditLockDateExpires = cpCore.workflow.GetEditLockDateExpires(pageContentModel.contentName, RecordID);
+                cpCore.workflow.ClearEditLock(pageContentModel.contentName, RecordID);
                 //
                 // tough case, in Quick mode, lets mark the record reviewed, no matter what button they push, except cancel
                 //
                 if (Button != ButtonCancel) {
-                    cpcore.doc.markRecordReviewed(pageContentModel.contentName, RecordID);
+                    cpCore.doc.markRecordReviewed(pageContentModel.contentName, RecordID);
                 }
                 //
                 // Determine is the record should be saved
                 //
-                if ((!IsApproved) && (!cpcore.docProperties.getBoolean("RENDERMODE"))) {
+                if ((!IsApproved) && (!cpCore.docProperties.getBoolean("RENDERMODE"))) {
                     if (iIsAdmin) {
                         //
                         // cases that admin can save
@@ -689,28 +694,28 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Save Changes
                     SaveButNoChanges = true;
-                    pageContentModel page = pageContentModel.create(cpcore, RecordID);
+                    pageContentModel page = pageContentModel.create(cpCore, RecordID);
                     if (page != null) {
-                        Copy = cpcore.docProperties.getText("copyFilename");
-                        Copy = cpcore.html.convertEditorResponseToActiveContent(Copy);
+                        Copy = cpCore.docProperties.getText("copyFilename");
+                        Copy = cpCore.html.convertEditorResponseToActiveContent(Copy);
                         if (Copy != page.Copyfilename.content) {
                             page.Copyfilename.content = Copy;
                             SaveButNoChanges = false;
                         }
-                        RecordName = cpcore.docProperties.getText("name");
+                        RecordName = cpCore.docProperties.getText("name");
                         if (RecordName != page.name) {
                             page.name = RecordName;
-                            docController.addLinkAlias(cpcore, RecordName, RecordID, "");
+                            docController.addLinkAlias(cpCore, RecordName, RecordID, "");
                             SaveButNoChanges = false;
                         }
                         RecordParentID = page.ParentID;
-                        page.save(cpcore);
+                        page.save(cpCore);
                         //
-                        cpcore.workflow.SetEditLock(pageContentModel.contentName, page.id);
+                        cpCore.workflow.SetEditLock(pageContentModel.contentName, page.id);
                         //
                         if (!SaveButNoChanges) {
-                            cpcore.doc.processAfterSave(false, pageContentModel.contentName, page.id, page.name, page.ParentID, false);
-                            cpcore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
+                            cpCore.doc.processAfterSave(false, pageContentModel.contentName, page.id, page.name, page.ParentID, false);
+                            cpCore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
                         }
                     }
                 }
@@ -718,17 +723,17 @@ namespace Contensive.Core.Controllers {
                     //
                     //
                     //
-                    CSBlock = cpcore.db.csInsertRecord(pageContentModel.contentName);
-                    if (cpcore.db.csOk(CSBlock)) {
-                        cpcore.db.csSet(CSBlock, "active", true);
-                        cpcore.db.csSet(CSBlock, "ParentID", RecordID);
-                        cpcore.db.csSet(CSBlock, "contactmemberid", cpcore.doc.authContext.user.id);
-                        cpcore.db.csSet(CSBlock, "name", "New Page added " + cpcore.doc.profileStartTime + " by " + cpcore.doc.authContext.user.name);
-                        cpcore.db.csSet(CSBlock, "copyFilename", "");
-                        RecordID = cpcore.db.csGetInteger(CSBlock, "ID");
-                        cpcore.db.csSave2(CSBlock);
+                    CSBlock = cpCore.db.csInsertRecord(pageContentModel.contentName);
+                    if (cpCore.db.csOk(CSBlock)) {
+                        cpCore.db.csSet(CSBlock, "active", true);
+                        cpCore.db.csSet(CSBlock, "ParentID", RecordID);
+                        cpCore.db.csSet(CSBlock, "contactmemberid", cpCore.doc.authContext.user.id);
+                        cpCore.db.csSet(CSBlock, "name", "New Page added " + cpCore.doc.profileStartTime + " by " + cpCore.doc.authContext.user.name);
+                        cpCore.db.csSet(CSBlock, "copyFilename", "");
+                        RecordID = cpCore.db.csGetInteger(CSBlock, "ID");
+                        cpCore.db.csSave2(CSBlock);
                         //
-                        Link = pageContentController.getPageLink(cpcore, RecordID, "", true, false);
+                        Link = pageContentController.getPageLink(cpCore, RecordID, "", true, false);
                         //Link = main_GetPageLink(RecordID)
                         //If main_WorkflowSupport Then
                         //    If Not cpCore.doc.authContext.isWorkflowRendering() Then
@@ -736,57 +741,57 @@ namespace Contensive.Core.Controllers {
                         //        Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
                         //    End If
                         //End If
-                        cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.",, false);
+                        cpCore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", false, false);
                     }
-                    cpcore.db.csClose(ref CSBlock);
+                    cpCore.db.csClose(ref CSBlock);
                     //
-                    cpcore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
+                    cpCore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
                 }
                 if (Button == ButtonAddSiblingPage) {
                     //
                     //
                     //
-                    CSBlock = cpcore.db.csOpenRecord(pageContentModel.contentName, RecordID,,, "ParentID");
-                    if (cpcore.db.csOk(CSBlock)) {
-                        ParentID = cpcore.db.csGetInteger(CSBlock, "ParentID");
+                    CSBlock = cpCore.db.csOpenRecord(pageContentModel.contentName, RecordID, false, false, "ParentID");
+                    if (cpCore.db.csOk(CSBlock)) {
+                        ParentID = cpCore.db.csGetInteger(CSBlock, "ParentID");
                     }
-                    cpcore.db.csClose(ref CSBlock);
+                    cpCore.db.csClose(ref CSBlock);
                     if (ParentID != 0) {
-                        CSBlock = cpcore.db.csInsertRecord(pageContentModel.contentName);
-                        if (cpcore.db.csOk(CSBlock)) {
-                            cpcore.db.csSet(CSBlock, "active", true);
-                            cpcore.db.csSet(CSBlock, "ParentID", ParentID);
-                            cpcore.db.csSet(CSBlock, "contactmemberid", cpcore.doc.authContext.user.id);
-                            cpcore.db.csSet(CSBlock, "name", "New Page added " + cpcore.doc.profileStartTime + " by " + cpcore.doc.authContext.user.name);
-                            cpcore.db.csSet(CSBlock, "copyFilename", "");
-                            RecordID = cpcore.db.csGetInteger(CSBlock, "ID");
-                            cpcore.db.csSave2(CSBlock);
+                        CSBlock = cpCore.db.csInsertRecord(pageContentModel.contentName);
+                        if (cpCore.db.csOk(CSBlock)) {
+                            cpCore.db.csSet(CSBlock, "active", true);
+                            cpCore.db.csSet(CSBlock, "ParentID", ParentID);
+                            cpCore.db.csSet(CSBlock, "contactmemberid", cpCore.doc.authContext.user.id);
+                            cpCore.db.csSet(CSBlock, "name", "New Page added " + cpCore.doc.profileStartTime + " by " + cpCore.doc.authContext.user.name);
+                            cpCore.db.csSet(CSBlock, "copyFilename", "");
+                            RecordID = cpCore.db.csGetInteger(CSBlock, "ID");
+                            cpCore.db.csSave2(CSBlock);
                             //
-                            Link = pageContentController.getPageLink(cpcore, RecordID, "", true, false);
-                            cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", false, false);
+                            Link = pageContentController.getPageLink(cpCore, RecordID, "", true, false);
+                            cpCore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", false, false);
                         }
-                        cpcore.db.csClose(ref CSBlock);
+                        cpCore.db.csClose(ref CSBlock);
                     }
-                    cpcore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
+                    cpCore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
                 }
                 if (Button == ButtonDelete) {
-                    CSBlock = cpcore.db.csOpenRecord(pageContentModel.contentName, RecordID);
-                    if (cpcore.db.csOk(CSBlock)) {
-                        ParentID = cpcore.db.csGetInteger(CSBlock, "parentid");
+                    CSBlock = cpCore.db.csOpenRecord(pageContentModel.contentName, RecordID);
+                    if (cpCore.db.csOk(CSBlock)) {
+                        ParentID = cpCore.db.csGetInteger(CSBlock, "parentid");
                     }
-                    cpcore.db.csClose(ref CSBlock);
+                    cpCore.db.csClose(ref CSBlock);
                     //
                     deleteChildRecords(pageContentModel.contentName, RecordID, false);
-                    cpcore.db.deleteContentRecord(pageContentModel.contentName, RecordID);
+                    cpCore.db.deleteContentRecord(pageContentModel.contentName, RecordID);
                     //
                     if (!false) {
-                        cpcore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
+                        cpCore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
                     }
                     //
                     if (!false) {
-                        Link = pageContentController.getPageLink(cpcore, ParentID, "", true, false);
+                        Link = pageContentController.getPageLink(cpCore, ParentID, "", true, false);
                         Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "The page has been deleted, and you have been redirected to the parent of the deleted page.", true);
-                        cpcore.webServer.redirect(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", redirectBecausePageNotFound, false);
+                        cpCore.webServer.redirect(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", redirectBecausePageNotFound, false);
                         return;
                     }
                 }
@@ -798,11 +803,11 @@ namespace Contensive.Core.Controllers {
                 //    Call cpcore.workflow.main_SubmitEdit(pageContentModel.contentName, RecordID)
                 //    Call sendPublishSubmitNotice(pageContentModel.contentName, RecordID, "")
                 //End If
-                if ((!(cpcore.doc.debug_iUserError != "")) & ((Button == ButtonOK) || (Button == ButtonCancel))) {
+                if ((!(cpCore.doc.debug_iUserError != "")) & ((Button == ButtonOK) || (Button == ButtonCancel))) {
                     //
                     // ----- Turn off Quick Editor if not save or add child
                     //
-                    cpcore.visitProperty.setProperty("AllowQuickEditor", "0");
+                    cpCore.visitProperty.setProperty("AllowQuickEditor", "0");
                 }
             }
         }
@@ -829,7 +834,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     ContentName = pageContentModel.contentName;
                 }
-                object isAuthoring = cpcore.doc.authContext.isEditing(ContentName);
+                object isAuthoring = cpCore.doc.authContext.isEditing(ContentName);
                 //
                 int ChildListCount = 0;
                 string UcaseRequestedListName = genericController.vbUCase(RequestedListName);
@@ -837,17 +842,17 @@ namespace Contensive.Core.Controllers {
                     UcaseRequestedListName = "";
                 }
                 //
-                string archiveLink = cpcore.webServer.requestPathPage;
-                archiveLink = genericController.ConvertLinkToShortLink(archiveLink, cpcore.webServer.requestDomain, cpcore.webServer.requestVirtualFilePath);
-                archiveLink = genericController.EncodeAppRootPath(archiveLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain);
+                string archiveLink = cpCore.webServer.requestPathPage;
+                archiveLink = genericController.ConvertLinkToShortLink(archiveLink, cpCore.webServer.requestDomain, cpCore.webServer.requestVirtualFilePath);
+                archiveLink = genericController.EncodeAppRootPath(archiveLink, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain);
                 //
                 string sqlCriteria = "(parentId=" + page.id + ")";
                 string sqlOrderBy = "sortOrder";
-                List<pageContentModel> childPageList = pageContentModel.createList(cpcore, sqlCriteria, sqlOrderBy);
+                List<pageContentModel> childPageList = pageContentModel.createList(cpCore, sqlCriteria, sqlOrderBy);
                 string inactiveList = "";
                 string activeList = "";
                 foreach (pageContentModel childPage in childPageList) {
-                    string PageLink = pageContentController.getPageLink(cpcore, childPage.id, "", true, false);
+                    string PageLink = pageContentController.getPageLink(cpCore, childPage.id, "", true, false);
                     string pageMenuHeadline = childPage.MenuHeadline;
                     if (string.IsNullOrEmpty(pageMenuHeadline)) {
                         pageMenuHeadline = childPage.name.Trim(' ');
@@ -856,8 +861,8 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     string pageEditLink = "";
-                    if (cpcore.doc.authContext.isEditing(ContentName)) {
-                        pageEditLink = cpcore.html.main_GetRecordEditLink2(ContentName, childPage.id, true, childPage.name, true);
+                    if (cpCore.doc.authContext.isEditing(ContentName)) {
+                        pageEditLink = cpCore.html.main_GetRecordEditLink2(ContentName, childPage.id, true, childPage.name, true);
                     }
                     //
                     string link = PageLink;
@@ -911,7 +916,7 @@ namespace Contensive.Core.Controllers {
                             inactiveList = inactiveList + "[Hidden (Inactive): " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
                         }
-                    } else if ((childPage.PubDate != DateTime.MinValue) && (childPage.PubDate > cpcore.doc.profileStartTime)) {
+                    } else if ((childPage.PubDate != DateTime.MinValue) && (childPage.PubDate > cpCore.doc.profileStartTime)) {
                         //
                         // ----- Child page has not been published
                         //
@@ -921,7 +926,7 @@ namespace Contensive.Core.Controllers {
                             inactiveList = inactiveList + "[Hidden (To be published " + childPage.PubDate + "): " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
                         }
-                    } else if ((childPage.DateExpires != DateTime.MinValue) && (childPage.DateExpires < cpcore.doc.profileStartTime)) {
+                    } else if ((childPage.DateExpires != DateTime.MinValue) && (childPage.DateExpires < cpCore.doc.profileStartTime)) {
                         //
                         // ----- Child page has expired
                         //
@@ -956,7 +961,7 @@ namespace Contensive.Core.Controllers {
                         // if AllowBrief is false, BriefFilename is not loaded
                         //
                         if ((childPage.BriefFilename != "") & (childPage.AllowBrief)) {
-                            string Brief = Convert.ToString(cpcore.cdnFiles.readFile(childPage.BriefFilename)).Trim(' ');
+                            string Brief = Convert.ToString(cpCore.cdnFiles.readFile(childPage.BriefFilename)).Trim(' ');
                             if (!string.IsNullOrEmpty(Brief)) {
                                 activeList = activeList + "<div class=\"ccListCopy\">" + Brief + "</div>";
                             }
@@ -970,7 +975,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Add Link
                 //
                 if (!ArchivePages) {
-                    string AddLink = cpcore.html.main_GetRecordAddLink(ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true);
+                    string AddLink = cpCore.html.main_GetRecordAddLink(ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true);
                     if (!string.IsNullOrEmpty(AddLink)) {
                         inactiveList = inactiveList + "\r" + "<li class=\"ccListItem\">" + AddLink + "</LI>";
                     }
@@ -992,7 +997,7 @@ namespace Contensive.Core.Controllers {
                     result = "[Child Page List with no pages]</p><p>" + result;
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
             }
             return result;
         }
@@ -1009,9 +1014,9 @@ namespace Contensive.Core.Controllers {
                 int CS = 0;
                 string SQL = null;
                 //
-                if (cpcore.doc.authContext.isAuthenticatedAdmin(cpcore)) {
+                if (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
                     tempbypassContentBlock = true;
-                } else if (cpcore.doc.authContext.isAuthenticatedContentManager(cpcore, Models.Complex.cdefModel.getContentNameByID(cpcore, ContentID))) {
+                } else if (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID))) {
                     tempbypassContentBlock = true;
                 } else {
                     SQL = "SELECT ccMemberRules.MemberID"
@@ -1020,19 +1025,19 @@ namespace Contensive.Core.Controllers {
                         + " AND ((ccPageContentBlockRules.Active)<>0)"
                         + " AND ((ccgroups.Active)<>0)"
                         + " AND ((ccMemberRules.Active)<>0)"
-                        + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime) + ")"
-                        + " AND ((ccMemberRules.MemberID)=" + cpcore.doc.authContext.user.id + "));";
-                    CS = cpcore.db.csOpenSql(SQL);
-                    tempbypassContentBlock = cpcore.db.csOk(CS);
-                    cpcore.db.csClose(ref CS);
+                        + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) + ")"
+                        + " AND ((ccMemberRules.MemberID)=" + cpCore.doc.authContext.user.id + "));";
+                    CS = cpCore.db.csOpenSql(SQL);
+                    tempbypassContentBlock = cpCore.db.csOk(CS);
+                    cpCore.db.csClose(ref CS);
                 }
                 //
                 return tempbypassContentBlock;
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("IsContentBlocked")
+            ////throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("IsContentBlocked")
             return tempbypassContentBlock;
         }
         //'
@@ -1066,12 +1071,12 @@ namespace Contensive.Core.Controllers {
                 //
                 // For now, the child delete only works in non-workflow
                 //
-                CS = cpcore.db.csOpen(ContentName, "parentid=" + RecordID,,,,,, "ID");
-                while (cpcore.db.csOk(CS)) {
-                    result = result + "," + cpcore.db.csGetInteger(CS, "ID");
-                    cpcore.db.csGoNext(CS);
+                CS = cpCore.db.csOpen(ContentName, "parentid=" + RecordID, "", false, 0, false, false, "ID");
+                while (cpCore.db.csOk(CS)) {
+                    result = result + "," + cpCore.db.csGetInteger(CS, "ID");
+                    cpCore.db.csGoNext(CS);
                 }
-                cpcore.db.csClose(ref CS);
+                cpCore.db.csClose(ref CS);
                 if (!string.IsNullOrEmpty(result)) {
                     result = result.Substring(1);
                     //
@@ -1094,14 +1099,14 @@ namespace Contensive.Core.Controllers {
                         IDs = result.Split(',');
                         IDCnt = IDs.GetUpperBound(0) + 1;
                         SingleEntry = (IDCnt == 1);
-                        QuickEditing = cpcore.doc.authContext.isQuickEditing(cpcore, "page content");
+                        QuickEditing = cpCore.doc.authContext.isQuickEditing(cpCore, "page content");
                         for (Ptr = 0; Ptr < IDCnt; Ptr++) {
-                            cpcore.db.deleteContentRecord("page content", genericController.EncodeInteger(IDs[Ptr]));
+                            cpCore.db.deleteContentRecord("page content", genericController.EncodeInteger(IDs[Ptr]));
                         }
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
             }
             return result;
         }
@@ -1119,17 +1124,17 @@ namespace Contensive.Core.Controllers {
                 //
                 MethodName = "main_GetAuthoringStatus";
                 //
-                cpcore.workflow.getAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate);
+                cpCore.workflow.getAuthoringStatus(ContentName, RecordID, ref IsSubmitted, ref IsApproved, ref SubmittedName, ref ApprovedName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
                 //
                 return;
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
+            ////throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
                                                                     //
         }
         //
@@ -1172,12 +1177,12 @@ namespace Contensive.Core.Controllers {
                 // main_Get Authoring Workflow Status
                 //
                 if (RecordID != 0) {
-                    cpcore.workflow.getAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate);
+                    cpCore.workflow.getAuthoringStatus(ContentName, RecordID, ref IsSubmitted, ref IsApproved, ref SubmittedName, ref ApprovedName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
                 }
                 //
                 // main_Get Content Definition
                 //
-                CDef = Models.Complex.cdefModel.getCdef(cpcore, ContentName);
+                CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
                 //
                 // Set Buttons based on Status
                 //
@@ -1336,11 +1341,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
+            ////throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
                                                                     //
         }
         //
@@ -1359,28 +1364,28 @@ namespace Contensive.Core.Controllers {
                 //
                 MethodName = "main_SendPublishSubmitNotice";
                 //
-                FromAddress = cpcore.siteProperties.getText("EmailPublishSubmitFrom", cpcore.siteProperties.emailAdmin);
-                CDef = Models.Complex.cdefModel.getCdef(cpcore, ContentName);
-                Link = "/" + cpcore.serverConfig.appConfig.adminRoute + "?af=" + AdminFormPublishing;
+                FromAddress = cpCore.siteProperties.getText("EmailPublishSubmitFrom", cpCore.siteProperties.emailAdmin);
+                CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
+                Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
-                Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + genericController.encodeHTML(Link) + "\">" + cpcore.webServer.requestDomain + "</a>");
+                Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + genericController.encodeHTML(Link) + "\">" + cpCore.webServer.requestDomain + "</a>");
                 Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName);
                 Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName);
                 Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString());
-                Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", cpcore.doc.profileStartTime.ToString());
-                Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpcore.doc.authContext.user.name);
+                Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", cpCore.doc.profileStartTime.ToString());
+                Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpCore.doc.authContext.user.name);
                 //
-                cpcore.email.sendGroup(cpcore.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
+                cpCore.email.sendGroup(cpCore.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
                 //
                 return;
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
+            ////throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
                                                                     //
         }
         //
@@ -1389,21 +1394,14 @@ namespace Contensive.Core.Controllers {
         //=============================================================================
         //
         public string getContentWatchLinkByName(string ContentName, int RecordID, string DefaultLink = "", bool IncrementClicks = true) {
+            string result = "";
             try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                string ContentRecordKey;
-                //
-                ContentRecordKey = Models.Complex.cdefModel.getContentId(cpcore, genericController.encodeText(ContentName)) + "." + genericController.EncodeInteger(RecordID);
-                return getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
-                //
-                //
-            } catch {
+                string ContentRecordKey = Models.Complex.cdefModel.getContentId(cpCore, genericController.encodeText(ContentName)) + "." + genericController.EncodeInteger(RecordID);
+                result = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetContentWatchLinkByName")
+            return result;
         }
         //
         //=============================================================================
@@ -1420,25 +1418,25 @@ namespace Contensive.Core.Controllers {
                 //
                 // Lookup link in main_ContentWatch
                 //
-                CSPointer = cpcore.db.csOpen("Content Watch", "ContentRecordKey=" + cpcore.db.encodeSQLText(ContentRecordKey),,,,,, "Link,Clicks");
-                if (cpcore.db.csOk(CSPointer)) {
-                    tempgetContentWatchLinkByKey = cpcore.db.csGetText(CSPointer, "Link");
+                CSPointer = cpCore.db.csOpen("Content Watch", "ContentRecordKey=" + cpCore.db.encodeSQLText(ContentRecordKey), "", false, 0, false, false, "Link,Clicks");
+                if (cpCore.db.csOk(CSPointer)) {
+                    tempgetContentWatchLinkByKey = cpCore.db.csGetText(CSPointer, "Link");
                     if (genericController.EncodeBoolean(IncrementClicks)) {
-                        cpcore.db.csSet(CSPointer, "Clicks", cpcore.db.csGetInteger(CSPointer, "clicks") + 1);
+                        cpCore.db.csSet(CSPointer, "Clicks", cpCore.db.csGetInteger(CSPointer, "clicks") + 1);
                     }
                 } else {
                     tempgetContentWatchLinkByKey = genericController.encodeText(DefaultLink);
                 }
-                cpcore.db.csClose(ref CSPointer);
+                cpCore.db.csClose(ref CSPointer);
                 //
-                return genericController.EncodeAppRootPath(tempgetContentWatchLinkByKey, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain);
+                return genericController.EncodeAppRootPath(tempgetContentWatchLinkByKey, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain);
                 //
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetContentWatchLinkByKey")
+            ////throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetContentWatchLinkByKey")
             return tempgetContentWatchLinkByKey;
         }
         //
@@ -1452,7 +1450,7 @@ namespace Contensive.Core.Controllers {
         internal int getPageSectionId(int PageID, ref List<int> UsedIDList, Dictionary<int, int> siteSectionRootPageIndex) {
             int sectionId = 0;
             try {
-                Models.Entity.pageContentModel page = Models.Entity.pageContentModel.create(cpcore, PageID, new List<string>());
+                pageContentModel page = pageContentModel.create(cpCore, PageID, ref new List<string>());
                 if (page != null) {
                     if ((page.ParentID == 0) && (!UsedIDList.Contains(page.ParentID))) {
                         UsedIDList.Add(page.ParentID);
@@ -1464,7 +1462,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
                 throw;
             }
             return sectionId;
@@ -1485,12 +1483,12 @@ namespace Contensive.Core.Controllers {
                 int templateId = 0;
                 //
                 //
-                CS = cpcore.db.csOpenRecord("Page Content", PageID,,, "TemplateID,ParentID");
-                if (cpcore.db.csOk(CS)) {
-                    templateId = cpcore.db.csGetInteger(CS, "TemplateID");
-                    ParentID = cpcore.db.csGetInteger(CS, "ParentID");
+                CS = cpCore.db.csOpenRecord("Page Content", PageID, false, false, "TemplateID,ParentID");
+                if (cpCore.db.csOk(CS)) {
+                    templateId = cpCore.db.csGetInteger(CS, "TemplateID");
+                    ParentID = cpCore.db.csGetInteger(CS, "ParentID");
                 }
-                cpcore.db.csClose(ref CS);
+                cpCore.db.csClose(ref CS);
                 //
                 // Chase page tree to main_Get templateid
                 //
@@ -1502,11 +1500,11 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempmain_GetPageDynamicLink_GetTemplateID;
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetPageDynamicLink_GetTemplateID")
+            ////throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetPageDynamicLink_GetTemplateID")
             return tempmain_GetPageDynamicLink_GetTemplateID;
         }
         //
@@ -1527,9 +1525,9 @@ namespace Contensive.Core.Controllers {
             //
             // Convert default page to default link
             //
-            DefaultLink = cpcore.siteProperties.serverPageDefault;
+            DefaultLink = cpCore.siteProperties.serverPageDefault;
             if (DefaultLink.Substring(0, 1) != "/") {
-                DefaultLink = "/" + cpcore.siteProperties.serverPageDefault;
+                DefaultLink = "/" + cpCore.siteProperties.serverPageDefault;
             }
             //
             return main_GetPageDynamicLinkWithArgs(CCID, PageID, DefaultLink, IsRootPage, templateId, SectionID, MenuLinkOverRide, UseContentWatchLink);
@@ -1563,7 +1561,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- Current method - all pages are in the Template, Section, Page structure
                         if (templateId != 0) {
-                            pageTemplateModel template = pageTemplateModel.create(cpcore, templateId, new List<string>());
+                            pageTemplateModel template = pageTemplateModel.create(cpCore, templateId, ref new List<string>());
                             if (template != null) {
                                 resultLink = ""; // template.Link
                             }
@@ -1596,9 +1594,9 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                resultLink = genericController.EncodeAppRootPath(resultLink, cpcore.webServer.requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain);
+                resultLink = genericController.EncodeAppRootPath(resultLink, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain);
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
                 throw;
             }
             return resultLink;
@@ -1664,18 +1662,18 @@ namespace Contensive.Core.Controllers {
         public int createPageGetID(string PageName, string ContentName, int CreatedBy, string pageGuid) {
             int Id = 0;
             //
-            int CS = cpcore.db.csInsertRecord(ContentName, CreatedBy);
-            if (cpcore.db.csOk(CS)) {
-                Id = cpcore.db.csGetInteger(CS, "ID");
-                cpcore.db.csSet(CS, "name", PageName);
-                cpcore.db.csSet(CS, "active", "1");
+            int CS = cpCore.db.csInsertRecord(ContentName, CreatedBy);
+            if (cpCore.db.csOk(CS)) {
+                Id = cpCore.db.csGetInteger(CS, "ID");
+                cpCore.db.csSet(CS, "name", PageName);
+                cpCore.db.csSet(CS, "active", "1");
                 if (true) {
-                    cpcore.db.csSet(CS, "ccGuid", pageGuid);
+                    cpCore.db.csSet(CS, "ccGuid", pageGuid);
                 }
-                cpcore.db.csSave2(CS);
+                cpCore.db.csSave2(CS);
                 //   Call cpcore.workflow.publishEdit("Page Content", Id)
             }
-            cpcore.db.csClose(ref CS);
+            cpCore.db.csClose(ref CS);
             //
             return Id;
         }
@@ -1687,7 +1685,7 @@ namespace Contensive.Core.Controllers {
         //
         public static string getLinkAlias(coreClass cpcore, int PageID, string QueryStringSuffix, string DefaultLink) {
             string linkAlias = DefaultLink;
-            List<Models.Entity.linkAliasModel> linkAliasList = Models.Entity.linkAliasModel.createList(cpcore, PageID, QueryStringSuffix);
+            List<Models.Entity.linkAliasModel> linkAliasList = linkAliasModel.createList(cpcore, PageID, QueryStringSuffix);
             if (linkAliasList.Count > 0) {
                 linkAlias = linkAliasList.First().name;
                 if (linkAlias.Substring(0, 1) != "/") {
@@ -1833,7 +1831,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 FieldList = "Name,PageID,'' as QueryStringSuffix";
                             }
-                            CS = cpcore.db.csOpen("Link Aliases", "name=" + cpcore.db.encodeSQLText(WorkingLinkAlias),,,,,, FieldList);
+                            CS = cpcore.db.csOpen("Link Aliases", "name=" + cpcore.db.encodeSQLText(WorkingLinkAlias),"", false, 0, false, false, FieldList);
                             if (!cpcore.db.csOk(CS)) {
                                 //
                                 // Alias not found, create a Link Aliases
@@ -1997,12 +1995,12 @@ namespace Contensive.Core.Controllers {
                 //
                 if (Name.IndexOf("=") + 1 > 0) {
                     temp = Name.Split('=');
-                    refreshQueryString = genericController.ModifyQueryString(cpcore.doc.refreshQueryString, temp[0], temp[1], true);
+                    refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, temp[0], temp[1], true);
                 } else {
-                    refreshQueryString = genericController.ModifyQueryString(cpcore.doc.refreshQueryString, Name, Value, true);
+                    refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, Name, Value, true);
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
                 throw;
             }
 
@@ -2029,43 +2027,43 @@ namespace Contensive.Core.Controllers {
             int ContentID = 0;
             int ActivityLogOrganizationID = 0;
             //
-            ContentID = Models.Complex.cdefModel.getContentId(cpcore, ContentName);
-            TableName = Models.Complex.cdefModel.getContentTablename(cpcore, ContentName);
+            ContentID = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
+            TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
             markRecordReviewed(ContentName, RecordID);
             //
             // -- invalidate the specific cache for this record
-            cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID);
+            cpCore.cache.invalidateContent_Entity(cpCore, TableName, RecordID);
             //
             // -- invalidate the tablename -- meaning any cache consumer that cannot itemize its entity records, can depend on this, which will invalidate anytime any record clears
-            cpcore.cache.invalidateContent(TableName);
+            cpCore.cache.invalidateContent(TableName);
             //
             switch (genericController.vbLCase(TableName)) {
                 case linkForwardModel.contentTableName:
                     //
-                    Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
+                    Models.Complex.routeDictionaryModel.invalidateCache(cpCore);
                     break;
                 case linkAliasModel.contentTableName:
                     //
-                    Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
+                    Models.Complex.routeDictionaryModel.invalidateCache(cpCore);
                     break;
                 case addonModel.contentTableName:
                     //
-                    Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
+                    Models.Complex.routeDictionaryModel.invalidateCache(cpCore);
                     break;
                 case personModel.contentTableName:
                     //
                     // Log Activity for changes to people and organizattions
                     //
                     //hint = hint & ",110"
-                    CS = cpcore.db.cs_open2("people", RecordID,,, "Name,OrganizationID");
-                    if (cpcore.db.csOk(CS)) {
-                        ActivityLogOrganizationID = cpcore.db.csGetInteger(CS, "OrganizationID");
+                    CS = cpCore.db.cs_open2("people", RecordID, false, false, "Name,OrganizationID");
+                    if (cpCore.db.csOk(CS)) {
+                        ActivityLogOrganizationID = cpCore.db.csGetInteger(CS, "OrganizationID");
                     }
-                    cpcore.db.csClose(ref CS);
+                    cpCore.db.csClose(ref CS);
                     if (IsDelete) {
-                        logController.logActivity2(cpcore, "deleting user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
+                        logController.logActivity2(cpCore, "deleting user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
                     } else {
-                        logController.logActivity2(cpcore, "saving changes to user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
+                        logController.logActivity2(cpCore, "saving changes to user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
                     }
                     break;
                 case "organizations":
@@ -2074,9 +2072,9 @@ namespace Contensive.Core.Controllers {
                     //
                     //hint = hint & ",120"
                     if (IsDelete) {
-                        logController.logActivity2(cpcore, "deleting organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
+                        logController.logActivity2(cpCore, "deleting organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
                     } else {
-                        logController.logActivity2(cpcore, "saving changes to organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
+                        logController.logActivity2(cpCore, "saving changes to organization #" + RecordID + " (" + RecordName + ")", 0, RecordID);
                     }
                     break;
                 case "ccsetup":
@@ -2086,13 +2084,13 @@ namespace Contensive.Core.Controllers {
                     //hint = hint & ",130"
                     switch (genericController.vbLCase(RecordName)) {
                         case "allowlinkalias":
-                            cpcore.cache.invalidateAllObjectsInContent("Page Content");
+                            cpCore.cache.invalidateAllObjectsInContent("Page Content");
                             break;
                         case "sectionlandinglink":
-                            cpcore.cache.invalidateAllObjectsInContent("Page Content");
+                            cpCore.cache.invalidateAllObjectsInContent("Page Content");
                             break;
                         case siteproperty_serverPageDefault_name:
-                            cpcore.cache.invalidateAllObjectsInContent("Page Content");
+                            cpCore.cache.invalidateAllObjectsInContent("Page Content");
                             break;
                     }
                     break;
@@ -2103,7 +2101,7 @@ namespace Contensive.Core.Controllers {
                     //hint = hint & ",140"
                     if (RecordParentID > 0) {
                         if (!IsDelete) {
-                            cpcore.db.executeQuery("update ccpagecontent set ChildPagesfound=1 where ID=" + RecordParentID);
+                            cpCore.db.executeQuery("update ccpagecontent set ChildPagesfound=1 where ID=" + RecordParentID);
                         }
                     }
                     //
@@ -2113,18 +2111,18 @@ namespace Contensive.Core.Controllers {
                         //
                         // Clear the Landing page and page not found site properties
                         //
-                        if (RecordID == genericController.EncodeInteger(cpcore.siteProperties.getText("PageNotFoundPageID", "0"))) {
-                            cpcore.siteProperties.setProperty("PageNotFoundPageID", "0");
+                        if (RecordID == genericController.EncodeInteger(cpCore.siteProperties.getText("PageNotFoundPageID", "0"))) {
+                            cpCore.siteProperties.setProperty("PageNotFoundPageID", "0");
                         }
-                        if (RecordID == cpcore.siteProperties.landingPageID) {
-                            cpcore.siteProperties.setProperty("landingPageId", "0");
+                        if (RecordID == cpCore.siteProperties.landingPageID) {
+                            cpCore.siteProperties.setProperty("landingPageId", "0");
                         }
                         //
                         // Delete Link Alias entries with this PageID
                         //
-                        cpcore.db.executeQuery("delete from cclinkAliases where PageID=" + RecordID);
+                        cpCore.db.executeQuery("delete from cclinkAliases where PageID=" + RecordID);
                     }
-                    cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID);
+                    cpCore.cache.invalidateContent_Entity(cpCore, TableName, RecordID);
                     //Case "cctemplates" ', "ccsharedstyles"
                     //    '
                     //    ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
@@ -2138,38 +2136,38 @@ namespace Contensive.Core.Controllers {
                 case "ccaggregatefunctions":
                     //
                     // -- add-ons, rebuild addonCache
-                    cpcore.cache.invalidateContent("addonCache");
-                    cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID);
+                    cpCore.cache.invalidateContent("addonCache");
+                    cpCore.cache.invalidateContent_Entity(cpCore, TableName, RecordID);
                     break;
                 case "cclibraryfiles":
                     //
                     // if a AltSizeList is blank, make large,medium,small and thumbnails
                     //
                     //hint = hint & ",180"
-                    if (cpcore.siteProperties.getBoolean("ImageAllowSFResize", true)) {
+                    if (cpCore.siteProperties.getBoolean("ImageAllowSFResize", true)) {
                         if (!IsDelete) {
-                            CS = cpcore.db.csOpenRecord("library files", RecordID);
-                            if (cpcore.db.csOk(CS)) {
-                                Filename = cpcore.db.csGet(CS, "filename");
+                            CS = cpCore.db.csOpenRecord("library files", RecordID);
+                            if (cpCore.db.csOk(CS)) {
+                                Filename = cpCore.db.csGet(CS, "filename");
                                 Pos = Filename.LastIndexOf("/") + 1;
                                 if (Pos > 0) {
                                     FilePath = Filename.Substring(0, Pos);
                                     Filename = Filename.Substring(Pos);
                                 }
-                                cpcore.db.csSet(CS, "filesize", cpcore.appRootFiles.main_GetFileSize(FilePath + Filename));
+                                cpCore.db.csSet(CS, "filesize", cpCore.appRootFiles.main_GetFileSize(FilePath + Filename));
                                 Pos = Filename.LastIndexOf(".") + 1;
                                 if (Pos > 0) {
                                     FilenameExt = Filename.Substring(Pos);
                                     FilenameNoExt = Filename.Substring(0, Pos - 1);
                                     if (genericController.vbInstr(1, "jpg,gif,png", FilenameExt, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
                                         sf = new imageEditController();
-                                        if (sf.load(cpcore.appRootFiles.rootLocalPath + FilePath + Filename)) {
+                                        if (sf.load(cpCore.appRootFiles.rootLocalPath + FilePath + Filename)) {
                                             //
                                             //
                                             //
-                                            cpcore.db.csSet(CS, "height", sf.height);
-                                            cpcore.db.csSet(CS, "width", sf.width);
-                                            AltSizeList = cpcore.db.csGetText(CS, "AltSizeList");
+                                            cpCore.db.csSet(CS, "height", sf.height);
+                                            cpCore.db.csSet(CS, "width", sf.width);
+                                            AltSizeList = cpCore.db.csGetText(CS, "AltSizeList");
                                             RebuildSizes = (string.IsNullOrEmpty(AltSizeList));
                                             if (RebuildSizes) {
                                                 AltSizeList = "";
@@ -2179,7 +2177,7 @@ namespace Contensive.Core.Controllers {
                                                 if (sf.width >= 640) {
                                                     sf.height = Convert.ToInt32(sf.height * (640 / sf.width));
                                                     sf.width = 640;
-                                                    sf.save(cpcore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt);
+                                                    sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + Environment.NewLine + "640x" + sf.height;
                                                 }
                                                 //
@@ -2188,7 +2186,7 @@ namespace Contensive.Core.Controllers {
                                                 if (sf.width >= 320) {
                                                     sf.height = Convert.ToInt32(sf.height * (320 / sf.width));
                                                     sf.width = 320;
-                                                    sf.save(cpcore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt);
+                                                    sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt);
 
                                                     AltSizeList = AltSizeList + Environment.NewLine + "320x" + sf.height;
                                                 }
@@ -2198,7 +2196,7 @@ namespace Contensive.Core.Controllers {
                                                 if (sf.width >= 160) {
                                                     sf.height = Convert.ToInt32(sf.height * (160 / sf.width));
                                                     sf.width = 160;
-                                                    sf.save(cpcore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt);
+                                                    sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + Environment.NewLine + "160x" + sf.height;
                                                 }
                                                 //
@@ -2207,10 +2205,10 @@ namespace Contensive.Core.Controllers {
                                                 if (sf.width >= 80) {
                                                     sf.height = Convert.ToInt32(sf.height * (80 / sf.width));
                                                     sf.width = 80;
-                                                    sf.save(cpcore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt);
+                                                    sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + Environment.NewLine + "80x" + sf.height;
                                                 }
-                                                cpcore.db.csSet(CS, "AltSizeList", AltSizeList);
+                                                cpCore.db.csSet(CS, "AltSizeList", AltSizeList);
                                             }
                                             sf.Dispose();
                                             sf = null;
@@ -2270,23 +2268,23 @@ namespace Contensive.Core.Controllers {
                                     }
                                 }
                             }
-                            cpcore.db.csClose(ref CS);
+                            cpCore.db.csClose(ref CS);
                         }
                     }
                     break;
                 default:
                     //
                     // -- edit and delete for records -- clear entity cache
-                    cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID);
+                    cpCore.cache.invalidateContent_Entity(cpCore, TableName, RecordID);
                     break;
             }
             //
             // -- edit and delete for records -- clear entity cache
-            cpcore.cache.invalidateContent_Entity(cpcore, TableName, RecordID);
+            cpCore.cache.invalidateContent_Entity(cpCore, TableName, RecordID);
             //
             // Process Addons marked to trigger a process call on content change
             //
-            CS = cpcore.db.csOpen("Add-on Content Trigger Rules", "ContentID=" + ContentID,,,,,, "addonid");
+            CS = cpCore.db.csOpen("Add-on Content Trigger Rules", "ContentID=" + ContentID,"", false, 0, false, false, "addonid");
             if (IsDelete) {
                 Option_String = ""
                     + Environment.NewLine + "action=contentdelete"
@@ -2296,33 +2294,33 @@ namespace Contensive.Core.Controllers {
                     + Environment.NewLine + "action=contentchange"
                     + Environment.NewLine + "contentid=" + ContentID + Environment.NewLine + "recordid=" + RecordID + "";
             }
-            while (cpcore.db.csOk(CS)) {
-                addonId = cpcore.db.csGetInteger(CS, "Addonid");
+            while (cpCore.db.csOk(CS)) {
+                addonId = cpCore.db.csGetInteger(CS, "Addonid");
                 //hint = hint & ",210 addonid=[" & addonId & "]"
-                cpcore.addon.executeAddonAsProcess(addonId.ToString(), Option_String);
-                cpcore.db.csGoNext(CS);
+                cpCore.addon.executeAddonAsProcess(addonId.ToString(), Option_String);
+                cpCore.db.csGoNext(CS);
             }
-            cpcore.db.csClose(ref CS);
+            cpCore.db.csClose(ref CS);
             //
             // -- ok, temp work-around for the damn cache not invalidating correctly -- the nuclear solution
-            cpcore.cache.invalidateAll();
+            cpCore.cache.invalidateAll();
         }
         //
         public void markRecordReviewed(string ContentName, int RecordID) {
             try {
-                if (Models.Complex.cdefModel.isContentFieldSupported(cpcore, ContentName, "DateReviewed")) {
-                    string DataSourceName = Models.Complex.cdefModel.getContentDataSource(cpcore, ContentName);
-                    string TableName = Models.Complex.cdefModel.getContentTablename(cpcore, ContentName);
-                    string SQL = "update " + TableName + " set DateReviewed=" + cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime);
-                    if (Models.Complex.cdefModel.isContentFieldSupported(cpcore, ContentName, "ReviewedBy")) {
-                        SQL += ",ReviewedBy=" + cpcore.doc.authContext.user.id;
+                if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, ContentName, "DateReviewed")) {
+                    string DataSourceName = Models.Complex.cdefModel.getContentDataSource(cpCore, ContentName);
+                    string TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
+                    string SQL = "update " + TableName + " set DateReviewed=" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime);
+                    if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, ContentName, "ReviewedBy")) {
+                        SQL += ",ReviewedBy=" + cpCore.doc.authContext.user.id;
                     }
                     //
                     // -- Mark the live record
-                    cpcore.db.executeQuery(SQL + " where id=" + RecordID, DataSourceName);
+                    cpCore.db.executeQuery(SQL + " where id=" + RecordID, DataSourceName);
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
             }
         }
         //
@@ -2357,20 +2355,20 @@ namespace Contensive.Core.Controllers {
                 } else {
                     FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList";
                 }
-                CS = cpcore.db.csOpen("Meta Content", Criteria,,,,,, FieldList);
-                if (cpcore.db.csOk(CS)) {
-                    MetaContentID = cpcore.db.csGetInteger(CS, "ID");
-                    cpcore.html.addTitle(genericController.encodeHTML(cpcore.db.csGetText(CS, "Name")), "page content");
-                    cpcore.html.addMetaDescription(genericController.encodeHTML(cpcore.db.csGetText(CS, "MetaDescription")), "page content");
-                    cpcore.html.addHeadTag(cpcore.db.csGetText(CS, "OtherHeadTags"), "page content");
+                CS = cpCore.db.csOpen("Meta Content", Criteria, "", false, 0, false, false, FieldList);
+                if (cpCore.db.csOk(CS)) {
+                    MetaContentID = cpCore.db.csGetInteger(CS, "ID");
+                    cpCore.html.addTitle(genericController.encodeHTML(cpCore.db.csGetText(CS, "Name")), "page content");
+                    cpCore.html.addMetaDescription(genericController.encodeHTML(cpCore.db.csGetText(CS, "MetaDescription")), "page content");
+                    cpCore.html.addHeadTag(cpCore.db.csGetText(CS, "OtherHeadTags"), "page content");
                     if (true) {
-                        KeywordList = genericController.vbReplace(cpcore.db.csGetText(CS, "MetaKeywordList"), Environment.NewLine, ",");
+                        KeywordList = genericController.vbReplace(cpCore.db.csGetText(CS, "MetaKeywordList"), Environment.NewLine, ",");
                     }
                     //main_MetaContent_Title = encodeHTML(app.csv_cs_getText(CS, "Name"))
                     //htmldoc.main_MetaContent_Description = encodeHTML(app.csv_cs_getText(CS, "MetaDescription"))
                     //main_MetaContent_OtherHeadTags = app.csv_cs_getText(CS, "OtherHeadTags")
                 }
-                cpcore.db.csClose(ref CS);
+                cpCore.db.csClose(ref CS);
                 //
                 // main_Get Keyword List
                 //
@@ -2378,10 +2376,10 @@ namespace Contensive.Core.Controllers {
                     + " From ccMetaKeywords"
                     + " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID"
                     + " Where ccMetaKeywordRules.MetaContentID=" + MetaContentID;
-                CS = cpcore.db.csOpenSql(SQL);
-                while (cpcore.db.csOk(CS)) {
-                    KeywordList = KeywordList + "," + cpcore.db.csGetText(CS, "Name");
-                    cpcore.db.csGoNext(CS);
+                CS = cpCore.db.csOpenSql(SQL);
+                while (cpCore.db.csOk(CS)) {
+                    KeywordList = KeywordList + "," + cpCore.db.csGetText(CS, "Name");
+                    cpCore.db.csGoNext(CS);
                 }
                 if (!string.IsNullOrEmpty(KeywordList)) {
                     if (KeywordList.Substring(0, 1) == ",") {
@@ -2389,9 +2387,9 @@ namespace Contensive.Core.Controllers {
                     }
                     //KeyWordList = Mid(KeyWordList, 2)
                     KeywordList = genericController.encodeHTML(KeywordList);
-                    cpcore.html.addMetaKeywordList(KeywordList, "page content");
+                    cpCore.html.addMetaKeywordList(KeywordList, "page content");
                 }
-                cpcore.db.csClose(ref CS);
+                cpCore.db.csClose(ref CS);
             }
         }
         //
@@ -2401,7 +2399,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         public void clearMetaData() {
             try {
-                if (cpcore.doc.cdefDictionary != null) {
+                if (cpCore.doc.cdefDictionary != null) {
                     cdefDictionary.Clear();
                 }
                 if (tableSchemaDictionary != null) {
@@ -2410,7 +2408,7 @@ namespace Contensive.Core.Controllers {
                 contentNameIdDictionaryClear();
                 contentIdDictClear();
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
                 throw;
             }
         }

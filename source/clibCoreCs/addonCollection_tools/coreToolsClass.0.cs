@@ -1,7 +1,15 @@
 ﻿
 using System;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
 using Contensive.Core.Models.Entity;
-using Contensive.Core.Models.Context;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -254,7 +262,7 @@ namespace Contensive.Core {
                                 break;
                             case AdminFormToolBenchmark:
                                 //
-                                Stream.Add(GetForm_Benchmark);
+                                Stream.Add(GetForm_Benchmark());
                                 break;
                             case AdminFormToolClearContentWatchLink:
                                 //
@@ -262,39 +270,39 @@ namespace Contensive.Core {
                                 break;
                             case AdminFormToolSchema:
                                 //
-                                Stream.Add(GetForm_DbSchema);
+                                Stream.Add(GetForm_DbSchema());
                                 break;
                             case AdminFormToolContentFileView:
                                 //
-                                Stream.Add(GetForm_ContentFileManager);
+                                Stream.Add(GetForm_ContentFileManager());
                                 break;
                             case AdminFormToolWebsiteFileView:
                                 //
-                                Stream.Add(GetForm_WebsiteFileManager);
+                                Stream.Add(GetForm_WebsiteFileManager());
                                 break;
                             case AdminFormToolDbIndex:
                                 //
-                                Stream.Add(GetForm_DbIndex);
+                                Stream.Add(GetForm_DbIndex());
                                 break;
                             case AdminFormToolContentDbSchema:
                                 //
-                                Stream.Add(GetForm_ContentDbSchema);
+                                Stream.Add(GetForm_ContentDbSchema());
                                 break;
                             case AdminFormToolLogFileView:
                                 //
-                                Stream.Add(GetForm_LogFiles);
+                                Stream.Add(GetForm_LogFiles());
                                 break;
                             case AdminFormToolLoadCDef:
                                 //
-                                Stream.Add(GetForm_LoadCDef);
+                                Stream.Add(GetForm_LoadCDef());
                                 break;
                             case AdminFormToolRestart:
                                 //
-                                Stream.Add(GetForm_Restart);
+                                Stream.Add(GetForm_Restart());
                                 break;
                             case AdminFormToolLoadTemplates:
                                 //
-                                Stream.Add(GetForm_LoadTemplates);
+                                Stream.Add(GetForm_LoadTemplates());
                                 break;
                             case AdminformToolFindAndReplace:
                                 //
@@ -543,7 +551,7 @@ namespace Contensive.Core {
                 string SQLName = null;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
-                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("dataSourceid"), new List<string>());
+                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("dataSourceid"), ref new List<string>());
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
@@ -687,7 +695,7 @@ namespace Contensive.Core {
                 Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
                 Stream.Add("<br><br>Data Source<br>" + cpCore.html.main_GetFormInputSelect("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
                 //
-                SelectFieldWidthLimit = cpCore.siteProperties.getinteger("SelectFieldWidthLimit", 200);
+                SelectFieldWidthLimit = cpCore.siteProperties.getInteger("SelectFieldWidthLimit", 200);
                 if (!string.IsNullOrEmpty(SQLArchive)) {
                     Stream.Add("<br><br>Previous Queries<br>");
                     Stream.Add("<select size=\"1\" name=\"SQLList\" ID=\"SQLList\" onChange=\"SQL.value=SQLList.value\">");
@@ -749,7 +757,7 @@ namespace Contensive.Core {
                 string Caption = null;
                 int NavID = 0;
                 int ParentNavID = 0;
-                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"), new List<string>());
+                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"), ref new List<string>());
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 Caption = "Create Content Definition";
@@ -2232,7 +2240,7 @@ namespace Contensive.Core {
                     //   Run Tools
                     //
                     Stream.Add("Synchronizing Tables to Content Definitions<br>");
-                    CSContent = cpCore.db.csOpen("Content",,,,,,, "id");
+                    CSContent = cpCore.db.csOpen("Content", "", "", false, 0, false, false, "id");
                     if (cpCore.db.csOk(CSContent)) {
                         do {
                             CD = Models.Complex.cdefModel.getCdef(cpCore, cpCore.db.csGetInteger(CSContent, "id"));
@@ -2446,7 +2454,7 @@ namespace Contensive.Core {
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
                         TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = cpCore.db.csOpen("Site Properties",,,,,,,, PageSize, PageNumber);
+                        CS = cpCore.db.csOpen("Site Properties", "",,,,,,, PageSize, PageNumber);
                         OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
@@ -2482,7 +2490,7 @@ namespace Contensive.Core {
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
                         TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = cpCore.db.csOpen("Site Properties",,,,,,, "name", PageSize, PageNumber);
+                        CS = cpCore.db.csOpen("Site Properties",,,, "",,, "name", PageSize, PageNumber);
                         OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
@@ -2539,7 +2547,7 @@ namespace Contensive.Core {
                 tempLocal_GetContentID = 0;
                 dt = cpCore.db.executeQuery("Select ID from ccContent where name=" + cpCore.db.encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
-                    tempLocal_GetContentID = genericController.EncodeInteger(dt.Rows[0].Item(0));
+                    tempLocal_GetContentID = genericController.EncodeInteger(dt.Rows[0][0]);
                 }
                 //
                 return tempLocal_GetContentID;
@@ -2567,7 +2575,7 @@ namespace Contensive.Core {
                 tempLocal_GetContentNameByID = "";
                 dt = cpCore.db.executeQuery("Select name from ccContent where id=" + ContentID);
                 if (dt.Rows.Count > 0) {
-                    tempLocal_GetContentNameByID = genericController.encodeText(dt.Rows[0].Item(0));
+                    tempLocal_GetContentNameByID = genericController.encodeText(dt.Rows[0][0]);
                 }
                 //
                 return tempLocal_GetContentNameByID;
@@ -2595,7 +2603,7 @@ namespace Contensive.Core {
                 tempLocal_GetContentTableName = "";
                 RS = cpCore.db.executeQuery("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" + cpCore.db.encodeSQLText(ContentName));
                 if (RS.Rows.Count > 0) {
-                    tempLocal_GetContentTableName = genericController.encodeText(RS.Rows[0].Item(0));
+                    tempLocal_GetContentTableName = genericController.encodeText(RS.Rows[0][0]);
                 }
                 //
                 return tempLocal_GetContentTableName;
@@ -2628,7 +2636,7 @@ namespace Contensive.Core {
                         + " where ccContent.name=" + cpCore.db.encodeSQLText(ContentName);
                 RS = cpCore.db.executeQuery(SQL);
                 if (isDataTableOk(RS)) {
-                    tempLocal_GetContentDataSource = genericController.encodeText(RS.Rows[0].Item("Name"));
+                    tempLocal_GetContentDataSource = genericController.encodeText(RS.Rows[0]["Name"]);
                 }
                 if (string.IsNullOrEmpty(tempLocal_GetContentDataSource)) {
                     tempLocal_GetContentDataSource = "Default";
@@ -2685,7 +2693,8 @@ namespace Contensive.Core {
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
                 DataTable RSSchema = null;
-                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"), new List<string>());
+                var tmpList = new List<string> { };
+                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"),ref tmpList);
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
@@ -4341,7 +4350,7 @@ namespace Contensive.Core {
         //                '
         //                ParentID = cpCore.db.cs_getInteger(CSContent, "parentID")
         //                If ParentID <> 0 Then
-        //                    ParentContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ParentID)
+        //                    ParentContentName = Models.Complex.cdefModel.getContentNameByID(cpcore,ParentID)
         //                    If ParentContentName <> "" Then
         //                        LoadCDef = LoadCDef(ParentContentName)
         //                    End If

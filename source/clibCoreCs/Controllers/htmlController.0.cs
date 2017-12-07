@@ -1,10 +1,21 @@
 ﻿
 using System;
-using Contensive.BaseClasses;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
-using Contensive.Core.Models.Entity;
+//
+
+using Contensive.BaseClasses;
 
 namespace Contensive.Core.Controllers {
     /// <summary>
@@ -903,7 +914,7 @@ namespace Contensive.Core.Controllers {
                     }
                     DataTable dt = cpCore.db.executeQuery(SQL);
                     if (dt.Rows.Count > 0) {
-                        RowCnt = genericController.EncodeInteger(dt.Rows[0].Item("cnt"));
+                        RowCnt = genericController.EncodeInteger(dt.Rows[0]["cnt"]);
                     }
                     if (RowCnt == 0) {
                         RowMax = -1;
@@ -1015,7 +1026,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // ----- select values
                             //
-                            CSPointer = cpCore.db.csOpen(ContentName, Criteria, SortFieldList,,,,, SelectFields);
+                            CSPointer = cpCore.db.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
                             if (cpCore.db.csOk(CSPointer)) {
                                 RowsArray = cpCore.db.cs_getRows(CSPointer);
                                 RowFieldArray = cpCore.db.cs_getSelectFieldList(CSPointer).Split(',');
@@ -1073,7 +1084,7 @@ namespace Contensive.Core.Controllers {
                                         Criteria = Criteria + "and";
                                     }
                                     Criteria = Criteria + "(id=" + genericController.EncodeInteger(CurrentValue) + ")";
-                                    CSPointer = cpCore.db.csOpen(ContentName, Criteria, SortFieldList, false,,,, SelectFields);
+                                    CSPointer = cpCore.db.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
                                     if (cpCore.db.csOk(CSPointer)) {
                                         RowsArray = cpCore.db.cs_getRows(CSPointer);
                                         RowFieldArray = cpCore.db.cs_getSelectFieldList(CSPointer).Split(',');
@@ -1512,7 +1523,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetFormInputSelectList2")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetFormInputSelectList2")
         }
         //
         //========================================================================
@@ -1614,7 +1625,7 @@ namespace Contensive.Core.Controllers {
         //            '
         //            Exit Sub
         ////ErrorTrap:
-        //            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("writeAltBuffer")
+        //            //throw new ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("writeAltBuffer")
         //        End Sub
 
         //        '
@@ -1631,7 +1642,7 @@ namespace Contensive.Core.Controllers {
         //            Exit Sub
         //            '
         ////ErrorTrap:
-        //            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_JavaStream_Add")
+        //            //throw new ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_JavaStream_Add")
         //        End Sub
 
 
@@ -1702,11 +1713,11 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 return temphtml_GetLegacySiteStyles;
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetLegacySiteStyles")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetLegacySiteStyles")
             return temphtml_GetLegacySiteStyles;
         }
         //
@@ -1732,11 +1743,11 @@ namespace Contensive.Core.Controllers {
                 }
 
                 return temphtml_GetAdminHintWrapper;
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetAdminHintWrapper")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetAdminHintWrapper")
             return temphtml_GetAdminHintWrapper;
         }
         //
@@ -1779,11 +1790,11 @@ namespace Contensive.Core.Controllers {
                 //
                 return "<form action=\"" + cpCore.webServer.serverFormActionURL + "?" + iActionQueryString + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" METHOD=\"POST\"  style=\"display: inline;\" >";
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetUploadFormStart")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetUploadFormStart")
         }
         //
         //========================================================================
@@ -1863,11 +1874,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
                                                                     //
             return temphtml_GetFormStart;
         }
@@ -1937,11 +1948,11 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 return temphtml_GetFormInputText2;
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetFormInputText2")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetFormInputText2")
             return temphtml_GetFormInputText2;
         }
         //
@@ -2024,7 +2035,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
@@ -2160,11 +2171,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
                                                                     //
             return temphtml_GetFormInputRadioBox;
         }
@@ -2201,11 +2212,11 @@ namespace Contensive.Core.Controllers {
                 return temphtml_GetFormInputCheckBox2 + ">";
                 //
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetFormInputCheckBox2")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetFormInputCheckBox2")
             return temphtml_GetFormInputCheckBox2;
         }
         //
@@ -2259,7 +2270,7 @@ namespace Contensive.Core.Controllers {
                 SecondaryCDef = Models.Complex.cdefModel.getCdef(cpCore, SecondaryContentName);
                 SecondaryTablename = SecondaryCDef.ContentTableName;
                 SecondaryContentID = SecondaryCDef.Id;
-                SecondaryCDef.childIdList(cpCore).Add(SecondaryContentID);
+                SecondaryCDef.get_childIdList(cpCore).Add(SecondaryContentID);
                 SingularPrefix = genericController.GetSingular(SecondaryContentName) + "&nbsp;";
                 //
                 // ----- Gather all the records, sorted by ContentName
@@ -2321,11 +2332,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
                                                                     //
         }
         //
@@ -2403,7 +2414,7 @@ namespace Contensive.Core.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
                                     } else {
-                                        returnResult = getFormInputHTML(FieldName, FieldValueText,, Width.ToString());
+                                        returnResult = getFormInputHTML(FieldName, FieldValueText,"", Width.ToString());
                                     }
                                     //
                                     // html files, read from cdnFiles and use html editor
@@ -2418,7 +2429,7 @@ namespace Contensive.Core.Controllers {
                                         returnResult = FieldValueText;
                                     } else {
                                         //Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = getFormInputHTML(FieldName, FieldValueText,, Width.ToString());
+                                        returnResult = getFormInputHTML(FieldName, FieldValueText,"", Width.ToString());
                                     }
                                     //
                                     // text cdnFiles files, read from cdnFiles and use text editor
@@ -2605,11 +2616,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
                                                                     //
         }
         //
@@ -2643,11 +2654,11 @@ namespace Contensive.Core.Controllers {
                 //
                 return s;
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetFormInputHidden")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetFormInputHidden")
         }
         //
         public string html_GetFormInputHidden(string TagName, bool TagValue, string htmlId = "") {
@@ -2705,11 +2716,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
                                                                     //
             return temphtml_GetWindowOpenJScript;
         }
@@ -2755,11 +2766,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
                                                                     //
             return temphtml_GetWindowDialogJScript;
         }
@@ -2960,7 +2971,7 @@ namespace Contensive.Core.Controllers {
                             MTMRuleContent = Models.Complex.cdefModel.getContentNameByID(cpCore, tempVar.manyToManyRuleContentID);
                             MTMRuleField0 = tempVar.ManyToManyRulePrimaryField;
                             MTMRuleField1 = tempVar.ManyToManyRuleSecondaryField;
-                            result = getCheckList(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1,,, false);
+                            result = getCheckList(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1,"","", false);
                             //result = getInputCheckListCategories(InputName, MTMContent0, ManyToManySourceRecordID, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, HtmlValue)
                             break;
                         }
@@ -2969,7 +2980,7 @@ namespace Contensive.Core.Controllers {
                             //
                             //
                             GroupID = genericController.EncodeInteger(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, ContentName, FieldName, "memberselectgroupid"));
-                            result = getInputMemberSelect(InputName, genericController.EncodeInteger(HtmlValue), GroupID,,, HtmlId);
+                            result = getInputMemberSelect(InputName, genericController.EncodeInteger(HtmlValue), GroupID,"","", HtmlId);
                             if (!string.IsNullOrEmpty(HtmlClass)) {
                                 result = genericController.vbReplace(result, ">", " class=\"" + HtmlClass + "\">");
                             }
@@ -3195,7 +3206,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Watch Lists
                         //
-                        CSLists = cpCore.db.csOpen("Content Watch Lists",, "Name,ID",,,,, "Name,ID", 20, 1);
+                        CSLists = cpCore.db.csOpen("Content Watch Lists","", "Name,ID", false, 0, false, false, "Name,ID", 20, 1);
                         if (cpCore.db.csOk(CSLists)) {
                             while (cpCore.db.csOk(CSLists)) {
                                 FieldName = Convert.ToString(cpCore.db.csGetText(CSLists, "name")).Trim(' ');
@@ -3253,7 +3264,7 @@ namespace Contensive.Core.Controllers {
                         }
                         AddonContentName = cnAddons;
                         SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid";
-                        CSAddons = cpCore.db.csOpen(AddonContentName, Criteria, "Name,ID",,,,, SelectList);
+                        CSAddons = cpCore.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
                         if (cpCore.db.csOk(CSAddons)) {
                             while (cpCore.db.csOk(CSAddons)) {
                                 AddonGuid = cpCore.db.csGetText(CSAddons, "ccguid");
@@ -3923,7 +3934,7 @@ namespace Contensive.Core.Controllers {
                                                                     CSPeople = cpCore.db.cs_openContentRecord("people", personalizationPeopleId);
                                                                     CSPeopleSet = true;
                                                                 }
-                                                                CSlanguage = cpCore.db.cs_openContentRecord("Languages", cpCore.db.csGetInteger(CSPeople, "LanguageID"),,,, "Name");
+                                                                CSlanguage = cpCore.db.cs_openContentRecord("Languages", cpCore.db.csGetInteger(CSPeople, "LanguageID"),0, false, false, "Name");
                                                                 if (cpCore.db.csOk(CSlanguage)) {
                                                                     PeopleLanguage = cpCore.db.csGetText(CSlanguage, "name");
                                                                 }
@@ -4031,7 +4042,7 @@ namespace Contensive.Core.Controllers {
                                                                         instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, AddonOptionStringHTMLEncoded),
                                                                         instanceGuid = ACInstanceID
                                                                     };
-                                                                    Models.Entity.addonModel addon = Models.Entity.addonModel.createByName(cpCore, ACName);
+                                                                    addonModel addon = addonModel.createByName(cpCore, ACName);
                                                                     Copy = cpCore.addon.execute(addon, executeContext);
                                                                     //Copy = cpCore.addon.execute_legacy6(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                                                     break;
@@ -4055,7 +4066,7 @@ namespace Contensive.Core.Controllers {
                                                             } else {
                                                                 Criteria = "name=" + cpCore.db.encodeSQLText(UCaseACName);
                                                             }
-                                                            CS = cpCore.db.csOpen(AddonContentName, Criteria, "Name,ID",,,,, SelectList);
+                                                            CS = cpCore.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
                                                             if (cpCore.db.csOk(CS)) {
                                                                 AddonFound = true;
                                                                 // ArgumentList comes in already encoded
@@ -4194,7 +4205,7 @@ namespace Contensive.Core.Controllers {
                                                         ACAttrHSpace = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"));
                                                         ACAttrAlign = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"));
                                                         //
-                                                        Models.Entity.libraryFilesModel file = Models.Entity.libraryFilesModel.create(cpCore, ACAttrRecordID);
+                                                        libraryFilesModel file = libraryFilesModel.create(cpCore, ACAttrRecordID);
                                                         if (file != null) {
                                                             Filename = file.Filename;
                                                             Filename = genericController.vbReplace(Filename, "\\", "/");
@@ -4275,7 +4286,7 @@ namespace Contensive.Core.Controllers {
                                                         //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
                                                     } else if (EncodeImages) {
                                                         //
-                                                        Models.Entity.libraryFilesModel file = Models.Entity.libraryFilesModel.create(cpCore, ACAttrRecordID);
+                                                        libraryFilesModel file = libraryFilesModel.create(cpCore, ACAttrRecordID);
                                                         if (file != null) {
                                                             if (string.IsNullOrEmpty(ACAttrAlt)) {
                                                                 ACAttrAlt = genericController.encodeText(file.AltText);
@@ -4916,7 +4927,7 @@ namespace Contensive.Core.Controllers {
                                                                                 //
                                                                                 // Get the record values
                                                                                 //
-                                                                                Models.Entity.libraryFilesModel file = Models.Entity.libraryFilesModel.create(cpCore, RecordID);
+                                                                                libraryFilesModel file = libraryFilesModel.create(cpCore, RecordID);
                                                                                 if (file != null) {
                                                                                     RecordVirtualFilename = file.Filename;
                                                                                     RecordWidth = file.pxWidth;
@@ -5162,11 +5173,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_EncodeCRLF")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_EncodeCRLF")
             return tempconvertCRLFToHtmlBreak;
         }
         //
@@ -5185,11 +5196,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("EncodeHTML")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("EncodeHTML")
         }
         //
         //========================================================================
@@ -5212,7 +5223,7 @@ namespace Contensive.Core.Controllers {
                 htmlToTextControllers Decoder = new htmlToTextControllers(cpCore);
                 return Decoder.convert(Source);
             } catch (Exception ex) {
-                throw new ApplicationException("Unexpected exception");
+                //throw new ApplicationException("Unexpected exception");
             }
         }
         //
@@ -5375,9 +5386,9 @@ namespace Contensive.Core.Controllers {
                                 // ContentList - Open the Content and build the options from the names
                                 //
                                 if (!string.IsNullOrEmpty(ContentCriteria)) {
-                                    CS = cpCore.db.csOpen(ContentName, ContentCriteria, "name",,,,, "ID,Name");
+                                    CS = cpCore.db.csOpen(ContentName, ContentCriteria, "name","",,"",, "ID,Name");
                                 } else {
-                                    CS = cpCore.db.csOpen(ContentName,, "name",,,,, "ID,Name");
+                                    CS = cpCore.db.csOpen(ContentName,"", "name","",,"",, "ID,Name");
                                 }
                             } else if (IsListField) {
                                 //
@@ -5385,7 +5396,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 CID = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
                                 if (CID > 0) {
-                                    CS = cpCore.db.csOpen("Content Fields", "Contentid=" + CID, "name",,,,, "ID,Name");
+                                    CS = cpCore.db.csOpen("Content Fields", "Contentid=" + CID, "name","",,"",, "ID,Name");
                                 }
                             }
 
@@ -6071,7 +6082,7 @@ namespace Contensive.Core.Controllers {
                     SecondaryTablename = SecondaryCDef.ContentTableName;
                     SecondaryContentID = SecondaryCDef.Id;
                     ContentIDList.Add(SecondaryContentID);
-                    ContentIDList.AddRange(SecondaryCDef.childIdList(cpCore));
+                    ContentIDList.AddRange(SecondaryCDef.get_childIdList(cpCore));
                     //
                     //
                     //
@@ -6377,11 +6388,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
+            //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
                                                                     //
             return tempmain_GetRecordEditLink2;
         }
@@ -6425,11 +6436,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
+            //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
                                                                     //
             return tempmain_cs_getRecordAddLink;
         }
@@ -6517,7 +6528,7 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
                     } else {
                         iContentID = Models.Complex.cdefModel.getContentId(cpCore, iContentName);
-                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + iContentID,,,,,, "id");
+                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + iContentID,"",,"",,"", "id");
                         useFlyout = cpCore.db.csOk(csChildContent);
                         cpCore.db.csClose(ref csChildContent);
                         //
@@ -6539,7 +6550,7 @@ namespace Contensive.Core.Controllers {
                         } else {
                             //
                             MenuName = genericController.GetRandomInteger().ToString();
-                            cpCore.menuFlyout.menu_AddEntry(MenuName,, "/ccLib/images/IconContentAdd.gif",,,, "stylesheet", "stylesheethover");
+                            cpCore.menuFlyout.menu_AddEntry(MenuName,"", "/ccLib/images/IconContentAdd.gif","",,"", "stylesheet", "stylesheethover");
                             LowestRequiredMenuName = main_GetRecordAddLink_AddMenuEntry(iContentName, iPresetNameValueList, "", MenuName, MenuName);
                         }
                         //
@@ -6623,11 +6634,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
+            //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError18(MethodName)
                                                                     //
             return tempmain_GetRecordAddLink2;
         }
@@ -6765,11 +6776,11 @@ namespace Contensive.Core.Controllers {
                                 Link = Link + "&wc=" + genericController.EncodeRequestVariable(PresetNameValueList);
                             }
                         }
-                        cpCore.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName,,, Link, ButtonCaption, "", "", true);
+                        cpCore.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName,"",, Link, ButtonCaption, "", "", true);
                         //
                         // Create child submenu if Child Entries found
                         //
-                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + ContentID,,,,,, "name");
+                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + ContentID,"",,"",,"", "name");
                         if (!cpCore.db.csOk(csChildContent)) {
                             //
                             // No child menu
@@ -7181,7 +7192,7 @@ namespace Contensive.Core.Controllers {
                             //            '
                             //            ' Path is blocked
                             //            '
-                            //            Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML("/" & cpCore.serverconfig.appconfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & models.complex.cdefmodel.getcontentid(cpcore,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                            //            Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML("/" & cpCore.serverconfig.appconfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.cdefModel.getContentId(cpcore,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                             //        Else
                             //            '
                             //            ' Path is not blocked
@@ -7276,7 +7287,7 @@ namespace Contensive.Core.Controllers {
                         + "\r" + "<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
                         + genericController.htmlIndent(Copy) + "\r" + "</table>";
                         ToolsPanel.Add(main_GetPanelInput(Copy));
-                        ToolsPanel.Add(cpCore.html.html_GetFormEnd);
+                        ToolsPanel.Add(cpCore.html.html_GetFormEnd());
                         result = result + main_GetPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         //
                         result = result + main_GetPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
@@ -7990,7 +8001,7 @@ namespace Contensive.Core.Controllers {
                                                     personalizationPeopleId = iPersonalizationPeopleId,
                                                     instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
                                                 };
-                                                Models.Entity.addonModel addon = Models.Entity.addonModel.create(cpCore, addonGuidDynamicForm);
+                                                addonModel addon = addonModel.create(cpCore, addonGuidDynamicForm);
                                                 result += cpCore.addon.execute(addon, executeContext);
                                                 break;
                                             case ACTypeChildList:
@@ -8161,14 +8172,14 @@ namespace Contensive.Core.Controllers {
                         //hint = hint & ",500, Adding edit wrappers"
                         if (isEditingAnything) {
                             if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
-                                throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
+                                //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
                                 Copy = getEditWrapper("Aggregate Script", "##MARKER##");
                                 Wrapper = Microsoft.VisualBasic.Strings.Split(Copy, "##MARKER##", -1, Microsoft.VisualBasic.CompareMethod.Binary);
                                 result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
                                 result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
                             }
                             if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
-                                throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
+                                //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
                                 Copy = getEditWrapper("Aggregate Replacement", "##MARKER##");
                                 Wrapper = Microsoft.VisualBasic.Strings.Split(Copy, "##MARKER##", -1, Microsoft.VisualBasic.CompareMethod.Binary);
                                 result = genericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
@@ -8324,7 +8335,7 @@ namespace Contensive.Core.Controllers {
                                 RecordID = genericController.EncodeInteger(TableSplit[2]);
                                 FilenameSegment = TableSplit[3];
                                 if ((TableName.ToLower() == "cclibraryfiles") && (FieldName.ToLower() == "filename") && (RecordID != 0)) {
-                                    Models.Entity.libraryFilesModel file = Models.Entity.libraryFilesModel.create(cpCore, RecordID);
+                                    libraryFilesModel file = libraryFilesModel.create(cpCore, RecordID);
                                     if (file != null) {
                                         //'hint = hint & ",060"
                                         FieldName = "filename";
@@ -8617,7 +8628,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // honestly, not sure what to do with 'return_ErrorMessage'
                 //
-                CS = cpCore.db.csOpen("copy content", "Name=" + cpCore.db.encodeSQLText(CopyName), "ID",, 0,,, "Name,ID,Copy,modifiedBy");
+                CS = cpCore.db.csOpen("copy content", "Name=" + cpCore.db.encodeSQLText(CopyName), "ID","", 0,"",, "Name,ID,Copy,modifiedBy");
                 if (!cpCore.db.csOk(CS)) {
                     cpCore.db.csClose(ref CS);
                     CS = cpCore.db.csInsertRecord("copy content", 0);
@@ -8670,7 +8681,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_AddTabEntry")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_AddTabEntry")
         }
         //        '
         //        '
@@ -8686,7 +8697,7 @@ namespace Contensive.Core.Controllers {
         //            '
         //            Exit Function
         ////ErrorTrap:
-        //            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetTabs")
+        //            //throw new ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetTabs")
         //        End Function
         //
         //
@@ -8706,7 +8717,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_AddLiveTabEntry")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_AddLiveTabEntry")
         }
         //
         //
@@ -8725,7 +8736,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetLiveTabs")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetLiveTabs")
         }
         //
         //
@@ -8745,7 +8756,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_AddComboTabEntry")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_AddComboTabEntry")
         }
         //
         //
@@ -8764,7 +8775,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetComboTabs")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetComboTabs")
         }
         //'
         //'================================================================================================================
@@ -9007,7 +9018,7 @@ namespace Contensive.Core.Controllers {
                     RuleId = 0;
                     TestRecordIDLast = 0;
                     for (Ptr = 0; Ptr < currentRulesCnt; Ptr++) {
-                        TestRecordID = genericController.EncodeInteger(currentRules.Rows[Ptr].Item(0));
+                        TestRecordID = genericController.EncodeInteger(currentRules.Rows[Ptr][0]);
                         if (TestRecordID == 0) {
                             //
                             // skip
@@ -9017,14 +9028,14 @@ namespace Contensive.Core.Controllers {
                             // hit
                             //
                             RuleFound = true;
-                            RuleId = genericController.EncodeInteger(currentRules.Rows[Ptr].Item(1));
+                            RuleId = genericController.EncodeInteger(currentRules.Rows[Ptr][1]);
                             break;
                         } else if (TestRecordID == TestRecordIDLast) {
                             //
                             // dup
                             //
-                            dupRuleIdList = dupRuleIdList + "," + genericController.EncodeInteger(currentRules.Rows[Ptr].Item(1));
-                            currentRules.Rows[Ptr].Item(0) = 0;
+                            dupRuleIdList = dupRuleIdList + "," + genericController.EncodeInteger(currentRules.Rows[Ptr][1]);
+                            currentRules.Rows[Ptr][0] = 0;
                         }
                         TestRecordIDLast = TestRecordID;
                     }

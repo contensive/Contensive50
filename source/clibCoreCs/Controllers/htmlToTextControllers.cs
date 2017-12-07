@@ -1,13 +1,18 @@
-﻿using System;
-
-//========================================================================
-// This conversion was produced by the Free Edition of
-// Instant C# courtesy of Tangible Software Solutions.
-// Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
-//========================================================================
-
+﻿
+using System;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
+using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
-
+using static Contensive.Core.constants;
 //
 namespace Contensive.Core.Controllers {
     public class htmlToTextControllers {

@@ -1,18 +1,18 @@
 ﻿
 using System;
-using System.Data.SqlClient;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Contensive;
-using Contensive.BaseClasses;
-using Contensive.Core;
-using Contensive.Core.Models;
-using Contensive.Core.Models.Entity;
-using Contensive.Core.Models.Context;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
+using Contensive.Core.Controllers;
+using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
-using System.Diagnostics;
-
+//
 namespace Contensive.Core.Controllers {
     public partial class dbController : IDisposable {
         //
@@ -144,7 +144,7 @@ namespace Contensive.Core.Controllers {
                 } else {
                     //
                     // -- lookup dataSource
-                    string normalizedDataSourceName = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName);
+                    string normalizedDataSourceName = dataSourceModel.normalizeDataSourceName(dataSourceName);
                     if ((string.IsNullOrEmpty(normalizedDataSourceName)) || (normalizedDataSourceName == "default")) {
                         //
                         // -- default datasource
@@ -196,7 +196,7 @@ namespace Contensive.Core.Controllers {
             //
             string returnConnString = "";
             try {
-                string normalizedDataSourceName = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName);
+                string normalizedDataSourceName = dataSourceModel.normalizeDataSourceName(dataSourceName);
                 string defaultConnString = "";
                 string serverUrl = cpCore.serverConfig.defaultDataSourceAddress;
                 if (serverUrl.IndexOf(":") > 0) {
@@ -453,7 +453,7 @@ namespace Contensive.Core.Controllers {
             try {
                 using (DataTable dt = insertTableRecordGetDataTable(DataSourceName, TableName, MemberID)) {
                     if (dt.Rows.Count > 0) {
-                        returnId = genericController.EncodeInteger(dt.Rows[0].Item("id"));
+                        returnId = genericController.EncodeInteger(dt.Rows[0]["id"]);
                     }
                 }
             } catch (Exception ex) {
@@ -478,7 +478,7 @@ namespace Contensive.Core.Controllers {
                 string CreateKeyString = null;
                 string DateAddedString = null;
                 //
-                CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger);
+                CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger());
                 DateAddedString = encodeSQLDate(DateTime.Now);
                 //
                 sqlList.add("createkey", CreateKeyString);
@@ -569,7 +569,7 @@ namespace Contensive.Core.Controllers {
                 saveTransactionLog_InProcess = true;
                 //
                 // -- block before appStatus OK because need site properties
-                if ((cpCore.serverConfig.enableLogging) && (cpCore.serverConfig.appConfig.appStatus == Models.Entity.serverConfigModel.appStatusEnum.OK)) {
+                if ((cpCore.serverConfig.enableLogging) && (cpCore.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
                     if (cpCore.siteProperties.allowTransactionLog) {
                         string LogEntry = ("duration [" + ElapsedMilliseconds + "], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
                         logController.appendLog(cpCore, LogEntry, "DbTransactions");
@@ -880,7 +880,7 @@ namespace Contensive.Core.Controllers {
         public string getRecordName(string ContentName, int RecordID) {
             string returnRecordName = "";
             try {
-                int CS = cs_openContentRecord(ContentName, RecordID,,,, "Name");
+                int CS = cs_openContentRecord(ContentName, RecordID, 0, false, false, "Name");
                 if (csOk(CS)) {
                     returnRecordName = csGet(CS, "Name");
                 }
@@ -1264,14 +1264,14 @@ namespace Contensive.Core.Controllers {
                 int iMemberID = 0;
                 string iCriteria = null;
                 string iSelectFieldList = null;
-                Models.Complex.cdefModel CDef = null;
+                cdefModel CDef = null;
                 string TestUcaseFieldList = null;
                 string SQL = null;
                 //
                 if (string.IsNullOrEmpty(ContentName)) {
                     throw new ApplicationException("ContentName cannot be blank");
                 } else {
-                    CDef = Models.Complex.cdefModel.getCdef(cpCore, ContentName);
+                    CDef = cdefModel.getCdef(cpCore, ContentName);
                     if (CDef == null) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
                     } else if (CDef.Id <= 0) {
@@ -1727,7 +1727,7 @@ namespace Contensive.Core.Controllers {
                         // ----- something has been set in buffer, check it first
                         //
                         if (tempVar.writeCache.ContainsKey(FieldName.ToLower())) {
-                            returnValue = tempVar.writeCache.Item(FieldName.ToLower());
+                            returnValue = tempVar.writeCache[FieldName.ToLower()];
                             fieldFound = true;
                         }
                     }
@@ -1743,7 +1743,7 @@ namespace Contensive.Core.Controllers {
                                     throw new ApplicationException("Field [" + fieldNameTrim + "] was Not found in sql [" + tempVar.Source + "]");
                                 }
                             } else {
-                                returnValue = genericController.encodeText(tempVar.dt.Rows[tempVar.readCacheRowPtr].Item(FieldName.ToLower()));
+                                returnValue = genericController.encodeText(tempVar.dt.Rows[tempVar.readCacheRowPtr][FieldName.ToLower()]);
                             }
                         } else {
                             //
@@ -2019,7 +2019,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // CS is SQL-based, use the contentname
                             //
-                            TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
+                            TableName = cdefModel.getContentTablename(cpCore, ContentName);
                         } else {
                             //
                             // no Contentname given
@@ -2258,7 +2258,7 @@ namespace Contensive.Core.Controllers {
                         // another option is invalidate the entire table (tablename-invalidate), but this also has performance problems
                         //
                         List<string> invaldiateObjectList = new List<string>();
-                        CSPointer = csOpen(ContentName, Criteria,, false, MemberID, true, true);
+                        CSPointer = csOpen(ContentName, Criteria, "", false, MemberID, true, true);
                         while (csOk(CSPointer)) {
                             invaldiateObjectList.Add(Controllers.cacheController.getCacheKey_Entity(CDef.ContentTableName, "id", csGetInteger(CSPointer, "id").ToString()));
                             csDeleteRecord(CSPointer);
@@ -2420,7 +2420,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         //
-                        CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger);
+                        CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger());
                         DateAddedString = encodeSQLDate(DateTime.Now);
                         //
                         sqlList.add("CREATEKEY", CreateKeyString); // ArrayPointer)
@@ -2728,7 +2728,7 @@ namespace Contensive.Core.Controllers {
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                                     //
                                                     // -- First try Lookup Content
-                                                    CSLookup = csOpen(LookupContentName, "ID=" + encodeSQLNumber(genericController.EncodeInteger(FieldValueVariant)),,,,,, "name", 1);
+                                                    CSLookup = csOpen(LookupContentName, "ID=" + encodeSQLNumber(genericController.EncodeInteger(FieldValueVariant)),,, "",,, "name", 1);
                                                     if (csOk(CSLookup)) {
                                                         fieldValue = csGetText(CSLookup, "name");
                                                     }
@@ -2861,7 +2861,7 @@ namespace Contensive.Core.Controllers {
                             if (!tempVar.CDef.fields.ContainsKey(FieldNameLc)) {
                                 throw new ArgumentException("The field [" + FieldName + "] could Not be found In content [" + tempVar.CDef.Name + "]");
                             } else {
-                                field = tempVar.CDef.fields.Item(FieldNameLc);
+                                field = tempVar.CDef.fields[FieldNameLc];
                                 switch (field.fieldTypeId) {
                                     case FieldTypeIdAutoIdIncrement:
                                     case FieldTypeIdRedirect:
@@ -3032,7 +3032,7 @@ namespace Contensive.Core.Controllers {
                             // ----- set the new value into the row buffer
                             //
                             if (tempVar.writeCache.ContainsKey(FieldNameLc)) {
-                                tempVar.writeCache.Item(FieldNameLc) = FieldValue.ToString();
+                                tempVar.writeCache[FieldNameLc] = FieldValue.ToString();
                             } else {
                                 tempVar.writeCache.Add(FieldNameLc, FieldValue.ToString());
                             }
@@ -3728,7 +3728,7 @@ namespace Contensive.Core.Controllers {
                 if (!genericController.isDataTableOk(dt)) {
                     throw new ApplicationException("Content [" + ContentName + "] was not found in ccContent table");
                 } else {
-                    returnResult = genericController.EncodeInteger(dt.Rows[0].Item("ContentTableID"));
+                    returnResult = genericController.EncodeInteger(dt.Rows[0]["ContentTableID"]);
                 }
                 dt.Dispose();
             } catch (Exception ex) {
@@ -3790,7 +3790,7 @@ namespace Contensive.Core.Controllers {
                     //'
                     //' ----- Delete CalendarEventRules and CalendarEvents
                     //'
-                    //If models.complex.cdefmodel.isContentFieldSupported(cpcore,"calendar events", "ID") Then
+                    //If Models.Complex.cdefModel.isContentFieldSupported(cpcore,"calendar events", "ID") Then
                     //    Call deleteContentRecords("Calendar Events", Criteria)
                     //End If
                     //'
@@ -4194,7 +4194,7 @@ namespace Contensive.Core.Controllers {
         //                        '
         //                        Call handleLegacyClassError3(MethodName, "The Lookup Content Definition [" & fieldLookupId & "] for this field [" & FieldName & "] is not valid.")
         //                    Else
-        //                        LookupContentName = models.complex.cdefmodel.getContentNameByID(cpcore,fieldLookupId)
+        //                        LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpcore,fieldLookupId)
         //                        returnResult = cs_open(LookupContentName, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
         //                        'CDefLookup = appEnvironment.GetCDefByID(FieldLookupID)
         //                        'csv_OpenCSJoin = csOpen(CDefLookup.Name, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
@@ -4482,7 +4482,7 @@ namespace Contensive.Core.Controllers {
         //''' </summary>
         //''' <returns></returns>
         //Public Function checkHealth() As applicationStatusEnum
-        //    Dim returnStatus As applicationStatusEnum = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusLoading
+        //    Dim returnStatus As applicationStatusEnum = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusLoading
         //    Try
         //        '
         //        Try
@@ -4494,11 +4494,11 @@ namespace Contensive.Core.Controllers {
         //            Dim testDt As DataTable
         //            testDt = executeSql("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='ccContent'")
         //            If testDt.Rows.Count <> 1 Then
-        //                cpcore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        //                cpcore.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         //            End If
         //            testDt.Dispose()
         //        Catch ex As Exception
-        //            cpcore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        //            cpcore.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         //        End Try
         //        '
         //        '--------------------------------------------------------------------------
@@ -4510,7 +4510,7 @@ namespace Contensive.Core.Controllers {
         //            '
         //            ' Bad Db and no upgrade - exit
         //            '
-        //            cpcore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
+        //            cpcore.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
         //        Else
         //        End If
         //    Catch ex As Exception
@@ -4552,7 +4552,7 @@ namespace Contensive.Core.Controllers {
             try {
                 DataTable dt = executeQuery("Select ID from ccContent where name=" + encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
-                    returnContentId = genericController.EncodeInteger(dt.Rows[0].Item("id"));
+                    returnContentId = genericController.EncodeInteger(dt.Rows[0]["id"]);
                 }
                 dt.Dispose();
             } catch (Exception ex) {
@@ -4572,7 +4572,7 @@ namespace Contensive.Core.Controllers {
         //    Dim returndataSourceName As String = "default"
         //    Try
         //        If (DataSourceID > 0) Then
-        //            For Each kvp As KeyValuePair(Of String, Models.Entity.dataSourceModel) In dataSources
+        //            For Each kvp As KeyValuePair(Of String, dataSourceModel) In dataSources
         //                If (kvp.Value.id = DataSourceID) Then
         //                    returndataSourceName = kvp.Value.name
         //                End If
@@ -4580,11 +4580,11 @@ namespace Contensive.Core.Controllers {
         //            If String.IsNullOrEmpty(returndataSourceName) Then
         //                Using dt As DataTable = executeSql("select name,connString from ccDataSources where id=" & DataSourceID)
         //                    If dt.Rows.Count > 0 Then
-        //                        Dim dataSource As New Models.Entity.dataSourceModel
+        //                        Dim dataSource As New dataSourceModel
         //                        With dataSource
-        //                            .id = genericController.EncodeInteger(dt(0).Item("id"))
-        //                            .ConnString = genericController.encodeText(dt(0).Item("connString"))
-        //                            .name = Models.Entity.dataSourceModel.normalizeDataSourceName(genericController.encodeText(dt(0).Item("name")))
+        //                            .id = genericController.EncodeInteger(dt(0)["id"))
+        //                            .ConnString = genericController.encodeText(dt(0)["connString"))
+        //                            .name = dataSourceModel.normalizeDataSourceName(genericController.encodeText(dt(0)["name")))
         //                            returndataSourceName = .name
         //                        End With
         //                    End If
@@ -4626,7 +4626,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //DataSourceID = cpCore.db.GetDataSourceID(DataSourceName)
                 DateAddedString = cpCore.db.encodeSQLDate(DateTime.Now);
-                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.GetRandomInteger);
+                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.GetRandomInteger());
                 //
                 //----------------------------------------------------------------
                 // ----- Read in a record from the table to get fields
@@ -4640,7 +4640,7 @@ namespace Contensive.Core.Controllers {
                     //
                     dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.doc.authContext.user.id);
                     if (dt.Rows.Count > 0) {
-                        RecordID = genericController.EncodeInteger(dt.Rows[0].Item("ID"));
+                        RecordID = genericController.EncodeInteger(dt.Rows[0]["ID"]);
                         cpCore.db.executeQuery("Update " + TableName + " Set active=0 where id=" + RecordID + ";", DataSource.Name);
                     }
                 }
@@ -4665,7 +4665,7 @@ namespace Contensive.Core.Controllers {
                         if (dt.Rows.Count == 0) {
                             throw new ApplicationException("Content Definition [" + ContentName + "] could Not be selected by name after it was inserted");
                         } else {
-                            ContentID = genericController.EncodeInteger(dt(0).Item("ID"));
+                            ContentID = genericController.EncodeInteger(dt(0)["ID"]);
                             cpCore.db.executeQuery("update ccContent Set CreateKey=0 where id=" + ContentID);
                         }
                         dt.Dispose();
@@ -5015,7 +5015,7 @@ namespace Contensive.Core.Controllers {
                 SQL = "select count(*) as RecordCount from " + TableName + " where " + Criteria;
                 DataTable dt = executeQuery(SQL);
                 if (dt.Rows.Count > 0) {
-                    CurrentCount = genericController.EncodeInteger(dt.Rows[0].Item(0));
+                    CurrentCount = genericController.EncodeInteger(dt.Rows[0][0]);
                 }
                 while ((CurrentCount != 0) & (PreviousCount != CurrentCount) && (LoopCount < iChunkCount)) {
                     if (getDataSourceType(DataSourceName) == DataSourceTypeODBCMySQL) {
@@ -5028,7 +5028,7 @@ namespace Contensive.Core.Controllers {
                     SQL = "select count(*) as RecordCount from " + TableName + " where " + Criteria;
                     dt = executeQuery(SQL);
                     if (dt.Rows.Count > 0) {
-                        CurrentCount = genericController.EncodeInteger(dt.Rows[0].Item(0));
+                        CurrentCount = genericController.EncodeInteger(dt.Rows[0][0]);
                     }
                     LoopCount = LoopCount + 1;
                 }

@@ -1,9 +1,18 @@
 ﻿
 using System;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Diagnostics;
-
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
+using Contensive.Core.Controllers;
+using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
+//
+using System.Runtime.Caching;
+//
 namespace Contensive.Core.Controllers {
 	//
 	//====================================================================================================
@@ -806,17 +815,17 @@ namespace Contensive.Core.Controllers {
 		{
 			//
 			invalidateContent(getCacheKey_Entity(tableName, recordId));
-			if (tableName.ToLower() == Models.Entity.linkAliasModel.contentTableName.ToLower())
+			if (tableName.ToLower() == linkAliasModel.contentTableName.ToLower())
 			{
 				//
 				Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
 			}
-			else if (tableName.ToLower() == Models.Entity.linkForwardModel.contentTableName.ToLower())
+			else if (tableName.ToLower() == linkForwardModel.contentTableName.ToLower())
 			{
 				//
 				Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
 			}
-			else if (tableName.ToLower() == Models.Entity.addonModel.contentTableName.ToLower())
+			else if (tableName.ToLower() == addonModel.contentTableName.ToLower())
 			{
 				//
 				Models.Complex.routeDictionaryModel.invalidateCache(cpcore);

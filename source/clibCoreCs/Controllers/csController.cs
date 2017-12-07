@@ -1,14 +1,16 @@
-﻿using System;
-
-//========================================================================
-// This conversion was produced by the Free Edition of
-// Instant C# courtesy of Tangible Software Solutions.
-// Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
-//========================================================================
-
-using Contensive.BaseClasses;
+﻿
+using System;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
-using System.Runtime.InteropServices;
+using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
+//
 
 namespace Contensive.Core {
     public class csController : IDisposable {
@@ -20,7 +22,7 @@ namespace Contensive.Core {
         //
         // Constructor - Initialize the Main and Csv objects
         //
-        public csController(ref coreClass cpCore) {
+        public csController(coreClass cpCore) {
             this.cpCore = cpCore;
         }
         //
@@ -88,7 +90,7 @@ namespace Contensive.Core {
                 if (csPtr != -1) {
                     cpCore.db.csClose(ref csPtr);
                 }
-                csPtr = cpCore.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly,,,, SelectFieldList, pageSize, PageNumber);
+                csPtr = cpCore.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly,0,false,false,SelectFieldList, pageSize, PageNumber);
                 success = cpCore.db.csOk(csPtr);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -105,7 +107,7 @@ namespace Contensive.Core {
                     cpCore.db.csClose(ref csPtr);
                 }
                 csPtr = cpCore.db.csOpenGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
-                success = ok();
+                success = OK();
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -123,7 +125,7 @@ namespace Contensive.Core {
                     cpCore.db.csClose(ref csPtr);
                 }
                 csPtr = cpCore.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
-                success = ok();
+                success = OK();
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -360,7 +362,7 @@ namespace Contensive.Core {
         }
         //
         //====================================================================================================
-        public bool ok() {
+        public bool OK() {
             return cpCore.db.csOk(csPtr);
         }
         //
@@ -445,11 +447,11 @@ namespace Contensive.Core {
                         //
                         Filename = cpcore.docProperties.getText(LocalRequestName);
                         if (!string.IsNullOrEmpty(Filename)) {
-                            Path = cpcore.db.csGetFilename(CSPointer, FieldName, Filename,, cpcore.db.cs_getFieldTypeId(CSPointer, FieldName));
+                            Path = cpcore.db.csGetFilename(CSPointer, FieldName, Filename, "", cpcore.db.cs_getFieldTypeId(CSPointer, FieldName));
                             cpcore.db.csSet(CSPointer, FieldName, Path);
                             Path = genericController.vbReplace(Path, "\\", "/");
                             Path = genericController.vbReplace(Path, "/" + Filename, "");
-                            cpcore.appRootFiles.upload(LocalRequestName, Path, Filename);
+                            cpcore.appRootFiles.upload(LocalRequestName, Path, ref Filename);
                         }
                         break;
                     default:
@@ -471,7 +473,7 @@ namespace Contensive.Core {
             int RecordID = 0;
             if (cpcore.db.cs_isFieldSupported(CSPointer, "id") & cpcore.db.cs_isFieldSupported(CSPointer, "contentcontrolId")) {
                 RecordID = cpcore.db.csGetInteger(CSPointer, "id");
-                ContentName = models.complex.cdefmodel.getContentNameByID(cpcore, cpcore.db.csGetInteger(CSPointer, "contentcontrolId"));
+                ContentName = Models.Complex.cdefModel.getContentNameByID(cpcore, cpcore.db.csGetInteger(CSPointer, "contentcontrolId"));
             }
             string source = cpcore.db.csGet(CSPointer, FieldName);
             return cpcore.html.convertActiveContentToHtmlForWebRender(source, ContentName, RecordID, cpcore.doc.authContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);

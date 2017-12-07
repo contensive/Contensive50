@@ -71,7 +71,7 @@ namespace Contensive.Core.Models.Entity
 			dataSourceModel result = null;
 			try
 			{
-				result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.doc.authContext.user.id), callersCacheNameList);
+				result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.doc.authContext.user.id),ref callersCacheNameList);
 			}
 			catch (Exception ex)
 			{
@@ -273,7 +273,7 @@ namespace Contensive.Core.Models.Entity
 						throw new ApplicationException("Unable to insert record in content [" + primaryContentName + "]");
 					}
 				}
-				if (cs.ok())
+				if (cs.OK())
 				{
 					ID = cs.getInteger("id");
 					if (string.IsNullOrEmpty(ccGuid))
@@ -356,7 +356,7 @@ namespace Contensive.Core.Models.Entity
 			{
 				if (!string.IsNullOrEmpty(ccguid))
 				{
-					object tempVar = new List<string>();
+					var  tempVar = new List<string>();
 					dataSourceModel instance = create(cpCore, ccguid, ref tempVar);
 					if (instance != null)
 					{
@@ -386,7 +386,7 @@ namespace Contensive.Core.Models.Entity
 			{
 				if ((foreignKey2Id > 0) && (foreignKey1Id > 0))
 				{
-					object tempVar = new List<string>();
+					var  tempVar = new List<string>();
 					dataSourceModel instance = create(cpCore, foreignKey1Id, foreignKey2Id, ref tempVar);
 					if (instance != null)
 					{
@@ -422,13 +422,13 @@ namespace Contensive.Core.Models.Entity
 					dataSourceModel instance = null;
 					do
 					{
-						instance = dataSourceModel.create(cpCore, cs.getInteger("id"), callersCacheNameList);
+						instance = dataSourceModel.create(cpCore, cs.getInteger("id"), ref callersCacheNameList);
 						if (instance != null)
 						{
 							result.Add(instance);
 						}
 						cs.goNext();
-					} while (cs.ok());
+					} while (cs.OK());
 				}
 				cs.Close();
 			}
@@ -478,7 +478,7 @@ namespace Contensive.Core.Models.Entity
 		/// <returns></returns>
 		public static string getRecordName(coreClass cpcore, int recordId)
 		{
-			object tempVar = new List<string>();
+			var  tempVar = new List<string>();
 			return normalizeDataSourceName(dataSourceModel.create(cpcore, recordId, ref tempVar).Name);
 		}
 		//
@@ -491,7 +491,7 @@ namespace Contensive.Core.Models.Entity
 		/// <returns></returns>
 		public static string getRecordName(coreClass cpcore, string ccGuid)
 		{
-			object tempVar = new List<string>();
+			var  tempVar = new List<string>();
 			return normalizeDataSourceName(dataSourceModel.create(cpcore, ccGuid, ref tempVar).Name);
 		}
 		//
@@ -504,7 +504,7 @@ namespace Contensive.Core.Models.Entity
 		/// <returns></returns>
 		public static int getRecordId(coreClass cpcore, string ccGuid)
 		{
-			object tempVar = new List<string>();
+			var  tempVar = new List<string>();
 			return dataSourceModel.create(cpcore, ccGuid, ref tempVar).ID;
 		}
 		//
@@ -535,7 +535,8 @@ namespace Contensive.Core.Models.Entity
 				{
 					do
 					{
-						dataSourceModel instance = create(cpcore, cs.getInteger("id"), new List<string>());
+                        var tmpList = new List<string>();
+                        dataSourceModel instance = create(cpcore, cs.getInteger("id"),ref tmpList);
 						if (instance != null)
 						{
 							result.Add(instance.Name.ToLower(), instance);

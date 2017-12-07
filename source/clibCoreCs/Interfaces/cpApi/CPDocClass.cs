@@ -1,20 +1,21 @@
-﻿using System;
-
-//========================================================================
-// This conversion was produced by the Free Edition of
-// Instant C# courtesy of Tangible Software Solutions.
-// Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
-//========================================================================
-
+﻿
+using System;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
-
-using System.Runtime.InteropServices;
+using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
+//
 
 namespace Contensive.Core {
-    //
-    // comVisible to be activeScript compatible
-    //
-    [ComVisible(true), Microsoft.VisualBasic.ComClass(CPDocClass.ClassId, CPDocClass.InterfaceId, CPDocClass.EventsId)]
     public class CPDocClass : BaseClasses.CPDocBaseClass, IDisposable {
         #region COM GUIDs
         public const string ClassId = "414BD6A9-195F-4E0F-AE24-B7BF56749CDD";

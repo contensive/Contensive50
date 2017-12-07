@@ -1,17 +1,20 @@
 ﻿
 using System;
-using System.Runtime.InteropServices;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
-using Contensive.BaseClasses;
-using static Contensive.Core.constants;
 using static Contensive.Core.Controllers.genericController;
-
+using static Contensive.Core.constants;
+//
 namespace Contensive.Core {
-    //
-    // comVisible to be activeScript compatible
-    //
-    [ComVisible(true), Microsoft.VisualBasic.ComClass(CPContextClass.ClassId, CPContextClass.InterfaceId, CPContextClass.EventsId)]
     public class CPContextClass : IDisposable {
         //
         #region COM GUIDs
@@ -26,7 +29,7 @@ namespace Contensive.Core {
         //
         //==========================================================================================
         //
-        public CPContextClass(ref CPClass cpParent) : base() {
+        public CPContextClass( CPClass cpParent) : base() {
             cp = cpParent;
         }
         //

@@ -1,10 +1,20 @@
 ﻿
 using System;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
 using System.Linq;
-using Contensive.BaseClasses;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
 using Contensive.Core.Models.Entity;
-using static Contensive.Core.constants;
+using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
+//
+using Contensive.BaseClasses;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -35,7 +45,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- OnBodyStart add-ons
                 CPUtilsBaseClass.addonExecuteContext bodyStartContext = new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextOnBodyStart };
-                foreach (addonModel addon in cpCore.addonCache.getOnBodyStartAddonList) {
+                foreach (addonModel addon in cpCore.addonCache.getOnBodyStartAddonList()) {
                     returnBody += cpCore.addon.execute(addon, bodyStartContext);
                 }
                 //
@@ -138,7 +148,7 @@ namespace Contensive.Core.Controllers {
                 RootPageContentName = "Page Content";
                 //
                 // -- validate domain
-                //domain = Models.Entity.domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
+                //domain = domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
                 if (cpCore.doc.domain == null) {
                     //
                     // -- domain not listed, this is now an error
@@ -179,13 +189,13 @@ namespace Contensive.Core.Controllers {
                 //'
                 //' -- build parentpageList (first = current page, last = root)
                 //' -- add a 0, then repeat until another 0 is found, or there is a repeat
-                //pageToRootList = New List(Of Models.Entity.pageContentModel)()
+                //pageToRootList = New List(Of pageContentModel)()
                 //Dim usedPageIdList As New List(Of Integer)()
                 //Dim targetPageId = PageID
                 //usedPageIdList.Add(0)
                 //Do While (Not usedPageIdList.Contains(targetPageId))
                 //    usedPageIdList.Add(targetPageId)
-                //    Dim targetpage As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpCore, targetPageId, New List(Of String))
+                //    Dim targetpage As pageContentModel = pageContentModel.create(cpCore, targetPageId, New List(Of String))
                 //    If (targetpage Is Nothing) Then
                 //        Exit Do
                 //    Else
@@ -202,10 +212,10 @@ namespace Contensive.Core.Controllers {
                 //page = pageToRootList.First
                 //'
                 //' -- get template from pages
-                //Dim template As Models.Entity.pageTemplateModel = Nothing
-                //For Each page As Models.Entity.pageContentModel In pageToRootList
+                //Dim template As pageTemplateModel = Nothing
+                //For Each page As pageContentModel In pageToRootList
                 //    If page.TemplateID > 0 Then
-                //        template = Models.Entity.pageTemplateModel.create(cpCore, page.TemplateID, New List(Of String))
+                //        template = pageTemplateModel.create(cpCore, page.TemplateID, New List(Of String))
                 //        If (template IsNot Nothing) Then
                 //            If (page Is page) Then
                 //                templateReason = "This template was used because it is selected by the current page."
@@ -221,12 +231,12 @@ namespace Contensive.Core.Controllers {
                 //    '
                 //    ' -- get template from domain
                 //    If (domain IsNot Nothing) Then
-                //        template = Models.Entity.pageTemplateModel.create(cpCore, domain.DefaultTemplateId, New List(Of String))
+                //        template = pageTemplateModel.create(cpCore, domain.DefaultTemplateId, New List(Of String))
                 //    End If
                 //    If (template Is Nothing) Then
                 //        '
                 //        ' -- get template named Default
-                //        template = Models.Entity.pageTemplateModel.createByName(cpCore, "default", New List(Of String))
+                //        template = pageTemplateModel.createByName(cpCore, "default", New List(Of String))
                 //    End If
                 //End If
                 //
@@ -332,7 +342,7 @@ namespace Contensive.Core.Controllers {
                 int CS = 0;
                 int PageID = 0;
                 //
-                CS = cpcore.db.csOpen("Copy Content", "name=" + cpcore.db.encodeSQLText(ContentBlockCopyName), "ID",,,,, "Copy,ID");
+                CS = cpcore.db.csOpen("Copy Content", "name=" + cpcore.db.encodeSQLText(ContentBlockCopyName), "ID", false, 0, false, false, "Copy,ID");
                 if (cpcore.db.csOk(CS)) {
                     tempgetDefaultBlockMessage = cpcore.db.csGet(CS, "Copy");
                 }
@@ -358,11 +368,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetDefaultBlockMessage")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetDefaultBlockMessage")
             return tempgetDefaultBlockMessage;
         }
         //
@@ -379,7 +389,7 @@ namespace Contensive.Core.Controllers {
                 string Copy;
                 //
                 Copy = "";
-                CS = cpCore.db.cs_openContentRecord("People", PeopleID,,,, "Name,Phone,Email");
+                CS = cpCore.db.cs_openContentRecord("People", PeopleID, 0, false, false, "Name,Phone,Email");
                 if (cpCore.db.csOk(CS)) {
                     ContactName = (cpCore.db.csGetText(CS, "Name"));
                     ContactPhone = (cpCore.db.csGetText(CS, "Phone"));
@@ -437,7 +447,7 @@ namespace Contensive.Core.Controllers {
                 CopyResult = "&nbsp;";
             }
             //
-            return genericController.GetTableCell("<nobr>" + CopyCaption + "</nobr>", "150",, EvenRow, "right") + genericController.GetTableCell(CopyResult, "100%",, EvenRow, "left") + kmaEndTableRow;
+            return genericController.GetTableCell("<nobr>" + CopyCaption + "</nobr>", "150", 0, EvenRow, "right") + genericController.GetTableCell(CopyResult, "100%", 0, EvenRow, "left") + kmaEndTableRow;
         }
         //
         public static void loadPage(coreClass cpcore, int requestedPageId, domainModel domain) {
@@ -473,7 +483,7 @@ namespace Contensive.Core.Controllers {
                     usedPageIdList.Add(0);
                     while (!usedPageIdList.Contains(targetPageId)) {
                         usedPageIdList.Add(targetPageId);
-                        Models.Entity.pageContentModel targetpage = Models.Entity.pageContentModel.create(cpcore, targetPageId, new List<string>());
+                        pageContentModel targetpage = pageContentModel.create(cpcore, targetPageId, ref new List<string>());
                         if (targetpage == null) {
                             break;
                         } else {
@@ -497,7 +507,7 @@ namespace Contensive.Core.Controllers {
                     cpcore.doc.template = null;
                     foreach (Models.Entity.pageContentModel page in cpcore.doc.pageToRootList) {
                         if (page.TemplateID > 0) {
-                            cpcore.doc.template = Models.Entity.pageTemplateModel.create(cpcore, page.TemplateID, new List<string>());
+                            cpcore.doc.template = pageTemplateModel.create(cpcore, page.TemplateID, ref new List<string>());
                             if (cpcore.doc.template == null) {
                                 //
                                 // -- templateId is not valid
@@ -519,7 +529,7 @@ namespace Contensive.Core.Controllers {
                         // -- get template from domain
                         if (domain != null) {
                             if (domain.DefaultTemplateId > 0) {
-                                cpcore.doc.template = Models.Entity.pageTemplateModel.create(cpcore, domain.DefaultTemplateId, new List<string>());
+                                cpcore.doc.template = pageTemplateModel.create(cpcore, domain.DefaultTemplateId, ref new List<string>());
                                 if (cpcore.doc.template == null) {
                                     //
                                     // -- domain templateId is not valid
@@ -531,11 +541,11 @@ namespace Contensive.Core.Controllers {
                         if (cpcore.doc.template == null) {
                             //
                             // -- get template named Default
-                            cpcore.doc.template = Models.Entity.pageTemplateModel.createByName(cpcore, defaultTemplateName, new List<string>());
+                            cpcore.doc.template = pageTemplateModel.createByName(cpcore, defaultTemplateName, ref new List<string>());
                             if (cpcore.doc.template == null) {
                                 //
                                 // -- ceate new template named Default
-                                cpcore.doc.template = Models.Entity.pageTemplateModel.add(cpcore, new List<string>());
+                                cpcore.doc.template = pageTemplateModel.add(cpcore );
                                 cpcore.doc.template.Name = defaultTemplateName;
                                 cpcore.doc.template.BodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename);
                                 cpcore.doc.template.save(cpcore);
@@ -561,7 +571,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // no domain page not found, use site default
                     //
-                    pageId = cpcore.siteProperties.getinteger("PageNotFoundPageID", 0);
+                    pageId = cpcore.siteProperties.getInteger("PageNotFoundPageID", 0);
                 }
             } catch (Exception ex) {
                 cpcore.handleException(ex);
@@ -575,7 +585,7 @@ namespace Contensive.Core.Controllers {
         //---------------------------------------------------------------------------
         //
         public static pageContentModel getLandingPage(coreClass cpcore, domainModel domain) {
-            Models.Entity.pageContentModel landingPage = null;
+            pageContentModel landingPage = null;
             try {
                 if (domain == null) {
                     //
@@ -594,7 +604,7 @@ namespace Contensive.Core.Controllers {
                     if (landingPage == null) {
                         //
                         // -- attempt site landing page
-                        int siteLandingPageID = cpcore.siteProperties.getinteger("LandingPageID", 0);
+                        int siteLandingPageID = cpcore.siteProperties.getInteger("LandingPageID", 0);
                         if (!siteLandingPageID.Equals(0)) {
                             landingPage = pageContentModel.create(cpcore, siteLandingPageID);
                             if (landingPage == null) {
@@ -777,7 +787,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- domain -- determine if the domain has any template requirements, and if so, is this template allowed
                 string SqlCriteria = "(domainId=" + cpcore.doc.domain.id + ")";
-                List<Models.Entity.TemplateDomainRuleModel> allowTemplateRuleList = Models.Entity.TemplateDomainRuleModel.createList(cpcore, SqlCriteria);
+                List<Models.Entity.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(cpcore, SqlCriteria);
                 bool templateAllowed = false;
                 foreach (TemplateDomainRuleModel rule in allowTemplateRuleList) {
                     if (rule.templateId == cpcore.doc.template.ID) {
@@ -865,11 +875,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("cpCoreClass.IsChildRecord")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("cpCoreClass.IsChildRecord")
                                                                     //
             return tempisChildRecord;
         }
@@ -949,7 +959,7 @@ namespace Contensive.Core.Controllers {
                         int posDot = 0;
                         int loopCnt = 10;
                         do {
-                            cpCore.doc.domain = Models.Entity.domainModel.createByName(cpCore, domainTest, new List<string>());
+                            cpCore.doc.domain = domainModel.createByName(cpCore, domainTest);
                             posDot = domainTest.IndexOf('.');
                             if ((posDot >= 0) && (domainTest.Length > 1)) {
                                 domainTest = domainTest.Substring(posDot + 1);
@@ -1077,14 +1087,14 @@ namespace Contensive.Core.Controllers {
                         if (downloadId != 0) {
                             //
                             // -- lookup record and set clicks
-                            Models.Entity.libraryFilesModel file = Models.Entity.libraryFilesModel.create(cpCore, downloadId);
+                            libraryFilesModel file = libraryFilesModel.create(cpCore, downloadId);
                             if (file != null) {
                                 file.Clicks += 1;
                                 file.save(cpCore);
                                 if (file.Filename != "") {
                                     //
                                     // -- create log entry
-                                    Models.Entity.libraryFileLogModel log = Models.Entity.libraryFileLogModel.add(cpCore);
+                                    libraryFileLogModel log = libraryFileLogModel.add(cpCore);
                                     if (log != null) {
                                         log.FileID = file.id;
                                         log.VisitID = cpCore.doc.authContext.visit.id;
@@ -1363,9 +1373,9 @@ namespace Contensive.Core.Controllers {
                             //
                             if (!string.IsNullOrEmpty(linkAliasTest1 + linkAliasTest2)) {
                                 string sqlLinkAliasCriteria = "(name=" + cpCore.db.encodeSQLText(linkAliasTest1) + ")or(name=" + cpCore.db.encodeSQLText(linkAliasTest2) + ")";
-                                List<Models.Entity.linkAliasModel> linkAliasList = Models.Entity.linkAliasModel.createList(cpCore, sqlLinkAliasCriteria, "id desc");
+                                List<Models.Entity.linkAliasModel> linkAliasList = linkAliasModel.createList(cpCore, sqlLinkAliasCriteria, "id desc");
                                 if (linkAliasList.Count > 0) {
-                                    Models.Entity.linkAliasModel linkAlias = linkAliasList.First;
+                                    linkAliasModel linkAlias = linkAliasList.First;
                                     string LinkQueryString = rnPageId + "=" + linkAlias.PageID + "&" + linkAlias.QueryStringSuffix;
                                     cpCore.docProperties.setProperty(rnPageId, linkAlias.PageID.ToString(), false);
                                     string[] nameValuePairs = linkAlias.QueryStringSuffix.Split('&');
@@ -1470,7 +1480,7 @@ namespace Contensive.Core.Controllers {
                     // -- if endpoint is domain + route (link alias), the route determines the page, which may determine the cpCore.doc.template. If this template is not allowed for this domain, redirect to the domain's landingcpCore.doc.page.
                     //
                     Sql = "(domainId=" + cpCore.doc.domain.id + ")";
-                    List<Models.Entity.TemplateDomainRuleModel> allowTemplateRuleList = Models.Entity.TemplateDomainRuleModel.createList(cpCore, Sql);
+                    List<Models.Entity.TemplateDomainRuleModel> allowTemplateRuleList = TemplateDomainRuleModel.createList(cpCore, Sql);
                     if (allowTemplateRuleList.Count == 0) {
                         //
                         // -- current template has no domain preference, use current
@@ -1614,7 +1624,7 @@ namespace Contensive.Core.Controllers {
                 returnHtml = errorController.getDocExceptionHtmlList(cpCore) + returnHtml;
                 //
             } catch (Exception ex) {
-                throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetHTMLDoc2")
+                //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetHTMLDoc2")
             }
             return returnHtml;
         }
@@ -1993,11 +2003,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetFormPage")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetFormPage")
             return tempgetFormPage;
         }
         //
@@ -2129,7 +2139,7 @@ namespace Contensive.Core.Controllers {
                     BlockedPages = BlockedRecordIDList.Split(',');
                     BlockedPageRecordID = genericController.EncodeInteger(BlockedPages[BlockedPages.GetUpperBound(0)]);
                     if (BlockedPageRecordID != 0) {
-                        CS = cpCore.db.csOpenRecord("Page Content", BlockedPageRecordID,,, "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
+                        CS = cpCore.db.csOpenRecord("Page Content", BlockedPageRecordID,, "", "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
                         if (cpCore.db.csOk(CS)) {
                             BlockSourceID = cpCore.db.csGetInteger(CS, "BlockSourceID");
                             ContentPadding = cpCore.db.csGetInteger(CS, "ContentPadding");
@@ -2416,7 +2426,7 @@ namespace Contensive.Core.Controllers {
                     // -- OnPageStartEvent
                     cpCore.doc.bodyContent = returnHtml;
                     executeContext.addonType = CPUtilsBaseClass.addonContext.ContextOnPageStart;
-                    List<addonModel> addonList = Models.Entity.addonModel.createList_OnPageStartEvent(cpCore, new List<string>());
+                    List<addonModel> addonList = addonModel.createList_OnPageStartEvent(cpCore, new List<string>());
                     foreach (Models.Entity.addonModel addon in addonList) {
                         cpCore.doc.bodyContent = cpCore.addon.execute(addon, executeContext) + cpCore.doc.bodyContent;
                         //AddonContent = cpCore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
@@ -2426,7 +2436,7 @@ namespace Contensive.Core.Controllers {
                     // -- OnPageEndEvent / filter
                     cpCore.doc.bodyContent = returnHtml;
                     executeContext.addonType = CPUtilsBaseClass.addonContext.ContextOnPageEnd;
-                    foreach (addonModel addon in cpCore.addonCache.getOnPageEndAddonList) {
+                    foreach (addonModel addon in cpCore.addonCache.getOnPageEndAddonList()) {
                         cpCore.doc.bodyContent += cpCore.addon.execute(addon, executeContext);
                         //cpCore.doc.bodyContent &= cpCore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                     }
@@ -2611,11 +2621,11 @@ namespace Contensive.Core.Controllers {
                             Cell = Cell + cpcore.html.html_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
                         }
                         bool AddonStatusOK = false;
-                        Models.Entity.addonModel addon = Models.Entity.addonModel.create(cpcore, cpcore.siteProperties.childListAddonID);
+                        addonModel addon = addonModel.create(cpcore, cpcore.siteProperties.childListAddonID);
                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                             hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                contentName = Models.Entity.pageContentModel.contentName,
+                                contentName = pageContentModel.contentName,
                                 fieldName = "",
                                 recordId = cpcore.doc.page.id
                             },
@@ -2624,7 +2634,7 @@ namespace Contensive.Core.Controllers {
                             wrapperID = cpcore.siteProperties.defaultWrapperID
                         };
                         Cell += cpcore.addon.execute(addon, executeContext);
-                        //Cell = Cell & cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", cpcore.doc.page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, cpcore.doc.page.id, "", PageChildListInstanceID, False, cpcore.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
+                        //Cell = Cell & cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", cpcore.doc.page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, cpcore.doc.page.id, "", PageChildListInstanceID, False, cpcore.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
                     }
                 }
                 //
@@ -2724,7 +2734,7 @@ namespace Contensive.Core.Controllers {
                 //
                 SeeAlsoCount = 0;
                 if (iRecordID > 0) {
-                    ContentID = models.complex.cdefmodel.getcontentid(cpcore, iContentName);
+                    ContentID = Models.Complex.cdefModel.getContentId(cpcore, iContentName);
                     if (ContentID > 0) {
                         //
                         // ----- Set authoring only for valid ContentName

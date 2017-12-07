@@ -1,13 +1,20 @@
 ﻿
 using System;
-using System.Runtime.InteropServices;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
+using Contensive.Core.Controllers;
+using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
-
+//
 namespace Contensive.Core {
-    //
-    // comVisible to be activeScript compatible
-    //
-    [ComVisible(true), Microsoft.VisualBasic.ComClass(CPBlockClass.ClassId, CPBlockClass.InterfaceId, CPBlockClass.EventsId)]
     public class CPBlockClass : BaseClasses.CPBlockBaseClass, IDisposable {
         //
         #region COM GUIDs
@@ -27,7 +34,7 @@ namespace Contensive.Core {
         /// Constructor - Initialize the Main and Csv objects
         /// </summary>
         /// <param name="cpParent"></param>
-        public CPBlockClass(ref CPClass cpParent) : base() {
+        public CPBlockClass( CPClass cpParent) : base() {
             try {
                 accum = "";
                 cp = cpParent;
@@ -181,8 +188,8 @@ namespace Contensive.Core {
                 CPCSClass cs = cp.CSNew();
                 accum = "";
                 if (!string.IsNullOrEmpty(layoutRecordNameOrGuid)) {
-                    cs.Open("layouts", "(name=" + cp.Db.EncodeSQLText(layoutRecordNameOrGuid) + ")or(ccGuid=" + cp.Db.EncodeSQLText(layoutRecordNameOrGuid) + ")", "id",, "layout");
-                    if (cs.OK) {
+                    cs.Open("layouts", "(name=" + cp.Db.EncodeSQLText(layoutRecordNameOrGuid) + ")or(ccGuid=" + cp.Db.EncodeSQLText(layoutRecordNameOrGuid) + ")", "id", false, "layout");
+                    if (cs.OK()) {
                         accum = cs.GetText("layout");
                     }
                     cs.Close();

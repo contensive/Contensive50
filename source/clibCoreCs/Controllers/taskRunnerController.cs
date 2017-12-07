@@ -1,7 +1,18 @@
 ﻿
 using System;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using Contensive.Core;
+using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
+using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
 //
 namespace Contensive.Core.Controllers {
     public class taskRunnerController : IDisposable {
@@ -147,7 +158,7 @@ namespace Contensive.Core.Controllers {
                 //
                 Console.WriteLine("taskRunnerService.runTasks");
                 //
-                foreach (KeyValuePair<string, Models.Entity.serverConfigModel.appConfigModel> kvp in cpClusterCore.serverConfig.apps) {
+                foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> kvp in cpClusterCore.serverConfig.apps) {
                     AppName = kvp.Value.name;
                     //
                     Console.WriteLine("taskRunnerService.runTasks, appname=[" + AppName + "]");
@@ -155,7 +166,7 @@ namespace Contensive.Core.Controllers {
                     // query tasks that need to be run
                     //
                     using (CPClass cpSite = new CPClass(AppName)) {
-                        if ((cpSite.core.serverConfig.appConfig.appStatus == Models.Entity.serverConfigModel.appStatusEnum.OK) && (cpSite.core.serverConfig.appConfig.appMode == Models.Entity.serverConfigModel.appModeEnum.normal)) {
+                        if ((cpSite.core.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK) && (cpSite.core.serverConfig.appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
                             try {
                                 do {
                                     //

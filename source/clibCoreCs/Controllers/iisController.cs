@@ -1,9 +1,19 @@
 ﻿
 using System;
-using System.Web;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
+using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+//
 using Microsoft.Web.Administration;
 
 namespace Contensive.Core.Controllers {
@@ -132,7 +142,7 @@ namespace Contensive.Core.Controllers {
                 //
                 LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger()) + ".Log";
                 Cmd = "%comspec% /c IISReset /stop >> \"" + LogFilename + "\"";
-                runProcess(cpCore, Cmd,, true);
+                runProcess(cpCore, Cmd, "", true);
                 Copy = cpCore.privateFiles.readFile(LogFilename);
                 cpCore.privateFiles.deleteFile(LogFilename);
                 Copy = genericController.vbReplace(Copy, Environment.NewLine, "\\n");
@@ -158,7 +168,7 @@ namespace Contensive.Core.Controllers {
                 string Copy = null;
                 //
                 Cmd = "%comspec% /c IISReset /start >> \"" + LogFilename + "\"";
-                runProcess(cpCore, Cmd,, true);
+                runProcess(cpCore, Cmd, "", true);
                 Copy = cpCore.privateFiles.readFile(LogFilename);
                 cpCore.privateFiles.deleteFile(LogFilename);
                 Copy = genericController.vbReplace(Copy, Environment.NewLine, "\\n");
@@ -275,7 +285,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //--------------------------------------------------------------------------
                 //
-                if (cpCore.serverConfig.appConfig.appStatus != Models.Entity.serverConfigModel.appStatusEnum.OK) {
+                if (cpCore.serverConfig.appConfig.appStatus != Models.Context.serverConfigModel.appStatusEnum.OK) {
                     //
                     // did not initialize correctly
                     //
@@ -332,7 +342,7 @@ namespace Contensive.Core.Controllers {
                         //
                         DateTime cookieDetectDate = new DateTime();
                         int CookieDetectVisitId = 0;
-                        cpCore.security.decodeToken(CookieDetectKey, CookieDetectVisitId, cookieDetectDate);
+                        cpCore.security.decodeToken(CookieDetectKey, ref CookieDetectVisitId, ref  cookieDetectDate);
                         if (CookieDetectVisitId != 0) {
                             cpCore.db.executeQuery("update ccvisits set CookieSupport=1 where id=" + CookieDetectVisitId);
                             cpCore.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
@@ -352,14 +362,14 @@ namespace Contensive.Core.Controllers {
                     cpCore.domainLegacyCache.domainDetails.forwardUrl = "";
                     //
                     // REFACTOR -- move to cpcore.domains class 
-                    cpCore.domainLegacyCache.domainDetailsList = cpCore.cache.getObject<Dictionary<string, Models.Entity.domainLegacyModel.domainDetailsClass>>("domainContentList");
+                    cpCore.domainLegacyCache.domainDetailsList = cpCore.cache.getObject<Dictionary<string, domainLegacyModel.domainDetailsClass>>("domainContentList");
                     if (cpCore.domainLegacyCache.domainDetailsList == null) {
                         //
                         //  no cache found, build domainContentList from database
-                        cpCore.domainLegacyCache.domainDetailsList = new Dictionary<string, Models.Entity.domainLegacyModel.domainDetailsClass>();
-                        List<Models.Entity.domainModel> domainList = Models.Entity.domainModel.createList(cpCore, "(active<>0)and(name is not null)");
+                        cpCore.domainLegacyCache.domainDetailsList = new Dictionary<string, domainLegacyModel.domainDetailsClass>();
+                        List<Models.Entity.domainModel> domainList = domainModel.createList(cpCore, "(active<>0)and(name is not null)");
                         foreach (var domain in domainList) {
-                            Models.Entity.domainLegacyModel.domainDetailsClass domainDetailsNew = new Models.Entity.domainLegacyModel.domainDetailsClass();
+                            domainLegacyModel.domainDetailsClass domainDetailsNew = new domainLegacyModel.domainDetailsClass();
                             domainDetailsNew.name = domain.name;
                             domainDetailsNew.rootPageId = domain.RootPageID;
                             domainDetailsNew.noFollow = domain.NoFollow;
@@ -385,7 +395,7 @@ namespace Contensive.Core.Controllers {
                     //
                     foreach (string domain in cpCore.serverConfig.appConfig.domainList) {
                         if (!cpCore.domainLegacyCache.domainDetailsList.ContainsKey(domain.ToLower())) {
-                            Models.Entity.domainLegacyModel.domainDetailsClass domainDetailsNew = new Models.Entity.domainLegacyModel.domainDetailsClass();
+                            domainLegacyModel.domainDetailsClass domainDetailsNew = new domainLegacyModel.domainDetailsClass();
                             domainDetailsNew.name = domain;
                             domainDetailsNew.rootPageId = 0;
                             domainDetailsNew.noFollow = false;
@@ -409,7 +419,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- domain not found
                         // -- current host not in domainContent, add it and re-save the cache
-                        Models.Entity.domainLegacyModel.domainDetailsClass domainDetailsNew = new Models.Entity.domainLegacyModel.domainDetailsClass();
+                        domainLegacyModel.domainDetailsClass domainDetailsNew = new domainLegacyModel.domainDetailsClass();
                         domainDetailsNew.name = requestDomain;
                         domainDetailsNew.rootPageId = 0;
                         domainDetailsNew.noFollow = false;
@@ -423,7 +433,7 @@ namespace Contensive.Core.Controllers {
                         cpCore.domainLegacyCache.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew);
                         //
                         // -- update database
-                        Models.Entity.domainModel domain = Models.Entity.domainModel.add(cpCore, new List<string>());
+                        domainModel domain = domainModel.add(cpCore, ref new List<string>());
                         cpCore.domainLegacyCache.domainDetails.id = domain.id;
                         domain.name = requestDomain;
                         domain.TypeID = 1;
@@ -439,7 +449,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // this is a default domain or a new domain -- add to the domain table
                         //
-                        Models.Entity.domainModel domain = new Models.Entity.domainModel() {
+                        domainModel domain = new domainModel() {
                             name = requestDomain,
                             TypeID = 1,
                             RootPageID = cpCore.domainLegacyCache.domainDetails.rootPageId,
@@ -784,11 +794,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Error Trap
                 //
-            } catch {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_SetStreamHeader")
+            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_SetStreamHeader")
                                                                     //
         }
         //
@@ -1155,7 +1165,7 @@ namespace Contensive.Core.Controllers {
                             //
                             LinkPrefix = cpcore.webServer.requestContentWatchPrefix;
                             ContentID = (cpcore.db.csGetInteger(CSPointer, "ContentID"));
-                            HostContentName = models.complex.cdefmodel.getContentNameByID(cpcore, ContentID);
+                            HostContentName = Models.Complex.cdefModel.getContentNameByID(cpcore, ContentID);
                             if (string.IsNullOrEmpty(HostContentName)) {
                                 //
                                 // ----- Content Watch with a bad ContentID, mark inactive
@@ -1186,7 +1196,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // ----- if a content watch record is blocked, delete the content tracking
                                 //
-                                cpcore.db.deleteContentRules(models.complex.cdefmodel.getcontentid(cpcore, HostContentName), HostRecordID);
+                                cpcore.db.deleteContentRules(Models.Complex.cdefModel.getContentId(cpcore, HostContentName), HostRecordID);
                             }
                             break;
                     }

@@ -1,13 +1,20 @@
 ﻿
 using System;
-using Contensive;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using Contensive.Core;
-using Contensive.Core.Controllers;
-using Contensive.Core.Models;
-using Contensive.Core.Models.Complex;
-using Contensive.Core.Models.Context;
 using Contensive.Core.Models.Entity;
-
+using Contensive.Core.Controllers;
+using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
+using Contensive.Core.Models.Complex;
+//
 namespace Contensive.Core {
     public class processEmailClass {
         //
@@ -70,9 +77,9 @@ namespace Contensive.Core {
             DateTime EmailServiceLastCheck = default(DateTime);
             bool IsNewHour = false;
             bool IsNewDay = false;
-            Core.Models.Entity.serverConfigModel.appConfigModel appConfig = cpCore.serverConfig.appConfig;
+            Core.Models.Context.serverConfigModel.appConfigModel appConfig = cpCore.serverConfig.appConfig;
             //
-            if ((appConfig.appStatus == Models.Entity.serverConfigModel.appStatusEnum.OK) && (appConfig.appMode == Models.Entity.serverConfigModel.appModeEnum.normal)) {
+            if ((appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK) && (appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
                 using (CPClass cp = new CPClass(appConfig.name)) {
                     cpCore.db.sqlCommandTimeout = 120;
                     EmailServiceLastCheck = (cpCore.siteProperties.getDate("EmailServiceLastCheck"));
@@ -153,9 +160,9 @@ namespace Contensive.Core {
                 CSEmail = cpCore.db.csOpen("Email", Criteria);
                 if (cpCore.db.csOk(CSEmail)) {
                     //
-                    SQLTablePeople = models.complex.cdefmodel.getContentTablename(cpCore, "People");
-                    SQLTableMemberRules = models.complex.cdefmodel.getContentTablename(cpCore, "Member Rules");
-                    SQLTableGroups = models.complex.cdefmodel.getContentTablename(cpCore, "Groups");
+                    SQLTablePeople = cdefModel.getContentTablename(cpCore, "People");
+                    SQLTableMemberRules =  cdefModel.getContentTablename(cpCore, "Member Rules");
+                    SQLTableGroups = cdefModel.getContentTablename(cpCore, "Groups");
                     BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "");
                     //siteStyles = cpCore.html.html_getStyleSheet2(0, 0)
                     //
@@ -347,9 +354,9 @@ namespace Contensive.Core {
                 string sqlDateTest = null;
                 //
                 dataSourceType = cpCore.db.getDataSourceType("default");
-                SQLTablePeople = models.complex.cdefmodel.getContentTablename(cpCore, "People");
-                SQLTableMemberRules = models.complex.cdefmodel.getContentTablename(cpCore, "Member Rules");
-                SQLTableGroups = models.complex.cdefmodel.getContentTablename(cpCore, "Groups");
+                SQLTablePeople = cdefModel.getContentTablename(cpCore, "People");
+                SQLTableMemberRules = cdefModel.getContentTablename(cpCore, "Member Rules");
+                SQLTableGroups = cdefModel.getContentTablename(cpCore, "Groups");
                 BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "");
                 // siteStyles = cpCore.html.html_getStyleSheet2(0, 0)
                 //
@@ -620,14 +627,14 @@ namespace Contensive.Core {
                     //
                     // Get the Member
                     //
-                    CSPeople = cpCore.db.cs_openContentRecord("People", MemberID,,,, "Email,Name");
+                    CSPeople = cpCore.db.cs_openContentRecord("People", MemberID, 0, false, false, "Email,Name");
                     if (cpCore.db.csOk(CSPeople)) {
                         ToAddress = cpCore.db.csGet(CSPeople, "Email");
                         EmailToName = cpCore.db.csGet(CSPeople, "Name");
                         ServerPageDefault = cpCore.siteProperties.getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue);
                         RootURL = protocolHostLink + requestAppRootPath;
                         if (EmailDropID != 0) {
-                            switch (cpCore.siteProperties.getinteger("GroupEmailOpenTriggerMethod", 0)) {
+                            switch (cpCore.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {
                                 case 1:
                                     OpenTriggerCode = "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + RootURL + ServerPageDefault + "?" + RequestNameEmailOpenCssFlag + "=" + EmailDropID + "&" + rnEmailMemberID + "=#member_id#\">";
                                     break;
@@ -647,12 +654,12 @@ namespace Contensive.Core {
                         //
                         // Encode body and subject
                         //
-                        EmailBodyEncoded = cpCore.html.executeContentCommands(null, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, errorMessage);
+                        EmailBodyEncoded = cpCore.html.executeContentCommands(null, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
                         EmailBodyEncoded = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailBodyEncoded, MemberID, ClickFlagQuery);
                         //EmailBodyEncoded = cpCore.html.convertActiveContent_internal(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         //EmailBodyEncoded = cpCore.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         //
-                        EmailSubjectEncoded = cpCore.html.executeContentCommands(null, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, errorMessage);
+                        EmailSubjectEncoded = cpCore.html.executeContentCommands(null, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
                         EmailSubjectEncoded = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailSubjectEncoded, MemberID, ClickFlagQuery);
                         //EmailSubjectEncoded = cpCore.html.convertActiveContent_internal(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         //EmailSubjectEncoded = cpCore.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
@@ -668,7 +675,7 @@ namespace Contensive.Core {
                             //
                             // use provided template
                             //
-                            EmailTemplateEncoded = cpCore.html.executeContentCommands(null, EmailTemplateEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, errorMessage);
+                            EmailTemplateEncoded = cpCore.html.executeContentCommands(null, EmailTemplateEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
                             EmailTemplateEncoded = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailTemplate, MemberID, ClickFlagQuery);
                             //EmailTemplateEncoded = cpCore.html.convertActiveContent_internal(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, protocolHostLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                             //EmailTemplateEncoded = cpCore.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
@@ -768,7 +775,7 @@ namespace Contensive.Core {
                 // Get the Template
                 //
                 if (EmailTemplateID != 0) {
-                    CS = cpCore.db.cs_openContentRecord("Email Templates", EmailTemplateID,,,, "BodyHTML");
+                    CS = cpCore.db.cs_openContentRecord("Email Templates", EmailTemplateID, 0, false, false, "BodyHTML");
                     if (cpCore.db.csOk(CS)) {
                         tempGetEmailTemplate = cpCore.db.csGet(CS, "BodyHTML");
                     }
@@ -815,12 +822,12 @@ namespace Contensive.Core {
                 if (cpCore.db.csOk(CSPeople)) {
                     ClickFlagQuery = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberID + "=" + ConfirmationMemberID;
                     //
-                    EmailSubject = cpCore.html.executeContentCommands(null, EmailSubject, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, true, errorMessage);
+                    EmailSubject = cpCore.html.executeContentCommands(null, EmailSubject, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, true, ref  errorMessage);
                     EmailSubject = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailSubject, ConfirmationMemberID, ClickFlagQuery);
                     //EmailSubject = cpCore.html.convertActiveContent_internal(EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                     //EmailSubject = cpCore.csv_EncodeContent8(Nothing, EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                     //
-                    EmailBody = cpCore.html.executeContentCommands(null, EmailBody, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, true, errorMessage);
+                    EmailBody = cpCore.html.executeContentCommands(null, EmailBody, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, true, ref errorMessage);
                     EmailBody = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailBody, ConfirmationMemberID, ClickFlagQuery);
                     //EmailBody = cpCore.html.convertActiveContent_internal(EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                     //EmailBody = cpCore.csv_EncodeContent8(Nothing, EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
@@ -834,7 +841,7 @@ namespace Contensive.Core {
                         EmailBody = "<div style=\"padding:10px\">" + EmailBody + "</div>";
                     } else {
                         WorkingTemplate = EmailTemplate;
-                        WorkingTemplate = cpCore.html.executeContentCommands(null, WorkingTemplate, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, true, errorMessage);
+                        WorkingTemplate = cpCore.html.executeContentCommands(null, WorkingTemplate, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, true, ref errorMessage);
                         WorkingTemplate = cpCore.html.convertActiveContentToHtmlForEmailSend(WorkingTemplate, ConfirmationMemberID, ClickFlagQuery);
                         //WorkingTemplate = cpCore.html.convertActiveContent_internal(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         //WorkingTemplate = cpCore.csv_encodecontent8(Nothing, EmailTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)

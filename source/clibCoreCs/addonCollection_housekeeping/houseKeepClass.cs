@@ -1,13 +1,21 @@
 ﻿
 using System;
-using System.IO;
-using Contensive.Core;
-using static Contensive.Core.constants;
-using Contensive.Core.Controllers;
-
+using System.Reflection;
 using System.Xml;
-using System.Text;
-
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
+using Contensive.Core.Controllers;
+using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
+//
+using System.IO;
+//
 namespace Contensive.Core {
     //
     //====================================================================================================
@@ -180,10 +188,10 @@ namespace Contensive.Core {
             //
             // Housekeep each application
             //
-            foreach (KeyValuePair<string, Models.Entity.serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
-                Models.Entity.serverConfigModel.appConfigModel appConfig = kvp.Value;
+            foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps) {
+                Models.Context.serverConfigModel.appConfigModel appConfig = kvp.Value;
                 if (true) {
-                    if ((appConfig.appStatus == Models.Entity.serverConfigModel.appStatusEnum.OK) && (appConfig.appMode == Models.Entity.serverConfigModel.appModeEnum.normal)) {
+                    if ((appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK) && (appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
                         cp = new CPClass(appConfig.name);
                         if (cp != null) {
                             if (true) {
@@ -198,7 +206,7 @@ namespace Contensive.Core {
                                 AppendClassLog(cp.core, "", "HouseKeep", "Updating local collections from library, see Upgrade log for details during this period.");
                                 string ignoreRefactorText = "";
                                 bool ignoreRefactorBoolean = false;
-                                if (!addonInstallClass.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cp.core, ErrorMessage, ignoreRefactorText, ignoreRefactorBoolean, false, nonCriticalErrorList)) {
+                                if (!addonInstallClass.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cp.core, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, ref nonCriticalErrorList)) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
                                     }
@@ -207,7 +215,7 @@ namespace Contensive.Core {
                                 //
                                 // Verify core installation
                                 //
-                                addonInstallClass.installCollectionFromRemoteRepo(cp.core, CoreCollectionGuid, ErrorMessage, "", false, nonCriticalErrorList);
+                                addonInstallClass.installCollectionFromRemoteRepo(cp.core, CoreCollectionGuid, ref ErrorMessage, "", false, ref nonCriticalErrorList);
                                 //
                                 DomainNamePrimary = cp.core.serverConfig.appConfig.domainList[0];
                                 Pos = genericController.vbInstr(1, DomainNamePrimary, ",");
@@ -390,7 +398,7 @@ namespace Contensive.Core {
                                         //
                                         if (true) {
                                             DateTime datePtr = default(DateTime);
-                                            SQL = cp.core.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc",, 1);
+                                            SQL = cp.core.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1);
                                             CS = cp.core.db.csOpenSql_rev("default", SQL);
                                             if (!cp.core.db.csOk(CS)) {
                                                 datePtr = OldestVisitSummaryWeCareAbout;
@@ -437,7 +445,7 @@ namespace Contensive.Core {
                                     //PeriodStep = CDbl(1) / CDbl(24)
                                     StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
                                     OldestDateAdded = StartOfHour;
-                                    SQL = cp.core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + cp.core.db.encodeSQLDate(StartOfHour), "dateadded",, 1);
+                                    SQL = cp.core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + cp.core.db.encodeSQLDate(StartOfHour), "dateadded", "", 1);
                                     //SQL = "select top 1 Dateadded from ccvisits where LastVisitTime>" & encodeSQLDate(StartOfHour) & " order by DateAdded"
                                     CS = cp.core.db.csOpenSql_rev("default", SQL);
                                     if (cp.core.db.csOk(CS)) {
@@ -531,7 +539,7 @@ namespace Contensive.Core {
             //
             return;
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception");
+            //throw new ApplicationException("Unexpected exception");
         }
         //
         //
@@ -547,7 +555,7 @@ namespace Contensive.Core {
                 string FilenameExt = null;
                 string FilenameNoExt = null;
                 string FilenameAltSize = null;
-                IO.FileInfo[] FileList = null;
+                FileInfo[] FileList = null;
                 //
                 long FileSize = 0;
                 string PathNameRev = null;
@@ -778,7 +786,7 @@ namespace Contensive.Core {
                 // Get Oldest Visit
                 //
                 //SQL = "select top 1 DateAdded from ccVisits where dateadded>0 order by DateAdded"
-                SQL = cp.core.db.GetSQLSelect("default", "ccVisits", "DateAdded",, "dateadded",, 1);
+                SQL = cp.core.db.GetSQLSelect("default", "ccVisits", "DateAdded", "", "dateadded", "", 1);
                 CS = cp.core.db.csOpenSql_rev("default", SQL);
                 if (cp.core.db.csOk(CS)) {
                     OldestVisitDate = cp.core.db.csGetDate(CS, "DateAdded").Date;
@@ -858,8 +866,8 @@ namespace Contensive.Core {
 
                 cp.core.db.executeQuery(SQL);
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (Microsoft.VisualBasic.Information.Err().Number != 0) {
-                    throw new ApplicationException("Unexpected exception");
+                if (0 != 0) {
+                    //throw new ApplicationException("Unexpected exception");
                 }
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
@@ -912,8 +920,8 @@ namespace Contensive.Core {
 
                 cp.core.db.executeQuery(SQL);
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (Microsoft.VisualBasic.Information.Err().Number != 0) {
-                    throw new ApplicationException("Unexpected exception");
+                if (0 != 0) {
+                    //throw new ApplicationException("Unexpected exception");
                 }
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
@@ -927,8 +935,8 @@ namespace Contensive.Core {
 
                 cp.core.db.deleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" + cp.core.db.encodeSQLDate(ArchiveEmailDropDate) + ")");
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (Microsoft.VisualBasic.Information.Err().Number != 0) {
-                    throw new ApplicationException("Unexpected exception");
+                if (0 != 0) {
+                    //throw new ApplicationException("Unexpected exception");
                 }
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
@@ -942,8 +950,8 @@ namespace Contensive.Core {
 
                 cp.core.db.deleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + cp.core.db.encodeSQLDate(ArchiveEmailDropDate) + "))");
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (Microsoft.VisualBasic.Information.Err().Number != 0) {
-                    throw new ApplicationException("Unexpected Exception");
+                if (0 != 0) {
+                    //throw new ApplicationException("Unexpected exception");
                 }
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
@@ -982,8 +990,8 @@ namespace Contensive.Core {
 
                 cp.core.db.executeQuery(SQL);
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (Microsoft.VisualBasic.Information.Err().Number != 0) {
-                    throw new ApplicationException("Unexpected Exception");
+                if (0 != 0) {
+                    //throw new ApplicationException("Unexpected exception");
                 }
                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                 //Microsoft.VisualBasic.Information.Err().Clear();
@@ -1404,7 +1412,7 @@ namespace Contensive.Core {
                         FileList = cp.core.cdnFiles.getFileList(PathName);
                         if (FileList.Length > 0) {
                             cp.core.db.executeQuery("CREATE INDEX temp" + FieldName + " ON " + TableName + " (" + FieldName + ")");
-                            foreach (IO.FileInfo file in FileList) {
+                            foreach (FileInfo file in FileList) {
                                 Filename = file.Name;
                                 VirtualFileName = PathName + "\\" + Filename;
                                 VirtualLink = genericController.vbReplace(VirtualFileName, "\\", "/");
@@ -1530,7 +1538,7 @@ namespace Contensive.Core {
                 return;
                 //
             } catch (Exception ex) {
-                cp.Site.ErrorReport(ex);
+                cpCore.handleException(ex);
             }
         }
         //
@@ -1647,10 +1655,10 @@ namespace Contensive.Core {
                 return;
                 //
             } catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected Exception");
+            //throw new ApplicationException("Unexpected exception");
             //
             // restore saved timeout
             //
@@ -1769,10 +1777,10 @@ namespace Contensive.Core {
                 return;
                 //
             } catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected Exception");
+            //throw new ApplicationException("Unexpected exception");
             //
             // restore saved timeout
             //
@@ -1916,7 +1924,7 @@ namespace Contensive.Core {
                 //Dim AddonInstall As New addonInstallClass
                 //
                 if (string.CompareOrdinal(BuildVersion, cp.Version) < 0) {
-                    throw new ApplicationException("Unexpected Exception");
+                    //throw new ApplicationException("Unexpected exception");
                 } else {
                     PeriodStart = StartTimeDate;
                     if (PeriodStart < OldestVisitSummaryWeCareAbout) {
@@ -2127,10 +2135,10 @@ namespace Contensive.Core {
                 //
                 return;
             } catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected Exception");
+            //throw new ApplicationException("Unexpected exception");
         }
         //
         //======================================================================================
@@ -2148,12 +2156,12 @@ namespace Contensive.Core {
                 //
                 DateTime LogDate = default(DateTime);
                 //Dim fs As New fileSystemClass
-                IO.FileInfo[] FileList = null;
+                FileInfo[] FileList = null;
                 //
                 LogDate = DateTime.Now.AddDays(-30);
                 AppendClassLog(cpCore, "", "HouseKeep", "Deleting Logs [" + FolderName + "] older than 30 days");
                 FileList = cp.core.programDataFiles.getFileList(FolderName);
-                foreach (IO.FileInfo file in FileList) {
+                foreach (FileInfo file in FileList) {
                     if (file.CreationTime < LogDate) {
                         cp.core.privateFiles.deleteFile(FolderName + "\\" + file.Name);
                     }
@@ -2162,15 +2170,15 @@ namespace Contensive.Core {
                 return;
                 //
             } catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                    ;
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected exception");
+            //throw new ApplicationException("Unexpected exception");
         }
         //'
         //Private Sub HandleClassTrapError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal Cause As String, ByVal ResumeNext As Boolean)
         //    '
-        //    Throw New ApplicationException("Unexpected exception")
+        //    //throw new ApplicationException("Unexpected exception")
         //    '
         //End Sub
         //'
@@ -2178,7 +2186,7 @@ namespace Contensive.Core {
         //'
         //Private Sub HandleClassInternalError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal Cause As String)
         //    '
-        //    Throw New ApplicationException("Unexpected exception")
+        //    //throw new ApplicationException("Unexpected exception")
         //    '
         //End Sub
         //
@@ -2187,7 +2195,7 @@ namespace Contensive.Core {
         private void HouseKeep_App_Daily_LogFolder(string FolderName, DateTime LastMonth) {
             try {
                 //
-                IO.FileInfo[] FileList = null;
+                FileInfo[] FileList = null;
                 string[] FileArray = null;
                 int FileArrayCount = 0;
                 int FileArrayPointer = 0;
@@ -2195,7 +2203,7 @@ namespace Contensive.Core {
                 //
                 AppendClassLog(cp.core, cp.core.serverConfig.appConfig.name, "HouseKeep_App_Daily_LogFolder(" + cp.core.serverConfig.appConfig.name + ")", "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
                 FileList = cp.core.privateFiles.getFileList(FolderName);
-                foreach (IO.FileInfo file in FileList) {
+                foreach (FileInfo file in FileList) {
                     if (file.CreationTime < LastMonth) {
                         cp.core.privateFiles.deleteFile(FolderName + "/" + file.Name);
                     }
@@ -2203,10 +2211,10 @@ namespace Contensive.Core {
                 return;
                 //
             } catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected Exception");
+            //throw new ApplicationException("Unexpected exception");
         }
         //
         //
@@ -2263,7 +2271,7 @@ namespace Contensive.Core {
                 // error - Need a way to reach the user that submitted the file
                 //
                 tempDownloadUpdates = false;
-                throw new ApplicationException("Unexpected Exception");
+                //throw new ApplicationException("Unexpected exception");
             }
             return loadOK;
         }
@@ -2586,10 +2594,10 @@ namespace Contensive.Core {
                 //
                 return;
             } catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cpCore.handleException(ex);
             }
             //ErrorTrap:
-            throw new ApplicationException("Unexpected Exception");
+            //throw new ApplicationException("Unexpected exception");
         }
         //
         //====================================================================================================
@@ -2604,7 +2612,7 @@ namespace Contensive.Core {
                 string Cmd = null;
                 string CollectionRootPath = null;
                 int Pos = 0;
-                IO.DirectoryInfo[] FolderList = null;
+                DirectoryInfo[] FolderList = null;
                 string LocalPath = null;
                 string LocalGuid = null;
                 XmlDocument Doc = new XmlDocument();
@@ -2699,11 +2707,11 @@ namespace Contensive.Core {
                                     } else {
                                         CollectionRootPath = CollectionRootPath.Substring(0, Pos - 1);
                                         Path = cp.core.addon.getPrivateFilesAddonPath() + "\\" + CollectionRootPath + "\\";
-                                        FolderList = new IO.DirectoryInfo[0];
+                                        FolderList = new DirectoryInfo[0];
                                         if (cp.core.privateFiles.pathExists(Path)) {
                                             FolderList = cp.core.privateFiles.getFolderList(Path);
                                             //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                            if (Microsoft.VisualBasic.Information.Err().Number != 0) {
+                                            if (0 != 0) {
                                                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                                                 //Microsoft.VisualBasic.Information.Err().Clear();
                                             }
@@ -2713,7 +2721,7 @@ namespace Contensive.Core {
                                             AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "no subfolders found in physical path [" + Path + "], skipping");
                                             //
                                         } else {
-                                            foreach (IO.DirectoryInfo dir in FolderList) {
+                                            foreach (DirectoryInfo dir in FolderList) {
                                                 IsActiveFolder = false;
                                                 //
                                                 // register or unregister all files in this folder

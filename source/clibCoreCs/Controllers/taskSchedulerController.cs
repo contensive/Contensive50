@@ -1,7 +1,18 @@
 ﻿
 using System;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using Contensive.Core;
+using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
+using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
 //
 namespace Contensive.Core.Controllers {
     public class taskSchedulerController : IDisposable {
@@ -150,18 +161,18 @@ namespace Contensive.Core.Controllers {
                 //
                 logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks");
                 //
-                foreach (KeyValuePair<string, Models.Entity.serverConfigModel.appConfigModel> kvp in cpClusterCore.serverConfig.apps) {
+                foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> kvp in cpClusterCore.serverConfig.apps) {
                     //
                     // schedule tasks for this app
                     //
                     logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" + kvp.Value.name + "]");
                     //
                     using (CPClass cpSite = new CPClass(kvp.Value.name)) {
-                        if (!(cpSite.core.serverConfig.appConfig.appStatus == Models.Entity.serverConfigModel.appStatusEnum.OK)) {
+                        if (!(cpSite.core.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
                             //
                             logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app status not ok");
                             //
-                        } else if (!(cpSite.core.serverConfig.appConfig.appMode == Models.Entity.serverConfigModel.appModeEnum.normal)) {
+                        } else if (!(cpSite.core.serverConfig.appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
                             //
                             logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app mode not normal");
                             //

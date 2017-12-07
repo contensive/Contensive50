@@ -1,11 +1,19 @@
 ﻿
-using Contensive.Core.Controllers;
 using System;
-using System.Collections.Generic;
+using System.Reflection;
 using System.Xml;
-using static Contensive.Core.constants;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
+using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
-
+using static Contensive.Core.constants;
+//
 namespace Contensive.Core {
     public class addon_AddonMngrSafeClass {
         //
@@ -418,7 +426,7 @@ namespace Contensive.Core {
                                             if (cpCore.db.csOk(CS)) {
                                                 AddonNavigatorID = cpCore.db.csGetInteger(CS, "ID");
                                             }
-                                            cpCore.db.csClose(ref  ref CS);
+                                            cpCore.db.csClose( ref CS);
                                             if (AddonNavigatorID > 0) {
                                                 GetForm_SafeModeAddonManager_DeleteNavigatorBranch(TargetCollectionName, AddonNavigatorID);
                                             }
@@ -814,7 +822,7 @@ namespace Contensive.Core {
                                     // developers
                                     //
                                     DisplaySystem = true;
-                                    CS = cpCore.db.csOpen("Add-on Collections",, "Name");
+                                    CS = cpCore.db.csOpen("Add-on Collections", "", "Name");
                                 }
                                 //INSTANT C# NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
                                 //ORIGINAL LINE: ReDim Preserve Cells(cpCore.db.csGetRowCount(CS), ColumnCnt)
@@ -978,7 +986,7 @@ namespace Contensive.Core {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cpCore.handleException(ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetXMLAttribute");
@@ -1025,14 +1033,14 @@ namespace Contensive.Core {
                         ParentNameSpace = menuNameSpace.Substring(0, Pos - 1);
                     }
                     if (string.IsNullOrEmpty(ParentNameSpace)) {
-                        CS = cpCore.db.csOpen(ContentName, "(name=" + cpCore.db.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID",,,,, "ID");
+                        CS = cpCore.db.csOpen(ContentName, "(name=" + cpCore.db.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0, false, false, "ID");
                         if (cpCore.db.csOk(CS)) {
                             tempGetParentIDFromNameSpace = cpCore.db.csGetInteger(CS, "ID");
                         }
                         cpCore.db.csClose(ref CS);
                     } else {
                         ParentID = GetParentIDFromNameSpace(ContentName, ParentNameSpace);
-                        CS = cpCore.db.csOpen(ContentName, "(name=" + cpCore.db.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID",,,,, "ID");
+                        CS = cpCore.db.csOpen(ContentName, "(name=" + cpCore.db.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, false, false, "ID");
                         if (cpCore.db.csOk(CS)) {
                             tempGetParentIDFromNameSpace = cpCore.db.csGetInteger(CS, "ID");
                         }
@@ -1045,7 +1053,7 @@ namespace Contensive.Core {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                CP.Site.ErrorReport(ex);
+                cpCore.handleException(ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetParentIDFromNameSpace");
