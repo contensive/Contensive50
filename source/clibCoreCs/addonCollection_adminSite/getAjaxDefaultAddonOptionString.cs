@@ -48,7 +48,7 @@ namespace Contensive.Addons.AdminSite
 					addonIsInline = cpCore.db.csGetBoolean(CS, "IsInline");
 					returnHtml = addonController.main_GetDefaultAddonOption_String(cpCore, addonArgumentList, AddonGuid, addonIsInline);
 				}
-				cpCore.db.csClose(CS);
+				cpCore.db.csClose(ref CS);
 			}
 			catch (Exception ex)
 			{

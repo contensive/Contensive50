@@ -7,7 +7,7 @@
 //========================================================================
 
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 //
 namespace Contensive.Core.Controllers
 {
@@ -78,8 +78,8 @@ namespace Contensive.Core.Controllers
 			this.cpCore = cpCore;
 			//
 			EntryIndexName = new keyPtrController();
-			Microsoft.VisualBasic.VBMath.Randomize();
-			MenuFlyoutNamePrefix = "id" + Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(9999 * Microsoft.VisualBasic.VBMath.Rnd()))));
+            Random rnd = new Random(); 
+			MenuFlyoutNamePrefix = "id" + rnd.Next(9999).ToString() ;
 			MenuFlyoutIcon_Local = "&nbsp;&#187;";
 		}
 		//
@@ -98,7 +98,7 @@ namespace Contensive.Core.Controllers
 				MenuFlyoutIcon = cpCore.siteProperties.getText("MenuFlyoutIcon", DefaultIcon);
 				if (MenuFlyoutIcon != DefaultIcon)
 				{
-					MenuFlyoutIcon = MenuFlyoutIcon;
+					//MenuFlyoutIcon = MenuFlyoutIcon;
 				}
 				switch (MenuStyle)
 				{
@@ -194,9 +194,9 @@ namespace Contensive.Core.Controllers
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
 			handleLegacyClassError("GetMenu", Microsoft.VisualBasic.Information.Err().Number, Microsoft.VisualBasic.Information.Err().Source, Microsoft.VisualBasic.Information.Err().Description);
 		}
@@ -256,9 +256,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
 			handleLegacyClassError("AddEntry", Microsoft.VisualBasic.Information.Err().Number, Microsoft.VisualBasic.Information.Err().Source, Microsoft.VisualBasic.Information.Err().Description);
 		}
@@ -301,9 +301,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
 			handleLegacyClassError("ReadLine", Microsoft.VisualBasic.Information.Err().Number, Microsoft.VisualBasic.Information.Err().Source, Microsoft.VisualBasic.Information.Err().Description);
 			return tempReadLine;
@@ -649,9 +649,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
 			handleLegacyClassError("GetMenuFlyoutPanel", Microsoft.VisualBasic.Information.Err().Number, Microsoft.VisualBasic.Information.Err().Source, Microsoft.VisualBasic.Information.Err().Description);
 			return tempGetMenuFlyoutPanel;
@@ -684,62 +684,35 @@ ErrorTrap:
 		/// <remarks></remarks>
 		private void handleLegacyClassError(string MethodName, int ErrNumber, string ErrSource, string ErrDescription)
 		{
-			try
-			{
-				//
-				throw (new Exception("unexpected error in method [" + MethodName + "], errDescription [" + ErrDescription + "]"));
-				//
-		}
-
-		//
-		//========================================================================
-		// ----- Add a new DHTML menu entry
-		//========================================================================
-		//
-		public void menu_AddEntry(string Name, string ParentName = "", string ImageLink = "", string ImageOverLink = "", string Link = "", string Caption = "", string StyleSheet = "", string StyleSheetHover = "", bool NewWindow = false)
+            throw (new Exception("unexpected error in method [" + MethodName + "], errDescription [" + ErrDescription + "]"));
+        }
+        //
+        //========================================================================
+        // ----- Add a new DHTML menu entry
+        //========================================================================
+        //
+        public void menu_AddEntry(string Name, string ParentName = "", string ImageLink = "", string ImageOverLink = "", string Link = "", string Caption = "", string StyleSheet = "", string StyleSheetHover = "", bool NewWindow = false)
 		{
-			try
-			{
-				//
-				//If Not (true) Then Exit Sub
-				string MethodName = null;
-				string Image = null;
-				string ImageOver = string.Empty;
-				//
-				MethodName = "AddMenu()";
-				//
-				Image = genericController.encodeText(ImageLink);
-				if (!string.IsNullOrEmpty(Image))
-				{
-					ImageOver = genericController.encodeText(ImageOverLink);
-					if (Image == ImageOver)
-					{
-						ImageOver = "";
-					}
-				}
-				cpCore.menuFlyout.AddEntry(genericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption,, NewWindow);
-				//
-				return;
-				//
-				// ----- Error Trap
-				//
-			}
-			catch
-			{
-				goto ErrorTrap;
-			}
-ErrorTrap:
-			throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
-			//
-		}
-		//
-		//========================================================================
-		// ----- main_Get all the menu close scripts
-		//
-		//   call this at the end of the page
-		//========================================================================
-		//
-		public string menu_GetClose()
+            string Image = null;
+            string ImageOver = string.Empty;
+            //
+            Image = genericController.encodeText(ImageLink);
+            if (!string.IsNullOrEmpty(Image)) {
+                ImageOver = genericController.encodeText(ImageOverLink);
+                if (Image == ImageOver) {
+                    ImageOver = "";
+                }
+            }
+            cpCore.menuFlyout.AddEntry(genericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption,"", NewWindow);
+        }
+        //
+        //========================================================================
+        // ----- main_Get all the menu close scripts
+        //
+        //   call this at the end of the page
+        //========================================================================
+        //
+        public string menu_GetClose()
 		{
 			string result = string.Empty;
 			try

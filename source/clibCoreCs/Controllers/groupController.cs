@@ -52,7 +52,7 @@ namespace Contensive.Core.Controllers
 				dt = cpCore.db.executeQuery("SELECT ID FROM CCGROUPS WHERE NAME=" + sqlGroupName + "");
 				if (dt.Rows.Count > 0)
 				{
-					returnGroupId = genericController.EncodeInteger(dt.Rows(0).Item("ID"));
+					returnGroupId = genericController.EncodeInteger(dt.Rows[0].Item("ID"));
 				}
 				else
 				{
@@ -65,7 +65,7 @@ namespace Contensive.Core.Controllers
 					dt = cpCore.db.executeQuery(sql);
 					if (dt.Rows.Count > 0)
 					{
-						returnGroupId = genericController.EncodeInteger(dt.Rows(0).Item(0));
+						returnGroupId = genericController.EncodeInteger(dt.Rows[0].Item(0));
 					}
 				}
 				dt.Dispose();
@@ -294,7 +294,7 @@ namespace Contensive.Core.Controllers
 				dt = cpcore.db.executeQuery("select top 1 id from ccGroups where name=" + cpcore.db.encodeSQLText(iGroupName));
 				if (dt.Rows.Count > 0)
 				{
-					tempgroup_GetGroupID = genericController.EncodeInteger(dt.Rows(0).Item(0));
+					tempgroup_GetGroupID = genericController.EncodeInteger(dt.Rows[0].Item(0));
 				}
 			}
 			return tempgroup_GetGroupID;
@@ -327,7 +327,7 @@ namespace Contensive.Core.Controllers
 				{
 					tempgroup_GetGroupName = genericController.encodeText(cpcore.db.cs_getValue(CS, "Name"));
 				}
-				cpcore.db.csClose(CS);
+				cpcore.db.csClose(ref CS);
 			}
 			return tempgroup_GetGroupName;
 		}
@@ -353,7 +353,7 @@ namespace Contensive.Core.Controllers
 			DataTable dt = cpcore.db.executeQuery("SELECT ID FROM ccgroups WHERE NAME=" + cpcore.db.encodeSQLText(iGroupName));
 			if (dt.Rows.Count > 0)
 			{
-				tempgroup_Add = genericController.EncodeInteger(dt.Rows(0).Item(0));
+				tempgroup_Add = genericController.EncodeInteger(dt.Rows[0].Item(0));
 			}
 			else
 			{
@@ -365,7 +365,7 @@ namespace Contensive.Core.Controllers
 					cpcore.db.csSet(CS, "caption", iGroupCaption);
 					cpcore.db.csSet(CS, "active", true);
 				}
-				cpcore.db.csClose(CS);
+				cpcore.db.csClose(ref CS);
 			}
 			return tempgroup_Add;
 		}
@@ -414,7 +414,7 @@ namespace Contensive.Core.Controllers
 					CS = cpcore.db.csOpen("Member Rules", "(MemberID=" + cpcore.db.encodeSQLNumber(NewMemberID) + ")and(GroupID=" + cpcore.db.encodeSQLNumber(GroupID) + ")",, false);
 					if (!cpcore.db.csOk(CS))
 					{
-						cpcore.db.csClose(CS);
+						cpcore.db.csClose(ref CS);
 						CS = cpcore.db.csInsertRecord("Member Rules");
 					}
 					if (!cpcore.db.csOk(CS))
@@ -435,7 +435,7 @@ namespace Contensive.Core.Controllers
 							cpcore.db.csSet(CS, "DateExpires", "");
 						}
 					}
-					cpcore.db.csClose(CS);
+					cpcore.db.csClose(ref CS);
 				}
 			}
 		}

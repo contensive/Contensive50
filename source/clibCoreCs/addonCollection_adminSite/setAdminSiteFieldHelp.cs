@@ -10,7 +10,7 @@ using Contensive.BaseClasses;
 using Contensive.Core;
 using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 //
 namespace Contensive.Addons.AdminSite
 {

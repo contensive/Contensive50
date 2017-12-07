@@ -211,7 +211,7 @@ namespace Contensive.Core.Controllers
 					}
 					else
 					{
-						returnValue = dataStore.dataList(ptr);
+						returnValue = dataStore.dataList[ptr];
 					}
 				}
 			}
@@ -280,7 +280,7 @@ namespace Contensive.Core.Controllers
 							dataStore.keyPtrIndex = new keyPtrController();
 							for (Ptr = 0; Ptr < dataStore.dataList.Count; Ptr++)
 							{
-								RecordIdTextValue = dataStore.dataList(Ptr);
+								RecordIdTextValue = dataStore.dataList[Ptr];
 								dataStore.keyPtrIndex.setPtr(RecordIdTextValue, Ptr);
 							}
 							updateCache();

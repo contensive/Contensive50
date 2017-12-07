@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 //
 using Contensive.BaseClasses;
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 using Contensive.Core.Models;
 using Contensive.Core.Models.Context;
 using Contensive.Core.Models.Entity;
@@ -183,7 +183,7 @@ namespace Contensive.Core.Controllers
 						//
 						// Fix links for HTML send
 						//
-						rootUrl = "http://" + cpcore.serverConfig.appConfig.domainList(0) + "/";
+						rootUrl = "http://" + cpcore.serverConfig.appConfig.domainList[0] + "/";
 						BodyMessage = genericController.ConvertLinksToAbsolute(BodyMessage, rootUrl);
 						//
 						// compose body
@@ -227,7 +227,7 @@ namespace Contensive.Core.Controllers
 								cpcore.db.csSet(CSLog, "emailid", emailIdOrZeroForLog);
 							}
 						}
-						cpcore.db.csClose(CSLog);
+						cpcore.db.csClose(ref CSLog);
 					}
 				}
 			}
@@ -254,7 +254,7 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            '
 		//            Exit Function
-		//ErrorTrap:
+		////ErrorTrap:
 		//            cpCore.handleException(New Exception("Unexpected exception"))
 		//        End Function
 		//  
@@ -288,7 +288,7 @@ namespace Contensive.Core.Controllers
 				bodyEncoded = Body;
 				templateEncoded = template;
 				//
-				CS = cpcore.db.cs_openContentRecord("People", personId,,,, "email");
+				CS = cpcore.db.cs_openContentRecord("People", personId,0,false,false, "email");
 				if (cpcore.db.csOk(CS))
 				{
 					ToAddress = Convert.ToString(cpcore.db.csGetText(CS, "email")).Trim(' ');
@@ -315,13 +315,13 @@ namespace Contensive.Core.Controllers
 						//
 						subjectEncoded = cpcore.html.executeContentCommands(null, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, true, layoutError);
 						subjectEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(subjectEncoded, personId, "");
-						//subjectEncoded = cpcore.html.convertActiveContent_internal(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+						//subjectEncoded = cpcore.html.convertActiveContent_internal(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
 						//
 						// encode Body
 						//
 						bodyEncoded = cpcore.html.executeContentCommands(null, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, true, layoutError);
 						bodyEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(bodyEncoded, personId, "");
-						//bodyEncoded = cpcore.html.convertActiveContent_internal(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+						//bodyEncoded = cpcore.html.convertActiveContent_internal(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
 						//
 						// encode template
 						//
@@ -329,7 +329,7 @@ namespace Contensive.Core.Controllers
 						{
 							templateEncoded = cpcore.html.executeContentCommands(null, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, true, layoutError);
 							templateEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(templateEncoded, personId, "");
-							//templateEncoded = cpcore.html.convertActiveContent_internal(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+							//templateEncoded = cpcore.html.convertActiveContent_internal(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
 							//
 							if (templateEncoded.IndexOf(fpoContentBox) + 1 != 0)
 							{
@@ -346,7 +346,7 @@ namespace Contensive.Core.Controllers
 						returnStatus = send(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog);
 					}
 				}
-				cpcore.db.csClose(CS);
+				cpcore.db.csClose(ref CS);
 			}
 			catch (Exception ex)
 			{
@@ -452,13 +452,13 @@ namespace Contensive.Core.Controllers
 					//
 					// ----- Email was not found
 					//
-					cpcore.db.csClose(CSEmail);
+					cpcore.db.csClose(ref CSEmail);
 					CSEmail = cpcore.db.csInsertRecord("System Email");
 					cpcore.db.csSet(CSEmail, "name", EMailName);
 					cpcore.db.csSet(CSEmail, "Subject", EMailName);
-					cpcore.db.csSet(CSEmail, "FromAddress", cpcore.siteProperties.getText("EmailAdmin", "webmaster@" + cpcore.serverConfig.appConfig.domainList(0)));
+					cpcore.db.csSet(CSEmail, "FromAddress", cpcore.siteProperties.getText("EmailAdmin", "webmaster@" + cpcore.serverConfig.appConfig.domainList[0]));
 					//Call app.csv_SetCS(CSEmail, "caption", EmailName)
-					cpcore.db.csClose(CSEmail);
+					cpcore.db.csClose(ref CSEmail);
 					cpcore.handleException(new ApplicationException("No system email was found with the name [" + EMailName + "]. A new email blank was created but not sent."));
 				}
 				else
@@ -488,7 +488,7 @@ namespace Contensive.Core.Controllers
 						{
 							EmailTemplateSource = cpcore.db.csGet(CS, "BodyHTML");
 						}
-						cpcore.db.csClose(CS);
+						cpcore.db.csClose(ref CS);
 					}
 					if (string.IsNullOrEmpty(EmailTemplateSource))
 					{
@@ -508,7 +508,7 @@ namespace Contensive.Core.Controllers
 						// This field is default true, and non-authorable
 						// It will be true in all cases, except a possible unforseen exception
 						//
-						EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML("http://" + cpcore.serverConfig.appConfig.domainList(0) + "/" + cpcore.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+						EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML("http://" + cpcore.serverConfig.appConfig.domainList[0] + "/" + cpcore.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
 					}
 					//
 					// --- Send message to the additional member
@@ -536,7 +536,7 @@ namespace Contensive.Core.Controllers
 								EmailStatusMessage = EmailStatusMessage + "&nbsp;&nbsp;Sent to " + EmailToName + " at " + EmailToAddress + ", Status = " + EmailStatus + BR;
 							}
 						}
-						cpcore.db.csClose(CSPeople);
+						cpcore.db.csClose(ref CSPeople);
 					}
 					//
 					// --- Send message to everyone selected
@@ -564,7 +564,7 @@ namespace Contensive.Core.Controllers
 							cpcore.db.csGoNext(CSPeople);
 						}
 					}
-					cpcore.db.csClose(CSPeople);
+					cpcore.db.csClose(ref CSPeople);
 					//
 					// --- Send the completion message to the administrator
 					//
@@ -587,7 +587,7 @@ namespace Contensive.Core.Controllers
 							EmailToAddress = cpcore.db.csGetText(CSPeople, "email");
 							isAdmin = cpcore.db.csGetBoolean(CSPeople, "admin");
 						}
-						cpcore.db.csClose(CSPeople);
+						cpcore.db.csClose(ref CSPeople);
 						//
 						if (!isValid)
 						{
@@ -623,7 +623,7 @@ namespace Contensive.Core.Controllers
 							ConfirmBody = ConfirmBody + "--- end of list ---" + BR;
 							ConfirmBody = ConfirmBody + "</div>";
 							//
-							EmailStatus = sendPerson(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " + cpcore.serverConfig.appConfig.domainList(0), ConfirmBody, false, true, EmailRecordID, "", false);
+							EmailStatus = sendPerson(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " + cpcore.serverConfig.appConfig.domainList[0], ConfirmBody, false, true, EmailRecordID, "", false);
 							if (isAdmin && (!string.IsNullOrEmpty(EmailStatus)))
 							{
 								returnString = "Administrator: There was a problem sending the confirmation email, " + EmailStatus;
@@ -633,9 +633,9 @@ namespace Contensive.Core.Controllers
 					//
 					// ----- Done
 					//
-					cpcore.db.csClose(CSPeople);
+					cpcore.db.csClose(ref CSPeople);
 				}
-				cpcore.db.csClose(CSEmail);
+				cpcore.db.csClose(ref CSEmail);
 				//
 				return returnString;
 				//
@@ -645,9 +645,9 @@ namespace Contensive.Core.Controllers
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			throw new applicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("csv_SendSystemEmail", "Unexpected Trap")
 		}
 		//
@@ -737,7 +737,7 @@ ErrorTrap:
 						{
 							EmailTemplate = cpcore.db.csGet(CSTemplate, "BodyHTML");
 						}
-						cpcore.db.csClose(CSTemplate);
+						cpcore.db.csClose(ref CSTemplate);
 					}
 					//
 					// styles
@@ -820,7 +820,7 @@ ErrorTrap:
 						}
 						//TotalList = TotalList & "--- end all recipients ---" & BR
 					}
-					cpcore.db.csClose(CSPeople);
+					cpcore.db.csClose(ref CSPeople);
 					//
 					if (DupCnt == 1)
 					{
@@ -882,7 +882,7 @@ ErrorTrap:
 						}
 					}
 				}
-				cpcore.db.csClose(CS);
+				cpcore.db.csClose(ref CS);
 			}
 			catch (Exception ex)
 			{
@@ -1053,9 +1053,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			throw new applicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
 			//
 		}
@@ -1151,7 +1151,7 @@ ErrorTrap:
 								//
 								// look for expired account to renew
 								//
-								cpcore.db.csClose(CS);
+								cpcore.db.csClose(ref CS);
 								CS = cpcore.db.csOpen("People", "((email=" + cpcore.db.encodeSQLText(workingEmail) + "))", "ID", PageSize:1);
 								if (cpcore.db.csOk(CS))
 								{
@@ -1169,7 +1169,7 @@ ErrorTrap:
 									// inject support record
 									//
 									//hint = "150"
-									cpcore.db.csClose(CS);
+									cpcore.db.csClose(ref CS);
 									CS = cpcore.db.csInsertRecord("people");
 									cpcore.db.csSet(CS, "name", "Contensive Support");
 									cpcore.db.csSet(CS, "email", workingEmail);

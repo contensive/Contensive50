@@ -9,7 +9,7 @@
 using Contensive.Core.Models.Context;
 using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 
 //
 namespace Contensive.Core.Controllers

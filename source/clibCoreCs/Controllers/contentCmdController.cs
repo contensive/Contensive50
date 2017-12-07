@@ -6,7 +6,7 @@
 // Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
 //========================================================================
 
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 using Contensive.BaseClasses;
 
 //
@@ -64,7 +64,7 @@ namespace Contensive.Core.Controllers
 		//            execute = ExecuteCmd(src, Context, personalizationPeopleId, personalizationIsAuthenticated)
 		//        End If
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex)
+		//        cpCore.handleException(ex);
 		//    End Try
 		//    Return returnValue
 		//End Function
@@ -650,7 +650,7 @@ namespace Contensive.Core.Controllers
 									//
 									throw new ApplicationException("Error parsing JSON command list, , command list [" + cmdSrc + "]");
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-									Microsoft.VisualBasic.Information.Err().Clear();
+									//Microsoft.VisualBasic.Information.Err().Clear();
 									return null;
 								}
 							}
@@ -662,7 +662,7 @@ namespace Contensive.Core.Controllers
 							//
 							throw new ApplicationException("Error parsing JSON command list, , command list [" + cmdSrc + "]");
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-							Microsoft.VisualBasic.Information.Err().Clear();
+							//Microsoft.VisualBasic.Information.Err().Clear();
 							return null;
 						}
 						//
@@ -754,7 +754,7 @@ namespace Contensive.Core.Controllers
 									DataTable dt = cpCore.db.executeQuery("select layout from ccLayouts where name=" + cpCore.db.encodeSQLText(ArgName));
 									if (dt != null)
 									{
-										CmdAccumulator = genericController.encodeText(dt.Rows(0).Item("layout"));
+										CmdAccumulator = genericController.encodeText(dt.Rows[0].Item("layout"));
 									}
 									dt.Dispose();
 								}
@@ -810,9 +810,9 @@ namespace Contensive.Core.Controllers
 								//CmdAccumulator = ""
 								//ArgName = ""
 								//For Ptr = 0 To cmdArgDef.Count - 1
-								//    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
+								//    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
 								//        Case "name", "default"
-								//            ArgName = cmdArgDef.Item(Ptr)
+								//            ArgName = cmdArgDef.Item[Ptr]
 								//    End Select
 								//Next
 								//If ArgName <> "" Then
@@ -834,11 +834,11 @@ namespace Contensive.Core.Controllers
 								//'CmdAccumulator = ""
 								//ArgName = ""
 								//For Ptr = 0 To cmdArgDef.Count - 1
-								//    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
+								//    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
 								//        Case "find"
-								//            argFind = cmdArgDef.Item(Ptr)
+								//            argFind = cmdArgDef.Item[Ptr]
 								//        Case "replace"
-								//            argReplace = cmdArgDef.Item(Ptr)
+								//            argReplace = cmdArgDef.Item[Ptr]
 								//    End Select
 								//Next
 								//If argFind <> "" Then
@@ -859,11 +859,11 @@ namespace Contensive.Core.Controllers
 								//'
 								//ArgName = ""
 								//For Ptr = 0 To cmdArgDef.Count - 1
-								//    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
+								//    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
 								//        Case "find"
-								//            argFind = cmdArgDef.Item(Ptr)
+								//            argFind = cmdArgDef.Item[Ptr]
 								//        Case "replace"
-								//            argReplace = cmdArgDef.Item(Ptr)
+								//            argReplace = cmdArgDef.Item[Ptr]
 								//    End Select
 								//Next
 								//If argFind <> "" Then
@@ -883,11 +883,11 @@ namespace Contensive.Core.Controllers
 								//'
 								//ArgName = ""
 								//For Ptr = 0 To cmdArgDef.Count - 1
-								//    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
+								//    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
 								//        Case "find"
-								//            argFind = cmdArgDef.Item(Ptr)
+								//            argFind = cmdArgDef.Item[Ptr]
 								//        Case "replace"
-								//            argReplace = cmdArgDef.Item(Ptr)
+								//            argReplace = cmdArgDef.Item[Ptr]
 								//    End Select
 								//Next
 								//If argFind <> "" Then
@@ -908,11 +908,11 @@ namespace Contensive.Core.Controllers
 								//'
 								//ArgName = ""
 								//For Ptr = 0 To cmdArgDef.Count - 1
-								//    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
+								//    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
 								//        Case "find"
-								//            argFind = cmdArgDef.Item(Ptr)
+								//            argFind = cmdArgDef.Item[Ptr]
 								//        Case "replace"
-								//            argReplace = cmdArgDef.Item(Ptr)
+								//            argReplace = cmdArgDef.Item[Ptr]
 								//    End Select
 								//Next
 								//If argFind <> "" Then
@@ -932,11 +932,11 @@ namespace Contensive.Core.Controllers
 								//'
 								//ArgName = ""
 								//For Ptr = 0 To cmdArgDef.Count - 1
-								//    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
+								//    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
 								//        Case "find"
-								//            argFind = cmdArgDef.Item(Ptr)
+								//            argFind = cmdArgDef.Item[Ptr]
 								//        Case "replace"
-								//            argReplace = cmdArgDef.Item(Ptr)
+								//            argReplace = cmdArgDef.Item[Ptr]
 								//    End Select
 								//Next
 								//If argFind <> "" Then

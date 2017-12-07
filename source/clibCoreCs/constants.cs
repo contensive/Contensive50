@@ -1935,7 +1935,7 @@ namespace Contensive.Core
 		//
 		// Cache the input selects (admin uses the same ones over and over)
 		//
-		public struct main_InputSelectCacheType
+		public class main_InputSelectCacheType
 		{
 			public string SelectRaw;
 			public string ContentName;

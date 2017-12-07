@@ -365,9 +365,9 @@
       <Project>{31EDC921-CD8E-4AE8-B74D-0E1B238192B6}</Project>
       <Name>legacyWorker</Name>
     </ProjectReference>
-    <ProjectReference Include="..\cpBaseCs\cpBaseCs.csproj">
+    <ProjectReference Include="..\cpBaseCs\CPBaseCs.csproj">
       <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
-      <Name>cpBaseCs</Name>
+      <Name>CPBaseCs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

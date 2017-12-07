@@ -7,7 +7,7 @@
 //========================================================================
 
 using System.Xml;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 using Contensive.Core.Controllers;
 using Contensive.Core.Models.Entity;
 
@@ -191,7 +191,7 @@ namespace Contensive.Core.Controllers
 					RS = cpCore.db.executeQuery(SQL);
 					if (RS.Rows.Count > 0)
 					{
-						ContentID = genericController.EncodeInteger(RS.Rows(0).Item("id"));
+						ContentID = genericController.EncodeInteger(RS.Rows[0].Item("id"));
 					}
 				}
 				if (!string.IsNullOrEmpty(iContentName) && (ContentID == 0))
@@ -543,9 +543,9 @@ namespace Contensive.Core.Controllers
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetXMLContentDefinition3");
 			return tempGetXMLContentDefinition3;
 		}
@@ -565,7 +565,7 @@ ErrorTrap:
 			//
 			// ----- Error Trap
 			//
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetXMLContentDefinition");
 		}
 		//'
@@ -613,7 +613,7 @@ ErrorTrap:
 		//    '
 		//    ' ----- Error Trap
 		//    '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    Call HandleClassErrorAndBubble(appname,"GetXMLContent")
 		//End Function
 		//
@@ -672,12 +672,12 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble("unknown", "GetXMLAttribute");
-//INSTANT C# TODO TASK: The 'Resume Next' statement is not converted by Instant C#:
-			Resume Next
+//INSTANT C# TODO TASK: The '//Resume Next' statement is not converted by Instant C#:
+			//Resume Next
 			return tempGetXMLAttribute;
 		}
 		//
@@ -730,7 +730,7 @@ ErrorTrap:
 		//    '
 		//    ' ----- Error Trap
 		//    '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    Call HandleClassErrorAndBubble(appname,"GetXMLAttribute")
 		//End Function
 		//'
@@ -760,7 +760,7 @@ ErrorTrap:
 		//    '
 		//    ' ----- Error Trap
 		//    '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    Call HandleClassErrorAndBubble(appName, "GetContentNameByID")
 		//End Function
 		//
@@ -871,7 +871,7 @@ ErrorTrap:
 					}
 					cpCore.db.csGoNext(CS);
 				}
-				cpCore.db.csClose(CS);
+				cpCore.db.csClose(ref CS);
 				return sb.ToString();
 				//
 				//
@@ -880,9 +880,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_SQLIndexes");
 		}
 		//
@@ -911,9 +911,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_AdminMenus");
 		}
 		//
@@ -1003,9 +1003,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_NavigatorEntries");
 		}
 		//
@@ -1067,9 +1067,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_NavigatorEntries");
 		}
 		//
@@ -1113,9 +1113,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_AggregateFunctions");
 		}
 		//
@@ -1147,7 +1147,7 @@ ErrorTrap:
 					dt = cpCore.db.executeQuery("select Name from " + TableName + " where ID=" + RecordID);
 					if (dt.Rows.Count > 0)
 					{
-						tempGetTableRecordName = dt.Rows(0).Item(0).ToString();
+						tempGetTableRecordName = dt.Rows[0].Item(0).ToString();
 					}
 				}
 				//
@@ -1159,9 +1159,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetTableRecordName");
 			return tempGetTableRecordName;
 		}
@@ -1181,9 +1181,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetRSXML");
 		}
 		//
@@ -1202,9 +1202,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "GetRSXMLLookupAttribute");
 		}
 		//
@@ -1239,8 +1239,8 @@ ErrorTrap:
 							rs = cpCore.db.executeQuery("select Name,ParentID from ccMenuEntries where ID=" + RecordID);
 							if (isDataTableOk(rs))
 							{
-								ParentID = genericController.EncodeInteger(rs.Rows(0).Item("ParentID"));
-								RecordName = genericController.encodeText(rs.Rows(0).Item("Name"));
+								ParentID = genericController.EncodeInteger(rs.Rows[0].Item("ParentID"));
+								RecordName = genericController.encodeText(rs.Rows[0].Item("Name"));
 							}
 							if (isDataTableOk(rs))
 							{
@@ -1291,9 +1291,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			HandleClassErrorAndBubble(appName, "getMenuNameSpace");
 			return tempgetMenuNameSpace;
 		}

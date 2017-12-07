@@ -30,7 +30,7 @@ namespace Contensive.Addons.Core
 			{
 				CPClass processor = (CPClass)cp;
 				coreClass cpCore = processor.core;
-				if (cpCore.doc.authContext.isAuthenticated() & cpCore.doc.authContext.isAuthenticatedAdmin(cpCore))
+				if (cpCore.doc.authContext.isAuthenticated & cpCore.doc.authContext.isAuthenticatedAdmin(cpCore))
 				{
 					//
 					// Save the site sites

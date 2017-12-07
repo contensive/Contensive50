@@ -90,7 +90,7 @@ namespace Contensive.Core.Models.Complex
 								{
 									foreach (DataRow row in dt.Rows)
 									{
-										tableSchema.columns.Add(genericController.encodeText(row("COLUMN_NAME")).ToLower);
+										tableSchema.columns.Add(genericController.encodeText(row("COLUMN_NAME")).ToLower());
 									}
 								}
 								//
@@ -101,7 +101,7 @@ namespace Contensive.Core.Models.Complex
 								{
 									foreach (DataRow row in dt.Rows)
 									{
-										tableSchema.indexes.Add(genericController.encodeText(row("INDEX_NAME")).ToLower);
+										tableSchema.indexes.Add(genericController.encodeText(row("INDEX_NAME")).ToLower());
 									}
 								}
 							}

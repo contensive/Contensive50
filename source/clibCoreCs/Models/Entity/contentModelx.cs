@@ -70,7 +70,7 @@
 //            Try
 //                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.doc.authContext.user.id), callersCacheNameList)
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //                Throw
 //            End Try
 //            Return result
@@ -98,7 +98,7 @@
 //                    End If
 //                End If
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //                Throw
 //            End Try
 //            Return result
@@ -125,7 +125,7 @@
 //                    End If
 //                End If
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //                Throw
 //            End Try
 //            Return result
@@ -151,7 +151,7 @@
 //                    End If
 //                End If
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //                Throw
 //            End Try
 //            Return result
@@ -223,7 +223,7 @@
 //                    End If
 //                End If
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //                Throw
 //            End Try
 //            Return result
@@ -302,7 +302,7 @@
 //                ' -- object is here, but the cache was invalidated, setting
 //                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.id.ToString()), Me)
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //                Throw
 //            End Try
 //            Return id
@@ -321,7 +321,7 @@
 //                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, recordId))
 //                End If
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //                Throw
 //            End Try
 //        End Sub
@@ -342,7 +342,7 @@
 //                    End If
 //                End If
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //                Throw
 //            End Try
 //        End Sub
@@ -364,7 +364,7 @@
 //                    End If
 //                End If
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //                Throw
 //            End Try
 //        End Sub
@@ -395,7 +395,7 @@
 //                End If
 //                cs.Close()
 //            Catch ex As Exception
-//                cpCore.handleException(ex) : Throw
+//                cpCore.handleException(ex); : Throw
 //            End Try
 //            Return result
 //        End Function

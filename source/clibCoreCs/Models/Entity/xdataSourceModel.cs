@@ -163,10 +163,10 @@
 //                        'Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
 //                    Else
 //                        Dim dataSource As New dataSourceModel
-//                        Dim normalizedDataSourceName As String = normalizeDataSourceName(dt.Rows(0).Field(Of String)("name"))
-//                        dataSource.id = dt.Rows(0).Field(Of Integer)("id")
+//                        Dim normalizedDataSourceName As String = normalizeDataSourceName(dt.Rows[0].Field(Of String)("name"))
+//                        dataSource.id = dt.Rows[0].Field(Of Integer)("id")
 //                        dataSource.name = normalizedDataSourceName
-//                        dataSource.connStringOLEDB = dt.Rows(0).Field(Of String)("connString")
+//                        dataSource.connStringOLEDB = dt.Rows[0].Field(Of String)("connString")
 //                        result.Add(normalizedDataSourceName, dataSource)
 //                    End If
 //                End Using

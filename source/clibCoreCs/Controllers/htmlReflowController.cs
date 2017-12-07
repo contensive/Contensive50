@@ -41,8 +41,8 @@ namespace Contensive.Core.Controllers
 			//    Call Parse.Load(source)
 			//    If Parse.ElementCount > 0 Then
 			//        For Ptr = 0 To Parse.ElementCount - 1
-			//            If Not Parse.IsTag(Ptr) Then
-			//                Dim Content As String = Parse.Text(Ptr)
+			//            If Not Parse.IsTag[Ptr] Then
+			//                Dim Content As String = Parse.Text[Ptr]
 			//                If BlockFormatting Then
 			//                    Result.Add(Content)
 			//                Else
@@ -60,40 +60,40 @@ namespace Contensive.Core.Controllers
 			//                    End If
 			//                End If
 			//            Else
-			//                Select Case genericController.vbLCase(Parse.TagName(Ptr))
+			//                Select Case genericController.vbLCase(Parse.TagName[Ptr])
 			//                    Case "pre", "script"
 			//                        '
 			//                        ' End block formating
 			//                        '
-			//                        Result.Add(vbCrLf & Parse.Text(Ptr))
+			//                        Result.Add(vbCrLf & Parse.Text[Ptr])
 			//                        BlockFormatting = True
 			//                    Case "/pre", "/script"
 			//                        '
 			//                        ' end block formating
 			//                        '
-			//                        Result.Add(Parse.Text(Ptr) & vbCrLf)
+			//                        Result.Add(Parse.Text[Ptr] & vbCrLf)
 			//                        BlockFormatting = False
 			//                    Case Else
 			//                        If BlockFormatting Then
 			//                            '
 			//                            ' formatting is blocked
 			//                            '
-			//                            Result.Add(Parse.Text(Ptr))
+			//                            Result.Add(Parse.Text[Ptr])
 			//                        Else
 			//                            '
 			//                            ' format the tag
 			//                            '
-			//                            Select Case genericController.vbLCase(Parse.TagName(Ptr))
+			//                            Select Case genericController.vbLCase(Parse.TagName[Ptr])
 			//                                Case "p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "br"
 			//                                    '
 			//                                    ' new line
 			//                                    '
-			//                                    Result.Add(vbCrLf & New String(CChar(vbTab), indentCnt) & Parse.Text(Ptr))
+			//                                    Result.Add(vbCrLf & New String(CChar(vbTab), indentCnt) & Parse.Text[Ptr])
 			//                                Case "div", "td", "table", "tr", "tbody", "ol", "ul", "form"
 			//                                    '
 			//                                    ' new line and +indent
 			//                                    '
-			//                                    Result.Add(vbCrLf & New String(CChar(vbTab), indentCnt) & Parse.Text(Ptr))
+			//                                    Result.Add(vbCrLf & New String(CChar(vbTab), indentCnt) & Parse.Text[Ptr])
 			//                                    indentCnt = indentCnt + 1
 			//                                    ContentIndent = vbCrLf & New String(CChar(vbTab), indentCnt)
 			//                                    ContentCnt = 0
@@ -109,16 +109,16 @@ namespace Contensive.Core.Controllers
 			//                                        '
 			//                                    End If
 			//                                    If ContentCnt = 0 Then
-			//                                        Result.Add(Parse.Text(Ptr))
+			//                                        Result.Add(Parse.Text[Ptr])
 			//                                    Else
-			//                                        Result.Add(vbCrLf & New String(CChar(vbTab), indentCnt) & Parse.Text(Ptr))
+			//                                        Result.Add(vbCrLf & New String(CChar(vbTab), indentCnt) & Parse.Text[Ptr])
 			//                                    End If
 			//                                    ContentCnt = ContentCnt + 1
 			//                                Case Else
 			//                                    '
 			//                                    ' tag that acts like content
 			//                                    '
-			//                                    Content = Parse.Text(Ptr)
+			//                                    Content = Parse.Text[Ptr]
 			//                                    If Content <> "" Then
 			//                                        Result.Add(ContentIndent & Content)
 			//                                        ContentIndent = ""

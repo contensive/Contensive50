@@ -485,7 +485,7 @@ namespace Contensive.Core.Models.Entity
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
 		//            '
 		//        End Sub

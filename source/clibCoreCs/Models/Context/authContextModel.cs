@@ -830,7 +830,7 @@ namespace Contensive.Core.Models.Context
 										+ ")";
 								CS = cpCore.db.csOpenSql(SQL);
 								_isAuthenticatedContentManagerAnything = cpCore.db.csOk(CS);
-								cpCore.db.csClose(CS);
+								cpCore.db.csClose(ref CS);
 								//
 								_isAuthenticatedContentManagerAnything_userId = user.id;
 								_isAuthenticatedContentManagerAnything_loaded = true;
@@ -1020,7 +1020,7 @@ namespace Contensive.Core.Models.Context
 									{
 										returnUserId = 0;
 									}
-									cpCore.db.csClose(CS);
+									cpCore.db.csClose(ref CS);
 								}
 							}
 							else
@@ -1044,7 +1044,7 @@ namespace Contensive.Core.Models.Context
 							errorController.error_AddUserError(cpCore, badLoginUserError);
 						}
 					}
-					cpCore.db.csClose(CS);
+					cpCore.db.csClose(ref CS);
 				}
 			}
 			catch (Exception ex)
@@ -1106,7 +1106,7 @@ namespace Contensive.Core.Models.Context
 					{
 						returnOk = true;
 					}
-					cpCore.db.csClose(CSPointer);
+					cpCore.db.csClose(ref CSPointer);
 				}
 			}
 			catch (Exception ex)
@@ -1255,7 +1255,7 @@ namespace Contensive.Core.Models.Context
 						returnAllowAdd = cpCore.db.csGetBoolean(CSPointer, "allowAdd");
 						returnAllowDelete = cpCore.db.csGetBoolean(CSPointer, "allowDelete");
 					}
-					cpCore.db.csClose(CSPointer);
+					cpCore.db.csClose(ref CSPointer);
 					//
 					if (!returnAllowEdit)
 					{
@@ -1603,7 +1603,7 @@ namespace Contensive.Core.Models.Context
 								+ " ";
 							CS = cpCore.db.csOpenSql_rev("default", SQL);
 							returnREsult = cpCore.db.csOk(CS);
-							cpCore.db.csClose(CS);
+							cpCore.db.csClose(ref CS);
 						}
 					}
 					else
@@ -1639,7 +1639,7 @@ namespace Contensive.Core.Models.Context
 							+ " where" + Criteria;
 						CS = cpCore.db.csOpenSql_rev("default", SQL);
 						returnREsult = cpCore.db.csOk(CS);
-						cpCore.db.csClose(CS);
+						cpCore.db.csClose(ref CS);
 					}
 				}
 

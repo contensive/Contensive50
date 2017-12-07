@@ -6,7 +6,7 @@
 // Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
 //========================================================================
 
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 //
 namespace Contensive.Core.Controllers
 {
@@ -166,9 +166,9 @@ namespace Contensive.Core.Controllers
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			throw (new Exception("Unexpected exception")); // Call HandleClassError("AddEntry", Err.Number, Err.Source, Err.Description)
 		}
 		//        '
@@ -246,7 +246,7 @@ ErrorTrap:
 		//            End If
 		//            Exit Function
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            throw (New Exception("Unexpected exception")) ' Call HandleClassError("GetMenu", Err.Number, Err.Source, Err.Description)
 		//        End Function
 		//
@@ -323,9 +323,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			throw (new Exception("Unexpected exception")); // Call HandleClassError("GetMenuTreeList", Err.Number, Err.Source, Err.Description)
 		}
 		//
@@ -498,7 +498,7 @@ ErrorTrap:
 
 		//            Exit Function
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            throw (New Exception("Unexpected exception")) ' Call HandleClassError("GetTree", Err.Number, Err.Source, Err.Description)
 		//        End Function
 		//        '
@@ -580,7 +580,7 @@ ErrorTrap:
 		//            '
 		//            Exit Function
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            throw (New Exception("Unexpected exception")) ' Call HandleClassError("GetMKTreeBranch", Err.Number, Err.Source, Err.Description)
 		//        End Function
 		//

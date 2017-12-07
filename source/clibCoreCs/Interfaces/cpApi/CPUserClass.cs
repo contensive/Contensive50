@@ -151,7 +151,7 @@ namespace Contensive.Core
 			{
 				if (true)
 				{
-					return (CP.core.doc.authContext.isAuthenticated());
+					return (CP.core.doc.authContext.isAuthenticated);
 				}
 				else
 				{

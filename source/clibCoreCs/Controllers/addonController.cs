@@ -5,9 +5,13 @@ using System.Xml;
 using Contensive.Core.Models.Entity;
 using Contensive.BaseClasses;
 using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
 using System.Collections.Generic;
 
 namespace Contensive.Core.Controllers {
+    //
+    // replace mscript with https://github.com/Microsoft/ClearScript
+    //
     //
     //====================================================================================================
     /// <summary>
@@ -119,7 +123,7 @@ namespace Contensive.Core.Controllers {
                     string ContainerCssID = "";
                     string ContainerCssClass = "";
                     foreach (var kvp in executeContext.instanceArguments) {
-                        switch (kvp.Key.ToLower) {
+                        switch (kvp.Key.ToLower()) {
                             case "wrapper":
                                 executeContext.wrapperID = genericController.EncodeInteger(kvp.Value);
                                 break;
@@ -271,7 +275,7 @@ namespace Contensive.Core.Controllers {
                             //    QS = cpCore.docProperties.getText("HostRQS")
                             //    QSSplit = Split(QS, "&")
                             //    For Ptr = 0 To UBound(QSSplit)
-                            //        NVPair = QSSplit(Ptr)
+                            //        NVPair = QSSplit[Ptr]
                             //        If NVPair <> "" Then
                             //            NVSplit = Split(NVPair, "=")
                             //            If UBound(NVSplit) > 0 Then
@@ -493,7 +497,7 @@ namespace Contensive.Core.Controllers {
                         // -- iFrame content, framed in content, during the remote method call, add in the rest of the html page
                         cpCore.doc.setMetaContent(0, 0);
                         result = ""
-                            + cpCore.siteProperties.docTypeDeclaration() + Environment.NewLine + "<html>"
+                            + cpCore.siteProperties.docTypeDeclaration + Environment.NewLine + "<html>"
                             + "\r" + "<head>"
                             + Environment.NewLine + htmlIndent(cpCore.html.getHtmlHead()) + "\r" + "</head>"
                             + '\r' + TemplateDefaultBodyTag + "\r" + "</body>"
@@ -791,7 +795,7 @@ namespace Contensive.Core.Controllers {
 
                                                                 CS = cpCore.db.csOpen("Copy Content", "name=" + cpCore.db.encodeSQLText(FieldName), "ID");
                                                                 if (!cpCore.db.csOk(CS)) {
-                                                                    cpCore.db.csClose(CS);
+                                                                    cpCore.db.csClose(ref CS);
                                                                     CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.authContext.user.id);
                                                                 }
                                                                 if (cpCore.db.csOk(CS)) {
@@ -809,7 +813,7 @@ namespace Contensive.Core.Controllers {
                                                                         cpCore.db.csGoNext(CS);
                                                                     }
                                                                 }
-                                                                cpCore.db.csClose(CS);
+                                                                cpCore.db.csClose(ref CS);
                                                             }
 
                                                             break;
@@ -1051,7 +1055,7 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID",,,,, "id,name,Copy");
                                                             if (!cpCore.db.csOk(CS)) {
-                                                                cpCore.db.csClose(CS);
+                                                                cpCore.db.csClose(ref CS);
                                                                 CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.authContext.user.id);
                                                                 if (cpCore.db.csOk(CS)) {
                                                                     RecordID = cpCore.db.csGetInteger(CS, "ID");
@@ -1209,7 +1213,7 @@ namespace Contensive.Core.Controllers {
                                                                                         //Cnt = UBound(CellData)
                                                                                         //Dim Ptr As Integer
                                                                                         //For Ptr = 0 To Cnt - 1
-                                                                                        //    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData(Ptr) & "]")
+                                                                                        //    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData[Ptr] & "]")
                                                                                         //Next
                                                                                         //Copy = Copy & (ColumnEnd)
                                                                                     } else if (genericController.encodeText(CellData) == "") {
@@ -1908,7 +1912,7 @@ namespace Contensive.Core.Controllers {
                 int Ptr = 0;
                 int Pos = 0;
                 //
-                if (cpCore.doc.authContext.isAuthenticated() & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
+                if (cpCore.doc.authContext.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
                     if (cpCore.doc.authContext.isEditingAnything()) {
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
@@ -2117,18 +2121,10 @@ namespace Contensive.Core.Controllers {
                             + GetIconSprite("", 0, "/ccLib/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " + AddonName + " Add-on", "Edit options used just for this instance of the " + AddonName + " Add-on", "", true, "") + "</a>"
                             + ""
                             + "";
-                        cpCore.doc.helpCodes.push xxx
-                        if (cpCore.doc.helpCodeCount >= cpCore.doc.helpCodeSize) {
-                            cpCore.doc.helpCodeSize = cpCore.doc.helpCodeSize + 10;
-                            //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                            ReDim Preserve cpCore.doc.helpCodes(cpCore.doc.helpCodeSize);
-                            //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                            ReDim Preserve cpCore.doc.helpCaptions(cpCore.doc.helpCodeSize);
-                        }
-                        cpCore.doc.helpCodes(cpCore.doc.helpCodeCount) = LocalCode;
-                        cpCore.doc.helpCaptions(cpCore.doc.helpCodeCount) = AddonName;
-                        cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1;
-                        //
+                        cpCore.doc.helpCodes.Add( new docController.helpStuff() {
+                            caption = AddonName,
+                            code = LocalCode
+                        });
                         if (cpCore.doc.helpDialogCnt == 0) {
                             cpCore.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
                         }
@@ -2137,10 +2133,10 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 return tempgetInstanceBubble;
-            } catch {
-                goto ErrorTrap;
+            } catch (Exception ex) {
+                cpCore.handleException( ex );
             }
-            ErrorTrap:
+            //ErrorTrap:
             throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetInstanceBubble")
             return tempgetInstanceBubble;
         }
@@ -2161,7 +2157,7 @@ namespace Contensive.Core.Controllers {
                 string BubbleJS = null;
                 //Dim AddonName As String = String.Empty
                 //
-                if (cpCore.doc.authContext.isAuthenticated() && true) {
+                if (cpCore.doc.authContext.isAuthenticated && true) {
                     if (cpCore.doc.authContext.isEditingAnything()) {
                         Models.Entity.addonModel addon = Models.Entity.addonModel.create(cpCore, addonId);
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
@@ -2208,12 +2204,12 @@ namespace Contensive.Core.Controllers {
                         if (cpCore.doc.helpCodeCount >= cpCore.doc.helpCodeSize) {
                             cpCore.doc.helpCodeSize = cpCore.doc.helpCodeSize + 10;
                             //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                            ReDim Preserve cpCore.doc.helpCodes(cpCore.doc.helpCodeSize);
+                            Array.Resize( ref asdf,asdf) // redim preserve  cpCore.doc.helpCodes(cpCore.doc.helpCodeSize);
                             //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                            ReDim Preserve cpCore.doc.helpCaptions(cpCore.doc.helpCodeSize);
+                            Array.Resize( ref asdf,asdf) // redim preserve  cpCore.doc.helpCaptions(cpCore.doc.helpCodeSize);
                         }
-                        cpCore.doc.helpCodes(cpCore.doc.helpCodeCount) = LocalCode;
-                        cpCore.doc.helpCaptions(cpCore.doc.helpCodeCount) = addon.name;
+                        cpCore.doc.helpCodes[cpCore.doc.helpCodeCount] = LocalCode;
+                        cpCore.doc.helpCaptions[cpCore.doc.helpCodeCount] = addon.name;
                         cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1;
                     }
                 }
@@ -2239,7 +2235,7 @@ namespace Contensive.Core.Controllers {
             string InnerCopy = null;
             string CollectionCopy = string.Empty;
             //
-            if (cpCore.doc.authContext.isAuthenticated()) {
+            if (cpCore.doc.authContext.isAuthenticated) {
                 if (cpCore.doc.authContext.isEditingAnything()) {
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"));
                     //cpCore.html.html_HelpViewerButtonID = "HelpBubble" & doccontroller.htmlDoc_HelpCodeCount
@@ -2285,17 +2281,11 @@ namespace Contensive.Core.Controllers {
                         + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                         + "</table>"
                         + "</div>";
-                    BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodeCount + "',this);return false;\"";
-                    if (cpCore.doc.helpCodeCount >= cpCore.doc.helpCodeSize) {
-                        cpCore.doc.helpCodeSize = cpCore.doc.helpCodeSize + 10;
-                        //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                        ReDim Preserve cpCore.doc.helpCodes(cpCore.doc.helpCodeSize);
-                        //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                        ReDim Preserve cpCore.doc.helpCaptions(cpCore.doc.helpCodeSize);
-                    }
-                    cpCore.doc.helpCodes(cpCore.doc.helpCodeCount) = LocalCode;
-                    cpCore.doc.helpCaptions(cpCore.doc.helpCodeCount) = AddonName;
-                    cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1;
+                    BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodes.Count + "',this);return false;\"";
+                    cpCore.doc.helpCodes.Add(new docController.helpStuff {
+                        code = LocalCode,
+                        caption = AddonName
+                    });
                     //
                     if (cpCore.doc.helpDialogCnt == 0) {
                         cpCore.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
@@ -2344,7 +2334,7 @@ namespace Contensive.Core.Controllers {
                 int StyleSN = 0;
                 string HTMLViewerBubbleID = null;
                 //
-                if (cpCore.doc.authContext.isAuthenticated()) {
+                if (cpCore.doc.authContext.isAuthenticated) {
                     if (cpCore.doc.authContext.isEditingAnything()) {
                         StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"));
                         HTMLViewerBubbleID = "HelpBubble" + cpCore.doc.helpCodeCount;
@@ -2375,17 +2365,10 @@ namespace Contensive.Core.Controllers {
                             + "</table>"
                             + "</div>";
                         BubbleJS = " onClick=\"var d=document.getElementById('" + HTMLViewerBubbleID + "_dst');if(d){var s=document.getElementById('" + HTMLSourceID + "');if(s){d.value=s.innerHTML;HelpBubbleOn( '" + HTMLViewerBubbleID + "',this)}};return false;\" ";
-                        if (cpCore.doc.helpCodeCount >= cpCore.doc.helpCodeSize) {
-                            cpCore.doc.helpCodeSize = cpCore.doc.helpCodeSize + 10;
-                            //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                            ReDim Preserve cpCore.doc.helpCodes(cpCore.doc.helpCodeSize);
-                            //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                            ReDim Preserve cpCore.doc.helpCaptions(cpCore.doc.helpCodeSize);
-                        }
-                        cpCore.doc.helpCodes(cpCore.doc.helpCodeCount) = LocalCode;
-                        cpCore.doc.helpCaptions(cpCore.doc.helpCodeCount) = AddonName;
-                        cpCore.doc.helpCodeCount = cpCore.doc.helpCodeCount + 1;
-                        //SiteStylesBubbleCache = "x"
+                        cpCore.doc.helpCodes.Add(new docController.helpStuff {
+                            code = LocalCode,
+                            caption = AddonName
+                        });
                         //
                         if (cpCore.doc.helpDialogCnt == 0) {
                             cpCore.html.addScriptCode_onLoad("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs");
@@ -2398,10 +2381,10 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 return tempgetHTMLViewerBubble;
-            } catch {
-                goto ErrorTrap;
+            } catch (Exception ex) {
+                cpCore.handleException( ex );
             }
-            ErrorTrap:
+            //ErrorTrap:
             throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
             return tempgetHTMLViewerBubble;
         }
@@ -2628,7 +2611,7 @@ namespace Contensive.Core.Controllers {
 
                                                                 CS = cpCore.db.csOpen("Copy Content", "name=" + cpCore.db.encodeSQLText(FieldName), "ID");
                                                                 if (!cpCore.db.csOk(CS)) {
-                                                                    cpCore.db.csClose(CS);
+                                                                    cpCore.db.csClose(ref CS);
                                                                     CS = cpCore.db.csInsertRecord("Copy Content");
                                                                 }
                                                                 if (cpCore.db.csOk(CS)) {
@@ -2646,7 +2629,7 @@ namespace Contensive.Core.Controllers {
                                                                         cpCore.db.csGoNext(CS);
                                                                     }
                                                                 }
-                                                                cpCore.db.csClose(CS);
+                                                                cpCore.db.csClose(ref CS);
                                                             }
 
                                                             break;
@@ -2889,7 +2872,7 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID",,,,, "Copy");
                                                             if (!cpCore.db.csOk(CS)) {
-                                                                cpCore.db.csClose(CS);
+                                                                cpCore.db.csClose(ref CS);
                                                                 CS = cpCore.db.csInsertRecord("Copy Content");
                                                                 if (cpCore.db.csOk(CS)) {
                                                                     RecordID = cpCore.db.csGetInteger(CS, "ID");
@@ -3246,10 +3229,10 @@ namespace Contensive.Core.Controllers {
                 FastString = null;
                 return tempgetFormContent_decodeSelector;
                 //
-            } catch {
-                goto ErrorTrap;
+            } catch (Exception ex) {
+                cpCore.handleException( ex );
             }
-            ErrorTrap:
+            //ErrorTrap:
             FastString = null;
             throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetFormContent_decodeSelector")
             return tempgetFormContent_decodeSelector;
@@ -3490,17 +3473,17 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                cpCore.db.csClose(CS);
+                cpCore.db.csClose(ref CS);
                 //
                 return s;
                 //
                 //
                 // ----- Error Trap
                 //
-            } catch {
-                goto ErrorTrap;
+            } catch (Exception ex) {
+                cpCore.handleException( ex );
             }
-            ErrorTrap:
+            //ErrorTrap:
             throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("WrapContent")
         }
         //

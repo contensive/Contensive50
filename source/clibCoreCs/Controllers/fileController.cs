@@ -12,7 +12,7 @@ using ICSharpCode.SharpZipLib.Zip;
 using Contensive.Core;
 using Contensive.BaseClasses;
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 using Contensive.Core.Models;
 using Contensive.Core.Models.Context;
 using Contensive.Core.Models.Entity;

@@ -7,8 +7,7 @@
 //========================================================================
 
 using System.Xml;
-using Microsoft.Web.Administration;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 using Contensive.Core.Models.Entity;
 //
 namespace Contensive.Core.Controllers
@@ -108,7 +107,7 @@ namespace Contensive.Core.Controllers
 		//            'cpCore.AppendLog("dll" & ".SiteBuilderClass.RegisterDotnet called Regsvr32, called but the output could not be captured")
 		//            '
 		//            Exit Sub
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Call handleLegacyClassError1("unknown", "RegisterDotnet")
 		//        End Sub
 		//'
@@ -155,7 +154,7 @@ namespace Contensive.Core.Controllers
 		//        Call cpNewApp.core.app.siteProperty_set(siteproperty_serverPageDefault_name, iisDefaultDoc)
 		//        cpNewApp.Dispose()
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex)
+		//        cpCore.handleException(ex);
 		//    End Try
 		//    Return returnOk
 		//End Function
@@ -250,7 +249,7 @@ namespace Contensive.Core.Controllers
 		//    '
 		//    Exit Sub
 		//    '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "Init", True, False)
 		//End Sub
 		//'
@@ -311,7 +310,7 @@ namespace Contensive.Core.Controllers
 					string primaryDomain = cpcore.serverConfig.appConfig.name;
 					if (cpcore.serverConfig.appConfig.domainList.Count > 0)
 					{
-						primaryDomain = cpcore.serverConfig.appConfig.domainList(0);
+						primaryDomain = cpcore.serverConfig.appConfig.domainList[0];
 					}
 					Controllers.iisController.verifySite(cpcore, cpcore.serverConfig.appConfig.name, primaryDomain, cpcore.serverConfig.appConfig.appRootFilesPath, "default.aspx");
 					//
@@ -411,11 +410,11 @@ namespace Contensive.Core.Controllers
 					cpcore.siteProperties.getText("DefaultFormInputTextHeight", "1");
 					cpcore.siteProperties.getText("DefaultFormInputWidth", "60");
 					cpcore.siteProperties.getText("EditLockTimeout", "5");
-					cpcore.siteProperties.getText("EmailAdmin", "webmaster@" + cpcore.serverConfig.appConfig.domainList(0));
-					cpcore.siteProperties.getText("EmailFromAddress", "webmaster@" + cpcore.serverConfig.appConfig.domainList(0));
-					cpcore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" + cpcore.serverConfig.appConfig.domainList(0));
+					cpcore.siteProperties.getText("EmailAdmin", "webmaster@" + cpcore.serverConfig.appConfig.domainList[0]);
+					cpcore.siteProperties.getText("EmailFromAddress", "webmaster@" + cpcore.serverConfig.appConfig.domainList[0]);
+					cpcore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" + cpcore.serverConfig.appConfig.domainList[0]);
 					cpcore.siteProperties.getText("Language", "English");
-					cpcore.siteProperties.getText("PageContentMessageFooter", "Copyright " + cpcore.serverConfig.appConfig.domainList(0));
+					cpcore.siteProperties.getText("PageContentMessageFooter", "Copyright " + cpcore.serverConfig.appConfig.domainList[0]);
 					cpcore.siteProperties.getText("SelectFieldLimit", "4000");
 					cpcore.siteProperties.getText("SelectFieldWidthLimit", "100");
 					cpcore.siteProperties.getText("SMTPServer", "127.0.0.1");
@@ -457,7 +456,7 @@ namespace Contensive.Core.Controllers
 						string primaryDomain = cpcore.serverConfig.appConfig.name;
 						if (cpcore.serverConfig.appConfig.domainList.Count > 0)
 						{
-							primaryDomain = cpcore.serverConfig.appConfig.domainList(0);
+							primaryDomain = cpcore.serverConfig.appConfig.domainList[0];
 						}
 						//
 						// -- primary domain
@@ -552,7 +551,7 @@ namespace Contensive.Core.Controllers
 							//    Guids = Split(InstallCollectionList, ",")
 							//    For Ptr = 0 To UBound(Guids)
 							//        ErrorMessage = ""
-							//        Guid = Guids(Ptr)
+							//        Guid = Guids[Ptr]
 							//        If Guid <> "" Then
 							//            saveLogFolder = classLogFolder
 							//            Call addonInstall.GetCollectionConfig(Guid, CollectionPath, LastChangeDate, "")
@@ -754,7 +753,7 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "RenameContentDefinition", True, False)
 		//        End Sub
 
@@ -791,7 +790,7 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Dim ex As New exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "UpgradeSortOrder", True, False)
 		//        End Sub
 		//        '
@@ -832,7 +831,7 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "ExistsSQLTableField", True, False)
 		//        End Function
 		//        '
@@ -860,7 +859,7 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "createPage") ' Err.Number, Err.Source, Err.Description, "CreatePage", True, False)
 		//        End Sub
 		//        '
@@ -971,13 +970,13 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            UpgradeErrorCount = UpgradeErrorCount + 1
 		//            Dim ex As New exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "PopulateTableTable (error #" & UpgradeErrorCount & ")", True, True)
 		//            If UpgradeErrorCount >= UpgradeErrorTheshold Then
 		//                Dim ex3 As New Exception("todo") : Call HandleClassError(ex3, cpcore.app.config.name, MethodName) ' Err.Number, Err.Source, Err.Description, "PopulateTableTable (error #" & UpgradeErrorCount & ")", True, False)
 		//            End If
-		//            Resume Next
+		//            //Resume Next
 		//        End Sub
 
 		//        '
@@ -1110,7 +1109,7 @@ namespace Contensive.Core.Controllers
 		//                    ' repair the country table (abbreviation was set to an integer a long time ago)
 		//                    '
 		//                    SQL = "insert into cccountries (abbreviation)values('US')"
-		//                    On Error Resume Next
+		//                    //On Error //Resume Next
 		//                    Call cpcore.app.ExecuteSQL("", CStr(SQL))
 		//                    ErrMessage = Err.Description
 		//                    Err.Clear()
@@ -1225,13 +1224,13 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            UpgradeErrorCount = UpgradeErrorCount + 1
 		//            Dim ex As New exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "Upgrade_Conversion_to_41 (error #" & UpgradeErrorCount & ")", True, True)
 		//            If UpgradeErrorCount >= UpgradeErrorTheshold Then
 		//                Dim ex4 As New Exception("todo") : Call HandleClassError(ex4, cpcore.app.config.name, MethodName) ' Err.Number, Err.Source, Err.Description, "Upgrade_Conversion_to_41 (error #" & UpgradeErrorCount & ")", True, False)
 		//            End If
-		//            Resume Next
+		//            //Resume Next
 		//        End Sub
 		//        '
 		//        ' ----- Delete unused fields from both the Content Definition and the Table
@@ -1277,7 +1276,7 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            Exit Sub
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "deleteField") ' Err.Number, Err.Source, Err.Description, "DeleteField", True, False)
 		//        End Sub
 		//        '
@@ -1300,7 +1299,7 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            Exit Function
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "GetTableID", True, False)
 		//        End Function
 		//        '
@@ -1317,7 +1316,7 @@ namespace Contensive.Core.Controllers
 		//            core_group_add = 0
 		//            dt = cpCore.app.executeSql("SELECT ID FROM CCGROUPS WHERE NAME='" & GroupName & "';")
 		//            If dt.Rows.Count > 0 Then
-		//                core_group_add = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
+		//                core_group_add = genericController.EncodeInteger(dt.Rows[0].Item("ID"))
 		//            Else
 		//                cid = GetContentID("groups")
 		//                sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & EncodeSQLText(GroupName) & "," & EncodeSQLText(GroupName) & ")"
@@ -1325,14 +1324,14 @@ namespace Contensive.Core.Controllers
 		//                sql = "select id from ccgroups where createkey=" & createkey & " order by id desc"
 		//                dt = cpCore.app.executeSql(sql)
 		//                If dt.Rows.Count > 0 Then
-		//                    core_group_add = genericController.EncodeInteger(dt.Rows(0).Item("id"))
+		//                    core_group_add = genericController.EncodeInteger(dt.Rows[0].Item("id"))
 		//                End If
 
 		//            End If
 		//            '
 		//            Exit Function
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "AddGroup", True, False)
 		//        End Function
 		//
@@ -1494,7 +1493,7 @@ namespace Contensive.Core.Controllers
 				ptr = 0;
 				while (ptr < dt.Rows.Count)
 				{
-					IDVariant = genericController.EncodeInteger(dt.Rows(ptr).Item("DataSourceID"));
+					IDVariant = genericController.EncodeInteger(dt.Rows[ptr].Item("DataSourceID"));
 					if (IDVariant == 0)
 					{
 						Active = true;
@@ -1502,12 +1501,12 @@ namespace Contensive.Core.Controllers
 					}
 					else
 					{
-						Active = genericController.EncodeBoolean(dt.Rows(ptr).Item("DataSourceActive"));
-						DataSourceName = genericController.encodeText(dt.Rows(ptr).Item("DataSourcename"));
+						Active = genericController.EncodeBoolean(dt.Rows[ptr].Item("DataSourceActive"));
+						DataSourceName = genericController.encodeText(dt.Rows[ptr].Item("DataSourcename"));
 					}
 					if (Active)
 					{
-						cpCore.db.createSQLTable(DataSourceName, genericController.encodeText(dt.Rows(ptr).Item("Tablename")));
+						cpCore.db.createSQLTable(DataSourceName, genericController.encodeText(dt.Rows[ptr].Item("Tablename")));
 					}
 					ptr += 1;
 				}
@@ -1610,7 +1609,7 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyContentWatchLists", True, True)
 		//'        End Sub
 		//'
@@ -1691,7 +1690,7 @@ namespace Contensive.Core.Controllers
 		//        Call cpCore.app.executeSql("Update ccSurveyQuestionTypes Set Name='Select Dropdown' where ID=2;")
 		//        Call cpCore.app.executeSql("Update ccSurveyQuestionTypes Set Name='Radio Buttons' where ID=3;")
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex)
+		//        cpCore.handleException(ex);
 		//    End Try
 		//    Return returnType
 		//End Function
@@ -1705,7 +1704,7 @@ namespace Contensive.Core.Controllers
 		//            Try
 
 		//            Catch ex As Exception
-		//                cpCore.handleException(ex)
+		//                cpCore.handleException(ex);
 		//            End Try
 		//            Return returnAttr
 
@@ -1724,7 +1723,7 @@ namespace Contensive.Core.Controllers
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "DeleteAdminMenu", True, False)
 		//        End Function
 		//
@@ -1744,7 +1743,7 @@ namespace Contensive.Core.Controllers
 				rs = cpCore.db.executeQuery("Select ID from " + TableName + " where name=" + cpCore.db.encodeSQLText(RecordName));
 				if (isDataTableOk(rs))
 				{
-					tempGetIDBYName = genericController.EncodeInteger(rs.Rows(0).Item("ID"));
+					tempGetIDBYName = genericController.EncodeInteger(rs.Rows[0].Item("ID"));
 				}
 				rs.Dispose();
 			}
@@ -1871,7 +1870,7 @@ namespace Contensive.Core.Controllers
 					//
 					// create new record
 					//
-					cpcore.db.csClose(CS);
+					cpcore.db.csClose(ref CS);
 					CS = cpcore.db.csInsertRecord(ContentName, SystemMemberID);
 					cpcore.db.csSet(CS, "NAME", Name);
 					cpcore.db.csSet(CS, "ACTIVE", true);
@@ -1887,7 +1886,7 @@ namespace Contensive.Core.Controllers
 					cpcore.db.csSet(CS, "CountryID", CountryID);
 					cpcore.db.csSet(CS, "Abbreviation", Abbreviation);
 				}
-				cpcore.db.csClose(CS);
+				cpcore.db.csClose(ref CS);
 			}
 			catch (Exception ex)
 			{
@@ -1986,7 +1985,7 @@ namespace Contensive.Core.Controllers
 				CS = cpCore.db.csOpen("Countries", "name=" + cpCore.db.encodeSQLText(Name));
 				if (!cpCore.db.csOk(CS))
 				{
-					cpCore.db.csClose(CS);
+					cpCore.db.csClose(ref CS);
 					CS = cpCore.db.csInsertRecord("Countries", SystemMemberID);
 					if (cpCore.db.csOk(CS))
 					{
@@ -2002,7 +2001,7 @@ namespace Contensive.Core.Controllers
 						cpCore.db.csSet(CS, "DomesticShipping", "1");
 					}
 				}
-				cpCore.db.csClose(CS);
+				cpCore.db.csClose(ref CS);
 			}
 			catch (Exception ex)
 			{
@@ -2110,7 +2109,7 @@ namespace Contensive.Core.Controllers
 		//        Call cpCore.app.publicFiles.DeleteFileFolder(FilePath)
 		//        Call cpCore.app.publicFiles.createPath(FilePath)
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex)
+		//        cpCore.handleException(ex);
 		//    End Try
 		//End Sub
 		//'
@@ -2145,7 +2144,7 @@ namespace Contensive.Core.Controllers
 		//    Call cpcore.app.csv_CloseCS(CS)
 		//    '
 		//    Exit Sub
-		//ErrorTrap:
+		////ErrorTrap:
 		//    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "SetNavigatorEntry", True, False)
 		//End Sub
 		//'
@@ -2183,7 +2182,7 @@ namespace Contensive.Core.Controllers
 		//    End If
 		//    '
 		//    Exit Sub
-		//ErrorTrap:
+		////ErrorTrap:
 		//    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "SetNavigatorEntry", True, False)
 		//End Sub
 		//'
@@ -2213,7 +2212,7 @@ namespace Contensive.Core.Controllers
 		//            Call runAtServer.executeCmd("IISReset", "")
 		//        End If
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex)
+		//        cpCore.handleException(ex);
 		//    End Try
 		//    Return returnOk
 		//End Function
@@ -2243,7 +2242,7 @@ namespace Contensive.Core.Controllers
 		//    '
 		//    ' ----- Error Trap
 		//    '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name, Err.Number, Err.Source, Err.Description, "ReplaceAddonWithCollection", True, True)
 		//    Err.Clear
 		//End Sub
@@ -2396,7 +2395,7 @@ namespace Contensive.Core.Controllers
 		//
 		public static void SetNameValueArrays(coreClass cpCore, string InputName, string InputValue, ref string[] SQLName, ref string[] SQLValue, ref int Index)
 		{
-			// ##### removed to catch err<>0 problem on error resume next
+			// ##### removed to catch err<>0 problem //On Error //Resume Next
 			//
 			SQLName[Index] = InputName;
 			SQLValue[Index] = InputValue;
@@ -2421,7 +2420,7 @@ namespace Contensive.Core.Controllers
 		//            Call csv_VerifyAggregateReplacement2(Name, "", ArgumentList, SortOrder)
 		//        End If
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex)
+		//        cpCore.handleException(ex);
 		//    End Try
 		//End Sub '
 
@@ -2830,7 +2829,7 @@ namespace Contensive.Core.Controllers
 							{
 								RecordID = (cpCore.db.csGetInteger(CS, "ID"));
 							}
-							cpCore.db.csClose(CS);
+							cpCore.db.csClose(ref CS);
 							if (RecordID == 0)
 							{
 								CS = cpCore.db.csInsertRecord(cnNavigatorEntries, SystemMemberID);
@@ -2840,7 +2839,7 @@ namespace Contensive.Core.Controllers
 									cpCore.db.csSet(CS, "name", RecordName);
 									cpCore.db.csSet(CS, "parentID", ParentID);
 								}
-								cpCore.db.csClose(CS);
+								cpCore.db.csClose(ref CS);
 							}
 							ParentID = RecordID;
 						}

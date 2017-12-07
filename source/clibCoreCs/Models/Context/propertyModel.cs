@@ -165,7 +165,7 @@ namespace Contensive.Core.Models.Context
 						db.csSet(CS, "TypeID", propertyTypeId);
 						db.csSet(CS, "KeyID", keyId.ToString());
 					}
-					db.csClose(CS);
+					db.csClose(ref CS);
 				}
 				else if (propertyCache[1, Ptr] != PropertyValue)
 				{
@@ -187,9 +187,9 @@ namespace Contensive.Core.Models.Context
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("Unexpected exception"));
 		}
 		//
@@ -507,9 +507,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("Unexpected exception"));
 		}
 	}

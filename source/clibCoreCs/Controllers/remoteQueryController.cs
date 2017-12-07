@@ -40,7 +40,7 @@ namespace Contensive.Core.Controllers
 				cpCore.db.csSet(CS, "QueryTypeID", QueryTypeSQL);
 				cpCore.db.csSet(CS, "VisitId", cpCore.doc.authContext.visit.id);
 			}
-			cpCore.db.csClose(CS);
+			cpCore.db.csClose(ref CS);
 			//
 			return RemoteKey;
 		}

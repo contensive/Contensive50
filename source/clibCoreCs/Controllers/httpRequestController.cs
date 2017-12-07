@@ -1,17 +1,8 @@
-﻿using System;
-
-//========================================================================
-// This conversion was produced by the Free Edition of
-// Instant C# courtesy of Tangible Software Solutions.
-// Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
-//========================================================================
-
-#define DebugBuild
-
+﻿
+using System;
 using System.IO;
 using System.Net;
 //
-
 namespace Contensive.Core.Controllers
 {
 	//

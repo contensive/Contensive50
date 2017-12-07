@@ -7,7 +7,7 @@
 //========================================================================
 
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 //
 // findReplace as integer to as integer
 // just the document -- replace out 
@@ -360,9 +360,9 @@ namespace Contensive.Core.Controllers
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempLoad;
 		}
@@ -422,9 +422,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempText;
 		}
@@ -450,9 +450,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempTagName;
 		}
@@ -478,9 +478,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempPosition;
 		}
@@ -506,9 +506,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempElementAttributeCount;
 		}
@@ -537,9 +537,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempElementAttributeName;
 		}
@@ -568,9 +568,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempElementAttributeValue;
 		}
@@ -612,9 +612,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempElementAttribute;
 		}
@@ -788,9 +788,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 		}
 		//'
@@ -858,9 +858,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempGetLesserNonZero;
 		}
@@ -883,9 +883,9 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			cpCore.handleException(new Exception("unexpected exception"));
 			return tempPassWhiteSpace;
 		}
@@ -991,7 +991,7 @@ ErrorTrap:
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//            cpCore.handleException(New Exception("unexpected exception"))
 		//        End Function
 		//        '
@@ -1048,7 +1048,7 @@ ErrorTrap:
 		//            End If
 		//            '
 		//            Exit Function
-		//ErrorTrap:
+		////ErrorTrap:
 		//            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
 		//        End Function
 		//
@@ -1082,7 +1082,7 @@ ErrorTrap:
 					else
 					{
 						SrcTag = ReplaceBlob(SplitSrc.Substring(0, Ptr));
-						SrcBody = ReplaceBlob(SplitSrc.Substring(Ptr));
+						SrcBody = ReplaceBlob(SplitSrc.Substring[Ptr]);
 					}
 					if (Ptr == 0)
 					{

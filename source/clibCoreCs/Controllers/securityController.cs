@@ -7,7 +7,7 @@
 //========================================================================
 
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 using System.Text;
 using System.Security.Cryptography;
 

@@ -10,7 +10,7 @@ using Models;
 using Models.Context;
 using Models.Entity;
 using Contensive.Core.Controllers;
-
+using System.Collections.Generic;
 
 namespace Contensive.Core.Models.Complex
 {
@@ -177,7 +177,7 @@ namespace Contensive.Core.Models.Complex
 						// ----- save values in definition
 						//
 						string contentName = null;
-						DataRow row = dt.Rows(0);
+						DataRow row = dt.Rows[0];
 						contentName = Convert.ToString(genericController.encodeText(row.Item(1))).Trim(' ');
 						string contentTablename = genericController.encodeText(row.Item(10));
 						result.Name = contentName;
@@ -321,7 +321,7 @@ namespace Contensive.Core.Models.Complex
 									//
 									// this is a dup field for this content (not accounting for possibleinherited field) - keep the one with the lowest id
 									//
-									if (result.fields(fieldNameLower).id < fieldId)
+									if (result.fields[fieldNameLower].id < fieldId)
 									{
 										//
 										// this new field has a higher id, skip it
@@ -548,7 +548,7 @@ namespace Contensive.Core.Models.Complex
 			{
 				if (cpcore.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower()))
 				{
-					returnId = cpcore.doc.contentNameIdDictionary(contentName.ToLower());
+					returnId = cpcore.doc.contentNameIdDictionary[contentName.ToLower()];
 				}
 			}
 			catch (Exception ex)
@@ -809,7 +809,7 @@ namespace Contensive.Core.Models.Complex
 				rs = cpcore.db.executeQuery(SQL);
 				if (isDataTableOk(rs))
 				{
-					ChildContentID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows(0), "ID"));
+					ChildContentID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
 					//
 					// mark the record touched so upgrade will not delete it
 					//
@@ -833,7 +833,7 @@ namespace Contensive.Core.Models.Complex
 					rs = cpcore.db.executeQuery(SQL, DataSourceName);
 					if (isDataTableOk(rs))
 					{
-						ParentContentID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows(0), "ID"));
+						ParentContentID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
 						//
 						// mark the record touched so upgrade will not delete it
 						//
@@ -917,10 +917,10 @@ namespace Contensive.Core.Models.Complex
 										}
 									}
 								}
-								cpcore.db.csClose(CSNew);
+								cpcore.db.csClose(ref CSNew);
 							}
 						}
-						cpcore.db.csClose(CSContent);
+						cpcore.db.csClose(ref CSContent);
 					}
 				}
 				//
@@ -1071,9 +1071,9 @@ namespace Contensive.Core.Models.Complex
 						dt = cpcore.db.executeQuery(SQL);
 						if (dt.Rows.Count > 0)
 						{
-							returnContentId = genericController.EncodeInteger(dt.Rows(0).Item("ID"));
-							LcContentGuid = genericController.vbLCase(genericController.encodeText(dt.Rows(0).Item("ccguid")));
-							ContentIsBaseContent = genericController.EncodeBoolean(dt.Rows(0).Item("IsBaseContent"));
+							returnContentId = genericController.EncodeInteger(dt.Rows[0].Item("ID"));
+							LcContentGuid = genericController.vbLCase(genericController.encodeText(dt.Rows[0].Item("ccguid")));
+							ContentIsBaseContent = genericController.EncodeBoolean(dt.Rows[0].Item("IsBaseContent"));
 						}
 						dt.Dispose();
 						//
@@ -1090,7 +1090,7 @@ namespace Contensive.Core.Models.Complex
 							dt = cpcore.db.executeQuery(SQL);
 							if (dt.Rows.Count > 0)
 							{
-								ContentIDofContent = genericController.EncodeInteger(dt.Rows(0).Item("ID"));
+								ContentIDofContent = genericController.EncodeInteger(dt.Rows[0].Item("ID"));
 							}
 							dt.Dispose();
 						}
@@ -1103,7 +1103,7 @@ namespace Contensive.Core.Models.Complex
 							dt = cpcore.db.executeQuery(SQL);
 							if (dt.Rows.Count > 0)
 							{
-								parentId = genericController.EncodeInteger(dt.Rows(0).Item(0));
+								parentId = genericController.EncodeInteger(dt.Rows[0].Item(0));
 							}
 							dt.Dispose();
 						}
@@ -1117,7 +1117,7 @@ namespace Contensive.Core.Models.Complex
 							dt = cpcore.db.executeQuery(SQL);
 							if (dt.Rows.Count > 0)
 							{
-								InstalledByCollectionID = genericController.EncodeInteger(dt.Rows(0).Item("ID"));
+								InstalledByCollectionID = genericController.EncodeInteger(dt.Rows[0].Item("ID"));
 							}
 						}
 						//
@@ -1169,7 +1169,7 @@ namespace Contensive.Core.Models.Complex
 							}
 							else
 							{
-								TableID = genericController.EncodeInteger(dt.Rows(0).Item("ID"));
+								TableID = genericController.EncodeInteger(dt.Rows[0].Item("ID"));
 							}
 							//
 							// ----- Get Sort Method ID from SortMethod
@@ -1187,7 +1187,7 @@ namespace Contensive.Core.Models.Complex
 								dt = cpcore.db.openTable("Default", "ccSortMethods", "(name=" + cpcore.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
 								if (dt.Rows.Count > 0)
 								{
-									DefaultSortMethodID = genericController.EncodeInteger(dt.Rows(0).Item("ID"));
+									DefaultSortMethodID = genericController.EncodeInteger(dt.Rows[0].Item("ID"));
 								}
 							}
 							if (DefaultSortMethodID == 0)
@@ -1198,7 +1198,7 @@ namespace Contensive.Core.Models.Complex
 								dt = cpcore.db.openTable("Default", "ccSortMethods", "(OrderByClause=" + cpcore.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
 								if (dt.Rows.Count > 0)
 								{
-									DefaultSortMethodID = genericController.EncodeInteger(dt.Rows(0).Item("ID"));
+									DefaultSortMethodID = genericController.EncodeInteger(dt.Rows[0].Item("ID"));
 								}
 							}
 							//
@@ -1527,8 +1527,8 @@ namespace Contensive.Core.Models.Complex
 				rs = cpcore.db.executeQuery(SQL);
 				if (isDataTableOk(rs))
 				{
-					ContentID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows(0), "ID"));
-					TableID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows(0), "ContentTableID"));
+					ContentID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
+					TableID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
 				}
 				//
 				// test if field definition found or not
@@ -1540,8 +1540,8 @@ namespace Contensive.Core.Models.Complex
 				if (isDataTableOk(rs))
 				{
 					isNewFieldRecord = false;
-					RecordID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows(0), "ID"));
-					RecordIsBaseField = genericController.EncodeBoolean(cpcore.db.getDataRowColumnName(rs.Rows(0), "IsBaseField"));
+					RecordID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
+					RecordIsBaseField = genericController.EncodeBoolean(cpcore.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
 				}
 				//
 				// check if this is a non-base field updating a base field
@@ -1619,8 +1619,8 @@ namespace Contensive.Core.Models.Complex
 						}
 						else
 						{
-							DataSourceID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows(0), "DataSourceID"));
-							TableName = genericController.encodeText(cpcore.db.getDataRowColumnName(rs.Rows(0), "Name"));
+							DataSourceID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
+							TableName = genericController.encodeText(cpcore.db.getDataRowColumnName(rs.Rows[0], "Name"));
 						}
 						rs.Dispose();
 						if (!string.IsNullOrEmpty(TableName))
@@ -1646,7 +1646,7 @@ namespace Contensive.Core.Models.Complex
 								}
 								else
 								{
-									DataSourceName = genericController.encodeText(cpcore.db.getDataRowColumnName(rs.Rows(0), "Name"));
+									DataSourceName = genericController.encodeText(cpcore.db.getDataRowColumnName(rs.Rows[0], "Name"));
 								}
 								rs.Dispose();
 							}
@@ -1659,7 +1659,7 @@ namespace Contensive.Core.Models.Complex
 								rs = cpcore.db.executeQuery("Select id from ccAddonCollections where ccguid=" + cpcore.db.encodeSQLText(installedByCollectionGuid) + ";");
 								if (isDataTableOk(rs))
 								{
-									InstalledByCollectionID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows(0), "Id"));
+									InstalledByCollectionID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "Id"));
 								}
 								rs.Dispose();
 							}
@@ -1866,7 +1866,7 @@ namespace Contensive.Core.Models.Complex
 				{
 					tempgetContentIDByTablename = cpcore.db.csGetInteger(CS, "ContentControlID");
 				}
-				cpcore.db.csClose(CS);
+				cpcore.db.csClose(ref CS);
 			}
 			return tempgetContentIDByTablename;
 		}
@@ -1907,7 +1907,7 @@ namespace Contensive.Core.Models.Complex
 					RecordContentID = cpcore.db.csGetInteger(CS, "ContentControlID");
 					RecordContentName = getContentNameByID(cpcore, RecordContentID);
 				}
-				cpcore.db.csClose(CS);
+				cpcore.db.csClose(ref CS);
 				if (!string.IsNullOrEmpty(RecordContentName))
 				{
 					//
@@ -1929,7 +1929,7 @@ namespace Contensive.Core.Models.Complex
 							setContentControlId(cpcore, cpcore.db.csGetInteger(CS, "contentcontrolid"), cpcore.db.csGetInteger(CS, "ID"), NewContentControlID, UsedIDString + "," + RecordID);
 							cpcore.db.csGoNext(CS);
 						}
-						cpcore.db.csClose(CS);
+						cpcore.db.csClose(ref CS);
 					}
 					//
 					// fix content watch

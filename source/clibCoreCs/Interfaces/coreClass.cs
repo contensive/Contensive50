@@ -6,6 +6,7 @@ using Contensive.Core.Controllers;
 using Contensive.Core.Models.Context;
 using Contensive.Core.Models.Entity;
 using System.Collections.Generic;
+using static Contensive.Core.constants;
 //
 namespace Contensive.Core
 {
@@ -37,7 +38,7 @@ namespace Contensive.Core
 					{
 						_assemblySkipList = new List<string>();
 					}
-					_assemblySkipList_CountWhenLoaded = _assemblySkipList.Count();
+					_assemblySkipList_CountWhenLoaded = _assemblySkipList.Count;
 				}
 				return _assemblySkipList;
 			}
@@ -638,7 +639,7 @@ namespace Contensive.Core
 						{
 							//
 							// -- no override or argument, use the url as the route
-							normalizedRoute = genericController.normalizeRoute(webServer.requestPathPage.ToLower);
+							normalizedRoute = genericController.normalizeRoute(webServer.requestPathPage.ToLower());
 						}
 					}
 					//
@@ -685,22 +686,22 @@ namespace Contensive.Core
 								//
 								// moved to Addons.AdminSite
 								doc.continueProcessing = false;
-								return (new Addons.AdminSite.openAjaxIndexFilterClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.AdminSite.openAjaxIndexFilterClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case AjaxOpenIndexFilterGetContent:
 								//
 								// moved to Addons.AdminSite
 								doc.continueProcessing = false;
-								return (new Addons.AdminSite.openAjaxIndexFilterGetContentClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.AdminSite.openAjaxIndexFilterGetContentClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case AjaxCloseIndexFilter:
 								//
 								// moved to Addons.AdminSite
 								doc.continueProcessing = false;
-								return (new Addons.AdminSite.closeAjaxIndexFilterClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.AdminSite.closeAjaxIndexFilterClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case AjaxOpenAdminNav:
 								//
 								// moved to Addons.AdminSite
 								doc.continueProcessing = false;
-								return (new Addons.AdminSite.openAjaxAdminNavClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.AdminSite.openAjaxAdminNavClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							default:
 								//
 								// -- unknown method, log warning
@@ -715,21 +716,21 @@ namespace Contensive.Core
 						//
 						// -- Process Email Open
 						doc.continueProcessing = false;
-						return (new Addons.Core.openEmailClass()).execute(cp_forAddonExecutionOnly).ToString();
+						return (new Addons.Core.openEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
 					}
 					if (docProperties.getInteger(rnEmailClickFlag) > 0)
 					{
 						//
 						// -- Process Email click
 						doc.continueProcessing = false;
-						return (new Addons.Core.clickEmailClass()).execute(cp_forAddonExecutionOnly).ToString();
+						return (new Addons.Core.clickEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
 					}
 					if (docProperties.getInteger(rnEmailBlockRecipientEmail) > 0)
 					{
 						//
 						// -- Process Email block
 						doc.continueProcessing = false;
-						return (new Addons.Core.blockEmailClass()).execute(cp_forAddonExecutionOnly).ToString();
+						return (new Addons.Core.blockEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
 					}
 					//
 					// -- legacy form process methods 
@@ -742,44 +743,44 @@ namespace Contensive.Core
 						{
 							case FormTypeAddonStyleEditor:
 								//
-								result = (new Addons.Core.processAddonStyleEditorClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processAddonStyleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 							case FormTypeAddonSettingsEditor:
 								//
-								result = (new Addons.Core.processAddonSettingsEditorClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processAddonSettingsEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 							case FormTypeSendPassword:
 								//
-								result = (new Addons.Core.processSendPasswordFormClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processSendPasswordFormClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 							case FormTypeLogin:
 							case "l09H58a195":
 								//
-								result = (new Addons.Core.processFormLoginDefaultClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processFormLoginDefaultClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 							case FormTypeToolsPanel:
 								//
-								result = (new Addons.Core.processFormToolsPanelClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processFormToolsPanelClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 							case FormTypePageAuthoring:
 								//
-								result = (new Addons.Core.processFormQuickEditingClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processFormQuickEditingClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 							case FormTypeActiveEditor:
 								//
-								result = (new Addons.Core.processActiveEditorClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processActiveEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 							case FormTypeSiteStyleEditor:
 								//
-								result = (new Addons.Core.processSiteStyleEditorClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processSiteStyleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 							case FormTypeHelpBubbleEditor:
 								//
-								result = (new Addons.Core.processHelpBubbleEditorClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processHelpBubbleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 							case FormTypeJoin:
 								//
-								result = (new Addons.Core.processJoinFormClass()).execute(cp_forAddonExecutionOnly).ToString();
+								result = (new Addons.Core.processJoinFormClass()).Execute(cp_forAddonExecutionOnly).ToString();
 								break;
 						}
 					}
@@ -792,37 +793,37 @@ namespace Contensive.Core
 						{
 							case HardCodedPageSendPassword:
 								//
-								return (new Addons.Core.processSendPasswordMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processSendPasswordMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPageResourceLibrary:
 								//
-								return (new Addons.Core.processResourceLibraryMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processResourceLibraryMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPageLoginDefault:
 								//
-								return (new Addons.Core.processLoginDefaultMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processLoginDefaultMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPageLogin:
 								//
-								return (new Addons.Core.processLoginMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processLoginMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPageLogoutLogin:
 								//
-								return (new Addons.Core.processLogoutLoginMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processLogoutLoginMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPageLogout:
 								//
-								return (new Addons.Core.processLogoutMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processLogoutMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPageSiteExplorer:
 								//
-								return (new Addons.Core.processSiteExplorerMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processSiteExplorerMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPageStatus:
 								//
-								return (new Addons.Core.processStatusMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processStatusMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPageRedirect:
 								//
-								return (new Addons.Core.processRedirectMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processRedirectMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPageExportAscii:
 								//
-								return (new Addons.Core.processExportAsciiMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processExportAsciiMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 							case HardCodedPagePayPalConfirm:
 								//
-								return (new Addons.Core.processPayPalConformMethodClass()).execute(cp_forAddonExecutionOnly).ToString();
+								return (new Addons.Core.processPayPalConformMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
 						}
 					}
 					//
@@ -849,7 +850,7 @@ namespace Contensive.Core
 					// -- execute route
 					if (routeFound)
 					{
-						CPSiteBaseClass.routeClass route = routeDictionary(routeTest);
+						CPSiteBaseClass.routeClass route = routeDictionary[routeTest];
 						switch (route.routeType)
 						{
 							case CPSiteBaseClass.routeTypeEnum.admin:
@@ -1085,8 +1086,8 @@ namespace Contensive.Core
 										Ptr = gv.errors.GetUpperBound(0) + 1;
 									}
 //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-									ReDim gv.errors(Ptr);
-									gv.errors(Ptr) = "permission error";
+									ReDim gv.errors[Ptr];
+									gv.errors[Ptr] = "permission error";
 								}
 								else
 								{
@@ -1105,12 +1106,12 @@ namespace Contensive.Core
 								//    Else
 								//        Ptr = UBound(gv.errors) + 1
 								//    End If
-								//    ReDim gv.errors(Ptr)
-								//    gv.errors(Ptr) = "query not found"
+								//    ReDim gv.errors[Ptr]
+								//    gv.errors[Ptr] = "query not found"
 								break;
 						}
 					}
-					db.csClose(CS);
+					db.csClose(ref CS);
 					//
 					if (gv.status == GoogleVisualizationStatusEnum.OK)
 					{
@@ -1169,7 +1170,7 @@ namespace Contensive.Core
 										}
 									}
 								}
-								db.csClose(CS);
+								db.csClose(ref CS);
 								//Case QueryTypeInsertContent
 								//    '
 								//    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table

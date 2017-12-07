@@ -274,6 +274,10 @@
       <HintPath>..\packages\Amazon.ElastiCacheCluster.1.0.0.4\lib\net35\Amazon.ElastiCacheCluster.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClearScript, Version=5.5.0.0, Culture=neutral, PublicKeyToken=935d0c957da47c73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\h\ClearScript-master\bin\Debug\ClearScript.dll</HintPath>
+    </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
       <HintPath>..\packages\EnyimMemcached.2.16.0\lib\net35\Enyim.Caching.dll</HintPath>
       <Private>True</Private>
@@ -285,8 +289,8 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.Administration.7.0.0.0\lib\net20\Microsoft.Web.Administration.dll</HintPath>
+    <Reference Include="Microsoft.Web.Administration, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Administration.10.0.0\lib\netstandard1.3\Microsoft.Web.Administration.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -628,9 +632,9 @@
     <None Include="signingKey.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\cpBaseCs\cpBaseCs.csproj">
+    <ProjectReference Include="..\cpBaseCs\CPBaseCs.csproj">
       <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
-      <Name>cpBaseCs</Name>
+      <Name>CPBaseCs</Name>
     </ProjectReference>
     <ProjectReference Include="..\webClientExt\webClientExt.csproj">
       <Project>{41DC21C3-5FA4-43DD-9EEB-DA8964E5CD66}</Project>
@@ -651,7 +655,25 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="ClearScriptV8-32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ClearScriptV8-64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Models\dataModelFields.txt" />
+    <Content Include="v8-base-ia32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="v8-base-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="v8-ia32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="v8-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">

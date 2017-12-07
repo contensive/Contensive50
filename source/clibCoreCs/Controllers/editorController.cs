@@ -36,7 +36,7 @@ namespace Contensive.Core.Controllers
 			string ContentCopy = null;
 			//
 			Button = cpCore.docProperties.getText("Button");
-			switch (Convert.ToInt32(Button))
+			switch (Button)
 			{
 				case ButtonCancel:
 					//
@@ -66,7 +66,7 @@ namespace Contensive.Core.Controllers
 						{
 							cpCore.db.csSet(CS, FieldName, ContentCopy);
 						}
-						cpCore.db.csClose(CS);
+						cpCore.db.csClose(ref CS);
 					}
 					break;
 			}
@@ -126,7 +126,7 @@ namespace Contensive.Core.Controllers
 						ButtonPanel = cpcore.html.main_GetPanelButtons(ButtonCancel + "," + ButtonSave, "button");
 						EditorPanel = EditorPanel + ButtonPanel;
 					}
-					cpcore.db.csClose(CSPointer);
+					cpcore.db.csClose(ref CSPointer);
 				}
 			}
 			Stream = Stream + cpcore.html.main_GetPanelHeader("Contensive Active Content Editor");

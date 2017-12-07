@@ -7,7 +7,7 @@
 //========================================================================
 
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 
 namespace Contensive.Core.Controllers
 {
@@ -253,7 +253,7 @@ namespace Contensive.Core.Controllers
 								{
 									_childListAddonID = cpCore.db.csGetInteger(CS, "ID");
 								}
-								cpCore.db.csClose(CS);
+								cpCore.db.csClose(ref CS);
 								if (_childListAddonID == 0)
 								{
 									CS = cpCore.db.csInsertRecord(cnAddons);
@@ -267,7 +267,7 @@ namespace Contensive.Core.Controllers
 										cpCore.db.csSet(CS, "StylesFilename", "");
 										cpCore.db.csSet(CS, "ccguid", addonGuidChildList);
 									}
-									cpCore.db.csClose(CS);
+									cpCore.db.csClose(ref CS);
 								}
 								setProperty("ChildListAddonID", Convert.ToString(_childListAddonID));
 							}
@@ -480,7 +480,7 @@ namespace Contensive.Core.Controllers
 				{
 					if (dt.Rows.Count > 0)
 					{
-						returnString = genericController.encodeText(dt.Rows(0).Item("FieldValue"));
+						returnString = genericController.encodeText(dt.Rows[0].Item("FieldValue"));
 						return_propertyFound = true;
 					}
 					else if (!string.IsNullOrEmpty(DefaultValue))
@@ -548,7 +548,7 @@ namespace Contensive.Core.Controllers
 							{
 								//
 								// -- property in memory cache
-								returnString = nameValueDict(cacheName);
+								returnString = nameValueDict[cacheName];
 							}
 							else
 							{
@@ -695,7 +695,7 @@ namespace Contensive.Core.Controllers
 				//    End If
 				//    returnString = _dataBuildVersion
 				//Catch ex As Exception
-				//    cpCore.handleException(ex) : Throw
+				//    cpCore.handleException(ex); : Throw
 				//End Try
 				//Return returnString
 			}

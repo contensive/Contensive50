@@ -672,9 +672,9 @@
       <Project>{9814c7bd-200c-4c57-859d-5d81899a3421}</Project>
       <Name>clibCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\cpBaseCs\cpBaseCs.csproj">
+    <ProjectReference Include="..\cpBaseCs\CPBaseCs.csproj">
       <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
-      <Name>cpBaseCs</Name>
+      <Name>CPBaseCs</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
@@ -773,7 +773,11 @@
   <PropertyGroup>
     <PostBuildEvent>$(SolutionDir)scripts\aspnetDefaultAppPostBuild.bat
 
-</PostBuildEvent>
+
+if not exist "$(TargetDir)" md "$(TargetDir)"
+xcopy /s /y "$(SolutionDir)packages\ClearScript.V8.5.5.0\tools\native\x86\*.*" "$(TargetDir)"
+if not exist "$(TargetDir)" md "$(TargetDir)"
+xcopy /s /y "$(SolutionDir)packages\ClearScript.V8.5.5.0\tools\native\amd64\*.*" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

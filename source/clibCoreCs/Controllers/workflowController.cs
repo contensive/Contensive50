@@ -7,7 +7,7 @@
 //========================================================================
 
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 using Contensive.Core.Models.Entity;
 
 namespace Contensive.Core.Controllers
@@ -147,7 +147,7 @@ namespace Contensive.Core.Controllers
 							{
 								main_EditLockMemberName_Local = cpCore.db.csGetText(CS, "name");
 							}
-							cpCore.db.csClose(CS);
+							cpCore.db.csClose(ref CS);
 						}
 						if (string.IsNullOrEmpty(main_EditLockMemberName_Local))
 						{
@@ -329,8 +329,8 @@ namespace Contensive.Core.Controllers
 		//                    Throw (New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
 		//                Else
 		//                    If True Then
-		//                        LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
-		//                        LiveRecordBlank = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "EditBlank"))
+		//                        LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
+		//                        LiveRecordBlank = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSLive.Rows[0], "EditBlank"))
 		//                        '
 		//                        ' ----- Open the edit record
 		//                        '
@@ -341,11 +341,11 @@ namespace Contensive.Core.Controllers
 		//                            Throw (New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
 		//                        Else
 		//                            If True Then
-		//                                EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
-		//                                EditRecordCID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ContentControlID"))
-		//                                EditRecordBlank = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "EditBlank"))
+		//                                EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
+		//                                EditRecordCID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "ContentControlID"))
+		//                                EditRecordBlank = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "EditBlank"))
 		//                                PublishingDelete = EditRecordBlank
-		//                                PublishingInactive = Not genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "active"))
+		//                                PublishingInactive = Not genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "active"))
 		//                                '
 		//                                ' ----- Create new Edit record
 		//                                '
@@ -389,8 +389,8 @@ namespace Contensive.Core.Controllers
 		//                                                            '
 		//                                                            ' ----- Content related field
 		//                                                            '
-		//                                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-		//                                                            EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+		//                                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+		//                                                            EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
 		//                                                            BlankSQLValue = cpCore.db.EncodeSQL(Nothing, fieldTypeId)
 		//                                                            FieldNameArray(FieldPointer) = FieldName
 		//                                                            '
@@ -402,7 +402,7 @@ namespace Contensive.Core.Controllers
 		//                                                                        '
 		//                                                                        ' ----- cdn files - create copy of File for neweditrecord
 		//                                                                        '
-		//                                                                        EditFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName))
+		//                                                                        EditFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName))
 		//                                                                        If EditFilename = "" Then
 		//                                                                            NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
 		//                                                                        Else
@@ -415,7 +415,7 @@ namespace Contensive.Core.Controllers
 		//                                                                        '
 		//                                                                        ' ----- private files - create copy of File for neweditrecord
 		//                                                                        '
-		//                                                                        EditFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName))
+		//                                                                        EditFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName))
 		//                                                                        If EditFilename = "" Then
 		//                                                                            NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
 		//                                                                        Else
@@ -459,8 +459,8 @@ namespace Contensive.Core.Controllers
 		//                                    FieldName = "MODIFIEDDATE"
 		//                                    fieldTypeId = FieldTypeIdDate
 		//                                    FieldNameArray(FieldPointer) = FieldName
-		//                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-		//                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+		//                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+		//                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
 		//                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
 		//                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
 		//                                    PublishFieldNameArray(FieldPointer) = FieldName
@@ -470,8 +470,8 @@ namespace Contensive.Core.Controllers
 		//                                    FieldName = "MODIFIEDBY"
 		//                                    fieldTypeId = FieldTypeIdLookup
 		//                                    FieldNameArray(FieldPointer) = FieldName
-		//                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-		//                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+		//                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+		//                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
 		//                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
 		//                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
 		//                                    PublishFieldNameArray(FieldPointer) = FieldName
@@ -481,8 +481,8 @@ namespace Contensive.Core.Controllers
 		//                                    FieldName = "CONTENTCONTROLID"
 		//                                    fieldTypeId = FieldTypeIdLookup
 		//                                    FieldNameArray(FieldPointer) = FieldName
-		//                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-		//                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+		//                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+		//                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
 		//                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
 		//                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
 		//                                    PublishFieldNameArray(FieldPointer) = FieldName
@@ -496,8 +496,8 @@ namespace Contensive.Core.Controllers
 		//                                    FieldName = "EDITBLANK"
 		//                                    fieldTypeId = FieldTypeIdBoolean
 		//                                    FieldNameArray(FieldPointer) = FieldName
-		//                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-		//                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+		//                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
+		//                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
 		//                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
 		//                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
 		//                                    PublishFieldNameArray(FieldPointer) = FieldName
@@ -567,7 +567,7 @@ namespace Contensive.Core.Controllers
 		//            End If
 		//        End If
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex) : Throw
+		//        cpCore.handleException(ex); : Throw
 		//    End Try
 		//End Sub
 		//'
@@ -626,7 +626,7 @@ namespace Contensive.Core.Controllers
 		//                        '
 		//                        Throw (New ApplicationException("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
 		//                    Else
-		//                        LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
+		//                        LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
 		//                        '
 		//                        ' Open the edit record
 		//                        '
@@ -639,7 +639,7 @@ namespace Contensive.Core.Controllers
 		//                                '
 		//                                Throw (New ApplicationException("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
 		//                            Else
-		//                                EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
+		//                                EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
 		//                                '
 		//                                ' create update arrays
 		//                                '
@@ -650,7 +650,7 @@ namespace Contensive.Core.Controllers
 		//                                        FieldName = .nameLc
 		//                                        If cpCore.db.isSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
 		//                                            fieldTypeId = .fieldTypeId
-		//                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
+		//                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
 		//                                            Select Case genericController.vbUCase(FieldName)
 		//                                                Case "ID"
 		//                                                    '
@@ -664,7 +664,7 @@ namespace Contensive.Core.Controllers
 		//                                                        '
 		//                                                        '   cdnfiles - create copy of Live TextFile for Edit record
 		//                                                        '
-		//                                                        LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
+		//                                                        LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName))
 		//                                                        If LiveFilename <> "" Then
 		//                                                            EditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, fieldTypeId)
 		//                                                            Call cpCore.cdnFiles.copyFile(LiveFilename, EditFilename)
@@ -675,7 +675,7 @@ namespace Contensive.Core.Controllers
 		//                                                        '
 		//                                                        '   pivatefiles - create copy of Live TextFile for Edit record
 		//                                                        '
-		//                                                        LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
+		//                                                        LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows[0], FieldName))
 		//                                                        If LiveFilename <> "" Then
 		//                                                            EditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, fieldTypeId)
 		//                                                            Call cpCore.cdnFiles.copyFile(LiveFilename, EditFilename)
@@ -710,7 +710,7 @@ namespace Contensive.Core.Controllers
 		//            End If
 		//        End If
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex) : Throw
+		//        cpCore.handleException(ex); : Throw
 		//    End Try
 		//End Sub
 		//'
@@ -730,7 +730,7 @@ namespace Contensive.Core.Controllers
 		//            End If
 		//        End If
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex) : Throw
+		//        cpCore.handleException(ex); : Throw
 		//    End Try
 		//End Sub
 		//'
@@ -750,7 +750,7 @@ namespace Contensive.Core.Controllers
 		//            End If
 		//        End If
 		//    Catch ex As Exception
-		//        cpCore.handleException(ex) : Throw
+		//        cpCore.handleException(ex); : Throw
 		//    End Try
 		//End Sub
 		//
@@ -769,7 +769,7 @@ namespace Contensive.Core.Controllers
 				Criteria = getAuthoringControlCriteria(ContentName, RecordID) + "and(CreatedBy<>" + cpCore.db.encodeSQLNumber(MemberID) + ")";
 				CS = cpCore.db.csOpen("Authoring Controls", Criteria,,, MemberID);
 				result = cpCore.db.csOk(CS);
-				cpCore.db.csClose(CS);
+				cpCore.db.csClose(ref CS);
 			}
 			catch (Exception ex)
 			{
@@ -805,7 +805,7 @@ namespace Contensive.Core.Controllers
 					ContentCnt = ContentCnt + 1;
 					cpCore.db.csGoNext(CS);
 				}
-				cpCore.db.csClose(CS);
+				cpCore.db.csClose(ref CS);
 				if (ContentCnt < 1)
 				{
 					//
@@ -925,7 +925,7 @@ namespace Contensive.Core.Controllers
 										cpCore.db.csSet(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID + "." + RecordID));
 										cpCore.db.csSet(CSNewLock, "ContentID", ContentID);
 									}
-									cpCore.db.csClose(CSNewLock);
+									cpCore.db.csClose(ref CSNewLock);
 								}
 								else
 								{
@@ -937,7 +937,7 @@ namespace Contensive.Core.Controllers
 										cpCore.db.csSet(CSCurrentLock, "DateExpires", (DateTime.Now.AddDays(EditLockTimeoutDays)));
 									}
 								}
-								cpCore.db.csClose(CSCurrentLock);
+								cpCore.db.csClose(ref CSCurrentLock);
 							}
 							//Case AuthoringControlsSubmitted, AuthoringControlsApproved, AuthoringControlsModified
 							//    If False And cpCore.siteProperties.allowWorkflowAuthoring Then
@@ -1050,8 +1050,8 @@ namespace Contensive.Core.Controllers
 						//    & " ORDER BY AuthoringTableName.ID DESC;"
 						//    rs = cpCore.db.executeSql(SQL, DataSourceName)
 						//    If isDataTableOk(rs) Then
-						//        IsInserted = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsInserted"))
-						//        IsDeleted = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsDeleted"))
+						//        IsInserted = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows[0], "IsInserted"))
+						//        IsDeleted = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows[0], "IsDeleted"))
 						//        'IsModified = (getDataRowColumnName(RS.rows(0), "LiveRecordModifiedDate") <> getDataRowColumnName(RS.rows(0), "EditRecordModifiedDate"))
 						//    End If
 						//    Call closeDataTable(rs)

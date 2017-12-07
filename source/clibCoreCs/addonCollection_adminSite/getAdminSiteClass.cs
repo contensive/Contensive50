@@ -6,12 +6,11 @@ using Contensive.Core.Models.Complex;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using System.Collections.Generic;
 
 //
-namespace Contensive.Addons.AdminSite
-{
-	public class getAdminSiteClass : Contensive.BaseClasses.AddonBaseClass
-	{
+namespace Contensive.Addons.AdminSite {
+    public class getAdminSiteClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         // objects passed in - do not dispose
@@ -586,7 +585,7 @@ namespace Contensive.Addons.AdminSite
         //'========================================================================
         //'
         //Private Function GetForm_Edit_RSSFeeds(ContentName As String, ContentID as integer, RecordID as integer, PageLink As String) As String
-        //    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_Edit_RSSFeeds")
+        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_Edit_RSSFeeds")
         //    '
         //    Dim DateExpiresText As String
         //    Dim DatePublishText As String
@@ -790,7 +789,7 @@ namespace Contensive.Addons.AdminSite
         //    End If
         //    '''Dim th as integer: Exit Function
         //    '
-        //ErrorTrap:
+        ////ErrorTrap:
         //    s = Nothing
         //    Call HandleClassTrapErrorBubble("GetForm_Edit_RSSFeeds")
         //End Function
@@ -800,7 +799,7 @@ namespace Contensive.Addons.AdminSite
         //'========================================================================
         //'
         //Private Sub LoadAndSaveRSSFeeds(ContentName As String, ContentID as integer, RecordID as integer, ItemLink As String)
-        //    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.LoadAndSaveRSSFeeds")
+        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.LoadAndSaveRSSFeeds")
         //    '
         //    Dim AttachID as integer
         //    Dim AttachLink As String
@@ -960,7 +959,7 @@ namespace Contensive.Addons.AdminSite
         //    '
         //    ' ----- Error Trap
         //    '
-        //ErrorTrap:
+        ////ErrorTrap:
         //    Call HandleClassTrapErrorBubble("LoadAndSaveRSSFeeds")
         //    '
         //End Sub
@@ -970,1576 +969,1403 @@ namespace Contensive.Addons.AdminSite
         //
         //========================================================================
         //
-        private string GetForm_ClearCache()
-		{
-			string returnHtml = "";
-			try
-			{
-				stringBuilderLegacyController Content = new stringBuilderLegacyController();
-				string Button = null;
-				adminUIController Adminui = new adminUIController(cpCore);
-				string Description = null;
-				string ButtonList = null;
-				//
-				Button = cpCore.docProperties.getText(RequestNameButton);
-				if (Button == ButtonCancel)
-				{
-					//
-					// Cancel just exits with no content
-					//
-					return "";
-				}
-				else if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore))
-				{
-					//
-					// Not Admin Error
-					//
-					ButtonList = ButtonCancel;
-					Content.Add(Adminui.GetFormBodyAdminOnly());
-				}
-				else
-				{
-					Content.Add(Adminui.EditTableOpen);
-					//
-					// Set defaults
-					//
-					//
-					// Process Requests
-					//
-					switch (Convert.ToInt32(Button))
-					{
-						case ButtonApply:
-						case ButtonOK:
-							//
-							// Clear the cache
-							//
-							cpCore.cache.invalidateAll();
-							break;
-					}
-					if (Button == ButtonOK)
-					{
-						//
-						// Exit on OK or cancel
-						//
-						return "";
-					}
-					//
-					// Buttons
-					//
-					ButtonList = ButtonCancel + "," + ButtonApply + "," + ButtonOK;
-					//
-					// Close Tables
-					//
-					Content.Add(Adminui.EditTableClose);
-					Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormClearCache));
-				}
-				//
-				Description = "Hit Apply or OK to clear all current content caches";
-				returnHtml = Adminui.GetBody("Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
-				Content = null;
-			}
-			catch (Exception ex)
-			{
-				cpCore.handleException(ex);
-				throw;
-			}
-			return returnHtml;
-		}
-		//
-		//========================================================================
-		// Tool to enter multiple Meta Keywords
-		//========================================================================
-		//
-		private string GetForm_MetaKeywordTool()
-		{
-				string tempGetForm_MetaKeywordTool = null;
-			try
-			{
-				//
-				const int LoginMode_None = 1;
-				const int LoginMode_AutoRecognize = 2;
-				const int LoginMode_AutoLogin = 3;
-				//
-				int LoginMode = 0;
-				string Help = null;
-				stringBuilderLegacyController Content = new stringBuilderLegacyController();
-				string Copy = null;
-				string Button = null;
-				string PageNotFoundPageID = null;
-				adminUIController Adminui = new adminUIController(cpCore);
-				string Description = null;
-				string ButtonList = null;
-				bool AllowLinkAlias = false;
-				//Dim AllowExternalLinksInChildList As Boolean
-				bool LinkForwardAutoInsert = false;
-				string SectionLandingLink = null;
-				string ServerPageDefault = null;
-				string LandingPageID = null;
-				string DocTypeDeclaration = null;
-				bool AllowAutoRecognize = false;
-				string KeywordList = null;
-				//
-				Button = cpCore.docProperties.getText(RequestNameButton);
-				if (Button == ButtonCancel)
-				{
-					//
-					// Cancel just exits with no content
-					//
-					return tempGetForm_MetaKeywordTool;
-				}
-				else if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore))
-				{
-					//
-					// Not Admin Error
-					//
-					ButtonList = ButtonCancel;
-					Content.Add(Adminui.GetFormBodyAdminOnly());
-				}
-				else
-				{
-					Content.Add(Adminui.EditTableOpen);
-					//
-					// Process Requests
-					//
-					switch (Convert.ToInt32(Button))
-					{
-						case ButtonSave:
-						case ButtonOK:
-							//
-							string[] Keywords = null;
-							string Keyword = null;
-							int Cnt = 0;
-							int Ptr = 0;
-							DataTable dt = null;
-							int CS = 0;
-							KeywordList = cpCore.docProperties.getText("KeywordList");
-							if (!string.IsNullOrEmpty(KeywordList))
-							{
-								KeywordList = genericController.vbReplace(KeywordList, Environment.NewLine, ",");
-								Keywords = KeywordList.Split(',');
-								Cnt = Keywords.GetUpperBound(0) + 1;
-								for (Ptr = 0; Ptr < Cnt; Ptr++)
-								{
-									Keyword = Keywords[Ptr].Trim(' ');
-									if (!string.IsNullOrEmpty(Keyword))
-									{
-										//Dim dt As DataTable
+        private string GetForm_ClearCache() {
+            string returnHtml = "";
+            try {
+                stringBuilderLegacyController Content = new stringBuilderLegacyController();
+                string Button = null;
+                adminUIController Adminui = new adminUIController(cpCore);
+                string Description = null;
+                string ButtonList = null;
+                //
+                Button = cpCore.docProperties.getText(RequestNameButton);
+                if (Button == ButtonCancel) {
+                    //
+                    // Cancel just exits with no content
+                    //
+                    return "";
+                } else if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                    //
+                    // Not Admin Error
+                    //
+                    ButtonList = ButtonCancel;
+                    Content.Add(Adminui.GetFormBodyAdminOnly());
+                } else {
+                    Content.Add(Adminui.EditTableOpen);
+                    //
+                    // Set defaults
+                    //
+                    //
+                    // Process Requests
+                    //
+                    switch (Button) {
+                        case ButtonApply:
+                        case ButtonOK:
+                            //
+                            // Clear the cache
+                            //
+                            cpCore.cache.invalidateAll();
+                            break;
+                    }
+                    if (Button == ButtonOK) {
+                        //
+                        // Exit on OK or cancel
+                        //
+                        return "";
+                    }
+                    //
+                    // Buttons
+                    //
+                    ButtonList = ButtonCancel + "," + ButtonApply + "," + ButtonOK;
+                    //
+                    // Close Tables
+                    //
+                    Content.Add(Adminui.EditTableClose);
+                    Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormClearCache));
+                }
+                //
+                Description = "Hit Apply or OK to clear all current content caches";
+                returnHtml = Adminui.GetBody("Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                Content = null;
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+            return returnHtml;
+        }
+        //
+        //========================================================================
+        // Tool to enter multiple Meta Keywords
+        //========================================================================
+        //
+        private string GetForm_MetaKeywordTool() {
+            string tempGetForm_MetaKeywordTool = null;
+            try {
+                //
+                const int LoginMode_None = 1;
+                const int LoginMode_AutoRecognize = 2;
+                const int LoginMode_AutoLogin = 3;
+                //
+                int LoginMode = 0;
+                string Help = null;
+                stringBuilderLegacyController Content = new stringBuilderLegacyController();
+                string Copy = null;
+                string Button = null;
+                string PageNotFoundPageID = null;
+                adminUIController Adminui = new adminUIController(cpCore);
+                string Description = null;
+                string ButtonList = null;
+                bool AllowLinkAlias = false;
+                //Dim AllowExternalLinksInChildList As Boolean
+                bool LinkForwardAutoInsert = false;
+                string SectionLandingLink = null;
+                string ServerPageDefault = null;
+                string LandingPageID = null;
+                string DocTypeDeclaration = null;
+                bool AllowAutoRecognize = false;
+                string KeywordList = null;
+                //
+                Button = cpCore.docProperties.getText(RequestNameButton);
+                if (Button == ButtonCancel) {
+                    //
+                    // Cancel just exits with no content
+                    //
+                    return tempGetForm_MetaKeywordTool;
+                } else if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                    //
+                    // Not Admin Error
+                    //
+                    ButtonList = ButtonCancel;
+                    Content.Add(Adminui.GetFormBodyAdminOnly());
+                } else {
+                    Content.Add(Adminui.EditTableOpen);
+                    //
+                    // Process Requests
+                    //
+                    switch (Button) {
+                        case ButtonSave:
+                        case ButtonOK:
+                            //
+                            string[] Keywords = null;
+                            string Keyword = null;
+                            int Cnt = 0;
+                            int Ptr = 0;
+                            DataTable dt = null;
+                            int CS = 0;
+                            KeywordList = cpCore.docProperties.getText("KeywordList");
+                            if (!string.IsNullOrEmpty(KeywordList)) {
+                                KeywordList = genericController.vbReplace(KeywordList, Environment.NewLine, ",");
+                                Keywords = KeywordList.Split(',');
+                                Cnt = Keywords.GetUpperBound(0) + 1;
+                                for (Ptr = 0; Ptr < Cnt; Ptr++) {
+                                    Keyword = Keywords[Ptr].Trim(' ');
+                                    if (!string.IsNullOrEmpty(Keyword)) {
+                                        //Dim dt As DataTable
 
-										dt = cpCore.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" + cpCore.db.encodeSQLText(Keyword));
-										if (dt.Rows.Count == 0)
-										{
-											CS = cpCore.db.csInsertRecord("Meta Keywords");
-											if (cpCore.db.csOk(CS))
-											{
-												cpCore.db.csSet(CS, "name", Keyword);
-											}
-											cpCore.db.csClose(CS);
-										}
-									}
-								}
-							}
-							break;
-					}
-					if (Button == ButtonOK)
-					{
-						//
-						// Exit on OK or cancel
-						//
-						return tempGetForm_MetaKeywordTool;
-					}
-					//
-					// KeywordList
-					//
-					Copy = cpCore.html.html_GetFormInputTextExpandable("KeywordList",, 10);
-					Copy = Copy + "<div>Paste your Meta Keywords into this text box, separated by either commas or enter keys. When you hit Save or OK, Meta Keyword records will be made out of each word. These can then be checked on any content page.</div>";
-					Content.Add(Adminui.GetEditRow(Copy, "Paste Meta Keywords", "", false, false, ""));
-					//
-					// Buttons
-					//
-					ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK;
-					//
-					// Close Tables
-					//
-					Content.Add(Adminui.EditTableClose);
-					Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormSecurityControl));
-				}
-				//
-				Description = "Use this tool to enter multiple Meta Keywords";
-				tempGetForm_MetaKeywordTool = Adminui.GetBody("Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
-				Content = null;
-				//
-				///Dim th as integer: Exit Function
-				//
-				// ----- Error Trap
-				//
-			}
-			catch
-			{
-				cpCore.handleException( ex )
-			}
-ErrorTrap:
-			Content = null;
-			handleLegacyClassError3("GetForm_MetaKeywordTool");
-			//
-			return tempGetForm_MetaKeywordTool;
-		}
-		//
-		//
-		//
-		private bool AllowAdminFieldCheck()
-		{
-			if (!AllowAdminFieldCheck_LocalLoaded)
-			{
-				AllowAdminFieldCheck_LocalLoaded = true;
-				AllowAdminFieldCheck_Local = (cpCore.siteProperties.getBoolean("AllowAdminFieldCheck", true));
-			}
-			return AllowAdminFieldCheck_Local;
-		}
-		//
-		//
-		//
-		private string GetAddonHelp(int HelpAddonID, string UsedIDString)
-		{
-			string addonHelp = "";
-			try
-			{
-				string IconFilename = null;
-				int IconWidth = 0;
-				int IconHeight = 0;
-				int IconSprites = 0;
-				bool IconIsInline = false;
-				int CS = 0;
-				string AddonName = "";
-				string AddonHelpCopy = "";
-				DateTime AddonDateAdded = default(DateTime);
-				DateTime AddonLastUpdated = default(DateTime);
-				string SQL = null;
-				string IncludeHelp = "";
-				int IncludeID = 0;
-				string IconImg = "";
-				string helpLink = "";
-				bool FoundAddon = false;
-				//
-				if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpAddonID.ToString() + ",") == 0)
-				{
-					CS = cpCore.db.csOpenRecord(cnAddons, HelpAddonID);
-					if (cpCore.db.csOk(CS))
-					{
-						FoundAddon = true;
-						AddonName = cpCore.db.csGet(CS, "Name");
-						AddonHelpCopy = cpCore.db.csGet(CS, "help");
-						AddonDateAdded = cpCore.db.csGetDate(CS, "dateadded");
-						if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, cnAddons, "lastupdated"))
-						{
-							AddonLastUpdated = cpCore.db.csGetDate(CS, "lastupdated");
-						}
-						if (AddonLastUpdated == DateTime.MinValue)
-						{
-							AddonLastUpdated = AddonDateAdded;
-						}
-						IconFilename = cpCore.db.csGet(CS, "Iconfilename");
-						IconWidth = cpCore.db.csGetInteger(CS, "IconWidth");
-						IconHeight = cpCore.db.csGetInteger(CS, "IconHeight");
-						IconSprites = cpCore.db.csGetInteger(CS, "IconSprites");
-						IconIsInline = cpCore.db.csGetBoolean(CS, "IsInline");
-						IconImg = genericController.GetAddonIconImg("/" + cpCore.serverConfig.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, cpCore.serverConfig.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0);
-						helpLink = cpCore.db.csGet(CS, "helpLink");
-					}
-					cpCore.db.csClose(CS);
-					//
-					if (FoundAddon)
-					{
-						//
-						// Included Addons
-						//
-						SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
-						CS = cpCore.db.csOpenSql_rev("default", SQL);
-						while (cpCore.db.csOk(CS))
-						{
-							IncludeID = cpCore.db.csGetInteger(CS, "IncludedAddonID");
-							IncludeHelp = IncludeHelp + GetAddonHelp(IncludeID, HelpAddonID + "," + IncludeID.ToString());
-							cpCore.db.csGoNext(CS);
-						}
-						cpCore.db.csClose(CS);
-						//
-						if (!string.IsNullOrEmpty(helpLink))
-						{
-							if (!string.IsNullOrEmpty(AddonHelpCopy))
-							{
-								AddonHelpCopy = AddonHelpCopy + "<p>For additional help with this add-on, please visit <a href=\"" + helpLink + "\">" + helpLink + "</a>.</p>";
-							}
-							else
-							{
-								AddonHelpCopy = AddonHelpCopy + "<p>For help with this add-on, please visit <a href=\"" + helpLink + "\">" + helpLink + "</a>.</p>";
-							}
-						}
-						if (string.IsNullOrEmpty(AddonHelpCopy))
-						{
-							AddonHelpCopy = AddonHelpCopy + "<p>Please refer to the help resources available for this collection. More information may also be available in the Contensive online Learning Center <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com for more information.</p>";
-						}
-						addonHelp = ""
-							+ "<div class=\"ccHelpCon\">"
-							+ "<div class=\"title\"><div style=\"float:right;\"><a href=\"?addonid=" + HelpAddonID + "\">" + IconImg + "</a></div>" + AddonName + " Add-on</div>"
-							+ "<div class=\"byline\">"
-								+ "<div>Installed " + AddonDateAdded + "</div>"
-								+ "<div>Last Updated " + AddonLastUpdated + "</div>"
-							+ "</div>"
-							+ "<div class=\"body\" style=\"clear:both;\">" + AddonHelpCopy + "</div>"
-							+ "</div>";
-						addonHelp = addonHelp + IncludeHelp;
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				cpCore.handleException(ex);
-				throw;
-			}
-			return addonHelp;
-		}
-		//
-		//
-		//
-		private string GetCollectionHelp(int HelpCollectionID, string UsedIDString)
-		{
-			string returnHelp = "";
-			try
-			{
-				int CS = 0;
-				string Collectionname = "";
-				string CollectionHelpCopy = "";
-				string CollectionHelpLink = "";
-				DateTime CollectionDateAdded = default(DateTime);
-				DateTime CollectionLastUpdated = default(DateTime);
-				string SQL = null;
-				string IncludeHelp = "";
-				int addonId = 0;
-				//
-				if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID.ToString() + ",") == 0)
-				{
-					CS = cpCore.db.csOpenRecord("Add-on Collections", HelpCollectionID);
-					if (cpCore.db.csOk(CS))
-					{
-						Collectionname = cpCore.db.csGet(CS, "Name");
-						CollectionHelpCopy = cpCore.db.csGet(CS, "help");
-						CollectionDateAdded = cpCore.db.csGetDate(CS, "dateadded");
-						if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, "Add-on Collections", "lastupdated"))
-						{
-							CollectionLastUpdated = cpCore.db.csGetDate(CS, "lastupdated");
-						}
-						if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, "Add-on Collections", "helplink"))
-						{
-							CollectionHelpLink = cpCore.db.csGet(CS, "helplink");
-						}
-						if (CollectionLastUpdated == DateTime.MinValue)
-						{
-							CollectionLastUpdated = CollectionDateAdded;
-						}
-					}
-					cpCore.db.csClose(CS);
-					//
-					// Add-ons
-					//
-					if (true) // 4.0.321" Then
-					{
-						//$$$$$ cache this
-						CS = cpCore.db.csOpen(cnAddons, "CollectionID=" + HelpCollectionID, "name",,,,, "ID");
-						while (cpCore.db.csOk(CS))
-						{
-							IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cpCore.db.csGetInteger(CS, "ID"), "") + "</div>";
-							cpCore.db.csGoNext(CS);
-						}
-						cpCore.db.csClose(CS);
-					}
-					else
-					{
-						// addoncollectionrules deprecated for collectionid
-						SQL = "select AddonID from ccAddonCollectionRules where CollectionID=" + HelpCollectionID;
-						CS = cpCore.db.csOpenSql_rev("default", SQL);
-						while (cpCore.db.csOk(CS))
-						{
-							addonId = cpCore.db.csGetInteger(CS, "AddonID");
-							if (addonId != 0)
-							{
-								IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(addonId, "") + "</div>";
-							}
-							cpCore.db.csGoNext(CS);
-						}
-						cpCore.db.csClose(CS);
-					}
-					//
-					if ((string.IsNullOrEmpty(CollectionHelpLink)) && (string.IsNullOrEmpty(CollectionHelpCopy)))
-					{
-						CollectionHelpCopy = "<p>No help information could be found for this collection. Please use the online resources at <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com by email.</p>";
-					}
-					else if (!string.IsNullOrEmpty(CollectionHelpLink))
-					{
-						CollectionHelpCopy = ""
-							+ "<p>For information about this collection please visit <a href=\"" + CollectionHelpLink + "\">" + CollectionHelpLink + "</a>.</p>"
-							+ CollectionHelpCopy;
-					}
-					//
-					returnHelp = ""
-						+ "<div class=\"ccHelpCon\">"
-						+ "<div class=\"title\">" + Collectionname + " Collection</div>"
-						+ "<div class=\"byline\">"
-							+ "<div>Installed " + CollectionDateAdded + "</div>"
-							+ "<div>Last Updated " + CollectionLastUpdated + "</div>"
-						+ "</div>"
-						+ "<div class=\"body\">" + CollectionHelpCopy + "</div>";
-					if (!string.IsNullOrEmpty(IncludeHelp))
-					{
-						returnHelp = returnHelp + IncludeHelp;
-					}
-					returnHelp = returnHelp + "</div>";
-				}
-			}
-			catch (Exception ex)
-			{
-				cpCore.handleException(ex);
-				throw;
-			}
-			return returnHelp;
-		}
-		//
-		//
-		//
-		private void SetIndexSQL(Models.Complex.cdefModel adminContent, editRecordClass editRecord, indexConfigClass IndexConfig, ref bool Return_AllowAccess, ref string return_sqlFieldList, ref string return_sqlFrom, ref string return_SQLWhere, ref string return_SQLOrderBy, ref bool return_IsLimitedToSubContent, ref string return_ContentAccessLimitMessage, ref Dictionary<string, bool> FieldUsedInColumns, Dictionary<string, bool> IsLookupFieldValid)
-		{
-			try
-			{
-				string LookupQuery = null;
-				string ContentName = null;
-				string SortFieldName = null;
-				//
-				int LookupPtr = 0;
-				string[] lookups = null;
-				string FindWordName = null;
-				string FindWordValue = null;
-				int FindMatchOption = 0;
-				int WCount = 0;
-				string SubContactList = "";
-				int ContentID = 0;
-				int Pos = 0;
-				int Cnt = 0;
-				string[] ListSplit = null;
-				int SubContentCnt = 0;
-				string list = null;
-				string SubQuery = null;
-				int GroupID = 0;
-				string GroupName = null;
-				string JoinTablename = null;
-				//Dim FieldName As String
-				int Ptr = 0;
-				bool IncludedInLeftJoin = false;
-				//  Dim SupportWorkflowFields As Boolean
-				int FieldPtr = 0;
-				bool IncludedInColumns = false;
-				string LookupContentName = null;
-				//'Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
-				//
-				Return_AllowAccess = true;
-				//
-				// ----- Workflow Fields
-				//
-				return_sqlFieldList = return_sqlFieldList + adminContent.ContentTableName + ".ID";
-				//
-				// ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
-				//
-				return_sqlFrom = adminContent.ContentTableName;
-				foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in adminContent.fields)
-				{
-					Models.Complex.CDefFieldModel field = keyValuePair.Value;
-					FieldPtr = field.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
-					IncludedInColumns = false;
-					IncludedInLeftJoin = false;
-					if (!IsLookupFieldValid.ContainsKey(field.nameLc))
-					{
-						IsLookupFieldValid.Add(field.nameLc, false);
-					}
-					if (!FieldUsedInColumns.ContainsKey(field.nameLc))
-					{
-						FieldUsedInColumns.Add(field.nameLc, false);
-					}
-					//
-					// test if this field is one of the columns we are displaying
-					//
-					IncludedInColumns = IndexConfig.Columns.ContainsKey(field.nameLc);
-					//
-					// disallow IncludedInColumns if a non-supported field type
-					//
-					switch (field.fieldTypeId)
-					{
-						case FieldTypeIdFileCSS:
-						case FieldTypeIdFile:
-						case FieldTypeIdFileImage:
-						case FieldTypeIdFileJavascript:
-						case FieldTypeIdLongText:
-						case FieldTypeIdManyToMany:
-						case FieldTypeIdRedirect:
-						case FieldTypeIdFileText:
-						case FieldTypeIdFileXML:
-						case FieldTypeIdHTML:
-						case FieldTypeIdFileHTML:
-							IncludedInColumns = false;
-							break;
-					}
-					//FieldName = genericController.vbLCase(.Name)
-					if ((field.fieldTypeId == FieldTypeIdMemberSelect) || ((field.fieldTypeId == FieldTypeIdLookup) && (field.lookupContentID != 0)))
-					{
-						//
-						// This is a lookup field -- test if IncludedInLeftJoins
-						//
-						JoinTablename = "";
-						if (field.fieldTypeId == FieldTypeIdMemberSelect)
-						{
-							LookupContentName = "people";
-						}
-						else
-						{
-							LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, field.lookupContentID);
-						}
-						if (!string.IsNullOrEmpty(LookupContentName))
-						{
-							JoinTablename = Models.Complex.cdefModel.getContentTablename(cpCore, LookupContentName);
-						}
-						IncludedInLeftJoin = IncludedInColumns;
-						if (IndexConfig.FindWords.Count > 0)
-						{
-							//
-							// test findwords
-							//
-							if (IndexConfig.FindWords.ContainsKey(field.nameLc))
-							{
-								if (IndexConfig.FindWords(field.nameLc).MatchOption != FindWordMatchEnum.MatchIgnore)
-								{
-									IncludedInLeftJoin = true;
-								}
-							}
-						}
-						if ((!IncludedInLeftJoin) && IndexConfig.Sorts.Count > 0)
-						{
-							//
-							// test sorts
-							//
-							if (IndexConfig.Sorts.ContainsKey(field.nameLc.ToLower))
-							{
-								IncludedInLeftJoin = true;
-							}
-						}
-						if (IncludedInLeftJoin)
-						{
-							//
-							// include this lookup field
-							//
-							FieldUsedInColumns.Item(field.nameLc) = true;
-							if (!string.IsNullOrEmpty(JoinTablename))
-							{
-								IsLookupFieldValid(field.nameLc) = true;
-								return_sqlFieldList = return_sqlFieldList + ", LookupTable" + FieldPtr + ".Name AS LookupTable" + FieldPtr + "Name";
-								return_sqlFrom = "(" + return_sqlFrom + " LEFT JOIN " + JoinTablename + " AS LookupTable" + FieldPtr + " ON " + adminContent.ContentTableName + "." + field.nameLc + " = LookupTable" + FieldPtr + ".ID)";
-							}
-							//End If
-						}
-					}
-					if (IncludedInColumns)
-					{
-						//
-						// This field is included in the columns, so include it in the select
-						//
-						return_sqlFieldList = return_sqlFieldList + " ," + adminContent.ContentTableName + "." + field.nameLc;
-						FieldUsedInColumns(field.nameLc) = true;
-					}
-				}
-				//
-				// Sub CDef filter
-				//
-				if (IndexConfig.SubCDefID > 0)
-				{
-					ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, IndexConfig.SubCDefID);
-					return_SQLWhere += "AND(" + Models.Complex.cdefModel.getContentControlCriteria(cpCore, ContentName) + ")";
-				}
-				//
-				// Return_sqlFrom and Where Clause for Groups filter
-				//
-				DateTime rightNow = DateTime.Now;
-				string sqlRightNow = cpCore.db.encodeSQLDate(rightNow);
-				if (adminContent.ContentTableName.ToLower() == "ccmembers")
-				{
-					if (IndexConfig.GroupListCnt > 0)
-					{
-						for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++)
-						{
-							GroupName = IndexConfig.GroupList[Ptr];
-							if (!string.IsNullOrEmpty(GroupName))
-							{
-								GroupID = cpCore.db.getRecordID("Groups", GroupName);
-								if (GroupID == 0 && genericController.vbIsNumeric(GroupName))
-								{
-									GroupID = genericController.EncodeInteger(GroupName);
-								}
-								string groupTableAlias = "GroupFilter" + Ptr;
-								return_SQLWhere += "AND(" + groupTableAlias + ".GroupID=" + GroupID + ")and((" + groupTableAlias + ".dateExpires is null)or(" + groupTableAlias + ".dateExpires>" + sqlRightNow + "))";
-								return_sqlFrom = "(" + return_sqlFrom + " INNER JOIN ccMemberRules AS GroupFilter" + Ptr + " ON GroupFilter" + Ptr + ".MemberID=ccMembers.ID)";
-								//Return_sqlFrom = "(" & Return_sqlFrom & " INNER JOIN ccMemberRules AS GroupFilter" & Ptr & " ON GroupFilter" & Ptr & ".MemberID=ccmembers.ID)"
-							}
-						}
-					}
-				}
-				//
-				// Add Name into Return_sqlFieldList
-				//
-				//If Not SQLSelectIncludesName Then
-				// SQLSelectIncludesName is declared, but not initialized
-				return_sqlFieldList = return_sqlFieldList + " ," + adminContent.ContentTableName + ".Name";
-				//End If
-				//
-				// paste sections together and do where clause
-				//
-				if (userHasContentAccess(adminContent.Id))
-				{
-					//
-					// This person can see all the records
-					//
-					return_SQLWhere += "AND(" + Models.Complex.cdefModel.getContentControlCriteria(cpCore, adminContent.Name) + ")";
-				}
-				else
-				{
-					//
-					// Limit the Query to what they can see
-					//
-					return_IsLimitedToSubContent = true;
-					SubQuery = "";
-					list = adminContent.ContentControlCriteria;
-					adminContent.Id = adminContent.Id;
-					SubContentCnt = 0;
-					if (!string.IsNullOrEmpty(list))
-					{
-						Console.WriteLine("console - adminContent.contentControlCriteria=" + list);
-						Debug.WriteLine("debug - adminContent.contentControlCriteria=" + list);
-						logController.appendLog(cpCore, "appendlog - adminContent.contentControlCriteria=" + list);
-						ListSplit = list.Split('=');
-						Cnt = ListSplit.GetUpperBound(0) + 1;
-						if (Cnt > 0)
-						{
-							for (Ptr = 0; Ptr < Cnt; Ptr++)
-							{
-								Pos = genericController.vbInstr(1, ListSplit[Ptr], ")");
-								if (Pos > 0)
-								{
-									ContentID = genericController.EncodeInteger(ListSplit[Ptr].Substring(0, Pos - 1));
-									if (ContentID > 0 && (ContentID != adminContent.Id) & userHasContentAccess(ContentID))
-									{
-										SubQuery = SubQuery + "OR(" + adminContent.ContentTableName + ".ContentControlID=" + ContentID + ")";
-										return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID) + "</a>'";
-										SubContactList += "," + ContentID;
-										SubContentCnt = SubContentCnt + 1;
-									}
-								}
-							}
-						}
-					}
-					if (string.IsNullOrEmpty(SubQuery))
-					{
-						//
-						// Person has no access
-						//
-						Return_AllowAccess = false;
-						return;
-					}
-					else
-					{
-						return_SQLWhere += "AND(" + SubQuery.Substring(2) + ")";
-						return_ContentAccessLimitMessage = "Your access to " + adminContent.Name + " is limited to Sub-content(s) " + return_ContentAccessLimitMessage.Substring(2);
-					}
-				}
-				//
-				// Where Clause: Active Only
-				//
-				if (IndexConfig.ActiveOnly)
-				{
-					return_SQLWhere += "AND(" + adminContent.ContentTableName + ".active<>0)";
-				}
-				//
-				// Where Clause: edited by me
-				//
-				if (IndexConfig.LastEditedByMe)
-				{
-					return_SQLWhere += "AND(" + adminContent.ContentTableName + ".ModifiedBy=" + cpCore.doc.authContext.user.id + ")";
-				}
-				//
-				// Where Clause: edited today
-				//
-				if (IndexConfig.LastEditedToday)
-				{
-					return_SQLWhere += "AND(" + adminContent.ContentTableName + ".ModifiedDate>=" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date) + ")";
-				}
-				//
-				// Where Clause: edited past week
-				//
-				if (IndexConfig.LastEditedPast7Days)
-				{
-					return_SQLWhere += "AND(" + adminContent.ContentTableName + ".ModifiedDate>=" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date.AddDays(-7)) + ")";
-				}
-				//
-				// Where Clause: edited past month
-				//
-				if (IndexConfig.LastEditedPast30Days)
-				{
-					return_SQLWhere += "AND(" + adminContent.ContentTableName + ".ModifiedDate>=" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date.AddDays(-30)) + ")";
-				}
-				//
-				// Where Clause: Where Pairs
-				//
-				for (WCount = 0; WCount <= 9; WCount++)
-				{
-					if (!string.IsNullOrEmpty(WherePair[1, WCount]))
-					{
-						//
-						// Verify that the fieldname called out is in this table
-						//
-						if (adminContent.fields.Count > 0)
-						{
-							foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in adminContent.fields)
-							{
-								Models.Complex.CDefFieldModel field = keyValuePair.Value;
-								if (genericController.vbUCase(field.nameLc) == genericController.vbUCase(WherePair[0, WCount]))
-								{
-									//
-									// found it, add it in the sql
-									//
-									return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + WherePair[0, WCount] + "=";
-									if (genericController.vbIsNumeric(WherePair[1, WCount]))
-									{
-										return_SQLWhere += WherePair[1, WCount] + ")";
-									}
-									else
-									{
-										return_SQLWhere += "'" + WherePair[1, WCount] + "')";
-									}
-									break;
-								}
-							}
-						}
-					}
-				}
-				//
-				// Where Clause: findwords
-				//
-				if (IndexConfig.FindWords.Count > 0)
-				{
-					foreach (var kvp in IndexConfig.FindWords)
-					{
-						indexConfigFindWordClass findword = kvp.Value;
-						FindMatchOption = (int)findword.MatchOption;
-						if (FindMatchOption != (int)FindWordMatchEnum.MatchIgnore)
-						{
-							FindWordName = genericController.vbLCase(findword.Name);
-							FindWordValue = findword.Value;
-							//
-							// Get FieldType
-							//
-							if (adminContent.fields.Count > 0)
-							{
-								foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in adminContent.fields)
-								{
-									Models.Complex.CDefFieldModel field = keyValuePair.Value;
-									FieldPtr = field.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
-									if (genericController.vbLCase(field.nameLc) == FindWordName)
-									{
-										switch (field.fieldTypeId)
-										{
-											case FieldTypeIdAutoIdIncrement:
-											case FieldTypeIdInteger:
-												//
-												// integer
-												//
-												int FindWordValueInteger = genericController.EncodeInteger(FindWordValue);
-												switch (FindMatchOption)
-												{
-													case (int)FindWordMatchEnum.MatchEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
-														break;
-													case (int)FindWordMatchEnum.MatchNotEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
-														break;
-													case (int)FindWordMatchEnum.MatchEquals:
-													case (int)FindWordMatchEnum.matchincludes:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLNumber(FindWordValueInteger) + ")";
-														break;
-													case (int)FindWordMatchEnum.MatchGreaterThan:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + ">" + cpCore.db.encodeSQLNumber(FindWordValueInteger) + ")";
-														break;
-													case (int)FindWordMatchEnum.MatchLessThan:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<" + cpCore.db.encodeSQLNumber(FindWordValueInteger) + ")";
-														break;
-												}
-//INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-//ORIGINAL LINE: Exit For
-												goto ExitLabel1;
+                                        dt = cpCore.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" + cpCore.db.encodeSQLText(Keyword));
+                                        if (dt.Rows.Count == 0) {
+                                            CS = cpCore.db.csInsertRecord("Meta Keywords");
+                                            if (cpCore.db.csOk(CS)) {
+                                                cpCore.db.csSet(CS, "name", Keyword);
+                                            }
+                                            cpCore.db.csClose(ref CS);
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                    if (Button == ButtonOK) {
+                        //
+                        // Exit on OK or cancel
+                        //
+                        return tempGetForm_MetaKeywordTool;
+                    }
+                    //
+                    // KeywordList
+                    //
+                    Copy = cpCore.html.html_GetFormInputTextExpandable("KeywordList",, 10);
+                    Copy = Copy + "<div>Paste your Meta Keywords into this text box, separated by either commas or enter keys. When you hit Save or OK, Meta Keyword records will be made out of each word. These can then be checked on any content page.</div>";
+                    Content.Add(Adminui.GetEditRow(Copy, "Paste Meta Keywords", "", false, false, ""));
+                    //
+                    // Buttons
+                    //
+                    ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK;
+                    //
+                    // Close Tables
+                    //
+                    Content.Add(Adminui.EditTableClose);
+                    Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormSecurityControl));
+                }
+                //
+                Description = "Use this tool to enter multiple Meta Keywords";
+                tempGetForm_MetaKeywordTool = Adminui.GetBody("Meta Keyword Entry Tool", ButtonList, "", true, true, Description, "", 0, Content.Text);
+                Content = null;
+                //
+                ///Dim th as integer: Exit Function
+                //
+                // ----- Error Trap
+                //
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+            }
+            //ErrorTrap:
+            Content = null;
+            handleLegacyClassError3("GetForm_MetaKeywordTool");
+            //
+            return tempGetForm_MetaKeywordTool;
+        }
+        //
+        //
+        //
+        private bool AllowAdminFieldCheck() {
+            if (!AllowAdminFieldCheck_LocalLoaded) {
+                AllowAdminFieldCheck_LocalLoaded = true;
+                AllowAdminFieldCheck_Local = (cpCore.siteProperties.getBoolean("AllowAdminFieldCheck", true));
+            }
+            return AllowAdminFieldCheck_Local;
+        }
+        //
+        //
+        //
+        private string GetAddonHelp(int HelpAddonID, string UsedIDString) {
+            string addonHelp = "";
+            try {
+                string IconFilename = null;
+                int IconWidth = 0;
+                int IconHeight = 0;
+                int IconSprites = 0;
+                bool IconIsInline = false;
+                int CS = 0;
+                string AddonName = "";
+                string AddonHelpCopy = "";
+                DateTime AddonDateAdded = default(DateTime);
+                DateTime AddonLastUpdated = default(DateTime);
+                string SQL = null;
+                string IncludeHelp = "";
+                int IncludeID = 0;
+                string IconImg = "";
+                string helpLink = "";
+                bool FoundAddon = false;
+                //
+                if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpAddonID.ToString() + ",") == 0) {
+                    CS = cpCore.db.csOpenRecord(cnAddons, HelpAddonID);
+                    if (cpCore.db.csOk(CS)) {
+                        FoundAddon = true;
+                        AddonName = cpCore.db.csGet(CS, "Name");
+                        AddonHelpCopy = cpCore.db.csGet(CS, "help");
+                        AddonDateAdded = cpCore.db.csGetDate(CS, "dateadded");
+                        if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, cnAddons, "lastupdated")) {
+                            AddonLastUpdated = cpCore.db.csGetDate(CS, "lastupdated");
+                        }
+                        if (AddonLastUpdated == DateTime.MinValue) {
+                            AddonLastUpdated = AddonDateAdded;
+                        }
+                        IconFilename = cpCore.db.csGet(CS, "Iconfilename");
+                        IconWidth = cpCore.db.csGetInteger(CS, "IconWidth");
+                        IconHeight = cpCore.db.csGetInteger(CS, "IconHeight");
+                        IconSprites = cpCore.db.csGetInteger(CS, "IconSprites");
+                        IconIsInline = cpCore.db.csGetBoolean(CS, "IsInline");
+                        IconImg = genericController.GetAddonIconImg("/" + cpCore.serverConfig.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, cpCore.serverConfig.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0);
+                        helpLink = cpCore.db.csGet(CS, "helpLink");
+                    }
+                    cpCore.db.csClose(ref CS);
+                    //
+                    if (FoundAddon) {
+                        //
+                        // Included Addons
+                        //
+                        SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
+                        CS = cpCore.db.csOpenSql_rev("default", SQL);
+                        while (cpCore.db.csOk(CS)) {
+                            IncludeID = cpCore.db.csGetInteger(CS, "IncludedAddonID");
+                            IncludeHelp = IncludeHelp + GetAddonHelp(IncludeID, HelpAddonID + "," + IncludeID.ToString());
+                            cpCore.db.csGoNext(CS);
+                        }
+                        cpCore.db.csClose(ref CS);
+                        //
+                        if (!string.IsNullOrEmpty(helpLink)) {
+                            if (!string.IsNullOrEmpty(AddonHelpCopy)) {
+                                AddonHelpCopy = AddonHelpCopy + "<p>For additional help with this add-on, please visit <a href=\"" + helpLink + "\">" + helpLink + "</a>.</p>";
+                            } else {
+                                AddonHelpCopy = AddonHelpCopy + "<p>For help with this add-on, please visit <a href=\"" + helpLink + "\">" + helpLink + "</a>.</p>";
+                            }
+                        }
+                        if (string.IsNullOrEmpty(AddonHelpCopy)) {
+                            AddonHelpCopy = AddonHelpCopy + "<p>Please refer to the help resources available for this collection. More information may also be available in the Contensive online Learning Center <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com for more information.</p>";
+                        }
+                        addonHelp = ""
+                            + "<div class=\"ccHelpCon\">"
+                            + "<div class=\"title\"><div style=\"float:right;\"><a href=\"?addonid=" + HelpAddonID + "\">" + IconImg + "</a></div>" + AddonName + " Add-on</div>"
+                            + "<div class=\"byline\">"
+                                + "<div>Installed " + AddonDateAdded + "</div>"
+                                + "<div>Last Updated " + AddonLastUpdated + "</div>"
+                            + "</div>"
+                            + "<div class=\"body\" style=\"clear:both;\">" + AddonHelpCopy + "</div>"
+                            + "</div>";
+                        addonHelp = addonHelp + IncludeHelp;
+                    }
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+            return addonHelp;
+        }
+        //
+        //
+        //
+        private string GetCollectionHelp(int HelpCollectionID, string UsedIDString) {
+            string returnHelp = "";
+            try {
+                int CS = 0;
+                string Collectionname = "";
+                string CollectionHelpCopy = "";
+                string CollectionHelpLink = "";
+                DateTime CollectionDateAdded = default(DateTime);
+                DateTime CollectionLastUpdated = default(DateTime);
+                string SQL = null;
+                string IncludeHelp = "";
+                int addonId = 0;
+                //
+                if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID.ToString() + ",") == 0) {
+                    CS = cpCore.db.csOpenRecord("Add-on Collections", HelpCollectionID);
+                    if (cpCore.db.csOk(CS)) {
+                        Collectionname = cpCore.db.csGet(CS, "Name");
+                        CollectionHelpCopy = cpCore.db.csGet(CS, "help");
+                        CollectionDateAdded = cpCore.db.csGetDate(CS, "dateadded");
+                        if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, "Add-on Collections", "lastupdated")) {
+                            CollectionLastUpdated = cpCore.db.csGetDate(CS, "lastupdated");
+                        }
+                        if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, "Add-on Collections", "helplink")) {
+                            CollectionHelpLink = cpCore.db.csGet(CS, "helplink");
+                        }
+                        if (CollectionLastUpdated == DateTime.MinValue) {
+                            CollectionLastUpdated = CollectionDateAdded;
+                        }
+                    }
+                    cpCore.db.csClose(ref CS);
+                    //
+                    // Add-ons
+                    //
+                    if (true) // 4.0.321" Then
+                    {
+                        //$$$$$ cache this
+                        CS = cpCore.db.csOpen(cnAddons, "CollectionID=" + HelpCollectionID, "name",,,,, "ID");
+                        while (cpCore.db.csOk(CS)) {
+                            IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cpCore.db.csGetInteger(CS, "ID"), "") + "</div>";
+                            cpCore.db.csGoNext(CS);
+                        }
+                        cpCore.db.csClose(ref CS);
+                    } else {
+                        // addoncollectionrules deprecated for collectionid
+                        SQL = "select AddonID from ccAddonCollectionRules where CollectionID=" + HelpCollectionID;
+                        CS = cpCore.db.csOpenSql_rev("default", SQL);
+                        while (cpCore.db.csOk(CS)) {
+                            addonId = cpCore.db.csGetInteger(CS, "AddonID");
+                            if (addonId != 0) {
+                                IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(addonId, "") + "</div>";
+                            }
+                            cpCore.db.csGoNext(CS);
+                        }
+                        cpCore.db.csClose(ref CS);
+                    }
+                    //
+                    if ((string.IsNullOrEmpty(CollectionHelpLink)) && (string.IsNullOrEmpty(CollectionHelpCopy))) {
+                        CollectionHelpCopy = "<p>No help information could be found for this collection. Please use the online resources at <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com by email.</p>";
+                    } else if (!string.IsNullOrEmpty(CollectionHelpLink)) {
+                        CollectionHelpCopy = ""
+                            + "<p>For information about this collection please visit <a href=\"" + CollectionHelpLink + "\">" + CollectionHelpLink + "</a>.</p>"
+                            + CollectionHelpCopy;
+                    }
+                    //
+                    returnHelp = ""
+                        + "<div class=\"ccHelpCon\">"
+                        + "<div class=\"title\">" + Collectionname + " Collection</div>"
+                        + "<div class=\"byline\">"
+                            + "<div>Installed " + CollectionDateAdded + "</div>"
+                            + "<div>Last Updated " + CollectionLastUpdated + "</div>"
+                        + "</div>"
+                        + "<div class=\"body\">" + CollectionHelpCopy + "</div>";
+                    if (!string.IsNullOrEmpty(IncludeHelp)) {
+                        returnHelp = returnHelp + IncludeHelp;
+                    }
+                    returnHelp = returnHelp + "</div>";
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+            return returnHelp;
+        }
+        //
+        //
+        //
+        private void SetIndexSQL(Models.Complex.cdefModel adminContent, editRecordClass editRecord, indexConfigClass IndexConfig, ref bool Return_AllowAccess, ref string return_sqlFieldList, ref string return_sqlFrom, ref string return_SQLWhere, ref string return_SQLOrderBy, ref bool return_IsLimitedToSubContent, ref string return_ContentAccessLimitMessage, ref Dictionary<string, bool> FieldUsedInColumns, Dictionary<string, bool> IsLookupFieldValid) {
+            try {
+                string LookupQuery = null;
+                string ContentName = null;
+                string SortFieldName = null;
+                //
+                int LookupPtr = 0;
+                string[] lookups = null;
+                string FindWordName = null;
+                string FindWordValue = null;
+                int FindMatchOption = 0;
+                int WCount = 0;
+                string SubContactList = "";
+                int ContentID = 0;
+                int Pos = 0;
+                int Cnt = 0;
+                string[] ListSplit = null;
+                int SubContentCnt = 0;
+                string list = null;
+                string SubQuery = null;
+                int GroupID = 0;
+                string GroupName = null;
+                string JoinTablename = null;
+                //Dim FieldName As String
+                int Ptr = 0;
+                bool IncludedInLeftJoin = false;
+                //  Dim SupportWorkflowFields As Boolean
+                int FieldPtr = 0;
+                bool IncludedInColumns = false;
+                string LookupContentName = null;
+                //'Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
+                //
+                Return_AllowAccess = true;
+                //
+                // ----- Workflow Fields
+                //
+                return_sqlFieldList = return_sqlFieldList + adminContent.ContentTableName + ".ID";
+                //
+                // ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
+                //
+                return_sqlFrom = adminContent.ContentTableName;
+                foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in adminContent.fields) {
+                    Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                    FieldPtr = field.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
+                    IncludedInColumns = false;
+                    IncludedInLeftJoin = false;
+                    if (!IsLookupFieldValid.ContainsKey(field.nameLc)) {
+                        IsLookupFieldValid.Add(field.nameLc, false);
+                    }
+                    if (!FieldUsedInColumns.ContainsKey(field.nameLc)) {
+                        FieldUsedInColumns.Add(field.nameLc, false);
+                    }
+                    //
+                    // test if this field is one of the columns we are displaying
+                    //
+                    IncludedInColumns = IndexConfig.Columns.ContainsKey(field.nameLc);
+                    //
+                    // disallow IncludedInColumns if a non-supported field type
+                    //
+                    switch (field.fieldTypeId) {
+                        case FieldTypeIdFileCSS:
+                        case FieldTypeIdFile:
+                        case FieldTypeIdFileImage:
+                        case FieldTypeIdFileJavascript:
+                        case FieldTypeIdLongText:
+                        case FieldTypeIdManyToMany:
+                        case FieldTypeIdRedirect:
+                        case FieldTypeIdFileText:
+                        case FieldTypeIdFileXML:
+                        case FieldTypeIdHTML:
+                        case FieldTypeIdFileHTML:
+                            IncludedInColumns = false;
+                            break;
+                    }
+                    //FieldName = genericController.vbLCase(.Name)
+                    if ((field.fieldTypeId == FieldTypeIdMemberSelect) || ((field.fieldTypeId == FieldTypeIdLookup) && (field.lookupContentID != 0))) {
+                        //
+                        // This is a lookup field -- test if IncludedInLeftJoins
+                        //
+                        JoinTablename = "";
+                        if (field.fieldTypeId == FieldTypeIdMemberSelect) {
+                            LookupContentName = "people";
+                        } else {
+                            LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, field.lookupContentID);
+                        }
+                        if (!string.IsNullOrEmpty(LookupContentName)) {
+                            JoinTablename = Models.Complex.cdefModel.getContentTablename(cpCore, LookupContentName);
+                        }
+                        IncludedInLeftJoin = IncludedInColumns;
+                        if (IndexConfig.FindWords.Count > 0) {
+                            //
+                            // test findwords
+                            //
+                            if (IndexConfig.FindWords.ContainsKey(field.nameLc)) {
+                                if (IndexConfig.FindWords[field.nameLc].MatchOption != FindWordMatchEnum.MatchIgnore) {
+                                    IncludedInLeftJoin = true;
+                                }
+                            }
+                        }
+                        if ((!IncludedInLeftJoin) && IndexConfig.Sorts.Count > 0) {
+                            //
+                            // test sorts
+                            //
+                            if (IndexConfig.Sorts.ContainsKey(field.nameLc.ToLower())) {
+                                IncludedInLeftJoin = true;
+                            }
+                        }
+                        if (IncludedInLeftJoin) {
+                            //
+                            // include this lookup field
+                            //
+                            FieldUsedInColumns.Item(field.nameLc) = true;
+                            if (!string.IsNullOrEmpty(JoinTablename)) {
+                                IsLookupFieldValid(field.nameLc) = true;
+                                return_sqlFieldList = return_sqlFieldList + ", LookupTable" + FieldPtr + ".Name AS LookupTable" + FieldPtr + "Name";
+                                return_sqlFrom = "(" + return_sqlFrom + " LEFT JOIN " + JoinTablename + " AS LookupTable" + FieldPtr + " ON " + adminContent.ContentTableName + "." + field.nameLc + " = LookupTable" + FieldPtr + ".ID)";
+                            }
+                            //End If
+                        }
+                    }
+                    if (IncludedInColumns) {
+                        //
+                        // This field is included in the columns, so include it in the select
+                        //
+                        return_sqlFieldList = return_sqlFieldList + " ," + adminContent.ContentTableName + "." + field.nameLc;
+                        FieldUsedInColumns(field.nameLc) = true;
+                    }
+                }
+                //
+                // Sub CDef filter
+                //
+                if (IndexConfig.SubCDefID > 0) {
+                    ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, IndexConfig.SubCDefID);
+                    return_SQLWhere += "AND(" + Models.Complex.cdefModel.getContentControlCriteria(cpCore, ContentName) + ")";
+                }
+                //
+                // Return_sqlFrom and Where Clause for Groups filter
+                //
+                DateTime rightNow = DateTime.Now;
+                string sqlRightNow = cpCore.db.encodeSQLDate(rightNow);
+                if (adminContent.ContentTableName.ToLower() == "ccmembers") {
+                    if (IndexConfig.GroupListCnt > 0) {
+                        for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
+                            GroupName = IndexConfig.GroupList[Ptr];
+                            if (!string.IsNullOrEmpty(GroupName)) {
+                                GroupID = cpCore.db.getRecordID("Groups", GroupName);
+                                if (GroupID == 0 && genericController.vbIsNumeric(GroupName)) {
+                                    GroupID = genericController.EncodeInteger(GroupName);
+                                }
+                                string groupTableAlias = "GroupFilter" + Ptr;
+                                return_SQLWhere += "AND(" + groupTableAlias + ".GroupID=" + GroupID + ")and((" + groupTableAlias + ".dateExpires is null)or(" + groupTableAlias + ".dateExpires>" + sqlRightNow + "))";
+                                return_sqlFrom = "(" + return_sqlFrom + " INNER JOIN ccMemberRules AS GroupFilter" + Ptr + " ON GroupFilter" + Ptr + ".MemberID=ccMembers.ID)";
+                                //Return_sqlFrom = "(" & Return_sqlFrom & " INNER JOIN ccMemberRules AS GroupFilter" & Ptr & " ON GroupFilter" & Ptr & ".MemberID=ccmembers.ID)"
+                            }
+                        }
+                    }
+                }
+                //
+                // Add Name into Return_sqlFieldList
+                //
+                //If Not SQLSelectIncludesName Then
+                // SQLSelectIncludesName is declared, but not initialized
+                return_sqlFieldList = return_sqlFieldList + " ," + adminContent.ContentTableName + ".Name";
+                //End If
+                //
+                // paste sections together and do where clause
+                //
+                if (userHasContentAccess(adminContent.Id)) {
+                    //
+                    // This person can see all the records
+                    //
+                    return_SQLWhere += "AND(" + Models.Complex.cdefModel.getContentControlCriteria(cpCore, adminContent.Name) + ")";
+                } else {
+                    //
+                    // Limit the Query to what they can see
+                    //
+                    return_IsLimitedToSubContent = true;
+                    SubQuery = "";
+                    list = adminContent.ContentControlCriteria;
+                    adminContent.Id = adminContent.Id;
+                    SubContentCnt = 0;
+                    if (!string.IsNullOrEmpty(list)) {
+                        Console.WriteLine("console - adminContent.contentControlCriteria=" + list);
+                        Debug.WriteLine("debug - adminContent.contentControlCriteria=" + list);
+                        logController.appendLog(cpCore, "appendlog - adminContent.contentControlCriteria=" + list);
+                        ListSplit = list.Split('=');
+                        Cnt = ListSplit.GetUpperBound(0) + 1;
+                        if (Cnt > 0) {
+                            for (Ptr = 0; Ptr < Cnt; Ptr++) {
+                                Pos = genericController.vbInstr(1, ListSplit[Ptr], ")");
+                                if (Pos > 0) {
+                                    ContentID = genericController.EncodeInteger(ListSplit[Ptr].Substring(0, Pos - 1));
+                                    if (ContentID > 0 && (ContentID != adminContent.Id) & userHasContentAccess(ContentID)) {
+                                        SubQuery = SubQuery + "OR(" + adminContent.ContentTableName + ".ContentControlID=" + ContentID + ")";
+                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID) + "</a>'";
+                                        SubContactList += "," + ContentID;
+                                        SubContentCnt = SubContentCnt + 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (string.IsNullOrEmpty(SubQuery)) {
+                        //
+                        // Person has no access
+                        //
+                        Return_AllowAccess = false;
+                        return;
+                    } else {
+                        return_SQLWhere += "AND(" + SubQuery.Substring(2) + ")";
+                        return_ContentAccessLimitMessage = "Your access to " + adminContent.Name + " is limited to Sub-content(s) " + return_ContentAccessLimitMessage.Substring(2);
+                    }
+                }
+                //
+                // Where Clause: Active Only
+                //
+                if (IndexConfig.ActiveOnly) {
+                    return_SQLWhere += "AND(" + adminContent.ContentTableName + ".active<>0)";
+                }
+                //
+                // Where Clause: edited by me
+                //
+                if (IndexConfig.LastEditedByMe) {
+                    return_SQLWhere += "AND(" + adminContent.ContentTableName + ".ModifiedBy=" + cpCore.doc.authContext.user.id + ")";
+                }
+                //
+                // Where Clause: edited today
+                //
+                if (IndexConfig.LastEditedToday) {
+                    return_SQLWhere += "AND(" + adminContent.ContentTableName + ".ModifiedDate>=" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date) + ")";
+                }
+                //
+                // Where Clause: edited past week
+                //
+                if (IndexConfig.LastEditedPast7Days) {
+                    return_SQLWhere += "AND(" + adminContent.ContentTableName + ".ModifiedDate>=" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date.AddDays(-7)) + ")";
+                }
+                //
+                // Where Clause: edited past month
+                //
+                if (IndexConfig.LastEditedPast30Days) {
+                    return_SQLWhere += "AND(" + adminContent.ContentTableName + ".ModifiedDate>=" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime.Date.AddDays(-30)) + ")";
+                }
+                //
+                // Where Clause: Where Pairs
+                //
+                for (WCount = 0; WCount <= 9; WCount++) {
+                    if (!string.IsNullOrEmpty(WherePair[1, WCount])) {
+                        //
+                        // Verify that the fieldname called out is in this table
+                        //
+                        if (adminContent.fields.Count > 0) {
+                            foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in adminContent.fields) {
+                                Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                                if (genericController.vbUCase(field.nameLc) == genericController.vbUCase(WherePair[0, WCount])) {
+                                    //
+                                    // found it, add it in the sql
+                                    //
+                                    return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + WherePair[0, WCount] + "=";
+                                    if (genericController.vbIsNumeric(WherePair[1, WCount])) {
+                                        return_SQLWhere += WherePair[1, WCount] + ")";
+                                    } else {
+                                        return_SQLWhere += "'" + WherePair[1, WCount] + "')";
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                //
+                // Where Clause: findwords
+                //
+                if (IndexConfig.FindWords.Count > 0) {
+                    foreach (var kvp in IndexConfig.FindWords) {
+                        indexConfigFindWordClass findword = kvp.Value;
+                        FindMatchOption = (int)findword.MatchOption;
+                        if (FindMatchOption != (int)FindWordMatchEnum.MatchIgnore) {
+                            FindWordName = genericController.vbLCase(findword.Name);
+                            FindWordValue = findword.Value;
+                            //
+                            // Get FieldType
+                            //
+                            if (adminContent.fields.Count > 0) {
+                                foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in adminContent.fields) {
+                                    Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                                    FieldPtr = field.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
+                                    if (genericController.vbLCase(field.nameLc) == FindWordName) {
+                                        switch (field.fieldTypeId) {
+                                            case FieldTypeIdAutoIdIncrement:
+                                            case FieldTypeIdInteger:
+                                                //
+                                                // integer
+                                                //
+                                                int FindWordValueInteger = genericController.EncodeInteger(FindWordValue);
+                                                switch (FindMatchOption) {
+                                                    case (int)FindWordMatchEnum.MatchEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchEquals:
+                                                    case (int)FindWordMatchEnum.matchincludes:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchGreaterThan:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + ">" + cpCore.db.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchLessThan:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<" + cpCore.db.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                        break;
+                                                }
+                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //ORIGINAL LINE: Exit For
+                                                goto ExitLabel1;
 
-											case FieldTypeIdCurrency:
-											case FieldTypeIdFloat:
-												//
-												// double
-												//
-												double FindWordValueDouble = genericController.EncodeNumber(FindWordValue);
-												switch (FindMatchOption)
-												{
-													case (int)FindWordMatchEnum.MatchEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
-														break;
-													case (int)FindWordMatchEnum.MatchNotEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
-														break;
-													case (int)FindWordMatchEnum.MatchEquals:
-													case (int)FindWordMatchEnum.matchincludes:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLNumber(FindWordValueDouble) + ")";
-														break;
-													case (int)FindWordMatchEnum.MatchGreaterThan:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + ">" + cpCore.db.encodeSQLNumber(FindWordValueDouble) + ")";
-														break;
-													case (int)FindWordMatchEnum.MatchLessThan:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<" + cpCore.db.encodeSQLNumber(FindWordValueDouble) + ")";
-														break;
-												}
-//INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-//ORIGINAL LINE: Exit For
-												goto ExitLabel1;
-											case FieldTypeIdFile:
-											case FieldTypeIdFileImage:
-												//
-												// Date
-												//
-												switch (FindMatchOption)
-												{
-													case (int)FindWordMatchEnum.MatchEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
-														break;
-													case (int)FindWordMatchEnum.MatchNotEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
-														break;
-												}
-//INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-//ORIGINAL LINE: Exit For
-												goto ExitLabel1;
-											case FieldTypeIdDate:
-												//
-												// Date
-												//
-												DateTime findDate = DateTime.MinValue;
-												if (DateHelper.IsDate(FindWordValue))
-												{
-													findDate = DateTime.Parse(FindWordValue);
-												}
-												switch (FindMatchOption)
-												{
-													case (int)FindWordMatchEnum.MatchEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
-														break;
-													case (int)FindWordMatchEnum.MatchNotEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
-														break;
-													case (int)FindWordMatchEnum.MatchEquals:
-													case (int)FindWordMatchEnum.matchincludes:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLDate(findDate) + ")";
-														break;
-													case (int)FindWordMatchEnum.MatchGreaterThan:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + ">" + cpCore.db.encodeSQLDate(findDate) + ")";
-														break;
-													case (int)FindWordMatchEnum.MatchLessThan:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<" + cpCore.db.encodeSQLDate(findDate) + ")";
-														break;
-												}
-//INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-//ORIGINAL LINE: Exit For
-												goto ExitLabel1;
-											case FieldTypeIdLookup:
-											case FieldTypeIdMemberSelect:
-												//
-												// Lookup
-												//
-												if (IsLookupFieldValid(field.nameLc))
-												{
-													//
-													// Content Lookup
-													//
-													switch (FindMatchOption)
-													{
-														case (int)FindWordMatchEnum.MatchEmpty:
-															return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is null)";
-															break;
-														case (int)FindWordMatchEnum.MatchNotEmpty:
-															return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is not null)";
-															break;
-														case (int)FindWordMatchEnum.MatchEquals:
-															return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name=" + cpCore.db.encodeSQLText(FindWordValue) + ")";
-															break;
-														case (int)FindWordMatchEnum.matchincludes:
-															return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name LIKE " + cpCore.db.encodeSQLText("%" + FindWordValue + "%") + ")";
-															break;
-													}
-												}
-												else if (field.lookupList != "")
-												{
-													//
-													// LookupList
-													//
-													switch (FindMatchOption)
-													{
-														case (int)FindWordMatchEnum.MatchEmpty:
-															return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
-															break;
-														case (int)FindWordMatchEnum.MatchNotEmpty:
-															return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
-															break;
-														case (int)FindWordMatchEnum.MatchEquals:
-														case (int)FindWordMatchEnum.matchincludes:
-															lookups = field.lookupList.Split(',');
-															LookupQuery = "";
-															for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++)
-															{
-																if (genericController.vbInstr(1, lookups[LookupPtr], FindWordValue, Microsoft.VisualBasic.Constants.vbTextCompare) != 0)
-																{
-																	LookupQuery = LookupQuery + "OR(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLNumber(LookupPtr + 1) + ")";
-																}
-															}
-															if (!string.IsNullOrEmpty(LookupQuery))
-															{
-																return_SQLWhere += "AND(" + LookupQuery.Substring(2) + ")";
-															}
-															break;
-													}
-												}
-//INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-//ORIGINAL LINE: Exit For
-												goto ExitLabel1;
-											case FieldTypeIdBoolean:
-												//
-												// Boolean
-												//
-												switch (FindMatchOption)
-												{
-													case (int)FindWordMatchEnum.matchincludes:
-														if (genericController.EncodeBoolean(FindWordValue))
-														{
-															return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<>0)";
-														}
-														else
-														{
-															return_SQLWhere += "AND((" + adminContent.ContentTableName + "." + FindWordName + "=0)or(" + adminContent.ContentTableName + "." + FindWordName + " is null))";
-														}
-														break;
-													case (int)FindWordMatchEnum.MatchTrue:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<>0)";
-														break;
-													case (int)FindWordMatchEnum.MatchFalse:
-														return_SQLWhere += "AND((" + adminContent.ContentTableName + "." + FindWordName + "=0)or(" + adminContent.ContentTableName + "." + FindWordName + " is null))";
-														break;
-												}
-//INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-//ORIGINAL LINE: Exit For
-												goto ExitLabel1;
-											default:
-												//
-												// Text (and the rest)
-												//
-												switch (FindMatchOption)
-												{
-													case (int)FindWordMatchEnum.MatchEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
-														break;
-													case (int)FindWordMatchEnum.MatchNotEmpty:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
-														break;
-													case (int)FindWordMatchEnum.matchincludes:
-														FindWordValue = cpCore.db.encodeSQLText(FindWordValue);
-														FindWordValue = FindWordValue.Substring(1, FindWordValue.Length - 2);
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " LIKE '%" + FindWordValue + "%')";
-														break;
-													case (int)FindWordMatchEnum.MatchEquals:
-														return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLText(FindWordValue) + ")";
-														break;
-												}
-//INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-//ORIGINAL LINE: Exit For
-												goto ExitLabel1;
-										}
-										break;
-									}
-								}
-								ExitLabel1: ;
-							}
-						}
-					}
-				}
-				return_SQLWhere = return_SQLWhere.Substring(3);
-				//
-				// SQL Order by
-				//
-				return_SQLOrderBy = "";
-				string orderByDelim = " ";
-				foreach (var kvp in IndexConfig.Sorts)
-				{
-					indexConfigSortClass sort = kvp.Value;
-					SortFieldName = genericController.vbLCase(sort.fieldName);
-					//
-					// Get FieldType
-					//
-					if (adminContent.fields.ContainsKey(sort.fieldName))
-					{
-						var tempVar = adminContent.fields(sort.fieldName);
-						FieldPtr = tempVar.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
-						if ((tempVar.fieldTypeId == FieldTypeIdLookup) && IsLookupFieldValid(sort.fieldName))
-						{
-							return_SQLOrderBy += orderByDelim + "LookupTable" + FieldPtr + ".Name";
-						}
-						else
-						{
-							return_SQLOrderBy += orderByDelim + adminContent.ContentTableName + "." + SortFieldName;
-						}
-					}
-					if (sort.direction > 1)
-					{
-						return_SQLOrderBy = return_SQLOrderBy + " Desc";
-					}
-					orderByDelim = ",";
-				}
-			}
-			catch (Exception ex)
-			{
-				cpCore.handleException(ex);
-				throw;
-			}
-		}
-		//
-		//==============================================================================================
-		//   If this field has no help message, check the field with the same name from it's inherited parent
-		//==============================================================================================
-		//
-		private void getFieldHelpMsgs(int ContentID, string FieldName, ref string return_Default, ref string return_Custom)
-		{
-			try
-			{
-				//
-				string SQL = null;
-				int CS = 0;
-				bool Found = false;
-				int ParentID = 0;
-				//
-				Found = false;
-				SQL = "select h.HelpDefault,h.HelpCustom from ccfieldhelp h left join ccfields f on f.id=h.fieldid where f.contentid=" + ContentID + " and f.name=" + cpCore.db.encodeSQLText(FieldName);
-				CS = cpCore.db.csOpenSql(SQL);
-				if (cpCore.db.csOk(CS))
-				{
-					Found = true;
-					return_Default = cpCore.db.csGetText(CS, "helpDefault");
-					return_Custom = cpCore.db.csGetText(CS, "helpCustom");
-				}
-				cpCore.db.csClose(CS);
-				//
-				if (!Found)
-				{
-					ParentID = 0;
-					SQL = "select parentid from cccontent where id=" + ContentID;
-					CS = cpCore.db.csOpenSql(SQL);
-					if (cpCore.db.csOk(CS))
-					{
-						ParentID = cpCore.db.csGetInteger(CS, "parentid");
-					}
-					cpCore.db.csClose(CS);
-					if (ParentID != 0)
-					{
-						getFieldHelpMsgs(ParentID, FieldName, ref return_Default, ref return_Custom);
-					}
-				}
-				//
-				return;
-				//
-			}
-			catch
-			{
-				cpCore.handleException( ex )
-			}
-ErrorTrap:
-			throw (new Exception("unexpected exception"));
-		}
-		//
-		//===========================================================================
-		/// <summary>
-		/// handle legacy errors in this class, v3
-		/// </summary>
-		/// <param name="MethodName"></param>
-		/// <param name="Context"></param>
-		/// <remarks></remarks>
-		private void handleLegacyClassError3(string MethodName, string Context = "")
-		{
-			//
-			throw (new Exception("error in method [" + MethodName + "], contect [" + Context + "]"));
-			//
-		}
-		//
-		//===========================================================================
-		/// <summary>
-		/// handle legacy errors in this class, v2
-		/// </summary>
-		/// <param name="MethodName"></param>
-		/// <param name="Context"></param>
-		/// <remarks></remarks>
-		private void handleLegacyClassError2(string MethodName, string Context = "")
-		{
-			//
-			throw (new Exception("error in method [" + MethodName + "], Context [" + Context + "]"));
-//INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-			Microsoft.VisualBasic.Information.Err().Clear();
-			//
-		}
-		//
-		//===========================================================================
-		/// <summary>
-		/// handle legacy errors in this class, v1
-		/// </summary>
-		/// <param name="MethodName"></param>
-		/// <param name="ErrDescription"></param>
-		/// <remarks></remarks>
-		private void handleLegacyClassError(string MethodName, string ErrDescription)
-		{
-			throw (new Exception("error in method [" + MethodName + "], ErrDescription [" + ErrDescription + "]"));
-		}
-		//Private Sub pattern1()
-		//    Dim admincontent As coreMetaDataClass.CDefClass
-		//    For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In admincontent.fields
-		//        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
-		//        '
-		//    Next
-		//End Sub
-		//
-		//====================================================================================================
-		// properties
-		//====================================================================================================
-		//
-		// ----- ccGroupRules storage for list of Content that a group can author
-		//
-		private struct ContentGroupRuleType
-		{
-			public int ContentID;
-			public int GroupID;
-			public bool AllowAdd;
-			public bool AllowDelete;
-		}
-		//
-		// ----- generic id/name dictionary
-		//
-		private struct StorageType
-		{
-			public int Id;
-			public string Name;
-		}
-		//
-		// ----- Group Rules
-		//
-		private struct GroupRuleType
-		{
-			public int GroupID;
-			public bool AllowAdd;
-			public bool AllowDelete;
-		}
-		//
-		// ----- Used within Admin site to create fancyBox popups
-		//
-		private bool includeFancyBox;
-		private int fancyBoxPtr;
-		private string fancyBoxHeadJS;
-		private bool ClassInitialized; // if true, the module has been
-		private const bool allowSaveBeforeDuplicate = false;
-		//
-		// ----- To interigate Add-on Collections to check for re-use
-		//
-		private struct DeleteType
-		{
-			public string Name;
-			public int ParentID;
-		}
-		private struct NavigatorType
-		{
-			public string Name;
-			public string menuNameSpace;
-		}
-		private struct Collection2Type
-		{
-			public int AddOnCnt;
-			public string[] AddonGuid;
-			public string[] AddonName;
-			public int MenuCnt;
-			public string[] Menus;
-			public int NavigatorCnt;
-			public NavigatorType[] Navigators;
-		}
-		private int CollectionCnt;
-		private Collection2Type[] Collections;
-		//
-		// ----- Target Data Storage
-		//
-		private int requestedContentId;
-		private int requestedRecordId;
-		//Private false As Boolean    ' set if content and site support workflow authoring
-		private bool BlockEditForm; // true if there was an error loading the edit record - use to block the edit form
-		//
-		// ----- Storage for current EditRecord, loaded in LoadEditRecord
-		//
-		public class editRecordFieldClass
-		{
-			public object dbValue;
-			public object value;
-		}
-		//
-		public class editRecordClass
-		{
-			public Dictionary<string, editRecordFieldClass> fieldsLc = new Dictionary<string, editRecordFieldClass>();
-			public int id; // ID field of edit record (Record to be edited)
-			public int parentID; // ParentID field of edit record (Record to be edited)
-			public string nameLc; // name field of edit record
-			public bool active; // active field of the edit record
-			public int contentControlId; // ContentControlID of the edit record
-			public string contentControlId_Name;
-			public string menuHeadline; // Used for Content Watch Link Label if default
-			public DateTime modifiedDate; // Used for control section display
-			public int modifiedByMemberID; // =
-			public DateTime dateAdded; // =
-			public int createByMemberId; // =
+                                            case FieldTypeIdCurrency:
+                                            case FieldTypeIdFloat:
+                                                //
+                                                // double
+                                                //
+                                                double FindWordValueDouble = genericController.EncodeNumber(FindWordValue);
+                                                switch (FindMatchOption) {
+                                                    case (int)FindWordMatchEnum.MatchEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchEquals:
+                                                    case (int)FindWordMatchEnum.matchincludes:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchGreaterThan:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + ">" + cpCore.db.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchLessThan:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<" + cpCore.db.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                        break;
+                                                }
+                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //ORIGINAL LINE: Exit For
+                                                goto ExitLabel1;
+                                            case FieldTypeIdFile:
+                                            case FieldTypeIdFileImage:
+                                                //
+                                                // Date
+                                                //
+                                                switch (FindMatchOption) {
+                                                    case (int)FindWordMatchEnum.MatchEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
+                                                        break;
+                                                }
+                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //ORIGINAL LINE: Exit For
+                                                goto ExitLabel1;
+                                            case FieldTypeIdDate:
+                                                //
+                                                // Date
+                                                //
+                                                DateTime findDate = DateTime.MinValue;
+                                                if (DateHelper.IsDate(FindWordValue)) {
+                                                    findDate = DateTime.Parse(FindWordValue);
+                                                }
+                                                switch (FindMatchOption) {
+                                                    case (int)FindWordMatchEnum.MatchEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchEquals:
+                                                    case (int)FindWordMatchEnum.matchincludes:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLDate(findDate) + ")";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchGreaterThan:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + ">" + cpCore.db.encodeSQLDate(findDate) + ")";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchLessThan:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<" + cpCore.db.encodeSQLDate(findDate) + ")";
+                                                        break;
+                                                }
+                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //ORIGINAL LINE: Exit For
+                                                goto ExitLabel1;
+                                            case FieldTypeIdLookup:
+                                            case FieldTypeIdMemberSelect:
+                                                //
+                                                // Lookup
+                                                //
+                                                if (IsLookupFieldValid(field.nameLc)) {
+                                                    //
+                                                    // Content Lookup
+                                                    //
+                                                    switch (FindMatchOption) {
+                                                        case (int)FindWordMatchEnum.MatchEmpty:
+                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is null)";
+                                                            break;
+                                                        case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is not null)";
+                                                            break;
+                                                        case (int)FindWordMatchEnum.MatchEquals:
+                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name=" + cpCore.db.encodeSQLText(FindWordValue) + ")";
+                                                            break;
+                                                        case (int)FindWordMatchEnum.matchincludes:
+                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name LIKE " + cpCore.db.encodeSQLText("%" + FindWordValue + "%") + ")";
+                                                            break;
+                                                    }
+                                                } else if (field.lookupList != "") {
+                                                    //
+                                                    // LookupList
+                                                    //
+                                                    switch (FindMatchOption) {
+                                                        case (int)FindWordMatchEnum.MatchEmpty:
+                                                            return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
+                                                            break;
+                                                        case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                            return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
+                                                            break;
+                                                        case (int)FindWordMatchEnum.MatchEquals:
+                                                        case (int)FindWordMatchEnum.matchincludes:
+                                                            lookups = field.lookupList.Split(',');
+                                                            LookupQuery = "";
+                                                            for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
+                                                                if (genericController.vbInstr(1, lookups[LookupPtr], FindWordValue, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                                                    LookupQuery = LookupQuery + "OR(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLNumber(LookupPtr + 1) + ")";
+                                                                }
+                                                            }
+                                                            if (!string.IsNullOrEmpty(LookupQuery)) {
+                                                                return_SQLWhere += "AND(" + LookupQuery.Substring(2) + ")";
+                                                            }
+                                                            break;
+                                                    }
+                                                }
+                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //ORIGINAL LINE: Exit For
+                                                goto ExitLabel1;
+                                            case FieldTypeIdBoolean:
+                                                //
+                                                // Boolean
+                                                //
+                                                switch (FindMatchOption) {
+                                                    case (int)FindWordMatchEnum.matchincludes:
+                                                        if (genericController.EncodeBoolean(FindWordValue)) {
+                                                            return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<>0)";
+                                                        } else {
+                                                            return_SQLWhere += "AND((" + adminContent.ContentTableName + "." + FindWordName + "=0)or(" + adminContent.ContentTableName + "." + FindWordName + " is null))";
+                                                        }
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchTrue:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "<>0)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchFalse:
+                                                        return_SQLWhere += "AND((" + adminContent.ContentTableName + "." + FindWordName + "=0)or(" + adminContent.ContentTableName + "." + FindWordName + " is null))";
+                                                        break;
+                                                }
+                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //ORIGINAL LINE: Exit For
+                                                goto ExitLabel1;
+                                            default:
+                                                //
+                                                // Text (and the rest)
+                                                //
+                                                switch (FindMatchOption) {
+                                                    case (int)FindWordMatchEnum.MatchEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is null)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchNotEmpty:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " is not null)";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.matchincludes:
+                                                        FindWordValue = cpCore.db.encodeSQLText(FindWordValue);
+                                                        FindWordValue = FindWordValue.Substring(1, FindWordValue.Length - 2);
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + " LIKE '%" + FindWordValue + "%')";
+                                                        break;
+                                                    case (int)FindWordMatchEnum.MatchEquals:
+                                                        return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + FindWordName + "=" + cpCore.db.encodeSQLText(FindWordValue) + ")";
+                                                        break;
+                                                }
+                                                //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                                //ORIGINAL LINE: Exit For
+                                                goto ExitLabel1;
+                                        }
+                                        break;
+                                    }
+                                }
+                                ExitLabel1:;
+                            }
+                        }
+                    }
+                }
+                return_SQLWhere = return_SQLWhere.Substring(3);
+                //
+                // SQL Order by
+                //
+                return_SQLOrderBy = "";
+                string orderByDelim = " ";
+                foreach (var kvp in IndexConfig.Sorts) {
+                    indexConfigSortClass sort = kvp.Value;
+                    SortFieldName = genericController.vbLCase(sort.fieldName);
+                    //
+                    // Get FieldType
+                    //
+                    if (adminContent.fields.ContainsKey(sort.fieldName)) {
+                        var tempVar = adminContent.fields(sort.fieldName);
+                        FieldPtr = tempVar.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
+                        if ((tempVar.fieldTypeId == FieldTypeIdLookup) && IsLookupFieldValid(sort.fieldName)) {
+                            return_SQLOrderBy += orderByDelim + "LookupTable" + FieldPtr + ".Name";
+                        } else {
+                            return_SQLOrderBy += orderByDelim + adminContent.ContentTableName + "." + SortFieldName;
+                        }
+                    }
+                    if (sort.direction > 1) {
+                        return_SQLOrderBy = return_SQLOrderBy + " Desc";
+                    }
+                    orderByDelim = ",";
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //==============================================================================================
+        //   If this field has no help message, check the field with the same name from it's inherited parent
+        //==============================================================================================
+        //
+        private void getFieldHelpMsgs(int ContentID, string FieldName, ref string return_Default, ref string return_Custom) {
+            try {
+                //
+                string SQL = null;
+                int CS = 0;
+                bool Found = false;
+                int ParentID = 0;
+                //
+                Found = false;
+                SQL = "select h.HelpDefault,h.HelpCustom from ccfieldhelp h left join ccfields f on f.id=h.fieldid where f.contentid=" + ContentID + " and f.name=" + cpCore.db.encodeSQLText(FieldName);
+                CS = cpCore.db.csOpenSql(SQL);
+                if (cpCore.db.csOk(CS)) {
+                    Found = true;
+                    return_Default = cpCore.db.csGetText(CS, "helpDefault");
+                    return_Custom = cpCore.db.csGetText(CS, "helpCustom");
+                }
+                cpCore.db.csClose(ref CS);
+                //
+                if (!Found) {
+                    ParentID = 0;
+                    SQL = "select parentid from cccontent where id=" + ContentID;
+                    CS = cpCore.db.csOpenSql(SQL);
+                    if (cpCore.db.csOk(CS)) {
+                        ParentID = cpCore.db.csGetInteger(CS, "parentid");
+                    }
+                    cpCore.db.csClose(ref CS);
+                    if (ParentID != 0) {
+                        getFieldHelpMsgs(ParentID, FieldName, ref return_Default, ref return_Custom);
+                    }
+                }
+                //
+                return;
+                //
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
 
-			public int RootPageID;
-			public bool SetPageNotFoundPageID;
-			public bool SetLandingPageID;
+            }
+            //ErrorTrap:
+            throw (new Exception("unexpected exception"));
+        }
+        //
+        //===========================================================================
+        /// <summary>
+        /// handle legacy errors in this class, v3
+        /// </summary>
+        /// <param name="MethodName"></param>
+        /// <param name="Context"></param>
+        /// <remarks></remarks>
+        private void handleLegacyClassError3(string MethodName, string Context = "") {
+            //
+            throw (new Exception("error in method [" + MethodName + "], contect [" + Context + "]"));
+            //
+        }
+        //
+        //===========================================================================
+        /// <summary>
+        /// handle legacy errors in this class, v2
+        /// </summary>
+        /// <param name="MethodName"></param>
+        /// <param name="Context"></param>
+        /// <remarks></remarks>
+        private void handleLegacyClassError2(string MethodName, string Context = "") {
+            throw (new Exception("error in method [" + MethodName + "], Context [" + Context + "]"));
+        }
+        //
+        //===========================================================================
+        /// <summary>
+        /// handle legacy errors in this class, v1
+        /// </summary>
+        /// <param name="MethodName"></param>
+        /// <param name="ErrDescription"></param>
+        /// <remarks></remarks>
+        private void handleLegacyClassError(string MethodName, string ErrDescription) {
+            throw (new Exception("error in method [" + MethodName + "], ErrDescription [" + ErrDescription + "]"));
+        }
+        //Private Sub pattern1()
+        //    Dim admincontent As coreMetaDataClass.CDefClass
+        //    For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In admincontent.fields
+        //        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+        //        '
+        //    Next
+        //End Sub
+        //
+        //====================================================================================================
+        // properties
+        //====================================================================================================
+        //
+        // ----- ccGroupRules storage for list of Content that a group can author
+        //
+        private struct ContentGroupRuleType {
+            public int ContentID;
+            public int GroupID;
+            public bool AllowAdd;
+            public bool AllowDelete;
+        }
+        //
+        // ----- generic id/name dictionary
+        //
+        private struct StorageType {
+            public int Id;
+            public string Name;
+        }
+        //
+        // ----- Group Rules
+        //
+        private struct GroupRuleType {
+            public int GroupID;
+            public bool AllowAdd;
+            public bool AllowDelete;
+        }
+        //
+        // ----- Used within Admin site to create fancyBox popups
+        //
+        private bool includeFancyBox;
+        private int fancyBoxPtr;
+        private string fancyBoxHeadJS;
+        private bool ClassInitialized; // if true, the module has been
+        private const bool allowSaveBeforeDuplicate = false;
+        //
+        // ----- To interigate Add-on Collections to check for re-use
+        //
+        private struct DeleteType {
+            public string Name;
+            public int ParentID;
+        }
+        private struct NavigatorType {
+            public string Name;
+            public string menuNameSpace;
+        }
+        private struct Collection2Type {
+            public int AddOnCnt;
+            public string[] AddonGuid;
+            public string[] AddonName;
+            public int MenuCnt;
+            public string[] Menus;
+            public int NavigatorCnt;
+            public NavigatorType[] Navigators;
+        }
+        private int CollectionCnt;
+        private Collection2Type[] Collections;
+        //
+        // ----- Target Data Storage
+        //
+        private int requestedContentId;
+        private int requestedRecordId;
+        //Private false As Boolean    ' set if content and site support workflow authoring
+        private bool BlockEditForm; // true if there was an error loading the edit record - use to block the edit form
+                                    //
+                                    // ----- Storage for current EditRecord, loaded in LoadEditRecord
+                                    //
+        public class editRecordFieldClass {
+            public object dbValue;
+            public object value;
+        }
+        //
+        public class editRecordClass {
+            public Dictionary<string, editRecordFieldClass> fieldsLc = new Dictionary<string, editRecordFieldClass>();
+            public int id; // ID field of edit record (Record to be edited)
+            public int parentID; // ParentID field of edit record (Record to be edited)
+            public string nameLc; // name field of edit record
+            public bool active; // active field of the edit record
+            public int contentControlId; // ContentControlID of the edit record
+            public string contentControlId_Name;
+            public string menuHeadline; // Used for Content Watch Link Label if default
+            public DateTime modifiedDate; // Used for control section display
+            public int modifiedByMemberID; // =
+            public DateTime dateAdded; // =
+            public int createByMemberId; // =
 
-			//
-			public bool Loaded; // true/false - set true when the field array values are loaded
-			public bool Saved; // true if edit record was saved during this page
-			public bool Read_Only; // set if this record can not be edited, for various reasons
-			//
-			// From cpCore.main_GetAuthoringStatus
-			//
-			public bool IsDeleted; // true means the edit record has been deleted
-			public bool IsInserted; // set if Workflow authoring insert
-			public bool IsModified; // record has been modified since last published
-			public string LockModifiedName; // member who first edited the record
-			public DateTime LockModifiedDate; // Date when member modified record
-			public bool SubmitLock; // set if a submit Lock, even if the current user is admin
-			public string SubmittedName; // member who submitted the record
-			public DateTime SubmittedDate; // Date when record was submitted
-			public bool ApproveLock; // set if an approve Lock
-			public string ApprovedName; // member who approved the record
-			public DateTime ApprovedDate; // Date when record was approved
-			//
-			// From cpCore.main_GetAuthoringPermissions
-			//
-			public bool AllowInsert;
-			public bool AllowCancel;
-			public bool AllowSave;
-			public bool AllowDelete;
-			public bool AllowPublish;
-			public bool AllowAbort;
-			public bool AllowSubmit;
-			public bool AllowApprove;
-			//
-			// From cpCore.main_GetEditLock
-			//
-			public bool EditLock; // set if an edit Lock by anyone else besides the current user
-			public int EditLockMemberID; // Member who edit locked the record
-			public string EditLockMemberName; // Member who edit locked the record
-			public DateTime EditLockExpires; // Time when the edit lock expires
+            public int RootPageID;
+            public bool SetPageNotFoundPageID;
+            public bool SetLandingPageID;
 
-		}
-		//Private EditRecordValuesObject() As Object      ' Storage for Edit Record values
-		//Private EditRecordDbValues() As Object         ' Storage for last values read from Defaults+Db, added b/c file fields need Db value to display
-		//Private EditRecord.ID As Integer                    ' ID field of edit record (Record to be edited)
-		//Private EditRecord.ParentID As Integer              ' ParentID field of edit record (Record to be edited)
-		//Private EditRecord.Name As String                ' name field of edit record
-		//Private EditRecord.Active As Boolean             ' active field of the edit record
-		//Private EditRecord.ContentID As Integer             ' ContentControlID of the edit record
-		//Private EditRecord.ContentName As String         '
-		//Private EditRecord.MenuHeadline As String        ' Used for Content Watch Link Label if default
-		//Private EditRecord.ModifiedDate As Date          ' Used for control section display
-		//Private EditRecord.ModifiedByMemberID As Integer    '   =
-		//Private EditRecord.AddedDate As Date             '   =
-		//Private EditRecord.AddedByMemberID As Integer       '   =
-		//Private EditRecord.ContentCategoryID As Integer
-		//Private EditRecordRootPageID As Integer
-		//Private EditRecord.SetPageNotFoundPageID As Boolean
-		//Private EditRecord.SetLandingPageID As Boolean
+            //
+            public bool Loaded; // true/false - set true when the field array values are loaded
+            public bool Saved; // true if edit record was saved during this page
+            public bool Read_Only; // set if this record can not be edited, for various reasons
+                                   //
+                                   // From cpCore.main_GetAuthoringStatus
+                                   //
+            public bool IsDeleted; // true means the edit record has been deleted
+            public bool IsInserted; // set if Workflow authoring insert
+            public bool IsModified; // record has been modified since last published
+            public string LockModifiedName; // member who first edited the record
+            public DateTime LockModifiedDate; // Date when member modified record
+            public bool SubmitLock; // set if a submit Lock, even if the current user is admin
+            public string SubmittedName; // member who submitted the record
+            public DateTime SubmittedDate; // Date when record was submitted
+            public bool ApproveLock; // set if an approve Lock
+            public string ApprovedName; // member who approved the record
+            public DateTime ApprovedDate; // Date when record was approved
+                                          //
+                                          // From cpCore.main_GetAuthoringPermissions
+                                          //
+            public bool AllowInsert;
+            public bool AllowCancel;
+            public bool AllowSave;
+            public bool AllowDelete;
+            public bool AllowPublish;
+            public bool AllowAbort;
+            public bool AllowSubmit;
+            public bool AllowApprove;
+            //
+            // From cpCore.main_GetEditLock
+            //
+            public bool EditLock; // set if an edit Lock by anyone else besides the current user
+            public int EditLockMemberID; // Member who edit locked the record
+            public string EditLockMemberName; // Member who edit locked the record
+            public DateTime EditLockExpires; // Time when the edit lock expires
 
-		//'
-		//Private EditRecord.Loaded As Boolean            ' true/false - set true when the field array values are loaded
-		//Private EditRecord.Saved As Boolean              ' true if edit record was saved during this page
-		//Private editrecord.read_only As Boolean           ' set if this record can not be edited, for various reasons
-		//'
-		//' From cpCore.main_GetAuthoringStatus
-		//'
-		//Private EditRecord.IsDeleted As Boolean          ' true means the edit record has been deleted
-		//Private EditRecord.IsInserted As Boolean         ' set if Workflow authoring insert
-		//Private EditRecord.IsModified As Boolean         ' record has been modified since last published
-		//Private EditRecord.LockModifiedName As String        ' member who first edited the record
-		//Private EditRecord.LockModifiedDate As Date          ' Date when member modified record
-		//Private EditRecord.SubmitLock As Boolean         ' set if a submit Lock, even if the current user is admin
-		//Private EditRecord.SubmittedName As String       ' member who submitted the record
-		//Private EditRecordSubmittedDate As Date         ' Date when record was submitted
-		//Private EditRecord.ApproveLock As Boolean        ' set if an approve Lock
-		//Private EditRecord.ApprovedName As String        ' member who approved the record
-		//Private EditRecordApprovedDate As Date          ' Date when record was approved
-		//'
-		//' From cpCore.main_GetAuthoringPermissions
-		//'
-		//Private EditRecord.AllowInsert As Boolean
-		//Private EditRecord.AllowCancel As Boolean
-		//Private EditRecord.AllowSave As Boolean
-		//Private EditRecord.AllowDelete As Boolean
-		//Private EditRecord.AllowPublish As Boolean
-		//Private EditRecord.AllowAbort As Boolean
-		//Private EditRecord.AllowSubmit As Boolean
-		//Private EditRecord.AllowApprove As Boolean
-		//'
-		//' From cpCore.main_GetEditLock
-		//'
-		//Private EditRecord.EditLock As Boolean           ' set if an edit Lock by anyone else besides the current user
-		//Private EditRecord.EditLockMemberID As Integer      ' Member who edit locked the record
-		//Private EditRecord.EditLockMemberName As String  ' Member who edit locked the record
-		//Private EditRecord.EditLockExpires As Date       ' Time when the edit lock expires
-		//'
-		//
-		//=============================================================================
-		// ----- Control Response
-		//=============================================================================
-		//
-		private string AdminButton; // Value returned from a submit button, process into action/form
-		private int AdminAction; // The action to be performed before the next form
-		private int AdminForm; // The next form to print
-		private int AdminSourceForm; // The form that submitted that the button to process
-		private string[,] WherePair = new string[3, 11]; // for passing where clause values from page to page
-		private int WherePairCount; // the current number of WherePairCount in use
-		//Private OrderByFieldPointer as integer
-		private const int OrderByFieldPointerDefault = -1;
-		//Private Direction as integer
-		private int RecordTop;
-		private int RecordsPerPage;
-		private const int RecordsPerPageDefault = 50;
-		//Private InputFieldName As String   ' Input FieldName used for DHTMLEdit
+        }
+        //Private EditRecordValuesObject() As Object      ' Storage for Edit Record values
+        //Private EditRecordDbValues() As Object         ' Storage for last values read from Defaults+Db, added b/c file fields need Db value to display
+        //Private EditRecord.ID As Integer                    ' ID field of edit record (Record to be edited)
+        //Private EditRecord.ParentID As Integer              ' ParentID field of edit record (Record to be edited)
+        //Private EditRecord.Name As String                ' name field of edit record
+        //Private EditRecord.Active As Boolean             ' active field of the edit record
+        //Private EditRecord.ContentID As Integer             ' ContentControlID of the edit record
+        //Private EditRecord.ContentName As String         '
+        //Private EditRecord.MenuHeadline As String        ' Used for Content Watch Link Label if default
+        //Private EditRecord.ModifiedDate As Date          ' Used for control section display
+        //Private EditRecord.ModifiedByMemberID As Integer    '   =
+        //Private EditRecord.AddedDate As Date             '   =
+        //Private EditRecord.AddedByMemberID As Integer       '   =
+        //Private EditRecord.ContentCategoryID As Integer
+        //Private EditRecordRootPageID As Integer
+        //Private EditRecord.SetPageNotFoundPageID As Boolean
+        //Private EditRecord.SetLandingPageID As Boolean
 
-		private int MenuDepth; // The number of windows open (below this one)
-		private string TitleExtension; // String that adds on to the end of the title
-		//Private Findstring(50) As String                ' Value to search for each index column
-		//
-		// SpellCheck Features
-		//
-		private bool SpellCheckSupported; // if true, spell checking is supported
-		private bool SpellCheckRequest; // If true, send the spell check form to the browser
-		private bool SpellCheckResponse; // if true, the user is sending the spell check back to process
-		private string SpellCheckWhiteCharacterList;
-		private string SpellCheckDictionaryFilename; // Full path to user dictionary
-		private string SpellCheckIgnoreList; // List of ignore words (used to verify the file is there)
-		//
-		//=============================================================================
-		// preferences
-		//=============================================================================
-		//
-		private int AdminMenuModeID; // Controls the menu mode, set from cpCore.main_MemberAdminMenuModeID
-		private bool allowAdminTabs; // true uses tab system
-		private string fieldEditorPreference; // this is a hidden on the edit form. The popup editor preferences sets this hidden and submits
-		//
-		//=============================================================================
-		//   Content Tracking Editing
-		//
-		//   These values are read from Edit form response, and are used to populate then
-		//   ContentWatch and ContentWatchListRules records.
-		//
-		//   They are read in before the current record is processed, then processed and
-		//   Saved back to ContentWatch and ContentWatchRules after the current record is
-		//   processed, so changes to the record can be reflected in the ContentWatch records.
-		//   For instance, if the record is marked inactive, the ContentWatchLink is cleared
-		//   and all ContentWatchListRules are deleted.
-		//
-		//=============================================================================
-		//
-		private bool ContentWatchLoaded; // flag set that shows the rest are valid
-		//
-		private int ContentWatchRecordID;
-		private string ContentWatchLink;
-		private int ContentWatchClicks;
-		private string ContentWatchLinkLabel;
-		private DateTime ContentWatchExpires;
-		private int[] ContentWatchListID; // list of all ContentWatchLists for this Content, read from response, then later saved to Rules
-		private int ContentWatchListIDSize; // size of ContentWatchListID() array
-		private int ContentWatchListIDCount; // number of valid entries in ContentWatchListID()
-		//'
-		//'=============================================================================
-		//'   Calendar Event Editing
-		//'=============================================================================
-		//'
-		//Private CalendarEventName As String
-		//Private CalendarEventStartDate As Date
-		//Private CalendarEventEndDate As Date
-		//
-		//=============================================================================
-		// Other
-		//=============================================================================
-		//
-		private int ObjectCount; // Convert the following objects to this one
-		private int ButtonObjectCount; // Count of Buttons in use
-		private int ImagePreloadCount; // Number of images preloaded
-		private string[,] ImagePreloads = new string[3, 101]; // names of all gifs already preloaded
-		//                       (0,x) = imagename
-		//                       (1,x) = ImageObject name for the image
-		private string JavaScriptString; // Collected string of Javascript functions to print at end
-		private string AdminFormBottom; // the HTML needed to complete the Admin Form after contents
-		private bool UserAllowContentEdit; // set on load - checked within each edit/index page
-		private bool UserAllowContentAdd;
-		private bool UserAllowContentDelete;
-		private int TabStopCount; // used to generate TabStop values
-		private int FormInputCount; // used to generate labels for form input
-		private int EditSectionPanelCount;
+        //'
+        //Private EditRecord.Loaded As Boolean            ' true/false - set true when the field array values are loaded
+        //Private EditRecord.Saved As Boolean              ' true if edit record was saved during this page
+        //Private editrecord.read_only As Boolean           ' set if this record can not be edited, for various reasons
+        //'
+        //' From cpCore.main_GetAuthoringStatus
+        //'
+        //Private EditRecord.IsDeleted As Boolean          ' true means the edit record has been deleted
+        //Private EditRecord.IsInserted As Boolean         ' set if Workflow authoring insert
+        //Private EditRecord.IsModified As Boolean         ' record has been modified since last published
+        //Private EditRecord.LockModifiedName As String        ' member who first edited the record
+        //Private EditRecord.LockModifiedDate As Date          ' Date when member modified record
+        //Private EditRecord.SubmitLock As Boolean         ' set if a submit Lock, even if the current user is admin
+        //Private EditRecord.SubmittedName As String       ' member who submitted the record
+        //Private EditRecordSubmittedDate As Date         ' Date when record was submitted
+        //Private EditRecord.ApproveLock As Boolean        ' set if an approve Lock
+        //Private EditRecord.ApprovedName As String        ' member who approved the record
+        //Private EditRecordApprovedDate As Date          ' Date when record was approved
+        //'
+        //' From cpCore.main_GetAuthoringPermissions
+        //'
+        //Private EditRecord.AllowInsert As Boolean
+        //Private EditRecord.AllowCancel As Boolean
+        //Private EditRecord.AllowSave As Boolean
+        //Private EditRecord.AllowDelete As Boolean
+        //Private EditRecord.AllowPublish As Boolean
+        //Private EditRecord.AllowAbort As Boolean
+        //Private EditRecord.AllowSubmit As Boolean
+        //Private EditRecord.AllowApprove As Boolean
+        //'
+        //' From cpCore.main_GetEditLock
+        //'
+        //Private EditRecord.EditLock As Boolean           ' set if an edit Lock by anyone else besides the current user
+        //Private EditRecord.EditLockMemberID As Integer      ' Member who edit locked the record
+        //Private EditRecord.EditLockMemberName As String  ' Member who edit locked the record
+        //Private EditRecord.EditLockExpires As Date       ' Time when the edit lock expires
+        //'
+        //
+        //=============================================================================
+        // ----- Control Response
+        //=============================================================================
+        //
+        private string AdminButton; // Value returned from a submit button, process into action/form
+        private int AdminAction; // The action to be performed before the next form
+        private int AdminForm; // The next form to print
+        private int AdminSourceForm; // The form that submitted that the button to process
+        private string[,] WherePair = new string[3, 11]; // for passing where clause values from page to page
+        private int WherePairCount; // the current number of WherePairCount in use
+                                    //Private OrderByFieldPointer as integer
+        private const int OrderByFieldPointerDefault = -1;
+        //Private Direction as integer
+        private int RecordTop;
+        private int RecordsPerPage;
+        private const int RecordsPerPageDefault = 50;
+        //Private InputFieldName As String   ' Input FieldName used for DHTMLEdit
 
-		private const string OpenLiveWindowTable = "<div ID=\"LiveWindowTable\">";
-		private const string CloseLiveWindowTable = "</div>";
-		//Const OpenLiveWindowTable = "<table ID=""LiveWindowTable"" border=0 cellpadding=0 cellspacing=0 width=""100%""><tr><td>"
-		//Const CloseLiveWindowTable = "</td></tr></table>"
-		//
-		//Const adminui.EditTableClose = "<tr>" _
-		//        & "<td width=20%><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
-		//        & "<td width=""70%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
-		//        & "<td width=""10%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
-		//        & "</tr>" _
-		//        & "</table>"
-		private const string AdminFormErrorOpen = "<table border=\"0\" cellpadding=\"20\" cellspacing=\"0\" width=\"100%\"><tr><td align=\"left\">";
-		private const string AdminFormErrorClose = "</td></tr></table>";
-		//
-		// these were defined different in csv
-		//
-		//Private Const ContentTypeMember = 1
-		//Private Const ContentTypePaths = 2
-		//Private Const csv_contenttypeenum.contentTypeEmail = 3
-		//Private Const ContentTypeContent = 4
-		//Private Const ContentTypeSystem = 5
-		//Private Const ContentTypeNormal = 6
-		//
-		//
-		//
-		private const string RequestNameAdminDepth = "ad";
-		private const string RequestNameAdminForm = "af";
-		private const string RequestNameAdminSourceForm = "asf";
-		private const string RequestNameAdminAction = "aa";
-		//Private Const RequestNameFieldName = "fn"
-		private const string RequestNameTitleExtension = "tx";
-		//
-		//
-		//'
-		//'Private AdminContentCellBackgroundColor As String
-		//'
-		public enum NodeTypeEnum
-		{
-			NodeTypeEntry = 0,
-			NodeTypeCollection = 1,
-			NodeTypeAddon = 2,
-			NodeTypeContent = 3
-		}
-		//
-		private const string IndexConfigPrefix = "IndexConfig:";
-		//
-		public enum FindWordMatchEnum
-		{
-			MatchIgnore = 0,
-			MatchEmpty = 1,
-			MatchNotEmpty = 2,
-			MatchGreaterThan = 3,
-			MatchLessThan = 4,
-			matchincludes = 5,
-			MatchEquals = 6,
-			MatchTrue = 7,
-			MatchFalse = 8
-		}
-		//
-		//
-		//
-		public class indexConfigSortClass
-		{
-			//Dim FieldPtr As Integer
-			public string fieldName;
-			public int direction; // 1=forward, 2=reverse, 0=ignore/remove this sort
-		}
-		//
-		public class indexConfigFindWordClass
-		{
-			public string Name;
-			public string Value;
-			public int Type;
-			public FindWordMatchEnum MatchOption;
-		}
-		//
-		public class indexConfigColumnClass
-		{
-			public string Name;
-			//Public FieldId As Integer
-			public int Width;
-			public int SortPriority;
-			public int SortDirection;
-		}
-		//
-		public class indexConfigClass
-		{
-			public bool Loaded;
-			public int ContentID;
-			public int PageNumber;
-			public int RecordsPerPage;
-			public int RecordTop;
+        private int MenuDepth; // The number of windows open (below this one)
+        private string TitleExtension; // String that adds on to the end of the title
+                                       //Private Findstring(50) As String                ' Value to search for each index column
+                                       //
+                                       // SpellCheck Features
+                                       //
+        private bool SpellCheckSupported; // if true, spell checking is supported
+        private bool SpellCheckRequest; // If true, send the spell check form to the browser
+        private bool SpellCheckResponse; // if true, the user is sending the spell check back to process
+        private string SpellCheckWhiteCharacterList;
+        private string SpellCheckDictionaryFilename; // Full path to user dictionary
+        private string SpellCheckIgnoreList; // List of ignore words (used to verify the file is there)
+                                             //
+                                             //=============================================================================
+                                             // preferences
+                                             //=============================================================================
+                                             //
+        private int AdminMenuModeID; // Controls the menu mode, set from cpCore.main_MemberAdminMenuModeID
+        private bool allowAdminTabs; // true uses tab system
+        private string fieldEditorPreference; // this is a hidden on the edit form. The popup editor preferences sets this hidden and submits
+                                              //
+                                              //=============================================================================
+                                              //   Content Tracking Editing
+                                              //
+                                              //   These values are read from Edit form response, and are used to populate then
+                                              //   ContentWatch and ContentWatchListRules records.
+                                              //
+                                              //   They are read in before the current record is processed, then processed and
+                                              //   Saved back to ContentWatch and ContentWatchRules after the current record is
+                                              //   processed, so changes to the record can be reflected in the ContentWatch records.
+                                              //   For instance, if the record is marked inactive, the ContentWatchLink is cleared
+                                              //   and all ContentWatchListRules are deleted.
+                                              //
+                                              //=============================================================================
+                                              //
+        private bool ContentWatchLoaded; // flag set that shows the rest are valid
+                                         //
+        private int ContentWatchRecordID;
+        private string ContentWatchLink;
+        private int ContentWatchClicks;
+        private string ContentWatchLinkLabel;
+        private DateTime ContentWatchExpires;
+        private int[] ContentWatchListID; // list of all ContentWatchLists for this Content, read from response, then later saved to Rules
+        private int ContentWatchListIDSize; // size of ContentWatchListID() array
+        private int ContentWatchListIDCount; // number of valid entries in ContentWatchListID()
+                                             //'
+                                             //'=============================================================================
+                                             //'   Calendar Event Editing
+                                             //'=============================================================================
+                                             //'
+                                             //Private CalendarEventName As String
+                                             //Private CalendarEventStartDate As Date
+                                             //Private CalendarEventEndDate As Date
+                                             //
+                                             //=============================================================================
+                                             // Other
+                                             //=============================================================================
+                                             //
+        private int ObjectCount; // Convert the following objects to this one
+        private int ButtonObjectCount; // Count of Buttons in use
+        private int ImagePreloadCount; // Number of images preloaded
+        private string[,] ImagePreloads = new string[3, 101]; // names of all gifs already preloaded
+                                                              //                       (0,x) = imagename
+                                                              //                       (1,x) = ImageObject name for the image
+        private string JavaScriptString; // Collected string of Javascript functions to print at end
+        private string AdminFormBottom; // the HTML needed to complete the Admin Form after contents
+        private bool UserAllowContentEdit; // set on load - checked within each edit/index page
+        private bool UserAllowContentAdd;
+        private bool UserAllowContentDelete;
+        private int TabStopCount; // used to generate TabStop values
+        private int FormInputCount; // used to generate labels for form input
+        private int EditSectionPanelCount;
 
-			//FindWordList As String
-			public Dictionary<string, indexConfigFindWordClass> FindWords = new Dictionary<string, indexConfigFindWordClass>();
-			//Public FindWordCnt As Integer
-			public bool ActiveOnly;
-			public bool LastEditedByMe;
-			public bool LastEditedToday;
-			public bool LastEditedPast7Days;
-			public bool LastEditedPast30Days;
-			public bool Open;
-			//public SortCnt As Integer
-			public Dictionary<string, indexConfigSortClass> Sorts = new Dictionary<string, indexConfigSortClass>();
-			public int GroupListCnt;
-			public string[] GroupList;
-			//public ColumnCnt As Integer
-			public Dictionary<string, indexConfigColumnClass> Columns = new Dictionary<string, indexConfigColumnClass>();
-			//SubCDefs() as integer
-			//SubCDefCnt as integer
-			public int SubCDefID;
-		}
-		//
-		// Temp
-		//
-		private const int ToolsActionMenuMove = 1;
-		private const int ToolsActionAddField = 2; // Add a field to the Index page
-		private const int ToolsActionRemoveField = 3;
-		private const int ToolsActionMoveFieldRight = 4;
-		private const int ToolsActionMoveFieldLeft = 5;
-		private const int ToolsActionSetAZ = 6;
-		private const int ToolsActionSetZA = 7;
-		private const int ToolsActionExpand = 8;
-		private const int ToolsActionContract = 9;
-		private const int ToolsActionEditMove = 10;
-		private const int ToolsActionRunQuery = 11;
-		private const int ToolsActionDuplicateDataSource = 12;
-		private const int ToolsActionDefineContentFieldFromTableFieldsFromTable = 13;
-		private const int ToolsActionFindAndReplace = 14;
-		//
-		private bool AllowAdminFieldCheck_Local;
-		private bool AllowAdminFieldCheck_LocalLoaded;
-		//
-		private const string AddonGuidPreferences = "{D9C2D64E-9004-4DBE-806F-60635B9F52C8}";
-		//
-		//========================================================================
-		//
-		//========================================================================
-		//
-		public string admin_GetAdminFormBody(string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content)
-		{
-			return (new adminUIController(cpCore)).GetBody(Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content);
-		}
+        private const string OpenLiveWindowTable = "<div ID=\"LiveWindowTable\">";
+        private const string CloseLiveWindowTable = "</div>";
+        //Const OpenLiveWindowTable = "<table ID=""LiveWindowTable"" border=0 cellpadding=0 cellspacing=0 width=""100%""><tr><td>"
+        //Const CloseLiveWindowTable = "</td></tr></table>"
+        //
+        //Const adminui.EditTableClose = "<tr>" _
+        //        & "<td width=20%><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
+        //        & "<td width=""70%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
+        //        & "<td width=""10%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
+        //        & "</tr>" _
+        //        & "</table>"
+        private const string AdminFormErrorOpen = "<table border=\"0\" cellpadding=\"20\" cellspacing=\"0\" width=\"100%\"><tr><td align=\"left\">";
+        private const string AdminFormErrorClose = "</td></tr></table>";
+        //
+        // these were defined different in csv
+        //
+        //Private Const ContentTypeMember = 1
+        //Private Const ContentTypePaths = 2
+        //Private Const csv_contenttypeenum.contentTypeEmail = 3
+        //Private Const ContentTypeContent = 4
+        //Private Const ContentTypeSystem = 5
+        //Private Const ContentTypeNormal = 6
+        //
+        //
+        //
+        private const string RequestNameAdminDepth = "ad";
+        private const string RequestNameAdminForm = "af";
+        private const string RequestNameAdminSourceForm = "asf";
+        private const string RequestNameAdminAction = "aa";
+        //Private Const RequestNameFieldName = "fn"
+        private const string RequestNameTitleExtension = "tx";
+        //
+        //
+        //'
+        //'Private AdminContentCellBackgroundColor As String
+        //'
+        public enum NodeTypeEnum {
+            NodeTypeEntry = 0,
+            NodeTypeCollection = 1,
+            NodeTypeAddon = 2,
+            NodeTypeContent = 3
+        }
+        //
+        private const string IndexConfigPrefix = "IndexConfig:";
+        //
+        public enum FindWordMatchEnum {
+            MatchIgnore = 0,
+            MatchEmpty = 1,
+            MatchNotEmpty = 2,
+            MatchGreaterThan = 3,
+            MatchLessThan = 4,
+            matchincludes = 5,
+            MatchEquals = 6,
+            MatchTrue = 7,
+            MatchFalse = 8
+        }
+        //
+        //
+        //
+        public class indexConfigSortClass {
+            //Dim FieldPtr As Integer
+            public string fieldName;
+            public int direction; // 1=forward, 2=reverse, 0=ignore/remove this sort
+        }
+        //
+        public class indexConfigFindWordClass {
+            public string Name;
+            public string Value;
+            public int Type;
+            public FindWordMatchEnum MatchOption;
+        }
+        //
+        public class indexConfigColumnClass {
+            public string Name;
+            //Public FieldId As Integer
+            public int Width;
+            public int SortPriority;
+            public int SortDirection;
+        }
+        //
+        public class indexConfigClass {
+            public bool Loaded;
+            public int ContentID;
+            public int PageNumber;
+            public int RecordsPerPage;
+            public int RecordTop;
+
+            //FindWordList As String
+            public Dictionary<string, indexConfigFindWordClass> FindWords = new Dictionary<string, indexConfigFindWordClass>();
+            //Public FindWordCnt As Integer
+            public bool ActiveOnly;
+            public bool LastEditedByMe;
+            public bool LastEditedToday;
+            public bool LastEditedPast7Days;
+            public bool LastEditedPast30Days;
+            public bool Open;
+            //public SortCnt As Integer
+            public Dictionary<string, indexConfigSortClass> Sorts = new Dictionary<string, indexConfigSortClass>();
+            public int GroupListCnt;
+            public string[] GroupList;
+            //public ColumnCnt As Integer
+            public Dictionary<string, indexConfigColumnClass> Columns = new Dictionary<string, indexConfigColumnClass>();
+            //SubCDefs() as integer
+            //SubCDefCnt as integer
+            public int SubCDefID;
+        }
+        //
+        // Temp
+        //
+        private const int ToolsActionMenuMove = 1;
+        private const int ToolsActionAddField = 2; // Add a field to the Index page
+        private const int ToolsActionRemoveField = 3;
+        private const int ToolsActionMoveFieldRight = 4;
+        private const int ToolsActionMoveFieldLeft = 5;
+        private const int ToolsActionSetAZ = 6;
+        private const int ToolsActionSetZA = 7;
+        private const int ToolsActionExpand = 8;
+        private const int ToolsActionContract = 9;
+        private const int ToolsActionEditMove = 10;
+        private const int ToolsActionRunQuery = 11;
+        private const int ToolsActionDuplicateDataSource = 12;
+        private const int ToolsActionDefineContentFieldFromTableFieldsFromTable = 13;
+        private const int ToolsActionFindAndReplace = 14;
+        //
+        private bool AllowAdminFieldCheck_Local;
+        private bool AllowAdminFieldCheck_LocalLoaded;
+        //
+        private const string AddonGuidPreferences = "{D9C2D64E-9004-4DBE-806F-60635B9F52C8}";
+        //
+        //========================================================================
+        //
+        //========================================================================
+        //
+        public string admin_GetAdminFormBody(string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
+            return (new adminUIController(cpCore)).GetBody(Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content);
+        }
         //
         //
         //========================================================================
@@ -2719,7 +2545,7 @@ ErrorTrap:
                             if (cpCore.db.csOk(CS)) {
                                 recordCnt = cpCore.db.csGetInteger(CS, "cnt");
                             }
-                            cpCore.db.csClose(CS);
+                            cpCore.db.csClose(ref CS);
                             //
                             // Assumble the SQL
                             //
@@ -2746,8 +2572,8 @@ ErrorTrap:
                             cpCore.doc.addRefreshQueryString(RequestNameTitleExtension, genericController.EncodeRequestVariable(TitleExtension));
                             if (WherePairCount > 0) {
                                 for (WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
-                                    cpCore.doc.addRefreshQueryString("wl" + WhereCount, WherePair(0, WhereCount));
-                                    cpCore.doc.addRefreshQueryString("wr" + WhereCount, WherePair(1, WhereCount));
+                                    cpCore.doc.addRefreshQueryString("wl" + WhereCount, WherePair[0, WhereCount]);
+                                    cpCore.doc.addRefreshQueryString("wr" + WhereCount, WherePair[1, WhereCount]);
                                 }
                             }
                             //
@@ -2869,12 +2695,12 @@ ErrorTrap:
                                 //If (LCase(AdminContent.ContentTableName) = "ccmembers") And (.GroupListCnt > 0) Then
                                 SubTitlePart = "";
                                 for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                                    if (IndexConfig.GroupList(Ptr) != "") {
-                                        GroupList = GroupList + "\t" + IndexConfig.GroupList(Ptr);
+                                    if (IndexConfig.GroupList[Ptr] != "") {
+                                        GroupList = GroupList + "\t" + IndexConfig.GroupList[Ptr];
                                     }
                                 }
                                 if (!string.IsNullOrEmpty(GroupList)) {
-                                    Groups = Microsoft.VisualBasic.Strings.Split(GroupList.Substring(1), "\t", -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                                    Groups = GroupList.Split("\t".ToCharArray() );
                                     if (Groups.GetUpperBound(0) == 0) {
                                         SubTitle = SubTitle + ", in group '" + Groups[0] + "'";
                                     } else if (Groups.GetUpperBound(0) == 1) {
@@ -3060,7 +2886,7 @@ ErrorTrap:
                                 if (!IndexConfig.Sorts.ContainsKey(FieldName)) {
                                     ButtonHref += "&SetSortDirection=1";
                                 } else {
-                                    switch (IndexConfig.Sorts(FieldName).direction) {
+                                    switch (IndexConfig.Sorts[FieldName].direction) {
                                         case 1:
                                             ButtonHref += "&SetSortDirection=2";
                                             break;
@@ -3076,18 +2902,18 @@ ErrorTrap:
                                 //
                                 if (WherePairCount > 0) {
                                     for (WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
-                                        if (WherePair(0, WhereCount) != "") {
-                                            ButtonHref += "&wl" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair(0, WhereCount));
-                                            ButtonHref += "&wr" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair(1, WhereCount));
+                                        if (WherePair[0, WhereCount] != "") {
+                                            ButtonHref += "&wl" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair[0, WhereCount]);
+                                            ButtonHref += "&wr" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair[1, WhereCount]);
                                         }
                                     }
                                 }
-                                ButtonFace = adminContent.fields(FieldName.ToLower()).caption;
+                                ButtonFace = adminContent.fields[FieldName.ToLower()].caption;
                                 ButtonFace = genericController.vbReplace(ButtonFace, " ", "&nbsp;");
                                 SortTitle = "Sort A-Z";
                                 //
                                 if (IndexConfig.Sorts.ContainsKey(FieldName)) {
-                                    switch (IndexConfig.Sorts(FieldName).direction) {
+                                    switch (IndexConfig.Sorts[FieldName].direction) {
                                         case 1:
                                             ButtonFace = ButtonFace + "<img src=\"/ccLib/images/arrowdown.gif\" width=8 height=8 border=0>";
                                             SortTitle = "Sort Z-A";
@@ -3154,7 +2980,7 @@ ErrorTrap:
                                     URI = "\\" + cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminAction + "=" + AdminActionNop + "&cid=" + adminContent.Id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + genericController.EncodeRequestVariable(TitleExtension) + "&ad=" + MenuDepth + "&" + RequestNameAdminSourceForm + "=" + AdminForm + "&" + RequestNameAdminForm + "=" + AdminFormEdit;
                                     if (WherePairCount > 0) {
                                         for (WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
-                                            URI = URI + "&wl" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair(0, WhereCount)) + "&wr" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair(1, WhereCount));
+                                            URI = URI + "&wl" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair[1, WhereCount]);
                                         }
                                     }
                                     DataTable_DataRows += ("<a href=\"" + genericController.encodeHTML(URI) + "\"><img src=\"/ccLib/images/IconContentEdit.gif\" border=\"0\"></a>");
@@ -3190,7 +3016,7 @@ ErrorTrap:
                                     RecordTop_PreviousPage = 0;
                                 }
                             }
-                            cpCore.db.csClose(CS);
+                            cpCore.db.csClose(ref CS);
                             //
                             // Header at bottom
                             //
@@ -3260,7 +3086,7 @@ ErrorTrap:
                                 FieldName = genericController.vbLCase(column.Name);
                                 FindWordValue = "";
                                 if (IndexConfig.FindWords.ContainsKey(FieldName)) {
-                                    var tempVar = IndexConfig.FindWords(FieldName);
+                                    var tempVar = IndexConfig.FindWords[FieldName];
                                     if ((tempVar.MatchOption == FindWordMatchEnum.matchincludes) || (tempVar.MatchOption == FindWordMatchEnum.MatchEquals)) {
                                         FindWordValue = tempVar.Value;
                                     }
@@ -3356,10 +3182,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetXMLAttribute");
             return tempGetXMLAttribute;
         }
@@ -3468,13 +3294,13 @@ ErrorTrap:
                     SubFilterList = "";
                     if (IndexConfig.GroupListCnt > 0) {
                         for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                            GroupName = IndexConfig.GroupList(Ptr);
-                            if (IndexConfig.GroupList(Ptr) != "") {
+                            GroupName = IndexConfig.GroupList[Ptr];
+                            if (IndexConfig.GroupList[Ptr] != "") {
                                 if (GroupName.Length > 30) {
                                     GroupName = GroupName.Substring(0, 15) + "..." + GroupName.Substring(GroupName.Length - 15);
                                 }
                                 QS = RQS;
-                                QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveGroup", IndexConfig.GroupList(Ptr));
+                                QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveGroup", IndexConfig.GroupList[Ptr]);
                                 Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
                                 SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">" + GroupName + "</a></div>";
                             }
@@ -3612,7 +3438,7 @@ ErrorTrap:
                         Ptr = 0;
                         if (IndexConfig.GroupListCnt > 0) {
                             for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                                if (Name == IndexConfig.GroupList(Ptr)) {
+                                if (Name == IndexConfig.GroupList[Ptr]) {
                                     break;
                                 }
                             }
@@ -3803,7 +3629,7 @@ ErrorTrap:
                             adminContent = Models.Complex.cdefModel.getCdef(cpCore, adminContent.Id);
                         }
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                 }
                 //
                 // Other page control fields
@@ -3819,14 +3645,14 @@ ErrorTrap:
                 //
                 WherePairCount = 99;
                 for (WCount = 0; WCount <= 99; WCount++) {
-                    WherePair(0, WCount) = genericController.encodeText(cpCore.docProperties.getText("WL" + WCount));
-                    if (WherePair(0, WCount) == "") {
+                    WherePair[0, WCount] = genericController.encodeText(cpCore.docProperties.getText("WL" + WCount));
+                    if (WherePair[0, WCount] == "") {
                         WherePairCount = WCount;
                         break;
                     } else {
-                        WherePair(1, WCount) = genericController.encodeText(cpCore.docProperties.getText("WR" + WCount));
-                        cpCore.doc.addRefreshQueryString("wl" + WCount, genericController.EncodeRequestVariable(WherePair(0, WCount)));
-                        cpCore.doc.addRefreshQueryString("wr" + WCount, genericController.EncodeRequestVariable(WherePair(1, WCount)));
+                        WherePair[1, WCount) = genericController.encodeText(cpCore.docProperties.getText("WR" + WCount]);
+                        cpCore.doc.addRefreshQueryString("wl" + WCount, genericController.EncodeRequestVariable(WherePair[0, WCount]));
+                        cpCore.doc.addRefreshQueryString("wr" + WCount, genericController.EncodeRequestVariable(WherePair[1, WCount]));
                     }
                 }
                 //
@@ -3957,7 +3783,7 @@ ErrorTrap:
                                         //
                                         // remove current preferences for this field
                                         //
-                                        Parts = Microsoft.VisualBasic.Strings.Split("," + editorpreferences, "," + fieldEditorFieldId.ToString() + ":", -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                                        Parts = ("," + editorpreferences).Split( ("," + fieldEditorFieldId.ToString() + ":").ToCharArray());
                                         Cnt = Parts.GetUpperBound(0) + 1;
                                         if (Cnt > 0) {
                                             for (Ptr = 1; Ptr < Cnt; Ptr++) {
@@ -3997,13 +3823,13 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError2("GetForm_LoadControl");
-            //INSTANT C# TODO TASK: The 'Resume Next' statement is not converted by Instant C#:
-            Resume Next
+            //INSTANT C# TODO TASK: The '////Resume Next' statement is not converted by Instant C#:
+            ////Resume Next
 
         }
         //
@@ -4347,7 +4173,7 @@ ErrorTrap:
                                                     cpCore.db.csSet(CS, "ScheduleDate", cpCore.doc.profileStartTime);
                                                 }
                                             }
-                                            cpCore.db.csClose(CS);
+                                            cpCore.db.csClose(ref CS);
                                         }
                                     }
                                 }
@@ -4373,7 +4199,7 @@ ErrorTrap:
                                             } else {
                                                 cpCore.db.csSet(CS, "submitted", false);
                                             }
-                                            cpCore.db.csClose(CS);
+                                            cpCore.db.csClose(ref CS);
                                         }
                                     }
                                 }
@@ -4405,7 +4231,7 @@ ErrorTrap:
                                                     cpCore.db.csSet(CS, "ScheduleDate", cpCore.doc.profileStartTime);
                                                 }
                                             }
-                                            cpCore.db.csClose(CS);
+                                            cpCore.db.csClose(ref CS);
                                         }
                                     }
                                 }
@@ -4471,7 +4297,7 @@ ErrorTrap:
                                                     }
                                                 }
                                             }
-                                            cpCore.db.csClose(CSEditRecord);
+                                            cpCore.db.csClose(ref CSEditRecord);
                                         }
                                     }
                                 }
@@ -4504,10 +4330,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError2("ProcessActions");
             errorController.error_AddUserError(cpCore, "There was an unknown error processing this page at " + cpCore.doc.profileStartTime + ". Please try again, Or report this error To the site administrator.");
         }
@@ -4578,7 +4404,7 @@ ErrorTrap:
                                 cpCore.db.csSet(CSNew, "AllowAdd", AllowAdd);
                                 cpCore.db.csSet(CSNew, "AllowDelete", AllowDelete);
                             }
-                            cpCore.db.csClose(CSNew);
+                            cpCore.db.csClose(ref CSNew);
                             RecordChanged = true;
                         } else if (RuleFound && !RuleNeeded) {
                             DeleteIdList += ", " + RuleId;
@@ -4596,7 +4422,7 @@ ErrorTrap:
                         }
                     }
                 }
-                cpCore.db.csClose(CSPointer);
+                cpCore.db.csClose(ref CSPointer);
                 if (!string.IsNullOrEmpty(DeleteIdList)) {
                     SQL = "delete from ccgrouprules where id In (" + DeleteIdList.Substring(1) + ")";
                     cpCore.db.executeQuery(SQL);
@@ -4606,10 +4432,10 @@ ErrorTrap:
                 }
                 return;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("LoadAndSaveContentGroupRules");
         }
         //
@@ -4627,10 +4453,10 @@ ErrorTrap:
                 //
                 return;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("LoadAndSaveGroupRules");
         }
         //
@@ -4660,15 +4486,15 @@ ErrorTrap:
                         LoadAndSaveGroupRules_ForContentAndChildren(cpCore.db.csGetInteger(CSPointer, "id"), MyParentIDString);
                         cpCore.db.csGoNext(CSPointer);
                     }
-                    cpCore.db.csClose(CSPointer);
+                    cpCore.db.csClose(ref CSPointer);
                 }
                 //
                 return;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("LoadAndSaveGroupRules_ForContentAndChildren");
         }
         //
@@ -4731,7 +4557,7 @@ ErrorTrap:
                                 cpCore.db.csSet(CSNew, "AllowAdd", AllowAdd);
                                 cpCore.db.csSet(CSNew, "AllowDelete", AllowDelete);
                             }
-                            cpCore.db.csClose(CSNew);
+                            cpCore.db.csClose(ref CSNew);
                             RecordChanged = true;
                         } else if (RuleFound && !RuleNeeded) {
                             cpCore.db.csDeleteRecord(CSPointer);
@@ -4748,13 +4574,13 @@ ErrorTrap:
                         }
                     }
                 }
-                cpCore.db.csClose(CSPointer);
+                cpCore.db.csClose(ref CSPointer);
                 if (RecordChanged) {
                     cpCore.cache.invalidateAllObjectsInContent("Group Rules");
                 }
                 return;
                 //
-            } catch( Exception ex) {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
         }
@@ -4888,10 +4714,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("LoadEditRecord");
             //
         }
@@ -4923,10 +4749,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetWherePairValue");
             //
             return tempGetWherePairValue;
@@ -4972,39 +4798,39 @@ ErrorTrap:
                             case FieldTypeIdAutoIdIncrement:
                             case FieldTypeIdMemberSelect:
                                 //
-                                editrecord.fieldsLc(field.nameLc).value = genericController.EncodeInteger(defaultValue);
+                                editrecord.fieldsLc[field.nameLc].value = genericController.EncodeInteger(defaultValue);
                                 break;
                             case FieldTypeIdCurrency:
                             case FieldTypeIdFloat:
                                 //
-                                editrecord.fieldsLc(field.nameLc).value = genericController.EncodeNumber(defaultValue);
+                                editrecord.fieldsLc[field.nameLc].value = genericController.EncodeNumber(defaultValue);
                                 break;
                             case FieldTypeIdBoolean:
                                 //
-                                editrecord.fieldsLc(field.nameLc).value = genericController.EncodeBoolean(defaultValue);
+                                editrecord.fieldsLc[field.nameLc].value = genericController.EncodeBoolean(defaultValue);
                                 break;
                             case FieldTypeIdDate:
                                 //
-                                editrecord.fieldsLc(field.nameLc).value = genericController.EncodeDate(defaultValue);
+                                editrecord.fieldsLc[field.nameLc].value = genericController.EncodeDate(defaultValue);
                                 break;
                             case FieldTypeIdLookup:
 
                                 DefaultValueText = genericController.encodeText(field.defaultValue);
                                 if (!string.IsNullOrEmpty(DefaultValueText)) {
                                     if (genericController.vbIsNumeric(DefaultValueText)) {
-                                        editrecord.fieldsLc(field.nameLc).value = DefaultValueText;
+                                        editrecord.fieldsLc[field.nameLc].value = DefaultValueText;
                                     } else {
                                         if (field.lookupContentID != 0) {
                                             LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, field.lookupContentID);
                                             if (!string.IsNullOrEmpty(LookupContentName)) {
-                                                editrecord.fieldsLc(field.nameLc).value = cpCore.db.getRecordID(LookupContentName, DefaultValueText);
+                                                editrecord.fieldsLc[field.nameLc].value = cpCore.db.getRecordID(LookupContentName, DefaultValueText);
                                             }
                                         } else if (field.lookupList != "") {
                                             UCaseDefaultValueText = genericController.vbUCase(DefaultValueText);
                                             lookups = field.lookupList.Split(',');
                                             for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
                                                 if (UCaseDefaultValueText == genericController.vbUCase(lookups[Ptr])) {
-                                                    editrecord.fieldsLc(field.nameLc).value = Ptr + 1;
+                                                    editrecord.fieldsLc[field.nameLc].value = Ptr + 1;
                                                     break;
                                                 }
                                             }
@@ -5015,7 +4841,7 @@ ErrorTrap:
                                 break;
                             default:
                                 //
-                                editrecord.fieldsLc(field.nameLc).value = genericController.encodeText(defaultValue);
+                                editrecord.fieldsLc[field.nameLc].value = genericController.encodeText(defaultValue);
                                 break;
                         }
                     }
@@ -5028,12 +4854,12 @@ ErrorTrap:
                         //    .readonlyfield = True
                         //    .Required = False
                         case "MODIFIEDBY":
-                            editrecord.fieldsLc(field.nameLc).value = cpCore.doc.authContext.user.id;
+                            editrecord.fieldsLc[field.nameLc].value = cpCore.doc.authContext.user.id;
                             //    .readonlyfield = True
                             //    .Required = False
                             break;
                         case "CREATEDBY":
-                            editrecord.fieldsLc(field.nameLc).value = cpCore.doc.authContext.user.id;
+                            editrecord.fieldsLc[field.nameLc].value = cpCore.doc.authContext.user.id;
                             //    .readonlyfield = True
                             //    .Required = False
                             //Case "DATEADDED"
@@ -5041,12 +4867,12 @@ ErrorTrap:
                             //    .Required = False
                             break;
                         case "CONTENTCONTROLID":
-                            editrecord.fieldsLc(field.nameLc).value = adminContent.Id;
+                            editrecord.fieldsLc[field.nameLc].value = adminContent.Id;
                             //Case "SORTORDER"
                             // default to ID * 100, but must be done later
                             break;
                     }
-                    editrecord.fieldsLc(field.nameLc).dbValue = editrecord.fieldsLc(field.nameLc).value;
+                    editrecord.fieldsLc[field.nameLc].dbValue = editrecord.fieldsLc[field.nameLc].value;
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -5109,10 +4935,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("LoadEditRecord_WherePairs");
         }
         //
@@ -5207,7 +5033,7 @@ ErrorTrap:
                                 editRecordField = new editRecordFieldClass();
                                 editrecord.fieldsLc.Add(fieldNameLc, editRecordField);
                             } else {
-                                editRecordField = editrecord.fieldsLc(fieldNameLc);
+                                editRecordField = editrecord.fieldsLc[fieldNameLc];
                             }
                             //
                             // 1/21/2007 - added clause if required and null, set to default value
@@ -5312,7 +5138,7 @@ ErrorTrap:
                             editRecordField.value = DBValueVariant;
                         }
                     }
-                    cpCore.db.csClose(CSEditRecord);
+                    cpCore.db.csClose(ref CSEditRecord);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -5407,7 +5233,7 @@ ErrorTrap:
         //'========================================================================
         //'
         //Private Sub LoadEditResponseByName(FieldName As String)
-        //    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.LoadEditResponseByName")
+        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.LoadEditResponseByName")
         //    '
         //    ' converted array to dictionary - Dim FieldPointer As Integer
         //    Dim FieldFound As Boolean
@@ -5437,7 +5263,7 @@ ErrorTrap:
         //    '
         //    ' ----- Error Trap
         //    '
-        //ErrorTrap:
+        ////ErrorTrap:
         //    Call HandleClassTrapErrorBubble("LoadEditResponseByName")
         //    '
         //End Sub
@@ -5530,7 +5356,7 @@ ErrorTrap:
                             ResponseFieldValueText = cpCore.docProperties.getText(FieldName);
                             //ResponseValueVariant = cpCore.main_ReadStreamText(FieldName)
                             //ResponseValueText = genericController.encodeText(ResponseValueVariant)
-                            if (genericController.EncodeInteger(ResponseFieldValueText) == genericController.EncodeInteger(editRecord.fieldsLc(field.nameLc).value)) {
+                            if (genericController.EncodeInteger(ResponseFieldValueText) == genericController.EncodeInteger(editRecord.fieldsLc[field.nameLc].value)) {
                                 //
                                 // No change
                                 //
@@ -5538,7 +5364,7 @@ ErrorTrap:
                                 //
                                 // new value
                                 //
-                                editRecord.fieldsLc(field.nameLc).value = ResponseFieldValueText;
+                                editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
                                 ResponseFieldIsEmpty = false;
                             }
                             break;
@@ -5558,11 +5384,11 @@ ErrorTrap:
                             //
                             bool responseValue = cpCore.docProperties.getBoolean(FieldName);
 
-                            if (!responseValue.Equals(EncodeBoolean(editRecord.fieldsLc(field.nameLc).value))) {
+                            if (!responseValue.Equals(EncodeBoolean(editRecord.fieldsLc[field.nameLc].value))) {
                                 //
                                 // new value
                                 //
-                                editRecord.fieldsLc(field.nameLc).value = responseValue;
+                                editRecord.fieldsLc[field.nameLc].value = responseValue;
                                 ResponseFieldIsEmpty = false;
                             }
                             break;
@@ -5581,7 +5407,7 @@ ErrorTrap:
                             }
                             //
                             ResponseFieldValueText = cpCore.docProperties.getText(FieldName);
-                            if (ResponseFieldValueText == editRecord.fieldsLc(field.nameLc).value.ToString()) {
+                            if (ResponseFieldValueText == editRecord.fieldsLc[field.nameLc].value.ToString()) {
                                 //
                                 // No change
                                 //
@@ -5589,7 +5415,7 @@ ErrorTrap:
                                 //
                                 // new value
                                 //
-                                editRecord.fieldsLc(field.nameLc).value = ResponseFieldValueText;
+                                editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
                                 ResponseFieldIsEmpty = false;
                             }
                             break;
@@ -5805,7 +5631,7 @@ ErrorTrap:
                                         } else {
                                             ParentID = cpCore.db.csGetInteger(CS, "ParentID");
                                         }
-                                        cpCore.db.csClose(CS);
+                                        cpCore.db.csClose(ref CS);
                                         LoopPtr = LoopPtr + 1;
                                     }
                                     if (LoopPtr == LoopPtrMax) {
@@ -5832,7 +5658,7 @@ ErrorTrap:
                                     //
                                     // text buffering
                                     //
-                                    ResponseFieldValueText = genericController.main_RemoveControlCharacters(ResponseFieldValueText);
+                                    //ResponseFieldValueText = genericController.main_RemoveControlCharacters(ResponseFieldValueText);
                                 }
                                 if ((field.Required) && (ResponseFieldIsEmpty)) {
                                     //
@@ -5886,7 +5712,7 @@ ErrorTrap:
                                         }
                                         ResponseFieldValueIsOKToSave = false;
                                     }
-                                    cpCore.db.csClose(CSPointer);
+                                    cpCore.db.csClose(ref CSPointer);
                                 }
                             }
                             // end case
@@ -5896,7 +5722,7 @@ ErrorTrap:
                     // Save response if it is valid
                     //
                     if (ResponseFieldValueIsOKToSave) {
-                        editRecord.fieldsLc(field.nameLc).value = ResponseFieldValueText;
+                        editRecord.fieldsLc[field.nameLc].value = ResponseFieldValueText;
                     }
                 }
             } catch (Exception ex) {
@@ -5945,7 +5771,7 @@ ErrorTrap:
                     ContentID = editRecord.contentControlId;
                     CSContentWatch = cpCore.db.csOpen("Content Watch", "(ContentID=" + cpCore.db.encodeSQLNumber(ContentID) + ")And(RecordID=" + cpCore.db.encodeSQLNumber(editRecord.id) + ")");
                     if (!cpCore.db.csOk(CSContentWatch)) {
-                        cpCore.db.csClose(CSContentWatch);
+                        cpCore.db.csClose(ref CSContentWatch);
                         CSContentWatch = cpCore.db.csInsertRecord("Content Watch");
                         cpCore.db.csSet(CSContentWatch, "contentid", ContentID);
                         cpCore.db.csSet(CSContentWatch, "recordid", editRecord.id);
@@ -5968,7 +5794,7 @@ ErrorTrap:
                             cpCore.db.csDeleteRecord(CSPointer);
                             cpCore.db.csGoNext(CSPointer);
                         }
-                        cpCore.db.csClose(CSPointer);
+                        cpCore.db.csClose(ref CSPointer);
                         //
                         // ----- Update ContentWatchListRules for all entries in ContentWatchListID( ContentWatchListIDCount )
                         //
@@ -5978,23 +5804,23 @@ ErrorTrap:
                                 CSRules = cpCore.db.csInsertRecord("Content Watch List Rules");
                                 if (cpCore.db.csOk(CSRules)) {
                                     cpCore.db.csSet(CSRules, "ContentWatchID", ContentWatchID);
-                                    cpCore.db.csSet(CSRules, "ContentWatchListID", ContentWatchListID(ListPointer));
+                                    cpCore.db.csSet(CSRules, "ContentWatchListID", ContentWatchListID[ListPointer]);
                                 }
-                                cpCore.db.csClose(CSRules);
+                                cpCore.db.csClose(ref CSRules);
                             }
                         }
                     }
-                    cpCore.db.csClose(CSContentWatch);
+                    cpCore.db.csClose(ref CSContentWatch);
                 }
                 //
                 return;
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("SaveContentTracking");
             //
         }
@@ -6025,25 +5851,24 @@ ErrorTrap:
                         if (cpCore.docProperties.getBoolean("ContentWatchList." + RecordID)) {
                             if (ContentWatchListIDCount >= ContentWatchListIDSize) {
                                 ContentWatchListIDSize = ContentWatchListIDSize + 50;
-                                //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                                ReDim Preserve ContentWatchListID(ContentWatchListIDSize);
+                                Array.Resize(ref ContentWatchListID, ContentWatchListIDSize);
                             }
-                            ContentWatchListID(ContentWatchListIDCount) = RecordID;
+                            ContentWatchListID[ContentWatchListIDCount] = RecordID;
                             ContentWatchListIDCount = ContentWatchListIDCount + 1;
                         }
                         cpCore.db.csGoNext(CSContentWatchList);
                     }
-                    cpCore.db.csClose(CSContentWatchList);
+                    cpCore.db.csClose(ref CSContentWatchList);
                 }
                 //
                 return;
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("LoadContentTrackingResponse");
             //
         }
@@ -6110,7 +5935,7 @@ ErrorTrap:
         //            '
         //            ' ----- Error Trap
         //            '
-        //ErrorTrap:
+        ////ErrorTrap:
         //            Call handleLegacyClassError3("LoadAndSaveMetaContent")
         //            '
         //        End Sub
@@ -6146,7 +5971,7 @@ ErrorTrap:
                                 isDupError = true;
                                 errorController.error_AddUserError(cpCore, "The Link Alias you entered can not be used because another record uses this value [" + linkAlias + "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.");
                             }
-                            cpCore.db.csClose(CS);
+                            cpCore.db.csClose(ref CS);
                         }
                         if (!isDupError) {
                             DupCausesWarning = true;
@@ -6154,7 +5979,7 @@ ErrorTrap:
                             if (cpCore.db.csOk(CS)) {
                                 cpCore.db.csSet(CS, "linkalias", linkAlias);
                             }
-                            cpCore.db.csClose(CS);
+                            cpCore.db.csClose(ref CS);
                             //
                             // Update the Link Aliases
                             //
@@ -6194,7 +6019,7 @@ ErrorTrap:
                         ContentWatchClicks = (cpCore.db.csGetInteger(CSPointer, "Clicks"));
                         ContentWatchLinkLabel = (cpCore.db.csGet(CSPointer, "LinkLabel"));
                         ContentWatchExpires = (cpCore.db.csGetDate(CSPointer, "WhatsNewDateExpires"));
-                        cpCore.db.csClose(CSPointer);
+                        cpCore.db.csClose(ref CSPointer);
                     }
                 }
                 //
@@ -6202,10 +6027,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("LoadContentTrackingDataBase");
             //
         }
@@ -6266,7 +6091,7 @@ ErrorTrap:
                         bool FieldChanged = false;
                         foreach (var keyValuePair in adminContent.fields) {
                             Models.Complex.CDefFieldModel field = keyValuePair.Value;
-                            editRecordFieldClass editRecordField = editRecord.fieldsLc(field.nameLc);
+                            editRecordFieldClass editRecordField = editRecord.fieldsLc[field.nameLc];
                             object fieldValueObject = editRecordField.value;
                             string FieldValueText = genericController.encodeText(fieldValueObject);
                             string FieldName = field.nameLc;
@@ -6511,7 +6336,7 @@ ErrorTrap:
                             }
                         }
                         //
-                        cpCore.db.csClose(CSEditRecord);
+                        cpCore.db.csClose(ref CSEditRecord);
                         if (RecordChanged) {
                             //
                             // -- clear cache
@@ -6594,10 +6419,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetJustTableName");
             //
             return tempGetJustTableName;
@@ -6764,7 +6589,7 @@ ErrorTrap:
                 if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, adminContent.Name, "parentid")) {
                     CS = cpCore.db.csOpen(adminContent.Name, "parentid=" + editRecord.id,,,,,, "ID");
                     HasChildRecords = cpCore.db.csOk(CS);
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                 }
                 IncludeCDefReload = (adminContent.ContentTableName.ToLower() == "cccontent") || (adminContent.ContentTableName.ToLower() == "ccdatasources") || (adminContent.ContentTableName.ToLower() == "cctables") || (adminContent.ContentTableName.ToLower() == "ccfields");
                 AllowMarkReviewed = cpCore.db.isSQLTableField("default", adminContent.ContentTableName, "DateReviewed");
@@ -6775,7 +6600,7 @@ ErrorTrap:
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex)
+                cpCore.handleException(ex);
             }
             return result;
         }
@@ -6876,15 +6701,15 @@ ErrorTrap:
                         switch (field.fieldTypeId) {
                             case FieldTypeIdFile:
                             case FieldTypeIdFileImage:
-                                editRecord.fieldsLc(field.nameLc).value = editRecord.fieldsLc(field.nameLc).dbValue;
+                                editRecord.fieldsLc[field.nameLc].value = editRecord.fieldsLc[field.nameLc].dbValue;
                                 break;
                         }
                     }
                     //For Ptr = 0 To adminContent.fields.Count - 1
-                    //    fieldType = arrayOfFields(Ptr).fieldType
+                    //    fieldType = arrayOfFields[Ptr].fieldType
                     //    Select Case fieldType
                     //        Case FieldTypeFile, FieldTypeImage
-                    //            EditRecordValuesObject(Ptr) = EditRecordDbValues(Ptr)
+                    //            EditRecordValuesObject[Ptr] = EditRecordDbValues[Ptr]
                     //    End Select
                     //Next
                 } else {
@@ -7059,7 +6884,7 @@ ErrorTrap:
                     + "Name: " + editRecord.nameLc + "<br>Record ID: " + editRecord.id + "</td><td width=\"50%\">";
                     //
                     CreatedCopy = "";
-                    DateTime editRecordDateAdded = genericController.EncodeDate(editRecord.fieldsLc("dateadded").value);
+                    DateTime editRecordDateAdded = genericController.EncodeDate(editRecord.fieldsLc["dateadded"].value);
                     if (editRecord.dateAdded != DateTime.MinValue) {
                         CreatedCopy = CreatedCopy + " " + editRecordDateAdded.ToString(); // editRecord.dateAdded
                     }
@@ -7083,7 +6908,7 @@ ErrorTrap:
                         } else {
                             CreatedBy = "deleted user #" + editRecord.createByMemberId;
                         }
-                        cpCore.db.csClose(CS);
+                        cpCore.db.csClose(ref CS);
                     }
                     if (!string.IsNullOrEmpty(CreatedBy)) {
                         CreatedCopy = CreatedCopy + " by " + CreatedBy;
@@ -7115,7 +6940,7 @@ ErrorTrap:
                             } else {
                                 CreatedBy = "deleted user #" + editRecord.modifiedByMemberID;
                             }
-                            cpCore.db.csClose(CS);
+                            cpCore.db.csClose(ref CS);
                         }
                         if (!string.IsNullOrEmpty(CreatedBy)) {
                             ModifiedCopy = ModifiedCopy + " by " + CreatedBy;
@@ -7295,7 +7120,7 @@ ErrorTrap:
                     {
                         AllowEmailSendWithoutTest = (cpCore.siteProperties.getBoolean("AllowEmailSendWithoutTest", false));
                         if (editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
-                            LastSendTestDate = genericController.EncodeDate(editRecord.fieldsLc("lastsendtestdate").value);
+                            LastSendTestDate = genericController.EncodeDate(editRecord.fieldsLc["lastsendtestdate"].value);
                         }
                     }
                     if (!(cpCore.doc.authContext.isAuthenticatedAdmin(cpCore))) {
@@ -7645,7 +7470,7 @@ ErrorTrap:
         //'========================================================================
         //'
         //Private Function GetForm_EditHTML() As String
-        //    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_EditHTML")
+        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_EditHTML")
         //    '
         //    Dim WhereCount as integer
         //    Dim FastString As fastStringClass
@@ -7666,7 +7491,7 @@ ErrorTrap:
         //    '
         //    ' ----- Error Trap
         //    '
-        //ErrorTrap:
+        ////ErrorTrap:
         //    FastString = Nothing
         //    Call HandleClassTrapErrorBubble("PrintDHTMLEditForm")
         //    '
@@ -7780,7 +7605,7 @@ ErrorTrap:
         //                If cpCore.db.csOk(CSPointer) Then
         //                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
         //                End If
-        //                Call cpCore.db.csClose(CSPointer)
+        //                Call cpCore.db.csClose(ref CSPointer)
         //                Call Content.Add(Adminui.GetEditRow(Copy, "Links Found", "", False, False, ""))
         //                '
         //                ' ----- Pages Complete
@@ -7791,7 +7616,7 @@ ErrorTrap:
         //                If cpCore.db.csOk(CSPointer) Then
         //                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
         //                End If
-        //                Call cpCore.db.csClose(CSPointer)
+        //                Call cpCore.db.csClose(ref CSPointer)
         //                Call Content.Add(Adminui.GetEditRow(Copy, "Pages Complete", "", False, False, ""))
         //                '
         //                ' ----- Bad Links
@@ -7804,7 +7629,7 @@ ErrorTrap:
         //                If cpCore.db.csOk(CSPointer) Then
         //                    Copy = genericController.encodeText(cpCore.db.csGetInteger(CSPointer, "PagesFound"))
         //                End If
-        //                Call cpCore.db.csClose(CSPointer)
+        //                Call cpCore.db.csClose(ref CSPointer)
         //                Call Content.Add(Adminui.GetEditRow("<a href=""/" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
         //                '
         //                ' ----- Options
@@ -7844,7 +7669,7 @@ ErrorTrap:
         //                    Copy = Copy & cpCore.db.csGetRecordEditLink(CSPointer) & cpCore.db.csGet(CSPointer, "Name")
         //                    cpCore.db.csGoNext(CSPointer)
         //                Loop
-        //                Call cpCore.db.csClose(CSPointer)
+        //                Call cpCore.db.csClose(ref CSPointer)
         //                Copy = Copy & "<br>" & cpCore.html.main_cs_getRecordAddLink(CSPointer)
         //                Call Content.Add(Adminui.GetEditRow(Copy, "Seed URLs", "", False, False, ""))
         //                '
@@ -7859,7 +7684,7 @@ ErrorTrap:
         //                    Copy = Copy & cpCore.db.csGetRecordEditLink(CSPointer) & cpCore.db.csGet(CSPointer, "Name")
         //                    cpCore.db.csGoNext(CSPointer)
         //                Loop
-        //                Call cpCore.db.csClose(CSPointer)
+        //                Call cpCore.db.csClose(ref CSPointer)
         //                'If cpCore.visitProperty_AllowEditing Then
         //                '    If Copy <> "" Then
         //                '        'Copy = Copy & "<br>"
@@ -7888,7 +7713,7 @@ ErrorTrap:
         //            '
         //            ' ----- Error Trap
         //            '
-        //ErrorTrap:
+        ////ErrorTrap:
         //            Content = Nothing
         //            Call handleLegacyClassError3("PrintDHTMLEditForm")
         //            '
@@ -8179,7 +8004,7 @@ ErrorTrap:
                                             RecordCount = RecordCount + 1;
                                         }
                                     }
-                                    cpCore.db.csClose(CSAuthoringRecord);
+                                    cpCore.db.csClose(ref CSAuthoringRecord);
                                 }
                             }
                             cpCore.db.csGoNext(CS);
@@ -8196,7 +8021,7 @@ ErrorTrap:
                             RecordPrevious = 0;
                         }
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                     if (RecordCount == 0) {
                         //
                         // No records printed
@@ -8237,10 +8062,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Publish");
             //
             return tempGetForm_Publish;
@@ -8368,7 +8193,7 @@ ErrorTrap:
                         FieldName = field.nameLc;
                         FormFieldLCaseName = genericController.vbLCase(FieldName);
                         fieldTypeId = field.fieldTypeId;
-                        FieldValueObject = editRecord.fieldsLc(field.nameLc).value;
+                        FieldValueObject = editRecord.fieldsLc[field.nameLc].value;
                         FieldValueText = genericController.encodeText(FieldValueObject);
                         FieldRows = 1;
                         FieldOptionRow = "&nbsp;";
@@ -8555,7 +8380,7 @@ ErrorTrap:
                                         cpCore.userProperty.setProperty("editorPreferencesForContent:" + adminContent.Id, tmpList);
                                     }
                                 }
-                                cpCore.db.csClose(CS);
+                                cpCore.db.csClose(ref CS);
                             }
                         }
                         if (!useEditorAddon) {
@@ -8656,7 +8481,7 @@ ErrorTrap:
                                             } else {
                                                 EditorString += ("None");
                                             }
-                                            cpCore.db.csClose(CSLookup);
+                                            cpCore.db.csClose(ref CSLookup);
                                             EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + field.lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
                                         } else if (field.lookupList != "") {
                                             lookups = field.lookupList.Split(',');
@@ -8934,7 +8759,7 @@ ErrorTrap:
                                                 if (cpCore.db.csOk(CSPointer)) {
                                                     EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?" + RequestNameAdminForm + "=4&cid=" + field.lookupContentID + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">Details</a>]");
                                                 }
-                                                cpCore.db.csClose(CSPointer);
+                                                cpCore.db.csClose(ref CSPointer);
                                             }
                                             EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + field.lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
                                         } else if (field.lookupList != "") {
@@ -8969,7 +8794,7 @@ ErrorTrap:
                                             if (cpCore.db.csOk(CSPointer)) {
                                                 EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?" + RequestNameAdminForm + "=4&cid=" + Models.Complex.cdefModel.getContentId(cpCore, "people") + "&id=" + FieldValueObject.ToString() + "\" target=\"_blank\">Details</a>]");
                                             }
-                                            cpCore.db.csClose(CSPointer);
+                                            cpCore.db.csClose(ref CSPointer);
                                         }
                                         GroupName = cpCore.db.getRecordName("groups", field.MemberSelectGroupID);
                                         EditorString += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + Models.Complex.cdefModel.getContentId(cpCore, "groups") + "\" target=\"_blank\">Select from members of " + GroupName + "</a>]");
@@ -9254,7 +9079,7 @@ ErrorTrap:
                         //        Call cpCore.app.setCS(CS, "HelpDefault", HelpMsgDefault)
                         //        Call cpCore.app.setCS(CS, "HelpCustom", HelpMsgCustom)
                         //    End If
-                        //    Call cpCore.app.csClose(CS)
+                        //    Call cpCore.app.csClose(ref CS)
                         //End If
                         if (!string.IsNullOrEmpty(HelpMsgCustom)) {
                             HelpMsg = HelpMsgCustom;
@@ -9502,7 +9327,7 @@ ErrorTrap:
                                 } else {
                                     HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("ContentWatchList." + cpCore.db.csGet(CSLists, "ID"), cpCore.db.csOk(CSRules));
                                 }
-                                cpCore.db.csClose(CSRules);
+                                cpCore.db.csClose(ref CSRules);
                             } else {
                                 if (editRecord.Read_Only) {
                                     HTMLFieldString = genericController.encodeText(false);
@@ -9566,16 +9391,16 @@ ErrorTrap:
                         EditSectionPanelCount = EditSectionPanelCount + 1;
                         //
                     }
-                    cpCore.db.csClose(CSLists);
+                    cpCore.db.csClose(ref CSLists);
                     FastString = null;
                 }
                 //
                 return tempGetForm_Edit_ContentTracking;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             FastString = null;
             handleLegacyClassError3("GetForm_Edit_ContentTracking");
             return tempGetForm_Edit_ContentTracking;
@@ -9843,7 +9668,7 @@ ErrorTrap:
                                     ParentID = cpCore.db.csGetInteger(CS, "ParentID");
                                 }
                             }
-                            cpCore.db.csClose(CS);
+                            cpCore.db.csClose(ref CS);
                         }
                         //
                         LimitContentSelectToThisID = 0;
@@ -9859,7 +9684,7 @@ ErrorTrap:
                                 if (cpCore.db.csOk(CSPointer)) {
                                     LimitContentSelectToThisID = cpCore.db.csGetInteger(CSPointer, "ContentControlID");
                                 }
-                                cpCore.db.csClose(CSPointer);
+                                cpCore.db.csClose(ref CSPointer);
                             }
 
                         }
@@ -9886,7 +9711,7 @@ ErrorTrap:
                                 }
                                 cpCore.db.csGoNext(CSPointer);
                             }
-                            cpCore.db.csClose(CSPointer);
+                            cpCore.db.csClose(ref CSPointer);
                             if (!string.IsNullOrEmpty(CIDList)) {
                                 CIDList = CIDList.Substring(1);
                                 HTMLFieldString = cpCore.html.main_GetFormInputSelect2("ContentControlID", FieldValueInteger, "Content", "id in (" + CIDList + ")", "", "", IsEmptyList);
@@ -9917,7 +9742,7 @@ ErrorTrap:
                         } else {
                             HTMLFieldString = cpCore.db.csGet(CSPointer, "name");
                         }
-                        cpCore.db.csClose(CSPointer);
+                        cpCore.db.csClose(ref CSPointer);
                     }
                 }
                 HTMLFieldString = cpCore.html.html_GetFormInputText2("ignore", HTMLFieldString,,,,, true);
@@ -9950,7 +9775,7 @@ ErrorTrap:
                         if (cpCore.db.csOk(CSPointer)) {
                             HTMLFieldString = cpCore.db.csGet(CSPointer, "name");
                         }
-                        cpCore.db.csClose(CSPointer);
+                        cpCore.db.csClose(ref CSPointer);
                     }
                 }
                 HTMLFieldString = cpCore.html.html_GetFormInputText2("ignore", HTMLFieldString,,,,, true);
@@ -9977,10 +9802,10 @@ ErrorTrap:
                 //
                 return tempGetForm_Edit_Control;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             FastString = null;
             handleLegacyClassError3("GetForm_Edit_Control");
             return tempGetForm_Edit_Control;
@@ -10048,11 +9873,11 @@ ErrorTrap:
                     //
                     FieldName = field.nameLc;
                     if (genericController.vbLCase(FieldName) == "name") {
-                        SitePropertyName = genericController.encodeText(editRecord.fieldsLc(field.nameLc).value);
+                        SitePropertyName = genericController.encodeText(editRecord.fieldsLc[field.nameLc].value);
                     } else if (FieldName.ToLower() == "fieldvalue") {
-                        SitePropertyValue = genericController.encodeText(editRecord.fieldsLc(field.nameLc).value);
+                        SitePropertyValue = genericController.encodeText(editRecord.fieldsLc[field.nameLc].value);
                     } else if (FieldName.ToLower() == "selector") {
-                        selector = genericController.encodeText(editRecord.fieldsLc(field.nameLc).value);
+                        selector = genericController.encodeText(editRecord.fieldsLc[field.nameLc].value);
                     }
                 }
                 if (string.IsNullOrEmpty(SitePropertyName)) {
@@ -10169,10 +9994,10 @@ ErrorTrap:
                 FastString = null;
                 return tempGetForm_Edit_SiteProperties;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             FastString = null;
             handleLegacyClassError3("GetForm_Edit_SiteProperties");
             return tempGetForm_Edit_SiteProperties;
@@ -10201,7 +10026,7 @@ ErrorTrap:
                         addonId = cpCore.db.csGetInteger(CS, "id");
                         cpCore.siteProperties.setProperty("AdminRootAddonID", genericController.encodeText(addonId));
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                 }
                 if (addonId == 0) {
                     //
@@ -10234,7 +10059,7 @@ ErrorTrap:
                             addonId = -1;
                             cpCore.siteProperties.setProperty("AdminRootAddonID", "");
                         }
-                        cpCore.db.csClose(CS);
+                        cpCore.db.csClose(ref CS);
                     }
                     if (addonId == -1) {
                         //
@@ -10246,7 +10071,7 @@ ErrorTrap:
                             addonId = cpCore.db.csGetInteger(CS, "id");
                             cpCore.siteProperties.setProperty("AdminRootAddonID", genericController.encodeText(addonId));
                         }
-                        cpCore.db.csClose(CS);
+                        cpCore.db.csClose(ref CS);
                     }
                 }
                 if (addonId != 0) {
@@ -10269,7 +10094,7 @@ ErrorTrap:
                     //
                     returnHtml = returnHtml + Environment.NewLine + "<div style=\"padding:20px;height:450px\">"
                     + Environment.NewLine + "<div><a href=http://www.Contensive.com target=_blank><img style=\"border:1px solid #000;\" src=\"/ccLib/images/ContensiveAdminLogo.GIF\" border=0 ></A></div>"
-                    + Environment.NewLine + "<div><strong>Contensive/" + cpCore.codeVersion + "</strong></div>"
+                    + Environment.NewLine + "<div><strong>Contensive/" + cpCore.codeVersion() + "</strong></div>"
                     + Environment.NewLine + "<div style=\"clear:both;height:18px;margin-top:10px\"><div style=\"float:left;width:200px;\">Domain Name</div><div style=\"float:left;\">" + cpCore.webServer.requestDomain + "</div></div>"
                     + Environment.NewLine + "<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Login Member Name</div><div style=\"float:left;\">" + cpCore.doc.authContext.user.name + "</div></div>"
                     + Environment.NewLine + "<div style=\"clear:both;height:18px;\"><div style=\"float:left;width:200px;\">Quick Reports</div><div style=\"float:left;\"><a Href=\"?" + RequestNameAdminForm + "=" + AdminFormQuickStats + "\">Real-Time Activity</A></div></div>"
@@ -10339,11 +10164,11 @@ ErrorTrap:
                     PageCount = cpCore.db.csGetNumber(CS, "pageCount");
                     Stream.Add("<tr>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "All Visits</span></td>");
-                    Stream.Add("<td style=\"width:150px;border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + cpCore.doc.profileStartTime + "&DateTo=" + cpCore.doc.profileStartTime.ToShortDateString) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
+                    Stream.Add("<td style=\"width:150px;border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + cpCore.doc.profileStartTime + "&DateTo=" + cpCore.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
                     Stream.Add("</tr>");
                 }
-                cpCore.db.csClose(CS);
+                cpCore.db.csClose(ref CS);
                 //
                 // ----- Non-Bot Visits Today
                 //
@@ -10354,11 +10179,11 @@ ErrorTrap:
                     PageCount = cpCore.db.csGetNumber(CS, "pageCount");
                     Stream.Add("<tr>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Non-bot Visits</span></td>");
-                    Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + cpCore.doc.profileStartTime.ToShortDateString + "&DateTo=" + cpCore.doc.profileStartTime.ToShortDateString) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
+                    Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + cpCore.doc.profileStartTime.ToShortDateString() + "&DateTo=" + cpCore.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
                     Stream.Add("</tr>");
                 }
-                cpCore.db.csClose(CS);
+                cpCore.db.csClose(ref CS);
                 //
                 // ----- Visits Today by new visitors
                 //
@@ -10369,11 +10194,11 @@ ErrorTrap:
                     PageCount = cpCore.db.csGetNumber(CS, "pageCount");
                     Stream.Add("<tr>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Visits by New Visitors</span></td>");
-                    Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&ExcludeOldVisitors=1&DateFrom=" + cpCore.doc.profileStartTime.ToShortDateString + "&DateTo=" + cpCore.doc.profileStartTime.ToShortDateString) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
+                    Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormReports + "&rid=3&ExcludeOldVisitors=1&DateFrom=" + cpCore.doc.profileStartTime.ToShortDateString() + "&DateTo=" + cpCore.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
                     Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
                     Stream.Add("</tr>");
                 }
-                cpCore.db.csClose(CS);
+                cpCore.db.csClose(ref CS);
                 //
                 Stream.Add("</table>");
                 //
@@ -10417,7 +10242,7 @@ ErrorTrap:
                         }
                         Panel = Panel + "</table>";
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                     Stream.Add(cpCore.html.main_GetPanel(Panel, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 0));
                 }
                 Stream.Add("</td></tr></table>");
@@ -10429,10 +10254,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_QuickStats");
             //
             return tempGetForm_QuickStats;
@@ -10443,7 +10268,7 @@ ErrorTrap:
         //'========================================================================
         //'
         //Private Function GetForm_Edit_TopicRules() As String
-        //    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_Edit_TopicRules")
+        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_Edit_TopicRules")
         //    '
         //    Dim SQL As String
         //    Dim CS as integer
@@ -10561,7 +10386,7 @@ ErrorTrap:
         //    End If
         //    '''Dim th as integer: Exit Function
         //    '
-        //ErrorTrap:
+        ////ErrorTrap:
         //    Call HandleClassTrapErrorBubble("GetForm_Edit_TopicRules")
         //End Function
         //
@@ -10632,7 +10457,7 @@ ErrorTrap:
                         LinkCnt = LinkCnt + 1;
                         cpCore.db.csGoNext(CS);
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                     if (LinkCnt > 0) {
                         f.Add("<tr><td class=\"ccAdminEditCaption\">" + SpanClassAdminSmall + "Previous Link Alias List</td>");
                         f.Add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminNormal);
@@ -10647,10 +10472,10 @@ ErrorTrap:
                 //
                 return tempGetForm_Edit_LinkAliases;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Edit_LinkAliases");
             return tempGetForm_Edit_LinkAliases;
         }
@@ -10763,7 +10588,7 @@ ErrorTrap:
         //            '
         //            Exit Function
         //            '
-        //ErrorTrap:
+        ////ErrorTrap:
         //            FastString = Nothing
         //            Call handleLegacyClassError3("GetForm_Edit_MetaContent")
         //        End Function
@@ -10816,7 +10641,7 @@ ErrorTrap:
                         int HiddenPos = genericController.vbInstr(1, GroupSplit[Ptr], "hidden", Microsoft.VisualBasic.Constants.vbTextCompare);
                         if (HiddenPos > 0) {
                             IDPtr = genericController.vbInstr(1, GroupSplit[Ptr], "value=", Microsoft.VisualBasic.Constants.vbTextCompare);
-                            //IDPtr = genericController.vbInstr(HiddenPos, GroupSplit(Ptr), "value=", vbTextCompare)
+                            //IDPtr = genericController.vbInstr(HiddenPos, GroupSplit[Ptr], "value=", vbTextCompare)
                             if (IDPtr > 0) {
                                 IDEndPtr = genericController.vbInstr(IDPtr, GroupSplit[Ptr], ">");
                                 if (IDEndPtr > 0) {
@@ -10840,10 +10665,10 @@ ErrorTrap:
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 return tempGetForm_Edit_EmailRules;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Edit_EmailRules");
             return tempGetForm_Edit_EmailRules;
         }
@@ -10855,7 +10680,7 @@ ErrorTrap:
         //========================================================================
         //
         private string GetForm_Edit_EmailTopics(Contensive.Core.Models.Complex.cdefModel adminContent, editRecordClass editRecord, bool readOnlyField) {
-            string s="";
+            string s = "";
             try {
                 //
                 stringBuilderLegacyController f = new stringBuilderLegacyController();
@@ -10871,7 +10696,7 @@ ErrorTrap:
                     + "</tr>";
                 s = Adminui.EditTableOpen + s + Adminui.EditTableClose;
                 s = Adminui.GetEditPanel((!allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
-            } catch( Exception ex) {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             return s;
@@ -10915,10 +10740,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Edit_EmailBounceStatus");
             //
             return tempGetForm_Edit_EmailBounceStatus;
@@ -10991,7 +10816,7 @@ ErrorTrap:
                             MembershipCount = MembershipCount + 1;
                             cpCore.db.csGoNext(CS);
                         }
-                        cpCore.db.csClose(CS);
+                        cpCore.db.csClose(ref CS);
                     }
                     //
                     // ----- read in all the groups, sorted by ContentName
@@ -11060,7 +10885,7 @@ ErrorTrap:
                         }
                         cpCore.db.csGoNext(CS);
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                 }
                 if (GroupCount == 0) {
                     //If EditRecord.ID = 0 Then
@@ -11082,10 +10907,10 @@ ErrorTrap:
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 return tempGetForm_Edit_MemberGroups;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Edit_MemberGroups");
             return tempGetForm_Edit_MemberGroups;
         }
@@ -11114,10 +10939,10 @@ ErrorTrap:
                 FastString = null;
                 return tempGetForm_Edit_LayoutReports;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             FastString = null;
             handleLegacyClassError3("GetForm_Edit_LayoutReports");
             return tempGetForm_Edit_LayoutReports;
@@ -11148,10 +10973,10 @@ ErrorTrap:
                 FastString = null;
                 return tempGetForm_Edit_MemberReports;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             FastString = null;
             handleLegacyClassError3("GetForm_Edit_MemberReports");
             return tempGetForm_Edit_MemberReports;
@@ -11178,7 +11003,7 @@ ErrorTrap:
         //            FastString = Nothing
         //            Exit Function
         //            '
-        //ErrorTrap:
+        ////ErrorTrap:
         //            FastString = Nothing
         //            Call handleLegacyClassError3("GetForm_Edit_PathRules")
         //        End Function
@@ -11223,10 +11048,10 @@ ErrorTrap:
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 return tempGetForm_Edit_PageContentBlockRules;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Edit_PageContentBlockRules");
             return tempGetForm_Edit_PageContentBlockRules;
         }
@@ -11273,10 +11098,10 @@ ErrorTrap:
                 EditSectionPanelCount = EditSectionPanelCount + 1;
                 return tempGetForm_Edit_LibraryFolderRules;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Edit_LibraryFolderRules");
             return tempGetForm_Edit_LibraryFolderRules;
         }
@@ -11340,7 +11165,7 @@ ErrorTrap:
                         }
                     }
                 }
-                cpCore.db.csClose(CS);
+                cpCore.db.csClose(ref CS);
                 //
                 // ----- Gather all the groups, sorted by ContentName
                 //
@@ -11402,7 +11227,7 @@ ErrorTrap:
                         FastString.Add(Environment.NewLine + "<input type=\"hidden\" name=\"GroupCount\" value=\"" + GroupCount + "\">");
                     }
                 }
-                cpCore.db.csClose(CS);
+                cpCore.db.csClose(ref CS);
                 //
                 // ----- close the panel
                 //
@@ -11414,10 +11239,10 @@ ErrorTrap:
                 FastString = null;
                 return tempGetForm_Edit_GroupRules;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             FastString = null;
             handleLegacyClassError3("GetForm_Edit_GroupRules");
             return tempGetForm_Edit_GroupRules;
@@ -11477,7 +11302,7 @@ ErrorTrap:
                             }
                         }
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                     //
                     // ----- Gather all the content, sorted by ContentName
                     //
@@ -11523,7 +11348,7 @@ ErrorTrap:
                         }
                         FastString.Add(Environment.NewLine + "<input type=\"hidden\" name=\"ContentCount\" value=\"" + ContentCount + "\">");
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                     //
                     // ----- close the panel
                     //
@@ -11536,10 +11361,10 @@ ErrorTrap:
                 }
                 return tempGetForm_Edit_ContentGroupRules;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             FastString = null;
             handleLegacyClassError3("GetForm_Edit_ContentGroupRules");
             return tempGetForm_Edit_ContentGroupRules;
@@ -11576,7 +11401,7 @@ ErrorTrap:
         //            '
         //            ' ----- Error Trap
         //            '
-        //ErrorTrap:
+        ////ErrorTrap:
         //            Call handleLegacyClassError3("GetFieldPtrNoError")
         //            '
         //        End Function
@@ -11597,7 +11422,7 @@ ErrorTrap:
         //            '
         //            ' ----- Error Trap
         //            '
-        //ErrorTrap:
+        ////ErrorTrap:
         //            Call handleLegacyClassError3("GetFieldPtr")
         //            '
         //        End Function
@@ -11621,10 +11446,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("MakeButton");
             //
             return tempMakeButton;
@@ -11678,10 +11503,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("MakeButtonFlat");
             //
             return tempMakeButtonFlat;
@@ -11747,7 +11572,7 @@ ErrorTrap:
         //                Call cpCore.db.csGoNext(CS)
         //            Loop
         //        End If
-        //        Call cpCore.db.csClose(CS)
+        //        Call cpCore.db.csClose(ref CS)
         //        '
         //        ' Close the menu panel
         //        '
@@ -11835,12 +11660,12 @@ ErrorTrap:
         //                    Call cpCore.db.csGoNext(CS)
         //                Loop
         //            End If
-        //            Call cpCore.db.csClose(CS)
+        //            Call cpCore.db.csClose(ref CS)
         //            Exit Function
         //            '
         //            ' ----- Error Trap
         //            '
-        //ErrorTrap:
+        ////ErrorTrap:
         //            Call handleLegacyClassError3("GetMenuLeftModeBranch")
         //            '
         //        End Function
@@ -11949,7 +11774,7 @@ ErrorTrap:
         //            '
         //            ' ----- Error Trap
         //            '
-        //ErrorTrap:
+        ////ErrorTrap:
         //            Call handleLegacyClassError3("GetMenuLeftMode")
         //            '
         //        End Function
@@ -12107,7 +11932,7 @@ ErrorTrap:
         //'========================================================================
         //'
         //Private Function PreloadImage(Image As String) As String
-        //    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.PreloadImage")
+        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.PreloadImage")
         //    '
         //    Dim ImageFound As Boolean
         //    Dim ImagePreloadPointer as integer
@@ -12139,7 +11964,7 @@ ErrorTrap:
         //    '
         //    ' ----- Error Trap
         //    '
-        //ErrorTrap:
+        ////ErrorTrap:
         //    Call HandleClassTrapErrorBubble("PreloadImage")
         //    '
         //End Function
@@ -12209,7 +12034,7 @@ ErrorTrap:
                 }
                 SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid";
                 result = "select " + SelectList + " from ccMenuEntries where " + Criteria + " order by ccMenuEntries.Name";
-            } catch( Exception ex) {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             return result;
@@ -12256,10 +12081,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetMenuLink");
             //
             return tempGetMenuLink;
@@ -12489,7 +12314,7 @@ ErrorTrap:
                                         cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename);
                                         cpCore.db.csGoNext(CS);
                                     }
-                                    cpCore.db.csClose(CS);
+                                    cpCore.db.csClose(ref CS);
                                     break;
                             }
                             //
@@ -12511,10 +12336,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("ProcessForms");
             //
         }
@@ -12537,7 +12362,7 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             return tempGetForm_EditTitle;
@@ -12569,7 +12394,7 @@ ErrorTrap:
                 s = s + Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + TitleExtension + "\">";
                 s = s + Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + MenuDepth + "\">";
                 s = s + Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + "FormEmptyFieldList\" ID=\"" + "FormEmptyFieldList\" VALUE=\",\">";
-            } catch( Exception ex) {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             return s;
@@ -12638,10 +12463,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("IsVisibleUserField");
             //
             return tempIsVisibleUserField;
@@ -12661,10 +12486,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("IsFieldEditable");
             //
             return tempIsFieldEditable;
@@ -12689,10 +12514,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Close");
             //
             return tempGetForm_Close;
@@ -12884,7 +12709,7 @@ ErrorTrap:
         //'========================================================================
         //'
         //Private Function GetForm_EmailControl() As String
-        //    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_EmailControl")
+        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_EmailControl")
         //    '
         //    Dim Content As New fastStringClass
         //    Dim Copy As String
@@ -13040,7 +12865,7 @@ ErrorTrap:
         //    '
         //    ' ----- Error Trap
         //    '
-        //ErrorTrap:
+        ////ErrorTrap:
         //    Call HandleClassTrapErrorBubble("GetForm_EmailControl")
         //End Function
         //
@@ -13166,7 +12991,7 @@ ErrorTrap:
                     // Process Requests
                     //
                     if (!string.IsNullOrEmpty(Button)) {
-                        switch (Convert.ToInt32(Button)) {
+                        switch (Button) {
                             case ButtonDelete:
                                 RowCnt = cpCore.docProperties.getInteger("RowCnt");
                                 if (RowCnt > 0) {
@@ -13202,9 +13027,9 @@ ErrorTrap:
                                                         cpCore.db.csSet(CSDst, "Command", "BUILDCSV");
                                                     }
                                                 }
-                                                cpCore.db.csClose(CSDst);
+                                                cpCore.db.csClose(ref CSDst);
                                             }
-                                            cpCore.db.csClose(CSSrc);
+                                            cpCore.db.csClose(ref CSSrc);
                                         }
                                     }
                                 }
@@ -13229,7 +13054,7 @@ ErrorTrap:
                                         cpCore.db.csSet(CS, SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
                                         Description = Description + "<p>Your CSV Download has been requested.</p>";
                                     }
-                                    cpCore.db.csClose(CS);
+                                    cpCore.db.csClose(ref CS);
                                     Format = "";
                                     ContentID = 0;
                                 } else if (Format == "XML") {
@@ -13246,7 +13071,7 @@ ErrorTrap:
                                         cpCore.db.csSet(CS, SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
                                         Description = Description + "<p>Your XML Download has been requested.</p>";
                                     }
-                                    cpCore.db.csClose(CS);
+                                    cpCore.db.csClose(ref CS);
                                     Format = "";
                                     ContentID = 0;
                                 }
@@ -13322,7 +13147,7 @@ ErrorTrap:
                             Cells[RowPointer, 0] = cpCore.html.html_GetFormInputCheckBox2("Row" + RowPointer) + cpCore.html.html_GetFormInputHidden("RowID" + RowPointer, RecordID);
                             Cells[RowPointer, 1] = cpCore.db.csGetText(CS, "name");
                             Cells[RowPointer, 2] = cpCore.db.csGetText(CS, "CreatedByName");
-                            Cells[RowPointer, 3] = cpCore.db.csGetDate(CS, "DateAdded").ToShortDateString;
+                            Cells[RowPointer, 3] = cpCore.db.csGetDate(CS, "DateAdded").ToShortDateString();
                             if (DateCompleted == DateTime.MinValue) {
                                 RemoteKey = remoteQueryController.main_GetRemoteQueryKey(cpCore, "select DateCompleted,filename,resultMessage from cctasks where id=" + RecordID, "default", 1);
                                 Cell = "";
@@ -13362,7 +13187,7 @@ ErrorTrap:
                             cpCore.db.csGoNext(CS);
                         }
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                     Tab0.Add(cpCore.html.html_GetFormInputHidden("RowCnt", RowPointer));
                     Cell = Adminui.GetReport(RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add(Cell);
@@ -13416,10 +13241,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Downloads");
             return tempGetForm_Downloads;
         }
@@ -13443,10 +13268,10 @@ ErrorTrap:
                 //
                 return tempGetForm_Edit_AddTab;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Edit_AddTab");
             return tempGetForm_Edit_AddTab;
         }
@@ -13478,10 +13303,10 @@ ErrorTrap:
                 //
                 return tempGetForm_Edit_AddTab2;
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Edit_AddTab2");
             return tempGetForm_Edit_AddTab2;
         }
@@ -13714,7 +13539,7 @@ ErrorTrap:
         //            '
         //            ' ----- Error Trap
         //            '
-        //ErrorTrap:
+        ////ErrorTrap:
         //            Call handleLegacyClassError3("GetForm_Edit_UserFieldTabs")
         //        End Sub
         //
@@ -13835,7 +13660,7 @@ ErrorTrap:
                     // Process Requests
                     //
                     if (!string.IsNullOrEmpty(Button)) {
-                        switch (Convert.ToInt32(Button)) {
+                        switch (Button) {
                             case ButtonCancel:
                                 return cpCore.webServer.redirect("/" + cpCore.serverConfig.appConfig.adminRoute, "CustomReports, Cancel Button Pressed");
                             //Call cpCore.main_Redirect2(encodeAppRootPath(cpCore.main_GetSiteProperty2("AdminURL"), cpCore.main_ServerVirtualPath, cpCore.app.RootPath, cpCore.main_ServerHost))
@@ -13863,7 +13688,7 @@ ErrorTrap:
                                             cpCore.db.csSet(CS, "Name", Name);
                                             cpCore.db.csSet(CS, SQLFieldName, SQL);
                                         }
-                                        cpCore.db.csClose(CS);
+                                        cpCore.db.csClose(ref CS);
                                     }
                                 }
                                 //
@@ -13877,7 +13702,7 @@ ErrorTrap:
                                                 SQL = cpCore.db.csGetText(CS, SQLFieldName);
                                                 Name = cpCore.db.csGetText(CS, "Name");
                                             }
-                                            cpCore.db.csClose(CS);
+                                            cpCore.db.csClose(ref CS);
                                             //
                                             CS = cpCore.db.csInsertRecord("Tasks");
                                             if (cpCore.db.csOk(CS)) {
@@ -13893,7 +13718,7 @@ ErrorTrap:
                                                 cpCore.db.csSet(CS, SQLFieldName, SQL);
                                                 Description = Description + "<p>Your Download [" + Name + "] has been requested, and will be available in the <a href=\"?" + RequestNameAdminForm + "=30\">Download Manager</a> when it is complete. This may take a few minutes depending on the size of the report.</p>";
                                             }
-                                            cpCore.db.csClose(CS);
+                                            cpCore.db.csClose(ref CS);
                                         }
                                     }
                                 }
@@ -13964,13 +13789,13 @@ ErrorTrap:
                             Cells[RowPointer, 0] = cpCore.html.html_GetFormInputCheckBox2("Row" + RowPointer) + cpCore.html.html_GetFormInputHidden("RowID" + RowPointer, RecordID);
                             Cells[RowPointer, 1] = cpCore.db.csGetText(CS, "name");
                             Cells[RowPointer, 2] = cpCore.db.csGet(CS, "CreatedBy");
-                            Cells[RowPointer, 3] = cpCore.db.csGetDate(CS, "DateAdded").ToShortDateString;
+                            Cells[RowPointer, 3] = cpCore.db.csGetDate(CS, "DateAdded").ToShortDateString();
                             //Cells(RowPointer, 4) = "&nbsp;"
                             RowPointer = RowPointer + 1;
                             cpCore.db.csGoNext(CS);
                         }
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                     string Cell = null;
                     Tab0.Add(cpCore.html.html_GetFormInputHidden("RowCnt", RowPointer));
                     adminUIController Adminui = new adminUIController(cpCore);
@@ -14010,10 +13835,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_CustomReports");
             return tempGetForm_CustomReports;
         }
@@ -14041,10 +13866,10 @@ ErrorTrap:
                                 // ----- Convert this to the Duplicate
                                 //
                                 if (adminContent.fields.ContainsKey("submitted")) {
-                                    editRecord.fieldsLc("submitted").value = false;
+                                    editRecord.fieldsLc["submitted"].value = false;
                                 }
                                 if (adminContent.fields.ContainsKey("sent")) {
-                                    editRecord.fieldsLc("sent").value = false;
+                                    editRecord.fieldsLc["sent"].value = false;
                                 }
                                 //
                                 editRecord.id = 0;
@@ -14070,32 +13895,32 @@ ErrorTrap:
                                 // block fields that should not duplicate
                                 //
                                 if (editRecord.fieldsLc.ContainsKey("ccguid")) {
-                                    editRecord.fieldsLc("ccguid").value = "";
+                                    editRecord.fieldsLc["ccguid"].value = "";
                                 }
                                 //
                                 if (editRecord.fieldsLc.ContainsKey("dateadded")) {
-                                    editRecord.fieldsLc("dateadded").value = DateTime.MinValue;
+                                    editRecord.fieldsLc["dateadded"].value = DateTime.MinValue;
                                 }
                                 //
                                 if (editRecord.fieldsLc.ContainsKey("modifieddate")) {
-                                    editRecord.fieldsLc("modifieddate").value = DateTime.MinValue;
+                                    editRecord.fieldsLc["modifieddate"].value = DateTime.MinValue;
                                 }
                                 //
                                 if (editRecord.fieldsLc.ContainsKey("modifiedby")) {
-                                    editRecord.fieldsLc("modifiedby").value = 0;
+                                    editRecord.fieldsLc["modifiedby"].value = 0;
                                 }
                                 //
                                 // block fields that must be unique
                                 //
-                                foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in adminContent.fields) {
+                                foreach (KeyValuePair<string, Contensive.Core.Models.Complex.CDefFieldModel> keyValuePair in adminContent.fields) {
                                     Models.Complex.CDefFieldModel field = keyValuePair.Value;
                                     if (genericController.vbLCase(field.nameLc) == "email") {
                                         if ((adminContent.ContentTableName.ToLower() == "ccmembers") && (genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowemaillogin", false)))) {
-                                            editRecord.fieldsLc(field.nameLc).value = "";
+                                            editRecord.fieldsLc[field.nameLc].value = "";
                                         }
                                     }
                                     if (field.UniqueName) {
-                                        editRecord.fieldsLc(field.nameLc).value = "";
+                                        editRecord.fieldsLc[field.nameLc].value = "";
                                     }
                                 }
                                 //
@@ -14112,10 +13937,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("ProcessActionDuplicate");
             //
         }
@@ -14220,7 +14045,7 @@ ErrorTrap:
                                 cpCore.db.csGoNext(CSMenus);
                             }
                         }
-                        cpCore.db.csClose(CSMenus);
+                        cpCore.db.csClose(ref CSMenus);
                         //            '
                         //            ' Add in top level node for "switch to navigator"
                         //            '
@@ -14257,7 +14082,7 @@ ErrorTrap:
                             tempGetMenuTopMode = tempGetMenuTopMode + "</tr></table>";
                             tempGetMenuTopMode = cpCore.html.main_GetPanel(tempGetMenuTopMode, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 1);
                         }
-                        cpCore.db.csClose(CSMenus);
+                        cpCore.db.csClose(ref CSMenus);
                         //
                         // Save the Baked Menu
                         //
@@ -14271,10 +14096,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetMenuTopMode");
             //
             return tempGetMenuTopMode;
@@ -14331,7 +14156,7 @@ ErrorTrap:
                                 //
                                 // No record, Rule needed, add it
                                 //
-                                cpCore.db.csClose(CSRule);
+                                cpCore.db.csClose(ref CSRule);
                                 CSRule = cpCore.db.csInsertRecord("Member Rules");
                                 if (cpCore.db.csOk(CSRule)) {
                                     cpCore.db.csSet(CSRule, "Active", true);
@@ -14339,12 +14164,12 @@ ErrorTrap:
                                     cpCore.db.csSet(CSRule, "GroupID", GroupID);
                                     cpCore.db.csSet(CSRule, "DateExpires", DateExpires);
                                 }
-                                cpCore.db.csClose(CSRule);
+                                cpCore.db.csClose(ref CSRule);
                             } else {
                                 //
                                 // No record, no Rule needed, ignore it
                                 //
-                                cpCore.db.csClose(CSRule);
+                                cpCore.db.csClose(ref CSRule);
                             }
                         } else {
                             //
@@ -14360,13 +14185,13 @@ ErrorTrap:
                                     cpCore.db.csSet(CSRule, "Active", true);
                                     cpCore.db.csSet(CSRule, "DateExpires", DateExpires);
                                 }
-                                cpCore.db.csClose(CSRule);
+                                cpCore.db.csClose(ref CSRule);
                             } else {
                                 //
                                 // record exists and it is not needed, delete it
                                 //
                                 MemberRuleID = cpCore.db.csGetInteger(CSRule, "ID");
-                                cpCore.db.csClose(CSRule);
+                                cpCore.db.csClose(ref CSRule);
                                 cpCore.db.deleteTableRecord("ccMemberRules", MemberRuleID, "Default");
                             }
                         }
@@ -14376,10 +14201,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("SaveMemberRules");
         }
         //
@@ -14400,10 +14225,10 @@ ErrorTrap:
                 }
                 //
                 return tempGetForm_Error;
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Error");
             return tempGetForm_Error;
         }
@@ -14504,7 +14329,7 @@ ErrorTrap:
                                     GroupID = cpCore.db.csGetInteger(CS, "ID");
                                 } else {
                                     Description = Description + "<div>Creating new group [" + NewGroupName + "]</div>";
-                                    cpCore.db.csClose(CS);
+                                    cpCore.db.csClose(ref CS);
                                     CS = cpCore.db.csInsertRecord("Groups");
                                     if (cpCore.db.csOk(CS)) {
                                         GroupID = cpCore.db.csGetInteger(CS, "ID");
@@ -14512,7 +14337,7 @@ ErrorTrap:
                                         cpCore.db.csSet(CS, "Caption", NewGroupName);
                                     }
                                 }
-                                cpCore.db.csClose(CS);
+                                cpCore.db.csClose(ref CS);
                             }
                             if (GroupID != 0) {
                                 CS = cpCore.db.csInsertRecord("Group Rules");
@@ -14521,7 +14346,7 @@ ErrorTrap:
                                     cpCore.db.csSet(CS, "GroupID", GroupID);
                                     cpCore.db.csSet(CS, "ContentID", ChildContentID);
                                 }
-                                cpCore.db.csClose(CS);
+                                cpCore.db.csClose(ref CS);
                             }
                             //
                             // Add Admin Menu Entry
@@ -14635,7 +14460,7 @@ ErrorTrap:
                 Caption = "Create Content Definition";
                 Description = "<div>This tool is used to create content definitions that help segregate your content into authorable segments.</div>" + Description;
                 result = Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 0, Content.Text);
-            } catch( Exception ex) {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
             return result;
@@ -14671,7 +14496,7 @@ ErrorTrap:
                     returnOptions = returnOptions + GetContentChildTool_Options(RecordID, DefaultValue);
                     cpCore.db.csGoNext(CS);
                 }
-                cpCore.db.csClose(CS);
+                cpCore.db.csClose(ref CS);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -14684,7 +14509,7 @@ ErrorTrap:
         //'=============================================================================
         //'
         //Private Function GetForm_PageContentMap_OpenNodeList(Criteria As String) As String
-        //    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_PageContentMap_OpenNodeList")
+        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_PageContentMap_OpenNodeList")
         //    '
         //    Dim CS as integer
         //    Dim ParentID as integer
@@ -14708,7 +14533,7 @@ ErrorTrap:
         //    '
         //    ' ----- Error Trap
         //    '
-        //ErrorTrap:
+        ////ErrorTrap:
         //    Call HandleClassTrapErrorBubble("GetForm_PageContentMap_OpenNodeList")
         //End Function
         //
@@ -14787,7 +14612,7 @@ ErrorTrap:
                     //
                     // Process Requests
                     //
-                    switch (Convert.ToInt32(Button)) {
+                    switch (Button) {
                         case ButtonOK:
                         case ButtonSave:
                             //
@@ -14818,7 +14643,7 @@ ErrorTrap:
                     if (cpCore.db.csOk(CSServers)) {
                         PagesTotal = cpCore.db.csGetInteger(CSServers, "Result");
                     }
-                    cpCore.db.csClose(CSServers);
+                    cpCore.db.csClose(ref CSServers);
                     Content.Add(Adminui.GetEditRow(SpanClassAdminNormal + PagesTotal, "Visits Found", "", false, false, ""));
                     //
                     // ----- Oldest Visit
@@ -14836,7 +14661,7 @@ ErrorTrap:
                             AgeInDays = genericController.encodeText(Convert.ToInt32(Math.Floor(Convert.ToDouble(cpCore.doc.profileStartTime - DateValue))));
                         }
                     }
-                    cpCore.db.csClose(CSServers);
+                    cpCore.db.csClose(ref CSServers);
                     Content.Add(Adminui.GetEditRow(SpanClassAdminNormal + Copy + " (" + AgeInDays + " days)", "Oldest Visit", "", false, false, ""));
                     //
                     // ----- Viewings Found
@@ -14847,7 +14672,7 @@ ErrorTrap:
                     if (cpCore.db.csOk(CSServers)) {
                         PagesTotal = cpCore.db.csGetInteger(CSServers, "Result");
                     }
-                    cpCore.db.csClose(CSServers);
+                    cpCore.db.csClose(ref CSServers);
                     Content.Add(Adminui.GetEditRow(SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
                     //
                     Content.Add(genericController.StartTableRow() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Options</b>" + kmaEndTableCell + kmaEndTableRow);
@@ -14878,10 +14703,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_HouseKeepingControl");
             //
             return tempGetForm_HouseKeepingControl;
@@ -14890,7 +14715,7 @@ ErrorTrap:
         //'
         //'
         //Private Function GetPropertyControl(Name As String, FieldType as integer, ProcessRequest As Boolean, DefaultValue As String) As String
-        //    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetPropertyControl")
+        //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetPropertyControl")
         //    '
         //    Dim CurrentValue As String
         //    '
@@ -14910,7 +14735,7 @@ ErrorTrap:
         //    '
         //    ' ----- Error Trap
         //    '
-        //ErrorTrap:
+        ////ErrorTrap:
         //    Call HandleClassTrapErrorBubble("GetPropertyControl")
         //End Function
         //
@@ -14936,10 +14761,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetPropertyControl");
             return tempGetPropertyHTMLControl;
         }
@@ -15012,7 +14837,7 @@ ErrorTrap:
             //            '
             //            ' ----- Error Trap
             //            '
-            //ErrorTrap:
+            ////ErrorTrap:
             //            Call handleLegacyClassError3("GetForm_StyleEditor")
             //            '
         }
@@ -15035,7 +14860,7 @@ ErrorTrap:
                     RecordID = cpCore.db.csGetInteger(CS, "ID");
                     Copy = cpCore.db.csGetText(CS, "copy");
                 }
-                cpCore.db.csClose(CS);
+                cpCore.db.csClose(ref CS);
                 //
                 if (RecordID != 0) {
                     EditIcon = "<a href=\"?cid=" + Models.Complex.cdefModel.getContentId(cpCore, ContentName) + "&id=" + RecordID + "&" + RequestNameAdminForm + "=4\" target=_blank><img src=\"/ccLib/images/IconContentEdit.gif\" border=0 alt=\"Edit content\" valign=absmiddle></a>";
@@ -15057,1176 +14882,13 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_ControlPage_CopyContent");
             //
             return tempGetForm_ControlPage_CopyContent;
-        }
-        //
-        //========================================================================
-        //   Print the index form, values and all
-        //       creates a sql with leftjoins, and renames lookups as TableLookupxName
-        //       where x is the TarGetFieldPtr of the field that is FieldTypeLookup
-        //
-        //   Input:
-        //       AdminContent.contenttablename is required
-        //       OrderByFieldPtr
-        //       OrderByDirection
-        //       RecordTop
-        //       RecordsPerPage
-        //       Findstring( ColumnPointer )
-        //========================================================================
-        //
-        private string GetForm_Index(Models.Complex.cdefModel adminContent, editRecordClass editRecord, bool IsEmailContent) {
-            string returnForm = "";
-            try {
-                const string FilterClosedLabel = "<div style=\"font-size:9px;text-align:center;\">&nbsp;<br>F<br>i<br>l<br>t<br>e<br>r<br>s</div>";
-                //
-                string Copy = "";
-                string RightCopy = null;
-                int TitleRows = 0;
-                // refactor -- is was using page manager code, and it only detected if the page is the current domain's 
-                //Dim LandingPageID As Integer
-                //Dim IsPageContent As Boolean
-                //Dim IsLandingPage As Boolean
-                int PageCount = 0;
-                bool AllowAdd = false;
-                bool AllowDelete = false;
-                int recordCnt = 0;
-                bool AllowAccessToContent = false;
-                string ContentName = null;
-                string ContentAccessLimitMessage = "";
-                bool IsLimitedToSubContent = false;
-                string GroupList = "";
-                string[] Groups = null;
-                string FieldCaption = null;
-                string SubTitle = null;
-                string SubTitlePart = null;
-                string Title = null;
-                string AjaxQS = null;
-                string FilterColumn = "";
-                string DataColumn = null;
-                string DataTable_DataRows = "";
-                string FilterDataTable = "";
-                string DataTable_FindRow = "";
-                string DataTable = null;
-                string DataTable_HdrRow = "";
-                string IndexFilterContent = "";
-                string IndexFilterHead = "";
-                string IndexFilterJS = "";
-                bool IndexFilterOpen = false;
-                indexConfigClass IndexConfig = null;
-                int Ptr = 0;
-                string SortTitle = null;
-                string HeaderDescription = "";
-                bool AllowFilterNav = false;
-                int ColumnPointer = 0;
-                int WhereCount = 0;
-                string sqlWhere = "";
-                string sqlOrderBy = "";
-                string sqlFieldList = "";
-                string sqlFrom = "";
-                int CS = 0;
-                string SQL = null;
-                string RowColor = "";
-                int RecordPointer = 0;
-                int RecordLast = 0;
-                int RecordTop_NextPage = 0;
-                int RecordTop_PreviousPage = 0;
-                int ColumnWidth = 0;
-                string ButtonBar = null;
-                string TitleBar = null;
-                string FindWordValue = null;
-                string ButtonObject = null;
-                string ButtonFace = null;
-                string ButtonHref = null;
-                string URI = null;
-                //Dim DataSourceName As String
-                //Dim DataSourceType As Integer
-                string FieldName = null;
-                Dictionary<string, bool> FieldUsedInColumns = new Dictionary<string, bool>(); // used to prevent select SQL from being sorted by a field that does not appear
-                int ColumnWidthTotal = 0;
-                int SubForm = 0;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                int RecordID = 0;
-                string RecordName = null;
-                string LeftButtons = "";
-                string RightButtons = "";
-                adminUIController Adminui = new adminUIController(cpCore);
-                Dictionary<string, bool> IsLookupFieldValid = new Dictionary<string, bool>();
-                bool allowCMEdit = false;
-                bool allowCMAdd = false;
-                bool allowCMDelete = false;
-                //
-                // --- make sure required fields are present
-                //
-                if (adminContent.Id == 0) {
-                    //
-                    // Bad content id
-                    //
-                    Stream.Add(GetForm_Error("This form requires a valid content definition, and one was not found for content ID [" + adminContent.Id + "].", "No content definition was specified [ContentID=0]. Please contact your application developer for more assistance."));
-                } else if (string.IsNullOrEmpty(adminContent.Name)) {
-                    //
-                    // Bad content name
-                    //
-                    Stream.Add(GetForm_Error("No content definition could be found for ContentID [" + adminContent.Id + "]. This could be a menu error. Please contact your application developer for more assistance.", "No content definition for ContentID [" + adminContent.Id + "] could be found."));
-                } else if (adminContent.ContentTableName == "") {
-                    //
-                    // No tablename
-                    //
-                    Stream.Add(GetForm_Error("The content definition [" + adminContent.Name + "] is not associated with a valid database table. Please contact your application developer for more assistance.", "Content [" + adminContent.Name + "] ContentTablename is empty."));
-                } else if (adminContent.fields.Count == 0) {
-                    //
-                    // No Fields
-                    //
-                    Stream.Add(GetForm_Error("This content [" + adminContent.Name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminContent.Name + "] has no field records."));
-                } else if (adminContent.DeveloperOnly & (!cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore))) {
-                    //
-                    // Developer Content and not developer
-                    //
-                    Stream.Add(GetForm_Error("Access to this content [" + adminContent.Name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminContent.Name + "] has no field records."));
-                } else {
-                    Models.Entity.dataSourceModel datasource = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, new List<string>());
-                    //
-                    // get access rights
-                    //
-                    cpCore.doc.authContext.getContentAccessRights(cpCore, adminContent.Name, allowCMEdit, allowCMAdd, allowCMDelete);
-                    //
-                    // detemine which subform to disaply
-                    //
-                    SubForm = cpCore.docProperties.getInteger(RequestNameAdminSubForm);
-                    if (SubForm != 0) {
-                        switch (SubForm) {
-                            case AdminFormIndex_SubFormExport:
-                                Copy = GetForm_Index_Export(adminContent, editRecord);
-                                break;
-                            case AdminFormIndex_SubFormSetColumns:
-                                Copy = GetForm_Index_SetColumns(adminContent, editRecord);
-                                break;
-                            case AdminFormIndex_SubFormAdvancedSearch:
-                                Copy = GetForm_Index_AdvancedSearch(adminContent, editRecord);
-                                break;
-                        }
-                    }
-                    Stream.Add(Copy);
-                    if (string.IsNullOrEmpty(Copy)) {
-                        //
-                        // If subforms return empty, go to parent form
-                        //
-                        AllowFilterNav = true;
-                        //
-                        // -- Load Index page customizations
-                        IndexConfig = LoadIndexConfig(adminContent);
-                        SetIndexSQL_ProcessIndexConfigRequests(adminContent, editRecord, IndexConfig);
-                        SetIndexSQL_SaveIndexConfig(IndexConfig);
-                        //
-                        // Get the SQL parts
-                        //
-                        SetIndexSQL(adminContent, editRecord, IndexConfig, AllowAccessToContent, sqlFieldList, sqlFrom, sqlWhere, sqlOrderBy, IsLimitedToSubContent, ContentAccessLimitMessage, FieldUsedInColumns, IsLookupFieldValid);
-                        if ((!allowCMEdit) || (!AllowAccessToContent)) {
-                            //
-                            // two conditions should be the same -- but not time to check - This user does not have access to this content
-                            //
-                            errorController.error_AddUserError(cpCore, "Your account does not have access to any records in '" + adminContent.Name + "'.");
-                        } else {
-                            //
-                            // Get the total record count
-                            //
-                            SQL = "select count(" + adminContent.ContentTableName + ".ID) as cnt from " + sqlFrom;
-                            if (!string.IsNullOrEmpty(sqlWhere)) {
-                                SQL += " where " + sqlWhere;
-                            }
-                            CS = cpCore.db.csOpenSql_rev(datasource.Name, SQL);
-                            if (cpCore.db.csOk(CS)) {
-                                recordCnt = cpCore.db.csGetInteger(CS, "cnt");
-                            }
-                            cpCore.db.csClose(CS);
-                            //
-                            // Assumble the SQL
-                            //
-                            SQL = "select";
-                            if (datasource.type != DataSourceTypeODBCMySQL) {
-                                SQL += " Top " + (IndexConfig.RecordTop + IndexConfig.RecordsPerPage);
-                            }
-                            SQL += " " + sqlFieldList + " From " + sqlFrom;
-                            if (!string.IsNullOrEmpty(sqlWhere)) {
-                                SQL += " WHERE " + sqlWhere;
-                            }
-                            if (!string.IsNullOrEmpty(sqlOrderBy)) {
-                                SQL += " Order By" + sqlOrderBy;
-                            }
-                            if (datasource.type == DataSourceTypeODBCMySQL) {
-                                SQL += " Limit " + (IndexConfig.RecordTop + IndexConfig.RecordsPerPage);
-                            }
-                            //
-                            // Refresh Query String
-                            //
-                            cpCore.doc.addRefreshQueryString("tr", IndexConfig.RecordTop.ToString());
-                            cpCore.doc.addRefreshQueryString("asf", AdminForm.ToString());
-                            cpCore.doc.addRefreshQueryString("cid", adminContent.Id.ToString());
-                            cpCore.doc.addRefreshQueryString(RequestNameTitleExtension, genericController.EncodeRequestVariable(TitleExtension));
-                            if (WherePairCount > 0) {
-                                for (WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
-                                    cpCore.doc.addRefreshQueryString("wl" + WhereCount, WherePair(0, WhereCount));
-                                    cpCore.doc.addRefreshQueryString("wr" + WhereCount, WherePair(1, WhereCount));
-                                }
-                            }
-                            //
-                            // ----- ButtonBar
-                            //
-                            AllowAdd = adminContent.AllowAdd & (!IsLimitedToSubContent) && (allowCMAdd);
-                            if (MenuDepth > 0) {
-                                LeftButtons = LeftButtons + cpCore.html.html_GetFormButton(ButtonClose,,, "window.close();");
-                            } else {
-                                LeftButtons = LeftButtons + cpCore.html.html_GetFormButton(ButtonCancel);
-                                //LeftButtons = LeftButtons & cpCore.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
-                            }
-                            if (AllowAdd) {
-                                LeftButtons = LeftButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonAdd + "\">";
-                                //LeftButtons = LeftButtons & "<input TYPE=SUBMIT NAME=BUTTON VALUE=""" & ButtonAdd & """ onClick=""return processSubmit(this);"">"
-                            } else {
-                                LeftButtons = LeftButtons + "<input TYPE=SUBMIT NAME=BUTTON DISABLED VALUE=\"" + ButtonAdd + "\">";
-                                //LeftButtons = LeftButtons & "<input TYPE=SUBMIT NAME=BUTTON DISABLED VALUE=""" & ButtonAdd & """ onClick=""return processSubmit(this);"">"
-                            }
-                            AllowDelete = (adminContent.AllowDelete) && (allowCMDelete);
-                            if (AllowDelete) {
-                                LeftButtons = LeftButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonDelete + "\" onClick=\"if(!DeleteCheck())return false;\">";
-                            } else {
-                                LeftButtons = LeftButtons + "<input TYPE=SUBMIT NAME=BUTTON DISABLED VALUE=\"" + ButtonDelete + "\" onClick=\"if(!DeleteCheck())return false;\">";
-                            }
-                            if (IndexConfig.PageNumber == 1) {
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonFirst + "\" DISABLED>";
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonPrevious + "\" DISABLED>";
-                            } else {
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonFirst + "\">";
-                                //RightButtons = RightButtons & "<input TYPE=SUBMIT NAME=BUTTON VALUE=""" & ButtonFirst & """ onClick=""return processSubmit(this);"">"
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonPrevious + "\">";
-                                //RightButtons = RightButtons & "<input TYPE=SUBMIT NAME=BUTTON VALUE=""" & ButtonPrevious & """ onClick=""return processSubmit(this);"">"
-                            }
-                            //RightButtons = RightButtons & cpCore.main_GetFormButton(ButtonFirst)
-                            //RightButtons = RightButtons & cpCore.main_GetFormButton(ButtonPrevious)
-                            if (recordCnt > (IndexConfig.PageNumber * IndexConfig.RecordsPerPage)) {
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonNext + "\">";
-                                //RightButtons = RightButtons & "<input TYPE=SUBMIT NAME=BUTTON VALUE=""" & ButtonNext & """ onClick=""return processSubmit(this);"">"
-                            } else {
-                                RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonNext + "\" DISABLED>";
-                            }
-                            RightButtons = RightButtons + "<input TYPE=SUBMIT NAME=BUTTON VALUE=\"" + ButtonRefresh + "\">";
-                            if (recordCnt <= 1) {
-                                PageCount = 1;
-                            } else {
-                                PageCount = Convert.ToInt32(1 + Convert.ToInt32(Math.Floor(Convert.ToDouble((recordCnt - 1) / IndexConfig.RecordsPerPage))));
-                            }
-                            ButtonBar = Adminui.GetButtonBarForIndex(LeftButtons, RightButtons, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, PageCount);
-                            //ButtonBar = AdminUI.GetButtonBar(LeftButtons, RightButtons)
-                            //
-                            // ----- TitleBar
-                            //
-                            Title = "";
-                            SubTitle = "";
-                            SubTitlePart = "";
-                            if (IndexConfig.ActiveOnly) {
-                                SubTitle = SubTitle + ", active records";
-                            }
-                            SubTitlePart = "";
-                            if (IndexConfig.LastEditedByMe) {
-                                SubTitlePart = SubTitlePart + " by " + cpCore.doc.authContext.user.name;
-                            }
-                            if (IndexConfig.LastEditedPast30Days) {
-                                SubTitlePart = SubTitlePart + " in the past 30 days";
-                            }
-                            if (IndexConfig.LastEditedPast7Days) {
-                                SubTitlePart = SubTitlePart + " in the week";
-                            }
-                            if (IndexConfig.LastEditedToday) {
-                                SubTitlePart = SubTitlePart + " today";
-                            }
-                            if (!string.IsNullOrEmpty(SubTitlePart)) {
-                                SubTitle = SubTitle + ", last edited" + SubTitlePart;
-                            }
-                            foreach (var kvp in IndexConfig.FindWords) {
-                                indexConfigFindWordClass findWord = kvp.Value;
-                                if (!string.IsNullOrEmpty(findWord.Name)) {
-                                    FieldCaption = genericController.encodeText(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, adminContent.Name, findWord.Name, "caption"));
-                                    switch (findWord.MatchOption) {
-                                        case FindWordMatchEnum.MatchEmpty:
-                                            SubTitle = SubTitle + ", " + FieldCaption + " is empty";
-                                            break;
-                                        case FindWordMatchEnum.MatchEquals:
-                                            SubTitle = SubTitle + ", " + FieldCaption + " = '" + findWord.Value + "'";
-                                            break;
-                                        case FindWordMatchEnum.MatchFalse:
-                                            SubTitle = SubTitle + ", " + FieldCaption + " is false";
-                                            break;
-                                        case FindWordMatchEnum.MatchGreaterThan:
-                                            SubTitle = SubTitle + ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
-                                            break;
-                                        case FindWordMatchEnum.matchincludes:
-                                            SubTitle = SubTitle + ", " + FieldCaption + " includes '" + findWord.Value + "'";
-                                            break;
-                                        case FindWordMatchEnum.MatchLessThan:
-                                            SubTitle = SubTitle + ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
-                                            break;
-                                        case FindWordMatchEnum.MatchNotEmpty:
-                                            SubTitle = SubTitle + ", " + FieldCaption + " is not empty";
-                                            break;
-                                        case FindWordMatchEnum.MatchTrue:
-                                            SubTitle = SubTitle + ", " + FieldCaption + " is true";
-                                            break;
-                                    }
-
-                                }
-                            }
-                            if (IndexConfig.SubCDefID > 0) {
-                                ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, IndexConfig.SubCDefID);
-                                if (!string.IsNullOrEmpty(ContentName)) {
-                                    SubTitle = SubTitle + ", in Sub-content '" + ContentName + "'";
-                                }
-                            }
-                            //
-                            // add groups to caption
-                            //
-                            if ((adminContent.ContentTableName.ToLower() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
-                                //If (LCase(AdminContent.ContentTableName) = "ccmembers") And (.GroupListCnt > 0) Then
-                                SubTitlePart = "";
-                                for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                                    if (IndexConfig.GroupList(Ptr) != "") {
-                                        GroupList = GroupList + "\t" + IndexConfig.GroupList(Ptr);
-                                    }
-                                }
-                                if (!string.IsNullOrEmpty(GroupList)) {
-                                    Groups = Microsoft.VisualBasic.Strings.Split(GroupList.Substring(1), "\t", -1, Microsoft.VisualBasic.CompareMethod.Binary);
-                                    if (Groups.GetUpperBound(0) == 0) {
-                                        SubTitle = SubTitle + ", in group '" + Groups[0] + "'";
-                                    } else if (Groups.GetUpperBound(0) == 1) {
-                                        SubTitle = SubTitle + ", in groups '" + Groups[0] + "' and '" + Groups[1] + "'";
-                                    } else {
-                                        for (Ptr = 0; Ptr < Groups.GetUpperBound(0); Ptr++) {
-                                            SubTitlePart = SubTitlePart + ", '" + Groups[Ptr] + "'";
-                                        }
-                                        SubTitle = SubTitle + ", in groups" + SubTitlePart.Substring(1) + " and '" + Groups[Ptr] + "'";
-                                    }
-
-                                }
-                            }
-                            //
-                            // add sort details to caption
-                            //
-                            SubTitlePart = "";
-                            foreach (var kvp in IndexConfig.Sorts) {
-                                indexConfigSortClass sort = kvp.Value;
-                                if (sort.direction > 0) {
-                                    SubTitlePart = SubTitlePart + " and " + adminContent.fields(sort.fieldName).caption;
-                                    if (sort.direction > 1) {
-                                        SubTitlePart += " reverse";
-                                    }
-                                }
-                            }
-                            if (!string.IsNullOrEmpty(SubTitlePart)) {
-                                SubTitle += ", sorted by" + SubTitlePart.Substring(4);
-                            }
-                            //
-                            Title = adminContent.Name;
-                            if (TitleExtension != "") {
-                                Title = Title + " " + TitleExtension;
-                            }
-                            switch (recordCnt) {
-                                case 0:
-                                    RightCopy = "no records found";
-                                    break;
-                                case 1:
-                                    RightCopy = "1 record found";
-                                    break;
-                                default:
-                                    RightCopy = recordCnt + " records found";
-                                    break;
-                            }
-                            RightCopy = RightCopy + ", page " + IndexConfig.PageNumber;
-                            Title = "<div>"
-                                + "<span style=\"float:left;\"><strong>" + Title + "</strong></span>"
-                                + "<span style=\"float:right;\">" + RightCopy + "</span>"
-                                + "</div>";
-                            TitleRows = 0;
-                            if (!string.IsNullOrEmpty(SubTitle)) {
-                                Title = Title + "<div style=\"clear:both\">Filter: " + genericController.encodeHTML(SubTitle.Substring(2)) + "</div>";
-                                TitleRows = TitleRows + 1;
-                            }
-                            if (!string.IsNullOrEmpty(ContentAccessLimitMessage)) {
-                                Title = Title + "<div style=\"clear:both\">" + ContentAccessLimitMessage + "</div>";
-                                TitleRows = TitleRows + 1;
-                            }
-                            if (TitleRows == 0) {
-                                Title = Title + "<div style=\"clear:both\">&nbsp;</div>";
-                            }
-                            //
-                            TitleBar = SpanClassAdminNormal + Title + "</span>";
-                            //TitleBar = TitleBar & cpCore.main_GetHelpLink(46, "Using the Admin Index Page", BubbleCopy_AdminIndexPage)
-                            //
-                            // ----- Filter Data Table
-                            //
-                            if (AllowFilterNav) {
-                                //
-                                // Filter Nav - if enabled, just add another cell to the row
-                                //
-                                IndexFilterOpen = cpCore.visitProperty.getBoolean("IndexFilterOpen", false);
-                                if (IndexFilterOpen) {
-                                    //
-                                    // Ajax Filter Open
-                                    //
-                                    IndexFilterHead = ""
-                                        + Environment.NewLine + "<div class=\"ccHeaderCon\">"
-                                        + Environment.NewLine + "<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\">"
-                                        + "\r" + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
-                                        + "\r" + "<td valign=Middle class=\"left\">Filters</td>"
-                                        + "\r" + "<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\"><img alt=\"Close Filters\" title=\"Close Filters\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
-                                        + "\r" + "</tr></table>"
-                                        + Environment.NewLine + "</div>"
-                                        + Environment.NewLine + "<div id=\"IndexFilterHeadClosed\" class=\"closed\" style=\"display:none;\">"
-                                        + "\r" + "<a href=\"#\" onClick=\"OpenIndexFilter();return false\"><img title=\"Open Navigator\" alt=\"Open Filter\" src=\"/ccLib/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\"></a>"
-                                        + Environment.NewLine + "</div>"
-                                        + Environment.NewLine + "</div>"
-                                        + "";
-                                    IndexFilterContent = ""
-                                        + Environment.NewLine + "<div class=\"ccContentCon\">"
-                                        + Environment.NewLine + "<div id=\"IndexFilterContentOpened\" class=\"opened\">" + GetForm_IndexFilterContent(adminContent) + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
-                                        + Environment.NewLine + "<div id=\"IndexFilterContentClosed\" class=\"closed\" style=\"display:none;\">" + FilterClosedLabel + "</div>"
-                                        + Environment.NewLine + "</div>";
-                                    IndexFilterJS = ""
-                                        + Environment.NewLine + "<script Language=\"JavaScript\" type=\"text/javascript\">"
-                                        + Environment.NewLine + "function CloseIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','none');SetDisplay('IndexFilterContentOpened','none');SetDisplay('IndexFilterHeadClosed','block');SetDisplay('IndexFilterContentClosed','block');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxCloseIndexFilter + "','','')}"
-                                        + Environment.NewLine + "function OpenIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','block');SetDisplay('IndexFilterContentOpened','block');SetDisplay('IndexFilterHeadClosed','none');SetDisplay('IndexFilterContentClosed','none');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxOpenIndexFilter + "','','')}"
-                                        + Environment.NewLine + "</script>";
-                                } else {
-                                    //
-                                    // Ajax Filter Closed
-                                    //
-                                    IndexFilterHead = ""
-                                        + Environment.NewLine + "<div class=\"ccHeaderCon\">"
-                                        + Environment.NewLine + "<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\" style=\"display:none;\">"
-                                        + "\r" + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
-                                        + "\r" + "<td valign=Middle class=\"left\">Filter</td>"
-                                        + "\r" + "<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\"><img alt=\"Close Filter\" title=\"Close Navigator\" src=\"/ccLib/images/ClosexRev1313.gif\" width=13 height=13 border=0></a></td>"
-                                        + "\r" + "</tr></table>"
-                                        + Environment.NewLine + "</div>"
-                                        + Environment.NewLine + "<div id=\"IndexFilterHeadClosed\" class=\"closed\">"
-                                        + "\r" + "<a href=\"#\" onClick=\"OpenIndexFilter();return false\"><img title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/ccLib/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\"></a>"
-                                        + Environment.NewLine + "</div>"
-                                        + Environment.NewLine + "</div>"
-                                        + "";
-                                    IndexFilterContent = ""
-                                        + Environment.NewLine + "<div class=\"ccContentCon\">"
-                                        + Environment.NewLine + "<div id=\"IndexFilterContentOpened\" class=\"opened\" style=\"display:none;\"><div style=\"text-align:center;\"><img src=\"/ccLib/images/ajax-loader-small.gif\" width=16 height=16></div></div>"
-                                        + Environment.NewLine + "<div id=\"IndexFilterContentClosed\" class=\"closed\">" + FilterClosedLabel + "</div>"
-                                        + Environment.NewLine + "<div id=\"IndexFilterContentMinWidth\" style=\"display:none;\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
-                                        + Environment.NewLine + "</div>";
-                                    AjaxQS = cpCore.doc.refreshQueryString;
-                                    AjaxQS = genericController.ModifyQueryString(AjaxQS, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent);
-                                    IndexFilterJS = ""
-                                        + Environment.NewLine + "<script Language=\"JavaScript\" type=\"text/javascript\">"
-                                        + Environment.NewLine + "var IndexFilterPop=false;"
-                                        + Environment.NewLine + "function CloseIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','none');SetDisplay('IndexFilterHeadClosed','block');SetDisplay('IndexFilterContentOpened','none');SetDisplay('IndexFilterContentMinWidth','none');SetDisplay('IndexFilterContentClosed','block');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxCloseIndexFilter + "','','')}"
-                                        + Environment.NewLine + "function OpenIndexFilter() {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','block');SetDisplay('IndexFilterHeadClosed','none');SetDisplay('IndexFilterContentOpened','block');SetDisplay('IndexFilterContentMinWidth','block');SetDisplay('IndexFilterContentClosed','none');if(!IndexFilterPop){cj.ajax.qs('" + AjaxQS + "','','IndexFilterContentOpened');IndexFilterPop=true;}else{cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxOpenIndexFilter + "','','');}}"
-                                        + Environment.NewLine + "</script>";
-                                }
-                            }
-                            //
-                            // Dual Window Right - Data
-                            //
-                            FilterDataTable += "<td valign=top class=\"ccPanel\">";
-                            //
-                            DataTable_HdrRow += "<tr>";
-                            //
-                            // Row Number Column
-                            //
-                            DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"ccAdminListCaption\">Row</td>";
-                            //
-                            // Delete Select Box Columns
-                            //
-                            if (!AllowDelete) {
-                                DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"ccAdminListCaption\"><input TYPE=CheckBox disabled=\"disabled\"></td>";
-                            } else {
-                                DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"ccAdminListCaption\"><input TYPE=CheckBox OnClick=\"CheckInputs('DelCheck',this.checked);\"></td>";
-                            }
-                            //
-                            // Calculate total width
-                            //
-                            ColumnWidthTotal = 0;
-                            foreach (var kvp in IndexConfig.Columns) {
-                                indexConfigColumnClass column = kvp.Value;
-                                if (column.Width < 1) {
-                                    column.Width = 1;
-                                }
-                                ColumnWidthTotal = ColumnWidthTotal + column.Width;
-                            }
-                            //
-                            // Edit Column
-                            //
-                            DataTable_HdrRow += "<td width=20 align=center valign=bottom class=\"ccAdminListCaption\">Edit</td>";
-                            foreach (var kvp in IndexConfig.Columns) {
-                                indexConfigColumnClass column = kvp.Value;
-                                //
-                                // ----- print column headers - anchored so they sort columns
-                                //
-                                ColumnWidth = Convert.ToInt32((100 * column.Width) / (double)ColumnWidthTotal);
-                                //fieldId = column.FieldId
-                                FieldName = column.Name;
-                                //
-                                //if this is a current sort ,add the reverse flag
-                                //
-                                ButtonHref = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminForm + "=" + AdminFormIndex + "&SetSortField=" + FieldName + "&RT=0&" + RequestNameTitleExtension + "=" + genericController.EncodeRequestVariable(TitleExtension) + "&cid=" + adminContent.Id + "&ad=" + MenuDepth;
-                                foreach (var sortKvp in IndexConfig.Sorts) {
-                                    indexConfigSortClass sort = sortKvp.Value;
-
-                                }
-                                if (!IndexConfig.Sorts.ContainsKey(FieldName)) {
-                                    ButtonHref += "&SetSortDirection=1";
-                                } else {
-                                    switch (IndexConfig.Sorts(FieldName).direction) {
-                                        case 1:
-                                            ButtonHref += "&SetSortDirection=2";
-                                            break;
-                                        case 2:
-                                            ButtonHref += "&SetSortDirection=0";
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                                //
-                                //----- column header includes WherePairCount
-                                //
-                                if (WherePairCount > 0) {
-                                    for (WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
-                                        if (WherePair(0, WhereCount) != "") {
-                                            ButtonHref += "&wl" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair(0, WhereCount));
-                                            ButtonHref += "&wr" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair(1, WhereCount));
-                                        }
-                                    }
-                                }
-                                ButtonFace = adminContent.fields(FieldName.ToLower()).caption;
-                                ButtonFace = genericController.vbReplace(ButtonFace, " ", "&nbsp;");
-                                SortTitle = "Sort A-Z";
-                                //
-                                if (IndexConfig.Sorts.ContainsKey(FieldName)) {
-                                    switch (IndexConfig.Sorts(FieldName).direction) {
-                                        case 1:
-                                            ButtonFace = ButtonFace + "<img src=\"/ccLib/images/arrowdown.gif\" width=8 height=8 border=0>";
-                                            SortTitle = "Sort Z-A";
-                                            break;
-                                        case 2:
-                                            ButtonFace = ButtonFace + "<img src=\"/ccLib/images/arrowup.gif\" width=8 height=8 border=0>";
-                                            SortTitle = "Remove Sort";
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                                ButtonObject = "Button" + ButtonObjectCount;
-                                ButtonObjectCount = ButtonObjectCount + 1;
-                                DataTable_HdrRow += "<td width=\"" + ColumnWidth + "%\" valign=bottom align=left class=\"ccAdminListCaption\">";
-                                DataTable_HdrRow += ("<a title=\"" + SortTitle + "\" href=\"" + genericController.encodeHTML(ButtonHref) + "\" class=\"ccAdminListCaption\">" + ButtonFace + "</A>");
-                                DataTable_HdrRow += ("</td>");
-                            }
-                            DataTable_HdrRow += ("</tr>");
-                            //
-                            //   select and print Records
-                            //
-                            //DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
-                            CS = cpCore.db.csOpenSql(SQL, datasource.Name, IndexConfig.RecordsPerPage, IndexConfig.PageNumber);
-                            if (cpCore.db.csOk(CS)) {
-                                RowColor = "";
-                                RecordPointer = IndexConfig.RecordTop;
-                                RecordLast = IndexConfig.RecordTop + IndexConfig.RecordsPerPage;
-                                //
-                                // --- Print out the records
-                                //
-                                //IsPageContent = (LCase(adminContent.ContentTableName) = "ccpagecontent")
-                                //If IsPageContent Then
-                                //    LandingPageID = cpCore.main_GetLandingPageID
-                                //End If
-                                while ((cpCore.db.csOk(CS)) && (RecordPointer < RecordLast)) {
-                                    RecordID = cpCore.db.csGetInteger(CS, "ID");
-                                    RecordName = cpCore.db.csGetText(CS, "name");
-                                    //IsLandingPage = IsPageContent And (RecordID = LandingPageID)
-                                    if (RowColor == "class=\"ccAdminListRowOdd\"") {
-                                        RowColor = "class=\"ccAdminListRowEven\"";
-                                    } else {
-                                        RowColor = "class=\"ccAdminListRowOdd\"";
-                                    }
-                                    DataTable_DataRows += Environment.NewLine + "<tr>";
-                                    //
-                                    // --- Record Number column
-                                    //
-                                    DataTable_DataRows += "<td align=right " + RowColor + ">" + SpanClassAdminSmall + "[" + (RecordPointer + 1) + "]</span></td>";
-                                    //
-                                    // --- Delete Checkbox Columns
-                                    //
-                                    if (AllowDelete) {
-                                        //If AllowDelete And Not IsLandingPage Then
-                                        //If AdminContent.AllowDelete And Not IsLandingPage Then
-                                        DataTable_DataRows += "<td align=center " + RowColor + "><input TYPE=CheckBox NAME=row" + RecordPointer + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>";
-                                    } else {
-                                        DataTable_DataRows += "<td align=center " + RowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + RecordPointer + " VALUE=1><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>";
-                                    }
-                                    //
-                                    // --- Edit button column
-                                    //
-                                    DataTable_DataRows += "<td align=center " + RowColor + ">";
-                                    URI = "\\" + cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminAction + "=" + AdminActionNop + "&cid=" + adminContent.Id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + genericController.EncodeRequestVariable(TitleExtension) + "&ad=" + MenuDepth + "&" + RequestNameAdminSourceForm + "=" + AdminForm + "&" + RequestNameAdminForm + "=" + AdminFormEdit;
-                                    if (WherePairCount > 0) {
-                                        for (WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
-                                            URI = URI + "&wl" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair(0, WhereCount)) + "&wr" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair(1, WhereCount));
-                                        }
-                                    }
-                                    DataTable_DataRows += ("<a href=\"" + genericController.encodeHTML(URI) + "\"><img src=\"/ccLib/images/IconContentEdit.gif\" border=\"0\"></a>");
-                                    DataTable_DataRows += ("</td>");
-                                    //
-                                    // --- field columns
-                                    //
-                                    foreach (var columnKvp in IndexConfig.Columns) {
-                                        indexConfigColumnClass column = columnKvp.Value;
-                                        string columnNameLc = column.Name.ToLower();
-                                        if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
-                                            if (FieldUsedInColumns.Item(columnNameLc)) {
-                                                DataTable_DataRows += (Environment.NewLine + "<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal);
-                                                DataTable_DataRows += GetForm_Index_GetCell(adminContent, editRecord, column.Name, CS, IsLookupFieldValid(columnNameLc), genericController.vbLCase(adminContent.ContentTableName) == "ccemail");
-                                                DataTable_DataRows += ("&nbsp;</span></td>");
-                                            }
-                                        }
-                                    }
-                                    DataTable_DataRows += ("\n" + "    </tr>");
-                                    cpCore.db.csGoNext(CS);
-                                    RecordPointer = RecordPointer + 1;
-                                }
-                                DataTable_DataRows += "<input type=hidden name=rowcnt value=" + RecordPointer + ">";
-                                //
-                                // --- print out the stuff at the bottom
-                                //
-                                RecordTop_NextPage = IndexConfig.RecordTop;
-                                if (cpCore.db.csOk(CS)) {
-                                    RecordTop_NextPage = RecordPointer;
-                                }
-                                RecordTop_PreviousPage = IndexConfig.RecordTop - IndexConfig.RecordsPerPage;
-                                if (RecordTop_PreviousPage < 0) {
-                                    RecordTop_PreviousPage = 0;
-                                }
-                            }
-                            cpCore.db.csClose(CS);
-                            //
-                            // Header at bottom
-                            //
-                            if (RowColor == "class=\"ccAdminListRowOdd\"") {
-                                RowColor = "class=\"ccAdminListRowEven\"";
-                            } else {
-                                RowColor = "class=\"ccAdminListRowOdd\"";
-                            }
-                            if (RecordPointer == 0) {
-                                //
-                                // No records found
-                                //
-                                DataTable_DataRows += ("<tr>" + "<td " + RowColor + " align=center>-</td>" + "<td " + RowColor + " align=center>-</td>" + "<td " + RowColor + " align=center>-</td>" + "<td colspan=" + IndexConfig.Columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">no records were found</td>" + "</tr>");
-                            } else {
-                                if (RecordPointer < RecordLast) {
-                                    //
-                                    // End of list
-                                    //
-                                    DataTable_DataRows += ("<tr>" + "<td " + RowColor + " align=center>-</td>" + "<td " + RowColor + " align=center>-</td>" + "<td " + RowColor + " align=center>-</td>" + "<td colspan=" + IndexConfig.Columns.Count + " " + RowColor + " style=\"text-align:left ! important;\">----- end of list</td>" + "</tr>");
-                                }
-                                //
-                                // Add another header to the data rows
-                                //
-                                DataTable_DataRows += DataTable_HdrRow;
-                            }
-                            //'
-                            //' ----- DataTable_FindRow
-                            //'
-                            //ReDim Findstring(IndexConfig.Columns.Count)
-                            //For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
-                            //    FieldName = IndexConfig.Columns(ColumnPointer).Name
-                            //    If genericController.vbLCase(FieldName) = FindWordName Then
-                            //        Findstring(ColumnPointer) = FindWordValue
-                            //    End If
-                            //Next
-                            //        ReDim Findstring(CustomAdminColumnCount)
-                            //        For ColumnPointer = 0 To CustomAdminColumnCount - 1
-                            //            FieldPtr = CustomAdminColumn(ColumnPointer).FieldPointer
-                            //            With AdminContent.fields(FieldPtr)
-                            //                If genericController.vbLCase(.Name) = FindWordName Then
-                            //                    Findstring(ColumnPointer) = FindWordValue
-                            //                End If
-                            //            End With
-                            //        Next
-                            //
-                            DataTable_FindRow = DataTable_FindRow + "<tr><td colspan=" + (3 + IndexConfig.Columns.Count) + " style=\"background-color:black;height:1;\"></td></tr>";
-                            //DataTable_FindRow = DataTable_FindRow & "<tr><td colspan=" & (3 + CustomAdminColumnCount) & " style=""background-color:black;height:1;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td></tr>"
-                            DataTable_FindRow = DataTable_FindRow + "<tr>";
-                            DataTable_FindRow = DataTable_FindRow + "<td colspan=3 width=\"60\" class=\"ccPanel\" align=center style=\"text-align:center ! important;\">";
-                            DataTable_FindRow = DataTable_FindRow + Environment.NewLine + "<script language=\"javascript\" type=\"text/javascript\">"
-                                + Environment.NewLine + "function KeyCheck(e){"
-                                + Environment.NewLine + "  var code = e.keyCode;"
-                                + Environment.NewLine + "  if(code==13){"
-                                + Environment.NewLine + "    document.getElementById('FindButton').focus();"
-                                + Environment.NewLine + "    document.getElementById('FindButton').click();"
-                                + Environment.NewLine + "    return false;"
-                                + Environment.NewLine + "  }"
-                                + Environment.NewLine + "} "
-                                + Environment.NewLine + "</script>";
-                            DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br >" + cpCore.html.html_GetFormButton(ButtonFind,, "FindButton") + "</td>";
-                            ColumnPointer = 0;
-                            foreach (var kvp in IndexConfig.Columns) {
-                                indexConfigColumnClass column = kvp.Value;
-                                //For ColumnPointer = 0 To CustomAdminColumnCount - 1
-                                ColumnWidth = column.Width;
-                                //fieldId = .FieldId
-                                FieldName = genericController.vbLCase(column.Name);
-                                FindWordValue = "";
-                                if (IndexConfig.FindWords.ContainsKey(FieldName)) {
-                                    var tempVar = IndexConfig.FindWords(FieldName);
-                                    if ((tempVar.MatchOption == FindWordMatchEnum.matchincludes) || (tempVar.MatchOption == FindWordMatchEnum.MatchEquals)) {
-                                        FindWordValue = tempVar.Value;
-                                    }
-                                }
-                                DataTable_FindRow = DataTable_FindRow + Environment.NewLine + "<td valign=\"top\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding-top:2px;padding-bottom:2px;\">"
-                                    + "<input type=hidden name=\"FindName" + ColumnPointer + "\" value=\"" + FieldName + "\">"
-                                    + "<input onkeypress=\"KeyCheck(event);\"  type=text id=\"F" + ColumnPointer + "\" name=\"FindValue" + ColumnPointer + "\" value=\"" + FindWordValue + "\" style=\"width:98%\">"
-                                    + "</td>";
-                                ColumnPointer += 1;
-                            }
-                            DataTable_FindRow = DataTable_FindRow + "</tr>";
-                            //
-                            // Assemble DataTable
-                            //
-                            DataTable = ""
-                                + "<table ID=\"DataTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"Background-Color:white;\">"
-                                + DataTable_HdrRow + DataTable_DataRows + DataTable_FindRow + "</table>";
-                            //DataTable = GetForm_Index_AdvancedSearch()
-                            //
-                            // Assemble DataFilterTable
-                            //
-                            if (!string.IsNullOrEmpty(IndexFilterContent)) {
-                                FilterColumn = "<td valign=top style=\"border-right:1px solid black;\" class=\"ccToolsCon\">" + IndexFilterJS + IndexFilterHead + IndexFilterContent + "</td>";
-                                //FilterColumn = "<td valign=top class=""ccPanel3DReverse ccAdminEditBody"" style=""border-right:1px solid black;"">" & IndexFilterJS & IndexFilterHead & IndexFilterContent & "</td>"
-                            }
-                            DataColumn = "<td width=\"99%\" valign=top>" + DataTable + "</td>";
-                            FilterDataTable = ""
-                                + "<table ID=\"DataFilterTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"Background-Color:white;\">"
-                                + "<tr>"
-                                + FilterColumn + DataColumn + "</tr>"
-                                + "</table>";
-                            //
-                            // Assemble LiveWindowTable
-                            //
-                            // Stream.Add( OpenLiveWindowTable)
-                            Stream.Add(Environment.NewLine + cpCore.html.html_GetFormStart(, "adminForm"));
-                            Stream.Add("<input type=\"hidden\" name=\"indexGoToPage\" value=\"\">");
-                            Stream.Add(ButtonBar);
-                            Stream.Add(Adminui.GetTitleBar(TitleBar, HeaderDescription));
-                            Stream.Add(FilterDataTable);
-                            Stream.Add(ButtonBar);
-                            Stream.Add(cpCore.html.main_GetPanel("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\", height=\"10\" >"));
-                            Stream.Add("<input type=hidden name=Columncnt VALUE=" + IndexConfig.Columns.Count + ">");
-                            Stream.Add("</form>");
-                            //  Stream.Add( CloseLiveWindowTable)
-                            cpCore.html.addTitle(adminContent.Name);
-                        }
-                    }
-                    //End If
-                    //
-                }
-                returnForm = Stream.Text;
-                //
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnForm;
-        }
-        //
-        //========================================================================
-        // ----- Get an XML nodes attribute based on its name
-        //========================================================================
-        //
-        private string GetXMLAttribute(bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
-            string tempGetXMLAttribute = null;
-            try {
-                //
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlAttribute NodeAttribute = null;
-                XmlNode ResultNode = null;
-                string UcaseName = null;
-                //
-                Found = false;
-                ResultNode = Node.Attributes.GetNamedItem(Name);
-                if (ResultNode == null) {
-                    UcaseName = genericController.vbUCase(Name);
-                    foreach (XmlAttribute NodeAttribute in Node.Attributes) {
-                        if (genericController.vbUCase(NodeAttribute.Name) == UcaseName) {
-                            tempGetXMLAttribute = NodeAttribute.Value;
-                            Found = true;
-                            break;
-                        }
-                    }
-                } else {
-                    tempGetXMLAttribute = ResultNode.Value;
-                    Found = true;
-                }
-                if (!Found) {
-                    tempGetXMLAttribute = DefaultIfNotFound;
-                }
-                return tempGetXMLAttribute;
-                //
-                // ----- Error Trap
-                //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
-            }
-            ErrorTrap:
-            handleLegacyClassError3("GetXMLAttribute");
-            return tempGetXMLAttribute;
-        }
-        //
-        // REFACTOR -- THIS SHOULD BE A REMOTE METHOD AND NOT CALLED FROM CPCORE.
-        //==========================================================================================================================================
-        /// <summary>
-        /// Get index view filter content - remote method
-        /// </summary>
-        /// <param name="adminContent"></param>
-        /// <returns></returns>
-        public string GetForm_IndexFilterContent(Models.Complex.cdefModel adminContent) {
-            string returnContent = "";
-            try {
-                int RecordID = 0;
-                string Name = null;
-                string TableName = null;
-                string FieldCaption = null;
-                string ContentName = null;
-                int CS = 0;
-                string SQL = null;
-                string Caption = null;
-                string Link = null;
-                bool IsAuthoringMode = false;
-                string FirstCaption = "";
-                string RQS = null;
-                string QS = null;
-                int Ptr = 0;
-                string SubFilterList = null;
-                indexConfigClass IndexConfig = null;
-                string list = null;
-                string[] ListSplit = null;
-                int Cnt = 0;
-                int Pos = 0;
-                int subContentID = 0;
-                //
-                IndexConfig = LoadIndexConfig(adminContent);
-                //
-                ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, adminContent.Id);
-                IsAuthoringMode = true;
-                RQS = "cid=" + adminContent.Id + "&af=1";
-                //
-                //-------------------------------------------------------------------------------------
-                // Remove filters
-                //-------------------------------------------------------------------------------------
-                //
-                if ((IndexConfig.SubCDefID > 0) || (IndexConfig.GroupListCnt != 0) | (IndexConfig.FindWords.Count != 0) | IndexConfig.ActiveOnly | IndexConfig.LastEditedByMe | IndexConfig.LastEditedToday | IndexConfig.LastEditedPast7Days | IndexConfig.LastEditedPast30Days) {
-                    //
-                    // Remove Filters
-                    //
-                    returnContent += "<div class=\"ccFilterHead\">Remove&nbsp;Filters</div>";
-                    QS = RQS;
-                    QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveAll", "1");
-                    Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                    returnContent += "<div class=\"ccFilterSubHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;Remove All</a></div>";
-                    //
-                    // Last Edited Edited by me
-                    //
-                    SubFilterList = "";
-                    if (IndexConfig.LastEditedByMe) {
-                        QS = RQS;
-                        QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedByMe", 0.ToString(), true);
-                        Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">By&nbsp;Me</a></div>";
-                    }
-                    if (IndexConfig.LastEditedToday) {
-                        QS = RQS;
-                        QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedToday", 0.ToString(), true);
-                        Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Today</a></div>";
-                    }
-                    if (IndexConfig.LastEditedPast7Days) {
-                        QS = RQS;
-                        QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", 0.ToString(), true);
-                        Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Past Week</a></div>";
-                    }
-                    if (IndexConfig.LastEditedPast30Days) {
-                        QS = RQS;
-                        QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", 0.ToString(), true);
-                        Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Past 30 Days</a></div>";
-                    }
-                    if (!string.IsNullOrEmpty(SubFilterList)) {
-                        returnContent += "<div class=\"ccFilterSubHead\">Last&nbsp;Edited</div>" + SubFilterList;
-                    }
-                    //
-                    // Sub Content definitions
-                    //
-                    string SubContentName = null;
-                    SubFilterList = "";
-                    if (IndexConfig.SubCDefID > 0) {
-                        SubContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, IndexConfig.SubCDefID);
-                        QS = RQS;
-                        QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveCDef", Convert.ToString(IndexConfig.SubCDefID));
-                        Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">" + SubContentName + "</a></div>";
-                    }
-                    if (!string.IsNullOrEmpty(SubFilterList)) {
-                        returnContent += "<div class=\"ccFilterSubHead\">In Sub-content</div>" + SubFilterList;
-                    }
-                    //
-                    // Group Filter List
-                    //
-                    string GroupName = null;
-                    SubFilterList = "";
-                    if (IndexConfig.GroupListCnt > 0) {
-                        for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                            GroupName = IndexConfig.GroupList(Ptr);
-                            if (IndexConfig.GroupList(Ptr) != "") {
-                                if (GroupName.Length > 30) {
-                                    GroupName = GroupName.Substring(0, 15) + "..." + GroupName.Substring(GroupName.Length - 15);
-                                }
-                                QS = RQS;
-                                QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveGroup", IndexConfig.GroupList(Ptr));
-                                Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                                SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">" + GroupName + "</a></div>";
-                            }
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(SubFilterList)) {
-                        returnContent += "<div class=\"ccFilterSubHead\">In Group(s)</div>" + SubFilterList;
-                    }
-                    //
-                    // Other Filter List
-                    //
-                    SubFilterList = "";
-                    if (IndexConfig.ActiveOnly) {
-                        QS = RQS;
-                        QS = genericController.ModifyQueryString(QS, "IndexFilterActiveOnly", 0.ToString(), true);
-                        Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent ccFilterList\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">Active&nbsp;Only</a></div>";
-                    }
-                    if (!string.IsNullOrEmpty(SubFilterList)) {
-                        returnContent += "<div class=\"ccFilterSubHead\">Other</div>" + SubFilterList;
-                    }
-                    //
-                    // FindWords
-                    //
-                    foreach (var findWordKvp in IndexConfig.FindWords) {
-                        indexConfigFindWordClass findWord = findWordKvp.Value;
-                        FieldCaption = genericController.encodeText(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, ContentName, findWord.Name, "caption"));
-                        QS = RQS;
-                        QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);
-                        Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                        switch (findWord.MatchOption) {
-                            case FindWordMatchEnum.matchincludes:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'</a></div>";
-                                break;
-                            case FindWordMatchEnum.MatchEmpty:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;is&nbsp;empty</a></div>";
-                                break;
-                            case FindWordMatchEnum.MatchEquals:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;=&nbsp;'" + findWord.Value + "'</a></div>";
-                                break;
-                            case FindWordMatchEnum.MatchFalse:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;is&nbsp;false</a></div>";
-                                break;
-                            case FindWordMatchEnum.MatchGreaterThan:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;&gt;&nbsp;'" + findWord.Value + "'</a></div>";
-                                break;
-                            case FindWordMatchEnum.MatchLessThan:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;&lt;&nbsp;'" + findWord.Value + "'</a></div>";
-                                break;
-                            case FindWordMatchEnum.MatchNotEmpty:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;is&nbsp;not&nbsp;empty</a></div>";
-                                break;
-                            case FindWordMatchEnum.MatchTrue:
-                                returnContent += "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\"><img src=\"/ccLib/images/delete1313.gif\" width=13 height=13 border=0 style=\"vertical-align:middle;\">&nbsp;" + FieldCaption + "&nbsp;is&nbsp;true</a></div>";
-                                break;
-                        }
-                    }
-                    //
-                    returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
-                }
-                //
-                //-------------------------------------------------------------------------------------
-                // Add filters
-                //-------------------------------------------------------------------------------------
-                //
-                returnContent += "<div class=\"ccFilterHead\">Add&nbsp;Filters</div>";
-                //
-                // Last Edited
-                //
-                SubFilterList = "";
-                if (!IndexConfig.LastEditedByMe) {
-                    QS = RQS;
-                    QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedByMe", "1", true);
-                    Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                    SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">By&nbsp;Me</a></div>";
-                }
-                if (!IndexConfig.LastEditedToday) {
-                    QS = RQS;
-                    QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedToday", "1", true);
-                    Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                    SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Today</a></div>";
-                }
-                if (!IndexConfig.LastEditedPast7Days) {
-                    QS = RQS;
-                    QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", "1", true);
-                    Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                    SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Past Week</a></div>";
-                }
-                if (!IndexConfig.LastEditedPast30Days) {
-                    QS = RQS;
-                    QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", "1", true);
-                    Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                    SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Past 30 Days</a></div>";
-                }
-                if (!string.IsNullOrEmpty(SubFilterList)) {
-                    returnContent += "<div class=\"ccFilterSubHead\">Last&nbsp;Edited</div>" + SubFilterList;
-                }
-                //
-                // Sub Content Definitions
-                //
-                SubFilterList = "";
-                list = Models.Complex.cdefModel.getContentControlCriteria(cpCore, ContentName);
-                if (!string.IsNullOrEmpty(list)) {
-                    ListSplit = list.Split('=');
-                    Cnt = ListSplit.GetUpperBound(0) + 1;
-                    if (Cnt > 0) {
-                        for (Ptr = 0; Ptr < Cnt; Ptr++) {
-                            Pos = genericController.vbInstr(1, ListSplit[Ptr], ")");
-                            if (Pos > 0) {
-                                subContentID = genericController.EncodeInteger(ListSplit[Ptr].Substring(0, Pos - 1));
-                                if (subContentID > 0 && (subContentID != adminContent.Id) & (subContentID != IndexConfig.SubCDefID)) {
-                                    Caption = "<span style=\"white-space:nowrap;\">" + Models.Complex.cdefModel.getContentNameByID(cpCore, subContentID) + "</span>";
-                                    QS = RQS;
-                                    QS = genericController.ModifyQueryString(QS, "IndexFilterAddCDef", subContentID.ToString(), true);
-                                    Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                                    SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
-                                }
-                            }
-                        }
-                    }
-                }
-                if (!string.IsNullOrEmpty(SubFilterList)) {
-                    returnContent += "<div class=\"ccFilterSubHead\">In Sub-content</div>" + SubFilterList;
-                }
-                //
-                // people filters
-                //
-                TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
-                SubFilterList = "";
-                if (genericController.vbLCase(TableName) == genericController.vbLCase("ccMembers")) {
-                    SQL = cpCore.db.GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
-                    CS = cpCore.db.csOpenSql_rev("default", SQL);
-                    while (cpCore.db.csOk(CS)) {
-                        Name = cpCore.db.csGetText(CS, "Name");
-                        Ptr = 0;
-                        if (IndexConfig.GroupListCnt > 0) {
-                            for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                                if (Name == IndexConfig.GroupList(Ptr)) {
-                                    break;
-                                }
-                            }
-                        }
-                        if (Ptr == IndexConfig.GroupListCnt) {
-                            RecordID = cpCore.db.csGetInteger(CS, "ID");
-                            Caption = cpCore.db.csGetText(CS, "Caption");
-                            if (string.IsNullOrEmpty(Caption)) {
-                                Caption = Name;
-                                if (string.IsNullOrEmpty(Caption)) {
-                                    Caption = "Group " + RecordID;
-                                }
-                            }
-                            if (Caption.Length > 30) {
-                                Caption = Caption.Substring(0, 15) + "..." + Caption.Substring(Caption.Length - 15);
-                            }
-                            Caption = "<span style=\"white-space:nowrap;\">" + Caption + "</span>";
-                            QS = RQS;
-                            if (!string.IsNullOrEmpty(Name.Trim(' '))) {
-                                QS = genericController.ModifyQueryString(QS, "IndexFilterAddGroup", Name, true);
-                            } else {
-                                QS = genericController.ModifyQueryString(QS, "IndexFilterAddGroup", RecordID.ToString(), true);
-                            }
-                            Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                            SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
-                        }
-                        cpCore.db.csGoNext(CS);
-                    }
-                }
-                if (!string.IsNullOrEmpty(SubFilterList)) {
-                    returnContent += "<div class=\"ccFilterSubHead\">In Group(s)</div>" + SubFilterList;
-                }
-                //
-                // Active Only
-                //
-                SubFilterList = "";
-                if (!IndexConfig.ActiveOnly) {
-                    QS = RQS;
-                    QS = genericController.ModifyQueryString(QS, "IndexFilterActiveOnly", "1", true);
-                    Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                    SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Active&nbsp;Only</a></div>";
-                }
-                if (!string.IsNullOrEmpty(SubFilterList)) {
-                    returnContent += "<div class=\"ccFilterSubHead\">Other</div>" + SubFilterList;
-                }
-                //
-                returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
-                //
-                // Advanced Search Link
-                //
-                QS = RQS;
-                QS = genericController.ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormAdvancedSearch, true);
-                Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                returnContent += "<div class=\"ccFilterHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Advanced&nbsp;Search</a></div>";
-                //
-                returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
-                //
-                // Set Column Link
-                //
-                QS = RQS;
-                QS = genericController.ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns, true);
-                Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                returnContent += "<div class=\"ccFilterHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Set&nbsp;Columns</a></div>";
-                //
-                returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
-                //
-                // Import Link
-                //
-                QS = RQS;
-                QS = genericController.ModifyQueryString(QS, RequestNameAdminForm, AdminFormImportWizard, true);
-                Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                returnContent += "<div class=\"ccFilterHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Import</a></div>";
-                //
-                returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
-                //
-                // Export Link
-                //
-                QS = RQS;
-                QS = genericController.ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormExport, true);
-                Link = "/" + cpCore.serverConfig.appConfig.adminRoute + "?" + QS;
-                returnContent += "<div class=\"ccFilterHead\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Export</a></div>";
-                //
-                returnContent += "<div style=\"border-bottom:1px dotted #808080;\">&nbsp;</div>";
-                //
-                returnContent = "<div style=\"padding-left:10px;padding-right:10px;\">" + returnContent + "</div>";
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnContent;
         }
         //
         //=============================================================================
@@ -16336,7 +14998,7 @@ ErrorTrap:
                             if (cpCore.db.csOk(CS)) {
                                 recordCnt = cpCore.db.csGetInteger(CS, "cnt");
                             }
-                            cpCore.db.csClose(CS);
+                            cpCore.db.csClose(ref CS);
                             //
                             // Build the SQL
                             //
@@ -16433,10 +15095,10 @@ ErrorTrap:
                 }
                 //
                 return tempGetForm_Index_Export;
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Index_Export");
             return tempGetForm_Index_Export;
         }
@@ -16607,9 +15269,9 @@ ErrorTrap:
                                                 cpCore.db.csSet(CSTarget, "ContentID", ContentID);
                                                 NeedToReloadCDef = true;
                                             }
-                                            cpCore.db.csClose(CSTarget);
+                                            cpCore.db.csClose(ref CSTarget);
                                         }
-                                        cpCore.db.csClose(CSSource);
+                                        cpCore.db.csClose(ref CSSource);
                                     }
                                     break;
                                 }
@@ -16632,9 +15294,9 @@ ErrorTrap:
                                         cpCore.db.csSet(CSTarget, "ContentID", ContentID);
                                         NeedToReloadCDef = true;
                                     }
-                                    cpCore.db.csClose(CSTarget);
+                                    cpCore.db.csClose(ref CSTarget);
                                 }
-                                cpCore.db.csClose(CSSource);
+                                cpCore.db.csClose(ref CSSource);
                             }
                         }
                         //
@@ -16664,7 +15326,7 @@ ErrorTrap:
                                             column.Name = cpCore.db.csGet(CSPointer, "name");
                                             column.Width = 20;
                                         }
-                                        cpCore.db.csClose(CSPointer);
+                                        cpCore.db.csClose(ref CSPointer);
                                         IndexConfig.Columns.Add(column.Name.ToLower(), column);
                                         NeedToReloadConfig = true;
                                     }
@@ -16677,7 +15339,7 @@ ErrorTrap:
                                     //
                                     indexConfigColumnClass column = null;
                                     if (IndexConfig.Columns.ContainsKey(TargetFieldName.ToLower())) {
-                                        column = IndexConfig.Columns(TargetFieldName.ToLower());
+                                        column = IndexConfig.Columns[TargetFieldName.ToLower()];
                                         ColumnWidthTotal = ColumnWidthTotal + column.Width;
                                         IndexConfig.Columns.Remove(TargetFieldName.ToLower());
                                         //
@@ -17061,10 +15723,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_Index_SetColumns");
             return tempGetForm_Index_SetColumns;
         }
@@ -17106,7 +15768,7 @@ ErrorTrap:
                         //
                         cpCore.db.csGoNext(CS);
                     }
-                    cpCore.db.csClose(CS);
+                    cpCore.db.csClose(ref CS);
                     if (cpCore.doc.debug_iUserError != "") {
                         //
                         // Throw out all the details of what happened, and add one simple error
@@ -17123,10 +15785,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("TurnOnLinkAlias");
         }
         //
@@ -17237,7 +15899,7 @@ ErrorTrap:
                                 cpCore.privateFiles.deleteFile(EditorStyleRulesFilename);
                                 cpCore.db.csGoNext(CS);
                             }
-                            cpCore.db.csClose(CS);
+                            cpCore.db.csClose(ref CS);
 
                         }
                         //
@@ -17316,10 +15978,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("GetForm_EditConfig");
             //
             return tempGetForm_EditConfig;
@@ -17362,7 +16024,7 @@ ErrorTrap:
                     //
                     // Process Requests
                     //
-                    switch (Convert.ToInt32(Button)) {
+                    switch (Button) {
                         case ButtonSave:
                         case ButtonOK:
                             //
@@ -17405,10 +16067,10 @@ ErrorTrap:
                 //
                 // ----- Error Trap
                 //
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             Content = null;
             handleLegacyClassError3("GetForm_BuildCollection");
             //
@@ -17619,7 +16281,7 @@ ErrorTrap:
                 //    Dim field As appServices_metaDataClass.CDefFieldClass = keyValuePair.Value
                 //    If .Columns.Count > 0 Then
                 //        For Ptr = 0 To .Columns.Count - 1
-                //            With .Columns(Ptr)
+                //            With .Columns[Ptr]
                 //                If genericController.vbLCase(.Name) = field.Name.ToLower() Then
                 //                    .FieldId = SrcPtr
                 //                    Exit For
@@ -17630,7 +16292,7 @@ ErrorTrap:
                 //    '
                 //    If .SortCnt > 0 Then
                 //        For Ptr = 0 To .SortCnt - 1
-                //            With .Sorts(Ptr)
+                //            With .Sorts[Ptr]
                 //                If genericController.vbLCase(.FieldName) = field.Name Then
                 //                    .FieldPtr = SrcPtr
                 //                    Exit For
@@ -17644,9 +16306,9 @@ ErrorTrap:
                 //        '
                 //        If .columns.count > 0 Then
                 //            For Ptr = 0 To .columns.count - 1
-                //                With .Columns(Ptr)
+                //                With .Columns[Ptr]
                 //                    For SrcPtr = 0 To AdminContent.fields.count - 1
-                //                        If .Name = AdminContent.fields(SrcPtr).Name Then
+                //                        If .Name = AdminContent.fields[SrcPtr].Name Then
                 //                            .FieldPointer = SrcPtr
                 //                            Exit For
                 //                        End If
@@ -17659,9 +16321,9 @@ ErrorTrap:
                 //        '
                 //        If .SortCnt > 0 Then
                 //            For Ptr = 0 To .SortCnt - 1
-                //                With .Sorts(Ptr)
+                //                With .Sorts[Ptr]
                 //                    For SrcPtr = 0 To AdminContent.fields.count - 1
-                //                        If genericController.vbLCase(.FieldName) = genericController.vbLCase(AdminContent.fields(SrcPtr).Name) Then
+                //                        If genericController.vbLCase(.FieldName) = genericController.vbLCase(AdminContent.fields[SrcPtr].Name) Then
                 //                            .FieldPtr = SrcPtr
                 //                            Exit For
                 //                        End If
@@ -17848,7 +16510,7 @@ ErrorTrap:
                         IndexConfig.PageNumber = 1;
                         //                If .SubCDefCnt > 0 Then
                         //                    For Ptr = 0 To .SubCDefCnt - 1
-                        //                        If VarInteger = .SubCDefs(Ptr) Then
+                        //                        If VarInteger = .SubCDefs[Ptr] Then
                         //                            Exit For
                         //                        End If
                         //                    Next
@@ -17869,8 +16531,8 @@ ErrorTrap:
                         IndexConfig.PageNumber = 1;
                         //                If .SubCDefCnt > 0 Then
                         //                    For Ptr = 0 To .SubCDefCnt - 1
-                        //                        If .SubCDefs(Ptr) = VarInteger Then
-                        //                            .SubCDefs(Ptr) = 0
+                        //                        If .SubCDefs[Ptr] = VarInteger Then
+                        //                            .SubCDefs[Ptr] = 0
                         //                            .PageNumber = 1
                         //                            Exit For
                         //                        End If
@@ -17921,9 +16583,9 @@ ErrorTrap:
                         }
                         //If .FindWords.Count > 0 Then
                         //    For Ptr = 0 To .FindWords.Count - 1
-                        //        If .FindWords(Ptr).Name = VarText Then
-                        //            .FindWords(Ptr).MatchOption = FindWordMatchEnum.MatchIgnore
-                        //            .FindWords(Ptr).Value = ""
+                        //        If .FindWords[Ptr].Name = VarText Then
+                        //            .FindWords[Ptr].MatchOption = FindWordMatchEnum.MatchIgnore
+                        //            .FindWords[Ptr].Value = ""
                         //            .PageNumber = 1
                         //            Exit For
                         //        End If
@@ -18008,8 +16670,8 @@ ErrorTrap:
                     //.FindWordList = ""
                     //If .findwords.count > 0 Then
                     //    For Ptr = 0 To .findwords.count - 1
-                    //        If .FindWords(Ptr).Value <> "" Then
-                    //            .FindWordList = .FindWordList & vbCrLf & .FindWords(Ptr).Name & "=" & .FindWords(Ptr).Value
+                    //        If .FindWords[Ptr].Value <> "" Then
+                    //            .FindWordList = .FindWordList & vbCrLf & .FindWords[Ptr].Name & "=" & .FindWords[Ptr].Value
                     //        End If
                     //    Next
                     //End If
@@ -18077,7 +16739,7 @@ ErrorTrap:
                 //        Dim field As appServices_metaDataClass.CDefFieldClass = keyValuePair.Value
                 //        If .Columns.Count > 0 Then
                 //            For Ptr = 0 To .Columns.Count - 1
-                //                With .Columns(Ptr)
+                //                With .Columns[Ptr]
                 //                    If genericController.vbLCase(.Name) = field.Name Then
                 //                        .FieldId = SrcPtr
                 //                        Exit For
@@ -18088,7 +16750,7 @@ ErrorTrap:
                 //        '
                 //        If .SortCnt > 0 Then
                 //            For Ptr = 0 To .SortCnt - 1
-                //                With .Sorts(Ptr)
+                //                With .Sorts[Ptr]
                 //                    If genericController.vbLCase(.FieldName) = field.Name Then
                 //                        .FieldPtr = SrcPtr
                 //                        Exit For
@@ -18100,10 +16762,10 @@ ErrorTrap:
                 //End If
                 //
                 return;
-            } catch( Exception ex) {
-                cpCore.handleException( ex )
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
             }
-            ErrorTrap:
+            //ErrorTrap:
             handleLegacyClassError3("ProcessIndexConfigRequests");
         }
         //
@@ -18147,8 +16809,8 @@ ErrorTrap:
             //        SubList = ""
             //        If .SubCDefCnt > 0 Then
             //            For Ptr = 0 To .SubCDefCnt - 1
-            //                If .SubCDefs(Ptr) <> 0 Then
-            //                    SubList = SubList & vbCrLf & .SubCDefs(Ptr)
+            //                If .SubCDefs[Ptr] <> 0 Then
+            //                    SubList = SubList & vbCrLf & .SubCDefs[Ptr]
             //                End If
             //            Next
             //        End If
@@ -18331,7 +16993,7 @@ ErrorTrap:
                     //
                     Button = cpCore.docProperties.getText("button");
                     if (!string.IsNullOrEmpty(Button)) {
-                        switch (Convert.ToInt32(Button)) {
+                        switch (Button) {
                             case ButtonSearch:
                                 IndexConfig = LoadIndexConfig(adminContent);
                                 FormFieldCnt = cpCore.docProperties.getInteger("fieldcnt");
@@ -18443,8 +17105,8 @@ ErrorTrap:
                         // set prepoplate value from indexconfig
                         //
                         if (IndexConfig.FindWords.ContainsKey(FieldName)) {
-                            FieldValue[FieldPtr] = IndexConfig.FindWords(FieldName).Value;
-                            FieldMatchOptions[FieldPtr] = IndexConfig.FindWords(FieldName).MatchOption;
+                            FieldValue[FieldPtr] = IndexConfig.FindWords[FieldName].Value;
+                            FieldMatchOptions[FieldPtr] = (int) IndexConfig.FindWords[FieldName].MatchOption;
                         }
                         FieldPtr += 1;
                     }
@@ -18481,9 +17143,9 @@ ErrorTrap:
                     //            With IndexConfig
                     //                If .findwords.count > 0 Then
                     //                    For Ptr = 0 To .findwords.count - 1
-                    //                        If .FindWords(Ptr).Name = FieldName Then
-                    //                            FieldValue(FieldPtr) = .FindWords(Ptr).Value
-                    //                            FieldMatchOptions(FieldPtr) = .FindWords(Ptr).MatchOption
+                    //                        If .FindWords[Ptr].Name = FieldName Then
+                    //                            FieldValue(FieldPtr) = .FindWords[Ptr].Value
+                    //                            FieldMatchOptions(FieldPtr) = .FindWords[Ptr].MatchOption
                     //                            Exit For
                     //                        End If
                     //                    Next
@@ -18807,10 +17469,5 @@ ErrorTrap:
             }
             return returnForm;
         }
-        //
-
-
-
-
     }
 }

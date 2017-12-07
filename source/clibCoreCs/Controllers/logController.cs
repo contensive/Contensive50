@@ -246,16 +246,16 @@ namespace Contensive.Core.Controllers
 					cpcore.db.csSet(CS, "VisitorID", VisitorID);
 					cpcore.db.csSet(CS, "VisitID", VisitID);
 				}
-				cpcore.db.csClose(CS);
+				cpcore.db.csClose(ref CS);
 				//
 				return;
 				//
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			throw (new Exception("Unexpected exception"));
 		}
 		//
@@ -317,7 +317,7 @@ ErrorTrap:
 			DataTable dt = cpcore.db.executeQuery(SQL);
 			if (dt.Rows.Count > 0)
 			{
-				warningId = genericController.EncodeInteger(dt.Rows(0).Item("id"));
+				warningId = genericController.EncodeInteger(dt.Rows[0].Item("id"));
 			}
 			//
 			if (warningId != 0)
@@ -349,7 +349,7 @@ ErrorTrap:
 						cpcore.db.csSet(CS, "pageId", PageID);
 					}
 				}
-				cpcore.db.csClose(CS);
+				cpcore.db.csClose(ref CS);
 			}
 			//
 		}

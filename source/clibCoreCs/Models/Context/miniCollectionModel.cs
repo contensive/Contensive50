@@ -27,8 +27,8 @@ namespace Contensive.Core.Models.Entity
 		public string name;
 		public bool isBaseCollection; // true only for the one collection created from the base file. This property does not transfer during addSrcToDst
 		public Dictionary<string, Models.Complex.cdefModel> CDef = new Dictionary<string, Models.Complex.cdefModel>();
-		public int SQLIndexCnt;
-		public SQLIndexType[] SQLIndexes;
+		//public int SQLIndexCnt;
+		public List<SQLIndexType> SQLIndexes;
 		public struct SQLIndexType
 		{
 			public string DataSourceName;

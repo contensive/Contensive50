@@ -33,18 +33,22 @@ Namespace Contensive.BaseClasses
         Public MustOverride Function GetInteger(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As Integer
         Public MustOverride Function GetNumber(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As Double
         Public MustOverride Function IsProperty(ByVal PropertyName As String) As Boolean
-        ' deprecated - replaced with Setproperty because c-sharp does not support properties with arguments
-        Public MustOverride Property GlobalVar(ByVal Index As String) As String
-        Public MustOverride ReadOnly Property IsGlobalVar(ByVal Index As String) As Boolean
-        Public MustOverride ReadOnly Property IsVar(ByVal Index As String) As Boolean
-        Public MustOverride Property Var(ByVal Index As String) As String
-        ''' <summary>
-        ''' Returns true if the doc is in the admin site
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public MustOverride ReadOnly Property IsAdminSite() As Boolean
+        ' deprecated - replaced with Setproperty because c-sharp does not support properties with arguments
+        '----------------------------------------------------------------------------------------------------
+        'Public MustOverride Property GlobalVar(ByVal Index As String) As String
+        Public MustOverride Function get_GlobalVar(ByVal Index As String) As String
+        Public MustOverride Sub set_GlobalVar(ByVal Index As String, ByVal Value As String)
+        '----------------------------------------------------------------------------------------------------
+        'Public MustOverride ReadOnly Property IsGlobalVar(ByVal Index As String) As Boolean
+        Public MustOverride Function get_IsGlobalVar(ByVal Index As String) As Boolean
+        '----------------------------------------------------------------------------------------------------
+        'Public MustOverride ReadOnly Property IsVar(ByVal Index As String) As Boolean
+        Public MustOverride Function get_IsVar(ByVal Index As String) As Boolean
+        '----------------------------------------------------------------------------------------------------
+        'Public MustOverride Property Var(ByVal Index As String) As String
+        Public MustOverride Function get_Var(ByVal Index As String) As String
+        Public MustOverride Sub Var(ByVal Index As String, ByVal Value As String)
 
     End Class
 

@@ -6,7 +6,7 @@
 // Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
 //========================================================================
 
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 using System.Xml;
 //
 namespace Contensive.Core.Controllers
@@ -116,7 +116,7 @@ namespace Contensive.Core.Controllers
 						//
 						for (Ptr = 0; Ptr < MSxml.ChildNodes.Count; Ptr++)
 						{
-							if (MSxml.ChildNodes(Ptr).NodeType == System.Xml.XmlNodeType.Element)
+							if (MSxml.ChildNodes[Ptr].NodeType == System.Xml.XmlNodeType.Element)
 							{
 								//
 								Tier[0].ChildPtr = ChildPtr;
@@ -124,7 +124,7 @@ namespace Contensive.Core.Controllers
 								//
 								TierPtr = 1;
 								Array.Resize(ref Tier, 2);
-								Tier[1].Node = MSxml.ChildNodes(Ptr);
+								Tier[1].Node = MSxml.ChildNodes[Ptr];
 								Tier[1].ChildPtr = 0;
 								Tier[1].ChildPtrOK = true;
 								Tier[1].AttrPtr = 0;
@@ -136,7 +136,7 @@ namespace Contensive.Core.Controllers
 			}
 			//
 			return tempLoad;
-ErrorTrap:
+//ErrorTrap:
 			throw (new Exception("unexpected exception"));
 			return tempLoad;
 		}
@@ -309,7 +309,7 @@ ErrorTrap:
 						//
 						TierPtr = TierPtr + 1;
 						Array.Resize(ref Tier, TierPtr + 1);
-						Tier[TierPtr].Node = Tier[TierPtr - 1].Node.ChildNodes(Ptr);
+						Tier[TierPtr].Node = Tier[TierPtr - 1].Node.ChildNodes[Ptr];
 						Tier[TierPtr].ChildPtr = 0;
 						Tier[TierPtr].ChildPtrOK = (Tier[TierPtr - 1].Node.ChildNodes.Count > 0);
 						Tier[TierPtr].AttrPtr = 0;

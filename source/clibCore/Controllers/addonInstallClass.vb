@@ -5583,7 +5583,7 @@ Namespace Contensive.Core
                 '        ' Search for this name in the Dst
                 '        '
                 '        For DstPtr = 0 To dstCollection.AddOnCnt - 1
-                '            DstName = genericController.vbLCase(dstCollection.AddOns(DstPtr).Name)
+                '            DstName = genericController.vbLCase(dstCollection.AddOns[dstPtr].Name)
                 '            If DstName = SrcContentName Then
                 '                '
                 '                ' found a match between Src and Dst
@@ -5592,7 +5592,7 @@ Namespace Contensive.Core
                 '                    '
                 '                    ' test for cdef attribute changes
                 '                    '
-                '                    With dstCollection.AddOns(DstPtr)
+                '                    With dstCollection.AddOns[dstPtr]
                 '                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(cpcore,.ArgumentList, srcCollection.AddOns(SrcPtr).ArgumentList)
                 '                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(cpcore,.Copy, srcCollection.AddOns(SrcPtr).Copy)
                 '                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(cpcore,.Link, srcCollection.AddOns(SrcPtr).Link)
@@ -5613,7 +5613,7 @@ Namespace Contensive.Core
                 '            okToUpdateDstFromSrc = True
                 '        End If
                 '        If okToUpdateDstFromSrc Then
-                '            With dstCollection.AddOns(DstPtr)
+                '            With dstCollection.AddOns[dstPtr]
                 '                '
                 '                ' It okToUpdateDstFromSrc, update the Dst with the Src
                 '                '

@@ -8,7 +8,7 @@
 
 using System.Net.Mail;
 using System.Net.Mime;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 //
 namespace Contensive.Core.Controllers
 {
@@ -224,16 +224,16 @@ namespace Contensive.Core.Controllers
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
 					tempaddEmailQueue = "There was an unexpected error detected exiting the SMTPHandler AddQueue method [" + Microsoft.VisualBasic.Information.Err().Description + "].";
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-					Microsoft.VisualBasic.Information.Err().Clear();
+					//Microsoft.VisualBasic.Information.Err().Clear();
 				}
 				return tempaddEmailQueue;
 				//
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
 			ErrorNumber = Microsoft.VisualBasic.Information.Err().Number;
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -244,7 +244,7 @@ ErrorTrap:
 			//
 			HandleClassTrapError(MethodName, true);
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-			Microsoft.VisualBasic.Information.Err().Clear();
+			//Microsoft.VisualBasic.Information.Err().Clear();
 			//
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
 			return "There was an unexpected error saving the email to the email queue [" + Microsoft.VisualBasic.Information.Err().Description + "].";
@@ -368,15 +368,15 @@ ErrorTrap:
 				{
 					HandleClassTrapError("SendQueue", true);
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-					Microsoft.VisualBasic.Information.Err().Clear();
+					//Microsoft.VisualBasic.Information.Err().Clear();
 				}
 				return;
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			//kmafs = Nothing
 			HandleClassTrapError(MethodName, false);
 		}
@@ -454,12 +454,12 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			tempCheckAddress = false;
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-			Microsoft.VisualBasic.Information.Err().Clear();
+			//Microsoft.VisualBasic.Information.Err().Clear();
 			return tempCheckAddress;
 		}
 		//
@@ -497,12 +497,12 @@ ErrorTrap:
 			}
 			catch
 			{
-				goto ErrorTrap;
+				cpCore.handleException( ex );
 			}
-ErrorTrap:
+//ErrorTrap:
 			tempCheckServer = false;
 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-			Microsoft.VisualBasic.Information.Err().Clear();
+			//Microsoft.VisualBasic.Information.Err().Clear();
 			return tempCheckServer;
 		}
 		//

@@ -89,7 +89,7 @@ namespace Contensive.Core.Models.Complex
 					DataTable dt = cpCore.db.executeQuery("select name from cccontent where id=" + RedirectContentID.ToString());
 					if (dt.Rows.Count > 0)
 					{
-						_RedirectContentName = genericController.encodeText(dt.Rows(0).Item(0));
+						_RedirectContentName = genericController.encodeText(dt.Rows[0].Item(0));
 					}
 				}
 			}
@@ -115,7 +115,7 @@ namespace Contensive.Core.Models.Complex
 					DataTable dt = cpCore.db.executeQuery("select name from cccontent where id=" + MemberSelectGroupID.ToString());
 					if (dt.Rows.Count > 0)
 					{
-						_MemberSelectGroupName = genericController.encodeText(dt.Rows(0).Item(0));
+						_MemberSelectGroupName = genericController.encodeText(dt.Rows[0].Item(0));
 					}
 				}
 			}
@@ -141,7 +141,7 @@ namespace Contensive.Core.Models.Complex
 					DataTable dt = cpCore.db.executeQuery("select name from cccontent where id=" + manyToManyContentID.ToString());
 					if (dt.Rows.Count > 0)
 					{
-						_ManyToManyContentName = genericController.encodeText(dt.Rows(0).Item(0));
+						_ManyToManyContentName = genericController.encodeText(dt.Rows[0].Item(0));
 					}
 				}
 			}
@@ -167,7 +167,7 @@ namespace Contensive.Core.Models.Complex
 					DataTable dt = cpCore.db.executeQuery("select name from cccontent where id=" + manyToManyRuleContentID.ToString());
 					if (dt.Rows.Count > 0)
 					{
-						_ManyToManyRuleContentName = genericController.encodeText(dt.Rows(0).Item(0));
+						_ManyToManyRuleContentName = genericController.encodeText(dt.Rows[0].Item(0));
 					}
 				}
 			}
@@ -193,7 +193,7 @@ namespace Contensive.Core.Models.Complex
 					DataTable dt = cpCore.db.executeQuery("select name from cccontent where id=" + lookupContentID.ToString());
 					if (dt.Rows.Count > 0)
 					{
-						_lookupContentName = genericController.encodeText(dt.Rows(0).Item(0));
+						_lookupContentName = genericController.encodeText(dt.Rows[0].Item(0));
 					}
 				}
 			}

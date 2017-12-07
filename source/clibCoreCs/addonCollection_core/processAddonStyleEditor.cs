@@ -32,7 +32,7 @@ namespace Contensive.Addons.Core
 				coreClass cpCore = processor.core;
 				//
 				// save custom styles
-				if (cpCore.doc.authContext.isAuthenticated() & cpCore.doc.authContext.isAuthenticatedAdmin(cpCore))
+				if (cpCore.doc.authContext.isAuthenticated & cpCore.doc.authContext.isAuthenticatedAdmin(cpCore))
 				{
 					int addonId = cpCore.docProperties.getInteger("AddonID");
 					if (addonId > 0)

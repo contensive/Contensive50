@@ -215,7 +215,7 @@ namespace Contensive.Core
 				tempDomainPrimary = "";
 				if (cpCore.serverConfig.appConfig.domainList.Count > 0)
 				{
-					tempDomainPrimary = cpCore.serverConfig.appConfig.domainList(0);
+					tempDomainPrimary = cpCore.serverConfig.appConfig.domainList[0];
 				}
 				return tempDomainPrimary;
 			}

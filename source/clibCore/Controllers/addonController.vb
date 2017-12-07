@@ -5,6 +5,7 @@ Option Strict On
 Imports System.Reflection
 Imports Contensive.BaseClasses
 Imports Contensive.Core.Controllers.genericController
+Imports Microsoft.ClearScript.V8
 
 Imports System.Xml
 Imports Contensive.Core.Models.Entity
@@ -1377,10 +1378,10 @@ Namespace Contensive.Core.Controllers
         Private Function execute_Script(ByRef addon As Models.Entity.addonModel, ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String) As String
             Dim returnText As String = ""
             Try
+                Dim engine As New Microsoft.ClearScript.Windows.VBScriptEngine()
                 Dim Lines() As String
                 Dim Args As String() = {}
                 Dim EntryPointArgs As String = String.Empty
-                '
                 Dim WorkingEntryPoint As String = EntryPoint
                 Dim WorkingCode As String = Code
                 Dim EntryPointName As String = WorkingEntryPoint
@@ -1428,6 +1429,7 @@ Namespace Contensive.Core.Controllers
                     Try
                         Dim mainCsv As New mainCsvScriptCompatibilityClass(cpCore)
                         Call sc.AddObject("ccLib", mainCsv)
+                        Call engine.AddHostObject("ccLib", mainCsv)
                     Catch ex As Exception
                         '
                         ' Error adding cclib object
@@ -1451,6 +1453,7 @@ Namespace Contensive.Core.Controllers
                     If True Then
                         Try
                             Call sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly)
+                            Call engine.AddHostObject("cp", cpCore.cp_forAddonExecutionOnly)
                         Catch ex As Exception
                             '
                             ' Error adding cp object
@@ -1481,6 +1484,10 @@ Namespace Contensive.Core.Controllers
                                 End If
                             End If
                             Try
+                                Dim returnObj As Object = engine.ExecuteCommand(WorkingCode)
+                                If (returnObj Is GetType(String)) Then
+                                    returnText = returnObj.ToString()
+                                End If
                                 If EntryPointArgs = "" Then
                                     returnText = genericController.encodeText(sc.Run(EntryPointName))
 

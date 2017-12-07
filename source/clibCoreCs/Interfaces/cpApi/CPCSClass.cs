@@ -56,7 +56,7 @@ namespace Contensive.Core
 					{
 						if (cs != -1 && true)
 						{
-							cpCore.db.csClose(cs);
+							cpCore.db.csClose(ref cs);
 						}
 						//If Not (False) Then
 						//    Call cmc.asv.csv_CloseCS(CSPointer)
@@ -86,7 +86,7 @@ namespace Contensive.Core
 			{
 				if (cs != -1)
 				{
-					cpCore.db.csClose(cs);
+					cpCore.db.csClose(ref cs);
 				}
 				cs = cpCore.db.csInsertRecord(ContentName, OpeningMemberID);
 				success = cpCore.db.csOk(cs);
@@ -109,7 +109,7 @@ namespace Contensive.Core
 			{
 				if (cs != -1)
 				{
-					cpCore.db.csClose(cs);
+					cpCore.db.csClose(ref cs);
 				}
 				cs = cpCore.db.csOpen(ContentName, "id=" + recordId,, ActiveOnly,,,, SelectFieldList, 1, 1);
 				success = cpCore.db.csOk(cs);
@@ -133,7 +133,7 @@ namespace Contensive.Core
 			{
 				if (cs != -1)
 				{
-					cpCore.db.csClose(cs);
+					cpCore.db.csClose(ref cs);
 				}
 				if ((pageSize == 0) || (pageSize == 10))
 				{
@@ -165,7 +165,7 @@ namespace Contensive.Core
 			{
 				if (cs != -1)
 				{
-					cpCore.db.csClose(cs);
+					cpCore.db.csClose(ref cs);
 				}
 				cs = cpCore.db.csOpenGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
 				success = OK();
@@ -190,7 +190,7 @@ namespace Contensive.Core
 				groupList.Add(GroupName);
 				if (cs != -1)
 				{
-					cpCore.db.csClose(cs);
+					cpCore.db.csClose(ref cs);
 				}
 				cs = cpCore.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
 				success = OK();
@@ -223,7 +223,7 @@ namespace Contensive.Core
 			{
 				if (cs != -1)
 				{
-					cpCore.db.csClose(cs);
+					cpCore.db.csClose(ref cs);
 				}
 				cs = cpCore.db.csOpenSql_rev("default", sql);
 				success = cpCore.db.csOk(cs);
@@ -247,7 +247,7 @@ namespace Contensive.Core
 			{
 				if (cs != -1)
 				{
-					cpCore.db.csClose(cs);
+					cpCore.db.csClose(ref cs);
 				}
 				if (((string.IsNullOrEmpty(sql)) || (sql.ToLower() == "default")) & (!string.IsNullOrEmpty(DataSourcename)) & (DataSourcename.ToLower() != "default"))
 				{
@@ -281,7 +281,7 @@ namespace Contensive.Core
 			{
 				if (cs != -1)
 				{
-					cpCore.db.csClose(cs);
+					cpCore.db.csClose(ref cs);
 				}
 				if (((string.IsNullOrEmpty(sql)) || (sql.ToLower() == "default")) & (!string.IsNullOrEmpty(DataSourcename)) & (DataSourcename.ToLower() != "default"))
 				{
@@ -312,7 +312,7 @@ namespace Contensive.Core
 			{
 				if (cs != -1)
 				{
-					cpCore.db.csClose(cs);
+					cpCore.db.csClose(ref cs);
 					cs = -1;
 				}
 			}

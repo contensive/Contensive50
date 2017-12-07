@@ -61,7 +61,7 @@ namespace Contensive.Core.Controllers
 		//    '
 		//    Public shared Function EncodeInteger(ExpressionVariant As Object) As Integer
 		//        ' 7/14/2009 - cover the overflow case, return 0
-		//        On Error Resume Next
+		//        //On Error //Resume Next
 		//        '
 		//        If Not IsArray(ExpressionVariant) Then
 		//            If Not IsMissing(ExpressionVariant) Then
@@ -79,7 +79,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Err.Clear()
 		//        encodeInteger = 0
 		//    End Function
@@ -107,7 +107,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Err.Clear()
 		//        encodeNumber = 0
 		//    End Function
@@ -137,7 +137,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Err.Clear()
 		//        encodeDate = Date.MinValue
 		//    End Function
@@ -176,7 +176,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Err.Clear()
 		//        encodeBoolean = False
 		//    End Function
@@ -198,7 +198,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Err.Clear()
 		//        encodeBit = 0
 		//    End Function
@@ -222,7 +222,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Err.Clear()
 		//        encodeText = ""
 		//    End Function
@@ -244,7 +244,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Err.Clear()
 		//    End Function
 		//
@@ -371,7 +371,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Err.Clear()
 		//    End Sub
 		//    '
@@ -463,7 +463,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Err.Clear()
 		//    End Sub
 		//    '
@@ -488,7 +488,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    End Function
 		//    '
 		//    '
@@ -501,7 +501,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    End Function
 		//    '
 		//    '=================================================================================
@@ -575,7 +575,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- ErrorTrap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    End Function
 		//    '
 		//    '=================================================================================
@@ -656,7 +656,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- Error Trap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    End Function
 		//    '
 		//    '========================================================================
@@ -685,7 +685,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- Error Trap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    End Function
 		//    '
 		//    '========================================================================
@@ -738,7 +738,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- Error Trap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    End Function
 		//    '
 		//    '========================================================================
@@ -777,7 +777,7 @@ namespace Contensive.Core.Controllers
 		//        '
 		//        ' ----- Error Trap
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//    End Function
 		//    '
 		//    '========================================================================
@@ -1130,7 +1130,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Function encodeURL(Source As String) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim URLSplit() As String
 		//        Dim LeftSide As String
@@ -1166,7 +1166,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Function encodeQueryString(Source As String) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim QSSplit() As String
 		//        Dim QSPointer As Integer
@@ -1205,7 +1205,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Function encodeRequestVariable(Source As String) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim SourcePointer As Integer
 		//        Dim Character As String
@@ -1240,7 +1240,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Function encodeHTML(Source As String) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        encodeHTML = Source
 		//        encodeHTML = vbReplace(encodeHTML, "&", "&amp;")
@@ -1261,7 +1261,7 @@ namespace Contensive.Core.Controllers
 		public static string decodeHtml(string Source)
 		{
 			string tempdecodeHtml = null;
-			// ##### removed to catch err<>0 problem on error resume next
+			// ##### removed to catch err<>0 problem //On Error //Resume Next
 			//
 			int Pos = 0;
 			string s = null;
@@ -1301,7 +1301,7 @@ namespace Contensive.Core.Controllers
 						if (vbIsNumeric(CharCodeString))
 						{
 							CharCode = EncodeInteger(CharCodeString);
-							s = s.Substring(0, Pos - 1) + Microsoft.VisualBasic.Strings.Chr(CharCode) + s.Substring(posEnd - 1);
+							s = s.Substring(0, Pos - 1) + Convert.ToChar(CharCode) + s.Substring(posEnd - 1);
 						}
 					}
 					//
@@ -1415,7 +1415,7 @@ namespace Contensive.Core.Controllers
 
 			//Dim iUnicode As Integer, i As Integer, j As Integer
 
-			//On Error Resume Next
+			////On Error //Resume Next
 			//i = UBound(Bytes)
 
 			//If (i < 1) Then
@@ -1528,7 +1528,7 @@ namespace Contensive.Core.Controllers
 		//    '======================================================================================
 		//    '
 		//    Public shared sub StartDebugTimer(Enabled As Boolean, Label As String)
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        If Enabled Then
 		//            If TimerStackCount < TimerStackMax Then
 		//                TimerStack(TimerStackCount).Label = Label
@@ -1541,7 +1541,7 @@ namespace Contensive.Core.Controllers
 		//    End Sub
 		//    '
 		//    Public shared sub StopDebugTimer(Enabled As Boolean, Label As String)
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        If Enabled Then
 		//            If TimerStackCount <= 0 Then
 		//                Call AppendLogFile("dll" & ".?.StopDebugTimer, " & "Timer Error, attempting to Pop, but the stack is empty")
@@ -1561,7 +1561,7 @@ namespace Contensive.Core.Controllers
 		//    '
 		//    '
 		//    Public shared Function PayString(Index) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        Select Case Index
 		//            Case PayTypeCreditCardOnline
 		//                PayString = "Credit Card"
@@ -1592,7 +1592,7 @@ namespace Contensive.Core.Controllers
 		//    '
 		//    '
 		//    Public shared Function CCString(Index) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        Select Case Index
 		//            Case CCTYPEVISA
 		//                CCString = "Visa"
@@ -1614,7 +1614,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Public shared Function GetLongFromByteArray(ByteArray() As Byte, Position As Integer) As Integer
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        GetLongFromByteArray = ByteArray(Position + 3)
 		//        GetLongFromByteArray = ByteArray(Position + 2) + (256 * GetLongFromByteArray)
@@ -1631,7 +1631,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Public shared Function GetNumberFromByteArray(ByteArray() As Byte, Position As Integer) As Integer
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim ArgumentCount As Integer
 		//        Dim ArgumentLength As Integer
@@ -1655,7 +1655,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Public shared Function GetStringFromByteArray(ByteArray() As Byte, Position As Integer) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim Pointer As Integer
 		//        Dim ArgumentLength As Integer
@@ -1677,7 +1677,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Public shared sub SetLongByteArray(ByRef ByteArray() As Byte, Position As Integer, LongValue As Integer)
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        ByteArray(Position + 0) = LongValue And (&HFF)
 		//        ByteArray(Position + 1) = Int(LongValue / 256) And (&HFF)
@@ -1692,7 +1692,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Public shared sub SetStringByteArray(ByRef ByteArray() As Byte, Position As Integer, StringValue As String)
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim Pointer As Integer
 		//        Dim LenStringValue As Integer
@@ -1714,7 +1714,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//Public shared sub SetRMBLong(ByRef ByteArray() As Byte, LongValue As Integer, Optional Position)
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim Temp As Integer
 		//        Dim MyPosition As Integer
@@ -1775,7 +1775,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//Public shared sub SetRMBString(ByRef ByteArray() As Byte, StringValue As String, Optional Position)
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim Temp As Integer
 		//        Dim MyPosition As Integer
@@ -1844,7 +1844,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Function EncodeXML(ValueVariant As Object, fieldType As Integer) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim TimeValuething As Single
 		//        Dim TimeHours As Integer
@@ -1969,7 +1969,7 @@ namespace Contensive.Core.Controllers
 		}
 		//    '
 		//    'Function encodeFilename(Filename As String) As String
-		//    '    ' ##### removed to catch err<>0 problem on error resume next
+		//    '    ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//    '    '
 		//    '    Dim Source() as object
 		//    '    Dim Replacement() as object
@@ -1996,7 +1996,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Function DecodeHTML(Source As String) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        DecodeHTML = decodeHtml(Source)
 		//        'Dim SourceChr() as object
@@ -2015,7 +2015,7 @@ namespace Contensive.Core.Controllers
 		//    '========================================================================
 		//    '
 		//    Function ReplaceMany(Source As String, ArrayOfSource() As Object, ArrayOfReplacement() As Object) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim Count As Integer
 		//        Dim Pointer As Integer
@@ -2031,7 +2031,7 @@ namespace Contensive.Core.Controllers
 		//    '
 		//    '
 		//    Public shared Function GetURIHost(URI) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        '   Divide the URI into URIHost, URIPath, and URIPage
 		//        '
@@ -2069,7 +2069,7 @@ namespace Contensive.Core.Controllers
 		//    '
 		//    '
 		//    Public shared Function GetURIPage(URI) As String
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        '   Divide the URI into URIHost, URIPath, and URIPage
 		//        '
@@ -2107,7 +2107,7 @@ namespace Contensive.Core.Controllers
 		//    '
 		//    '
 		//    Function GetDateFromGMT(GMTDate As String) As Date
-		//        ' ##### removed to catch err<>0 problem on error resume next
+		//        ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//        '
 		//        Dim WorkString As String
 		//        GetDateFromGMT = 0
@@ -2254,7 +2254,7 @@ namespace Contensive.Core.Controllers
 		//'    '========================================================================
 		//'    '
 		//Public shared Function EncodeSQL(ByVal expression As Object, Optional ByVal fieldType As Integer = FieldTypeIdText) As String
-		//    ' ##### removed to catch err<>0 problem on error resume next
+		//    ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//    '
 		//    Dim iFieldType As Integer
 		//    Dim MethodName As String
@@ -2286,7 +2286,7 @@ namespace Contensive.Core.Controllers
 		//'=====================================================================================================
 		//'
 		//Public shared sub SetNameValueArrays(ByVal InputName As String, ByVal InputValue As String, ByRef SQLName() As String, ByRef SQLValue() As String, ByRef Index As Integer)
-		//    ' ##### removed to catch err<>0 problem on error resume next
+		//    ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//    '
 		//    SQLName(Index) = InputName
 		//    SQLValue(Index) = InputValue
@@ -2492,21 +2492,21 @@ namespace Contensive.Core.Controllers
 			//
 			if (vbInstr(1, Expression, Environment.NewLine) != 0)
 			{
-				tempSplitCRLF = Microsoft.VisualBasic.Strings.Split(Expression, Environment.NewLine, -1, Microsoft.VisualBasic.Constants.vbTextCompare);
+                tempSplitCRLF = Expression.Split(Environment.NewLine.ToCharArray()); 
 			}
 			else if (vbInstr(1, Expression, "\r") != 0)
 			{
-				tempSplitCRLF = Microsoft.VisualBasic.Strings.Split(Expression, "\r", -1, Microsoft.VisualBasic.Constants.vbTextCompare);
-			}
+				tempSplitCRLF = Expression.Split("\r".ToCharArray()); 
+            }
 			else if (vbInstr(1, Expression, "\n") != 0)
 			{
-				tempSplitCRLF = Microsoft.VisualBasic.Strings.Split(Expression, "\n", -1, Microsoft.VisualBasic.Constants.vbTextCompare);
-			}
+				tempSplitCRLF = Expression.Split("\n".ToCharArray()); 
+            }
 			else
 			{
 				tempSplitCRLF = new string[1];
-				tempSplitCRLF = Microsoft.VisualBasic.Strings.Split(Expression, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
-			}
+				tempSplitCRLF = Expression.Split(Environment.NewLine.ToCharArray()); 
+            }
 			return tempSplitCRLF;
 		}
 		//    '
@@ -2524,7 +2524,7 @@ namespace Contensive.Core.Controllers
 		//        ShellObj = Nothing
 		//        Exit Sub
 		//        '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        Call AppendLogFile("ErrorTrap, runProcess running command [" & Cmd & "], WaitForReturn=" & WaitForReturn & ", err=" & GetErrString(Err))
 		//    End Sub
 		//
@@ -3213,7 +3213,7 @@ namespace Contensive.Core.Controllers
 			//
 			// ----- ErrorTrap
 			//
-ErrorTrap:
+//ErrorTrap:
 return tempGetArgument;
 		}
 		//'
@@ -3304,15 +3304,9 @@ return tempGetArgument;
 		//
 		public static int GetRandomInteger()
 		{
-			//
-			int RandomBase = 0;
-			int RandomLimit = 0;
-			//
-			RandomBase = Convert.ToInt32((Math.Pow(2, 30)) - 1);
-			RandomLimit = Convert.ToInt32((Math.Pow(2, 31)) - RandomBase - 1);
-			Microsoft.VisualBasic.VBMath.Randomize();
-			return Convert.ToInt32(RandomBase + (Microsoft.VisualBasic.VBMath.Rnd() * RandomLimit));
-			//
+            int RandomBase = Convert.ToInt32((Math.Pow(2, 30)) - 1); ;
+			int RandomLimit = Convert.ToInt32((Math.Pow(2, 31)) - RandomBase - 1);
+            return (new Random()).Next(RandomBase, RandomLimit);
 		}
 		//
 		//=================================================================================
@@ -3562,7 +3556,7 @@ return tempGetArgument;
 		public static string EncodeURL(string Source)
 		{
 			return WebUtility.UrlEncode(Source);
-			//' ##### removed to catch err<>0 problem on error resume next
+			//' ##### removed to catch err<>0 problem //On Error //Resume Next
 			//'
 			//Dim URLSplit() As String
 			//'Dim LeftSide As String
@@ -3600,7 +3594,7 @@ return tempGetArgument;
 		public static string EncodeQueryString(string Source)
 		{
 			string tempEncodeQueryString = null;
-			// ##### removed to catch err<>0 problem on error resume next
+			// ##### removed to catch err<>0 problem //On Error //Resume Next
 			//
 			string[] QSSplit = null;
 			int QSPointer = 0;
@@ -3656,7 +3650,7 @@ return tempGetArgument;
 			{
 				return System.Uri.EscapeDataString(Source);
 			}
-			//' ##### removed to catch err<>0 problem on error resume next
+			//' ##### removed to catch err<>0 problem //On Error //Resume Next
 			//'
 			//Dim SourcePointer As Integer
 			//Dim Character As String
@@ -3692,7 +3686,7 @@ return tempGetArgument;
 		//'========================================================================
 		//'
 		//Public shared Function DecodeHTML(ByVal Source As String) As String
-		//    ' ##### removed to catch err<>0 problem on error resume next
+		//    ' ##### removed to catch err<>0 problem //On Error //Resume Next
 		//    '
 		//    Dim Pos As Integer
 		//    Dim s As String
@@ -3791,7 +3785,7 @@ return tempGetArgument;
 					if (((string.CompareOrdinal(Digit1, "0") >= 0) && (string.CompareOrdinal(Digit1, "9") <= 0)) || ((string.CompareOrdinal(Digit1, "A") >= 0) && (string.CompareOrdinal(Digit1, "F") <= 0)))
 					{
 						ESCValue = int.Parse("&H" + ESCString.Substring(1));
-						tempDecodeResponseVariable = tempDecodeResponseVariable.Substring(0, Position - 1) + Microsoft.VisualBasic.Strings.Chr(ESCValue) + tempDecodeResponseVariable.Substring(Position + 2);
+						tempDecodeResponseVariable = tempDecodeResponseVariable.Substring(0, Position - 1) + Convert.ToChar(ESCValue) + tempDecodeResponseVariable.Substring(Position + 2);
 						//  & vbReplace(DecodeResponseVariable, ESCString, Chr(ESCValue), Position, 1)
 					}
 				}
@@ -3809,7 +3803,7 @@ return tempGetArgument;
 		public static string DecodeURL(string Source)
 		{
 			string tempDecodeURL = null;
-			// ##### removed to catch err<>0 problem on error resume next
+			// ##### removed to catch err<>0 problem //On Error //Resume Next
 			//
 			int Position = 0;
 			string ESCString = null;
@@ -3833,7 +3827,7 @@ return tempGetArgument;
 					if (((string.CompareOrdinal(Digit1, "0") >= 0) && (string.CompareOrdinal(Digit1, "9") <= 0)) || ((string.CompareOrdinal(Digit1, "A") >= 0) && (string.CompareOrdinal(Digit1, "F") <= 0)))
 					{
 						ESCValue = int.Parse("&H" + ESCString.Substring(1));
-						tempDecodeURL = vbReplace(tempDecodeURL, ESCString, Microsoft.VisualBasic.Strings.Chr(ESCValue));
+						tempDecodeURL = vbReplace(tempDecodeURL, ESCString, Convert.ToChar(ESCValue));
 					}
 				}
 				Position = vbInstr(Position + 1, tempDecodeURL, "%");
@@ -3851,7 +3845,7 @@ return tempGetArgument;
 		public static DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1)
 		{
 			DateTime tempGetFirstNonZeroDate = default(DateTime);
-			// ##### removed to catch err<>0 problem on error resume next
+			// ##### removed to catch err<>0 problem //On Error //Resume Next
 			//
 			DateTime NullDate;
 			//
@@ -3912,7 +3906,7 @@ return tempGetArgument;
 		public static int GetFirstNonZeroInteger(int Integer1, int Integer2)
 		{
 			int tempGetFirstNonZeroInteger = 0;
-			// ##### removed to catch err<>0 problem on error resume next
+			// ##### removed to catch err<>0 problem //On Error //Resume Next
 			//
 			if (Integer1 == 0)
 			{
@@ -3967,7 +3961,7 @@ return tempGetArgument;
 		//
 		public static string[] SplitDelimited(string WordList, string Delimiter)
 		{
-			// ##### removed to catch err<>0 problem on error resume next
+			// ##### removed to catch err<>0 problem //On Error //Resume Next
 			//
 			string[] QuoteSplit = null;
 			int QuoteSplitCount = 0;
@@ -4010,7 +4004,7 @@ return tempGetArgument;
 					{
 						if (!InQuote)
 						{
-							SpaceSplit = Microsoft.VisualBasic.Strings.Split(Fragment, Delimiter, -1, Microsoft.VisualBasic.CompareMethod.Binary);
+							SpaceSplit = Fragment.Split( Delimiter.ToCharArray());
 							SpaceSplitCount = SpaceSplit.GetUpperBound(0) + 1;
 							for (SpaceSplitPointer = 0; SpaceSplitPointer < SpaceSplitCount; SpaceSplitPointer++)
 							{
@@ -4877,7 +4871,7 @@ return tempGetArgument;
 		//            '
 		//            ' ----- Error Trap
 		//            '
-		//ErrorTrap:
+		////ErrorTrap:
 		//        End Function
 		//        '
 		//        '========================================================================
@@ -4980,19 +4974,19 @@ return tempGetArgument;
 			//
 			// ----- ErrorTrap
 			//
-ErrorTrap:
+//ErrorTrap:
 return tempgetSimpleNameValue;
 		}
-		//==========================================================================================================================
-		//   To convert from site license to server licenses, we still need the URLEncoder in the site license
-		//   This routine generates a site license that is just the URL encoder.
-		//==========================================================================================================================
-		//
-		public static string GetURLEncoder()
-		{
-			Microsoft.VisualBasic.VBMath.Randomize();
-			return Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(1000000000 + (Microsoft.VisualBasic.VBMath.Rnd() * 899999999)))));
-		}
+		////==========================================================================================================================
+		////   To convert from site license to server licenses, we still need the URLEncoder in the site license
+		////   This routine generates a site license that is just the URL encoder.
+		////==========================================================================================================================
+		////
+		//public static string GetURLEncoder()
+		//{
+		//	Microsoft.VisualBasic.VBMath.Randomize();
+		//	return Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(1000000000 + (Microsoft.VisualBasic.VBMath.Rnd() * 899999999)))));
+		//}
 		//
 		//
 		//
@@ -5660,32 +5654,33 @@ return tempgetSimpleNameValue;
 		//
 		public static string main_encodeCookieName(string Source)
 		{
-			string result = "";
+            return EncodeURL(Source);
+//			string result = "";
 
-			int SourcePointer = 0;
-			string Character = null;
-			string localSource = null;
-			//
-			if (!string.IsNullOrEmpty(Source))
-			{
-				localSource = Source;
-//INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(localSource) for every iteration:
-				int tempVar = localSource.Length;
-				for (SourcePointer = 1; SourcePointer <= tempVar; SourcePointer++)
-				{
-					Character = localSource.Substring(SourcePointer - 1, 1);
-					if (genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, Microsoft.VisualBasic.Constants.vbTextCompare) != 0)
-					{
-						result = result + Character;
-					}
-					else
-					{
-						result = result + "%" + Convert.ToString(Microsoft.VisualBasic.Strings.Asc(Character), 16).ToUpper();
-					}
-				}
-			}
-			//
-			return result;
+//			int SourcePointer = 0;
+//			string Character = null;
+//			string localSource = null;
+//			//
+//			if (!string.IsNullOrEmpty(Source))
+//			{
+//				localSource = Source;
+////INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(localSource) for every iteration:
+//				int tempVar = localSource.Length;
+//				for (SourcePointer = 1; SourcePointer <= tempVar; SourcePointer++)
+//				{
+//					Character = localSource.Substring(SourcePointer - 1, 1);
+//					if (genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, Microsoft.VisualBasic.Constants.vbTextCompare) != 0)
+//					{
+//						result = result + Character;
+//					}
+//					else
+//					{
+//						result = result + "%" + Convert.ToString(Microsoft.VisualBasic.Strings.Asc(Character), 16).ToUpper();
+//					}
+//				}
+//			}
+//			//
+//			return result;
 		}
 		public static string main_GetYesNo(bool InputValue)
 		{
@@ -5761,62 +5756,62 @@ return tempgetSimpleNameValue;
 			}
 			return result;
 		}
-		//
-		//=============================================================================
-		// Cleans a text file of control characters, allowing only vblf
-		//=============================================================================
-		//
-		public static string main_RemoveControlCharacters(string DirtyText)
-		{
-			string result = DirtyText;
-			int Pointer = 0;
-			int ChrTest = 0;
-			string iDirtyText;
-			//
-			iDirtyText = encodeText(DirtyText);
-			result = "";
-			if (!string.IsNullOrEmpty(iDirtyText))
-			{
-				result = "";
-//INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(iDirtyText) for every iteration:
-				int tempVar = iDirtyText.Length;
-				for (Pointer = 1; Pointer <= tempVar; Pointer++)
-				{
-					ChrTest = Microsoft.VisualBasic.Strings.Asc(iDirtyText.Substring(Pointer - 1, 1));
-					if (ChrTest >= 32 && ChrTest < 128)
-					{
-						result = result + Microsoft.VisualBasic.Strings.Chr(ChrTest);
-					}
-					else
-					{
-						switch (ChrTest)
-						{
-							case 9:
-								result = result + " ";
-								break;
-							case 10:
-								result = result + "\n";
-								break;
-						}
-					}
-				}
-				//
-				// limit CRLF to 2
-				//
-				while (vbInstr(result, "\n" + "\n" + "\n") != 0)
-				{
-					result = vbReplace(result, "\n" + "\n" + "\n", "\n" + "\n");
-				}
-				//
-				// limit spaces to 1
-				//
-				while (vbInstr(result, "  ") != 0)
-				{
-					result = vbReplace(result, "  ", " ");
-				}
-			}
-			return result;
-		}
+//		//
+//		//=============================================================================
+//		// Cleans a text file of control characters, allowing only vblf
+//		//=============================================================================
+//		//
+//		public static string main_RemoveControlCharacters(string DirtyText)
+//		{
+//			string result = DirtyText;
+//			int Pointer = 0;
+//			int ChrTest = 0;
+//			string iDirtyText;
+//			//
+//			iDirtyText = encodeText(DirtyText);
+//			result = "";
+//			if (!string.IsNullOrEmpty(iDirtyText))
+//			{
+//				result = "";
+////INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(iDirtyText) for every iteration:
+//				int tempVar = iDirtyText.Length;
+//				for (Pointer = 1; Pointer <= tempVar; Pointer++)
+//				{
+//                    ChrTest = iDirtyText.Substring(Pointer - 1, 1).ToCharArray()[0];
+//					if (ChrTest >= 32 && ChrTest < 128)
+//					{
+//						result = result + (int)str[i] Microsoft.VisualBasic.Strings.Chr(ChrTest);
+//					}
+//					else
+//					{
+//						switch (ChrTest)
+//						{
+//							case 9:
+//								result = result + " ";
+//								break;
+//							case 10:
+//								result = result + "\n";
+//								break;
+//						}
+//					}
+//				}
+//				//
+//				// limit CRLF to 2
+//				//
+//				while (vbInstr(result, "\n" + "\n" + "\n") != 0)
+//				{
+//					result = vbReplace(result, "\n" + "\n" + "\n", "\n" + "\n");
+//				}
+//				//
+//				// limit spaces to 1
+//				//
+//				while (vbInstr(result, "  ") != 0)
+//				{
+//					result = vbReplace(result, "  ", " ");
+//				}
+//			}
+//			return result;
+//		}
 		//
 		//========================================================================
 		//   convert a virtual file into a Link usable on the website:
@@ -5998,7 +5993,7 @@ return tempgetSimpleNameValue;
 		public static string encodeHTML(string Source)
 		{
 			string tempencodeHTML = null;
-			// ##### removed to catch err<>0 problem on error resume next
+			// ##### removed to catch err<>0 problem //On Error //Resume Next
 			//
 			tempencodeHTML = Source;
 			tempencodeHTML = genericController.vbReplace(tempencodeHTML, "&", "&amp;");

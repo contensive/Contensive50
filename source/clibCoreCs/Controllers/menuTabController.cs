@@ -6,7 +6,7 @@
 // Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
 //========================================================================
 
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 
 namespace Contensive.Core.Controllers
 {

@@ -8,7 +8,7 @@
 
 //
 using Contensive.Core.Controllers;
-using Contensive.Core.Controllers.genericController;
+using static Contensive.Core.Controllers.genericController;
 
 using System.Xml;
 using Contensive.Core;
@@ -481,7 +481,7 @@ namespace Contensive.Core.Controllers
 								cpcore.db.csSet(CS, "password", loginForm_Password);
 								cpcore.doc.authContext.authenticateById(cpcore, cpcore.doc.authContext.user.id, cpcore.doc.authContext);
 							}
-							cpcore.db.csClose(CS);
+							cpcore.db.csClose(ref CS);
 						}
 					}
 				}

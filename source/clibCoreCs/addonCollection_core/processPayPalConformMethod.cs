@@ -56,7 +56,7 @@ namespace Contensive.Addons.Core
 						cpCore.db.csSet(CS, "ContentControlID", models.complex.cdefmodel.getcontentid(cpCore,"Orders Completed"));
 						cpCore.db.csSave2(CS);
 					}
-					cpCore.db.csClose(CS);
+					cpCore.db.csClose(ref CS);
 					//
 					// Empty the cart
 					//
@@ -66,7 +66,7 @@ namespace Contensive.Addons.Core
 						cpCore.db.csSet(CS, "OrderID", 0);
 						cpCore.db.csSave2(CS);
 					}
-					cpCore.db.csClose(CS);
+					cpCore.db.csClose(ref CS);
 					//
 					// TEmp fix until HardCodedPage is complete
 					//
@@ -80,7 +80,7 @@ namespace Contensive.Addons.Core
 						string Sender = cpCore.siteProperties.getText("EmailOrderFromAddress");
 						string subject = cpCore.webServer.requestDomain + " Online Order Pending, #" + ConfirmOrderID;
 						string Message = "<p>An order confirmation has been recieved from PayPal for " + cpCore.webServer.requestDomain + "</p>";
-						cpCore.email.send_Legacy(Recipient, Sender, subject, Message,, false, true);
+						cpCore.email.send_Legacy(Recipient, Sender, subject, Message,0, false, true);
 					}
 				}
 				cpCore.doc.continueProcessing = false;

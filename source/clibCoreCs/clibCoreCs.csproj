@@ -32,13 +32,23 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Web.Administration, Version=10.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Administration.10.0.0\lib\netstandard1.3\Microsoft.Web.Administration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -46,9 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="addonCollection_addonMngr\addon_AddonMngrSafeClass.cs" />
-    <Compile Include="addonCollection_addonMngr\DateHelper.cs" />
     <Compile Include="addonCollection_adminSite\closeAjaxIndexFilter.cs" />
-    <Compile Include="addonCollection_adminSite\DateHelper.cs" />
     <Compile Include="addonCollection_adminSite\getAdminSiteClass.cs" />
     <Compile Include="addonCollection_adminSite\getAjaxDefaultAddonOptionString.cs" />
     <Compile Include="addonCollection_adminSite\getAjaxVisitProperty.cs" />
@@ -88,7 +96,6 @@
     <Compile Include="addonCollection_core\processStatusMethod.cs" />
     <Compile Include="addonCollection_core\robotsTxt.cs" />
     <Compile Include="addonCollection_emailProcess\processEmailClass.cs" />
-    <Compile Include="addonCollection_housekeeping\DateHelper.cs" />
     <Compile Include="addonCollection_housekeeping\houseKeepClass.cs" />
     <Compile Include="addonCollection_login\loginFormClass.cs" />
     <Compile Include="addonCollection_login\loginPageClass.cs" />
@@ -96,13 +103,9 @@
     <Compile Include="addonCollection_pageManager\getPageManager.cs" />
     <Compile Include="addonCollection_tools\addon_toolConfigureEdit.cs" />
     <Compile Include="addonCollection_tools\coreToolsClass.0.cs" />
-    <Compile Include="addonCollection_tools\coreToolsClass.1.cs" />
     <Compile Include="constants.cs" />
     <Compile Include="Controllers\addonController.cs" />
     <Compile Include="Controllers\addonInstallClass.0.cs" />
-    <Compile Include="Controllers\addonInstallClass.1.cs" />
-    <Compile Include="Controllers\addonInstallClass.2.cs" />
-    <Compile Include="Controllers\addonInstallClass.3.cs" />
     <Compile Include="Controllers\adminUIController.cs" />
     <Compile Include="Controllers\appBuilderController.cs" />
     <Compile Include="Controllers\cacheController.cs" />
@@ -113,8 +116,6 @@
     <Compile Include="Controllers\dataTreeController.cs" />
     <Compile Include="Controllers\DateHelper.cs" />
     <Compile Include="Controllers\dbController.0.cs" />
-    <Compile Include="Controllers\dbController.1.cs" />
-    <Compile Include="Controllers\dbController.2.cs" />
     <Compile Include="Controllers\dbEngineController.cs" />
     <Compile Include="Controllers\debugController.cs" />
     <Compile Include="Controllers\docController.cs" />
@@ -127,11 +128,6 @@
     <Compile Include="Controllers\genericController.cs" />
     <Compile Include="Controllers\groupController.cs" />
     <Compile Include="Controllers\htmlController.0.cs" />
-    <Compile Include="Controllers\htmlController.1.cs" />
-    <Compile Include="Controllers\htmlController.2.cs" />
-    <Compile Include="Controllers\htmlController.3.cs" />
-    <Compile Include="Controllers\htmlController.4.cs" />
-    <Compile Include="Controllers\htmlController.5.cs" />
     <Compile Include="Controllers\htmlParserController.cs" />
     <Compile Include="Controllers\htmlReflowController.cs" />
     <Compile Include="Controllers\htmlToTextControllers.cs" />
@@ -148,9 +144,6 @@
     <Compile Include="Controllers\menuTabController.cs" />
     <Compile Include="Controllers\menuTreeController.cs" />
     <Compile Include="Controllers\pageContentController.0.cs" />
-    <Compile Include="Controllers\pageContentController.1.cs" />
-    <Compile Include="Controllers\pageContentController.2.cs" />
-    <Compile Include="Controllers\pageContentController.3.cs" />
     <Compile Include="Controllers\remoteQueryController.cs" />
     <Compile Include="Controllers\securityController.cs" />
     <Compile Include="Controllers\sitePropertiesController.cs" />
@@ -185,7 +178,6 @@
     <Compile Include="Interfaces\cpApi\CPUtilsClass.cs" />
     <Compile Include="Interfaces\cpApi\CPVisitClass.cs" />
     <Compile Include="Interfaces\cpApi\CPVisitorClass.cs" />
-    <Compile Include="Interfaces\cpApi\DateHelper.cs" />
     <Compile Include="Interfaces\cpApi\NumericHelper.cs" />
     <Compile Include="Interfaces\mainCsvCompatibilityClass.cs" />
     <Compile Include="Models\Complex\cdefFieldModel.cs" />
@@ -242,9 +234,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\cpBaseCs\cpBaseCs.csproj">
+    <ProjectReference Include="..\cpBaseCs\CPBaseCs.csproj">
       <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
-      <Name>cpBaseCs</Name>
+      <Name>CPBaseCs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\webClientExt\webClientExt.csproj">
+      <Project>{41dc21c3-5fa4-43dd-9eeb-da8964e5cd66}</Project>
+      <Name>webClientExt</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -258,6 +254,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+if not exist "$(TargetDir)" md "$(TargetDir)"
+xcopy /s /y "$(SolutionDir)packages\ClearScript.V8.5.5.0\tools\native\x86\*.*" "$(TargetDir)"
+if not exist "$(TargetDir)" md "$(TargetDir)"
+xcopy /s /y "$(SolutionDir)packages\ClearScript.V8.5.5.0\tools\native\amd64\*.*" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
