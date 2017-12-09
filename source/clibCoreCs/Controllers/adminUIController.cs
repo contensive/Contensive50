@@ -55,7 +55,7 @@ namespace Contensive.Core {
                 // Add Errors
                 //
                 if (cpCore.doc.debug_iUserError != "") {
-                    Copy = Copy + "<div>" + errorController.error_GetUserError(cpCore) + "</div>";
+                    Copy += "<div>" + errorController.error_GetUserError(cpCore) + "</div>";
                 }
                 //
                 if (!string.IsNullOrEmpty(Copy)) {
@@ -188,8 +188,8 @@ namespace Contensive.Core {
                 }
                 //
                 tempGetEditButtonBar2 = ""
-                    + Environment.NewLine + "\t" + GetHTMLComment("ButtonBar") + Environment.NewLine + "\t" + "<div class=\"ccButtonCon\">"
-                    + htmlIndent(tempGetEditButtonBar2) + Environment.NewLine + "\t" + "</div><!-- ButtonBar End -->"
+                    + "\r\n\t" + GetHTMLComment("ButtonBar") + "\r\n\t<div class=\"ccButtonCon\">"
+                    + htmlIndent(tempGetEditButtonBar2) + "\r\n\t</div><!-- ButtonBar End -->"
                     + "";
                 return tempGetEditButtonBar2;
                 //
@@ -214,24 +214,24 @@ namespace Contensive.Core {
                 if (string.IsNullOrEmpty(RightSideMessage)) {
                     RightSideMessage = cpCore.doc.profileStartTime.ToString("G");
                 }
-                if (isInStr(1, HeaderMessage + RightSideMessage, Environment.NewLine)) {
+                if (isInStr(1, HeaderMessage + RightSideMessage, "\r\n")) {
                     s = ""
-                        + "\r" + "<td width=\"50%\" valign=Middle class=\"cchLeft\">"
-                        + htmlIndent(HeaderMessage) + "\r" + "</td>"
-                        + "\r" + "<td width=\"50%\" valign=Middle class=\"cchRight\">"
-                        + htmlIndent(RightSideMessage) + "\r" + "</td>";
+                        + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">"
+                        + htmlIndent(HeaderMessage) + "\r</td>"
+                        + "\r<td width=\"50%\" valign=Middle class=\"cchRight\">"
+                        + htmlIndent(RightSideMessage) + "\r</td>";
                 } else {
                     s = ""
-                        + "\r" + "<td width=\"50%\" valign=Middle class=\"cchLeft\">" + HeaderMessage + "</td>"
-                        + "\r" + "<td width=\"50%\" valign=Middle class=\"cchRight\">" + RightSideMessage + "</td>";
+                        + "\r<td width=\"50%\" valign=Middle class=\"cchLeft\">" + HeaderMessage + "</td>"
+                        + "\r<td width=\"50%\" valign=Middle class=\"cchRight\">" + RightSideMessage + "</td>";
                 }
                 s = ""
-                    + "\r" + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
-                    + htmlIndent(s) + "\r" + "</tr></table>"
+                    + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
+                    + htmlIndent(s) + "\r</tr></table>"
                     + "";
                 s = ""
-                    + "\r" + "<div class=\"ccHeaderCon\">"
-                    + htmlIndent(s) + "\r" + "</div>"
+                    + "\r<div class=\"ccHeaderCon\">"
+                    + htmlIndent(s) + "\r</div>"
                     + "";
                 //
             } catch (Exception ex) {
@@ -302,14 +302,14 @@ namespace Contensive.Core {
                     //
                 } else if (string.IsNullOrEmpty(RightButtons)) {
                     tempGetButtonBar = ""
-                        + "\r" + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
+                        + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                         + cr2 + "<tr>"
                         + cr3 + "<td align=left  class=\"ccButtonCon\">" + LeftButtons + "</td>"
                         + cr2 + "</tr>"
-                        + "\r" + "</table>";
+                        + "\r</table>";
                 } else {
                     tempGetButtonBar = ""
-                        + "\r" + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
+                        + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                         + cr2 + "<tr>"
                         + cr3 + "<td align=left  class=\"ccButtonCon\">"
                         + cr4 + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
@@ -320,7 +320,7 @@ namespace Contensive.Core {
                         + cr4 + "</table>"
                         + cr3 + "</td>"
                         + cr2 + "</tr>"
-                        + "\r" + "</table>";
+                        + "\r</table>";
                 }
                 return tempGetButtonBar;
                 //
@@ -366,11 +366,11 @@ namespace Contensive.Core {
                     Nav = Nav + "<li class=\"delim\">&#187;</li><li onclick=\"bbj(this);\">" + PageCount + "</li>";
                 }
                 Nav = genericController.vbReplace(Nav, ">" + PageNumber + "<", " class=\"hit\">" + PageNumber + "<");
-                tempGetButtonBarForIndex = tempGetButtonBarForIndex + "\r" + "<script language=\"javascript\">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>"
-                    + "\r" + "<div class=\"ccJumpCon\">"
+                tempGetButtonBarForIndex = tempGetButtonBarForIndex + "\r<script language=\"javascript\">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>"
+                    + "\r<div class=\"ccJumpCon\">"
                     + cr2 + "<ul><li class=\"caption\">Page</li>"
                     + cr3 + Nav + cr2 + "</ul>"
-                    + "\r" + "</div>";
+                    + "\r</div>";
                 //    GetButtonBarForIndex = GetButtonBarForIndex _
                 //        & CR & "<script language=""javascript"">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>" _
                 //        & CR & "<div class=""ccJumpCon"">" _
@@ -413,17 +413,16 @@ namespace Contensive.Core {
                 ButtonBar = GetButtonBar(LeftButtons, RightButtons);
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
-                    + "\r" + "<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
-                    + htmlIndent(cpCore.html.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) + "\r" + "</div>";
+                    + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
+                    + htmlIndent(cpCore.html.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) + "\r</div>";
                 }
                 //
                 ContentCell = ""
-                + "\r" + "<div style=\"padding:" + ContentPadding + "px;\">"
-                + htmlIndent(Content) + "\r" + "</div>";
+                + "\r<div style=\"padding:" + ContentPadding + "px;\">"
+                + htmlIndent(Content) + "\r</div>";
                 result = result + htmlIndent(ButtonBar) + htmlIndent(GetTitleBar(Caption, Description)) + htmlIndent(CellContentSummary) + htmlIndent(ContentCell) + htmlIndent(ButtonBar) + "";
 
-                result = ""
-                + '\r' + cpCore.html.html_GetUploadFormStart() + htmlIndent(result) + '\r' + cpCore.html.html_GetUploadFormEnd;
+                result = '\r' + cpCore.html.html_GetUploadFormStart() + htmlIndent(result) + '\r' + cpCore.html.html_GetUploadFormEnd();
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
@@ -465,7 +464,7 @@ namespace Contensive.Core {
                 }
                 Copy = "<div class=\"ccEditorCon\">" + Copy + "</div>";
                 //If HelpMessage <> "" Then
-                Copy = Copy + "<div class=\"ccEditorHelpCon\"><div class=\"closed\">" + HelpMessage + "</div></div>";
+                Copy += "<div class=\"ccEditorHelpCon\"><div class=\"closed\">" + HelpMessage + "</div></div>";
                 //Copy = Copy & "<div style=""padding:10px;white-space:normal"">" & HelpMessage & "</div>"
                 //End If
                 return tempGetEditRow + "<td class=\"ccEditFieldCon\">" + Copy + "</td></tr>";
@@ -603,7 +602,7 @@ namespace Contensive.Core {
                 Style = "ccAdminListRowEven";
             }
             //
-            tempGetReport_Cell = Environment.NewLine + "<td valign=\"middle\" align=\"" + iAlign + "\" class=\"" + Style + "\"";
+            tempGetReport_Cell = "\r\n<td valign=\"middle\" align=\"" + iAlign + "\" class=\"" + Style + "\"";
             if (Columns > 1) {
                 tempGetReport_Cell = tempGetReport_Cell + " colspan=\"" + Columns + "\"";
             }
@@ -629,11 +628,8 @@ namespace Contensive.Core {
         //==========================================================================================
         //
         private string GetReport_CellHeader(int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
+            string result = string.Empty;
             try {
-                //
-                // See new GetReportOrderBy for the method to setup sorting links
-                //
-                //
                 string Style = null;
                 string Copy = null;
                 string QS = null;
@@ -674,23 +670,17 @@ namespace Contensive.Core {
                     WidthTest = genericController.EncodeInteger(Width.ToLower().Replace("px", ""));
                     if (WidthTest != 0) {
                         Style = Style + "width:" + WidthTest + "px;";
-                        Copy = Copy + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
+                        Copy += "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
                         //Copy = Copy & "<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"
                     } else {
                         Style = Style + "width:" + Width + ";";
                     }
                 }
-                //
-                return Environment.NewLine + "<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
-                //
-                //
-                // ----- Error Trap
-                //
+                result = "\r\n<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            handleLegacyClassError("GetReport_CellHeader");
+            return result;
         }
         //
         //=============================================================================
@@ -745,26 +735,19 @@ namespace Contensive.Core {
         //=============================================================================
         //
         public string GetReport(int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle) {
+            string result = string.Empty;
             try {
-                //
-                bool[] ColSortable = null;
-                int ColCnt = 0;
-                int Ptr = 0;
-                //
-                ColCnt = Cells.GetUpperBound(1);
-                ColSortable = new bool[ColCnt + 1];
-                for (Ptr = 0; Ptr < ColCnt; Ptr++) {
+                int ColCnt = Cells.GetUpperBound(1);
+                bool[] ColSortable = new bool[ColCnt + 1];
+                for (int Ptr = 0; Ptr < ColCnt; Ptr++) {
                     ColSortable[Ptr] = false;
                 }
                 //
-                return GetReport2(RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
-                //
-                //
-                // ----- Error Trap
-                //
+                result = GetReport2(RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
+            return result;
         }
 
         //
@@ -827,7 +810,7 @@ namespace Contensive.Core {
                 //
                 // ----- Header
                 //
-                Content.Add(Environment.NewLine + "<tr>");
+                Content.Add("\r\n<tr>");
                 Content.Add(GetReport_CellHeader(0, "Row", "50", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
                 for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
                     ColumnWidth = ColWidth[ColumnPtr];
@@ -857,24 +840,24 @@ namespace Contensive.Core {
                     //    Call Content.Add(GetReport_CellHeader(ColumnPtr, ColCaption(ColumnPtr), ColumnWidth, ColAlign(ColumnPtr), "ccAdminListCaption", RQS, SortingStateEnum.SortableNotSet))
                     //End If
                 }
-                Content.Add(Environment.NewLine + "</tr>");
+                Content.Add("\r\n</tr>");
                 //
                 // ----- Data
                 //
                 if (RowCount == 0) {
-                    Content.Add(Environment.NewLine + "<tr>");
+                    Content.Add("\r\n<tr>");
                     Content.Add(GetReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
                     Content.Add(GetReport_Cell("-- End --", "left", ColumnCount, 0));
-                    Content.Add(Environment.NewLine + "</tr>");
+                    Content.Add("\r\n</tr>");
                 } else {
                     RowBAse = (ReportPageSize * (ReportPageNumber - 1)) + 1;
                     for (RowPointer = 0; RowPointer < RowCount; RowPointer++) {
-                        Content.Add(Environment.NewLine + "<tr>");
+                        Content.Add("\r\n<tr>");
                         Content.Add(GetReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
                         for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
                             Content.Add(GetReport_Cell(Cells[RowPointer, ColumnPtr], ColAlign[ColumnPtr], 1, RowPointer));
                         }
-                        Content.Add(Environment.NewLine + "</tr>");
+                        Content.Add("\r\n</tr>");
                     }
                 }
                 //

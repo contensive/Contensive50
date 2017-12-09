@@ -91,7 +91,7 @@ namespace Contensive.Core.Controllers {
                                     FieldNameVariant = cpCore.db.cs_getNextFieldName(CSPointer);
                                     ///DoEvents
                                 }
-                                sb.Append(Environment.NewLine);
+                                sb.Append("\r\n");
                             }
                             //
                             // ----- print out the values
@@ -109,7 +109,7 @@ namespace Contensive.Core.Controllers {
                                             Copy = cpCore.db.csGet(CSPointer, FieldName);
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 Copy = genericController.vbReplace(Copy, "\"", "'");
-                                                Copy = genericController.vbReplace(Copy, Environment.NewLine, " ");
+                                                Copy = genericController.vbReplace(Copy, "\r\n", " ");
                                                 Copy = genericController.vbReplace(Copy, "\r", " ");
                                                 Copy = genericController.vbReplace(Copy, "\n", " ");
                                             }
@@ -118,7 +118,7 @@ namespace Contensive.Core.Controllers {
                                         FieldNameVariant = cpCore.db.cs_getNextFieldName(CSPointer);
                                         ///DoEvents
                                     }
-                                    sb.Append(Environment.NewLine);
+                                    sb.Append("\r\n");
                                 }
                                 cpCore.db.csGoNext(CSPointer);
                                 ///DoEvents
@@ -146,7 +146,7 @@ namespace Contensive.Core.Controllers {
                                     FieldNameVariant = cpCore.db.cs_getNextFieldName(CSPointer);
                                     ///DoEvents
                                 }
-                                cpCore.appRootFiles.appendFile(TestFilename, Environment.NewLine);
+                                cpCore.appRootFiles.appendFile(TestFilename, "\r\n");
                             }
                             //
                             // ----- print out the values
@@ -175,7 +175,7 @@ namespace Contensive.Core.Controllers {
                                     }
                                     if (!string.IsNullOrEmpty(Copy)) {
                                         Copy = genericController.vbReplace(Copy, "\"", "'");
-                                        Copy = genericController.vbReplace(Copy, Environment.NewLine, " ");
+                                        Copy = genericController.vbReplace(Copy, "\r\n", " ");
                                         Copy = genericController.vbReplace(Copy, "\r", " ");
                                         Copy = genericController.vbReplace(Copy, "\n", " ");
                                     }
@@ -184,7 +184,7 @@ namespace Contensive.Core.Controllers {
                                     FieldNameVariant = cpCore.db.cs_getNextFieldName(CSPointer);
                                     ///DoEvents
                                 }
-                                cpCore.appRootFiles.appendFile(TestFilename, Environment.NewLine);
+                                cpCore.appRootFiles.appendFile(TestFilename, "\r\n");
                                 cpCore.db.csGoNext(CSPointer);
                                 ///DoEvents
                             }

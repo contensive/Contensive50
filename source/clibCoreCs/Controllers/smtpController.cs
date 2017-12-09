@@ -16,6 +16,7 @@ using static Contensive.Core.constants;
 //
 using System.Net.Mail;
 using System.Net.Mime;
+using System.IO;
 //
 namespace Contensive.Core.Controllers {
     public class smtpController {
@@ -84,25 +85,20 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- Send the email now
                         //
-                        //kma() 'fs = New fileSystemClass
-                        //Mailer = New SMTP5Class
-                        ReplyToAddress = ReplyToAddress;
                         ReturnAddress = BounceAddress;
                         if (HTML) {
                             //
                             // ----- send HTML email (and plain text conversion)
                             //
-                            converthtmlToText = new htmlToTextControllers(cpCore);
                             EmailBodyHTML = EmailBody;
-                            if (genericController.vbInstr(1, EmailBodyHTML, "<BODY", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                            if (genericController.vbInstr(1, EmailBodyHTML, "<BODY", 1) == 0) {
                                 EmailBodyHTML = "<BODY>" + EmailBodyHTML + "</BODY>";
                             }
-                            if (genericController.vbInstr(1, EmailBodyHTML, "<HTML>", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                            if (genericController.vbInstr(1, EmailBodyHTML, "<HTML>", 1) == 0) {
                                 EmailBodyHTML = "<HTML>" + EmailBodyHTML + "</HTML>";
                             }
-                            EmailBodyText = converthtmlToText.convert(EmailBody);
+                            EmailBodyText = htmlToTextControllers.convert(cpCore, EmailBody);
                             tempsendEmail5 = sendEmail6(EmailSMTPServer, EmailTo, EmailFrom, EmailSubject, EmailBodyText, "", EmailBodyHTML);
-                            //converthtmlToText = Nothing
                         } else {
                             //
                             // ----- send plain text email
@@ -113,7 +109,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- clean up the result code for logging (change empty to "ok")
                         //
-                        tempsendEmail5 = genericController.vbReplace(tempsendEmail5, Environment.NewLine, "");
+                        tempsendEmail5 = genericController.vbReplace(tempsendEmail5, "\r\n", "");
                         if (string.IsNullOrEmpty(tempsendEmail5)) {
                             SendResult = "ok";
                         } else {
@@ -123,12 +119,12 @@ namespace Contensive.Core.Controllers {
                         // ----- Update Email Result Log
                         //
                         if (!string.IsNullOrEmpty(ResultLogPathPage)) {
-                            cpCore.appRootFiles.appendFile(ResultLogPathPage, Convert.ToString(DateTime.Now) + " delivery attempted to " + EmailTo + "," + SendResult + Environment.NewLine);
+                            cpCore.appRootFiles.appendFile(ResultLogPathPage, Convert.ToString(DateTime.Now) + " delivery attempted to " + EmailTo + "," + SendResult + "\r\n");
                         }
                         //
                         // ----- Update the System Email Log
                         //
-                        LogLine = "\"" + Convert.ToString(DateTime.Now) + "\",\"To[" + EmailTo + "]\",\"From[" + EmailFrom + "]\",\"Bounce[" + BounceAddress + "]\",\"Subject[" + EmailSubject + "]\",\"Result[" + SendResult + "]\"" + Environment.NewLine;
+                        LogLine = "\"" + Convert.ToString(DateTime.Now) + "\",\"To[" + EmailTo + "]\",\"From[" + EmailFrom + "]\",\"Bounce[" + BounceAddress + "]\",\"Subject[" + EmailSubject + "]\",\"Result[" + SendResult + "]\"\r\n";
                         logController.appendLog(cpCore, LogLine, "email");
                     }
                 }
@@ -153,14 +149,8 @@ namespace Contensive.Core.Controllers {
                 tempaddEmailQueue = "";
                 //
                 string Filename = null;
-                string MethodName = null;
                 string Copy = null;
-                //Dim kmafs As fileSystemClass
                 string iEmailOutPath = null;
-                //
-                MethodName = "AddQueue";
-                //
-                // ----- Get the email folder
                 //
                 if (!string.IsNullOrEmpty(EmailOutPath)) {
                     if (EmailOutPath.IndexOf("\\") + 1 != EmailOutPath.Length) {
@@ -175,48 +165,23 @@ namespace Contensive.Core.Controllers {
                 // ----- write the email to the email queue folder for delivery later
                 //
                 Copy = "";
-                Copy = Copy + "Contensive Handler " + My.MyApplication.Application.Info.Version.Major + "." + My.MyApplication.Application.Info.Version.Minor + "." + My.MyApplication.Application.Info.Version.Revision + Environment.NewLine;
-                Copy = Copy + genericController.encodeText(SMTPServer) + Environment.NewLine;
-                Copy = Copy + genericController.encodeText(ResultLogPathPage) + Environment.NewLine;
-                Copy = Copy + genericController.encodeText(ToAddress) + Environment.NewLine;
-                Copy = Copy + genericController.encodeText(FromAddress) + Environment.NewLine;
-                Copy = Copy + genericController.encodeText(BounceAddress) + Environment.NewLine;
-                Copy = Copy + genericController.encodeText(ReplyToAddress) + Environment.NewLine;
-                Copy = Copy + genericController.encodeText(SubjectMessage) + Environment.NewLine;
-                Copy = Copy + genericController.encodeText(HTML) + Environment.NewLine;
-                Copy = Copy + genericController.encodeText(BodyMessage);
+                Copy += "Contensive Handler " + cpCore.codeVersion() + "\r\n";
+                Copy += genericController.encodeText(SMTPServer) + "\r\n";
+                Copy += genericController.encodeText(ResultLogPathPage) + "\r\n";
+                Copy += genericController.encodeText(ToAddress) + "\r\n";
+                Copy += genericController.encodeText(FromAddress) + "\r\n";
+                Copy += genericController.encodeText(BounceAddress) + "\r\n";
+                Copy += genericController.encodeText(ReplyToAddress) + "\r\n";
+                Copy += genericController.encodeText(SubjectMessage) + "\r\n";
+                Copy += genericController.encodeText(HTML) + "\r\n";
+                Copy += genericController.encodeText(BodyMessage);
                 Filename = "Out" + Convert.ToString(genericController.GetRandomInteger()) + ".txt";
                 //
                 cpCore.appRootFiles.saveFile(iEmailOutPath + Filename, Copy);
-                //
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (0 != 0) {
-                    HandleClassTrapError("AddQueue", true);
-                    //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                    tempaddEmailQueue = "There was an unexpected error detected exiting the SMTPHandler AddQueue method [" + "" + "].";
-                    //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                    //Microsoft.VisualBasic.Information.Err().Clear();
-                }
-                return tempaddEmailQueue;
-                //
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-            ErrorNumber = 0;
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-            ErrorSource = "";
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-            ErrorDescription = "";
-            //
-            //
-            HandleClassTrapError(MethodName, true);
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-            //Microsoft.VisualBasic.Information.Err().Clear();
-            //
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-            return "There was an unexpected error saving the email to the email queue [" + "" + "].";
+            return tempaddEmailQueue;
         }
         //
         //========================================================================
@@ -235,7 +200,7 @@ namespace Contensive.Core.Controllers {
                 string LogFilename = null;
                 string iEmailOutPath = null;
                 string MethodName = null;
-                IO.FileInfo[] FileList = null;
+                FileInfo[] FileList = null;
                 int EOL = 0;
                 int CommaPosition = 0;
                 string Filename = "";
@@ -265,7 +230,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 FileList = cpCore.appRootFiles.getFileList(iEmailOutPath);
-                foreach (IO.FileInfo file in FileList) {
+                foreach (FileInfo file in FileList) {
                     Copy = cpCore.appRootFiles.readFile(iEmailOutPath + Filename);
                     //
                     // No - no way to manage all the files for now. Later work up something
@@ -316,20 +281,10 @@ namespace Contensive.Core.Controllers {
                         HandleClassInternalError(ignoreInteger, "App.EXEName", "Invalid email in send queue [" + Filename + "] was removed", MethodName, true);
                     }
                 }
-                //
-                //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                if (0 != 0) {
-                    HandleClassTrapError("SendQueue", true);
-                    //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                    //Microsoft.VisualBasic.Information.Err().Clear();
-                }
                 return;
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //kmafs = Nothing
-            HandleClassTrapError(MethodName, false);
         }
         //
         //========================================================================
@@ -339,7 +294,7 @@ namespace Contensive.Core.Controllers {
         private string ReadLine(ref string Body) {
             string line = "";
             try {
-                int EOL = genericController.vbInstr(1, Body, Environment.NewLine);
+                int EOL = genericController.vbInstr(1, Body, "\r\n");
                 if (EOL != 0) {
                     line = Body.Substring(0, EOL - 1);
                     Body = Body.Substring(EOL + 1);
@@ -409,7 +364,7 @@ namespace Contensive.Core.Controllers {
                 //
                 if (string.IsNullOrEmpty(EmailServer)) {
                     tempCheckServer = false;
-                } else if (genericController.vbInstr(1, EmailServer, "SMTP.YourServer.Com", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                } else if (genericController.vbInstr(1, EmailServer, "SMTP.YourServer.Com", 1) != 0) {
                     tempCheckServer = false;
                 } else {
                     SplitArray = EmailServer.Split('.');

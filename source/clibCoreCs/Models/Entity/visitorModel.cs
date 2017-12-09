@@ -102,6 +102,7 @@ namespace Contensive.Core.Models.Entity {
             }
             return result;
         }
+        public static visitorModel create(coreClass cpCore, int recordId) { var tmpList = new List<string> { }; return create(cpCore, recordId, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>
@@ -365,19 +366,19 @@ namespace Contensive.Core.Models.Entity {
                 } else if (CDef.Id <= 0) {
                     throw new ApplicationException("content [" + primaryContentName + "] could Not be found.");
                 } else {
-                    instance.Active = genericController.EncodeBoolean(CDef.fields("Active").defaultValue);
-                    instance.ccGuid = genericController.encodeText(CDef.fields("ccGuid").defaultValue);
-                    instance.ContentControlID = genericController.EncodeInteger(CDef.fields("ContentControlID").defaultValue);
-                    instance.CreatedBy = genericController.EncodeInteger(CDef.fields("CreatedBy").defaultValue);
-                    instance.CreateKey = genericController.EncodeInteger(CDef.fields("CreateKey").defaultValue);
-                    instance.DateAdded = genericController.EncodeDate(CDef.fields("DateAdded").defaultValue);
-                    instance.ForceBrowserMobile = genericController.EncodeInteger(CDef.fields("ForceBrowserMobile").defaultValue);
-                    instance.MemberID = genericController.EncodeInteger(CDef.fields("MemberID").defaultValue);
-                    instance.ModifiedBy = genericController.EncodeInteger(CDef.fields("ModifiedBy").defaultValue);
-                    instance.ModifiedDate = genericController.EncodeDate(CDef.fields("ModifiedDate").defaultValue);
-                    instance.Name = genericController.encodeText(CDef.fields("Name").defaultValue);
-                    instance.OrderID = genericController.EncodeInteger(CDef.fields("OrderID").defaultValue);
-                    instance.SortOrder = genericController.encodeText(CDef.fields("SortOrder").defaultValue);
+                    instance.Active = genericController.EncodeBoolean(CDef.fields["Active"].defaultValue);
+                    instance.ccGuid = genericController.encodeText(CDef.fields["ccGuid"].defaultValue);
+                    instance.ContentControlID = genericController.EncodeInteger(CDef.fields["ContentControlID"].defaultValue);
+                    instance.CreatedBy = genericController.EncodeInteger(CDef.fields["CreatedBy"].defaultValue);
+                    instance.CreateKey = genericController.EncodeInteger(CDef.fields["CreateKey"].defaultValue);
+                    instance.DateAdded = genericController.EncodeDate(CDef.fields["DateAdded"].defaultValue);
+                    instance.ForceBrowserMobile = genericController.EncodeInteger(CDef.fields["ForceBrowserMobile"].defaultValue);
+                    instance.MemberID = genericController.EncodeInteger(CDef.fields["MemberID"].defaultValue);
+                    instance.ModifiedBy = genericController.EncodeInteger(CDef.fields["ModifiedBy"].defaultValue);
+                    instance.ModifiedDate = genericController.EncodeDate(CDef.fields["ModifiedDate"].defaultValue);
+                    instance.Name = genericController.encodeText(CDef.fields["Name"].defaultValue);
+                    instance.OrderID = genericController.EncodeInteger(CDef.fields["OrderID"].defaultValue);
+                    instance.SortOrder = genericController.encodeText(CDef.fields["SortOrder"].defaultValue);
                 }
             } catch (Exception ex) {
                 cpcore.handleException(ex);

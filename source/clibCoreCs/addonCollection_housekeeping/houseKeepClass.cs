@@ -104,7 +104,7 @@ namespace Contensive.Core {
                 Config = cp.core.privateFiles.readFile("" + ConfigFilename);
             }
             if (!string.IsNullOrEmpty(Config)) {
-                ConfigLines = Config.Split(Environment.NewLine.ToCharArray());
+                ConfigLines = Config.Split("\r\n".ToCharArray());
                 LineCnt = ConfigLines.GetUpperBound(0) + 1;
                 for (LinePtr = 0; LinePtr < LineCnt; LinePtr++) {
                     Line = ConfigLines[LinePtr].Trim(' ');
@@ -127,7 +127,7 @@ namespace Contensive.Core {
                 }
             }
             Content = ""
-                + "lastcheck=" + rightNow + Environment.NewLine + "serverhousekeeptime=" + ServerHousekeepTime + Environment.NewLine;
+                + "lastcheck=" + rightNow + "\r\nserverhousekeeptime=" + ServerHousekeepTime + "\r\n";
             cp.core.privateFiles.saveFile("config\\" + ConfigFilename, Content);
             //
             // ----- Run Server Housekeep
@@ -1538,7 +1538,7 @@ namespace Contensive.Core {
                 return;
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                cp.Site.ErrorReport(ex);
             }
         }
         //
@@ -1655,15 +1655,7 @@ namespace Contensive.Core {
                 return;
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception");
-            //
-            // restore saved timeout
-            //
-            if (TimeoutSave != 0) {
-                cp.core.db.sqlCommandTimeout = TimeoutSave;
+                cp.Site.ErrorReport(ex);
             }
         }
         //
@@ -1777,15 +1769,7 @@ namespace Contensive.Core {
                 return;
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception");
-            //
-            // restore saved timeout
-            //
-            if (TimeoutSave != 0) {
-                cp.core.db.sqlCommandTimeout = TimeoutSave;
+                cp.Site.ErrorReport(ex);
             }
         }
         //
@@ -2135,7 +2119,7 @@ namespace Contensive.Core {
                 //
                 return;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                cp.Site.ErrorReport(ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception");
@@ -2211,7 +2195,7 @@ namespace Contensive.Core {
                 return;
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                cp.Site.ErrorReport(ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception");
@@ -2230,7 +2214,7 @@ namespace Contensive.Core {
                 string Copy = null;
                 //
                 Doc = new XmlDocument();
-                URL = "http://support.contensive.com/GetUpdates?iv=" + cp.Version();
+                URL = "http://support.contensive.com/GetUpdates?iv=" + cp.Version;
                 loadOK = true;
                 Doc.Load(URL);
                 if (Doc.DocumentElement.Name.ToLower() != genericController.vbLCase("ContensiveUpdate")) {
@@ -2594,7 +2578,7 @@ namespace Contensive.Core {
                 //
                 return;
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                cp.Site.ErrorReport(ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception");
@@ -2632,7 +2616,7 @@ namespace Contensive.Core {
                 //
                 bool loadOK = true;
                 try {
-                    collectionFileFilename = cp.core.addon.getPrivateFilesAddonPath + "Collections.xml";
+                    collectionFileFilename = cp.core.addon.getPrivateFilesAddonPath() + "Collections.xml";
                     Doc.LoadXml(collectionFileFilename);
                 } catch (Exception ex) {
                     AppendClassLog(cpcore, "Server", "", "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file.");
@@ -2742,7 +2726,7 @@ namespace Contensive.Core {
                                                     }
                                                     // 20161005 - no longer need to register activeX
                                                     //FileList = cp.core.app.privateFiles.GetFolderFiles(Path & "\" & dir.Name)
-                                                    //For Each file As IO.FileInfo In FileList
+                                                    //For Each file As FileInfo In FileList
                                                     //    If Right(file.Name, 4) = ".dll" Then
                                                     //        If IsActiveFolder Then
                                                     //            '
@@ -2779,13 +2763,13 @@ namespace Contensive.Core {
                                             // register files found in the active folder last
                                             //
                                             if (!string.IsNullOrEmpty(RegisterPathList)) {
-                                                RegisterPaths = Microsoft.VisualBasic.Strings.Split(RegisterPathList, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                                                RegisterPaths = genericController.customSplit(RegisterPathList, "\r\n");
                                                 for (Ptr = 0; Ptr <= RegisterPaths.GetUpperBound(0); Ptr++) {
                                                     RegisterPath = RegisterPaths[Ptr].Trim(' ');
                                                     if (!string.IsNullOrEmpty(RegisterPath)) {
                                                         Cmd = "%comspec% /c regsvr32 \"" + RegisterPath + "\" /s";
                                                         AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "....Register DLL [" + Cmd + "]");
-                                                        runProcess(cp.core, Cmd,, true);
+                                                        runProcess(cp.core, Cmd,"", true);
                                                     }
                                                 }
                                                 RegisterPathList = "";

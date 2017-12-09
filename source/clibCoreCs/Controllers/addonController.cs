@@ -12,6 +12,8 @@ using static Contensive.Core.constants;
 //
 using Contensive.BaseClasses;
 using System.IO;
+using System.Data;
+using Contensive.Core.Models.Complex;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -108,7 +110,7 @@ namespace Contensive.Core.Controllers {
                     bool allowAdvanceEditor = cpCore.visitProperty.getBoolean("AllowAdvancedEditor");
                     //
                     // -- add addon record arguments to doc properties
-                    foreach (var addon_argument in addon.ArgumentList.Replace(Environment.NewLine, "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
+                    foreach (var addon_argument in addon.ArgumentList.Replace("\r\n", "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
                         if (!string.IsNullOrEmpty(addon_argument)) {
                             string[] nvp = addon_argument.Split('=');
                             if (!string.IsNullOrEmpty(nvp[0])) {
@@ -315,7 +317,7 @@ namespace Contensive.Core.Controllers {
                         //
                         string TestString = addon.Copy + addon.CopyText + addon.PageTitle + addon.MetaDescription + addon.MetaKeywordList + addon.OtherHeadTags + addon.FormXML;
                         if (!string.IsNullOrEmpty(TestString)) {
-                            foreach (var key in cpCore.docProperties.getKeyList) {
+                            foreach (var key in cpCore.docProperties.getKeyList()) {
                                 string ReplaceSource = "$" + key + "$";
                                 if (TestString.IndexOf(ReplaceSource) >= 0) {
                                     string ReplaceValue = cpCore.docProperties.getText(key);
@@ -413,12 +415,12 @@ namespace Contensive.Core.Controllers {
                             int PosStart = 0;
                             httpRequestController kmaHTTP = new httpRequestController();
                             string RemoteAssetContent = kmaHTTP.getURL(ref RemoteAssetLink);
-                            int Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            int Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", Microsoft.VisualBasic.CompareMethod.Text);
                             if (Pos > 0) {
                                 Pos = genericController.vbInstr(Pos, RemoteAssetContent, ">");
                                 if (Pos > 0) {
                                     PosStart = Pos + 1;
-                                    Pos = genericController.vbInstr(Pos, RemoteAssetContent, "</body", Microsoft.VisualBasic.Constants.vbTextCompare);
+                                    Pos = genericController.vbInstr(Pos, RemoteAssetContent, "</body", Microsoft.VisualBasic.CompareMethod.Text);
                                     if (Pos > 0) {
                                         RemoteAssetContent = RemoteAssetContent.Substring(PosStart - 1, Pos - PosStart);
                                     }
@@ -439,7 +441,7 @@ namespace Contensive.Core.Controllers {
                         // -- Script Callback
                         if (addon.Link != "") {
                             string callBackLink = EncodeAppRootPath(addon.Link, cpCore.webServer.requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain);
-                            foreach (var key in cpCore.docProperties.getKeyList) {
+                            foreach (var key in cpCore.docProperties.getKeyList()) {
                                 callBackLink = modifyLinkQuery(callBackLink, EncodeRequestVariable(key), EncodeRequestVariable(cpCore.docProperties.getText(key)), true);
                             }
                             foreach (var kvp in executeContext.instanceArguments) {
@@ -489,9 +491,9 @@ namespace Contensive.Core.Controllers {
                         // -- Add Css containers
                         if (!string.IsNullOrEmpty(ContainerCssID) | !string.IsNullOrEmpty(ContainerCssClass)) {
                             if (addon.IsInline) {
-                                result = "\r" + "<span id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
+                                result = "\r<span id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
                             } else {
-                                result = "\r" + "<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + htmlIndent(result) + "\r" + "</div>";
+                                result = "\r<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + htmlIndent(result) + "\r</div>";
                             }
                         }
                     }
@@ -502,11 +504,11 @@ namespace Contensive.Core.Controllers {
                         // -- iFrame content, framed in content, during the remote method call, add in the rest of the html page
                         cpCore.doc.setMetaContent(0, 0);
                         result = ""
-                            + cpCore.siteProperties.docTypeDeclaration + Environment.NewLine + "<html>"
-                            + "\r" + "<head>"
-                            + Environment.NewLine + htmlIndent(cpCore.html.getHtmlHead()) + "\r" + "</head>"
-                            + '\r' + TemplateDefaultBodyTag + "\r" + "</body>"
-                            + Environment.NewLine + "</html>";
+                            + cpCore.siteProperties.docTypeDeclaration + "\r\n<html>"
+                            + "\r<head>"
+                            + "\r\n" + htmlIndent(cpCore.html.getHtmlHead()) + "\r</head>"
+                            + '\r' + TemplateDefaultBodyTag + "\r</body>"
+                            + "\r\n</html>";
                     } else if (addon.AsAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
                         //
                         // -- as ajax content, AsAjax addon, during the Ajax callback, need to create an onload event that runs everything appended to onload within this content
@@ -534,12 +536,12 @@ namespace Contensive.Core.Controllers {
                                 if (cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                     string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
                                     string AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                    AddonEditIcon = "<a href=\"" + "/" + cpCore.serverConfig.appConfig.adminRoute + "?cid=" + cdefModel.getContentId(cpCore, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
+                                    AddonEditIcon = "<a href=\"/" + cpCore.serverConfig.appConfig.adminRoute + "?cid=" + cdefModel.getContentId(cpCore, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
                                     string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
                                     string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + cpCore.doc.editWrapperCnt, ref DialogList);
                                     string SiteStylesEditIcon = string.Empty; // ?????
                                     string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
-                                    ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                    ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
                                     result = cpCore.html.getEditWrapper("<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
                                 } else if (cpCore.visitProperty.getBoolean("AllowEditing")) {
                                     result = cpCore.html.getEditWrapper("<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
@@ -554,7 +556,7 @@ namespace Contensive.Core.Controllers {
                                 if (addon.IsInline) {
                                     result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
                                 } else {
-                                    result = "" + "\r" + "<!-- Add-on " + AddonCommentName + " -->" + htmlIndent(result) + "\r" + "<!-- /Add-on " + AddonCommentName + " -->";
+                                    result = "\r<!-- Add-on " + AddonCommentName + " -->" + htmlIndent(result) + "\r<!-- /Add-on " + AddonCommentName + " -->";
                                 }
                             }
                         }
@@ -936,7 +938,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
-                                                                            Copy = Copy + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy += cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue));
                                                                         }
@@ -1161,7 +1163,7 @@ namespace Contensive.Core.Controllers {
                                                                 // ----- Error
                                                                 //
                                                                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                Copy = "Error: " + "";
+                                                                Copy = "Error: ";
                                                             } else if (!isDataTableOk(dt)) {
                                                                 //
                                                                 // ----- no result
@@ -1184,13 +1186,13 @@ namespace Contensive.Core.Controllers {
                                                                             //
                                                                             // Build headers
                                                                             //
-                                                                            FieldCount = dr.ItemArray.Count;
-                                                                            Copy = Copy + ("\r" + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;\">");
-                                                                            Copy = Copy + ("\r" + "\t" + "<tr>");
+                                                                            FieldCount =  dr.ItemArray.Length;
+                                                                            Copy += ("\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;\">");
+                                                                            Copy += ("\r\t<tr>");
                                                                             foreach (DataColumn dc in dr.ItemArray) {
-                                                                                Copy = Copy + ("\r" + "\t" + "\t" + "<td class=\"ccadminsmall\" style=\"border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;\">" + dr(dc).ToString() + "</td>");
+                                                                                Copy += ("\r\t\t<td class=\"ccadminsmall\" style=\"border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;\">" + dr[dc].ToString() + "</td>");
                                                                             }
-                                                                            Copy = Copy + ("\r" + "\t" + "</tr>");
+                                                                            Copy += ("\r\t</tr>");
                                                                             //
                                                                             // Build output table
                                                                             //
@@ -1198,22 +1200,22 @@ namespace Contensive.Core.Controllers {
                                                                             string RowEnd = null;
                                                                             string ColumnStart = null;
                                                                             string ColumnEnd = null;
-                                                                            RowStart = "\r" + "\t" + "<tr>";
-                                                                            RowEnd = "\r" + "\t" + "</tr>";
-                                                                            ColumnStart = "\r" + "\t" + "\t" + "<td class=\"ccadminnormal\" style=\"border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px\">";
+                                                                            RowStart = "\r\t<tr>";
+                                                                            RowEnd = "\r\t</tr>";
+                                                                            ColumnStart = "\r\t\t<td class=\"ccadminnormal\" style=\"border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px\">";
                                                                             ColumnEnd = "</td>";
                                                                             int RowPointer = 0;
                                                                             for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                                                                                Copy = Copy + (RowStart);
+                                                                                Copy += (RowStart);
                                                                                 int ColumnPointer = 0;
                                                                                 for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                                                                     object CellData = something[ColumnPointer, RowPointer];
                                                                                     if (IsNull(CellData)) {
-                                                                                        Copy = Copy + (ColumnStart + "[null]" + ColumnEnd);
+                                                                                        Copy += (ColumnStart + "[null]" + ColumnEnd);
                                                                                     } else if ((CellData == null)) {
-                                                                                        Copy = Copy + (ColumnStart + "[empty]" + ColumnEnd);
+                                                                                        Copy += (ColumnStart + "[empty]" + ColumnEnd);
                                                                                     } else if (Microsoft.VisualBasic.Information.IsArray(CellData)) {
-                                                                                        Copy = Copy + ColumnStart + "[array]";
+                                                                                        Copy += ColumnStart + "[array]";
                                                                                         //Dim Cnt As Integer
                                                                                         //Cnt = UBound(CellData)
                                                                                         //Dim Ptr As Integer
@@ -1222,14 +1224,14 @@ namespace Contensive.Core.Controllers {
                                                                                         //Next
                                                                                         //Copy = Copy & (ColumnEnd)
                                                                                     } else if (genericController.encodeText(CellData) == "") {
-                                                                                        Copy = Copy + (ColumnStart + "[empty]" + ColumnEnd);
+                                                                                        Copy += (ColumnStart + "[empty]" + ColumnEnd);
                                                                                     } else {
-                                                                                        Copy = Copy + (ColumnStart + genericController.encodeHTML(genericController.encodeText(CellData)) + ColumnEnd);
+                                                                                        Copy += (ColumnStart + genericController.encodeHTML(genericController.encodeText(CellData)) + ColumnEnd);
                                                                                     }
                                                                                 }
-                                                                                Copy = Copy + (RowEnd);
+                                                                                Copy += (RowEnd);
                                                                             }
-                                                                            Copy = Copy + ("\r" + "</table>");
+                                                                            Copy += ("\r</table>");
                                                                         }
                                                                     }
                                                                 }
@@ -1377,7 +1379,7 @@ namespace Contensive.Core.Controllers {
                         case "checkbox":
                             //
                             //
-                            Copy = Copy + "<input type=\"hidden\" name=\"" + SitePropertyName + "CheckBoxCnt\" value=\"" + OptionCnt + "\" >";
+                            Copy += "<input type=\"hidden\" name=\"" + SitePropertyName + "CheckBoxCnt\" value=\"" + OptionCnt + "\" >";
                             break;
                         case "radio":
                             //
@@ -1427,162 +1429,162 @@ namespace Contensive.Core.Controllers {
         private string execute_Script(ref addonModel addon, string Language, string Code, string EntryPoint, int ScriptingTimeout, string ScriptName) {
             string returnText = "";
             try {
-                string[] Lines = null;
-                string[] Args = { };
-                string EntryPointArgs = string.Empty;
-                //
-                string WorkingEntryPoint = EntryPoint;
-                string WorkingCode = Code;
-                string EntryPointName = WorkingEntryPoint;
-                int Pos = genericController.vbInstr(1, EntryPointName, "(");
-                if (Pos == 0) {
-                    Pos = genericController.vbInstr(1, EntryPointName, " ");
-                }
-                if (Pos > 1) {
-                    EntryPointArgs = EntryPointName.Substring(Pos - 1).Trim(' ');
-                    EntryPointName = (EntryPointName.Substring(0, Pos - 1)).Trim(' ');
-                    if ((EntryPointArgs.Substring(0, 1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
-                        EntryPointArgs = EntryPointArgs.Substring(1, EntryPointArgs.Length - 2);
-                    }
-                    Args = SplitDelimited(EntryPointArgs, ",");
-                }
-                //
-                MSScriptControl.ScriptControl sc = new MSScriptControl.ScriptControl();
-                try {
-                    sc.AllowUI = false;
-                    sc.Timeout = ScriptingTimeout;
-                    if (!string.IsNullOrEmpty(Language)) {
-                        sc.Language = Language;
-                    } else {
-                        sc.Language = "VBScript";
-                    }
-                    sc.AddCode(WorkingCode);
-                } catch (Exception ex) {
-                    string errorMessage = "Error configuring scripting system";
-                    if (sc.Error.Number != 0) {
-                        errorMessage += ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                        if (sc.Error.Line != 0) {
-                            Lines = Microsoft.VisualBasic.Strings.Split(WorkingCode, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
-                            if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                                errorMessage += ", code [" + Lines[sc.Error.Line - 1] + "]";
-                            }
-                        }
-                    } else {
-                        errorMessage += ", no scripting error";
-                    }
-                    throw new ApplicationException(errorMessage, ex);
-                }
-                if (true) {
-                    try {
-                        mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(cpCore);
-                        sc.AddObject("ccLib", mainCsv);
-                    } catch (Exception ex) {
-                        //
-                        // Error adding cclib object
-                        //
-                        string errorMessage = "Error adding cclib compatibility object to script environment";
-                        if (sc.Error.Number != 0) {
-                            errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                            if (sc.Error.Line != 0) {
-                                Lines = Microsoft.VisualBasic.Strings.Split(WorkingCode, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
-                                if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                                    errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
-                                }
-                            }
-                        } else {
-                            errorMessage += ", no scripting error";
-                        }
-                        throw new ApplicationException(errorMessage, ex);
-                    }
-                    if (true) {
-                        try {
-                            sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly);
-                        } catch (Exception ex) {
-                            //
-                            // Error adding cp object
-                            //
-                            string errorMessage = "Error adding cp object to script environment";
-                            if (sc.Error.Number != 0) {
-                                errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                                if (sc.Error.Line != 0) {
-                                    Lines = Microsoft.VisualBasic.Strings.Split(WorkingCode, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
-                                    if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                                        errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
-                                    }
-                                }
-                            } else {
-                                errorMessage += ", no scripting error";
-                            }
-                            string addonDescription = getAddonDescription(cpCore, addon);
-                            errorMessage += ", " + addonDescription;
-                            throw new ApplicationException(errorMessage, ex);
-                        }
-                        if (true) {
-                            //
-                            if (string.IsNullOrEmpty(EntryPointName)) {
-                                if (sc.Procedures.Count > 0) {
-                                    EntryPointName = sc.Procedures(1).Name;
-                                }
-                            }
-                            try {
-                                if (string.IsNullOrEmpty(EntryPointArgs)) {
-                                    returnText = genericController.encodeText(sc.Run(EntryPointName));
+                //string[] Lines = null;
+                //string[] Args = { };
+                //string EntryPointArgs = string.Empty;
+                ////
+                //string WorkingEntryPoint = EntryPoint;
+                //string WorkingCode = Code;
+                //string EntryPointName = WorkingEntryPoint;
+                //int Pos = genericController.vbInstr(1, EntryPointName, "(");
+                //if (Pos == 0) {
+                //    Pos = genericController.vbInstr(1, EntryPointName, " ");
+                //}
+                //if (Pos > 1) {
+                //    EntryPointArgs = EntryPointName.Substring(Pos - 1).Trim(' ');
+                //    EntryPointName = (EntryPointName.Substring(0, Pos - 1)).Trim(' ');
+                //    if ((EntryPointArgs.Substring(0, 1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
+                //        EntryPointArgs = EntryPointArgs.Substring(1, EntryPointArgs.Length - 2);
+                //    }
+                //    Args = SplitDelimited(EntryPointArgs, ",");
+                //}
+                ////
+                //MSScriptControl.ScriptControl sc = new MSScriptControl.ScriptControl();
+                //try {
+                //    sc.AllowUI = false;
+                //    sc.Timeout = ScriptingTimeout;
+                //    if (!string.IsNullOrEmpty(Language)) {
+                //        sc.Language = Language;
+                //    } else {
+                //        sc.Language = "VBScript";
+                //    }
+                //    sc.AddCode(WorkingCode);
+                //} catch (Exception ex) {
+                //    string errorMessage = "Error configuring scripting system";
+                //    if (sc.Error.Number != 0) {
+                //        errorMessage += ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
+                //        if (sc.Error.Line != 0) {
+                //            Lines = genericController.customSplit(WorkingCode, "\r\n");
+                //            if (Lines.GetUpperBound(0) >= sc.Error.Line) {
+                //                errorMessage += ", code [" + Lines[sc.Error.Line - 1] + "]";
+                //            }
+                //        }
+                //    } else {
+                //        errorMessage += ", no scripting error";
+                //    }
+                //    throw new ApplicationException(errorMessage, ex);
+                //}
+                //if (true) {
+                //    try {
+                //        mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(cpCore);
+                //        sc.AddObject("ccLib", mainCsv);
+                //    } catch (Exception ex) {
+                //        //
+                //        // Error adding cclib object
+                //        //
+                //        string errorMessage = "Error adding cclib compatibility object to script environment";
+                //        if (sc.Error.Number != 0) {
+                //            errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
+                //            if (sc.Error.Line != 0) {
+                //                Lines = genericController.customSplit(WorkingCode, "\r\n");
+                //                if (Lines.GetUpperBound(0) >= sc.Error.Line) {
+                //                    errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
+                //                }
+                //            }
+                //        } else {
+                //            errorMessage += ", no scripting error";
+                //        }
+                //        throw new ApplicationException(errorMessage, ex);
+                //    }
+                //    if (true) {
+                //        try {
+                //            sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly);
+                //        } catch (Exception ex) {
+                //            //
+                //            // Error adding cp object
+                //            //
+                //            string errorMessage = "Error adding cp object to script environment";
+                //            if (sc.Error.Number != 0) {
+                //                errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
+                //                if (sc.Error.Line != 0) {
+                //                    Lines = genericController.customSplit(WorkingCode, "\r\n");
+                //                    if (Lines.GetUpperBound(0) >= sc.Error.Line) {
+                //                        errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
+                //                    }
+                //                }
+                //            } else {
+                //                errorMessage += ", no scripting error";
+                //            }
+                //            string addonDescription = getAddonDescription(cpCore, addon);
+                //            errorMessage += ", " + addonDescription;
+                //            throw new ApplicationException(errorMessage, ex);
+                //        }
+                //        if (true) {
+                //            //
+                //            if (string.IsNullOrEmpty(EntryPointName)) {
+                //                if (sc.Procedures.Count > 0) {
+                //                    EntryPointName = sc.Procedures(1).Name;
+                //                }
+                //            }
+                //            try {
+                //                if (string.IsNullOrEmpty(EntryPointArgs)) {
+                //                    returnText = genericController.encodeText(sc.Run(EntryPointName));
 
-                                } else {
-                                    switch (Args.GetUpperBound(0)) {
-                                        case 0:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0]));
-                                            break;
-                                        case 1:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1]));
-                                            break;
-                                        case 2:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2]));
-                                            break;
-                                        case 3:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3]));
-                                            break;
-                                        case 4:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4]));
-                                            break;
-                                        case 5:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5]));
-                                            break;
-                                        case 6:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6]));
-                                            break;
-                                        case 7:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7]));
-                                            break;
-                                        case 8:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8]));
-                                            break;
-                                        case 9:
-                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8], Args[9]));
-                                            break;
-                                        default:
-                                            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
-                                    }
-                                }
-                            } catch (Exception ex) {
-                                string addonDescription = getAddonDescription(cpCore, addon);
-                                string errorMessage = "Error executing script [" + ScriptName + "], " + addonDescription;
-                                if (sc.Error.Number != 0) {
-                                    errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                                    if (sc.Error.Line != 0) {
-                                        Lines = Microsoft.VisualBasic.Strings.Split(WorkingCode, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
-                                        if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                                            errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
-                                        }
-                                    }
-                                } else {
-                                    errorMessage = errorMessage + ", " + GetErrString();
-                                }
-                                throw new ApplicationException(errorMessage, ex);
-                            }
-                        }
-                    }
-                }
+                //                } else {
+                //                    switch (Args.GetUpperBound(0)) {
+                //                        case 0:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0]));
+                //                            break;
+                //                        case 1:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1]));
+                //                            break;
+                //                        case 2:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2]));
+                //                            break;
+                //                        case 3:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3]));
+                //                            break;
+                //                        case 4:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4]));
+                //                            break;
+                //                        case 5:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5]));
+                //                            break;
+                //                        case 6:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6]));
+                //                            break;
+                //                        case 7:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7]));
+                //                            break;
+                //                        case 8:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8]));
+                //                            break;
+                //                        case 9:
+                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8], Args[9]));
+                //                            break;
+                //                        default:
+                //                            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
+                //                    }
+                //                }
+                //            } catch (Exception ex) {
+                //                string addonDescription = getAddonDescription(cpCore, addon);
+                //                string errorMessage = "Error executing script [" + ScriptName + "], " + addonDescription;
+                //                if (sc.Error.Number != 0) {
+                //                    errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
+                //                    if (sc.Error.Line != 0) {
+                //                        Lines = genericController.customSplit(WorkingCode, "\r\n");
+                //                        if (Lines.GetUpperBound(0) >= sc.Error.Line) {
+                //                            errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
+                //                        }
+                //                    }
+                //                } else {
+                //                    errorMessage = errorMessage + ", " + GetErrString();
+                //                }
+                //                throw new ApplicationException(errorMessage, ex);
+                //            }
+                //        }
+                //    }
+                //}
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -1801,11 +1803,11 @@ namespace Contensive.Core.Controllers {
                                         throw new ApplicationException(detailedErrorMessage);
                                     }
                                 }
-                            } catch (Reflection.ReflectionTypeLoadException ex) {
+                            } catch (System.Reflection.ReflectionTypeLoadException ex) {
                                 cpCore.assemblySkipList.Add(TestFilePathname);
                                 string detailedErrorMessage = "A load exception occured for addon [" + AddonDisplayName + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
                                 foreach (Exception exLoader in ex.LoaderExceptions) {
-                                    detailedErrorMessage += Environment.NewLine + "--LoaderExceptions: " + exLoader.Message;
+                                    detailedErrorMessage += "\r\n--LoaderExceptions: " + exLoader.Message;
                                 }
                                 throw new ApplicationException(detailedErrorMessage);
                             } catch (Exception ex) {
@@ -1870,12 +1872,11 @@ namespace Contensive.Core.Controllers {
                     //
                     string cmdQueryString = ""
                         + "appname=" + encodeNvaArgument(EncodeRequestVariable(cpCore.serverConfig.appConfig.name)) + "&AddonID=" + Convert.ToString(addon.id) + "&OptionString=" + encodeNvaArgument(EncodeRequestVariable(OptionString));
-                    taskSchedulerController taskScheduler = new taskSchedulerController();
                     cmdDetailClass cmdDetail = new cmdDetailClass();
                     cmdDetail.addonId = addon.id;
                     cmdDetail.addonName = addon.name;
                     cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, cmdQueryString);
-                    taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    taskSchedulerController.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
                     //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                     logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
@@ -1959,7 +1960,7 @@ namespace Contensive.Core.Controllers {
                             //
                             CopyContent = CopyContent + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                                 + "";
-                            OptionSplit = Microsoft.VisualBasic.Strings.Split(Option_String, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                            OptionSplit = genericController.customSplit(Option_String, "\r\n");
                             for (Ptr = 0; Ptr <= OptionSplit.GetUpperBound(0); Ptr++) {
                                 //
                                 // Process each option row
@@ -2037,7 +2038,7 @@ namespace Contensive.Core.Controllers {
                                                     if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
                                                         FormInput = FormInput + "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
                                                     } else {
-                                                        OptionCaption = genericController.vbReplace(OptionCaption, Environment.NewLine, " ");
+                                                        OptionCaption = genericController.vbReplace(OptionCaption, "\r\n", " ");
                                                         FormInput = FormInput + "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
                                                     }
                                                     break;
@@ -2351,7 +2352,7 @@ namespace Contensive.Core.Controllers {
                         CopyContent = ""
                             + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                             + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">This is the HTML produced by this add-on. Carrage returns and tabs have been added or modified to enhance readability.</td></tr>"
-                            + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + cpCore.html.html_GetFormInputTextExpandable2("DefaultStyles", "", 10, "400px", HTMLViewerBubbleID + "_dst",, false) + "</td></tr>"
+                            + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + cpCore.html.html_GetFormInputTextExpandable2("DefaultStyles", "", 10, "400px", HTMLViewerBubbleID + "_dst",false, false) + "</td></tr>"
                             + "</tr>"
                             + "</table>"
                             + "";
@@ -2750,7 +2751,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
-                                                                            Copy = Copy + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy += cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue));
                                                                         }
@@ -2871,7 +2872,7 @@ namespace Contensive.Core.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
-                                                            CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID",,,,, "Copy");
+                                                            CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID",true,0,false,false, "Copy");
                                                             if (!cpCore.db.csOk(CS)) {
                                                                 cpCore.db.csClose(ref CS);
                                                                 CS = cpCore.db.csInsertRecord("Copy Content");
@@ -2952,7 +2953,7 @@ namespace Contensive.Core.Controllers {
 
                                                         if (!string.IsNullOrEmpty(FieldSQL)) {
                                                             try {
-                                                                dt = cpCore.db.executeQuery(FieldSQL, FieldDataSource,, SQLPageSize);
+                                                                dt = cpCore.db.executeQuery(FieldSQL, FieldDataSource,1, SQLPageSize);
                                                             } catch (Exception ex) {
                                                                 ErrorDescription = ex.ToString();
                                                                 loadOK = false;
@@ -2969,7 +2970,7 @@ namespace Contensive.Core.Controllers {
                                                                 // ----- Error
                                                                 //
                                                                 //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                Copy = "Error: " + "";
+                                                                Copy = "Error: ";
                                                             } else if (dt.Rows.Count <= 0) {
                                                                 //
                                                                 // ----- no result
@@ -2993,18 +2994,18 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     // Single result, display with no table
                                                                     //
-                                                                    Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(dataArray[0, 0]),,,,, true);
+                                                                    Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(dataArray[0, 0]),-1,-1,"",false, true);
                                                                 } else {
                                                                     //
                                                                     // Build headers
                                                                     //
                                                                     FieldCount = dt.Columns.Count;
-                                                                    Copy = Copy + ("\r" + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;\">");
-                                                                    Copy = Copy + (cr2 + "<tr>");
+                                                                    Copy += ("\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;\">");
+                                                                    Copy += (cr2 + "<tr>");
                                                                     foreach (DataColumn dc in dt.Columns) {
-                                                                        Copy = Copy + (cr2 + "\t" + "<td class=\"ccadminsmall\" style=\"border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;\">" + dc.ColumnName + "</td>");
+                                                                        Copy += (cr2 + "\t<td class=\"ccadminsmall\" style=\"border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;\">" + dc.ColumnName + "</td>");
                                                                     }
-                                                                    Copy = Copy + (cr2 + "</tr>");
+                                                                    Copy += (cr2 + "</tr>");
                                                                     //
                                                                     // Build output table
                                                                     //
@@ -3014,29 +3015,29 @@ namespace Contensive.Core.Controllers {
                                                                     string ColumnEnd = null;
                                                                     RowStart = cr2 + "<tr>";
                                                                     RowEnd = cr2 + "</tr>";
-                                                                    ColumnStart = cr2 + "\t" + "<td class=\"ccadminnormal\" style=\"border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px\">";
+                                                                    ColumnStart = cr2 + "\t<td class=\"ccadminnormal\" style=\"border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px\">";
                                                                     ColumnEnd = "</td>";
                                                                     int RowPointer = 0;
                                                                     for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                                                                        Copy = Copy + (RowStart);
+                                                                        Copy += (RowStart);
                                                                         int ColumnPointer = 0;
                                                                         for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                                                             object CellData = dataArray[ColumnPointer, RowPointer];
                                                                             if (IsNull(CellData)) {
-                                                                                Copy = Copy + (ColumnStart + "[null]" + ColumnEnd);
+                                                                                Copy += (ColumnStart + "[null]" + ColumnEnd);
                                                                             } else if ((CellData == null)) {
-                                                                                Copy = Copy + (ColumnStart + "[empty]" + ColumnEnd);
+                                                                                Copy += (ColumnStart + "[empty]" + ColumnEnd);
                                                                             } else if (Microsoft.VisualBasic.Information.IsArray(CellData)) {
-                                                                                Copy = Copy + ColumnStart + "[array]";
+                                                                                Copy += ColumnStart + "[array]";
                                                                             } else if (genericController.encodeText(CellData) == "") {
-                                                                                Copy = Copy + (ColumnStart + "[empty]" + ColumnEnd);
+                                                                                Copy += (ColumnStart + "[empty]" + ColumnEnd);
                                                                             } else {
-                                                                                Copy = Copy + (ColumnStart + genericController.encodeHTML(genericController.encodeText(CellData)) + ColumnEnd);
+                                                                                Copy += (ColumnStart + genericController.encodeHTML(genericController.encodeText(CellData)) + ColumnEnd);
                                                                             }
                                                                         }
-                                                                        Copy = Copy + (RowEnd);
+                                                                        Copy += (RowEnd);
                                                                     }
-                                                                    Copy = Copy + ("\r" + "</table>");
+                                                                    Copy += ("\r</table>");
                                                                 }
                                                             }
                                                         }
@@ -3203,7 +3204,7 @@ namespace Contensive.Core.Controllers {
                         case "checkbox":
                             //
                             //
-                            Copy = Copy + "<input type=\"hidden\" name=\"" + SitePropertyName + "CheckBoxCnt\" value=\"" + OptionCnt + "\" >";
+                            Copy += "<input type=\"hidden\" name=\"" + SitePropertyName + "CheckBoxCnt\" value=\"" + OptionCnt + "\" >";
                             break;
                         case "radio":
                             //
@@ -3228,14 +3229,9 @@ namespace Contensive.Core.Controllers {
                 }
 
                 FastString = null;
-                return tempgetFormContent_decodeSelector;
-                //
             } catch (Exception ex) {
                 cpCore.handleException( ex );
             }
-            //ErrorTrap:
-            FastString = null;
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("addon_execute_GetFormContent_decodeSelector")
             return tempgetFormContent_decodeSelector;
         }
         //
@@ -3284,7 +3280,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Initially Build Constructor from AddonOptions
                     //
-                    ConstructorNameValues = Microsoft.VisualBasic.Strings.Split(addonArgumentListFromRecord, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                    ConstructorNameValues = genericController.customSplit(addonArgumentListFromRecord, "\r\n");
                     ConstructorCnt = ConstructorNameValues.GetUpperBound(0) + 1;
                     ConstructorNames = new string[ConstructorCnt + 1];
                     ConstructorSelectors = new string[ConstructorCnt + 1];
@@ -3370,7 +3366,7 @@ namespace Contensive.Core.Controllers {
                     addonInstanceProperties.Add(ConstructorName, ConstructorValue);
                     //OptionString_ForObjectCall = OptionString_ForObjectCall & csv_DecodeAddonOptionArgument(ConstructorName) & "=" & csv_DecodeAddonOptionArgument(ConstructorValue) & vbCrLf
                     if (IncludeSettingsBubbleOptions) {
-                        addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor + Environment.NewLine + cpCore.html.getAddonSelector(ConstructorName, ConstructorValue, ConstructorSelector);
+                        addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor + "\r\n" + cpCore.html.getAddonSelector(ConstructorName, ConstructorValue, ConstructorSelector);
                     }
                 }
                 addonInstanceProperties.Add("InstanceID", InstanceID);
@@ -3419,13 +3415,13 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         private string addWrapperToResult(string Content, int WrapperID, string WrapperSourceForComment = "") {
+            string s = string.Empty;
             try {
                 //
                 int Pos = 0;
                 int CS = 0;
                 string JSFilename = null;
                 string Copy = null;
-                string s = null;
                 string SelectFieldList = null;
                 string Wrapper = null;
                 string wrapperName = null;
@@ -3434,7 +3430,7 @@ namespace Contensive.Core.Controllers {
                 //
                 s = Content;
                 SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString";
-                CS = cpCore.db.csOpenRecord("Wrappers", WrapperID,,, SelectFieldList);
+                CS = cpCore.db.csOpenRecord("Wrappers", WrapperID,false,false, SelectFieldList);
                 if (cpCore.db.csOk(CS)) {
                     Wrapper = cpCore.db.csGetText(CS, "copytext");
                     wrapperName = cpCore.db.csGetText(CS, "name");
@@ -3464,9 +3460,9 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     if (!string.IsNullOrEmpty(Wrapper)) {
-                        Pos = genericController.vbInstr(1, Wrapper, TargetString, Microsoft.VisualBasic.Constants.vbTextCompare);
+                        Pos = genericController.vbInstr(1, Wrapper, TargetString, 1);
                         if (Pos != 0) {
-                            s = genericController.vbReplace(Wrapper, TargetString, s, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                            s = genericController.vbReplace(Wrapper, TargetString, s, 1, 99, 1);
                         } else {
                             s = ""
                                 + "<!-- the selected wrapper does not include the Target String marker to locate the position of the content. -->"
@@ -3475,17 +3471,10 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 cpCore.db.csClose(ref CS);
-                //
-                return s;
-                //
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 cpCore.handleException( ex );
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("WrapContent")
+            return s;
         }
         //
         //========================================================================
@@ -3538,15 +3527,15 @@ namespace Contensive.Core.Controllers {
             string NameValue = null;
             int Ptr = 0;
             //
-            ArgumentList = genericController.vbReplace(ArgumentList, Environment.NewLine, "\r");
+            ArgumentList = genericController.vbReplace(ArgumentList, "\r\n", "\r");
             ArgumentList = genericController.vbReplace(ArgumentList, "\n", "\r");
-            ArgumentList = genericController.vbReplace(ArgumentList, "\r", Environment.NewLine);
+            ArgumentList = genericController.vbReplace(ArgumentList, "\r", "\r\n");
             if (ArgumentList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) + 1 == 0) {
                 //
                 // Add in default constructors, like wrapper
                 //
                 if (!string.IsNullOrEmpty(ArgumentList)) {
-                    ArgumentList = ArgumentList + Environment.NewLine;
+                    ArgumentList = ArgumentList + "\r\n";
                 }
                 if (genericController.vbLCase(AddonGuid) == genericController.vbLCase(addonGuidContentBox)) {
                     ArgumentList = ArgumentList + AddonOptionConstructor_BlockNoAjax;
@@ -3574,7 +3563,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // split on equal
                         //
-                        NameValue = genericController.vbReplace(NameValue, "\\=", Environment.NewLine);
+                        NameValue = genericController.vbReplace(NameValue, "\\=", "\r\n");
                         Pos = genericController.vbInstr(1, NameValue, "=");
                         if (Pos == 0) {
                             OptionName = NameValue;
@@ -3582,19 +3571,19 @@ namespace Contensive.Core.Controllers {
                             OptionName = NameValue.Substring(0, Pos - 1);
                             OptionValue = NameValue.Substring(Pos);
                         }
-                        OptionName = genericController.vbReplace(OptionName, Environment.NewLine, "\\=");
-                        OptionValue = genericController.vbReplace(OptionValue, Environment.NewLine, "\\=");
+                        OptionName = genericController.vbReplace(OptionName, "\r\n", "\\=");
+                        OptionValue = genericController.vbReplace(OptionValue, "\r\n", "\\=");
                         //
                         // split optionvalue on [
                         //
-                        OptionValue = genericController.vbReplace(OptionValue, "\\[", Environment.NewLine);
+                        OptionValue = genericController.vbReplace(OptionValue, "\\[", "\r\n");
                         Pos = genericController.vbInstr(1, OptionValue, "[");
                         if (Pos != 0) {
                             OptionSelector = OptionValue.Substring(Pos - 1);
                             OptionValue = OptionValue.Substring(0, Pos - 1);
                         }
-                        OptionValue = genericController.vbReplace(OptionValue, Environment.NewLine, "\\[");
-                        OptionSelector = genericController.vbReplace(OptionSelector, Environment.NewLine, "\\[");
+                        OptionValue = genericController.vbReplace(OptionValue, "\r\n", "\\[");
+                        OptionSelector = genericController.vbReplace(OptionSelector, "\r\n", "\\[");
                         //
                         // Decode AddonConstructor format
                         //
@@ -3738,7 +3727,7 @@ namespace Contensive.Core.Controllers {
                     + " where ";
                 if (genericController.vbIsNumeric(eventNameIdOrGuid)) {
                     sql += "e.id=" + cpCore.db.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
-                } else if (CP.Utils.isGuid(eventNameIdOrGuid)) {
+                } else if ( genericController.isGuid(eventNameIdOrGuid)) {
                     sql += "e.ccGuid=" + cpCore.db.encodeSQLText(eventNameIdOrGuid);
                 } else {
                     sql += "e.name=" + cpCore.db.encodeSQLText(eventNameIdOrGuid);

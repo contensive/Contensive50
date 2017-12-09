@@ -205,7 +205,7 @@ namespace Contensive.Core {
         //
         public override CPBlockBaseClass BlockNew() {
             CPClass tempVar = this;
-            return new CPBlockClass(ref tempVar);
+            return new CPBlockClass( tempVar);
         }
         //
         //=========================================================================================================
@@ -276,7 +276,7 @@ namespace Contensive.Core {
             get {
                 if (_cacheObj == null) {
                     CPClass tempVar = this;
-                    _cacheObj = new CPCacheClass(ref tempVar);
+                    _cacheObj = new CPCacheClass(tempVar);
                 }
                 return _cacheObj;
             }

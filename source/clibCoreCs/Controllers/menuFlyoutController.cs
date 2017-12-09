@@ -137,14 +137,11 @@ namespace Contensive.Core.Controllers {
         //===============================================================================
         //
         public string getMenuType(string MenuName, bool ClickToOpen, int Direction, string StyleSheetPrefix = "") {
+            string result = string.Empty;
             try {
-                //
-                string MenuSource = null;
-                int MenuPointer = 0;
                 int MenuStyle = 0;
                 //
                 // ----- Search local storage for this MenuName
-                //
                 if (!ClickToOpen) {
                     switch (Direction) {
                         case 1:
@@ -176,15 +173,11 @@ namespace Contensive.Core.Controllers {
                             break;
                     }
                 }
-                return GetMenuFlyout(MenuName, MenuStyle, StyleSheetPrefix);
-                //
-                //
+                result = GetMenuFlyout(MenuName, MenuStyle, StyleSheetPrefix);
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-            handleLegacyClassError("GetMenu", 0, "", "");
+            return result;
         }
         //
         //===============================================================================
@@ -202,7 +195,7 @@ namespace Contensive.Core.Controllers {
                 iEntryName = genericController.vbReplace(encodeEmptyText(EntryName, ""), ",", " ");
                 UcaseEntryName = genericController.vbUCase(iEntryName);
                 //
-                if ((!string.IsNullOrEmpty(iEntryName)) && (UsedEntries + ",".IndexOf("," + UcaseEntryName + ",") + 1 == 0)) {
+                if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",") + 1 == 0)) {
                     UsedEntries = UsedEntries + "," + UcaseEntryName;
                     if (iEntryCount >= iEntrySize) {
                         iEntrySize = iEntrySize + 10;
@@ -263,7 +256,7 @@ namespace Contensive.Core.Controllers {
                 int EndOfLine = 0;
                 //
                 tempReadLine = "";
-                EndOfLine = genericController.vbInstr(StartPosition, Source, Environment.NewLine);
+                EndOfLine = genericController.vbInstr(StartPosition, Source, "\r\n");
                 if (EndOfLine != 0) {
                     tempReadLine = Source.Substring(StartPosition - 1, EndOfLine);
                     StartPosition = EndOfLine + 2;
@@ -489,7 +482,7 @@ namespace Contensive.Core.Controllers {
                 iUsedEntries = UsedEntries;
                 for (EntryPointer = 0; EntryPointer < iEntryCount; EntryPointer++) {
                     if ((iEntry[EntryPointer].ParentName == PanelName) && (!string.IsNullOrEmpty(iEntry[EntryPointer].Caption))) {
-                        if (!(iUsedEntries + ",".IndexOf("," + EntryPointer + ",") + 1 < 0)) {
+                        if (!((iUsedEntries + ",").IndexOf("," + EntryPointer + ",") + 1 < 0)) {
                             PanelButtonCount = PanelButtonCount + 1;
                             iUsedEntries = iUsedEntries + "," + EntryPointer;
                             PanelButtonStyle = StyleSheetPrefix + "PanelButton";

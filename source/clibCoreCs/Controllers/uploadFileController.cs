@@ -33,9 +33,9 @@ namespace Contensive.Core.Controllers {
             if (ItemStorageCollection != null) {
                 if (ItemStorageCollection.Count > 0) {
                     if (FieldExists(Key)) {
-                        returnForm = ItemStorageCollection(Key);
+                        returnForm = ItemStorageCollection[Key];
                     } else {
-                        returnForm = ItemStorageCollection("EMPTY");
+                        returnForm = ItemStorageCollection["EMPTY"];
                     }
                 }
             }

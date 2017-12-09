@@ -39,7 +39,7 @@ namespace Contensive.Addons.Core {
                     //
                     // save default robots.txt
                     //
-                    result = "User-agent: *" + Environment.NewLine + "Disallow: /admin/" + Environment.NewLine + "Disallow: /images/";
+                    result = "User-agent: *\r\nDisallow: /admin/\r\nDisallow: /images/";
                     cpCore.appRootFiles.saveFile(Filename, result);
                 }
                 result = result + cpCore.addonCache.robotsTxt;

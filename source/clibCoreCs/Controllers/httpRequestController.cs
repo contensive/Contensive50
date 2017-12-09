@@ -57,8 +57,8 @@ namespace Contensive.Core.Controllers {
         //'
         //'============================================================================
         //'
-        //Public Function common_getHttpRequest(url As String) As IO.Stream
-        //    Dim returnstream As IO.Stream = Nothing
+        //Public Function common_getHttpRequest(url As String) As Stream
+        //    Dim returnstream As Stream = Nothing
         //    Try
         //        Dim rq As System.Net.WebRequest
         //        Dim response As System.Net.WebResponse
@@ -193,7 +193,7 @@ namespace Contensive.Core.Controllers {
                 http.Timeout = privateRequestTimeoutMsec;
                 //TimeoutTime = System.DateTime.FromOADate(Now.ToOADate + (privateRequestTimeoutMsec / 24 / 60 / 60))
                 //
-                privateRequestHeaders = http.Headers();
+                privateRequestHeaders = http.Headers;
                 privateResponseHeaders = new System.Net.WebHeaderCollection();
                 privateResponseLength = 0;
                 privateResponseStatusCode = 0;
@@ -324,7 +324,7 @@ namespace Contensive.Core.Controllers {
                         returnString += privateResponseProtocol + " " + privateResponseStatusCode + " " + privateResponseStatusDescription;
                         if (privateResponseHeaders.Count > 0) {
                             for (ptr = 0; ptr < privateResponseHeaders.Count; ptr++) {
-                                returnString += Environment.NewLine + privateResponseHeaders.GetKey(ptr) + ":" + privateResponseHeaders[ptr];
+                                returnString += "\r\n" + privateResponseHeaders.GetKey(ptr) + ":" + privateResponseHeaders[ptr];
                             }
                         }
                     }

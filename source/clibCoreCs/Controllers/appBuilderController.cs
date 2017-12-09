@@ -9,6 +9,8 @@ using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using System.Data;
+using System.Linq;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -282,6 +284,12 @@ namespace Contensive.Core.Controllers {
                     string DataBuildVersion = cpcore.siteProperties.dataBuildVersion;
                     List<string> nonCriticalErrorList = new List<string>();
                     //
+                    // -- determine primary domain
+                    string primaryDomain = cpcore.serverConfig.appConfig.name;
+                    if (cpcore.serverConfig.appConfig.domainList.Count > 0) {
+                        primaryDomain = cpcore.serverConfig.appConfig.domainList[0];
+                    }
+                    //
                     // -- Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods), then other basic system ops work, like site properties
                     VerifyBasicTables(cpcore);
                     //
@@ -298,10 +306,6 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- verify iis configuration
                     logController.appendInstallLog(cpcore, "Verify iis configuration");
-                    string primaryDomain = cpcore.serverConfig.appConfig.name;
-                    if (cpcore.serverConfig.appConfig.domainList.Count > 0) {
-                        primaryDomain = cpcore.serverConfig.appConfig.domainList[0];
-                    }
                     Controllers.iisController.verifySite(cpcore, cpcore.serverConfig.appConfig.name, primaryDomain, cpcore.serverConfig.appConfig.appRootFilesPath, "default.aspx");
                     //
                     //---------------------------------------------------------------------
@@ -331,7 +335,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- set build version so a scratch build will not go through data conversion
                         DataBuildVersion = cpcore.codeVersion();
-                        cpcore.siteProperties.dataBuildVersion = cpcore.codeVersion;
+                        cpcore.siteProperties.dataBuildVersion = cpcore.codeVersion();
                     }
                     //
                     //---------------------------------------------------------------------
@@ -436,36 +440,32 @@ namespace Contensive.Core.Controllers {
                     cpcore.cache.invalidateAll();
                     //
                     if (isNewBuild) {
-                        string primaryDomain = cpcore.serverConfig.appConfig.name;
-                        if (cpcore.serverConfig.appConfig.domainList.Count > 0) {
-                            primaryDomain = cpcore.serverConfig.appConfig.domainList[0];
-                        }
                         //
                         // -- primary domain
-                        domainModel domain = domainModel.createByName(cpcore, primaryDomain, new List<string>());
+                        domainModel domain = domainModel.createByName(cpcore, primaryDomain);
                         if (domain == null) {
-                            domain = domainModel.add(cpcore, new List<string>());
+                            domain = domainModel.add(cpcore);
                             domain.name = primaryDomain;
                         }
                         //
                         // -- Landing Page
-                        pageContentModel landingPage = pageContentModel.create(cpcore, DefaultLandingPageGuid, new List<string>());
+                        pageContentModel landingPage = pageContentModel.create(cpcore, DefaultLandingPageGuid);
                         if (landingPage == null) {
-                            landingPage = pageContentModel.add(cpcore, new List<string>());
+                            landingPage = pageContentModel.add(cpcore);
                             landingPage.ccguid = DefaultLandingPageGuid;
                         }
                         //
                         // -- default template
-                        pageTemplateModel defaultTemplate = pageTemplateModel.createByName(cpcore, "Default", new List<string>());
+                        pageTemplateModel defaultTemplate = pageTemplateModel.createByName(cpcore, "Default");
                         if (defaultTemplate == null) {
-                            defaultTemplate = pageTemplateModel.add(cpcore, new List<string>());
+                            defaultTemplate = pageTemplateModel.add(cpcore);
                             defaultTemplate.Name = "Default";
                         }
                         domain.DefaultTemplateId = defaultTemplate.ID;
                         domain.name = primaryDomain;
                         domain.PageNotFoundPageID = landingPage.id;
                         domain.RootPageID = landingPage.id;
-                        domain.TypeID = domainModel.domainTypeEnum.Normal;
+                        domain.TypeID = (int) domainModel.domainTypeEnum.Normal;
                         domain.Visited = false;
                         domain.save(cpcore);
                         //
@@ -486,8 +486,8 @@ namespace Contensive.Core.Controllers {
                     //---------------------------------------------------------------------
                     //
                     if (true) {
-                        logController.appendInstallLog(cpcore, "Internal upgrade complete, set Buildversion to " + cpcore.codeVersion);
-                        cpcore.siteProperties.setProperty("BuildVersion", cpcore.codeVersion);
+                        logController.appendInstallLog(cpcore, "Internal upgrade complete, set Buildversion to " + cpcore.codeVersion());
+                        cpcore.siteProperties.setProperty("BuildVersion", cpcore.codeVersion());
                         //
                         //---------------------------------------------------------------------
                         // ----- Upgrade local collections
@@ -505,7 +505,8 @@ namespace Contensive.Core.Controllers {
                             bool IISResetRequired = false;
                             //RegisterList = ""
                             logController.appendInstallLog(cpcore, "Upgrading All Local Collections to new server build.");
-                            bool UpgradeOK = addonInstallClass.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ErrorMessage, "", IISResetRequired, isNewBuild, nonCriticalErrorList);
+                            string tmpString = "";
+                            bool UpgradeOK = addonInstallClass.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, ref  nonCriticalErrorList);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
                                 throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
@@ -581,8 +582,8 @@ namespace Contensive.Core.Controllers {
                                                 for (rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
 
                                                     ErrorMessage = "";
-                                                    CollectionGuid = genericController.vbLCase(dt.Rows(rowptr)["ccguid"].ToString());
-                                                    Collectionname = dt.Rows(rowptr)["name"].ToString();
+                                                    CollectionGuid = genericController.vbLCase(dt.Rows[rowptr]["ccguid"].ToString());
+                                                    Collectionname = dt.Rows[rowptr]["name"].ToString();
                                                     logController.appendInstallLog(cpcore, "...checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
                                                     if (CollectionGuid != "{7c6601a7-9d52-40a3-9570-774d0d43d758}") {
                                                         //
@@ -590,13 +591,13 @@ namespace Contensive.Core.Controllers {
                                                         //
                                                         localCollectionFound = false;
                                                         bool upgradeCollection = false;
-                                                        DateTime LastChangeDate = genericController.EncodeDate(dt.Rows(rowptr)["LastChangeDate"]);
+                                                        DateTime LastChangeDate = genericController.EncodeDate(dt.Rows[rowptr]["LastChangeDate"]);
                                                         if (LastChangeDate == DateTime.MinValue) {
                                                             //
                                                             // app version has no lastchangedate
                                                             //
                                                             upgradeCollection = true;
-                                                            appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows(rowptr)["name"].ToString() + " because the collection installed in the application has no LastChangeDate. It may have been installed manually.");
+                                                            appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection installed in the application has no LastChangeDate. It may have been installed manually.");
                                                         } else {
                                                             //
                                                             // compare to last change date in collection config file
@@ -625,7 +626,7 @@ namespace Contensive.Core.Controllers {
                                                                     logController.appendInstallLog(cpcore, "...local collection found");
                                                                     if (LocalLastChangeDate != DateTime.MinValue) {
                                                                         if (LocalLastChangeDate > LastChangeDate) {
-                                                                            appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows(rowptr)["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
+                                                                            appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
                                                                             upgradeCollection = true;
                                                                         }
                                                                     }
@@ -1293,7 +1294,7 @@ namespace Contensive.Core.Controllers {
                 if (dt.Rows.Count > 0) {
                     FieldLast = "";
                     for (var rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
-                        FieldNew = genericController.encodeText(dt.Rows(rowptr)["name"]) + "." + genericController.encodeText(dt.Rows(rowptr)["parentid"]);
+                        FieldNew = genericController.encodeText(dt.Rows[rowptr]["name"]) + "." + genericController.encodeText(dt.Rows[rowptr]["parentid"]);
                         if (FieldNew == FieldLast) {
                             FieldRecordID = genericController.EncodeInteger(dt.Rows[rowptr]["ID"]);
                             cpCore.db.executeQuery("Update ccMenuEntries set active=0 where ID=" + FieldRecordID + ";");
@@ -1745,7 +1746,7 @@ namespace Contensive.Core.Controllers {
                 int CS = 0;
                 const string ContentName = "States";
                 //
-                CS = cpcore.db.csOpen(ContentName, "name=" + cpcore.db.encodeSQLText(Name),, false);
+                CS = cpcore.db.csOpen(ContentName, "name=" + cpcore.db.encodeSQLText(Name),"", false);
                 if (!cpcore.db.csOk(CS)) {
                     //
                     // create new record
@@ -1881,26 +1882,15 @@ namespace Contensive.Core.Controllers {
         public static void VerifyCountries(coreClass cpCore) {
             try {
                 //
-                string list = null;
-                string[] Rows = null;
-                int RowPtr = 0;
-                string Row = null;
-                string[] Attr = null;
-                string Name = null;
-                //Dim fs As New fileSystemClass
-                //
                 appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
-                list = cpCore.appRootFiles.readFile("cclib\\config\\isoCountryList.txt");
-                Rows = Microsoft.VisualBasic.Strings.Split(list, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
-                for (RowPtr = 0; RowPtr <= Rows.GetUpperBound(0); RowPtr++) {
-                    Row = Rows[RowPtr];
-                    if (!string.IsNullOrEmpty(Row)) {
-                        Attr = Row.Split(';');
-                        if (Attr.GetUpperBound(0) >= 1) {
-                            Name = Attr[0];
-                            Name = EncodeInitialCaps(Name);
-                            VerifyCountry(cpCore, Name, Attr[1]);
+                string list = cpCore.appRootFiles.readFile("cclib\\config\\isoCountryList.txt");
+                string[] rows  = genericController.customSplit(list, "\r\n");
+                foreach( var row in rows) {
+                    if (!string.IsNullOrEmpty(row)) {
+                        string[] attrs = row.Split(';');
+                        foreach (var attr in attrs) {
+                            VerifyCountry(cpCore, EncodeInitialCaps(attr), attrs[1]);
                         }
                     }
                 }
@@ -2391,7 +2381,7 @@ namespace Contensive.Core.Controllers {
                         entry.name = EntryName.Trim();
                         entry.ParentID = parentId;
                     } else {
-                        entry = entryList.First;
+                        entry = entryList.First();
                     }
                     if (contentId <= 0) {
                         entry.ContentID = 0;
@@ -2403,7 +2393,7 @@ namespace Contensive.Core.Controllers {
                     entry.AdminOnly = AdminOnly;
                     entry.DeveloperOnly = DeveloperOnly;
                     entry.NewWindow = NewWindow;
-                    entry.Active = Active;
+                    entry.active = Active;
                     entry.AddonID = addonId;
                     entry.ccguid = ccGuid;
                     entry.NavIconTitle = NavIconTitle;
@@ -2635,21 +2625,21 @@ namespace Contensive.Core.Controllers {
         //
         //
         public static int verifyNavigatorEntry_getParentIdFromNameSpace(coreClass cpCore, string menuNameSpace) {
-            int ParentID = 0;
+            int parentRecordId = 0;
             try {
                 if (!string.IsNullOrEmpty(menuNameSpace.Trim())) {
-                    string[] Parents = menuNameSpace.Trim().Split('.');
-                    for (int Ptr = 0; Ptr <= Parents.GetUpperBound(0); Ptr++) {
-                        string RecordName = Parents[Ptr];
-                        if (!string.IsNullOrEmpty(RecordName.Trim())) {
-                            string Criteria = "(name=" + cpCore.db.encodeSQLText(RecordName) + ")";
-                            if (ParentID == 0) {
+                    string[] parents = menuNameSpace.Trim().Split('.');
+                    foreach( var parent in parents ) {
+                        string recordName = parent.Trim();
+                        if (!string.IsNullOrEmpty(recordName)) {
+                            string Criteria = "(name=" + cpCore.db.encodeSQLText(recordName) + ")";
+                            if (parentRecordId == 0) {
                                 Criteria += "and((Parentid is null)or(Parentid=0))";
                             } else {
-                                Criteria += "and(Parentid=" + ParentID + ")";
+                                Criteria += "and(Parentid=" + parentRecordId + ")";
                             }
                             int RecordID = 0;
-                            int CS = cpCore.db.csOpen(cnNavigatorEntries, Criteria, "ID", true,,,, "ID", 1);
+                            int CS = cpCore.db.csOpen(cnNavigatorEntries, Criteria, "ID", true, 0, false, false, "ID", 1);
                             if (cpCore.db.csOk(CS)) {
                                 RecordID = (cpCore.db.csGetInteger(CS, "ID"));
                             }
@@ -2658,12 +2648,12 @@ namespace Contensive.Core.Controllers {
                                 CS = cpCore.db.csInsertRecord(cnNavigatorEntries, SystemMemberID);
                                 if (cpCore.db.csOk(CS)) {
                                     RecordID = cpCore.db.csGetInteger(CS, "ID");
-                                    cpCore.db.csSet(CS, "name", RecordName);
-                                    cpCore.db.csSet(CS, "parentID", ParentID);
+                                    cpCore.db.csSet(CS, "name", recordName);
+                                    cpCore.db.csSet(CS, "parentID", parentRecordId);
                                 }
                                 cpCore.db.csClose(ref CS);
                             }
-                            ParentID = RecordID;
+                            parentRecordId = RecordID;
                         }
                     }
                 }
@@ -2671,7 +2661,7 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
                 throw;
             }
-            return ParentID;
+            return parentRecordId;
         }
     }
 }

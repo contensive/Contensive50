@@ -13,6 +13,7 @@ using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using Contensive.BaseClasses;
 //
 //
 namespace Contensive.Core.Controllers {
@@ -104,7 +105,7 @@ namespace Contensive.Core.Controllers {
         public string trapLogMessage { get; set; } = ""; // The content of the current traplog (keep for popups if no Csv)
         public string testPointMessage { get; set; } = "";
         public bool visitPropertyAllowDebugging { get; set; } = false; // if true, send main_TestPoint messages to the stream
-        public Models.Context.authContextModel authContext { get; set; }
+        public Models.Context.authContextModel authContext;
         internal Stopwatch appStopWatch { get; set; } = Stopwatch.StartNew();
         public DateTime profileStartTime { get; set; } // set in constructor
         public int profileStartTickCount { get; set; } = 0;
@@ -226,18 +227,18 @@ namespace Contensive.Core.Controllers {
                 // ----- Add tablename to the front of SortFieldList fieldnames
                 //
                 iSortFieldList = " " + genericController.vbReplace(iSortFieldList, ",", " , ") + " ";
-                iSortFieldList = genericController.vbReplace(iSortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                iSortFieldList = genericController.vbReplace(iSortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                iSortFieldList = genericController.vbReplace(iSortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                iSortFieldList = genericController.vbReplace(iSortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                iSortFieldList = genericController.vbReplace(iSortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                iSortFieldList = genericController.vbReplace(iSortFieldList, " ContentID ", " ccContentWatch.ContentID ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                iSortFieldList = genericController.vbReplace(iSortFieldList, " RecordID ", " ccContentWatch.RecordID ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                iSortFieldList = genericController.vbReplace(iSortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, 1);
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, 1);
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, 1);
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", 1, 99, 1);
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", 1, 99, 1);
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " ContentID ", " ccContentWatch.ContentID ", 1, 99, 1);
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " RecordID ", " ccContentWatch.RecordID ", 1, 99, 1);
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", 1, 99, 1);
                 //
                 // ----- Special case
                 //
-                iSortFieldList = genericController.vbReplace(iSortFieldList, " name ", " ccContentWatch.LinkLabel ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " name ", " ccContentWatch.LinkLabel ", 1, 99, 1);
                 //
                 SQL = "SELECT"
                     + " ccContentWatch.ID AS ID"
@@ -304,7 +305,7 @@ namespace Contensive.Core.Controllers {
                         LinkLabel = this.cpCore.db.csGetText(CSPointer, "LinkLabel");
                         RecordID = this.cpCore.db.csGetInteger(CSPointer, "ID");
                         if (!string.IsNullOrEmpty(LinkLabel)) {
-                            result = result + "\r" + "<li class=\"ccListItem\">";
+                            result = result + "\r<li class=\"ccListItem\">";
                             if (!string.IsNullOrEmpty(Link)) {
                                 result = result + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML(cpcore.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID) + "\">", LinkLabel);
                             } else {
@@ -314,7 +315,7 @@ namespace Contensive.Core.Controllers {
                         }
                         this.cpCore.db.csGoNext(CSPointer);
                     }
-                    result = "\r" + "<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r" + "</ul>";
+                    result = "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
                 }
                 this.cpCore.db.csClose(ref CSPointer);
             } catch (Exception ex) {
@@ -347,7 +348,7 @@ namespace Contensive.Core.Controllers {
                         LinkLabel = this.cpCore.db.csGetText(CS, "LinkLabel");
                         RecordID = this.cpCore.db.csGetInteger(CS, "ID");
                         if (!string.IsNullOrEmpty(LinkLabel)) {
-                            result = result + "\r" + "<li id=\"main_ContentWatch" + RecordID + "\" class=\"ccListItem\">";
+                            result = result + "\r<li id=\"main_ContentWatch" + RecordID + "\" class=\"ccListItem\">";
                             if (!string.IsNullOrEmpty(Link)) {
                                 result = result + "<a href=\"http://" + this.cpCore.webServer.requestDomain + requestAppRootPath + this.cpCore.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID + "\">" + LinkLabel + "</a>";
                             } else {
@@ -358,7 +359,7 @@ namespace Contensive.Core.Controllers {
                         this.cpCore.db.csGoNext(CS);
                     }
                     if (!string.IsNullOrEmpty(result)) {
-                        result = this.cpCore.html.html_GetContentCopy("Watch List Caption: " + ListName, ListName, this.cpCore.doc.authContext.user.id, true, this.cpCore.doc.authContext.isAuthenticated) + "\r" + "<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r" + "</ul>";
+                        result = this.cpCore.html.html_GetContentCopy("Watch List Caption: " + ListName, ListName, this.cpCore.doc.authContext.user.id, true, this.cpCore.doc.authContext.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
                     }
                 }
                 this.cpCore.db.csClose(ref CS);
@@ -489,25 +490,25 @@ namespace Contensive.Core.Controllers {
                 //End If
                 if (cpCore.doc.debug_iUserError != "") {
                     result = result + ""
-                        + "\r" + "<tr>"
+                        + "\r<tr>"
                         + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + errorController.error_GetUserError(cpCore) + "</div></td>"
-                        + "\r" + "</tr>";
+                        + "\r</tr>";
                 }
                 if (readOnlyField) {
                     result = result + ""
-                    + "\r" + "<tr>"
+                    + "\r<tr>"
                     + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) + "</td>"
-                    + "\r" + "</tr>";
+                    + "\r</tr>";
                 } else {
                     result = result + ""
-                    + "\r" + "<tr>"
+                    + "\r<tr>"
                     + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(LiveRecordContentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, RootPageContentName, ArchivePages, contactMemberID) + "</td>"
-                    + "\r" + "</tr>";
+                    + "\r</tr>";
                 }
-                result = result + "\r" + "<tr>"
+                result = result + "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
                     + cr2 + "<td class=\"qeRow qeRight\">" + cpCore.html.html_GetFormInputText2("name", page.name, 1, 0, "", false, readOnlyField) + "</td>"
-                    + "\r" + "</tr>"
+                    + "\r</tr>"
                     + "";
                 //
                 // ----- Parent pages
@@ -526,10 +527,10 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 result = result + ""
-                + "\r" + "<tr>"
+                + "\r<tr>"
                 + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:26px;\">Parent Pages</td>"
                 + cr2 + "<td class=\"qeRow qeRight\"><div class=\"qeListCon\">" + PageList + "</div></td>"
-                + "\r" + "</tr>";
+                + "\r</tr>";
                 //
                 // ----- Child pages
                 //
@@ -546,16 +547,16 @@ namespace Contensive.Core.Controllers {
                 };
                 PageList = cpCore.addon.execute(addon, executeContext);
                 //PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
-                if (genericController.vbInstr(1, PageList, "<ul", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                if (genericController.vbInstr(1, PageList, "<ul", 1) == 0) {
                     PageList = "(there are no child pages)";
                 }
-                result = result + "\r" + "<tr>"
+                result = result + "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:36px;\">Child Pages</td>"
                     + cr2 + "<td class=\"qeRow qeRight\"><div class=\"qeListCon\">" + PageList + "</div></td>"
-                    + "\r" + "</tr>";
+                    + "\r</tr>";
                 result = ""
-                    + "\r" + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                    + genericController.htmlIndent(result) + "\r" + "</table>";
+                    + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
+                    + genericController.htmlIndent(result) + "\r</table>";
                 result = ""
                     + ButtonList + result + ButtonList;
                 result = cpCore.html.main_GetPanel(result);
@@ -568,8 +569,8 @@ namespace Contensive.Core.Controllers {
                 //& cr & cpcore.html.main_GetPanelHeader("Contensive Quick Editor") _
 
                 result = ""
-                    + "\r" + "<div class=\"ccCon\">"
-                    + genericController.htmlIndent(result) + "\r" + "</div>";
+                    + "\r<div class=\"ccCon\">"
+                    + genericController.htmlIndent(result) + "\r</div>";
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
@@ -834,7 +835,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     ContentName = pageContentModel.contentName;
                 }
-                object isAuthoring = cpCore.doc.authContext.isEditing(ContentName);
+                bool isAuthoring = cpCore.doc.authContext.isEditing(ContentName);
                 //
                 int ChildListCount = 0;
                 string UcaseRequestedListName = genericController.vbUCase(RequestedListName);
@@ -883,7 +884,7 @@ namespace Contensive.Core.Controllers {
                         // ----- Requested orphan list, and this record is in a named list, but authoring, list it
                         //
                         if (isAuthoring) {
-                            inactiveList = inactiveList + "\r" + "<li name=\"page" + childPage.id + "\" name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\" name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
                             inactiveList = inactiveList + pageEditLink;
                             inactiveList = inactiveList + "[from Child Page List '" + childPage.ParentListName + "': " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
@@ -901,17 +902,17 @@ namespace Contensive.Core.Controllers {
                         // ----- Allow in Child Page Lists is false, display hint to authors
                         //
                         if (isAuthoring) {
-                            inactiveList = inactiveList + "\r" + "<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
                             inactiveList = inactiveList + pageEditLink;
                             inactiveList = inactiveList + "[Hidden (Allow in Child Lists is not checked): " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
                         }
-                    } else if (!childPage.Active) {
+                    } else if (!childPage.active) {
                         //
                         // ----- Not active record, display hint if authoring
                         //
                         if (isAuthoring) {
-                            inactiveList = inactiveList + "\r" + "<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
                             inactiveList = inactiveList + pageEditLink;
                             inactiveList = inactiveList + "[Hidden (Inactive): " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
@@ -921,7 +922,7 @@ namespace Contensive.Core.Controllers {
                         // ----- Child page has not been published
                         //
                         if (isAuthoring) {
-                            inactiveList = inactiveList + "\r" + "<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
                             inactiveList = inactiveList + pageEditLink;
                             inactiveList = inactiveList + "[Hidden (To be published " + childPage.PubDate + "): " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
@@ -931,7 +932,7 @@ namespace Contensive.Core.Controllers {
                         // ----- Child page has expired
                         //
                         if (isAuthoring) {
-                            inactiveList = inactiveList + "\r" + "<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
                             inactiveList = inactiveList + pageEditLink;
                             inactiveList = inactiveList + "[Hidden (Expired " + childPage.DateExpires + "): " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
@@ -940,7 +941,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- display list (and authoring links)
                         //
-                        activeList = activeList + "\r" + "<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                        activeList = activeList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
                         if (!string.IsNullOrEmpty(pageEditLink)) {
                             activeList = activeList + pageEditLink + "&nbsp;";
                         }
@@ -977,7 +978,7 @@ namespace Contensive.Core.Controllers {
                 if (!ArchivePages) {
                     string AddLink = cpCore.html.main_GetRecordAddLink(ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true);
                     if (!string.IsNullOrEmpty(AddLink)) {
-                        inactiveList = inactiveList + "\r" + "<li class=\"ccListItem\">" + AddLink + "</LI>";
+                        inactiveList = inactiveList + "\r<li class=\"ccListItem\">" + AddLink + "</LI>";
                     }
                 }
                 //
@@ -985,10 +986,10 @@ namespace Contensive.Core.Controllers {
                 //
                 result = "";
                 if (!string.IsNullOrEmpty(activeList)) {
-                    result = result + "\r" + "<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + genericController.htmlIndent(activeList) + "\r" + "</ul>";
+                    result = result + "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + genericController.htmlIndent(activeList) + "\r</ul>";
                 }
                 if (!string.IsNullOrEmpty(inactiveList)) {
-                    result = result + "\r" + "<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + genericController.htmlIndent(inactiveList) + "\r" + "</ul>";
+                    result = result + "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + genericController.htmlIndent(inactiveList) + "\r</ul>";
                 }
                 //
                 // ----- if non-orphan list, authoring and none found, print none message
@@ -1450,12 +1451,12 @@ namespace Contensive.Core.Controllers {
         internal int getPageSectionId(int PageID, ref List<int> UsedIDList, Dictionary<int, int> siteSectionRootPageIndex) {
             int sectionId = 0;
             try {
-                pageContentModel page = pageContentModel.create(cpCore, PageID, ref new List<string>());
+                pageContentModel page = pageContentModel.create(cpCore, PageID);
                 if (page != null) {
                     if ((page.ParentID == 0) && (!UsedIDList.Contains(page.ParentID))) {
                         UsedIDList.Add(page.ParentID);
                         if (siteSectionRootPageIndex.ContainsKey(page.ParentID)) {
-                            sectionId = siteSectionRootPageIndex(page.ParentID);
+                            sectionId = siteSectionRootPageIndex[page.ParentID];
                         }
                     } else {
                         sectionId = getPageSectionId(page.ParentID, ref UsedIDList, siteSectionRootPageIndex);
@@ -1561,7 +1562,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- Current method - all pages are in the Template, Section, Page structure
                         if (templateId != 0) {
-                            pageTemplateModel template = pageTemplateModel.create(cpCore, templateId, ref new List<string>());
+                            pageTemplateModel template = pageTemplateModel.create(cpCore, templateId);
                             if (template != null) {
                                 resultLink = ""; // template.Link
                             }
@@ -1631,20 +1632,20 @@ namespace Contensive.Core.Controllers {
                     if (cpcore.db.csOk(CS)) {
                         cpcore.db.csSet(CS, "name", "Registration Form");
                         Copy = ""
-                        + Environment.NewLine + "<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">"
-                        + Environment.NewLine + "{{REPEATSTART}}<tr><td align=right style=\"height:22px;\">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}"
-                        + Environment.NewLine + "<tr><td align=right><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
-                        + Environment.NewLine + "<tr><td colspan=2>&nbsp;<br>" + cpcore.html.main_GetPanelButtons(ButtonRegister, "Button") + "</td></tr>"
-                        + Environment.NewLine + "</table>";
+                        + "\r\n<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">"
+                        + "\r\n{{REPEATSTART}}<tr><td align=right style=\"height:22px;\">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}"
+                        + "\r\n<tr><td align=right><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
+                        + "\r\n<tr><td colspan=2>&nbsp;<br>" + cpcore.html.main_GetPanelButtons(ButtonRegister, "Button") + "</td></tr>"
+                        + "\r\n</table>";
                         cpcore.db.csSet(CS, "Body", Copy);
                         Copy = ""
                         + "1"
-                        + Environment.NewLine + GroupNameList + Environment.NewLine + "true"
-                        + Environment.NewLine + "1,First Name,true,FirstName"
-                        + Environment.NewLine + "1,Last Name,true,LastName"
-                        + Environment.NewLine + "1,Email Address,true,Email"
-                        + Environment.NewLine + "1,Phone,true,Phone"
-                        + Environment.NewLine + "2,Please keep me informed of news and events,false,Subscribers"
+                        + "\r\n" + GroupNameList + "\r\ntrue"
+                        + "\r\n1,First Name,true,FirstName"
+                        + "\r\n1,Last Name,true,LastName"
+                        + "\r\n1,Email Address,true,Email"
+                        + "\r\n1,Phone,true,Phone"
+                        + "\r\n2,Please keep me informed of news and events,false,Subscribers"
                         + "";
                         cpcore.db.csSet(CS, "Instructions", Copy);
                     }
@@ -1765,15 +1766,15 @@ namespace Contensive.Core.Controllers {
                     int tempVar2 = Src.Length + 1;
                     for (Ptr = 1; Ptr <= tempVar2; Ptr++) {
                         TestChr = Src.Substring(Ptr - 1, 1);
-                        if (genericController.vbInstr(1, SafeString, TestChr, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                        if (genericController.vbInstr(1, SafeString, TestChr, 1) != 0) {
                         } else {
                             TestChr = "\t";
                         }
                         WorkingLinkAlias = WorkingLinkAlias + TestChr;
                     }
                     Ptr = 0;
-                    while (genericController.vbInstr(1, WorkingLinkAlias, "\t" + "\t") != 0 && (Ptr < 100)) {
-                        WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, "\t" + "\t", "\t");
+                    while (genericController.vbInstr(1, WorkingLinkAlias, "\t\t") != 0 && (Ptr < 100)) {
+                        WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, "\t\t", "\t");
                         Ptr = Ptr + 1;
                     }
                     if (WorkingLinkAlias.Substring(WorkingLinkAlias.Length - 1) == "\t") {
@@ -2049,6 +2050,8 @@ namespace Contensive.Core.Controllers {
                 case addonModel.contentTableName:
                     //
                     Models.Complex.routeDictionaryModel.invalidateCache(cpCore);
+                    cpCore.cache.invalidateContent("addonCache");
+                    cpCore.cache.invalidateContent_Entity(cpCore, TableName, RecordID);
                     break;
                 case personModel.contentTableName:
                     //
@@ -2133,12 +2136,6 @@ namespace Contensive.Core.Controllers {
                     //    End If
 
                     break;
-                case "ccaggregatefunctions":
-                    //
-                    // -- add-ons, rebuild addonCache
-                    cpCore.cache.invalidateContent("addonCache");
-                    cpCore.cache.invalidateContent_Entity(cpCore, TableName, RecordID);
-                    break;
                 case "cclibraryfiles":
                     //
                     // if a AltSizeList is blank, make large,medium,small and thumbnails
@@ -2159,7 +2156,7 @@ namespace Contensive.Core.Controllers {
                                 if (Pos > 0) {
                                     FilenameExt = Filename.Substring(Pos);
                                     FilenameNoExt = Filename.Substring(0, Pos - 1);
-                                    if (genericController.vbInstr(1, "jpg,gif,png", FilenameExt, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                    if (genericController.vbInstr(1, "jpg,gif,png", FilenameExt, 1) != 0) {
                                         sf = new imageEditController();
                                         if (sf.load(cpCore.appRootFiles.rootLocalPath + FilePath + Filename)) {
                                             //
@@ -2178,7 +2175,7 @@ namespace Contensive.Core.Controllers {
                                                     sf.height = Convert.ToInt32(sf.height * (640 / sf.width));
                                                     sf.width = 640;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt);
-                                                    AltSizeList = AltSizeList + Environment.NewLine + "640x" + sf.height;
+                                                    AltSizeList = AltSizeList + "\r\n640x" + sf.height;
                                                 }
                                                 //
                                                 // Attempt to make 320x
@@ -2188,7 +2185,7 @@ namespace Contensive.Core.Controllers {
                                                     sf.width = 320;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt);
 
-                                                    AltSizeList = AltSizeList + Environment.NewLine + "320x" + sf.height;
+                                                    AltSizeList = AltSizeList + "\r\n320x" + sf.height;
                                                 }
                                                 //
                                                 // Attempt to make 160x
@@ -2197,7 +2194,7 @@ namespace Contensive.Core.Controllers {
                                                     sf.height = Convert.ToInt32(sf.height * (160 / sf.width));
                                                     sf.width = 160;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt);
-                                                    AltSizeList = AltSizeList + Environment.NewLine + "160x" + sf.height;
+                                                    AltSizeList = AltSizeList + "\r\n160x" + sf.height;
                                                 }
                                                 //
                                                 // Attempt to make 80x
@@ -2206,7 +2203,7 @@ namespace Contensive.Core.Controllers {
                                                     sf.height = Convert.ToInt32(sf.height * (80 / sf.width));
                                                     sf.width = 80;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt);
-                                                    AltSizeList = AltSizeList + Environment.NewLine + "80x" + sf.height;
+                                                    AltSizeList = AltSizeList + "\r\n80x" + sf.height;
                                                 }
                                                 cpCore.db.csSet(CS, "AltSizeList", AltSizeList);
                                             }
@@ -2287,12 +2284,12 @@ namespace Contensive.Core.Controllers {
             CS = cpCore.db.csOpen("Add-on Content Trigger Rules", "ContentID=" + ContentID,"", false, 0, false, false, "addonid");
             if (IsDelete) {
                 Option_String = ""
-                    + Environment.NewLine + "action=contentdelete"
-                    + Environment.NewLine + "contentid=" + ContentID + Environment.NewLine + "recordid=" + RecordID + "";
+                    + "\r\naction=contentdelete"
+                    + "\r\ncontentid=" + ContentID + "\r\nrecordid=" + RecordID + "";
             } else {
                 Option_String = ""
-                    + Environment.NewLine + "action=contentchange"
-                    + Environment.NewLine + "contentid=" + ContentID + Environment.NewLine + "recordid=" + RecordID + "";
+                    + "\r\naction=contentchange"
+                    + "\r\ncontentid=" + ContentID + "\r\nrecordid=" + RecordID + "";
             }
             while (cpCore.db.csOk(CS)) {
                 addonId = cpCore.db.csGetInteger(CS, "Addonid");
@@ -2362,7 +2359,7 @@ namespace Contensive.Core.Controllers {
                     cpCore.html.addMetaDescription(genericController.encodeHTML(cpCore.db.csGetText(CS, "MetaDescription")), "page content");
                     cpCore.html.addHeadTag(cpCore.db.csGetText(CS, "OtherHeadTags"), "page content");
                     if (true) {
-                        KeywordList = genericController.vbReplace(cpCore.db.csGetText(CS, "MetaKeywordList"), Environment.NewLine, ",");
+                        KeywordList = genericController.vbReplace(cpCore.db.csGetText(CS, "MetaKeywordList"), "\r\n", ",");
                     }
                     //main_MetaContent_Title = encodeHTML(app.csv_cs_getText(CS, "Name"))
                     //htmldoc.main_MetaContent_Description = encodeHTML(app.csv_cs_getText(CS, "MetaDescription"))

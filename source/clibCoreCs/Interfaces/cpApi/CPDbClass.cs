@@ -95,7 +95,7 @@ namespace Contensive.Core {
         // deprecated 
         //
         [Obsolete("Use GetTableId instead.", true)]
-        public override int dbGetTableID(string TableName) {
+        public override int DbGetTableID(string TableName) {
             return GetTableID(TableName);
         }
         //
@@ -162,7 +162,7 @@ namespace Contensive.Core {
         public override string GetRemoteQueryKey(string sql, string DataSourceName = "Default", int pageSize = 100) {
             string returnKey = "";
             try {
-                Contensive.BaseClasses.CPCSBaseClass cs = cp.CSNew;
+                Contensive.BaseClasses.CPCSBaseClass cs = cp.CSNew();
                 int dataSourceID = 0;
                 //
                 if (pageSize == 0) {
@@ -171,13 +171,13 @@ namespace Contensive.Core {
                 if (cs.Insert("Remote Queries")) {
                     returnKey = Guid.NewGuid().ToString();
                     dataSourceID = cp.Content.GetRecordID("Data Sources", DataSourceName);
-                    cs.setField("remotekey", returnKey);
-                    cs.setField("datasourceid", dataSourceID.ToString());
-                    cs.setField("sqlquery", sql);
-                    cs.setField("maxRows", pageSize.ToString());
-                    cs.setField("dateexpires", DateTime.Now.AddDays(1).ToString());
-                    cs.setField("QueryTypeID", remoteQueryType.sql.ToString());
-                    cs.setField("VisitID", cp.Visit.Id.ToString());
+                    cs.SetField("remotekey", returnKey);
+                    cs.SetField("datasourceid", dataSourceID.ToString());
+                    cs.SetField("sqlquery", sql);
+                    cs.SetField("maxRows", pageSize.ToString());
+                    cs.SetField("dateexpires", DateTime.Now.AddDays(1).ToString());
+                    cs.SetField("QueryTypeID", remoteQueryType.sql.ToString());
+                    cs.SetField("VisitID", cp.Visit.Id.ToString());
                 }
                 cs.Close();
                 //

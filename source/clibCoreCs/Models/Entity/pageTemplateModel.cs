@@ -74,6 +74,7 @@ namespace Contensive.Core.Models.Entity {
             }
             return result;
         }
+        public static pageTemplateModel add(coreClass cpCore) { var tmpList = new List<string> { }; return add(cpCore, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>
@@ -504,28 +505,28 @@ namespace Contensive.Core.Models.Entity {
                 } else if (CDef.Id <= 0) {
                     throw new ApplicationException("content [" + primaryContentName + "] could Not be found.");
                 } else {
-                    instance.Active = genericController.EncodeBoolean(CDef.fields("Active").defaultValue);
-                    instance.BodyHTML = genericController.encodeText(CDef.fields("BodyHTML").defaultValue);
-                    // instance.BodyTag = genericController.encodeText(.fields("BodyTag").defaultValue)
-                    instance.ccGuid = genericController.encodeText(CDef.fields("ccGuid").defaultValue);
+                    instance.Active = genericController.EncodeBoolean(CDef.fields["Active"].defaultValue);
+                    instance.BodyHTML = genericController.encodeText(CDef.fields["BodyHTML"].defaultValue);
+                    // instance.BodyTag = genericController.encodeText(.fields["BodyTag"].defaultValue)
+                    instance.ccGuid = genericController.encodeText(CDef.fields["ccGuid"].defaultValue);
                     instance.ContentControlID = CDef.Id;
-                    instance.CreatedBy = genericController.EncodeInteger(CDef.fields("CreatedBy").defaultValue);
-                    instance.CreateKey = genericController.EncodeInteger(CDef.fields("CreateKey").defaultValue);
-                    instance.DateAdded = genericController.EncodeDate(CDef.fields("DateAdded").defaultValue);
-                    instance.IsSecure = genericController.EncodeBoolean(CDef.fields("IsSecure").defaultValue);
-                    // instance.JSEndBody = genericController.encodeText(.fields("JSEndBody").defaultValue)
-                    // instance.JSFilename = genericController.encodeText(.fields("JSFilename").defaultValue)
-                    // instance.JSHead = genericController.encodeText(.fields("JSHead").defaultValue)
-                    // instance.JSOnLoad = genericController.encodeText(.fields("JSOnLoad").defaultValue)
-                    // instance.Link = genericController.encodeText(.fields("Link").defaultValue)
-                    // instance.MobileBodyHTML = genericController.encodeText(.fields("MobileBodyHTML").defaultValue)
-                    instance.ModifiedBy = genericController.EncodeInteger(CDef.fields("ModifiedBy").defaultValue);
-                    instance.ModifiedDate = genericController.EncodeDate(CDef.fields("ModifiedDate").defaultValue);
-                    instance.Name = genericController.encodeText(CDef.fields("Name").defaultValue);
-                    // instance.OtherHeadTags = genericController.encodeText(.fields("OtherHeadTags").defaultValue)
-                    instance.SortOrder = genericController.encodeText(CDef.fields("SortOrder").defaultValue);
-                    // instance.Source = genericController.encodeText(.fields("Source").defaultValue)
-                    // instance.StylesFilename = genericController.encodeText(.fields("StylesFilename").defaultValue)
+                    instance.CreatedBy = genericController.EncodeInteger(CDef.fields["CreatedBy"].defaultValue);
+                    instance.CreateKey = genericController.EncodeInteger(CDef.fields["CreateKey"].defaultValue);
+                    instance.DateAdded = genericController.EncodeDate(CDef.fields["DateAdded"].defaultValue);
+                    instance.IsSecure = genericController.EncodeBoolean(CDef.fields["IsSecure"].defaultValue);
+                    // instance.JSEndBody = genericController.encodeText(.fields["JSEndBody"].defaultValue)
+                    // instance.JSFilename = genericController.encodeText(.fields["JSFilename"].defaultValue)
+                    // instance.JSHead = genericController.encodeText(.fields["JSHead"].defaultValue)
+                    // instance.JSOnLoad = genericController.encodeText(.fields["JSOnLoad"].defaultValue)
+                    // instance.Link = genericController.encodeText(.fields["Link"].defaultValue)
+                    // instance.MobileBodyHTML = genericController.encodeText(.fields["MobileBodyHTML"].defaultValue)
+                    instance.ModifiedBy = genericController.EncodeInteger(CDef.fields["ModifiedBy"].defaultValue);
+                    instance.ModifiedDate = genericController.EncodeDate(CDef.fields["ModifiedDate"].defaultValue);
+                    instance.Name = genericController.encodeText(CDef.fields["Name"].defaultValue);
+                    // instance.OtherHeadTags = genericController.encodeText(.fields["OtherHeadTags"].defaultValue)
+                    instance.SortOrder = genericController.encodeText(CDef.fields["SortOrder"].defaultValue);
+                    // instance.Source = genericController.encodeText(.fields["Source"].defaultValue)
+                    // instance.StylesFilename = genericController.encodeText(.fields["StylesFilename"].defaultValue)
                 }
             } catch (Exception ex) {
                 cpcore.handleException(ex);

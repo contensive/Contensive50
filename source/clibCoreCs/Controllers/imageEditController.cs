@@ -78,8 +78,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     Bitmap imgOutput = new Bitmap(srcImage, setWidth, setHeight);
-                    object imgFormat = srcImage.RawFormat;
-
+                    System.Drawing.Imaging.ImageFormat imgFormat = srcImage.RawFormat;
                     imgOutput.Save(physicalFilePath, imgFormat);
                     imgOutput.Dispose();
                     returnOk = true;

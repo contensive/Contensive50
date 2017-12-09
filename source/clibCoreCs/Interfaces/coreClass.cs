@@ -7,6 +7,8 @@ using Contensive.Core.Models.Context;
 using Contensive.Core.Models.Entity;
 using System.Collections.Generic;
 using static Contensive.Core.constants;
+using System.Diagnostics;
+using System.Linq;
 //
 namespace Contensive.Core {
     public class coreClass : IDisposable {
@@ -531,37 +533,37 @@ namespace Contensive.Core {
                         //
                         // -- Need to be converted to Url parameter addons
                         result = "";
-                        switch (Convert.ToInt32(AjaxFunction)) {
+                        switch ((AjaxFunction)) {
                             case ajaxGetFieldEditorPreferenceForm:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.getFieldEditorPreference()).execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.getFieldEditorPreference()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxGetDefaultAddonOptionString:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.getAjaxDefaultAddonOptionStringClass()).execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.getAjaxDefaultAddonOptionStringClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxSetVisitProperty:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.setAjaxVisitPropertyClass()).execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.setAjaxVisitPropertyClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxGetVisitProperty:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.getAjaxVisitPropertyClass()).execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.getAjaxVisitPropertyClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxData:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.processAjaxDataClass()).execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.processAjaxDataClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxPing:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.getOKClass()).execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.getOKClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxOpenIndexFilter:
                                 //
                                 // moved to Addons.AdminSite
@@ -779,13 +781,13 @@ namespace Contensive.Core {
                         //
                         // -- Favicon.ico
                         doc.continueProcessing = false;
-                        return (new Addons.Core.faviconIcoClass()).execute(cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Core.faviconIcoClass()).Execute(cp_forAddonExecutionOnly).ToString();
                     }
                     if (normalizedRoute.Equals("robots.txt")) {
                         //
                         // -- Favicon.ico
                         doc.continueProcessing = false;
-                        return (new Addons.Core.robotsTxtClass()).execute(cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Core.robotsTxtClass()).Execute(cp_forAddonExecutionOnly).ToString();
                     }
                     //
                     // -- default route
@@ -827,192 +829,192 @@ namespace Contensive.Core {
         public string executeRoute_ProcessAjaxData() {
             string result = "";
             try {
-                string RemoteKey = docProperties.getText("key");
-                string EncodedArgs = docProperties.getText("args");
-                int PageSize = docProperties.getInteger("pagesize");
-                int PageNumber = docProperties.getInteger("pagenumber");
-                RemoteFormatEnum RemoteFormat = null;
-                switch (genericController.vbLCase(docProperties.getText("responseformat"))) {
-                    case "jsonnamevalue":
-                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue;
-                        break;
-                    case "jsonnamearray":
-                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameArray;
-                        break;
-                    default: //jsontable
-                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonTable;
-                        break;
-                }
-                //
-                handleException(new ApplicationException("executeRoute_ProcessAjaxData deprecated, remoteKey [" + RemoteKey + "], responseformat [" + docProperties.getText("responseformat") + "], PageNumber [" + PageNumber + "], PageSize [" + PageSize + "], EncodedArgs [" + EncodedArgs + "]"));
-                return "";
-                //
-                //
-                // Handle common work
-                //
-                if (PageNumber == 0) {
-                    PageNumber = 1;
-                }
-                if (PageSize == 0) {
-                    PageSize = 100;
-                }
-                int maxRows = 0;
-                if (maxRows != 0 && PageSize > maxRows) {
-                    PageSize = maxRows;
-                }
-                //
-                string[] ArgName = { };
-                string[] ArgValue = { };
-                if (!string.IsNullOrEmpty(EncodedArgs)) {
-                    string Args = EncodedArgs;
-                    string[] ArgArray = Args.Split('&');
-                    int ArgCnt = ArgArray.GetUpperBound(0) + 1;
-                    ArgName = new string[ArgCnt + 1];
-                    ArgValue = new string[ArgCnt + 1];
-                    for (var Ptr = 0; Ptr < ArgCnt; Ptr++) {
-                        int Pos = genericController.vbInstr(1, ArgArray[Ptr], "=");
-                        if (Pos > 0) {
-                            ArgName[Ptr] = genericController.DecodeResponseVariable(ArgArray[Ptr].Substring(0, Pos - 1));
-                            ArgValue[Ptr] = genericController.DecodeResponseVariable(ArgArray[Ptr].Substring(Pos));
-                        }
-                    }
-                }
-                //
-                // main_Get values out of the remote query record
-                //
-                GoogleVisualizationType gv = new GoogleVisualizationType();
-                gv.status = GoogleVisualizationStatusEnum.OK;
-                //
-                if (gv.status == GoogleVisualizationStatusEnum.OK) {
-                    string SetPairString = "";
-                    int QueryType = 0;
-                    string ContentName = "";
-                    string Criteria = "";
-                    string SortFieldList = "";
-                    bool AllowInactiveRecords2 = false;
-                    string SelectFieldList = "";
-                    int CS = db.csOpen("Remote Queries", "((VisitId=" + doc.authContext.visit.id + ")and(remotekey=" + db.encodeSQLText(RemoteKey) + "))");
-                    if (db.csOk(CS)) {
-                        //
-                        // Use user definied query
-                        //
-                        string SQLQuery = db.csGetText(CS, "sqlquery");
-                        //DataSource = dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
-                        maxRows = db.csGetInteger(CS, "maxrows");
-                        QueryType = db.csGetInteger(CS, "QueryTypeID");
-                        ContentName = db.csGet(CS, "ContentID");
-                        Criteria = db.csGetText(CS, "Criteria");
-                        SortFieldList = db.csGetText(CS, "SortFieldList");
-                        AllowInactiveRecords2 = db.csGetBoolean(CS, "AllowInactiveRecords");
-                        SelectFieldList = db.csGetText(CS, "SelectFieldList");
-                    } else {
-                        //
-                        // Try Hardcoded queries
-                        //
-                        switch (genericController.vbLCase(RemoteKey)) {
-                            case "ccfieldhelpupdate":
-                                //
-                                // developers editing field help
-                                //
-                                if (!doc.authContext.user.Developer) {
-                                    gv.status = GoogleVisualizationStatusEnum.ErrorStatus;
-                                    int Ptr = 0;
-                                    if (gv.errors.GetType().IsArray) {
-                                        Ptr = gv.errors.GetUpperBound(0) + 1;
-                                    }
-                                    Array.Resize(ref gv.errors, Ptr);
-                                    gv.errors[Ptr] = "permission error";
-                                } else {
-                                    QueryType = QueryTypeUpdateContent;
-                                    ContentName = "Content Field Help";
-                                    Criteria = "";
-                                    AllowInactiveRecords2 = false;
-                                }
-                                //Case Else
-                                //    '
-                                //    ' query not found
-                                //    '
-                                //    gv.status = GoogleVisualizationStatusEnum.ErrorStatus
-                                //    If IsArray(gv.errors) Then
-                                //        Ptr = 0
-                                //    Else
-                                //        Ptr = UBound(gv.errors) + 1
-                                //    End If
-                                //    ReDim gv.errors[Ptr]
-                                //    gv.errors[Ptr] = "query not found"
-                                break;
-                        }
-                    }
-                    db.csClose(ref CS);
-                    //
-                    if (gv.status == GoogleVisualizationStatusEnum.OK) {
-                        switch (QueryType) {
-                            case QueryTypeUpdateContent:
-                                //
-                                // Contensive Content Update, args are field=value updates
-                                // !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
-                                //
-                                //
-                                // Go though args and main_Get Set and Criteria
-                                //
-                                SetPairString = "";
-                                Criteria = "";
-                                for (var Ptr = 0; Ptr < ArgName.Length; Ptr++) {
-                                    if (genericController.vbLCase(ArgName[Ptr]) == "setpairs") {
-                                        SetPairString = ArgValue[Ptr];
-                                    } else if (genericController.vbLCase(ArgName[Ptr]) == "criteria") {
-                                        Criteria = ArgValue[Ptr];
-                                    }
-                                }
-                                //
-                                // Open the content and cycle through each setPair
-                                //
-                                CS = db.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, 0, false, false, SelectFieldList);
-                                if (db.csOk(CS)) {
-                                    //
-                                    // update by looping through the args and setting name=values
-                                    //
-                                    string[] SetPairs = SetPairString.Split('&');
-                                    for (var Ptr = 0; Ptr <= SetPairs.GetUpperBound(0); Ptr++) {
-                                        if (!string.IsNullOrEmpty(SetPairs[Ptr])) {
-                                            int Pos = genericController.vbInstr(1, SetPairs[Ptr], "=");
-                                            if (Pos > 0) {
-                                                string FieldValue = genericController.DecodeResponseVariable(SetPairs[Ptr].Substring(Pos));
-                                                string FieldName = genericController.DecodeResponseVariable(SetPairs[Ptr].Substring(0, Pos - 1));
-                                                if (!Models.Complex.cdefModel.isContentFieldSupported(this, ContentName, FieldName)) {
-                                                    string errorMessage = "result, QueryTypeUpdateContent, key [" + RemoteKey + "], bad field [" + FieldName + "] skipped";
-                                                    throw (new ApplicationException(errorMessage));
-                                                } else {
-                                                    db.csSet(CS, FieldName, FieldValue);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                db.csClose(ref CS);
-                                //Case QueryTypeInsertContent
-                                //    '
-                                //    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
-                                //    '
-                                //    '
-                                //    ' Contensive Content Insert, args are field=value
-                                //    '
-                                //    'CS = main_InsertCSContent(ContentName)
-                                break;
-                            default:
-                                break;
-                        }
-                        //
-                        // output
-                        //
-                        GoogleDataType gd = new GoogleDataType();
-                        gd.IsEmpty = true;
-                        //
-                        string Copy = remoteQueryController.main_FormatRemoteQueryOutput(this, gd, RemoteFormat);
-                        Copy = genericController.encodeHTML(Copy);
-                        result = "<data>" + Copy + "</data>";
-                    }
-                }
+                handleException(new ApplicationException("executeRoute_ProcessAjaxData deprecated"));
+                //string RemoteKey = docProperties.getText("key");
+                //string EncodedArgs = docProperties.getText("args");
+                //int PageSize = docProperties.getInteger("pagesize");
+                //int PageNumber = docProperties.getInteger("pagenumber");
+                //RemoteFormatEnum RemoteFormat = null;
+                //switch (genericController.vbLCase(docProperties.getText("responseformat"))) {
+                //    case "jsonnamevalue":
+                //        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue;
+                //        break;
+                //    case "jsonnamearray":
+                //        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameArray;
+                //        break;
+                //    default: //jsontable
+                //        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonTable;
+                //        break;
+                //}
+                ////
+                //return "";
+                ////
+                ////
+                //// Handle common work
+                ////
+                //if (PageNumber == 0) {
+                //    PageNumber = 1;
+                //}
+                //if (PageSize == 0) {
+                //    PageSize = 100;
+                //}
+                //int maxRows = 0;
+                //if (maxRows != 0 && PageSize > maxRows) {
+                //    PageSize = maxRows;
+                //}
+                ////
+                //string[] ArgName = { };
+                //string[] ArgValue = { };
+                //if (!string.IsNullOrEmpty(EncodedArgs)) {
+                //    string Args = EncodedArgs;
+                //    string[] ArgArray = Args.Split('&');
+                //    int ArgCnt = ArgArray.GetUpperBound(0) + 1;
+                //    ArgName = new string[ArgCnt + 1];
+                //    ArgValue = new string[ArgCnt + 1];
+                //    for (var Ptr = 0; Ptr < ArgCnt; Ptr++) {
+                //        int Pos = genericController.vbInstr(1, ArgArray[Ptr], "=");
+                //        if (Pos > 0) {
+                //            ArgName[Ptr] = genericController.DecodeResponseVariable(ArgArray[Ptr].Substring(0, Pos - 1));
+                //            ArgValue[Ptr] = genericController.DecodeResponseVariable(ArgArray[Ptr].Substring(Pos));
+                //        }
+                //    }
+                //}
+                ////
+                //// main_Get values out of the remote query record
+                ////
+                //GoogleVisualizationType gv = new GoogleVisualizationType();
+                //gv.status = GoogleVisualizationStatusEnum.OK;
+                ////
+                //if (gv.status == GoogleVisualizationStatusEnum.OK) {
+                //    string SetPairString = "";
+                //    int QueryType = 0;
+                //    string ContentName = "";
+                //    string Criteria = "";
+                //    string SortFieldList = "";
+                //    bool AllowInactiveRecords2 = false;
+                //    string SelectFieldList = "";
+                //    int CS = db.csOpen("Remote Queries", "((VisitId=" + doc.authContext.visit.id + ")and(remotekey=" + db.encodeSQLText(RemoteKey) + "))");
+                //    if (db.csOk(CS)) {
+                //        //
+                //        // Use user definied query
+                //        //
+                //        string SQLQuery = db.csGetText(CS, "sqlquery");
+                //        //DataSource = dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
+                //        maxRows = db.csGetInteger(CS, "maxrows");
+                //        QueryType = db.csGetInteger(CS, "QueryTypeID");
+                //        ContentName = db.csGet(CS, "ContentID");
+                //        Criteria = db.csGetText(CS, "Criteria");
+                //        SortFieldList = db.csGetText(CS, "SortFieldList");
+                //        AllowInactiveRecords2 = db.csGetBoolean(CS, "AllowInactiveRecords");
+                //        SelectFieldList = db.csGetText(CS, "SelectFieldList");
+                //    } else {
+                //        //
+                //        // Try Hardcoded queries
+                //        //
+                //        switch (genericController.vbLCase(RemoteKey)) {
+                //            case "ccfieldhelpupdate":
+                //                //
+                //                // developers editing field help
+                //                //
+                //                if (!doc.authContext.user.Developer) {
+                //                    gv.status = GoogleVisualizationStatusEnum.ErrorStatus;
+                //                    int Ptr = 0;
+                //                    if (gv.errors.GetType().IsArray) {
+                //                        Ptr = gv.errors.GetUpperBound(0) + 1;
+                //                    }
+                //                    Array.Resize(ref gv.errors, Ptr);
+                //                    gv.errors[Ptr] = "permission error";
+                //                } else {
+                //                    QueryType = QueryTypeUpdateContent;
+                //                    ContentName = "Content Field Help";
+                //                    Criteria = "";
+                //                    AllowInactiveRecords2 = false;
+                //                }
+                //                //Case Else
+                //                //    '
+                //                //    ' query not found
+                //                //    '
+                //                //    gv.status = GoogleVisualizationStatusEnum.ErrorStatus
+                //                //    If IsArray(gv.errors) Then
+                //                //        Ptr = 0
+                //                //    Else
+                //                //        Ptr = UBound(gv.errors) + 1
+                //                //    End If
+                //                //    ReDim gv.errors[Ptr]
+                //                //    gv.errors[Ptr] = "query not found"
+                //                break;
+                //        }
+                //    }
+                //    db.csClose(ref CS);
+                //    //
+                //    if (gv.status == GoogleVisualizationStatusEnum.OK) {
+                //        switch (QueryType) {
+                //            case QueryTypeUpdateContent:
+                //                //
+                //                // Contensive Content Update, args are field=value updates
+                //                // !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
+                //                //
+                //                //
+                //                // Go though args and main_Get Set and Criteria
+                //                //
+                //                SetPairString = "";
+                //                Criteria = "";
+                //                for (var Ptr = 0; Ptr < ArgName.Length; Ptr++) {
+                //                    if (genericController.vbLCase(ArgName[Ptr]) == "setpairs") {
+                //                        SetPairString = ArgValue[Ptr];
+                //                    } else if (genericController.vbLCase(ArgName[Ptr]) == "criteria") {
+                //                        Criteria = ArgValue[Ptr];
+                //                    }
+                //                }
+                //                //
+                //                // Open the content and cycle through each setPair
+                //                //
+                //                CS = db.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, 0, false, false, SelectFieldList);
+                //                if (db.csOk(CS)) {
+                //                    //
+                //                    // update by looping through the args and setting name=values
+                //                    //
+                //                    string[] SetPairs = SetPairString.Split('&');
+                //                    for (var Ptr = 0; Ptr <= SetPairs.GetUpperBound(0); Ptr++) {
+                //                        if (!string.IsNullOrEmpty(SetPairs[Ptr])) {
+                //                            int Pos = genericController.vbInstr(1, SetPairs[Ptr], "=");
+                //                            if (Pos > 0) {
+                //                                string FieldValue = genericController.DecodeResponseVariable(SetPairs[Ptr].Substring(Pos));
+                //                                string FieldName = genericController.DecodeResponseVariable(SetPairs[Ptr].Substring(0, Pos - 1));
+                //                                if (!Models.Complex.cdefModel.isContentFieldSupported(this, ContentName, FieldName)) {
+                //                                    string errorMessage = "result, QueryTypeUpdateContent, key [" + RemoteKey + "], bad field [" + FieldName + "] skipped";
+                //                                    throw (new ApplicationException(errorMessage));
+                //                                } else {
+                //                                    db.csSet(CS, FieldName, FieldValue);
+                //                                }
+                //                            }
+                //                        }
+                //                    }
+                //                }
+                //                db.csClose(ref CS);
+                //                //Case QueryTypeInsertContent
+                //                //    '
+                //                //    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
+                //                //    '
+                //                //    '
+                //                //    ' Contensive Content Insert, args are field=value
+                //                //    '
+                //                //    'CS = main_InsertCSContent(ContentName)
+                //                break;
+                //            default:
+                //                break;
+                //        }
+                //        //
+                //        // output
+                //        //
+                //        GoogleDataType gd = new GoogleDataType();
+                //        gd.IsEmpty = true;
+                //        //
+                //        string Copy = remoteQueryController.main_FormatRemoteQueryOutput(this, gd, RemoteFormat);
+                //        Copy = genericController.encodeHTML(Copy);
+                //        result = "<data>" + Copy + "</data>";
+                //    }
+                //}
             } catch (Exception ex) {
                 throw (ex);
             }
@@ -1221,7 +1223,7 @@ namespace Contensive.Core {
                                     string requestFormSerialized = genericController.convertNameValueDictToREquestString(webServer.requestFormDict);
                                     string pagetitle = "";
                                     if (!doc.htmlMetaContent_TitleList.Count.Equals(0)) {
-                                        pagetitle = doc.htmlMetaContent_TitleList.First.content;
+                                        pagetitle = doc.htmlMetaContent_TitleList[0].content;
                                     }
                                     string SQL = "insert into ccviewings ("
                                         + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID,ExcludeFromAnalytics,pagetitle"

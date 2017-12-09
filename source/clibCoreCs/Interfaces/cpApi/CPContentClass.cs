@@ -237,7 +237,7 @@ namespace Contensive.Core {
         //
         [Obsolete("Please use AddRecord( ContentName as string) ", true)]
         public override int AddRecord(object ContentName) {
-            return AddRecord(cp.Utils.encodeText(ContentName));
+            return AddRecord(cp.Utils.EncodeText(ContentName));
         }
         public override int AddRecord(string ContentName) {
             int recordId = 0;
@@ -327,7 +327,9 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override int AddContent(string ContentName, string sqlTableName, string dataSourceName) {
-            return Models.Complex.cdefModel.addContent(cpCore, true, dataSourceModel.create(cpCore, dataSourceName, ref new List<string>()), sqlTableName, ContentName, false, false, true, false, "", "sort order", "name", false, false, false, false, false, false, "", 0, 0, 0, "", false, "", true);
+            var tmpList = new List<string> { };
+            dataSourceModel dataSource = dataSourceModel.createByName(cpCore, dataSourceName, ref tmpList);
+            return Models.Complex.cdefModel.addContent(cpCore, true, dataSource, sqlTableName, ContentName, false, false, true, false, "", "sort order", "name", false, false, false, false, false, false, "", 0, 0, 0, "", false, "", true);
         }
         //
         //====================================================================================================

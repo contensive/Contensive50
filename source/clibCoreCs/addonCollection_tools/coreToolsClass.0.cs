@@ -14,6 +14,8 @@ using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
+using System.Threading;
+//
 namespace Contensive.Core {
     public class coreToolsClass {
         //========================================================================
@@ -325,15 +327,9 @@ namespace Contensive.Core {
                     //        Call Stream.Add("</blockquote>")
                     tempGetForm = Stream.Text;
                 }
-                return tempGetForm;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // throw (New ApplicationException("Unexpected exception"))' Call handleLegacyClassErrors1("GetForm", "ErrorTrap")
             return tempGetForm;
         }
         //
@@ -342,6 +338,7 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_DefineContentFieldsFromTable() {
+            string result = string.Empty;
             try {
                 //
                 string SQL = null;
@@ -410,16 +407,11 @@ namespace Contensive.Core {
                         }
                     }
                 }
-                //
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // throw (New ApplicationException("Unexpected exception"))' Call handleLegacyClassErrors1("GetForm_DefineContentFieldsFromTable", "ErrorTrap")
+            return result;
         }
         //
         private class fieldSortClass {
@@ -432,8 +424,8 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_Root() {
+            string result = "";
             try {
-                //
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList;
                 //
@@ -462,15 +454,11 @@ namespace Contensive.Core {
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminFormToolRestart, "Contensive Application Restart", "Restart the Contensive Applicaiton. This will stop your site on the server for a short period."));
                 Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolCreateGUID, "Create GUID", "Use this tool to create a new GUID. This is useful when creating a new cpcore.addon."));
                 Stream.Add("</table>");
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // throw (New ApplicationException("Unexpected exception"))' Call handleLegacyClassErrors1("GetForm_Root", "ErrorTrap")
+            return result; 
         }
         //
         //==================================================================================
@@ -496,8 +484,6 @@ namespace Contensive.Core {
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // throw (New ApplicationException("Unexpected exception"))' Call handleLegacyClassErrors1("GetForm_RootRow", "ErrorTrap")
             return tempGetForm_RootRow;
         }
         //
@@ -551,7 +537,7 @@ namespace Contensive.Core {
                 string SQLName = null;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
-                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("dataSourceid"), ref new List<string>());
+                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("dataSourceid"));
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 //
@@ -593,12 +579,12 @@ namespace Contensive.Core {
                     // Add this SQL to the members SQL list
                     //
                     if (!string.IsNullOrEmpty(SQL)) {
-                        SQLArchive = genericController.vbReplace(SQLArchive, SQL + Environment.NewLine, "");
+                        SQLArchive = genericController.vbReplace(SQLArchive, SQL + "\r\n", "");
                         SQLArchiveOld = SQLArchive;
-                        SQLArchive = genericController.vbReplace(SQL, Environment.NewLine, " ") + Environment.NewLine;
+                        SQLArchive = genericController.vbReplace(SQL, "\r\n", " ") + "\r\n";
                         LineCounter = 0;
                         while ((LineCounter < 10) && (!string.IsNullOrEmpty(SQLArchiveOld))) {
-                            SQLArchive = SQLArchive + getLine( ref SQLArchiveOld) + Environment.NewLine;
+                            SQLArchive = SQLArchive + getLine( ref SQLArchiveOld) + "\r\n";
                         }
                         cpCore.appRootFiles.saveFile(SQLFilename, SQLArchive);
                     }
@@ -744,6 +730,7 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_CreateContentDefinition() {
+            string result = string.Empty;
             try {
                 //
                 int CS = 0;
@@ -757,7 +744,7 @@ namespace Contensive.Core {
                 string Caption = null;
                 int NavID = 0;
                 int ParentNavID = 0;
-                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"), ref new List<string>());
+                dataSourceModel datasource = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"));
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
                 Caption = "Create Content Definition";
@@ -821,20 +808,12 @@ namespace Contensive.Core {
                 Stream.Add("Table Name<br>");
                 Stream.Add(cpCore.html.html_GetFormInputText2("TableName", TableName, 1, 40));
                 Stream.Add("<br><br>");
-                //Call Stream.Add(cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateContentDefinition))
                 Stream.Add("</SPAN>");
-                //
-                return Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
-                //GetForm_CreateContentDefinition = genericLegacyView.OpenFormTable(cpcore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpcore,ButtonList)
-
-                //
-                // ----- Error Trap
-                //
+                result = Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // throw (New ApplicationException("Unexpected exception"))' Call handleLegacyClassErrors1("GetForm_CreateContentDefinition", "ErrorTrap")
+            return result;
         }
         //
         //=============================================================================
@@ -842,66 +821,21 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_ConfigureListing() {
+            string result = string.Empty;
             try {
-                //
-                string SQL = null;
-                string MenuHeader = null;
-                //Dim ColumnCount As Integer
                 int ColumnWidth = 0;
-                // converted array to dictionary - Dim FieldPointer As Integer
                 string FieldName = null;
-                int FieldToAdd = 0;
                 string AStart = null;
-                int CS = 0;
-                bool SetSort = false;
-                int MenuEntryID = 0;
-                int MenuHeaderID = 0;
-                int MenuDirection = 0;
-                int SourceID = 0;
-                int PreviousID = 0;
-                int SetID = 0;
-                int NextSetID = 0;
-                bool SwapWithPrevious = false;
-                int HitID = 0;
-                string HitTable = null;
-                int SortPriorityLowest = 0;
-                string TempColumn = null;
-                string Tempfield = null;
-                string TempWidth = null;
-                int TempSortPriority = 0;
-                int TempSortDirection = 0;
                 int CSPointer = 0;
-                int RecordID = 0;
                 int ContentID = 0;
                 Models.Complex.cdefModel CDef = null;
-                //Dim AdminColumn As appServices_metaDataClass.CDefAdminColumnClass
-                int[] RowFieldID = null;
-                int[] RowFieldWidth = null;
-                string[] RowFieldCaption = null;
-                //Dim RowFieldCount as integer
-                int[] NonRowFieldID = null;
-                string[] NonRowFieldCaption = null;
-                int NonRowFieldCount = 0;
                 string ContentName = null;
-                //
-                DataTable dt = null;
-                int IndexWidth = 0;
                 int CS1 = 0;
-                int CS2 = 0;
-                // Dim FieldPointer1 As Integer
-                int FieldPointer2 = 0;
-                int NewRowFieldWidth = 0;
                 int TargetFieldID = 0;
-                //
                 int ColumnWidthTotal = 0;
                 int ColumnNumberMax = 0;
-                //
-                //Dim ColumnPointer As Integer
-                //Dim CDefFieldCount As Integer
                 int fieldId = 0;
-                int FieldWidth = 0;
                 bool AllowContentAutoLoad = false;
-                int TargetFieldPointer = 0;
                 bool MoveNextColumn = false;
                 string FieldNameToAdd = null;
                 int FieldIDToAdd = 0;
@@ -912,14 +846,9 @@ namespace Contensive.Core {
                 bool ReloadCDef = false;
                 int InheritedFieldCount = 0;
                 string Caption = null;
-                //Dim ContentNameValues() As NameValuePrivateType
-                int ContentCount = 0;
-                int ContentSize = 0;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
                 string FormPanel = "";
-                int ColumnWidthIncrease = 0;
-                int ColumnWidthBalance = 0;
                 //
                 const string RequestNameAddField = "addfield";
                 const string RequestNameAddFieldID = "addfieldID";
@@ -1114,7 +1043,7 @@ namespace Contensive.Core {
                                     if (CDef.adminColumns.Count > 1) {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
-                                        foreach (var keyValuePair in CDef.adminColumns.Reverse) {
+                                        foreach (var keyValuePair in CDef.adminColumns.Reverse()) {
                                             Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Models.Complex.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
@@ -1484,17 +1413,11 @@ namespace Contensive.Core {
                 //
                 cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
                 Stream.Add(cpCore.html.html_GetFormInputHidden("ReloadCDef", ReloadCDef));
-
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                //
-                // ----- Error Trap
-                //
+                result =  htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_ConfigureListing", "ErrorTrap")
+            return result;
         }
         //
         //=============================================================================
@@ -1502,6 +1425,7 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_ContentDiagnostic() {
+            string result = string.Empty;
             try {
                 //
                 string SQL = null;
@@ -1934,20 +1858,11 @@ namespace Contensive.Core {
                     ButtonList = ButtonList + "," + ButtonFix;
                     ButtonList = ButtonList + "," + ButtonFixAndRun;
                 }
-                //
-                // ----- end form
-                //
-                //Call Stream.Add(cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolContentDiagnostic))
-                //
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_ContentDiagnostic", "ErrorTrap")
+            return result;
         }
         //
         //=============================================================================
@@ -2072,8 +1987,6 @@ namespace Contensive.Core {
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("NormalizeIndexColumns", "ErrorTrap")
         }
         //
         //=============================================================================
@@ -2081,25 +1994,18 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_CreateChildContent() {
+            string result = string.Empty;
             try {
-                //
                 int ParentContentID = 0;
                 string ParentContentName = null;
                 string ChildContentName = "";
                 bool AddAdminMenuEntry = false;
-                int CS = 0;
-                string MenuName = "";
-                bool AdminOnly = false;
-                bool DeveloperOnly = false;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                string ButtonList;
-                //
-                ButtonList = ButtonCancel + "," + ButtonRun;
+                string ButtonList = ButtonCancel + "," + ButtonRun;
                 //
                 Stream.Add(GetTitle("Create a Child Content from a Content Definition", "This tool creates a Content Definition based on another Content Definition."));
                 //
                 //   print out the submit form
-                //
                 if (cpCore.docProperties.getText("Button") != "") {
                     //
                     // Process input
@@ -2161,16 +2067,11 @@ namespace Contensive.Core {
                 //'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
                 Stream.Add("</SPAN>");
                 //
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_CreateChildContent", "ErrorTrap")
+            return result;
         }
         //
         //=============================================================================
@@ -2178,9 +2079,8 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_ClearContentWatchLinks() {
+            string result = string.Empty;
             try {
-                //
-                string SQL = null;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList;
                 //
@@ -2197,22 +2097,12 @@ namespace Contensive.Core {
                     cpCore.db.executeQuery("update ccContentWatch set Link=null;");
                     Stream.Add("<br>Content Watch Link field cleared.");
                 }
-                //
-                // ----- end form
-                //
-                //'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolClearContentWatchLink)
                 Stream.Add("</span>");
-                //
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_ClearContentWatchLinks", "ErrorTrap")
+            return result;
         }
         //
         //=============================================================================
@@ -2279,15 +2169,12 @@ namespace Contensive.Core {
         //
         //
         private string GetDiagError(string ProblemMsg, DiagActionType[] DiagActions) {
+            string result = string.Empty;
             try {
-                //
-                string MethodName = null;
                 int ActionCount = 0;
                 int ActionPointer = 0;
                 string Caption = null;
                 string Panel = "";
-                //
-                MethodName = "GetDiagError";
                 //
                 Panel = Panel + "<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">";
                 Panel = Panel + "<tr><td colspan=\"2\">" + SpanClassAdminNormal + "<b>" + ProblemMsg + "</b></SPAN></td></tr>";
@@ -2307,16 +2194,11 @@ namespace Contensive.Core {
                 }
                 Panel = Panel + "</TABLE>";
                 DiagActionCount = DiagActionCount + 1;
-                //
-                return cpCore.html.main_GetPanel(Panel);
-                //
-                // ----- Error Trap
-                //
+                result =  cpCore.html.main_GetPanel(Panel);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetDiagError", "ErrorTrap")
+            return result;
         }
         //
         //
@@ -2363,9 +2245,8 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_Benchmark() {
+            string result = string.Empty;
             try {
-                //
-                string MethodName = null;
                 int TestCount = 0;
                 int TestPointer = 0;
                 long TestTicks = 0;
@@ -2429,7 +2310,7 @@ namespace Contensive.Core {
                             NextTicks = NextTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = genericController.encodeText(dr("NAME"));
+                            TestCopy = genericController.encodeText(dr["NAME"]);
                             ReadTicks = ReadTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             RecordCount = RecordCount + 1;
@@ -2454,7 +2335,7 @@ namespace Contensive.Core {
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
                         TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = cpCore.db.csOpen("Site Properties", "",,,,,,, PageSize, PageNumber);
+                        CS = cpCore.db.csOpen("Site Properties", "","",true,0,true,false,"", PageSize, PageNumber);
                         OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
@@ -2490,7 +2371,7 @@ namespace Contensive.Core {
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
                         TestTicks = cpCore.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = cpCore.db.csOpen("Site Properties",,,, "",,, "name", PageSize, PageNumber);
+                        CS = cpCore.db.csOpen("Site Properties", "", "", true, 0, false, false, "name", PageSize, PageNumber);
                         OpenTicks = OpenTicks + cpCore.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
@@ -2519,19 +2400,11 @@ namespace Contensive.Core {
                 }
                 //
                 // Print Start Button
-                //
-                //'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolBenchmark)
-                //
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                // ----- Error Trap
-                //
+                result =  htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //RS = Nothing
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_Benchmark", "ErrorTrap")
+            return result;
         }
         //
         //=============================================================================
@@ -2541,24 +2414,14 @@ namespace Contensive.Core {
         private int Local_GetContentID(string ContentName) {
             int tempLocal_GetContentID = 0;
             try {
-                //
-                DataTable dt = null;
-                //
                 tempLocal_GetContentID = 0;
-                dt = cpCore.db.executeQuery("Select ID from ccContent where name=" + cpCore.db.encodeSQLText(ContentName));
+                DataTable dt = cpCore.db.executeQuery("Select ID from ccContent where name=" + cpCore.db.encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
                     tempLocal_GetContentID = genericController.EncodeInteger(dt.Rows[0][0]);
                 }
-                //
-                return tempLocal_GetContentID;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("Local_GetContentID", "ErrorTrap")
             return tempLocal_GetContentID;
         }
         //
@@ -2577,16 +2440,9 @@ namespace Contensive.Core {
                 if (dt.Rows.Count > 0) {
                     tempLocal_GetContentNameByID = genericController.encodeText(dt.Rows[0][0]);
                 }
-                //
-                return tempLocal_GetContentNameByID;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("Local_GetContentNameByID", "ErrorTrap")
             return tempLocal_GetContentNameByID;
         }
         //
@@ -2605,16 +2461,9 @@ namespace Contensive.Core {
                 if (RS.Rows.Count > 0) {
                     tempLocal_GetContentTableName = genericController.encodeText(RS.Rows[0][0]);
                 }
-                //
-                return tempLocal_GetContentTableName;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("Local_GetContentTableName", "ErrorTrap")
             return tempLocal_GetContentTableName;
         }
         //
@@ -2625,16 +2474,13 @@ namespace Contensive.Core {
         private string Local_GetContentDataSource(string ContentName) {
             string tempLocal_GetContentDataSource = null;
             try {
-                //
-                DataTable RS = null;
-                string SQL = null;
-                //
                 tempLocal_GetContentDataSource = "";
-                SQL = "Select ccDataSources.Name"
-                        + " from ( ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID )"
-                        + " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID"
-                        + " where ccContent.name=" + cpCore.db.encodeSQLText(ContentName);
-                RS = cpCore.db.executeQuery(SQL);
+                string SQL = ""
+                    +"Select ccDataSources.Name"
+                    + " from ( ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID )"
+                    + " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID"
+                    + " where ccContent.name=" + cpCore.db.encodeSQLText(ContentName);
+                DataTable RS = cpCore.db.executeQuery(SQL);
                 if (isDataTableOk(RS)) {
                     tempLocal_GetContentDataSource = genericController.encodeText(RS.Rows[0]["Name"]);
                 }
@@ -2642,17 +2488,9 @@ namespace Contensive.Core {
                     tempLocal_GetContentDataSource = "Default";
                 }
                 closeDataTable(RS);
-                //RS = Nothing
-                //
-                return tempLocal_GetContentDataSource;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("Local_GetContentDataSource", "ErrorTrap")
             return tempLocal_GetContentDataSource;
         }
         //
@@ -2661,6 +2499,7 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_DbSchema() {
+            string result = string.Empty;
             try {
                 //
                 string SQL = null;
@@ -2942,18 +2781,11 @@ namespace Contensive.Core {
                 //'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
                 Stream.Add("</SPAN>");
                 //
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //RSSchema = Nothing
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_DbSchema", "ErrorTrap")
-            StatusOK = false;
+            return result;
         }
         //
         //=============================================================================
@@ -3177,11 +3009,11 @@ namespace Contensive.Core {
                 //
                 Stream.Add(SpanClassAdminNormal + "<strong><a href=\"" + cpCore.webServer.requestPage + "?af=" + AdminFormToolRoot + "\">Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>");
                 Stream.Add("<div>");
-                Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">" + "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field." + "</div>");
+                Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field.</div>");
                 if (ContentID == 0) {
-                    Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Related Tools:" + "<div style=\"padding-left:20px;\"><a href=\"?af=104\">Set Default Admin Listing page columns</a></div>" + "</div>");
+                    Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Related Tools:<div style=\"padding-left:20px;\"><a href=\"?af=104\">Set Default Admin Listing page columns</a></div></div>");
                 } else {
-                    Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Related Tools:" + "<div style=\"padding-left:20px;\"><a href=\"?af=104&ContentID=" + ContentID + "\">Set Default Admin Listing page columns for '" + ContentName + "'</a></div>" + "<div style=\"padding-left:20px;\"><a href=\"?af=4&cid=" + Models.Complex.cdefModel.getContentId(cpCore, "content") + "&id=" + ContentID + "\">Edit '" + ContentName + "' Content Definition</a></div>" + "<div style=\"padding-left:20px;\"><a href=\"?cid=" + ContentID + "\">View records in '" + ContentName + "'</a></div>" + "</div>");
+                    Stream.Add("<div style=\"width:45%;float:left;padding:10px;\">Related Tools:<div style=\"padding-left:20px;\"><a href=\"?af=104&ContentID=" + ContentID + "\">Set Default Admin Listing page columns for '" + ContentName + "'</a></div><div style=\"padding-left:20px;\"><a href=\"?af=4&cid=" + Models.Complex.cdefModel.getContentId(cpCore, "content") + "&id=" + ContentID + "\">Edit '" + ContentName + "' Content Definition</a></div><div style=\"padding-left:20px;\"><a href=\"?cid=" + ContentID + "\">View records in '" + ContentName + "'</a></div></div>");
                 }
                 Stream.Add("</div>");
                 Stream.Add("<div style=\"clear:both\">&nbsp;</div>");
@@ -3392,8 +3224,8 @@ namespace Contensive.Core {
                                 streamRow.Add(cpCore.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + cpCore.html.html_GetFormInputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
                             } else {
                                 TypeSelect = TypeSelectTemplate;
-                                TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                                TypeSelect = genericController.vbReplace(TypeSelect, "=\"" + fieldsort.field.fieldTypeId + "\"", "=\"" + fieldsort.field.fieldTypeId + "\" selected", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
+                                TypeSelect = genericController.vbReplace(TypeSelect, "=\"" + fieldsort.field.fieldTypeId + "\"", "=\"" + fieldsort.field.fieldTypeId + "\" selected", 1, 99, 1);
                                 streamRow.Add(TypeSelect);
                             }
                             streamRow.Add("</nobr></td>");
@@ -3524,7 +3356,7 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_DbIndex() {
-            string tempGetForm_DbIndex = null;
+            string result = null;
             try {
                 //
                 int Count = 0;
@@ -3538,8 +3370,6 @@ namespace Contensive.Core {
                 DataTable RSSchema = null;
                 string Button = null;
                 int CS = 0;
-                int ErrorNumber = 0;
-                string ErrorDescription = null;
                 string[,] Rows = null;
                 int RowMax = 0;
                 int RowPointer = 0;
@@ -3549,7 +3379,7 @@ namespace Contensive.Core {
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel + "," + ButtonSelect;
-                tempGetForm_DbIndex = GetTitle("Modify Database Indexes", "This tool adds and removes database indexes.");
+                result = GetTitle("Modify Database Indexes", "This tool adds and removes database indexes.");
                 //
                 // Process Input
                 //
@@ -3558,7 +3388,7 @@ namespace Contensive.Core {
                 //
                 // Get Tablename and DataSource
                 //
-                CS = cpCore.db.csOpenRecord("Tables", TableID,,, "Name,DataSourceID");
+                CS = cpCore.db.csOpenRecord("Tables", TableID,false,false, "Name,DataSourceID");
                 if (cpCore.db.csOk(CS)) {
                     TableName = cpCore.db.csGetText(CS, "name");
                     DataSource = cpCore.db.csGetLookup(CS, "DataSourceID");
@@ -3574,7 +3404,7 @@ namespace Contensive.Core {
                         for (Pointer = 0; Pointer < Count; Pointer++) {
                             if (cpCore.docProperties.getBoolean("DropIndex." + Pointer)) {
                                 IndexName = cpCore.docProperties.getText("DropIndexName." + Pointer);
-                                tempGetForm_DbIndex = tempGetForm_DbIndex + "<br>Dropping index [" + IndexName + "] from table [" + TableName + "]";
+                                result = result + "<br>Dropping index [" + IndexName + "] from table [" + TableName + "]";
                                 cpCore.db.deleteSqlIndex("Default", TableName, IndexName);
                             }
                         }
@@ -3589,30 +3419,30 @@ namespace Contensive.Core {
                                 //IndexName = cpCore.main_GetStreamText2("AddIndexFieldName." & Pointer)
                                 FieldName = cpCore.docProperties.getText("AddIndexFieldName." + Pointer);
                                 IndexName = TableName + FieldName;
-                                tempGetForm_DbIndex = tempGetForm_DbIndex + "<br>Adding index [" + IndexName + "] to table [" + TableName + "] for field [" + FieldName + "]";
+                                result = result + "<br>Adding index [" + IndexName + "] to table [" + TableName + "] for field [" + FieldName + "]";
                                 cpCore.db.createSQLIndex(DataSource, TableName, IndexName, FieldName);
                             }
                         }
                     }
                 }
                 //
-                tempGetForm_DbIndex = tempGetForm_DbIndex + cpCore.html.html_GetFormStart;
+                result = result + cpCore.html.html_GetFormStart();
                 TableColSpan = 3;
-                tempGetForm_DbIndex = tempGetForm_DbIndex + StartTable(2, 0, 0);
+                result = result + StartTable(2, 0, 0);
                 //
                 // Select Table Form
                 //
-                tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableRow("<br><br><B>Select table to index</b>", TableColSpan, false);
-                tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableRow(cpCore.html.main_GetFormInputSelect("TableID", TableID, "Tables",, "Select a SQL table to start"), TableColSpan, false);
+                result = result + GetTableRow("<br><br><B>Select table to index</b>", TableColSpan, false);
+                result = result + GetTableRow(cpCore.html.main_GetFormInputSelect("TableID", TableID, "Tables","", "Select a SQL table to start"), TableColSpan, false);
                 if (TableID != 0) {
                     //
                     // Add/Drop Indexes form
                     //
-                    tempGetForm_DbIndex = tempGetForm_DbIndex + cpCore.html.html_GetFormInputHidden("PreviousTableID", TableID);
+                    result = result + cpCore.html.html_GetFormInputHidden("PreviousTableID", TableID);
                     //
                     // Drop Indexes
                     //
-                    tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableRow("<br><br><B>Select indexes to remove</b>", TableColSpan, TableRowEven);
+                    result = result + GetTableRow("<br><br><B>Select indexes to remove</b>", TableColSpan, TableRowEven);
                     RSSchema = cpCore.db.getIndexSchemaData(TableName);
 
 
@@ -3620,8 +3450,8 @@ namespace Contensive.Core {
                         //
                         // ----- no result
                         //
-                        Copy = Copy + DateTime.Now + " A schema was returned, but it contains no indexs.";
-                        tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableRow(Copy, TableColSpan, TableRowEven);
+                        Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
+                        result = result + GetTableRow(Copy, TableColSpan, TableRowEven);
                     } else {
 
                         Rows = cpCore.db.convertDataTabletoArray(RSSchema);
@@ -3629,70 +3459,63 @@ namespace Contensive.Core {
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             IndexName = genericController.encodeText(Rows[5, RowPointer]);
                             if (!string.IsNullOrEmpty(IndexName)) {
-                                tempGetForm_DbIndex = tempGetForm_DbIndex + StartTableRow();
+                                result = result + StartTableRow();
                                 Copy = cpCore.html.html_GetFormInputCheckBox2("DropIndex." + RowPointer, false) + cpCore.html.html_GetFormInputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
-                                tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableCell(Copy,,, TableRowEven);
-                                tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableCell(genericController.encodeText(Rows[17, RowPointer]),,, TableRowEven);
-                                tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableCell("&nbsp;",,, TableRowEven);
-                                tempGetForm_DbIndex = tempGetForm_DbIndex + kmaEndTableRow;
+                                result = result + GetTableCell(Copy,"",0, TableRowEven);
+                                result = result + GetTableCell(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
+                                result = result + GetTableCell("&nbsp;","",0, TableRowEven);
+                                result = result + kmaEndTableRow;
                                 TableRowEven = !TableRowEven;
                             }
                         }
-                        tempGetForm_DbIndex = tempGetForm_DbIndex + cpCore.html.html_GetFormInputHidden("DropCount", RowMax + 1);
+                        result = result + cpCore.html.html_GetFormInputHidden("DropCount", RowMax + 1);
                     }
                     //
                     // Add Indexes
                     //
                     TableRowEven = false;
-                    tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableRow("<br><br><B>Select database fields to index</b>", TableColSpan, TableRowEven);
+                    result = result + GetTableRow("<br><br><B>Select database fields to index</b>", TableColSpan, TableRowEven);
                     RSSchema = cpCore.db.getColumnSchemaData(TableName);
                     if (RSSchema.Rows.Count == 0) {
                         //
                         // ----- no result
                         //
-                        Copy = Copy + DateTime.Now + " A schema was returned, but it contains no indexs.";
-                        tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableRow(Copy, TableColSpan, TableRowEven);
+                        Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
+                        result = result + GetTableRow(Copy, TableColSpan, TableRowEven);
                     } else {
 
                         Rows = cpCore.db.convertDataTabletoArray(RSSchema);
                         //
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                            tempGetForm_DbIndex = tempGetForm_DbIndex + StartTableRow();
+                            result = result + StartTableRow();
                             Copy = cpCore.html.html_GetFormInputCheckBox2("AddIndex." + RowPointer, false) + cpCore.html.html_GetFormInputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
-                            tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableCell(Copy,,, TableRowEven);
-                            tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableCell("&nbsp;",,, TableRowEven);
-                            tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableCell("&nbsp;",,, TableRowEven);
-                            tempGetForm_DbIndex = tempGetForm_DbIndex + kmaEndTableRow;
+                            result = result + GetTableCell(Copy,"",0, TableRowEven);
+                            result = result + GetTableCell("&nbsp;","",0, TableRowEven);
+                            result = result + GetTableCell("&nbsp;","",0, TableRowEven);
+                            result = result + kmaEndTableRow;
                             TableRowEven = !TableRowEven;
                         }
-                        tempGetForm_DbIndex = tempGetForm_DbIndex + cpCore.html.html_GetFormInputHidden("AddCount", RowMax + 1);
+                        result = result + cpCore.html.html_GetFormInputHidden("AddCount", RowMax + 1);
                     }
                     //
                     // Spacers
                     //
-                    tempGetForm_DbIndex = tempGetForm_DbIndex + StartTableRow();
-                    tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableCell(getSpacer(300, 1), "200");
-                    tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableCell(getSpacer(200, 1), "200");
-                    tempGetForm_DbIndex = tempGetForm_DbIndex + GetTableCell("&nbsp;", "100%");
-                    tempGetForm_DbIndex = tempGetForm_DbIndex + kmaEndTableRow;
+                    result = result + StartTableRow();
+                    result = result + GetTableCell(getSpacer(300, 1), "200");
+                    result = result + GetTableCell(getSpacer(200, 1), "200");
+                    result = result + GetTableCell("&nbsp;", "100%");
+                    result = result + kmaEndTableRow;
                 }
-                tempGetForm_DbIndex = tempGetForm_DbIndex + kmaEndTable;
+                result = result + kmaEndTable;
                 //
                 // Buttons
                 //
-                //GetForm_DbIndex = GetForm_DbIndex & cpCore.main_GetFormInputHidden("af", AdminFormToolDbIndex)
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + tempGetForm_DbIndex + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + result + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_DbIndex", "ErrorTrap")
-            return tempGetForm_DbIndex;
+            return result;
         }
         //
         //=============================================================================
@@ -3700,7 +3523,7 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_ContentDbSchema() {
-            string tempGetForm_ContentDbSchema = null;
+            string result = null;
             try {
                 //
                 int CS = 0;
@@ -3711,10 +3534,10 @@ namespace Contensive.Core {
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel;
-                tempGetForm_ContentDbSchema = GetTitle("Get Content Database Schema", "This tool displays all tables and fields required for the current Content Defintions.");
+                result = GetTitle("Get Content Database Schema", "This tool displays all tables and fields required for the current Content Defintions.");
                 //
                 TableColSpan = 3;
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + StartTable(2, 0, 0);
+                result = result + StartTable(2, 0, 0);
                 SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName, ccFieldTypes.Name as FieldType"
                         + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID) LEFT JOIN ccFields ON ccContent.ID = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
                         + " ORDER BY ccTables.Name, ccFields.Name;";
@@ -3723,43 +3546,43 @@ namespace Contensive.Core {
                 while (cpCore.db.csOk(CS)) {
                     if (TableName != cpCore.db.csGetText(CS, "TableName")) {
                         TableName = cpCore.db.csGetText(CS, "TableName");
-                        tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
+                        result = result + GetTableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
                     }
-                    tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + StartTableRow();
-                    tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableCell("&nbsp;",,, TableEvenRow);
-                    tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableCell(cpCore.db.csGetText(CS, "FieldName"),,, TableEvenRow);
-                    tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableCell(cpCore.db.csGetText(CS, "FieldType"),,, TableEvenRow);
-                    tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + kmaEndTableRow;
+                    result = result + StartTableRow();
+                    result = result + GetTableCell("&nbsp;","",0, TableEvenRow);
+                    result = result + GetTableCell(cpCore.db.csGetText(CS, "FieldName"), "", 0, TableEvenRow);
+                    result = result + GetTableCell(cpCore.db.csGetText(CS, "FieldType"), "", 0, TableEvenRow);
+                    result = result + kmaEndTableRow;
                     TableEvenRow = !TableEvenRow;
                     cpCore.db.csGoNext(CS);
                 }
                 //
                 // Field Type Definitions
                 //
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("<br><br><B>Field Type Definitions</b>", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("Boolean - Boolean values 0 and 1 are stored in a database long integer field type", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("Lookup - References to related records stored as database long integer field type", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("Integer - database long integer field type", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("Float - database floating point value", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("Date - database DateTime field type.", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("AutoIncrement - database long integer field type. Field automatically increments when a record is added.", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("Text - database character field up to 255 characters.", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("LongText - database character field up to 64K characters.", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("TextFile - references a filename in the Content Files folder. Database character field up to 255 characters. ", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("File - references a filename in the Content Files folder. Database character field up to 255 characters. ", TableColSpan, TableEvenRow);
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableRow("Redirect - This field has no database equivelent. No Database field is required.", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("<br><br><B>Field Type Definitions</b>", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("Boolean - Boolean values 0 and 1 are stored in a database long integer field type", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("Lookup - References to related records stored as database long integer field type", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("Integer - database long integer field type", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("Float - database floating point value", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("Date - database DateTime field type.", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("AutoIncrement - database long integer field type. Field automatically increments when a record is added.", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("Text - database character field up to 255 characters.", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("LongText - database character field up to 64K characters.", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("TextFile - references a filename in the Content Files folder. Database character field up to 255 characters. ", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("File - references a filename in the Content Files folder. Database character field up to 255 characters. ", TableColSpan, TableEvenRow);
+                result = result + GetTableRow("Redirect - This field has no database equivelent. No Database field is required.", TableColSpan, TableEvenRow);
                 //
                 // Spacers
                 //
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + StartTableRow();
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableCell(getSpacer(20, 1), "20");
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableCell(getSpacer(300, 1), "300");
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + GetTableCell("&nbsp;", "100%");
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + kmaEndTableRow;
-                tempGetForm_ContentDbSchema = tempGetForm_ContentDbSchema + kmaEndTable;
+                result = result + StartTableRow();
+                result = result + GetTableCell(getSpacer(20, 1), "20");
+                result = result + GetTableCell(getSpacer(300, 1), "300");
+                result = result + GetTableCell("&nbsp;", "100%");
+                result = result + kmaEndTableRow;
+                result = result + kmaEndTable;
                 //
                 //GetForm_ContentDbSchema = GetForm_ContentDbSchema & cpCore.main_GetFormInputHidden("af", AdminFormToolContentDbSchema)
-                return (htmlController.legacy_openFormTable(cpCore, ButtonList)) + tempGetForm_ContentDbSchema + (htmlController.legacy_closeFormTable(cpCore, ButtonList));
+                result =  (htmlController.legacy_openFormTable(cpCore, ButtonList)) + result + (htmlController.legacy_closeFormTable(cpCore, ButtonList));
                 //
                 //
                 // ----- Error Trap
@@ -3767,9 +3590,7 @@ namespace Contensive.Core {
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_ContentDbSchema", "ErrorTrap")
-            return tempGetForm_ContentDbSchema;
+            return result;
         }
         //
         //=============================================================================
@@ -3779,30 +3600,18 @@ namespace Contensive.Core {
         private string GetForm_LogFiles() {
             string tempGetForm_LogFiles = null;
             try {
-                //
-                string QueryOld = null;
-                string QueryNew = null;
-                string ButtonList;
-                //
-                ButtonList = ButtonCancel;
+                string ButtonList = ButtonCancel;
                 tempGetForm_LogFiles = GetTitle("Log File View", "This tool displays the Contensive Log Files.");
                 tempGetForm_LogFiles = tempGetForm_LogFiles + "<P></P>";
                 //
-                QueryOld = ".asp?";
-                QueryNew = genericController.ModifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
-                tempGetForm_LogFiles = tempGetForm_LogFiles + genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                string QueryOld = ".asp?";
+                string QueryNew = genericController.ModifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
+                tempGetForm_LogFiles = tempGetForm_LogFiles + genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
-                //GetForm_LogFiles = GetForm_LogFiles & cpCore.main_GetFormInputHidden("af", AdminFormToolLogFileView)
-                return (htmlController.legacy_openFormTable(cpCore, ButtonList)) + tempGetForm_LogFiles + (htmlController.legacy_closeFormTable(cpCore, ButtonList));
-                //
-                //
-                // ----- Error Trap
-                //
+                tempGetForm_LogFiles = htmlController.legacy_openFormTable(cpCore, ButtonList) + tempGetForm_LogFiles + (htmlController.legacy_closeFormTable(cpCore, ButtonList));
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_LogFiles", "ErrorTrap")
             return tempGetForm_LogFiles;
         }
         //
@@ -3892,7 +3701,7 @@ namespace Contensive.Core {
 
                     SourceFolders = cpCore.appRootFiles.getFolderNameList(StartPath + CurrentPath);
                     if (!string.IsNullOrEmpty(SourceFolders)) {
-                        FolderSplit = SourceFolders.Split(Environment.NewLine.ToCharArray());
+                        FolderSplit = SourceFolders.Split("\r\n".ToCharArray());
                         FolderCount = FolderSplit.GetUpperBound(0) + 1;
                         for (FolderPointer = 0; FolderPointer < FolderCount; FolderPointer++) {
                             FolderLine = FolderSplit[FolderPointer];
@@ -3914,7 +3723,7 @@ namespace Contensive.Core {
                         FileDate = "";
                         result = result + GetForm_LogFiles_Details_GetRow(SpacerImage, "no files were found in this folder", FileSize, FileDate, RowEven);
                     } else {
-                        FolderSplit = SourceFolders.Split(Environment.NewLine.ToCharArray());
+                        FolderSplit = SourceFolders.Split("\r\n".ToCharArray());
                         FolderCount = FolderSplit.GetUpperBound(0) + 1;
                         for (FolderPointer = 0; FolderPointer < FolderCount; FolderPointer++) {
                             FolderLine = FolderSplit[FolderPointer];
@@ -4043,43 +3852,27 @@ namespace Contensive.Core {
                 } else {
                     //
                     // Restart
-                    //
                     logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " + cpCore.doc.authContext.user.name + " (" + cpCore.doc.authContext.user.id + ") restarted using the Restart tool", false, true, cpCore.webServer.requestUrl, "", "");
-                    //runAtServer = New runAtServerClass(cpCore)
-                    cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm",,, false);
-                    Threading.Thread.Sleep(2000);
+                    cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
+                    Thread.Sleep(2000);
                     //
-                    //
-                    //
-                    throw new NotImplementedException("GetForm_Restart");
-                    //hint = hint & ",035"
-                    taskSchedulerController taskScheduler = new taskSchedulerController();
-                    cmdDetailClass cmdDetail = new cmdDetailClass();
-                    cmdDetail.addonId = 0;
-                    cmdDetail.addonName = "commandRestart";
-                    cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, "");
-                    taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
-                    //
-                    //Call runAtServer.executeCmd("Restart", "appname=" & cpCore.app.config.name)
+                    taskSchedulerController.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, new cmdDetailClass() {
+                        addonId = 0,
+                        addonName = "commandRestart",
+                        docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, "")
+                    }, false);
                 }
                 //
                 // Display form
                 //
                 Stream.Add(SpanClassAdminNormal);
                 Stream.Add("<br>");
-                //'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolRestart)
                 Stream.Add("</SPAN>");
                 //
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                //
-                // ----- Error Trap
-                //
+                tempGetForm_Restart =  htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_Restart", "ErrorTrap")
             return tempGetForm_Restart;
         }
         //
@@ -4123,40 +3916,15 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_LoadTemplates() {
+            string result = string.Empty;
             try {
-                //
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonList = null;
-                //
-                string[] Folders = null;
-                string FolderList = null;
-                string FolderDetailString = null;
-                string[] FolderDetails = null;
-                string FolderName = null;
-                //
-                string FileList = null;
-                string[] Files = null;
-                int Ptr = 0;
-                string FilePath = null;
-                string FileDetailString = null;
-                string[] FileDetails = null;
-                string Filename = null;
-                string PageSource = null;
-                int CS = 0;
-                string Link = null;
-                string TemplateName = null;
-                //
-                //dim buildversion As String
-                string AppPath = null;
-                string FileRootPath = null;
-                //
-                bool AllowBodyHTML = false;
-                bool AllowScriptLink = false;
                 bool AllowImageImport = false;
                 bool AllowStyleImport = false;
                 //
-                AllowBodyHTML = cpCore.docProperties.getBoolean("AllowBodyHTML");
-                AllowScriptLink = cpCore.docProperties.getBoolean("AllowScriptLink");
+                bool AllowBodyHTML = cpCore.docProperties.getBoolean("AllowBodyHTML");
+                bool AllowScriptLink = cpCore.docProperties.getBoolean("AllowScriptLink");
                 AllowImageImport = cpCore.docProperties.getBoolean("AllowImageImport");
                 AllowStyleImport = cpCore.docProperties.getBoolean("AllowStyleImport");
                 //
@@ -4187,16 +3955,11 @@ namespace Contensive.Core {
                 Stream.Add("</SPAN>");
                 //
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
-                return htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
-                //
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_LoadTemplates", "ErrorTrap")
+            return result;
         }
         //'
         //'=============================================================================
@@ -4371,12 +4134,6 @@ namespace Contensive.Core {
         //                End With
         //            End If
         //            Call cpCore.db.cs_Close(CSContent)
-        //            '
-        //            Exit Function
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
         //            throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("ImportTemplates", "ErrorTrap")
         //        End Function
         //        '
@@ -4472,7 +4229,6 @@ namespace Contensive.Core {
         //            '
         //            ' ----- Error Trap
         //            '
-        ////ErrorTrap:
         //            throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetDbCDef_SetAdminColumns", "ErrorTrap")
         //        End Sub
         //
@@ -4531,6 +4287,7 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_FindAndReplace() {
+            string result = string.Empty;
             try {
                 //
                 bool IsDeveloper = false;
@@ -4573,23 +4330,14 @@ namespace Contensive.Core {
                         if (!string.IsNullOrEmpty(CDefList)) {
                             CDefList = CDefList.Substring(1);
                         }
-                        //CDefList = cpCore.main_GetStreamText2("CDefList")
                         FindText = cpCore.docProperties.getText("FindText");
                         ReplaceText = cpCore.docProperties.getText("ReplaceText");
-                        //runAtServer.ipAddress = "127.0.0.1"
-                        //runAtServer.port = "4531"
                         QS = "app=" + encodeNvaArgument(cpCore.serverConfig.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
-
-                        throw new NotImplementedException("GetForm_FindAndReplace");
-                        taskSchedulerController taskScheduler = new taskSchedulerController();
                         cmdDetailClass cmdDetail = new cmdDetailClass();
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
                         cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, QS);
-                        taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
-
-
-                        //                    Call runAtServer.executeCmd("FindAndReplace", QS)
+                        taskSchedulerController.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
                 } else {
@@ -4641,15 +4389,11 @@ namespace Contensive.Core {
                 cpCore.db.csClose(ref CS);
                 Stream.Add(TopHalf + BottomHalf + cpCore.html.html_GetFormInputHidden("CDefRowCnt", RowPtr));
                 //
-                return htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonFindAndReplace);
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_FindAndReplace", "ErrorTrap")
+            return result;
         }
         //
         //=============================================================================
@@ -4657,14 +4401,11 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_IISReset() {
+            string result = string.Empty;
             try {
-                //
                 string Button = null;
-                //Dim GUIDGenerator As guidClass
-                stringBuilderLegacyController s;
-                //Dim runAtServer As runAtServerClass
+                stringBuilderLegacyController s = new stringBuilderLegacyController();
                 //
-                s = new stringBuilderLegacyController();
                 s.Add(GetTitle("IIS Reset", "Reset the webserver."));
                 //
                 // Process the form
@@ -4677,34 +4418,22 @@ namespace Contensive.Core {
                     //
                     logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " + cpCore.doc.authContext.user.name + " (" + cpCore.doc.authContext.user.id + ") executed an IISReset using the IISReset tool", false, true, cpCore.webServer.requestUrl, "", "");
                     //runAtServer = New runAtServerClass(cpCore)
-                    cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm",,, false);
-                    Threading.Thread.Sleep(2000);
-
-
-
-                    throw new NotImplementedException("GetForm_IISReset");
-                    taskSchedulerController taskScheduler = new taskSchedulerController();
+                    cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
+                    Thread.Sleep(2000);
                     cmdDetailClass cmdDetail = new cmdDetailClass();
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
                     cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, "");
-                    taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
-
-
-                    // Call runAtServer.executeCmd("IISReset", "")
+                    taskSchedulerController.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                 }
                 //
                 // Display form
                 //
-                return htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonIISReset) + s.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonIISReset);
-                //
-                // ----- Error Trap
-                //
+                result = htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonIISReset) + s.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_IISReset", "ErrorTrap")
+            return result;
         }
         //
         //=============================================================================
@@ -4712,36 +4441,24 @@ namespace Contensive.Core {
         //=============================================================================
         //
         private string GetForm_CreateGUID() {
+            string result = "";
             try {
-                //
                 string Button = null;
-                //'Dim GUIDGenerator As guidClass
                 stringBuilderLegacyController s;
-                //
                 s = new stringBuilderLegacyController();
                 s.Add(GetTitle("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
                 //
                 // Process the form
-                //
                 Button = cpCore.docProperties.getText("button");
                 //
-                //If Button = ButtonCreateGUID Then
-                //GUIDGenerator = New guidClass
                 s.Add(cpCore.html.html_GetFormInputText2("GUID", Guid.NewGuid().ToString(), 1, 80));
-                //Call s.Add("<span style=""border:inset; padding:4px; background-color:white;"">" & Guid.NewGuid.ToString() & "</span>")
-                //End If
                 //
                 // Display form
-                //
-                return htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonCreateGUID);
-                //
-                // ----- Error Trap
-                //
+                result= htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors1("GetForm_CreateGUID", "ErrorTrap")
+            return result;
         }
         //'
         //'====================================================================================================

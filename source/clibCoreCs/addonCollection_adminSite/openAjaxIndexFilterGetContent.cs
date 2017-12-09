@@ -10,6 +10,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
 using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.Complex;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -36,7 +37,7 @@ namespace Contensive.Addons.AdminSite {
                 if (ContentID == 0) {
                     result = "No filter is available";
                 } else {
-                    Models.Complex.cdefModel cdef = Models.Complex.cdefModel.getCdef(cpCore, ContentID);
+                    cdefModel cdef = cdefModel.getCdef(cpCore, ContentID);
                     result = adminSite.GetForm_IndexFilterContent(cdef);
                 }
                 adminSite = null;

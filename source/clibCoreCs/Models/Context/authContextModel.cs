@@ -55,7 +55,7 @@ namespace Contensive.Core.Models.Context {
                         if (!string.IsNullOrEmpty(HTTP_Accept_Language)) {
                             List<languageModel> languageList = languageModel.createList(cpCore, "(HTTP_Accept_Language='" + HTTP_Accept_Language + "')");
                             if (languageList.Count > 0) {
-                                _language = languageList(0);
+                                _language = languageList[0];
                             }
                         }
                     }
@@ -84,7 +84,7 @@ namespace Contensive.Core.Models.Context {
                 return _language;
             }
         }
-        private LanguageModel _language = null;
+        private languageModel _language = null;
         //
         // -- legacy user object -- will be refactored out, constructor creates default non-authenticated instance
         //Public authContextUser As authContextUserModel
@@ -229,15 +229,15 @@ namespace Contensive.Core.Models.Context {
                             if (cookieVisitId != 0) {
                                 //
                                 // -- Visit is good, setup visit, then secondary visitor/user if possible
-                                resultAuthContext.visit = visitModel.create(cpCore, cookieVisitId, ref new List<string>());
+                                resultAuthContext.visit = visitModel.create(cpCore, cookieVisitId);
                                 if (resultAuthContext.visit == null) {
                                     //
                                     // -- visit record is missing, create a new visit
-                                    resultAuthContext.visit = visitModel.add(cpCore, ref new List<string>());
+                                    resultAuthContext.visit = visitModel.add(cpCore);
                                 } else if (resultAuthContext.visit.LastVisitTime.AddHours(1) < cpCore.doc.profileStartTime) {
                                     //
                                     // -- visit has expired, create new visit
-                                    resultAuthContext.visit = visitModel.add(cpCore, ref new List<string>());
+                                    resultAuthContext.visit = visitModel.add(cpCore);
                                 } else {
                                     //
                                     // -- visit object is valid, share its data with other objects
@@ -251,7 +251,7 @@ namespace Contensive.Core.Models.Context {
                                     if (resultAuthContext.visit.VisitorID > 0) {
                                         //
                                         // -- try visit's visitor object
-                                        visitorModel testVisitor = visitorModel.create(cpCore, resultAuthContext.visit.VisitorID, ref new List<string>());
+                                        visitorModel testVisitor = visitorModel.create(cpCore, resultAuthContext.visit.VisitorID);
                                         if (testVisitor != null) {
                                             resultAuthContext.visitor = testVisitor;
                                         }
@@ -259,7 +259,7 @@ namespace Contensive.Core.Models.Context {
                                     if (resultAuthContext.visit.MemberID > 0) {
                                         //
                                         // -- try visit's person object
-                                        personModel testUser = personModel.create(cpCore, resultAuthContext.visit.MemberID, ref new List<string>());
+                                        personModel testUser = personModel.create(cpCore, resultAuthContext.visit.MemberID);
                                         if (testUser != null) {
                                             resultAuthContext.user = testUser;
                                         }
@@ -272,7 +272,7 @@ namespace Contensive.Core.Models.Context {
                             if (resultAuthContext.visit.id == 0) {
                                 //
                                 // -- create new visit record
-                                resultAuthContext.visit = visitModel.add(cpCore, ref new List<string>());
+                                resultAuthContext.visit = visitModel.add(cpCore);
                                 if (string.IsNullOrEmpty(resultAuthContext.visit.Name)) {
                                     resultAuthContext.visit.Name = "User";
                                 }
@@ -309,7 +309,7 @@ namespace Contensive.Core.Models.Context {
                                         if (cookieVisitorId != 0) {
                                             //
                                             // -- visitor cookie good
-                                            visitorModel testVisitor = visitorModel.create(cpCore, cookieVisitorId, ref new List<string>());
+                                            visitorModel testVisitor = visitorModel.create(cpCore, cookieVisitorId);
                                             if (testVisitor != null) {
                                                 resultAuthContext.visitor = testVisitor;
                                                 visitor_changes = true;
@@ -370,7 +370,7 @@ namespace Contensive.Core.Models.Context {
                                             // If x_wap, set mobile true
                                             //
                                             resultAuthContext.visit.Mobile = true;
-                                        } else if (genericController.vbInstr(1, cpCore.webServer.requestHttpAccept, "wap", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                        } else if (genericController.vbInstr(1, cpCore.webServer.requestHttpAccept, "wap", 1) != 0) {
                                             //
                                             // If main_HTTP_Accept, set mobile true
                                             //
@@ -382,7 +382,7 @@ namespace Contensive.Core.Models.Context {
                                             string UserAgentSubstrings = main_GetMobileBrowserList(cpCore);
                                             List<string> userAgentList = new List<string>();
                                             if (!string.IsNullOrEmpty(UserAgentSubstrings)) {
-                                                UserAgentSubstrings = genericController.vbReplace(UserAgentSubstrings, Environment.NewLine, "\n");
+                                                UserAgentSubstrings = genericController.vbReplace(UserAgentSubstrings, "\r\n", "\n");
                                                 userAgentList.AddRange(UserAgentSubstrings.Split(Convert.ToChar("\n")));
                                                 foreach (string userAgent in userAgentList) {
                                                     if (cpCore.webServer.requestBrowser.IndexOf(userAgent) > 0) {
@@ -410,25 +410,25 @@ namespace Contensive.Core.Models.Context {
                                     botFileContent = cpCore.privateFiles.readFile(Filename);
                                     if (string.IsNullOrEmpty(botFileContent)) {
                                         botFileContent = ""
-                                    + Environment.NewLine + "//"
-                                    + Environment.NewLine + "// Default Bot Name list"
-                                    + Environment.NewLine + "// This file is maintained by the server. On the first hit of a visit,"
-                                    + Environment.NewLine + "// the default member name is overridden with this name if there is a match"
-                                    + Environment.NewLine + "// in either the user agent or the ipaddress."
-                                    + Environment.NewLine + "// format:  name -tab- browser-user-agent-substring -tab- ip-address-substring -tab- type "
-                                    + Environment.NewLine + "// This text is cached by the server for 1 hour, so changes take"
-                                    + Environment.NewLine + "// effect when the cache expires. It is updated daily from the"
-                                    + Environment.NewLine + "// support site feed. Manual changes may be over written."
-                                    + Environment.NewLine + "// type - r=robot (default), b=bad robot, u=user"
-                                    + Environment.NewLine + "//"
-                                    + Environment.NewLine + "Contensive MonitorContensive Monitor" + "\t" + "\t" + "r"
-                                    + Environment.NewLine + "Google-Bot" + "\t" + "googlebot" + "\t" + "\t" + "r"
-                                    + Environment.NewLine + "MSN-Bot" + "\t" + "msnbot" + "\t" + "\t" + "r"
-                                    + Environment.NewLine + "Yahoo-Bot" + "\t" + "slurp" + "\t" + "\t" + "r"
-                                    + Environment.NewLine + "SearchMe-Bot" + "\t" + "searchme.com" + "\t" + "\t" + "r"
-                                    + Environment.NewLine + "Twiceler-Bot" + "\t" + "www.cuil.com" + "\t" + "\t" + "r"
-                                    + Environment.NewLine + "Unknown Bot" + "\t" + "robot" + "\t" + "\t" + "r"
-                                    + Environment.NewLine + "Unknown Bot" + "\t" + "crawl" + "\t" + "\t" + "r"
+                                    + "\r\n//"
+                                    + "\r\n// Default Bot Name list"
+                                    + "\r\n// This file is maintained by the server. On the first hit of a visit,"
+                                    + "\r\n// the default member name is overridden with this name if there is a match"
+                                    + "\r\n// in either the user agent or the ipaddress."
+                                    + "\r\n// format:  name -tab- browser-user-agent-substring -tab- ip-address-substring -tab- type "
+                                    + "\r\n// This text is cached by the server for 1 hour, so changes take"
+                                    + "\r\n// effect when the cache expires. It is updated daily from the"
+                                    + "\r\n// support site feed. Manual changes may be over written."
+                                    + "\r\n// type - r=robot (default), b=bad robot, u=user"
+                                    + "\r\n//"
+                                    + "\r\nContensive MonitorContensive Monitor\t\tr"
+                                    + "\r\nGoogle-Bot\tgooglebot\t\tr"
+                                    + "\r\nMSN-Bot\tmsnbot\t\tr"
+                                    + "\r\nYahoo-Bot\tslurp\t\tr"
+                                    + "\r\nSearchMe-Bot\tsearchme.com\t\tr"
+                                    + "\r\nTwiceler-Bot\twww.cuil.com\t\tr"
+                                    + "\r\nUnknown Bot\trobot\t\tr"
+                                    + "\r\nUnknown Bot\tcrawl\t\tr"
                                     + "";
                                         cpCore.privateFiles.saveFile(Filename, botFileContent);
                                     }
@@ -436,17 +436,17 @@ namespace Contensive.Core.Models.Context {
                                 }
                                 //
                                 if (!string.IsNullOrEmpty(botFileContent)) {
-                                    botFileContent = genericController.vbReplace(botFileContent, Environment.NewLine, "\n");
+                                    botFileContent = genericController.vbReplace(botFileContent, "\r\n", "\n");
                                     List<string> botList = new List<string>();
                                     botList.AddRange(botFileContent.Split(Convert.ToChar("\n")));
                                     resultAuthContext.visit.Bot = false;
                                     resultAuthContext.visit_isBadBot = false;
                                     foreach (string Arg in botList) {
                                         if (Arg.Substring(0, 2) != "//") {
-                                            string[] Args = Microsoft.VisualBasic.Strings.Split(Arg, "\t", -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                                            string[] Args = genericController.customSplit(Arg, "\t");
                                             if (Args.GetUpperBound(0) > 0) {
                                                 if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
-                                                    if (genericController.vbInstr(1, cpCore.webServer.requestBrowser, Args[1], Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                                    if (genericController.vbInstr(1, cpCore.webServer.requestBrowser, Args[1], 1) != 0) {
                                                         resultAuthContext.visit.Name = Args[0];
                                                         //visitNameFound = True
                                                         break;
@@ -454,7 +454,7 @@ namespace Contensive.Core.Models.Context {
                                                 }
                                                 if (Args.GetUpperBound(0) > 1) {
                                                     if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
-                                                        if (genericController.vbInstr(1, cpCore.webServer.requestRemoteIP, Args[2], Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                                        if (genericController.vbInstr(1, cpCore.webServer.requestRemoteIP, Args[2], 1) != 0) {
                                                             resultAuthContext.visit.Name = Args[0];
                                                             //visitNameFound = True
                                                             break;
@@ -525,7 +525,7 @@ namespace Contensive.Core.Models.Context {
                                     //
                                     // -- do not track guests at all
                                     resultAuthContext.user = new personModel();
-                                    resultAuthContext.user.Name = DefaultMemberName;
+                                    resultAuthContext.user.name = DefaultMemberName;
                                     user_changes = false;
                                     resultAuthContext.visitor.MemberID = 0;
                                     visitor_changes = true;
@@ -610,7 +610,7 @@ namespace Contensive.Core.Models.Context {
                         //
                         // -- Write Visit Cookie
                         visitCookie = cpCore.security.encodeToken(resultAuthContext.visit.id, cpCore.doc.profileStartTime);
-                        cpCore.webServer.addResponseCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit, visitCookie, "", "", requestAppRootPath, false);
+                        cpCore.webServer.addResponseCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit, visitCookie, default(DateTime) , "", requestAppRootPath, false);
                     }
                 }
             } catch (Exception ex) {
@@ -1153,7 +1153,7 @@ namespace Contensive.Core.Models.Context {
         //   the current member to be non-authenticated, but recognized
         //========================================================================
         //
-        public bool recognizeById(coreClass cpCore, int userId, ref authContextModel authContext) {
+        public bool recognizeById(coreClass cpCore, int userId, ref  authContextModel authContext) {
             bool returnResult = false;
             try {
                 if (authContext.visitor.ID == 0) {
@@ -1521,11 +1521,11 @@ namespace Contensive.Core.Models.Context {
                 result = cpCore.privateFiles.readFile(Filename);
                 if (string.IsNullOrEmpty(result)) {
                     result = "midp,j2me,avantg,docomo,novarra,palmos,palmsource,240x320,opwv,chtml,pda,windows ce,mmp/,blackberry,mib/,symbian,wireless,nokia,hand,mobi,phone,cdm,up.b,audio,SIE-,SEC-,samsung,HTC,mot-,mitsu,sagem,sony,alcatel,lg,erics,vx,NEC,philips,mmm,xx,panasonic,sharp,wap,sch,rover,pocket,benq,java,pt,pg,vox,amoi,bird,compal,kg,voda,sany,kdd,dbt,sendo,sgh,gradi,jb,moto";
-                    result = genericController.vbReplace(result, ",", Environment.NewLine);
+                    result = genericController.vbReplace(result, ",", "\r\n");
                     //Call app.publicFiles.SaveFile(Filename, result)
                 }
                 datetext = DateTime.Now.AddHours(1).ToString();
-                cpCore.cache.setContent("MobileBrowserList", datetext + Environment.NewLine + result);
+                cpCore.cache.setContent("MobileBrowserList", datetext + "\r\n" + result);
             }
             return result;
         }

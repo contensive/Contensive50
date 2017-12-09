@@ -16,6 +16,7 @@ using static Contensive.Core.constants;
 //
 using Contensive.BaseClasses;
 using System.Runtime.InteropServices;
+using System.IO;
 //
 namespace Contensive.Core {
     public class CPFileSystemClass : BaseClasses.CPFileSystemBaseClass, IDisposable {
@@ -112,12 +113,12 @@ namespace Contensive.Core {
         }
         //
         //==========================================================================================
-        public override IO.FileInfo[] fileList(string folderName, int pageSize = 0, int pageNumber = 1) {
+        public override FileInfo[] fileList(string folderName, int pageSize = 0, int pageNumber = 1) {
             return fileSystem.getFileList(folderName);
         }
         //
         //==========================================================================================
-        public override IO.DirectoryInfo[] folderList(string folderName) {
+        public override DirectoryInfo[] folderList(string folderName) {
             return fileSystem.getFolderList(folderName);
         }
         //
@@ -129,13 +130,13 @@ namespace Contensive.Core {
         //==========================================================================================
         //
         public override bool saveUpload(string htmlformName, ref string returnFilename) {
-            return fileSystem.upload(htmlformName, "\\upload", returnFilename);
+            return fileSystem.upload(htmlformName, "\\upload", ref returnFilename);
         }
         //
         //==========================================================================================
         //
         public override bool saveUpload(string htmlformName, string folderpath, ref string returnFilename) {
-            return fileSystem.upload(htmlformName, folderpath, returnFilename);
+            return fileSystem.upload(htmlformName, folderpath, ref  returnFilename);
         }
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.

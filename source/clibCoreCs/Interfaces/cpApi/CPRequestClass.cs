@@ -10,6 +10,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
 using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.Complex;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -206,9 +207,9 @@ namespace Contensive.Core {
                 if (cpCore.doc.authContext.userLanguage == null) {
                     return "";
                 }
-                LanguageModel userLanguage = LanguageModel.create(cpCore, cpCore.doc.authContext.user.LanguageID, new List<string>());
+                languageModel userLanguage = languageModel.create(cpCore, cpCore.doc.authContext.user.LanguageID);
                 if (userLanguage != null) {
-                    return userLanguage.Name;
+                    return userLanguage.name;
                 }
                 return "English";
             }

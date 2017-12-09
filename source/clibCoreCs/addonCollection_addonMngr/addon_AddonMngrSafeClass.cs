@@ -556,7 +556,7 @@ namespace Contensive.Core {
                         // --------------------------------------------------------------------------------
                         //
                         if ((InstalledCollectionIDList.Count > 0) && (!(cpCore.doc.debug_iUserError != ""))) {
-                            return cpCore.webServer.redirect("/" + cpCore.serverConfig.appConfig.adminRoute + "?helpcollectionid=" + InstalledCollectionIDList(0).ToString(), "Redirecting to help page after collection installation");
+                            return cpCore.webServer.redirect("/" + cpCore.serverConfig.appConfig.adminRoute + "?helpcollectionid=" + InstalledCollectionIDList[0].ToString(), "Redirecting to help page after collection installation");
                         }
                         //
                         // --------------------------------------------------------------------------------

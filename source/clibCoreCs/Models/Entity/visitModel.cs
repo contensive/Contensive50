@@ -119,6 +119,7 @@ namespace Contensive.Core.Models.Entity {
             }
             return result;
         }
+        public static visitModel create(coreClass cpCore, int recordId) { var tmpList = new List<string> { }; return create(cpCore, recordId, ref tmpList); }
         //
         //====================================================================================================
         /// <summary>

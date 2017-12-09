@@ -739,7 +739,7 @@ namespace Contensive.Core.Controllers {
                 int CS = 0;
                 //
                 Criteria = getAuthoringControlCriteria(ContentName, RecordID) + "and(CreatedBy<>" + cpCore.db.encodeSQLNumber(MemberID) + ")";
-                CS = cpCore.db.csOpen("Authoring Controls", Criteria,, "", MemberID);
+                CS = cpCore.db.csOpen("Authoring Controls", Criteria,"", true, MemberID);
                 result = cpCore.db.csOk(CS);
                 cpCore.db.csClose(ref CS);
             } catch (Exception ex) {

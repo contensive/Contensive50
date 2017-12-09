@@ -68,7 +68,7 @@ namespace Contensive.Core {
         //
         //
         public override string ConvertHTML2Text(string Source) {
-            return CP.core.html.convertHTMLToText(Source);
+            return htmlToTextControllers.convert(CP.core, Source);
         }
         //
         //
@@ -405,7 +405,8 @@ namespace Contensive.Core {
             int taskId = 0;
             string ignoreUserMessage = "";
             string ignoreGuid = "";
-            addonInstallClass.InstallCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, ref new List<string>());
+            var ignoreList = new List<string> { };
+            addonInstallClass.InstallCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, ref ignoreList );
             return taskId;
         }
         //
@@ -419,8 +420,9 @@ namespace Contensive.Core {
         public override int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone) {
             int taskId = 0;
             string ignoreUserMessage = "";
-            List<string> ignoreList = new List<string>();
-            addonInstallClass.InstallCollectionsFromPrivateFolder(CP.core, privateFolder, ignoreUserMessage, ignoreList, false, ref new List<string>());
+            List<string> ignoreList1 = new List<string>();
+            List<string> ignoreList2 = new List<string>();
+            addonInstallClass.InstallCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, ref ignoreList2);
             return taskId;
         }
         //
@@ -444,7 +446,7 @@ namespace Contensive.Core {
         public override int installCollectionFromLibrary(string collectionGuid) {
             int taskId = 0;
             string ignoreUserMessage = "";
-            addonInstallClass.installCollectionFromRemoteRepo(CP.core, collectionGuid, ignoreUserMessage, "", false, ref new List<string>());
+            addonInstallClass.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false);
             return taskId;
         }
         //

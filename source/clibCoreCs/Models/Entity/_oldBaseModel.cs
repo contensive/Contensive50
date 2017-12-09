@@ -514,19 +514,19 @@ namespace Contensive.Core.Models.Entity {
                             default:
                                 switch (resultProperty.PropertyType.Name) {
                                     case "Int32":
-                                        resultProperty.SetValue(instance, genericController.EncodeInteger(CDef.fields(resultProperty.Name).defaultValue), null);
+                                        resultProperty.SetValue(instance, genericController.EncodeInteger(CDef.fields[resultProperty.Name].defaultValue), null);
                                         break;
                                     case "Boolean":
-                                        resultProperty.SetValue(instance, genericController.EncodeBoolean(CDef.fields(resultProperty.Name).defaultValue), null);
+                                        resultProperty.SetValue(instance, genericController.EncodeBoolean(CDef.fields[resultProperty.Name].defaultValue), null);
                                         break;
                                     case "DateTime":
-                                        resultProperty.SetValue(instance, genericController.EncodeDate(CDef.fields(resultProperty.Name).defaultValue), null);
+                                        resultProperty.SetValue(instance, genericController.EncodeDate(CDef.fields[resultProperty.Name].defaultValue), null);
                                         break;
                                     case "Double":
-                                        resultProperty.SetValue(instance, genericController.EncodeNumber(CDef.fields(resultProperty.Name).defaultValue), null);
+                                        resultProperty.SetValue(instance, genericController.EncodeNumber(CDef.fields[resultProperty.Name].defaultValue), null);
                                         break;
                                     default:
-                                        resultProperty.SetValue(instance, CDef.fields(resultProperty.Name).defaultValue, null);
+                                        resultProperty.SetValue(instance, CDef.fields[resultProperty.Name].defaultValue, null);
                                         break;
                                 }
                                 break;

@@ -79,7 +79,7 @@ namespace Contensive.Core.Models.Entity {
                             SQL = "select name from ccDomains where typeId=1";
                             dt = cpCore.db.executeQuery(SQL);
                             foreach (DataRow dr in dt.Rows) {
-                                domainList_local.Add(dr(0).ToString());
+                                domainList_local.Add(dr[0].ToString());
                             }
                             cpCore.cache.setContent(cacheName, domainList_local, "domains");
                             dt.Dispose();

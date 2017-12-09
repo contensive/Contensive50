@@ -16,6 +16,7 @@ using static Contensive.Core.constants;
 //
 
 using Contensive.BaseClasses;
+using System.IO;
 
 namespace Contensive.Core.Controllers {
     /// <summary>
@@ -143,7 +144,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     do {
                                         posEnd = posEnd + 1;
-                                    } while ((posEnd < layout.Length) && ("\t" + "\r" + "\n" + "\t" + " ".IndexOf(layout.Substring(posEnd - 1, 1)) + 1 != 0));
+                                    } while ((posEnd < layout.Length) && (("\t\r\n\t ").IndexOf(layout.Substring(posEnd - 1, 1)) + 1 != 0));
                                     posEnd = posEnd - 1;
                                     returnValue = layout.Substring(posStart - 1, (posEnd - posStart));
                                 }
@@ -181,7 +182,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // now backtrack to include the leading whitespace
                         //
-                        while ((posStart > 0) && ("\t" + "\r" + "\n" + "\t" + " ".IndexOf(s.Substring(posStart - 1, 1)) + 1 != 0)) {
+                        while ((posStart > 0) && (("\t\r\n\t ").IndexOf(s.Substring(posStart - 1, 1)) + 1 != 0)) {
                             posStart = posStart - 1;
                         }
                         //posStart = posStart + 1
@@ -228,7 +229,7 @@ namespace Contensive.Core.Controllers {
                     // check searchId
                     //
                     if (returnValue && (!string.IsNullOrEmpty(searchId))) {
-                        Pos = genericController.vbInstr(1, tagLower, " id=", Microsoft.VisualBasic.Constants.vbTextCompare);
+                        Pos = genericController.vbInstr(1, tagLower, " id=", 1);
                         if (Pos <= 0) {
                             //
                             // id required but this tag has no id attr
@@ -263,7 +264,7 @@ namespace Contensive.Core.Controllers {
                                 // search for end of non-delimited attribute value
                                 //
                                 posValueStart = Pos;
-                                while ((Pos < tagLength) && (isInStr(1, attrAllowedChars, tagLower.Substring(Pos - 1, 1), Microsoft.VisualBasic.Constants.vbTextCompare))) {
+                                while ((Pos < tagLength) && (isInStr(1, attrAllowedChars, tagLower.Substring(Pos - 1, 1)))) {
                                     Pos = Pos + 1;
                                 }
                                 if (Pos >= tagLength) {
@@ -292,7 +293,7 @@ namespace Contensive.Core.Controllers {
                     // check searchClass
                     //
                     if (returnValue && (!string.IsNullOrEmpty(searchClass))) {
-                        Pos = genericController.vbInstr(1, tagLower, " class=", Microsoft.VisualBasic.Constants.vbTextCompare);
+                        Pos = genericController.vbInstr(1, tagLower, " class=", 1);
                         if (Pos <= 0) {
                             //
                             // class required but this tag has no class attr
@@ -327,7 +328,7 @@ namespace Contensive.Core.Controllers {
                                 // search for end of non-delimited attribute value
                                 //
                                 posValueStart = Pos;
-                                while ((Pos < tagLength) && (isInStr(1, attrAllowedChars, tagLower.Substring(Pos - 1, 1), Microsoft.VisualBasic.Constants.vbTextCompare))) {
+                                while ((Pos < tagLength) && (isInStr(1, attrAllowedChars, tagLower.Substring(Pos - 1, 1)))) {
                                     Pos = Pos + 1;
                                 }
                                 if (Pos >= tagLength) {
@@ -605,7 +606,7 @@ namespace Contensive.Core.Controllers {
                         endTag = "</" + TagName;
                         startTag = "<" + TagName;
                         while (Pos != 0) {
-                            posEnd = genericController.vbInstr(Pos + 1, Source, endTag, Microsoft.VisualBasic.Constants.vbTextCompare);
+                            posEnd = genericController.vbInstr(Pos + 1, Source, endTag, 1);
                             if (posEnd == 0) {
                                 //
                                 // no end was found, return the tag or rest of the string
@@ -616,7 +617,7 @@ namespace Contensive.Core.Controllers {
                                 }
                                 break;
                             } else {
-                                posNest = genericController.vbInstr(Pos + 1, Source, startTag, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                posNest = genericController.vbInstr(Pos + 1, Source, startTag, 1);
                                 if (posNest == 0) {
                                     //
                                     // no nest found, set to end
@@ -709,7 +710,7 @@ namespace Contensive.Core.Controllers {
                 tempgetTagInnerHTML = "";
                 Pos = 1;
                 while ((Pos > 0) && (LoopCnt < 100)) {
-                    TagStart = genericController.vbInstr(Pos, PageSource, "<" + Tag, Microsoft.VisualBasic.Constants.vbTextCompare);
+                    TagStart = genericController.vbInstr(Pos, PageSource, "<" + Tag, 1);
                     if (TagStart == 0) {
                         Pos = 0;
                     } else {
@@ -733,11 +734,11 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // Get the tags innerHTML
                                 //
-                                TagStart = genericController.vbInstr(TagStart, PageSource, ">", Microsoft.VisualBasic.Constants.vbTextCompare);
+                                TagStart = genericController.vbInstr(TagStart, PageSource, ">", 1);
                                 Pos = TagStart;
                                 if (TagStart != 0) {
                                     TagStart = TagStart + 1;
-                                    TagEnd = genericController.vbInstr(TagStart, PageSource, "</" + Tag, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                    TagEnd = genericController.vbInstr(TagStart, PageSource, "</" + Tag, 1);
                                     if (TagEnd != 0) {
                                         tempgetTagInnerHTML += PageSource.Substring(TagStart - 1, TagEnd - TagStart);
                                     }
@@ -746,7 +747,7 @@ namespace Contensive.Core.Controllers {
                         }
                         LoopCnt = LoopCnt + 1;
                         if (ReturnAll) {
-                            TagStart = genericController.vbInstr(TagEnd, PageSource, "<" + Tag, Microsoft.VisualBasic.Constants.vbTextCompare);
+                            TagStart = genericController.vbInstr(TagEnd, PageSource, "<" + Tag, 1);
                         } else {
                             TagStart = 0;
                         }
@@ -755,11 +756,9 @@ namespace Contensive.Core.Controllers {
                 //
                 return tempgetTagInnerHTML;
                 //
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
+            } catch   {
+                throw;
             }
-            //ErrorTrap:
-            return tempgetTagInnerHTML;
         }
         //
         //====================================================================================================
@@ -770,7 +769,7 @@ namespace Contensive.Core.Controllers {
                 List<string> bodyScript = new List<string>();
                 //
                 // -- content extras like tool panel
-                if ((cpCore.doc.authContext.isAuthenticatedContentManager(cpCore) & cpCore.doc.authContext.user.AllowToolsPanel) != 0) {
+                if (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore) & (cpCore.doc.authContext.user.AllowToolsPanel)) {
                     if (AllowTools) {
                         result.Add(cpCore.html.main_GetToolsPanel());
                     }
@@ -1061,12 +1060,12 @@ namespace Contensive.Core.Controllers {
                                     RecordID = genericController.EncodeInteger(RowsArray[IDFieldPointer, RowPointer]);
                                     Copy = DropDownPreField;
                                     for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                        Copy = Copy + RowsArray[DropDownFieldPointer[FieldPointer], RowPointer] + DropDownDelimiter[FieldPointer];
+                                        Copy += RowsArray[DropDownFieldPointer[FieldPointer], RowPointer] + DropDownDelimiter[FieldPointer];
                                     }
                                     if (string.IsNullOrEmpty(Copy)) {
                                         Copy = "no name";
                                     }
-                                    FastString.Add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
+                                    FastString.Add("\r\n<option value=\"" + RecordID + "\" ");
                                     if (RecordID == CurrentValue) {
                                         FastString.Add("selected");
                                         SelectedFound = true;
@@ -1093,12 +1092,12 @@ namespace Contensive.Core.Controllers {
                                         RecordID = genericController.EncodeInteger(RowsArray[IDFieldPointer, 0]);
                                         Copy = DropDownPreField;
                                         for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                            Copy = Copy + RowsArray[DropDownFieldPointer[FieldPointer], 0] + DropDownDelimiter[FieldPointer];
+                                            Copy += RowsArray[DropDownFieldPointer[FieldPointer], 0] + DropDownDelimiter[FieldPointer];
                                         }
                                         if (string.IsNullOrEmpty(Copy)) {
                                             Copy = "no name";
                                         }
-                                        FastString.Add(Environment.NewLine + "<option value=\"" + RecordID + "\" selected");
+                                        FastString.Add("\r\n<option value=\"" + RecordID + "\" selected");
                                         SelectedFound = true;
                                         if (cpCore.siteProperties.selectFieldWidthLimit != 0) {
                                             if (Copy.Length > cpCore.siteProperties.selectFieldWidthLimit) {
@@ -1407,12 +1406,12 @@ namespace Contensive.Core.Controllers {
                                     if (RecordID != LastRecordID) {
                                         Copy = DropDownPreField;
                                         for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                            Copy = Copy + RowsArray[DropDownFieldPointer[FieldPointer], RowPointer] + DropDownDelimiter[FieldPointer];
+                                            Copy += RowsArray[DropDownFieldPointer[FieldPointer], RowPointer] + DropDownDelimiter[FieldPointer];
                                         }
                                         if (string.IsNullOrEmpty(Copy)) {
                                             Copy = "no name";
                                         }
-                                        FastString.Add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
+                                        FastString.Add("\r\n<option value=\"" + RecordID + "\" ");
                                         if (RecordID == iCurrentValue) {
                                             FastString.Add("selected");
                                             SelectedFound = true;
@@ -1467,24 +1466,20 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string getInputSelectList2(string MenuName, int CurrentValue, string SelectList, string NoneCaption, string htmlId, string HtmlClass = "") {
+            string result = string.Empty;
             try {
                 //
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
                 string[] lookups = null;
-                string iSelectList = null;
                 int Ptr = 0;
                 int RecordID = 0;
-                //Dim SelectedFound As Integer
                 string Copy = null;
-                string TagID = null;
                 int SelectFieldWidthLimit;
                 //
                 SelectFieldWidthLimit = cpCore.siteProperties.selectFieldWidthLimit;
                 if (SelectFieldWidthLimit == 0) {
                     SelectFieldWidthLimit = 256;
                 }
-                //
-                //iSelectList = genericController.encodeText(SelectList)
                 //
                 // ----- Start select box
                 //
@@ -1502,7 +1497,7 @@ namespace Contensive.Core.Controllers {
                     RecordID = Ptr + 1;
                     Copy = lookups[Ptr];
                     if (!string.IsNullOrEmpty(Copy)) {
-                        FastString.Add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
+                        FastString.Add("\r\n<option value=\"" + RecordID + "\" ");
                         if (RecordID == CurrentValue) {
                             FastString.Add("selected");
                             //SelectedFound = True
@@ -1514,7 +1509,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 FastString.Add("</select>");
-                return FastString.Text;
+                result = FastString.Text;
                 //
                 //
                 // ----- Error Trap
@@ -1522,8 +1517,7 @@ namespace Contensive.Core.Controllers {
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetFormInputSelectList2")
+            return result;
         }
         //
         //========================================================================
@@ -1692,22 +1686,22 @@ namespace Contensive.Core.Controllers {
                     //
                     if (false) {
                         temphtml_GetLegacySiteStyles = ""
-                            + "\r" + "<!-- compatibility with legacy framework --><style type=text/css>"
-                            + "\r" + " .ccEditWrapper {border-top:1px solid #6a6;border-left:1px solid #6a6;border-bottom:1px solid #cec;border-right:1px solid #cec;}"
-                            + "\r" + " .ccEditWrapperInner {border-top:1px solid #cec;border-left:1px solid #cec;border-bottom:1px solid #6a6;border-right:1px solid #6a6;}"
-                            + "\r" + " .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #888;padding:4px;background-color:#40C040;color:black;}"
-                            + "\r" + " .ccEditWrapperContent{padding:4px;}"
-                            + "\r" + " .ccHintWrapper {border:1px dashed #888;margin-bottom:10px}"
-                            + "\r" + " .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}"
+                            + "\r<!-- compatibility with legacy framework --><style type=text/css>"
+                            + "\r .ccEditWrapper {border-top:1px solid #6a6;border-left:1px solid #6a6;border-bottom:1px solid #cec;border-right:1px solid #cec;}"
+                            + "\r .ccEditWrapperInner {border-top:1px solid #cec;border-left:1px solid #cec;border-bottom:1px solid #6a6;border-right:1px solid #6a6;}"
+                            + "\r .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #888;padding:4px;background-color:#40C040;color:black;}"
+                            + "\r .ccEditWrapperContent{padding:4px;}"
+                            + "\r .ccHintWrapper {border:1px dashed #888;margin-bottom:10px}"
+                            + "\r .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}"
                             + "</style>";
                     } else {
                         temphtml_GetLegacySiteStyles = ""
-                            + "\r" + "<!-- compatibility with legacy framework --><style type=text/css>"
-                            + "\r" + " .ccEditWrapper {border:1px dashed #808080;}"
-                            + "\r" + " .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}"
-                            + "\r" + " .ccEditWrapperContent{padding:4px;}"
-                            + "\r" + " .ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}"
-                            + "\r" + " .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}"
+                            + "\r<!-- compatibility with legacy framework --><style type=text/css>"
+                            + "\r .ccEditWrapper {border:1px dashed #808080;}"
+                            + "\r .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}"
+                            + "\r .ccEditWrapperContent{padding:4px;}"
+                            + "\r .ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}"
+                            + "\r .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}"
                             + "</style>";
                     }
                 }
@@ -1732,7 +1726,7 @@ namespace Contensive.Core.Controllers {
                 //If Not (true) Then Exit Function
                 //
                 temphtml_GetAdminHintWrapper = "";
-                if ((cpCore.doc.authContext.isEditing("") | cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) != 0) {
+                if ((cpCore.doc.authContext.isEditing("") | cpCore.doc.authContext.isAuthenticatedAdmin(cpCore))) {
                     temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + html_GetLegacySiteStyles();
                     temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapper\">"
                             + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapperContent\">"
@@ -1779,22 +1773,17 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string html_GetUploadFormStart(string ActionQueryString = null) {
+            string result = string.Empty;
             try {
                 if (ActionQueryString == null) {
                     ActionQueryString = cpCore.doc.refreshQueryString;
                 }
-                //
-                string iActionQueryString;
-                //
-                iActionQueryString = genericController.ModifyQueryString(ActionQueryString, RequestNameRequestBinary, true, true);
-                //
-                return "<form action=\"" + cpCore.webServer.serverFormActionURL + "?" + iActionQueryString + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" METHOD=\"POST\"  style=\"display: inline;\" >";
-                //
+                string iActionQueryString = genericController.ModifyQueryString(ActionQueryString, RequestNameRequestBinary, true, true);
+                result = "<form action=\"" + cpCore.webServer.serverFormActionURL + "?" + iActionQueryString + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" METHOD=\"POST\"  style=\"display: inline;\" >";
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetUploadFormStart")
+            return result;
         }
         //
         //========================================================================
@@ -1860,14 +1849,14 @@ namespace Contensive.Core.Controllers {
                             } else {
                                 QSName = genericController.DecodeResponseVariable(QSNameValues[0]);
                                 QSValue = genericController.DecodeResponseVariable(QSNameValues[1]);
-                                RefreshHiddens = RefreshHiddens + "\r" + "<input type=\"hidden\" name=\"" + encodeHTML(QSName) + "\" value=\"" + encodeHTML(QSValue) + "\">";
+                                RefreshHiddens = RefreshHiddens + "\r<input type=\"hidden\" name=\"" + encodeHTML(QSName) + "\" value=\"" + encodeHTML(QSValue) + "\">";
                             }
                         }
                     }
                 }
                 //
                 temphtml_GetFormStart = ""
-                    + "\r" + "<form name=\"" + htmlName + "\" id=\"" + htmlId + "\" action=\"" + Action + "\" method=\"" + iMethod + "\" style=\"display: inline;\" >"
+                    + "\r<form name=\"" + htmlName + "\" id=\"" + htmlId + "\" action=\"" + Action + "\" method=\"" + iMethod + "\" style=\"display: inline;\" >"
                     + RefreshHiddens + "";
                 //
                 return temphtml_GetFormStart;
@@ -2013,19 +2002,19 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 EditorClosed = ""
-                    + "\r" + "<div class=\"ccTextAreaHead\" ID=\"" + IDRoot + "Head\">"
+                    + "\r<div class=\"ccTextAreaHead\" ID=\"" + IDRoot + "Head\">"
                     + cr2 + "<a href=\"#\" onClick=\"OpenTextArea('" + IDRoot + "');return false\"><img src=\"/ccLib/images/OpenUpRev1313.gif\" width=13 height=13 border=0>&nbsp;Full Screen</a>"
-                    + "\r" + "</div>"
-                    + "\r" + "<div class=\"ccTextArea\">"
+                    + "\r</div>"
+                    + "\r<div class=\"ccTextArea\">"
                     + cr2 + "<textarea ID=\"" + IDRoot + "\" NAME=\"" + TagName + "\" ROWS=\"" + Rows_Local + "\" Style=\"width:" + StyleWidth_Local + ";\"" + AttrDisabled + " onkeydown=\"return cj.encodeTextAreaKey(this, event);\">" + Value_Local + "</TEXTAREA>"
-                    + "\r" + "</div>"
+                    + "\r</div>"
                     + "";
                 //
                 EditorOpened = ""
-                    + "\r" + "<div class=\"ccTextAreaHeCursorTypeEnum.ADOPENed\" style=\"display:none;\" ID=\"" + IDRoot + "HeCursorTypeEnum.ADOPENed\">"
-                    + "\r" + "<a href=\"#\" onClick=\"CloseTextArea('" + IDRoot + "');return false\"><img src=\"/ccLib/images/OpenDownRev1313.gif\" width=13 height=13 border=0>&nbsp;Full Screen</a>"
+                    + "\r<div class=\"ccTextAreaHeCursorTypeEnum.ADOPENed\" style=\"display:none;\" ID=\"" + IDRoot + "HeCursorTypeEnum.ADOPENed\">"
+                    + "\r<a href=\"#\" onClick=\"CloseTextArea('" + IDRoot + "');return false\"><img src=\"/ccLib/images/OpenDownRev1313.gif\" width=13 height=13 border=0>&nbsp;Full Screen</a>"
                     + cr2 + "</div>"
-                    + "\r" + "<textarea class=\"ccTextAreaOpened\" style=\"display:none;\" ID=\"" + IDRoot + "Opened\" NAME=\"" + IDRoot + "Opened\"" + AttrDisabled + " onkeydown=\"return cj.encodeTextAreaKey(this, event);\"></TEXTAREA>";
+                    + "\r<textarea class=\"ccTextAreaOpened\" style=\"display:none;\" ID=\"" + IDRoot + "Opened\" NAME=\"" + IDRoot + "Opened\"" + AttrDisabled + " onkeydown=\"return cj.encodeTextAreaKey(this, event);\"></TEXTAREA>";
                 //
                 temphtml_GetFormInputTextExpandable2 = ""
                     + "<div class=\"" + HtmlClass + "\">"
@@ -2083,11 +2072,11 @@ namespace Contensive.Core.Controllers {
 
                 if (cpCore.doc.inputDateCnt == 0) {
                     HeadJS = ""
-                    + Environment.NewLine + "<SCRIPT LANGUAGE=\"JavaScript\" SRC=\"/ccLib/mktree/CalendarPopup.js\"></SCRIPT>"
-                    + Environment.NewLine + "<SCRIPT LANGUAGE=\"JavaScript\">"
-                    + Environment.NewLine + "var cal = new CalendarPopup();"
-                    + Environment.NewLine + "cal.showNavigationDropdowns();"
-                    + Environment.NewLine + "</SCRIPT>";
+                    + "\r\n<SCRIPT LANGUAGE=\"JavaScript\" SRC=\"/ccLib/mktree/CalendarPopup.js\"></SCRIPT>"
+                    + "\r\n<SCRIPT LANGUAGE=\"JavaScript\">"
+                    + "\r\nvar cal = new CalendarPopup();"
+                    + "\r\ncal.showNavigationDropdowns();"
+                    + "\r\n</SCRIPT>";
                     addScriptLink_Head("/ccLib/mktree/CalendarPopup.js", "Calendar Popup");
                     addScriptCode_head("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup");
                 }
@@ -2105,9 +2094,9 @@ namespace Contensive.Core.Controllers {
                 }
 
 
-                result = result + Environment.NewLine + "<input TYPE=\"text\" NAME=\"" + iTagName + "\" ID=\"" + iTagName + "\" VALUE=\"" + iDefaultValue + "\"  SIZE=\"" + iWidth + "\">"
-                + Environment.NewLine + "<a HREF=\"#\" Onclick = \"cal.select(document.getElementById('" + iTagName + "'),'" + AnchorName + "','MM/dd/yyyy','" + DateString + "'); return false;\" NAME=\"" + AnchorName + "\" ID=\"" + AnchorName + "\"><img title=\"Select a date\" alt=\"Select a date\" src=\"/ccLib/images/table.jpg\" width=12 height=10 border=0></A>"
-                + Environment.NewLine + "";
+                result = result + "\r\n<input TYPE=\"text\" NAME=\"" + iTagName + "\" ID=\"" + iTagName + "\" VALUE=\"" + iDefaultValue + "\"  SIZE=\"" + iWidth + "\">"
+                + "\r\n<a HREF=\"#\" Onclick = \"cal.select(document.getElementById('" + iTagName + "'),'" + AnchorName + "','MM/dd/yyyy','" + DateString + "'); return false;\" NAME=\"" + AnchorName + "\" ID=\"" + AnchorName + "\"><img title=\"Select a date\" alt=\"Select a date\" src=\"/ccLib/images/table.jpg\" width=12 height=10 border=0></A>"
+                + "\r\n";
 
                 cpCore.doc.inputDateCnt = cpCore.doc.inputDateCnt + 1;
             } catch (Exception ex) {
@@ -2234,23 +2223,13 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string html_GetFormInputCheckListByIDList(string TagName, string SecondaryContentName, string CheckedIDList, string CaptionFieldName = "", bool readOnlyField = false) {
+            string Result = string.Empty;
             try {
-                //
-                //If Not (true) Then Exit Function
-                //
                 string SQL = null;
                 int CS = 0;
-                int main_MemberShipCount = 0;
-                int main_MemberShipSize = 0;
-                int main_MemberShipPointer = 0;
-                string SectionName = null;
                 int GroupCount = 0;
-                int[] main_MemberShip = null;
                 string SecondaryTablename = null;
                 int SecondaryContentID = 0;
-                string rulesTablename = null;
-                string Result = string.Empty;
-                string MethodName = null;
                 string iCaptionFieldName = null;
                 string GroupName = null;
                 string GroupCaption = null;
@@ -2260,8 +2239,6 @@ namespace Contensive.Core.Controllers {
                 bool Found = false;
                 int RecordID = 0;
                 string SingularPrefix = null;
-                //
-                MethodName = "main_GetFormInputCheckListByIDList";
                 //
                 iCaptionFieldName = genericController.encodeEmptyText(CaptionFieldName, "name");
                 //
@@ -2285,7 +2262,7 @@ namespace Contensive.Core.Controllers {
                     + " ORDER BY ccContent.Name, " + SecondaryTablename + "." + iCaptionFieldName;
                 CS = cpCore.db.csOpenSql(SQL);
                 if (cpCore.db.csOk(CS)) {
-                    SectionName = "";
+                    //SectionName = "";
                     GroupCount = 0;
                     CanSeeHiddenFields = cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore);
                     while (cpCore.db.csOk(CS)) {
@@ -2301,7 +2278,7 @@ namespace Contensive.Core.Controllers {
                             }
                             if (GroupCount != 0) {
                                 // leave this between checkboxes - it is searched in the admin page
-                                Result = Result + "<br >" + Environment.NewLine;
+                                Result = Result + "<br >\r\n";
                             }
                             if (genericController.IsInDelimitedString(CheckedIDList, RecordID.ToString(), ",")) {
                                 Found = true;
@@ -2325,19 +2302,13 @@ namespace Contensive.Core.Controllers {
                         }
                         cpCore.db.csGoNext(CS);
                     }
-                    Result = Result + "<input type=\"hidden\" name=\"" + TagName + ".RowCount\" value=\"" + GroupCount + "\">" + Environment.NewLine;
+                    Result = Result + "<input type=\"hidden\" name=\"" + TagName + ".RowCount\" value=\"" + GroupCount + "\">\r\n";
                 }
                 cpCore.db.csClose(ref CS);
-                return Result;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
-                                                                    //
+            return Result;
         }
         //
         // -----
@@ -2593,17 +2564,8 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string html_GetFormButton2(string ButtonLabel, string Name = "button", string htmlId = "", string OnClick = "", bool Disabled = false) {
+            string s = null;
             try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                string MethodName = null;
-                string iOnClick = null;
-                string TagID = null;
-                string s = null;
-                //
-                MethodName = "main_GetFormButton2";
-                //
                 s = "<input TYPE=\"SUBMIT\""
                     + " NAME=\"" + genericController.encodeEmptyText(Name, "button") + "\""
                     + " VALUE=\"" + genericController.encodeText(ButtonLabel) + "\""
@@ -2612,16 +2574,10 @@ namespace Contensive.Core.Controllers {
                 if (Disabled) {
                     s = s + " disabled=\"disabled\"";
                 }
-                return s + ">";
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
-                                                                    //
+            return s + ">";
         }
         //
         //========================================================================
@@ -2630,35 +2586,25 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string html_GetFormInputHidden(string TagName, string TagValue, string htmlId = "") {
+            string result = string.Empty;
             try {
+                result = "\r<input type=\"hidden\" NAME=\"" + encodeHTML(genericController.encodeText(TagName)) + "\"";
                 //
-                //If Not (true) Then Exit Function
-                //
-                string iTagValue = null;
-                string ihtmlId = null;
-                string s;
-                //
-                s = "\r" + "<input type=\"hidden\" NAME=\"" + encodeHTML(genericController.encodeText(TagName)) + "\"";
-                //
-                iTagValue = encodeHTML(genericController.encodeText(TagValue));
+                string iTagValue = encodeHTML(genericController.encodeText(TagValue));
                 if (!string.IsNullOrEmpty(iTagValue)) {
-                    s = s + " VALUE=\"" + iTagValue + "\"";
+                    result = result + " VALUE=\"" + iTagValue + "\"";
                 }
                 //
-                ihtmlId = genericController.encodeText(htmlId);
+                string ihtmlId = genericController.encodeText(htmlId);
                 if (!string.IsNullOrEmpty(ihtmlId)) {
-                    s = s + " ID=\"" + encodeHTML(ihtmlId) + "\"";
+                    result = result + " ID=\"" + encodeHTML(ihtmlId) + "\"";
                 }
                 //
-                s = s + ">";
-                //
-                return s;
-                //
+                result = result + ">";
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetFormInputHidden")
+            return result;
         }
         //
         public string html_GetFormInputHidden(string TagName, bool TagValue, string htmlId = "") {
@@ -2782,11 +2728,11 @@ namespace Contensive.Core.Controllers {
         public void html_AddEvent(string HtmlId, string DOMEvent, string Javascript) {
             string JSCodeAsString = Javascript;
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, "'", "'+\"'\"+'");
-            JSCodeAsString = genericController.vbReplace(JSCodeAsString, Environment.NewLine, "\\n");
+            JSCodeAsString = genericController.vbReplace(JSCodeAsString, "\r\n", "\\n");
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, "\r", "\\n");
             JSCodeAsString = genericController.vbReplace(JSCodeAsString, "\n", "\\n");
             JSCodeAsString = "'" + JSCodeAsString + "'";
-            addScriptCode_onLoad("" + "cj.addListener(" + "document.getElementById('" + HtmlId + "')" + ",'" + DOMEvent + "'" + ",function(){eval(" + JSCodeAsString + ")}" + ")", "");
+            addScriptCode_onLoad("cj.addListener(document.getElementById('" + HtmlId + "'),'" + DOMEvent + "',function(){eval(" + JSCodeAsString + ")})", "");
         }
         //
         //
@@ -3328,10 +3274,10 @@ namespace Contensive.Core.Controllers {
                     // Build output sting in alphabetical order by name
                     //
                     s = "";
-                    ItemsPtr = Index.getFirstPtr;
+                    ItemsPtr = Index.getFirstPtr();
                     while (ItemsPtr >= 0 && LoopPtr < ItemsCnt) {
-                        s = s + Environment.NewLine + "," + Items[ItemsPtr];
-                        PtrTest = Index.getNextPtr;
+                        s = s + "\r\n," + Items[ItemsPtr];
+                        PtrTest = Index.getNextPtr();
                         if (PtrTest < 0) {
                             break;
                         } else {
@@ -3563,7 +3509,7 @@ namespace Contensive.Core.Controllers {
                 //    LayoutEngineOptionString = "data=" & encodeNvaArgument(TemplateBodyContent)
                 //    TemplateBodyContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", nothing, LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
                 //End If
-                Pos = genericController.vbInstr(1, workingContent, "<?contensive", Microsoft.VisualBasic.Constants.vbTextCompare);
+                Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
                 if (Pos > 0) {
                     throw new ApplicationException("Structured xml data commands are no longer supported");
                     //'
@@ -3580,7 +3526,7 @@ namespace Contensive.Core.Controllers {
                 // Convert <!-- STARTGROUPACCESS 10,11,12 --> format to <AC type=GROUPACCESS AllowGroups="10,11,12">
                 // Convert <!-- ENDGROUPACCESS --> format to <AC type=GROUPACCESSEND>
                 //
-                PosStart = genericController.vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", Microsoft.VisualBasic.Constants.vbTextCompare);
+                PosStart = genericController.vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", 1);
                 if (PosStart > 0) {
                     PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
                     if (PosEnd > 0) {
@@ -3589,7 +3535,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 //
-                PosStart = genericController.vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", Microsoft.VisualBasic.Constants.vbTextCompare);
+                PosStart = genericController.vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", 1);
                 if (PosStart > 0) {
                     PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
                     if (PosEnd > 0) {
@@ -3604,7 +3550,7 @@ namespace Contensive.Core.Controllers {
                     //
                     IconIDControlString = "AC," + ACTypeTemplateContent + "," + NotUsedID + "," + ACName + ",";
                     IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0);
-                    workingContent = genericController.vbReplace(workingContent, "{{content}}", IconImg, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                    workingContent = genericController.vbReplace(workingContent, "{{content}}", IconImg, 1, 99, 1);
                     //WorkingContent = genericController.vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
                     //'
                     //' replace all other {{...}}
@@ -3641,7 +3587,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // Test early if this needs to run at all
                 //
-                ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || EncodeImages || EncodeEditIcons)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) + 1 != 0)) != 0;
+                ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || EncodeImages || EncodeEditIcons)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) + 1 != 0));
                 ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (workingContent.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
                 if ((!string.IsNullOrEmpty(workingContent)) & (ProcessAnchorTags || ProcessACTags)) {
                     //
@@ -3680,10 +3626,10 @@ namespace Contensive.Core.Controllers {
                                                 //
                                                 // if it has "contensiveuserform=1" in the form tag, remove it from the form and add the hidden that makes it work
                                                 //
-                                                Copy = genericController.vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                                                Copy = genericController.vbReplace(Copy, "ContensiveUserForm=\"1\"", "", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                                Copy = genericController.vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, 1);
+                                                Copy = genericController.vbReplace(Copy, "ContensiveUserForm=\"1\"", "", 1, 99, 1);
                                                 if (!EncodeEditIcons) {
-                                                    Copy = Copy + "<input type=hidden name=ContensiveUserForm value=1>";
+                                                    Copy += "<input type=hidden name=ContensiveUserForm value=1>";
                                                 }
                                             }
                                         }
@@ -3716,7 +3662,7 @@ namespace Contensive.Core.Controllers {
                                                                 Link = Link.Substring(0, Pos - 1);
                                                             }
                                                         }
-                                                        if ((string.IsNullOrEmpty(Link)) || ("," + cpCore.serverConfig.appConfig.domainList[0] + ",".IndexOf("," + Link + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0)) {
+                                                        if ((string.IsNullOrEmpty(Link)) || (("," + cpCore.serverConfig.appConfig.domainList[0] + ",").IndexOf("," + Link + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0)) {
                                                             //
                                                             // ----- link is for this site
                                                             //
@@ -3725,7 +3671,7 @@ namespace Contensive.Core.Controllers {
                                                                 // Ends in a questionmark, must be Dwayne (?)
                                                                 //
                                                                 Value = Value + AnchorQuery;
-                                                            } else if (genericController.vbInstr(1, Value, "mailto:", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                                            } else if (genericController.vbInstr(1, Value, "mailto:", 1) != 0) {
                                                                 //
                                                                 // catch mailto
                                                                 //
@@ -3744,9 +3690,9 @@ namespace Contensive.Core.Controllers {
                                                             //    End If
                                                         }
                                                     }
-                                                    Copy = Copy + " " + Name + "=\"" + Value + "\"";
+                                                    Copy += " " + Name + "=\"" + Value + "\"";
                                                 }
-                                                Copy = Copy + ">";
+                                                Copy += ">";
                                             }
                                         }
                                         break;
@@ -3836,7 +3782,7 @@ namespace Contensive.Core.Controllers {
                                                                     CSPeople = cpCore.db.cs_openContentRecord("People", personalizationPeopleId);
                                                                     CSPeopleSet = true;
                                                                 }
-                                                                if ((cpCore.db.csOk(CSPeople) & cpCore.db.cs_isFieldSupported(CSPeople, FieldName)) != 0) {
+                                                                if ((cpCore.db.csOk(CSPeople) & cpCore.db.cs_isFieldSupported(CSPeople, FieldName))) {
                                                                     Copy = cpCore.db.csGetLookup(CSPeople, FieldName);
                                                                 }
                                                             }
@@ -4118,9 +4064,9 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             if (SrcOptionList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) + 1 == 0) {
                                                                 if (AddonIsInline) {
-                                                                    SrcOptionList = SrcOptionList + Environment.NewLine + AddonOptionConstructor_Inline;
+                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Inline;
                                                                 } else {
-                                                                    SrcOptionList = SrcOptionList + Environment.NewLine + AddonOptionConstructor_Block;
+                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Block;
                                                                 }
                                                             }
                                                             if (string.IsNullOrEmpty(SrcOptionList)) {
@@ -4128,9 +4074,9 @@ namespace Contensive.Core.Controllers {
                                                             } else {
                                                                 ResultOptionListHTMLEncoded = "";
                                                                 REsultOptionValue = "";
-                                                                SrcOptionList = genericController.vbReplace(SrcOptionList, Environment.NewLine, "\r");
+                                                                SrcOptionList = genericController.vbReplace(SrcOptionList, "\r\n", "\r");
                                                                 SrcOptionList = genericController.vbReplace(SrcOptionList, "\n", "\r");
-                                                                SrcOptions = Microsoft.VisualBasic.Strings.Split(SrcOptionList, "\r", -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                                                                SrcOptions = genericController.customSplit(SrcOptionList, "\r");
                                                                 for (Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
                                                                     SrcOptionName = SrcOptions[Ptr];
                                                                     int LoopPtr2 = 0;
@@ -4210,58 +4156,58 @@ namespace Contensive.Core.Controllers {
                                                             Filename = file.Filename;
                                                             Filename = genericController.vbReplace(Filename, "\\", "/");
                                                             Filename = genericController.EncodeURL(Filename);
-                                                            Copy = Copy + "<img ID=\"AC,IMAGE,," + ACAttrRecordID + "\" src=\"" + genericController.getCdnFileLink(cpCore, Filename) + "\"";
+                                                            Copy += "<img ID=\"AC,IMAGE,," + ACAttrRecordID + "\" src=\"" + genericController.getCdnFileLink(cpCore, Filename) + "\"";
                                                             //
                                                             if (ACAttrWidth == 0) {
                                                                 ACAttrWidth = file.pxWidth;
                                                             }
                                                             if (ACAttrWidth != 0) {
-                                                                Copy = Copy + " width=\"" + ACAttrWidth + "\"";
+                                                                Copy += " width=\"" + ACAttrWidth + "\"";
                                                             }
                                                             //
                                                             if (ACAttrHeight == 0) {
                                                                 ACAttrHeight = file.pxHeight;
                                                             }
                                                             if (ACAttrHeight != 0) {
-                                                                Copy = Copy + " height=\"" + ACAttrHeight + "\"";
+                                                                Copy += " height=\"" + ACAttrHeight + "\"";
                                                             }
                                                             //
                                                             if (ACAttrVSpace != 0) {
-                                                                Copy = Copy + " vspace=\"" + ACAttrVSpace + "\"";
+                                                                Copy += " vspace=\"" + ACAttrVSpace + "\"";
                                                             }
                                                             //
                                                             if (ACAttrHSpace != 0) {
-                                                                Copy = Copy + " hspace=\"" + ACAttrHSpace + "\"";
+                                                                Copy += " hspace=\"" + ACAttrHSpace + "\"";
                                                             }
                                                             //
                                                             if (!string.IsNullOrEmpty(ACAttrAlt)) {
-                                                                Copy = Copy + " alt=\"" + ACAttrAlt + "\"";
+                                                                Copy += " alt=\"" + ACAttrAlt + "\"";
                                                             }
                                                             //
                                                             if (!string.IsNullOrEmpty(ACAttrAlign)) {
-                                                                Copy = Copy + " align=\"" + ACAttrAlign + "\"";
+                                                                Copy += " align=\"" + ACAttrAlign + "\"";
                                                             }
                                                             //
                                                             // no, 0 is an important value
                                                             //If ACAttrBorder <> 0 Then
-                                                            Copy = Copy + " border=\"" + ACAttrBorder + "\"";
+                                                            Copy += " border=\"" + ACAttrBorder + "\"";
                                                             //    End If
                                                             //
                                                             if (ACAttrLoop != 0) {
-                                                                Copy = Copy + " loop=\"" + ACAttrLoop + "\"";
+                                                                Copy += " loop=\"" + ACAttrLoop + "\"";
                                                             }
                                                             //
                                                             string attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "STYLE"));
                                                             if (!string.IsNullOrEmpty(attr)) {
-                                                                Copy = Copy + " style=\"" + attr + "\"";
+                                                                Copy += " style=\"" + attr + "\"";
                                                             }
                                                             //
                                                             attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "CLASS"));
                                                             if (!string.IsNullOrEmpty(attr)) {
-                                                                Copy = Copy + " class=\"" + attr + "\"";
+                                                                Copy += " class=\"" + attr + "\"";
                                                             }
                                                             //
-                                                            Copy = Copy + ">";
+                                                            Copy += ">";
                                                         }
                                                     }
                                                     //
@@ -4596,8 +4542,8 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // if the image is from the virtual file path, but the editor did not include the root path, add it
                                                     //
-                                                    ElementText = genericController.vbReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                                                    ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                                    ElementText = genericController.vbReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
+                                                    ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
                                                 }
                                                 ImageSrc = genericController.decodeHtml(ImageSrcOriginal);
                                                 ImageSrc = DecodeURL(ImageSrc);
@@ -4849,13 +4795,13 @@ namespace Contensive.Core.Controllers {
                                                             }
                                                         }
                                                     }
-                                                } else if (genericController.vbInstr(1, ImageSrc, "cclibraryfiles", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                                } else if (genericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1) != 0) {
                                                     ImageAllowSFResize = cpCore.siteProperties.getBoolean("ImageAllowSFResize", true);
                                                     if (ImageAllowSFResize && true) {
                                                         //
                                                         // if it is a real image, check for resize
                                                         //
-                                                        Pos = genericController.vbInstr(1, ImageSrc, "cclibraryfiles", Microsoft.VisualBasic.Constants.vbTextCompare);
+                                                        Pos = genericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1);
                                                         if (Pos != 0) {
                                                             ImageVirtualFilename = ImageSrc.Substring(Pos - 1);
                                                             Paths = ImageVirtualFilename.Split('/');
@@ -4884,7 +4830,7 @@ namespace Contensive.Core.Controllers {
                                                                                 if (SizeTest.GetUpperBound(0) != 1) {
                                                                                     ImageFilenameAltSize = "";
                                                                                 } else {
-                                                                                    if ((genericController.vbIsNumeric(SizeTest[0]) & genericController.vbIsNumeric(SizeTest[1])) != 0) {
+                                                                                    if ((genericController.vbIsNumeric(SizeTest[0]) & genericController.vbIsNumeric(SizeTest[1]))) {
                                                                                         ImageFilenameNoExt = ImageFilenameNoExt.Substring(0, Pos - 1);
                                                                                         //RecordVirtualFilenameNoExt = Mid(RecordVirtualFilename, 1, Pos - 1)
                                                                                     } else {
@@ -4893,7 +4839,7 @@ namespace Contensive.Core.Controllers {
                                                                                 }
                                                                                 //ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
                                                                             }
-                                                                            if (genericController.vbInstr(1, sfImageExtList, ImageFilenameExt, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                                                            if (genericController.vbInstr(1, sfImageExtList, ImageFilenameExt, 1) != 0) {
                                                                                 //
                                                                                 // Determine ImageWidth and ImageHeight
                                                                                 //
@@ -5046,7 +4992,7 @@ namespace Contensive.Core.Controllers {
                                                                                                 // Raw image filename in content, but it is resized, switch to an alternate size
                                                                                                 //
                                                                                                 NewImageFilename = RecordFilename;
-                                                                                                if ((ImageWidth == 0) || (ImageHeight == 0) || (Environment.NewLine + RecordAltSizeList + Environment.NewLine.IndexOf(Environment.NewLine + ImageAltSize + Environment.NewLine) + 1 == 0)) {
+                                                                                                if ((ImageWidth == 0) || (ImageHeight == 0) )  {
                                                                                                     //
                                                                                                     // Alt image has not been built
                                                                                                     //
@@ -5100,10 +5046,10 @@ namespace Contensive.Core.Controllers {
                                                                                                         //
                                                                                                         // set HTML attributes so image properties will display
                                                                                                         //
-                                                                                                        if (genericController.vbInstr(1, ElementText, "height=", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                                                                                                        if (genericController.vbInstr(1, ElementText, "height=", 1) == 0) {
                                                                                                             ElementText = genericController.vbReplace(ElementText, ">", " height=\"" + ImageHeight + "\">");
                                                                                                         }
-                                                                                                        if (genericController.vbInstr(1, ElementText, "width=", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                                                                                                        if (genericController.vbInstr(1, ElementText, "width=", 1) == 0) {
                                                                                                             ElementText = genericController.vbReplace(ElementText, ">", " width=\"" + ImageWidth + "\">");
                                                                                                         }
                                                                                                         //
@@ -5114,7 +5060,7 @@ namespace Contensive.Core.Controllers {
                                                                                                         //
                                                                                                         // Update image record
                                                                                                         //
-                                                                                                        RecordAltSizeList = RecordAltSizeList + Environment.NewLine + ImageAltSize;
+                                                                                                        RecordAltSizeList = RecordAltSizeList + "\r\n" + ImageAltSize;
                                                                                                     }
                                                                                                 }
                                                                                                 //
@@ -5190,17 +5136,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string main_encodeHTML(object Source) {
-            try {
-                //
-                return encodeHTML(genericController.encodeText(Source));
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("EncodeHTML")
+            return encodeHTML(genericController.encodeText(Source));
         }
         //
         //========================================================================
@@ -5212,19 +5148,6 @@ namespace Contensive.Core.Controllers {
         //
         public string convertTextToHTML(string Source) {
             return convertCRLFToHtmlBreak(encodeHTML(Source));
-        }
-        //
-        //========================================================================
-        // ----- Encode Active Content AI
-        //========================================================================
-        //
-        public string convertHTMLToText(string Source) {
-            try {
-                htmlToTextControllers Decoder = new htmlToTextControllers(cpCore);
-                return Decoder.convert(Source);
-            } catch (Exception ex) {
-                //throw new ApplicationException("Unexpected exception");
-            }
         }
         //
         //===============================================================================================================================
@@ -5303,7 +5226,7 @@ namespace Contensive.Core.Controllers {
                         //
                         Pos = 0;
                         if (Pos == 0) {
-                            Pos = genericController.vbInstr(1, Choice, ACFunctionList1 + "(", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionList1 + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = false;
@@ -5311,7 +5234,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = genericController.vbInstr(1, Choice, ACFunctionList2 + "(", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionList2 + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = false;
@@ -5319,7 +5242,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = genericController.vbInstr(1, Choice, ACFunctionList3 + "(", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionList3 + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = false;
@@ -5327,7 +5250,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = genericController.vbInstr(1, Choice, ACFunctionListID + "(", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionListID + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = true;
@@ -5335,7 +5258,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = genericController.vbInstr(1, Choice, ACFunctionList + "(", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionList + "(", 1);
                             if (Pos > 0) {
                                 IsContentList = true;
                                 IncludeID = false;
@@ -5343,7 +5266,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if (Pos == 0) {
-                            Pos = genericController.vbInstr(1, Choice, ACFunctionListFields + "(", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            Pos = genericController.vbInstr(1, Choice, ACFunctionListFields + "(", 1);
                             if (Pos > 0) {
                                 IsListField = true;
                                 IncludeID = false;
@@ -5386,9 +5309,9 @@ namespace Contensive.Core.Controllers {
                                 // ContentList - Open the Content and build the options from the names
                                 //
                                 if (!string.IsNullOrEmpty(ContentCriteria)) {
-                                    CS = cpCore.db.csOpen(ContentName, ContentCriteria, "name","",,"",, "ID,Name");
+                                    CS = cpCore.db.csOpen(ContentName, ContentCriteria, "name",true,0,false,false, "ID,Name");
                                 } else {
-                                    CS = cpCore.db.csOpen(ContentName,"", "name","",,"",, "ID,Name");
+                                    CS = cpCore.db.csOpen(ContentName,"", "name",true,0,false,false, "ID,Name");
                                 }
                             } else if (IsListField) {
                                 //
@@ -5396,7 +5319,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 CID = Models.Complex.cdefModel.getContentId(cpCore, ContentName);
                                 if (CID > 0) {
-                                    CS = cpCore.db.csOpen("Content Fields", "Contentid=" + CID, "name","",,"",, "ID,Name");
+                                    CS = cpCore.db.csOpen("Content Fields", "Contentid=" + CID, "name",true,0,false,false, "ID,Name");
                                 }
                             }
 
@@ -5406,7 +5329,7 @@ namespace Contensive.Core.Controllers {
                                 for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                     //
                                     RecordName = genericController.encodeText(Cell[1, RowPtr]);
-                                    RecordName = genericController.vbReplace(RecordName, Environment.NewLine, " ");
+                                    RecordName = genericController.vbReplace(RecordName, "\r\n", " ");
                                     RecordID = genericController.EncodeInteger(Cell[0, RowPtr]);
                                     if (string.IsNullOrEmpty(RecordName)) {
                                         RecordName = "record " + RecordID;
@@ -5617,12 +5540,12 @@ namespace Contensive.Core.Controllers {
                     if (addon != null) {
                         FoundAddon = true;
                         AddonOptionConstructor = addon.ArgumentList;
-                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, Environment.NewLine, "\r");
+                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r\n", "\r");
                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\n", "\r");
-                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r", Environment.NewLine);
+                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r", "\r\n");
                         if (true) {
                             if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
-                                AddonOptionConstructor = AddonOptionConstructor + Environment.NewLine;
+                                AddonOptionConstructor = AddonOptionConstructor + "\r\n";
                             }
                             if (addon.IsInline) {
                                 AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
@@ -5631,7 +5554,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
 
-                        ConstructorSplit = Microsoft.VisualBasic.Strings.Split(AddonOptionConstructor, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                        ConstructorSplit = genericController.customSplit(AddonOptionConstructor, "\r\n");
                         AddonOptionConstructor = "";
                         //
                         // main_Get all responses from current Argument List and build new addonOption_String
@@ -5681,11 +5604,11 @@ namespace Contensive.Core.Controllers {
                 if (addon != null) {
                     FoundAddon = true;
                     AddonOptionConstructor = addon.ArgumentList;
-                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, Environment.NewLine, "\r");
+                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r\n", "\r");
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\n", "\r");
-                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r", Environment.NewLine);
+                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r", "\r\n");
                     if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
-                        AddonOptionConstructor = AddonOptionConstructor + Environment.NewLine;
+                        AddonOptionConstructor = AddonOptionConstructor + "\r\n";
                     }
                     if (genericController.EncodeBoolean(addon.IsInline)) {
                         AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
@@ -5707,7 +5630,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 if (FoundAddon) {
-                    ConstructorSplit = Microsoft.VisualBasic.Strings.Split(AddonOptionConstructor, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                    ConstructorSplit = genericController.customSplit(AddonOptionConstructor, "\r\n");
                     addonOption_String = "";
                     //
                     // main_Get all responses from current Argument List
@@ -5760,7 +5683,7 @@ namespace Contensive.Core.Controllers {
                         // Field is given, find the position
                         //
                         Copy = cpCore.db.csGet(CS, FieldName);
-                        PosACInstanceID = genericController.vbInstr(1, Copy, "=\"" + ACInstanceID + "\" ", Microsoft.VisualBasic.Constants.vbTextCompare);
+                        PosACInstanceID = genericController.vbInstr(1, Copy, "=\"" + ACInstanceID + "\" ", 1);
                     } else {
                         //
                         // Find the field, then find the position
@@ -5778,7 +5701,7 @@ namespace Contensive.Core.Controllers {
                                 case FieldTypeIdHTML:
                                 case FieldTypeIdFileHTML:
                                     Copy = cpCore.db.csGet(CS, FieldName);
-                                    PosACInstanceID = genericController.vbInstr(1, Copy, "ACInstanceID=\"" + ACInstanceID + "\"", Microsoft.VisualBasic.Constants.vbTextCompare);
+                                    PosACInstanceID = genericController.vbInstr(1, Copy, "ACInstanceID=\"" + ACInstanceID + "\"", 1);
                                     if (PosACInstanceID != 0) {
                                         //
                                         // found the instance
@@ -5807,7 +5730,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // main_Get Addon Name to lookup Addon and main_Get most recent Argument List
                             //
-                            PosNameStart = genericController.vbInstr(PosStart, Copy, " name=", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            PosNameStart = genericController.vbInstr(PosStart, Copy, " name=", 1);
                             if (PosNameStart != 0) {
                                 PosNameStart = PosNameStart + 7;
                                 PosNameEnd = genericController.vbInstr(PosNameStart, Copy, "\"");
@@ -5819,11 +5742,11 @@ namespace Contensive.Core.Controllers {
                                     if (embeddedAddon != null) {
                                         FoundAddon = true;
                                         AddonOptionConstructor = genericController.encodeText(embeddedAddon.ArgumentList);
-                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, Environment.NewLine, "\r");
+                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r\n", "\r");
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\n", "\r");
-                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r", Environment.NewLine);
+                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, "\r", "\r\n");
                                         if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
-                                            AddonOptionConstructor = AddonOptionConstructor + Environment.NewLine;
+                                            AddonOptionConstructor = AddonOptionConstructor + "\r\n";
                                         }
                                         if (genericController.EncodeBoolean(embeddedAddon.IsInline)) {
                                             AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
@@ -5843,7 +5766,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (FoundAddon) {
-                                        ConstructorSplit = Microsoft.VisualBasic.Strings.Split(AddonOptionConstructor, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                                        ConstructorSplit = genericController.customSplit(AddonOptionConstructor, "\r\n");
                                         addonOption_String = "";
                                         //
                                         // main_Get all responses from current Argument List
@@ -5882,7 +5805,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // Replace the new querystring into the AC tag in the content
                             //
-                            PosIDStart = genericController.vbInstr(PosStart, Copy, " querystring=", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            PosIDStart = genericController.vbInstr(PosStart, Copy, " querystring=", 1);
                             if (PosIDStart != 0) {
                                 PosIDStart = PosIDStart + 14;
                                 if (PosIDStart != 0) {
@@ -6209,7 +6132,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                         if (DivCheckBoxCnt != 0) {
                                             // leave this between checkboxes - it is searched in the admin page
-                                            returnHtml += "<br >" + Environment.NewLine;
+                                            returnHtml += "<br >\r\n";
                                         }
                                         RuleCopy = "";
                                         if (false) {
@@ -6239,7 +6162,7 @@ namespace Contensive.Core.Controllers {
                                                 }
                                             }
                                             // must leave the first hidden with the value in this form - it is searched in the admin pge
-                                            returnHtml += Environment.NewLine;
+                                            returnHtml += "\r\n";
                                             returnHtml += "<table><tr><td style=\"vertical-align:top;margin-top:0;width:20px;\">";
                                             returnHtml += "<input type=hidden name=\"" + TagName + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
                                             if (readOnlyfield && !Found) {
@@ -6265,7 +6188,7 @@ namespace Contensive.Core.Controllers {
                                     cpCore.db.csGoNext(CS);
                                 }
                                 returnHtml += EndDiv;
-                                returnHtml += "<input type=\"hidden\" name=\"" + TagName + ".RowCount\" value=\"" + CheckBoxCnt + "\">" + Environment.NewLine;
+                                returnHtml += "<input type=\"hidden\" name=\"" + TagName + ".RowCount\" value=\"" + CheckBoxCnt + "\">\r\n";
                             }
                         }
                         cpCore.db.csClose(ref CS);
@@ -6528,7 +6451,7 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
                     } else {
                         iContentID = Models.Complex.cdefModel.getContentId(cpCore, iContentName);
-                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + iContentID,"",,"",,"", "id");
+                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + iContentID,"",true,0,false,false, "id");
                         useFlyout = cpCore.db.csOk(csChildContent);
                         cpCore.db.csClose(ref csChildContent);
                         //
@@ -6550,7 +6473,7 @@ namespace Contensive.Core.Controllers {
                         } else {
                             //
                             MenuName = genericController.GetRandomInteger().ToString();
-                            cpCore.menuFlyout.menu_AddEntry(MenuName,"", "/ccLib/images/IconContentAdd.gif","",,"", "stylesheet", "stylesheethover");
+                            cpCore.menuFlyout.menu_AddEntry(MenuName,"", "/ccLib/images/IconContentAdd.gif","","","", "stylesheet", "stylesheethover");
                             LowestRequiredMenuName = main_GetRecordAddLink_AddMenuEntry(iContentName, iPresetNameValueList, "", MenuName, MenuName);
                         }
                         //
@@ -6567,7 +6490,7 @@ namespace Contensive.Core.Controllers {
                                         ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray[1]);
                                         //iContentID = main_GetContentID(iContentName)
                                         if (Models.Complex.cdefModel.isWithinContent(cpCore, ClipboardContentID, iContentID)) {
-                                            if (genericController.vbInstr(1, iPresetNameValueList, "PARENTID=", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                            if (genericController.vbInstr(1, iPresetNameValueList, "PARENTID=", 1) != 0) {
                                                 //
                                                 // must test for main_IsChildRecord
                                                 //
@@ -6600,7 +6523,7 @@ namespace Contensive.Core.Controllers {
                         //
                         if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + cpCore.menuFlyout.getMenu(LowestRequiredMenuName, 0);
-                            tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                            tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, 1);
                             if (!string.IsNullOrEmpty(PasteLink)) {
                                 tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + genericController.encodeHTML(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
                             }
@@ -6613,8 +6536,8 @@ namespace Contensive.Core.Controllers {
                         tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + helpLink;
                         if (!string.IsNullOrEmpty(tempmain_GetRecordAddLink2)) {
                             tempmain_GetRecordAddLink2 = ""
-                                + Environment.NewLine + "\t" + "<div style=\"display:inline;\">"
-                                + genericController.htmlIndent(tempmain_GetRecordAddLink2) + Environment.NewLine + "\t" + "</div>";
+                                + "\r\n\t<div style=\"display:inline;\">"
+                                + genericController.htmlIndent(tempmain_GetRecordAddLink2) + "\r\n\t</div>";
                         }
                         //
                         // ----- Add the flyout panels to the content to return
@@ -6622,11 +6545,11 @@ namespace Contensive.Core.Controllers {
                         //
                         if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + cpCore.menuFlyout.menu_GetClose();
-                            if (genericController.vbInstr(1, tempmain_GetRecordAddLink2, "IconContentAdd.gif", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                            if (genericController.vbInstr(1, tempmain_GetRecordAddLink2, "IconContentAdd.gif", 1) != 0) {
                                 tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "IconContentAdd.gif\" ", "IconContentAdd.gif\" align=\"absmiddle\" ");
                             }
                         }
-                        tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "target=", "xtarget=", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                        tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "target=", "xtarget=", 1, 99, 1);
                     }
                 }
                 //
@@ -6776,11 +6699,11 @@ namespace Contensive.Core.Controllers {
                                 Link = Link + "&wc=" + genericController.EncodeRequestVariable(PresetNameValueList);
                             }
                         }
-                        cpCore.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName,"",, Link, ButtonCaption, "", "", true);
+                        cpCore.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName,"","", Link, ButtonCaption, "", "", true);
                         //
                         // Create child submenu if Child Entries found
                         //
-                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + ContentID,"",,"",,"", "name");
+                        csChildContent = cpCore.db.csOpen("Content", "ParentID=" + ContentID,"",true,0,false,false, "name");
                         if (!cpCore.db.csOk(csChildContent)) {
                             //
                             // No child menu
@@ -6855,37 +6778,37 @@ namespace Contensive.Core.Controllers {
             //
             //
             s0 = ""
-                + "\r" + "<td style=\"padding:" + MyPadding + "px;vertical-align:top\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(genericController.encodeText(Panel)) + "\r" + "</td>"
+                + "\r<td style=\"padding:" + MyPadding + "px;vertical-align:top\" class=\"" + MyStylePanel + "\">"
+                + genericController.htmlIndent(genericController.encodeText(Panel)) + "\r</td>"
                 + "";
             //
             s1 = ""
-                + "\r" + "<tr>"
-                + genericController.htmlIndent(s0) + "\r" + "</tr>"
+                + "\r<tr>"
+                + genericController.htmlIndent(s0) + "\r</tr>"
                 + "";
             s2 = ""
-                + "\r" + "<table style=\"width:" + contentPanelWidthStyle + ";border:0px;\" class=\"" + MyStylePanel + "\" cellspacing=\"0\">"
-                + genericController.htmlIndent(s1) + "\r" + "</table>"
+                + "\r<table style=\"width:" + contentPanelWidthStyle + ";border:0px;\" class=\"" + MyStylePanel + "\" cellspacing=\"0\">"
+                + genericController.htmlIndent(s1) + "\r</table>"
                 + "";
             s3 = ""
-                + "\r" + "<td width=\"1\" height=\"" + MyHeightMin + "\" class=\"" + MyStyleHilite + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"" + MyHeightMin + "\" width=\"1\" ></td>"
-                + "\r" + "<td width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(s2) + "\r" + "</td>"
-                + "\r" + "<td width=\"1\" class=\"" + MyStyleShadow + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"1\" ></td>"
+                + "\r<td width=\"1\" height=\"" + MyHeightMin + "\" class=\"" + MyStyleHilite + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"" + MyHeightMin + "\" width=\"1\" ></td>"
+                + "\r<td width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
+                + genericController.htmlIndent(s2) + "\r</td>"
+                + "\r<td width=\"1\" class=\"" + MyStyleShadow + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"1\" ></td>"
                 + "";
             s4 = ""
-                + "\r" + "<tr>"
+                + "\r<tr>"
                 + cr2 + "<td colspan=\"3\" class=\"" + MyStyleHilite + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"" + MyWidth + "\" ></td>"
-                + "\r" + "</tr>"
-                + "\r" + "<tr>"
-                + genericController.htmlIndent(s3) + "\r" + "</tr>"
-                + "\r" + "<tr>"
+                + "\r</tr>"
+                + "\r<tr>"
+                + genericController.htmlIndent(s3) + "\r</tr>"
+                + "\r<tr>"
                 + cr2 + "<td colspan=\"3\" class=\"" + MyStyleShadow + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"" + MyWidth + "\" ></td>"
-                + "\r" + "</tr>"
+                + "\r</tr>"
                 + "";
             tempmain_GetPanel = ""
-                + "\r" + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(s4) + "\r" + "</table>"
+                + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">"
+                + genericController.htmlIndent(s4) + "\r</table>"
                 + "";
             return tempmain_GetPanel;
         }
@@ -6951,7 +6874,7 @@ namespace Contensive.Core.Controllers {
             } else {
                 ContentPanelWidth = "100%";
             }
-            tempmain_GetPanelTop = tempmain_GetPanelTop + "\r" + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">";
+            tempmain_GetPanelTop = tempmain_GetPanelTop + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">";
             //
             // --- top hilite row
             //
@@ -6998,7 +6921,7 @@ namespace Contensive.Core.Controllers {
                     + cr2 + "<tr>"
                     + cr3 + "<td colspan=\"3\" class=\"" + MyStyleShadow + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"" + MyWidth + "\" ></td>"
                     + cr2 + "</tr>"
-                    + "\r" + "</table>";
+                    + "\r</table>";
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
@@ -7132,8 +7055,8 @@ namespace Contensive.Core.Controllers {
                             iValueBoolean = cpCore.visitProperty.getBoolean("AllowEditing");
                             Tag = cpCore.html.html_GetFormInputCheckBox2(EditTagID, iValueBoolean, EditTagID);
                             Tag = genericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + QuickEditTagID + "').checked=false;document.getElementById('" + AdvancedEditTagID + "').checked=false;\">");
-                            OptionsPanel = OptionsPanel + "\r" + "<div class=\"ccAdminSmall\">"
-                            + cr2 + "<LABEL for=\"" + EditTagID + "\">" + Tag + "&nbsp;Edit</LABEL>" + helpLink + "\r" + "</div>";
+                            OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
+                            + cr2 + "<LABEL for=\"" + EditTagID + "\">" + Tag + "&nbsp;Edit</LABEL>" + helpLink + "\r</div>";
                             //
                             // Quick Edit
                             //
@@ -7142,8 +7065,8 @@ namespace Contensive.Core.Controllers {
                             iValueBoolean = cpCore.visitProperty.getBoolean("AllowQuickEditor");
                             Tag = cpCore.html.html_GetFormInputCheckBox2(QuickEditTagID, iValueBoolean, QuickEditTagID);
                             Tag = genericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + EditTagID + "').checked=false;document.getElementById('" + AdvancedEditTagID + "').checked=false;\">");
-                            OptionsPanel = OptionsPanel + "\r" + "<div class=\"ccAdminSmall\">"
-                            + cr2 + "<LABEL for=\"" + QuickEditTagID + "\">" + Tag + "&nbsp;Quick Edit</LABEL>" + helpLink + "\r" + "</div>";
+                            OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
+                            + cr2 + "<LABEL for=\"" + QuickEditTagID + "\">" + Tag + "&nbsp;Quick Edit</LABEL>" + helpLink + "\r</div>";
                             //
                             // Advanced Edit
                             //
@@ -7152,8 +7075,8 @@ namespace Contensive.Core.Controllers {
                             iValueBoolean = cpCore.visitProperty.getBoolean("AllowAdvancedEditor");
                             Tag = cpCore.html.html_GetFormInputCheckBox2(AdvancedEditTagID, iValueBoolean, AdvancedEditTagID);
                             Tag = genericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + QuickEditTagID + "').checked=false;document.getElementById('" + EditTagID + "').checked=false;\">");
-                            OptionsPanel = OptionsPanel + "\r" + "<div class=\"ccAdminSmall\">"
-                            + cr2 + "<LABEL for=\"" + AdvancedEditTagID + "\">" + Tag + "&nbsp;Advanced Edit</LABEL>" + helpLink + "\r" + "</div>";
+                            OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
+                            + cr2 + "<LABEL for=\"" + AdvancedEditTagID + "\">" + Tag + "&nbsp;Advanced Edit</LABEL>" + helpLink + "\r</div>";
                             //
                             // Workflow Authoring Render Mode
                             //
@@ -7171,8 +7094,8 @@ namespace Contensive.Core.Controllers {
                             iValueBoolean = cpCore.visitProperty.getBoolean("AllowDebugging");
                             TagID = "AllowDebugging";
                             Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, iValueBoolean, TagID);
-                            OptionsPanel = OptionsPanel + "\r" + "<div class=\"ccAdminSmall\">"
-                            + cr2 + "<LABEL for=\"" + TagID + "\">" + Tag + "&nbsp;Debug</LABEL>" + helpLink + "\r" + "</div>";
+                            OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
+                            + cr2 + "<LABEL for=\"" + TagID + "\">" + Tag + "&nbsp;Debug</LABEL>" + helpLink + "\r</div>";
                             //'
                             //' Create Path Block Row
                             //'
@@ -7211,9 +7134,9 @@ namespace Contensive.Core.Controllers {
                             // Buttons
                             //
                             OptionsPanel = OptionsPanel + ""
-                            + "\r" + "<div class=\"ccButtonCon\">"
-                            + cr2 + "<input type=submit name=" + "mb value=\"" + ButtonApply + "\">"
-                            + "\r" + "</div>"
+                            + "\r<div class=\"ccButtonCon\">"
+                            + cr2 + "<input type=submit name=mb value=\"" + ButtonApply + "\">"
+                            + "\r</div>"
                             + "";
                         }
                         //
@@ -7225,9 +7148,9 @@ namespace Contensive.Core.Controllers {
                             Copy = "You are logged in as " + cpCore.doc.authContext.user.name + ".";
                         }
                         LoginPanel = LoginPanel + ""
-                        + "\r" + "<div class=\"ccAdminSmall\">"
+                        + "\r<div class=\"ccAdminSmall\">"
                         + cr2 + Copy + ""
-                        + "\r" + "</div>";
+                        + "\r</div>";
                         //
                         // Username
                         //
@@ -7239,9 +7162,9 @@ namespace Contensive.Core.Controllers {
                         }
                         TagID = "Username";
                         LoginPanel = LoginPanel + ""
-                        + "\r" + "<div class=\"ccAdminSmall\">"
+                        + "\r<div class=\"ccAdminSmall\">"
                         + cr2 + "<LABEL for=\"" + TagID + "\">" + cpCore.html.html_GetFormInputText2(TagID, "", 1, 30, TagID, false) + "&nbsp;" + Caption + "</LABEL>"
-                        + "\r" + "</div>";
+                        + "\r</div>";
                         //
                         // Username
                         //
@@ -7252,9 +7175,9 @@ namespace Contensive.Core.Controllers {
                         }
                         TagID = "Password";
                         LoginPanel = LoginPanel + ""
-                        + "\r" + "<div class=\"ccAdminSmall\">"
+                        + "\r<div class=\"ccAdminSmall\">"
                         + cr2 + "<LABEL for=\"" + TagID + "\">" + cpCore.html.html_GetFormInputText2(TagID, "", 1, 30, TagID, true) + "&nbsp;" + Caption + "</LABEL>"
-                        + "\r" + "</div>";
+                        + "\r</div>";
                         //
                         // Autologin checkbox
                         //
@@ -7262,9 +7185,9 @@ namespace Contensive.Core.Controllers {
                             if (cpCore.doc.authContext.visit.CookieSupport) {
                                 TagID = "autologin";
                                 LoginPanel = LoginPanel + ""
-                                + "\r" + "<div class=\"ccAdminSmall\">"
+                                + "\r<div class=\"ccAdminSmall\">"
                                 + cr2 + "<LABEL for=\"" + TagID + "\">" + cpCore.html.html_GetFormInputCheckBox2(TagID, true, TagID) + "&nbsp;Login automatically from this computer</LABEL>"
-                                + "\r" + "</div>";
+                                + "\r</div>";
                             }
                         }
                         //
@@ -7275,17 +7198,17 @@ namespace Contensive.Core.Controllers {
                         // ----- assemble tools panel
                         //
                         Copy = ""
-                        + "\r" + "<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
-                        + genericController.htmlIndent(LoginPanel) + "\r" + "</td>"
-                        + "\r" + "<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
-                        + genericController.htmlIndent(OptionsPanel) + "\r" + "</td>";
+                        + "\r<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
+                        + genericController.htmlIndent(LoginPanel) + "\r</td>"
+                        + "\r<td width=\"50%\" class=\"ccPanelInput\" style=\"vertical-align:bottom;\">"
+                        + genericController.htmlIndent(OptionsPanel) + "\r</td>";
                         Copy = ""
-                        + "\r" + "<tr>"
-                        + genericController.htmlIndent(Copy) + "\r" + "</tr>"
+                        + "\r<tr>"
+                        + genericController.htmlIndent(Copy) + "\r</tr>"
                         + "";
                         Copy = ""
-                        + "\r" + "<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
-                        + genericController.htmlIndent(Copy) + "\r" + "</table>";
+                        + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
+                        + genericController.htmlIndent(Copy) + "\r</table>";
                         ToolsPanel.Add(main_GetPanelInput(Copy));
                         ToolsPanel.Add(cpCore.html.html_GetFormEnd());
                         result = result + main_GetPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
@@ -7318,7 +7241,7 @@ namespace Contensive.Core.Controllers {
                         //
                         //DebugPanel = DebugPanel & main_GetPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", "5")
                         //
-                        DebugPanel = DebugPanel + "\r" + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
+                        DebugPanel = DebugPanel + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                         + cr2 + "<tr>"
                         + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
                         + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
@@ -7345,7 +7268,7 @@ namespace Contensive.Core.Controllers {
                                     if (copyNameValueSplit.GetUpperBound(0) > 0) {
                                         copyValue = genericController.DecodeResponseVariable(copyNameValueSplit[1]);
                                     }
-                                    Copy = Copy + "\r" + "<br>" + genericController.encodeHTML(CopyName + "=" + copyValue);
+                                    Copy += "\r<br>" + genericController.encodeHTML(CopyName + "=" + copyValue);
                                 }
                             }
                             Copy = Copy.Substring(7);
@@ -7355,7 +7278,7 @@ namespace Contensive.Core.Controllers {
                         foreach (string key in cpCore.docProperties.getKeyList()) {
                             docPropertiesClass docProperty = cpCore.docProperties.getProperty(key);
                             if (docProperty.IsForm) {
-                                Copy = Copy + "\r" + "<br>" + genericController.encodeHTML(docProperty.NameValue);
+                                Copy += "\r<br>" + genericController.encodeHTML(docProperty.NameValue);
                             }
                         }
                         DebugPanel = DebugPanel + getDebugPanelRow("Render Time &gt;= ", ((cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec");
@@ -7366,7 +7289,7 @@ namespace Contensive.Core.Controllers {
                             DebugPanel = DebugPanel + getDebugPanelRow("Visit Length", Convert.ToString(cpCore.doc.authContext.visit.TimeToLastHit) + " sec, (" + VisitHrs + " hrs " + VisitMin + " mins " + VisitSec + " secs)");
                             //DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(main_VisitTimeToLastHit) & " sec, (" & Int(main_VisitTimeToLastHit / 60) & " min " & (main_VisitTimeToLastHit Mod 60) & " sec)")
                         }
-                        DebugPanel = DebugPanel + getDebugPanelRow("Addon Profile", "<hr><ul class=\"ccPanel\">" + "<li>tbd</li>" + "\r" + "</ul>");
+                        DebugPanel = DebugPanel + getDebugPanelRow("Addon Profile", "<hr><ul class=\"ccPanel\"><li>tbd</li>\r</ul>");
                         //
                         DebugPanel = DebugPanel + "</table>";
                         //
@@ -7382,7 +7305,7 @@ namespace Contensive.Core.Controllers {
                             result = result + main_GetPanelHeader("Debug Panel") + main_GetPanel(LinkPanel.Text) + main_GetPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         }
                     }
-                    result = "\r" + "<div class=\"ccCon\">" + genericController.htmlIndent(result) + "\r" + "</div>";
+                    result = "\r<div class=\"ccCon\">" + genericController.htmlIndent(result) + "\r</div>";
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -7432,11 +7355,11 @@ namespace Contensive.Core.Controllers {
                 string htmlBeforeEndOfBody = getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools);
 
                 result = ""
-                    + cpCore.siteProperties.docTypeDeclaration + Environment.NewLine + "<html>"
-                    + Environment.NewLine + "<head>"
-                    + htmlHead + Environment.NewLine + "</head>"
-                    + Environment.NewLine + htmlBodyTag + htmlBody + htmlBeforeEndOfBody + Environment.NewLine + "</body>"
-                    + Environment.NewLine + "</html>"
+                    + cpCore.siteProperties.docTypeDeclaration + "\r\n<html>"
+                    + "\r\n<head>"
+                    + htmlHead + "\r\n</head>"
+                    + "\r\n" + htmlBodyTag + htmlBody + htmlBeforeEndOfBody + "\r\n</body>"
+                    + "\r\n</html>"
                     + "";
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -7563,7 +7486,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- favicon
                 string VirtualFilename = cpCore.siteProperties.getText("faviconfilename");
-                switch (IO.Path.GetExtension(VirtualFilename).ToLower()) {
+                switch ( Path.GetExtension(VirtualFilename).ToLower()) {
                     case ".ico":
                         headList.Add("<link rel=\"icon\" type=\"image/vnd.microsoft.icon\" href=\"" + genericController.getCdnFileLink(cpCore, VirtualFilename) + "\" >");
                         break;
@@ -7928,19 +7851,15 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Do Plain Text Conversion
                     //
-                    //hint = hint & ",040"
                     if (PlainText) {
-                        converthtmlToText = new htmlToTextControllers(cpCore);
-                        result = converthtmlToText.convert(result);
-                        converthtmlToText = null;
+                        result = htmlToTextControllers.convert(cpCore,result);
                     }
                     //
                     // Process Active Content that must be run here to access webclass objects
                     //     parse as {{functionname?querystring}}
                     //
-                    //hint = hint & ",110"
                     if ((!EncodeActiveEditIcons) && (result.IndexOf("{{") + 1 != 0)) {
-                        ContentSplit = Microsoft.VisualBasic.Strings.Split(result, "{{", -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                        ContentSplit = genericController.customSplit(result, "{{");
                         result = "";
                         ContentSplitCnt = ContentSplit.GetUpperBound(0) + 1;
                         Ptr = 0;
@@ -7964,7 +7883,7 @@ namespace Contensive.Core.Controllers {
                                     // isolate the command
                                     //
                                     //hint = hint & ",220"
-                                    SegmentSplit = Microsoft.VisualBasic.Strings.Split(Segment, "}}", -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                                    SegmentSplit = genericController.customSplit(Segment, "}}");
                                     AcCmd = SegmentSplit[0];
                                     SegmentSplit[0] = "";
                                     SegmentSuffix = string.Join("}}", SegmentSplit).Substring(2);
@@ -8139,11 +8058,11 @@ namespace Contensive.Core.Controllers {
                     if ((!isEditingAnything) && (result != BlockTextStartMarker)) {
                         DoAnotherPass = true;
                         while ((result.IndexOf(BlockTextStartMarker, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) && DoAnotherPass) {
-                            LineStart = genericController.vbInstr(1, result, BlockTextStartMarker, Microsoft.VisualBasic.Constants.vbTextCompare);
+                            LineStart = genericController.vbInstr(1, result, BlockTextStartMarker, 1);
                             if (LineStart == 0) {
                                 DoAnotherPass = false;
                             } else {
-                                LineEnd = genericController.vbInstr(LineStart, result, BlockTextEndMarker, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                LineEnd = genericController.vbInstr(LineStart, result, BlockTextEndMarker, 1);
                                 if (LineEnd <= 0) {
                                     DoAnotherPass = false;
                                     result = result.Substring(0, LineStart - 1);
@@ -8174,24 +8093,24 @@ namespace Contensive.Core.Controllers {
                             if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
                                 //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
                                 Copy = getEditWrapper("Aggregate Script", "##MARKER##");
-                                Wrapper = Microsoft.VisualBasic.Strings.Split(Copy, "##MARKER##", -1, Microsoft.VisualBasic.CompareMethod.Binary);
-                                result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                                result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                Wrapper = genericController.customSplit(Copy, "##MARKER##");
+                                result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
+                                result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
                             }
                             if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
                                 //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
                                 Copy = getEditWrapper("Aggregate Replacement", "##MARKER##");
-                                Wrapper = Microsoft.VisualBasic.Strings.Split(Copy, "##MARKER##", -1, Microsoft.VisualBasic.CompareMethod.Binary);
-                                result = genericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                                result = genericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                Wrapper = genericController.customSplit(Copy, "##MARKER##");
+                                result = genericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
+                                result = genericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);
                             }
                         }
                         //
                         // Process Feedback form
                         //
                         //hint = hint & ",600, Handle webclient features"
-                        if (genericController.vbInstr(1, result, FeedbackFormNotSupportedComment, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
-                            result = genericController.vbReplace(result, FeedbackFormNotSupportedComment, pageContentController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                        if (genericController.vbInstr(1, result, FeedbackFormNotSupportedComment, 1) != 0) {
+                            result = genericController.vbReplace(result, FeedbackFormNotSupportedComment, pageContentController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, 1);
                         }
                         //'
                         //' If any javascript or styles were added during encode, pick them up now
@@ -8294,7 +8213,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //'hint = hint & ",010"
                     ParseError = false;
-                    LinkSplit = Microsoft.VisualBasic.Strings.Split(Source, ContentFilesLinkPrefix, -1, Microsoft.VisualBasic.Constants.vbTextCompare);
+                    LinkSplit = genericController.customSplit(Source, ContentFilesLinkPrefix);
                     LinkCnt = LinkSplit.GetUpperBound(0) + 1;
                     for (LinkPtr = 1; LinkPtr < LinkCnt; LinkPtr++) {
                         //
@@ -8511,7 +8430,7 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     // Exact match
                                                                     //
-                                                                } else if (genericController.vbInstr(1, ImageFilenameNoExt, RecordFilenameNoExt, Microsoft.VisualBasic.Constants.vbTextCompare) != 1) {
+                                                                } else if (genericController.vbInstr(1, ImageFilenameNoExt, RecordFilenameNoExt, 1) != 1) {
                                                                     //
                                                                     // There was a change and the recordfilename is not part of the imagefilename
                                                                     //
@@ -8587,24 +8506,24 @@ namespace Contensive.Core.Controllers {
                     //
                     // Convert ACTypeDynamicForm to Add-on
                     //
-                    if (genericController.vbInstr(1, result, "<ac type=\"" + ACTypeDynamicForm, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
-                        result = genericController.vbReplace(result, "type=\"DYNAMICFORM\"", "TYPE=\"aggregatefunction\"", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                        result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                    if (genericController.vbInstr(1, result, "<ac type=\"" + ACTypeDynamicForm, 1) != 0) {
+                        result = genericController.vbReplace(result, "type=\"DYNAMICFORM\"", "TYPE=\"aggregatefunction\"", 1, 99, 1);
+                        result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, 1);
                     }
                 }
                 //'hint = hint & ",930"
                 if (ParseError) {
                     result = ""
-                    + Environment.NewLine + "<!-- warning: parsing aborted on ccLibraryFile replacement -->"
-                    + Environment.NewLine + result + Environment.NewLine + "<!-- /warning: parsing aborted on ccLibraryFile replacement -->";
+                    + "\r\n<!-- warning: parsing aborted on ccLibraryFile replacement -->"
+                    + "\r\n" + result + "\r\n<!-- /warning: parsing aborted on ccLibraryFile replacement -->";
                 }
                 //
                 // {{content}} should be <ac type="templatecontent" etc>
                 // the merge is now handled in csv_EncodeActiveContent, but some sites have hand {{content}} tags entered
                 //
                 //'hint = hint & ",940"
-                if (genericController.vbInstr(1, result, "{{content}}", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
-                    result = genericController.vbReplace(result, "{{content}}", "<AC type=\"" + ACTypeTemplateContent + "\">", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                if (genericController.vbInstr(1, result, "{{content}}", 1) != 0) {
+                    result = genericController.vbReplace(result, "{{content}}", "<AC type=\"" + ACTypeTemplateContent + "\">", 1, 99, 1);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -8628,7 +8547,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // honestly, not sure what to do with 'return_ErrorMessage'
                 //
-                CS = cpCore.db.csOpen("copy content", "Name=" + cpCore.db.encodeSQLText(CopyName), "ID","", 0,"",, "Name,ID,Copy,modifiedBy");
+                CS = cpCore.db.csOpen("copy content", "Name=" + cpCore.db.encodeSQLText(CopyName), "ID",true, 0,false,false, "Name,ID,Copy,modifiedBy");
                 if (!cpCore.db.csOk(CS)) {
                     cpCore.db.csClose(ref CS);
                     CS = cpCore.db.csInsertRecord("copy content", 0);
@@ -8723,20 +8642,16 @@ namespace Contensive.Core.Controllers {
         //
         //
         public string main_GetLiveTabs() {
+            string result = string.Empty;
             try {
-                //
-                // should use the ccNav object, no the ccCommon module for this code
-                //
                 if (cpCore.doc.menuLiveTab == null) {
                     cpCore.doc.menuLiveTab = new menuLiveTabController();
                 }
-                return cpCore.doc.menuLiveTab.GetTabs();
-                //
+                result = cpCore.doc.menuLiveTab.GetTabs();
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetLiveTabs")
+            return result;
         }
         //
         //
@@ -8762,20 +8677,16 @@ namespace Contensive.Core.Controllers {
         //
         //
         public string menu_GetComboTabs() {
+            string result = string.Empty;
             try {
-                //
-                // should use the ccNav object, no the ccCommon module for this code
-                //
                 if (cpCore.doc.menuComboTab == null) {
                     cpCore.doc.menuComboTab = new menuComboTabController();
                 }
-                return cpCore.doc.menuComboTab.GetTabs();
-                //
+                result = cpCore.doc.menuComboTab.GetTabs();
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_GetComboTabs")
+            return result;
         }
         //'
         //'================================================================================================================

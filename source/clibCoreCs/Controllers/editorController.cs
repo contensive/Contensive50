@@ -152,9 +152,9 @@ namespace Contensive.Core.Controllers {
                     + " where (t.active<>0)and(a.active<>0) order by t.id";
                 RS = cpCore.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
-                    fieldTypeID = genericController.EncodeInteger(dr("contentfieldtypeid"));
+                    fieldTypeID = genericController.EncodeInteger(dr["contentfieldtypeid"]);
                     if (fieldTypeID <= FieldTypeIdMax) {
-                        editorAddonIds[fieldTypeID] = genericController.encodeText(dr("editorAddonId"));
+                        editorAddonIds[fieldTypeID] = genericController.encodeText(dr["editorAddonId"]);
                     }
                 }
                 //
@@ -162,10 +162,10 @@ namespace Contensive.Core.Controllers {
                 SQL = "select contentfieldtypeid, max(addonId) as editorAddonId from ccAddonContentFieldTypeRules group by contentfieldtypeid";
                 RS = cpCore.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
-                    fieldTypeID = genericController.EncodeInteger(dr("contentfieldtypeid"));
+                    fieldTypeID = genericController.EncodeInteger(dr["contentfieldtypeid"]);
                     if (fieldTypeID <= FieldTypeIdMax) {
                         if (string.IsNullOrEmpty(editorAddonIds[fieldTypeID])) {
-                            editorAddonIds[fieldTypeID] = genericController.encodeText(dr("editorAddonId"));
+                            editorAddonIds[fieldTypeID] = genericController.encodeText(dr["editorAddonId"]);
                         }
 
                     }

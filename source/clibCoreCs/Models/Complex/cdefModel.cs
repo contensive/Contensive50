@@ -655,7 +655,7 @@ namespace Contensive.Core.Models.Complex {
                 cidDataTable = cpcore.db.executeQuery(SQL);
                 CIDCount = cidDataTable.Rows.Count;
                 for (CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
-                    ContentID = genericController.EncodeInteger(cidDataTable.Rows(CIDPointer)[0]);
+                    ContentID = genericController.EncodeInteger(cidDataTable.Rows[CIDPointer][0]);
                     returnList.Add(ContentID);
                     CDef = getCdef(cpcore, ContentID);
                     if (CDef != null) {
@@ -1739,6 +1739,7 @@ namespace Contensive.Core.Models.Complex {
                                     break;
                                 default:
                                     //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
+                                    break;
                             }
                             break;
                         }
@@ -1836,6 +1837,7 @@ namespace Contensive.Core.Models.Complex {
                     break;
                 default:
                     //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
+                    break;
             }
             return result;
         }

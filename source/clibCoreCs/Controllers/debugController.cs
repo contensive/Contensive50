@@ -47,7 +47,7 @@ namespace Contensive.Core.Controllers {
                 // write to debug log in virtual files - to read from a test verbose viewer
                 //
                 iMessage = genericController.encodeText(Message);
-                iMessage = genericController.vbReplace(iMessage, Environment.NewLine, " ");
+                iMessage = genericController.vbReplace(iMessage, "\r\n", " ");
                 iMessage = genericController.vbReplace(iMessage, "\r", " ");
                 iMessage = genericController.vbReplace(iMessage, "\n", " ");
                 iMessage = DateTime.Now.ToString("") + "\t" + (ElapsedTime).ToString("00.000") + "\t" + cpcore.doc.authContext.visit.id + "\t" + iMessage;

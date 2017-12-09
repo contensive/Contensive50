@@ -299,7 +299,7 @@ namespace Contensive.Core.Controllers {
             tempGetAttrNames = "";
             if (TierPtr > 0) {
                 foreach (XmlAttribute NodeAttribute in Tier[TierPtr].Node.Attributes) {
-                    tempGetAttrNames = tempGetAttrNames + Environment.NewLine + NodeAttribute.Name;
+                    tempGetAttrNames = tempGetAttrNames + "\r\n" + NodeAttribute.Name;
                     //End If
                 }
             }
@@ -400,8 +400,8 @@ namespace Contensive.Core.Controllers {
             if (AttrCnt > 0 && (!string.IsNullOrEmpty(AttrName))) {
                 UCaseAttrName = genericController.vbUCase(AttrName);
                 for (AttrPtr = 0; AttrPtr < AttrCnt; AttrPtr++) {
-                    if (UCaseAttrName == genericController.vbUCase(Tier[TierPtr].Node.Attributes(AttrPtr).Name)) {
-                        tempGetAttr = Tier[TierPtr].Node.Attributes(AttrPtr).Value;
+                    if (UCaseAttrName == genericController.vbUCase(Tier[TierPtr].Node.Attributes[AttrPtr].Name)) {
+                        tempGetAttr = Tier[TierPtr].Node.Attributes[AttrPtr].Value;
                         break;
                     }
                 }
@@ -417,7 +417,7 @@ namespace Contensive.Core.Controllers {
             tempGetAttrName = "";
             if (IsAttrOK()) {
                 AttrPtr = Tier[TierPtr].AttrPtr;
-                tempGetAttrName = Tier[TierPtr].Node.Attributes(AttrPtr).Name;
+                tempGetAttrName = Tier[TierPtr].Node.Attributes[AttrPtr].Name;
             }
             return tempGetAttrName;
         }
@@ -430,7 +430,7 @@ namespace Contensive.Core.Controllers {
             tempGetAttrValue = "";
             if (IsAttrOK()) {
                 AttrPtr = Tier[TierPtr].AttrPtr;
-                tempGetAttrValue = Tier[TierPtr].Node.Attributes(AttrPtr).Value;
+                tempGetAttrValue = Tier[TierPtr].Node.Attributes[AttrPtr].Value;
             }
             return tempGetAttrValue;
         }

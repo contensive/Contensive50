@@ -275,13 +275,10 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- <cdef>
                         //
-                        IsBaseContent = genericController.EncodeBoolean(dr("isBaseContent"));
+                        IsBaseContent = genericController.EncodeBoolean(dr["isBaseContent"]);
                         iContentName = GetRSXMLAttribute(appName, dr, "Name");
-                        if (genericController.vbInstr(1, iContentName, "data sources", Microsoft.VisualBasic.Constants.vbTextCompare) == 1) {
-                            iContentName = iContentName;
-                        }
-                        ContentID = genericController.EncodeInteger(dr("ID"));
-                        sb.Append(Environment.NewLine + "\t" + "<CDef");
+                        ContentID = genericController.EncodeInteger(dr["ID"]);
+                        sb.Append("\r\n\t<CDef");
                         sb.Append(" Name=\"" + iContentName + "\"");
                         if ((!IsBaseContent) || IncludeBaseFields) {
                             sb.Append(" Active=\"" + GetRSXMLAttribute(appName, dr, "Active") + "\"");
@@ -297,7 +294,7 @@ namespace Contensive.Core.Controllers {
                             sb.Append(" AllowTopicRules=\"" + GetRSXMLAttribute(appName, dr, "AllowTopicRules") + "\"");
                             sb.Append(" AllowWorkflowAuthoring=\"" + GetRSXMLAttribute(appName, dr, "AllowWorkflowAuthoring") + "\"");
                             //
-                            AuthoringTableID = genericController.EncodeInteger(dr("AuthoringTableID"));
+                            AuthoringTableID = genericController.EncodeInteger(dr["AuthoringTableID"]);
                             TableName = "";
                             DataSourceName = "";
                             if (AuthoringTableID != 0) {
@@ -318,7 +315,7 @@ namespace Contensive.Core.Controllers {
                             sb.Append(" AuthoringDataSourceName=\"" + EncodeXMLattribute(DataSourceName) + "\"");
                             sb.Append(" AuthoringTableName=\"" + EncodeXMLattribute(TableName) + "\"");
                             //
-                            ContentTableID = genericController.EncodeInteger(dr("ContentTableID"));
+                            ContentTableID = genericController.EncodeInteger(dr["ContentTableID"]);
                             if (ContentTableID != AuthoringTableID) {
                                 if (ContentTableID != 0) {
                                     TableName = "";
@@ -338,18 +335,18 @@ namespace Contensive.Core.Controllers {
                             sb.Append(" ContentDataSourceName=\"" + EncodeXMLattribute(DataSourceName) + "\"");
                             sb.Append(" ContentTableName=\"" + EncodeXMLattribute(TableName) + "\"");
                             //
-                            DefaultSortMethodID = genericController.EncodeInteger(dr("DefaultSortMethodID"));
+                            DefaultSortMethodID = genericController.EncodeInteger(dr["DefaultSortMethodID"]);
                             DefaultSortMethod = CacheLookup(DefaultSortMethodID, Sorts);
                             sb.Append(" DefaultSortMethod=\"" + EncodeXMLattribute(DefaultSortMethod) + "\"");
                             //
                             sb.Append(" DeveloperOnly=\"" + GetRSXMLAttribute(appName, dr, "DeveloperOnly") + "\"");
                             sb.Append(" DropDownFieldList=\"" + GetRSXMLAttribute(appName, dr, "DropDownFieldList") + "\"");
                             //
-                            EditorGroupID = genericController.EncodeInteger(dr("EditorGroupID"));
+                            EditorGroupID = genericController.EncodeInteger(dr["EditorGroupID"]);
                             EditorGroupName = CacheLookup(EditorGroupID, Groups);
                             sb.Append(" EditorGroupName=\"" + EncodeXMLattribute(EditorGroupName) + "\"");
                             //
-                            ParentID = genericController.EncodeInteger(dr("ParentID"));
+                            ParentID = genericController.EncodeInteger(dr["ParentID"]);
                             ParentName = CacheLookup(ParentID, Contents);
                             sb.Append(" Parent=\"" + EncodeXMLattribute(ParentName) + "\"");
                             //
@@ -375,7 +372,7 @@ namespace Contensive.Core.Controllers {
                                 break;
                             } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
                                 if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) + 1 == 0)) {
-                                    sb.Append(Environment.NewLine + "\t" + "\t" + "<Field");
+                                    sb.Append("\r\n\t\t<Field");
                                     fieldType = cpCore.db.getFieldTypeNameFromFieldTypeId(EncodeInteger(CFields[f_Type, CFieldPtr]));
                                     sb.Append(" Name=\"" + xaT(FieldName) + "\"");
                                     sb.Append(" active=\"" + xaB(CFields[f_Active, CFieldPtr]) + "\"");
@@ -427,30 +424,19 @@ namespace Contensive.Core.Controllers {
                                     RecordID = genericController.EncodeInteger(CFields[f_ManyToManyRuleContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
                                     sb.Append(" ManyToManyRuleContent=\"" + genericController.encodeHTML(RecordName) + "\"");
-                                    //
                                     sb.Append(" >");
                                     //
                                     HelpCnt = 0;
-                                    //                    HelpDefault = xaT(CFields(f_helpdefault, CFieldPtr))
-                                    //                    If HelpDefault <> "" Then
-                                    //                        sb.Append( vbCrLf & vbTab & vbTab & vbTab & "<HelpDefault>" & HelpDefault & "</HelpDefault>")
-                                    //                        HelpCnt = HelpCnt + 1
-                                    //                    End If
                                     HelpDefault = xaT(CFields[f_helpcustom, CFieldPtr]);
                                     if (string.IsNullOrEmpty(HelpDefault)) {
                                         HelpDefault = xaT(CFields[f_helpdefault, CFieldPtr]);
                                     }
                                     if (!string.IsNullOrEmpty(HelpDefault)) {
-                                        sb.Append(Environment.NewLine + "\t" + "\t" + "\t" + "<HelpDefault>" + HelpDefault + "</HelpDefault>");
+                                        sb.Append("\r\n\t\t\t<HelpDefault>" + HelpDefault + "</HelpDefault>");
                                         HelpCnt = HelpCnt + 1;
                                     }
-                                    //                            HelpCustom = xaT(CFields(f_helpcustom, CFieldPtr))
-                                    //                            If HelpCustom <> "" Then
-                                    //                                sb.Append( vbCrLf & vbTab & vbTab & vbTab & "<HelpCustom>" & HelpCustom & "</HelpCustom>")
-                                    //                                HelpCnt = HelpCnt + 1
-                                    //                            End If
                                     if (HelpCnt > 0) {
-                                        sb.Append(Environment.NewLine + "\t" + "\t");
+                                        sb.Append("\r\n\t\t");
                                     }
                                     sb.Append("</Field>");
                                 }
@@ -460,38 +446,23 @@ namespace Contensive.Core.Controllers {
                         }
                         //
                         if (FieldCnt > 0) {
-                            sb.Append(Environment.NewLine + "\t");
+                            sb.Append("\r\n\t");
                         }
                         sb.Append("</CDef>");
                     }
                     if (string.IsNullOrEmpty(ContentName)) {
                         //
                         // Add other areas of the CDef file
-                        //
                         sb.Append(GetXMLContentDefinition_SQLIndexes());
                         if (FoundMenuTable) {
                             sb.Append(GetXMLContentDefinition_AdminMenus());
                         }
-                        //
-                        // These are not needed anymore - later add "ImportCollection" entries for all collections installed
-                        //
-                        //        If FoundAFTable Then
-                        //            sb.Append( GetXMLContentDefinition_AggregateFunctions()
-                        //        End If
                     }
-                    tempGetXMLContentDefinition3 = "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + Environment.NewLine + "</" + CollectionFileRootNode + ">";
+                    tempGetXMLContentDefinition3 = "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + "\r\n</" + CollectionFileRootNode + ">";
                 }
-                //
-                //cpCore.AppendLog("getXmlContentDefinition, exit")
-                return tempGetXMLContentDefinition3;
-                //
-                // ----- Error Trap
-                //
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetXMLContentDefinition3");
             return tempGetXMLContentDefinition3;
         }
         //
@@ -703,45 +674,28 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         private string GetXMLContentDefinition_SQLIndexes() {
+            string result = string.Empty;
             try {
-                //
-                string DataSourceName = null;
-                string TableName = null;
-                //
-                string IndexFields = "";
-                string IndexList = null;
-                string IndexName = null;
-                string[] ListRows = null;
-                string ListRow = null;
-                string[] ListRowSplit = null;
-                string SQL = null;
-                int CS = 0;
-                int Ptr = 0;
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                string appName;
-                //
-                appName = cpCore.serverConfig.appConfig.name;
-                SQL = "select D.name as DataSourceName,T.name as TableName"
+                string appName = cpCore.serverConfig.appConfig.name;
+                string SQL  = ""
+                    + " select D.name as DataSourceName,T.name as TableName"
                     + " from cctables T left join ccDataSources d on D.ID=T.DataSourceID"
                     + " where t.active<>0";
-                CS = cpCore.db.csOpenSql_rev("default", SQL);
+                int CS = cpCore.db.csOpenSql_rev("default", SQL);
                 while (cpCore.db.csOk(CS)) {
-                    DataSourceName = cpCore.db.csGetText(CS, "DataSourceName");
-                    TableName = cpCore.db.csGetText(CS, "TableName");
-                    IndexList = cpCore.db.getSQLIndexList(DataSourceName, TableName);
-                    //
-                    // name1,index1
-                    // name1,index2
-                    // name2,field3
-                    // name3,field4
-                    //
+                    string DataSourceName = cpCore.db.csGetText(CS, "DataSourceName");
+                    string TableName = cpCore.db.csGetText(CS, "TableName");
+                    string IndexList = cpCore.db.getSQLIndexList(DataSourceName, TableName);
                     //
                     if (!string.IsNullOrEmpty(IndexList)) {
-                        ListRows = Microsoft.VisualBasic.Strings.Split(IndexList, Environment.NewLine, -1, Microsoft.VisualBasic.CompareMethod.Binary);
-                        IndexName = "";
+                        string[] ListRows = genericController.customSplit(IndexList, "\r\n");
+                        string IndexName = "";
                         //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of UBound(ListRows) + 1 for every iteration:
                         int tempVar = ListRows.GetUpperBound(0) + 1;
-                        for (Ptr = 0; Ptr <= tempVar; Ptr++) {
+                        string IndexFields = "";
+                        for (int Ptr = 0; Ptr <= tempVar; Ptr++) {
+                            string[] ListRowSplit = null;
                             if (Ptr <= ListRows.GetUpperBound(0)) {
                                 //
                                 // ListRowSplit has the indexname and field for this index
@@ -777,7 +731,7 @@ namespace Contensive.Core.Controllers {
                                             sb.Append(" DataSourceName=\"" + EncodeXMLattribute(DataSourceName) + "\"");
                                             sb.Append(" TableName=\"" + EncodeXMLattribute(TableName) + "\"");
                                             sb.Append(" FieldNameList=\"" + EncodeXMLattribute(IndexFields) + "\"");
-                                            sb.Append("></SQLIndex>" + Environment.NewLine);
+                                            sb.Append("></SQLIndex>\r\n");
                                         }
                                         //
                                         IndexName = ListRowSplit[0];
@@ -790,16 +744,11 @@ namespace Contensive.Core.Controllers {
                     cpCore.db.csGoNext(CS);
                 }
                 cpCore.db.csClose(ref CS);
-                return sb.ToString();
-                //
-                //
-                // ----- Error Trap
-                //
+                result = sb.ToString();
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_SQLIndexes");
+            return result;
         }
         //
         //========================================================================
@@ -807,26 +756,15 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         private string GetXMLContentDefinition_AdminMenus() {
+            string s = "";
             try {
-                //
-                string s = "";
-                int ContentID = 0;
-                string appName;
-                //
-                appName = cpCore.serverConfig.appConfig.name;
+                string appName = cpCore.serverConfig.appConfig.name;
                 s = s + GetXMLContentDefinition_AdminMenus_MenuEntries();
                 s = s + GetXMLContentDefinition_AdminMenus_NavigatorEntries();
-                //
-                return s;
-                //
-                //
-                // ----- Error Trap
-                //
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_AdminMenus");
+            return s;
         }
         //
         //========================================================================
@@ -834,8 +772,8 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         private string GetXMLContentDefinition_AdminMenus_NavigatorEntries() {
+            string result = string.Empty;
             try {
-                //
                 int NavIconType = 0;
                 string NavIconTitle = null;
                 int CSPointer = 0;
@@ -860,11 +798,8 @@ namespace Contensive.Core.Controllers {
                     NavIconType = 0;
                     NavIconTitle = "";
                     foreach (DataRow rsDr in dt.Rows) {
-                        RecordName = genericController.encodeText(rsDr("Name"));
-                        if (RecordName == "Advanced") {
-                            RecordName = RecordName;
-                        }
-                        ParentID = genericController.EncodeInteger(rsDr("ParentID"));
+                        RecordName = genericController.encodeText(rsDr["Name"]);
+                        ParentID = genericController.EncodeInteger(rsDr["ParentID"]);
                         menuNameSpace = getMenuNameSpace(ParentID, "");
                         sb.Append("<NavigatorEntry Name=\"" + EncodeXMLattribute(RecordName) + "\"");
                         sb.Append(" NameSpace=\"" + menuNameSpace + "\"");
@@ -883,29 +818,16 @@ namespace Contensive.Core.Controllers {
                         SplitIndex = NavIconType - 1;
                         if ((SplitIndex >= 0) && (SplitIndex <= SplitArray.GetUpperBound(0))) {
                             sb.Append(" NavIconType=\"" + SplitArray[SplitIndex] + "\"");
-                        } else {
-                            SplitIndex = SplitIndex;
                         }
-                        //
-                        if (true) {
-                            sb.Append(" guid=\"" + GetRSXMLAttribute(appName, rsDr, "ccGuid") + "\"");
-                        } else if (true) {
-                            sb.Append(" guid=\"" + GetRSXMLAttribute(appName, rsDr, "NavGuid") + "\"");
-                        }
-                        //
-                        sb.Append("></NavigatorEntry>" + Environment.NewLine);
+                        sb.Append(" guid=\"" + GetRSXMLAttribute(appName, rsDr, "ccGuid") + "\"");
+                        sb.Append("></NavigatorEntry>\r\n");
                     }
                 }
-                return sb.ToString();
-                //
-                //
-                // ----- Error Trap
-                //
+                result = sb.ToString();
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_NavigatorEntries");
+            return result;
         }
         //
         //========================================================================
@@ -913,30 +835,16 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         private string GetXMLContentDefinition_AdminMenus_MenuEntries() {
+            string result = string.Empty;
             try {
-                //
-                int CSPointer = 0;
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                DataTable rs = null;
-                int ContentID = 0;
-                //dim buildversion As String
-                string menuNameSpace = null;
-                string RecordName = null;
-                int ParentID = 0;
-                int MenuContentID = 0;
-                string appName;
-                //
-                appName = cpCore.serverConfig.appConfig.name;
-                // BuildVersion = cpCore.app.getSiteProperty("BuildVersion", "0.0.000", SystemMemberID)
-                //
-                // ****************************** if cdef not loaded, this fails
-                //
-                MenuContentID = cpCore.db.getRecordID("Content", cnNavigatorEntries);
-                rs = cpCore.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
+                string appName = cpCore.serverConfig.appConfig.name;
+                int MenuContentID = cpCore.db.getRecordID("Content", cnNavigatorEntries);
+                DataTable rs = cpCore.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (isDataTableOk(rs)) {
                     if (true) {
                         foreach (DataRow dr in rs.Rows) {
-                            RecordName = genericController.encodeText(dr("Name"));
+                            string RecordName = genericController.encodeText(dr["Name"]);
                             sb.Append("<MenuEntry Name=\"" + EncodeXMLattribute(RecordName) + "\"");
                             sb.Append(" ParentName=\"" + GetRSXMLLookupAttribute(appName, dr, "ParentID", "ccMenuEntries") + "\"");
                             sb.Append(" LinkPage=\"" + GetRSXMLAttribute(appName, dr, "LinkPage") + "\"");
@@ -948,20 +856,15 @@ namespace Contensive.Core.Controllers {
                             if (true) {
                                 sb.Append(" AddonName=\"" + GetRSXMLLookupAttribute(appName, dr, "AddonID", "ccAggregateFunctions") + "\"");
                             }
-                            sb.Append("/>" + Environment.NewLine);
+                            sb.Append("/>\r\n");
                         }
                     }
                 }
-                return sb.ToString();
-                //
-                //
-                // ----- Error Trap
-                //
+                result = sb.ToString();
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_NavigatorEntries");
+            return result;
         }
         //
         //========================================================================
@@ -969,10 +872,10 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         private string GetXMLContentDefinition_AggregateFunctions() {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
             try {
                 //
                 DataTable rs = null;
-                System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string appName;
                 //
                 appName = cpCore.serverConfig.appConfig.name;
@@ -987,20 +890,14 @@ namespace Contensive.Core.Controllers {
                             sb.Append(" SortOrder=\"" + GetRSXMLAttribute(appName, rsdr, "SortOrder") + "\"");
                             sb.Append(" >");
                             sb.Append(GetRSXMLAttribute(appName, rsdr, "Copy"));
-                            sb.Append("</Addon>" + Environment.NewLine);
+                            sb.Append("</Addon>\r\n");
                         }
                     }
                 }
-                return sb.ToString();
-                //
-                //
-                // ----- Error Trap
-                //
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetXMLContentDefinition_AggregateFunctions");
+            return sb.ToString();
         }
         //
         //
@@ -1008,7 +905,7 @@ namespace Contensive.Core.Controllers {
         private string EncodeXMLattribute(string Source) {
             string tempEncodeXMLattribute = null;
             tempEncodeXMLattribute = genericController.encodeHTML(Source);
-            tempEncodeXMLattribute = genericController.vbReplace(tempEncodeXMLattribute, Environment.NewLine, " ");
+            tempEncodeXMLattribute = genericController.vbReplace(tempEncodeXMLattribute, "\r\n", " ");
             tempEncodeXMLattribute = genericController.vbReplace(tempEncodeXMLattribute, "\r", "");
             return genericController.vbReplace(tempEncodeXMLattribute, "\n", "");
         }
@@ -1029,52 +926,22 @@ namespace Contensive.Core.Controllers {
                         tempGetTableRecordName = dt.Rows[0][0].ToString();
                     }
                 }
-                //
-                //
-                return tempGetTableRecordName;
-                //
-                // ----- Error Trap
-                //
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetTableRecordName");
             return tempGetTableRecordName;
         }
         //
         //
         //
         private string GetRSXMLAttribute(string appName, DataRow dr, string FieldName) {
-            try {
-                //
-                return EncodeXMLattribute(genericController.encodeText(dr(FieldName)));
-                //
-                //
-                // ----- Error Trap
-                //
-            } catch( Exception ex ) {
-                cpCore.handleException(ex);
-            }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetRSXML");
+            return EncodeXMLattribute(genericController.encodeText(dr[FieldName]));
         }
         //
         //
         //
         private string GetRSXMLLookupAttribute(string appName, DataRow dr, string FieldName, string TableName) {
-            try {
-                //
-                return EncodeXMLattribute(GetTableRecordName(TableName, genericController.EncodeInteger(dr(FieldName))));
-                //
-                //
-                // ----- Error Trap
-                //
-            } catch( Exception ex ) {
-                cpCore.handleException(ex);
-            }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetRSXMLLookupAttribute");
+            return EncodeXMLattribute(GetTableRecordName(TableName, genericController.EncodeInteger(dr[FieldName])));
         }
         //
         //
@@ -1091,7 +958,7 @@ namespace Contensive.Core.Controllers {
                 //
                 appName = cpCore.serverConfig.appConfig.name;
                 if (RecordID != 0) {
-                    if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                    if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", 1) != 0) {
                         HandleClassErrorAndResume(appName, "getMenuNameSpace", "Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");
                         tempgetMenuNameSpace = "";
                     } else {
@@ -1135,13 +1002,9 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                return tempgetMenuNameSpace;
-                //
             } catch( Exception ex ) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "getMenuNameSpace");
             return tempgetMenuNameSpace;
         }
         //

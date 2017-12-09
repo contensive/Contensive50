@@ -117,14 +117,15 @@ namespace Contensive.Core.Models.Entity
 			}
 			return result;
 		}
-		//
-		//====================================================================================================
-		/// <summary>
-		/// open an existing object
-		/// </summary>
-		/// <param name="cp"></param>
-		/// <param name="recordGuid"></param>
-		public static dataSourceModel create(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList)
+        public static dataSourceModel create(coreClass cpCore, int recordId) { var tmpList = new List<string> { }; return create(cpCore, recordId, ref tmpList); }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// open an existing object
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="recordGuid"></param>
+        public static dataSourceModel create(coreClass cpCore, string recordGuid, ref List<string> callersCacheNameList)
 		{
 			dataSourceModel result = null;
 			try
@@ -573,7 +574,7 @@ namespace Contensive.Core.Models.Entity
 				}
 				else
 				{
-					string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", recordName);
+					string cacheName = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "name", recordName);
 					result = cpCore.cache.getObject<dataSourceModel>(cacheName);
 					if (result == null)
 					{

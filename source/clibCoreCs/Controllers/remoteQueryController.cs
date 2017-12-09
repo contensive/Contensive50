@@ -72,8 +72,8 @@ namespace Contensive.Core.Controllers {
                     s.Add("{");
                     if (!gd.IsEmpty) {
                         ColDelim = "";
-                        for (ColPtr = 0; ColPtr <= gd.col.GetUpperBound(0); ColPtr++) {
-                            s.Add(ColDelim + gd.col(ColPtr).Id + ":'" + gd.row(0).Cell(ColPtr).v + "'");
+                        for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
+                            s.Add(ColDelim + gd.col[ColPtr].Id + ":'" + gd.row[0].Cell[ColPtr].v + "'");
                             ColDelim = ",";
                         }
                     }
@@ -86,12 +86,12 @@ namespace Contensive.Core.Controllers {
                     s.Add("{");
                     if (!gd.IsEmpty) {
                         ColDelim = "";
-                        for (ColPtr = 0; ColPtr <= gd.col.GetUpperBound(0); ColPtr++) {
-                            s.Add(ColDelim + gd.col(ColPtr).Id + ":[");
+                        for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
+                            s.Add(ColDelim + gd.col[ColPtr].Id + ":[");
                             ColDelim = ",";
                             RowDelim = "";
-                            for (RowPtr = 0; RowPtr <= gd.row.GetUpperBound(0); RowPtr++) {
-                                var tempVar = gd.row(RowPtr).Cell(ColPtr);
+                            for (RowPtr = 0; RowPtr <= gd.row.Count ; RowPtr++) {
+                                var tempVar = gd.row[RowPtr].Cell[ColPtr];
                                 s.Add(RowDelim + "'" + tempVar.v + "'");
                                 RowDelim = ",";
                             }
@@ -108,19 +108,19 @@ namespace Contensive.Core.Controllers {
                     if (!gd.IsEmpty) {
                         s.Add("cols: [");
                         ColDelim = "";
-                        for (ColPtr = 0; ColPtr <= gd.col.GetUpperBound(0); ColPtr++) {
-                            var tempVar2 = gd.col(ColPtr);
+                        for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
+                            var tempVar2 = gd.col[ColPtr];
                             s.Add(ColDelim + "{id: '" + genericController.EncodeJavascript(tempVar2.Id) + "', label: '" + genericController.EncodeJavascript(tempVar2.Label) + "', type: '" + genericController.EncodeJavascript(tempVar2.Type) + "'}");
                             ColDelim = ",";
                         }
                         s.Add("],rows:[");
                         RowDelim = "";
-                        for (RowPtr = 0; RowPtr <= gd.row.GetUpperBound(0); RowPtr++) {
+                        for (RowPtr = 0; RowPtr <= gd.row.Count; RowPtr++) {
                             s.Add(RowDelim + "{c:[");
                             RowDelim = ",";
                             ColDelim = "";
-                            for (ColPtr = 0; ColPtr <= gd.col.GetUpperBound(0); ColPtr++) {
-                                var tempVar3 = gd.row(RowPtr).Cell(ColPtr);
+                            for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
+                                var tempVar3 = gd.row[RowPtr].Cell[ColPtr];
                                 s.Add(ColDelim + "{v: '" + genericController.EncodeJavascript(tempVar3.v) + "'}");
                                 ColDelim = ",";
                             }

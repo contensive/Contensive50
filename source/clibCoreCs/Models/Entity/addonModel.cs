@@ -307,7 +307,7 @@ namespace Contensive.Core.Models.Entity {
                 if ((addon.OnPageStartEvent) && (!OnPageStartIdList.Contains(addon.id))) {
                     OnPageStartIdList.Add(addon.id);
                 }
-                robotsTxt += Environment.NewLine + addon.RobotsTxt;
+                robotsTxt += "\r\n" + addon.RobotsTxt;
             }
             public addonModel getAddonByGuid(string guid) {
                 if (this.dictGuidId.ContainsKey(guid.ToLower())) {

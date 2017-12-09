@@ -48,7 +48,7 @@ namespace Contensive.Core.Models.Complex {
                         if ((cpcore.doc.tableSchemaDictionary) == null) {
                             cpcore.doc.tableSchemaDictionary = new Dictionary<string, Models.Complex.tableSchemaModel>();
                         } else {
-                            isInCache = cpcore.doc.tableSchemaDictionary.TryGetValue(lowerTablename, tableSchema);
+                            isInCache = cpcore.doc.tableSchemaDictionary.TryGetValue(lowerTablename, out tableSchema);
                         }
                         buildCache = !isInCache;
                         if (isInCache) {
@@ -73,7 +73,7 @@ namespace Contensive.Core.Models.Complex {
                                 dt = cpcore.db.getColumnSchemaData(TableName);
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
-                                        tableSchema.columns.Add(genericController.encodeText(row("COLUMN_NAME")).ToLower());
+                                        tableSchema.columns.Add(genericController.encodeText(row["COLUMN_NAME"]).ToLower());
                                     }
                                 }
                                 //
@@ -82,7 +82,7 @@ namespace Contensive.Core.Models.Complex {
                                 dt = cpcore.db.getIndexSchemaData(TableName);
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
-                                        tableSchema.indexes.Add(genericController.encodeText(row("INDEX_NAME")).ToLower());
+                                        tableSchema.indexes.Add(genericController.encodeText(row["INDEX_NAME"]).ToLower());
                                     }
                                 }
                             }
@@ -91,7 +91,7 @@ namespace Contensive.Core.Models.Complex {
                             } else if (isInDb && (!isInCache)) {
                                 cpcore.doc.tableSchemaDictionary.Add(lowerTablename, tableSchema);
                             } else if (isInDb && isInCache) {
-                                cpcore.doc.tableSchemaDictionary(lowerTablename) = tableSchema;
+                                cpcore.doc.tableSchemaDictionary[lowerTablename] = tableSchema;
                             }
                         }
                     }

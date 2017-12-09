@@ -34,7 +34,7 @@ namespace Contensive.Core.Controllers {
         //
         public static string LogFileCopyPrep(string Source) {
             string Copy = Source;
-            Copy = genericController.vbReplace(Copy, Environment.NewLine, " ");
+            Copy = genericController.vbReplace(Copy, "\r\n", " ");
             Copy = genericController.vbReplace(Copy, "\n", " ");
             Copy = genericController.vbReplace(Copy, "\r", " ");
             return Copy;
@@ -55,7 +55,7 @@ namespace Contensive.Core.Controllers {
                 //
                 int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
                 string threadName = threadId.ToString("00000000");
-                string absContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\t" + "thread:" + threadName + "\t" + LogLine + Environment.NewLine;
+                string absContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine + "\r\n";
                 Console.WriteLine(LogLine);
                 //
                 if (string.IsNullOrEmpty(LogFolder) || cpCore.serverConfig.enableLogging) {

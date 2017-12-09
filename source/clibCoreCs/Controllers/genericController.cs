@@ -1305,8 +1305,8 @@ namespace Contensive.Core.Controllers {
                     //
                     // no textarea
                     //
-                    string replaceText = Environment.NewLine + new string(Convert.ToChar("\t"), (depth + 1));
-                    temphtmlIndent = vbReplace(Source, Environment.NewLine + "\t", replaceText);
+                    string replaceText = "\r\n" + new string(Convert.ToChar("\t"), (depth + 1));
+                    temphtmlIndent = vbReplace(Source, "\r\n\t", replaceText);
                 } else {
                     //
                     // text area found, isolate it and indent before and after
@@ -2322,7 +2322,7 @@ namespace Contensive.Core.Controllers {
             tempprocessReplacement = encodeText(Source);
             if (PairCnt > 0) {
                 for (PairPtr = 0; PairPtr < PairCnt; PairPtr++) {
-                    tempprocessReplacement = vbReplace(tempprocessReplacement, Names[PairPtr], Values[PairPtr], 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                    tempprocessReplacement = vbReplace(tempprocessReplacement, Names[PairPtr], Values[PairPtr], 1, 99, 1);
                 }
             }
             //
@@ -2392,15 +2392,15 @@ namespace Contensive.Core.Controllers {
         public static string[] SplitCRLF(string Expression) {
             string[] tempSplitCRLF = null;
             //
-            if (vbInstr(1, Expression, Environment.NewLine) != 0) {
-                tempSplitCRLF = Expression.Split(Environment.NewLine.ToCharArray());
+            if (vbInstr(1, Expression, "\r\n") != 0) {
+                tempSplitCRLF = Expression.Split("\r\n".ToCharArray());
             } else if (vbInstr(1, Expression, "\r") != 0) {
                 tempSplitCRLF = Expression.Split("\r".ToCharArray());
             } else if (vbInstr(1, Expression, "\n") != 0) {
                 tempSplitCRLF = Expression.Split("\n".ToCharArray());
             } else {
                 tempSplitCRLF = new string[1];
-                tempSplitCRLF = Expression.Split(Environment.NewLine.ToCharArray());
+                tempSplitCRLF = Expression.Split("\r\n".ToCharArray());
             }
             return tempSplitCRLF;
         }
@@ -2437,7 +2437,7 @@ namespace Contensive.Core.Controllers {
         public static string EncodeAddonConstructorArgument(string Arg) {
             string a = Arg;
             a = vbReplace(a, "\\", "\\\\");
-            a = vbReplace(a, Environment.NewLine, "\\n");
+            a = vbReplace(a, "\r\n", "\\n");
             a = vbReplace(a, "\t", "\\t");
             a = vbReplace(a, "&", "\\&");
             a = vbReplace(a, "=", "\\=");
@@ -2481,7 +2481,7 @@ namespace Contensive.Core.Controllers {
             a = vbReplace(a, "\\=", "=");
             a = vbReplace(a, "\\&", "&");
             a = vbReplace(a, "\\t", "\t");
-            a = vbReplace(a, "\\n", Environment.NewLine);
+            a = vbReplace(a, "\\n", "\r\n");
             a = vbReplace(a, "\\\\", "\\");
             return a;
         }
@@ -2517,17 +2517,17 @@ namespace Contensive.Core.Controllers {
                             //
                             // try combinations including/excluding www.
                             //
-                            if (vbInstr(1, LinkHost, "www.", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                            if (vbInstr(1, LinkHost, "www.", 1) != 0) {
                                 //
                                 // remove it
                                 //
-                                LinkHost = vbReplace(LinkHost, "www.", "", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                LinkHost = vbReplace(LinkHost, "www.", "", 1, 99, 1);
                                 tempIsLinkToThisHost = (vbLCase(Host) == LinkHost);
                             } else {
                                 //
                                 // add it
                                 //
-                                LinkHost = vbReplace(LinkHost, "://", "://www.", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                LinkHost = vbReplace(LinkHost, "://", "://www.", 1, 99, 1);
                                 tempIsLinkToThisHost = (vbLCase(Host) == LinkHost);
                             }
                         }
@@ -2961,11 +2961,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // If not explicit
                 //
-                if (vbInstr(1, ArgumentString, Environment.NewLine) != 0) {
+                if (vbInstr(1, ArgumentString, "\r\n") != 0) {
                     //
                     // crlf can only be here if it is the delimiter
                     //
-                    Delimiter = Environment.NewLine;
+                    Delimiter = "\r\n";
                 } else {
                     //
                     // either only one option, or it is the legacy '&' delimit
@@ -2978,7 +2978,7 @@ namespace Contensive.Core.Controllers {
             tempGetArgument = iDefaultValue;
             if (!string.IsNullOrEmpty(WorkingString)) {
                 WorkingString = Delimiter + WorkingString + Delimiter;
-                ValueStart = vbInstr(1, WorkingString, Delimiter + Name + "=", Microsoft.VisualBasic.Constants.vbTextCompare);
+                ValueStart = vbInstr(1, WorkingString, Delimiter + Name + "=", 1);
                 if (ValueStart != 0) {
                     NameLength = Name.Length;
                     ValueStart = ValueStart + Delimiter.Length + NameLength + 1;
@@ -3257,20 +3257,20 @@ namespace Contensive.Core.Controllers {
                 } else {
                     //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                     Copy = "";
-                    Copy = vbReplace(Copy, Environment.NewLine, "-");
+                    Copy = vbReplace(Copy, "\r\n", "-");
                     Copy = vbReplace(Copy, "\n", "-");
-                    Copy = vbReplace(Copy, Environment.NewLine, "");
+                    Copy = vbReplace(Copy, "\r\n", "");
                     //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                    tempGetErrString = "[" + "" + " #" + 0 + ", " + Copy + "]";
+                    tempGetErrString = "[ #" + 0 + ", " + Copy + "]";
                 }
             } else {
                 if (ErrorObject.Number == 0) {
                     tempGetErrString = "[no error]";
                 } else {
                     Copy = ErrorObject.Description;
-                    Copy = vbReplace(Copy, Environment.NewLine, "-");
+                    Copy = vbReplace(Copy, "\r\n", "-");
                     Copy = vbReplace(Copy, "\n", "-");
-                    Copy = vbReplace(Copy, Environment.NewLine, "");
+                    Copy = vbReplace(Copy, "\r\n", "");
                     tempGetErrString = "[" + ErrorObject.Source + " #" + ErrorObject.Number + ", " + Copy + "]";
                 }
             }
@@ -3293,7 +3293,7 @@ namespace Contensive.Core.Controllers {
         //==========================================================================================
         //
         public static bool IsInDelimitedString(string DelimitedString, string TestString, string Delimiter) {
-            return (0 != vbInstr(1, Delimiter + DelimitedString + Delimiter, Delimiter + TestString + Delimiter, Microsoft.VisualBasic.Constants.vbTextCompare));
+            return (0 != vbInstr(1, Delimiter + DelimitedString + Delimiter, Delimiter + TestString + Delimiter, 1));
         }
         //
         //========================================================================
@@ -3811,7 +3811,7 @@ namespace Contensive.Core.Controllers {
             string tempConvertShortLinkToLink = null;
             tempConvertShortLinkToLink = URL;
             if (!string.IsNullOrEmpty(URL) & !string.IsNullOrEmpty(PathPagePrefix)) {
-                if (vbInstr(1, tempConvertShortLinkToLink, PathPagePrefix, Microsoft.VisualBasic.Constants.vbTextCompare) == 1) {
+                if (vbInstr(1, tempConvertShortLinkToLink, PathPagePrefix, 1) == 1) {
                     tempConvertShortLinkToLink = tempConvertShortLinkToLink.Substring(PathPagePrefix.Length);
                 }
             }
@@ -3837,12 +3837,12 @@ namespace Contensive.Core.Controllers {
             //
             // ----- Determine Protocol
             //
-            if (vbInstr(1, WorkingLink, "HTTP://", Microsoft.VisualBasic.Constants.vbTextCompare) == 1) {
+            if (vbInstr(1, WorkingLink, "HTTP://", 1) == 1) {
                 //
                 // HTTP
                 //
                 Protocol = WorkingLink.Substring(0, 7);
-            } else if (vbInstr(1, WorkingLink, "HTTPS://", Microsoft.VisualBasic.Constants.vbTextCompare) == 1) {
+            } else if (vbInstr(1, WorkingLink, "HTTPS://", 1) == 1) {
                 //
                 // HTTPS
                 //
@@ -3866,18 +3866,18 @@ namespace Contensive.Core.Controllers {
                         //
                         BadString = GoodString;
                         GoodString = ServerVirtualPath + "/files/";
-                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, 1);
                     } else {
                         //
                         // URL is not in files virtual directory
                         //
                         BadString = Protocol + ServerHost + ServerVirtualPath + "/";
                         GoodString = "/";
-                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, 1);
                         //
                         BadString = Protocol + ServerHost + "/";
                         GoodString = "/";
-                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, 1);
                     }
                 }
             }
@@ -3917,7 +3917,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Virtual hosted site, add VirualPath if it is not there
                         //
-                        if (vbInstr(1, Path, AppRootPath, Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                        if (vbInstr(1, Path, AppRootPath, 1) == 0) {
                             if (Path == "/") {
                                 Path = AppRootPath;
                             } else {
@@ -3928,7 +3928,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Root hosted site, remove virtual path if it is there
                         //
-                        if (vbInstr(1, Path, AppRootPath, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                        if (vbInstr(1, Path, AppRootPath, 1) != 0) {
                             Path = vbReplace(Path, AppRootPath, "/");
                         }
                     }
@@ -4017,7 +4017,7 @@ namespace Contensive.Core.Controllers {
             int Pos = 0;
             int PosEnd = 0;
             tempRemoveTag = Source;
-            Pos = vbInstr(1, Source, "<" + TagName, Microsoft.VisualBasic.Constants.vbTextCompare);
+            Pos = vbInstr(1, Source, "<" + TagName, 1);
             if (Pos != 0) {
                 PosEnd = vbInstr(Pos, Source, ">");
                 if (PosEnd > 0) {
@@ -4032,10 +4032,10 @@ namespace Contensive.Core.Controllers {
         public static string RemoveStyleTags(string Source) {
             string tempRemoveStyleTags = null;
             tempRemoveStyleTags = Source;
-            while (vbInstr(1, tempRemoveStyleTags, "<style", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+            while (vbInstr(1, tempRemoveStyleTags, "<style", 1) != 0) {
                 tempRemoveStyleTags = RemoveTag(tempRemoveStyleTags, "style");
             }
-            while (vbInstr(1, tempRemoveStyleTags, "</style", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+            while (vbInstr(1, tempRemoveStyleTags, "</style", 1) != 0) {
                 tempRemoveStyleTags = RemoveTag(tempRemoveStyleTags, "/style");
             }
             return tempRemoveStyleTags;
@@ -4081,7 +4081,7 @@ namespace Contensive.Core.Controllers {
             tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\\", "\\\\");
             tempEncodeJavascript = vbReplace(tempEncodeJavascript, "'", "\\'");
             //EncodeJavascript = vbReplace(EncodeJavascript, "'", "'+""'""+'")
-            tempEncodeJavascript = vbReplace(tempEncodeJavascript, Environment.NewLine, "\\n");
+            tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\r\n", "\\n");
             tempEncodeJavascript = vbReplace(tempEncodeJavascript, "\r", "\\n");
             return vbReplace(tempEncodeJavascript, "\n", "\\n");
             //
@@ -4303,7 +4303,7 @@ namespace Contensive.Core.Controllers {
         public static string encodeNvaArgument(string Arg) {
             string a = Arg;
             if (!string.IsNullOrEmpty(a)) {
-                a = vbReplace(a, Environment.NewLine, "#0013#");
+                a = vbReplace(a, "\r\n", "#0013#");
                 a = vbReplace(a, "\n", "#0013#");
                 a = vbReplace(a, "\r", "#0013#");
                 a = vbReplace(a, "&", "#0038#");
@@ -4338,7 +4338,7 @@ namespace Contensive.Core.Controllers {
             a = vbReplace(a, "#0044#", ",");
             a = vbReplace(a, "#0061#", "=");
             a = vbReplace(a, "#0038#", "&");
-            a = vbReplace(a, "#0013#", Environment.NewLine);
+            a = vbReplace(a, "#0013#", "\r\n");
             return a;
         }
         //        '
@@ -4479,11 +4479,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // If not explicit
                 //
-                if (vbInstr(1, ArgumentString, Environment.NewLine) != 0) {
+                if (vbInstr(1, ArgumentString, "\r\n") != 0) {
                     //
                     // crlf can only be here if it is the delimiter
                     //
-                    Delimiter = Environment.NewLine;
+                    Delimiter = "\r\n";
                 } else {
                     //
                     // either only one option, or it is the legacy '&' delimit
@@ -4496,7 +4496,7 @@ namespace Contensive.Core.Controllers {
             tempgetSimpleNameValue = iDefaultValue;
             if (!string.IsNullOrEmpty(WorkingString)) {
                 WorkingString = Delimiter + WorkingString + Delimiter;
-                ValueStart = vbInstr(1, WorkingString, Delimiter + Name + "=", Microsoft.VisualBasic.Constants.vbTextCompare);
+                ValueStart = vbInstr(1, WorkingString, Delimiter + Name + "=", 1);
                 if (ValueStart != 0) {
                     NameLength = Name.Length;
                     ValueStart = ValueStart + Delimiter.Length + NameLength + 1;
@@ -4609,18 +4609,18 @@ namespace Contensive.Core.Controllers {
             }
             return returnSeconds;
         }
-        //
-        // ==============================================================================
-        // true if there is a previous instance of this application running
-        // ==============================================================================
-        //
-        public static bool PrevInstance() {
-            if (System.Diagnostics.Process.GetProcessesByName(Diagnostics.Process.GetCurrentProcess.ProcessName).GetUpperBound(0) > 0) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+        ////
+        //// ==============================================================================
+        //// true if there is a previous instance of this application running
+        //// ==============================================================================
+        ////
+        //public static bool PrevInstance() {
+        //    if (System.Diagnostics.Process.GetProcessesByName(Diagnostics.Process.GetCurrentProcess.ProcessName).GetUpperBound(0) > 0) {
+        //        return true;
+        //    } else {
+        //        return false;
+        //    }
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -4740,6 +4740,9 @@ namespace Contensive.Core.Controllers {
         public static bool isInStr(int start, string haystack, string needle, Microsoft.VisualBasic.CompareMethod ignore = Microsoft.VisualBasic.CompareMethod.Text) {
             return (haystack.IndexOf(needle, start - 1, System.StringComparison.OrdinalIgnoreCase) + 1 >= 0);
         }
+        public static bool isInStr(int start, string haystack, string needle ) {
+            return (haystack.IndexOf(needle, start - 1, System.StringComparison.OrdinalIgnoreCase) + 1 >= 0);
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -4821,9 +4824,29 @@ namespace Contensive.Core.Controllers {
             }
             return returnValue;
         }
-        //
+        // todo refactor out vb fpo
         //====================================================================================================
-        //
+        /// <summary>
+        /// temp methods to convert from vb, refactor out
+        /// </summary>
+        /// <param name="string1"></param>
+        /// <param name="string2"></param>
+        /// <param name="intCompare"></param>
+        /// <returns></returns>
+        public static int vbInstr(string string1, string string2, int intCompare) {
+            if (intCompare == 1) {
+                return vbInstr(string1, string2, Microsoft.VisualBasic.CompareMethod.Text);
+            } else {
+                return vbInstr(string1, string2, Microsoft.VisualBasic.CompareMethod.Binary);
+            }
+        }
+        public static int vbInstr(int start, string string1, string string2, int intCompare) {
+            if (intCompare == 1) {
+                return vbInstr(start, string1, string2, Microsoft.VisualBasic.CompareMethod.Text);
+            } else {
+                return vbInstr(start, string1, string2, Microsoft.VisualBasic.CompareMethod.Binary);
+            }
+        }
         public static int vbInstr(string string1, string string2, Microsoft.VisualBasic.CompareMethod compare) {
             return vbInstr(1, string1, string2, compare);
         }
@@ -4854,21 +4877,13 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static string vbReplace(string expression, string find, int replacement) {
-            return vbReplace(expression, find, replacement.ToString(), 1, 9999, Microsoft.VisualBasic.CompareMethod.Binary);
-        }
-        //
-        public static string vbReplace(string expression, string find, string replacement) {
-            return vbReplace(expression, find, replacement, 1, 9999, Microsoft.VisualBasic.CompareMethod.Binary);
-        }
-        //
-        public static string vbReplace(string expression, string oldValue, string replacement, int startIgnore, int countIgnore, Microsoft.VisualBasic.CompareMethod compare) {
+        public static string vbReplace(string expression, string oldValue, string replacement, int startIgnore, int countIgnore, int compare) {
             if (string.IsNullOrEmpty(expression)) {
                 return expression;
             } else if (string.IsNullOrEmpty(oldValue)) {
                 return expression;
             } else {
-                if (compare == Microsoft.VisualBasic.CompareMethod.Binary) {
+                if (compare == 2) {
                     return expression.Replace(oldValue, replacement);
                 } else {
 
@@ -4884,14 +4899,13 @@ namespace Contensive.Core.Controllers {
                     }
                     sb.Append(expression.Substring(previousIndex));
                     return sb.ToString();
-
-                    //    ElseIf String.IsNullOrEmpty(replacement) Then
-                    //    Return Regex.Replace(expression, find, "", RegexOptions.IgnoreCase)
-                    //Else
-                    //    Return Regex.Replace(expression, find, replacement, RegexOptions.IgnoreCase)
                 }
             }
         }
+        //
+        public static string vbReplace(string expression, string find, int replacement) { return vbReplace(expression, find, replacement.ToString()); }
+        //
+        public static string vbReplace(string expression, string find, string replacement) { return vbReplace(expression, find, replacement, 1, 9999, 1); }
         //
         //====================================================================================================
         /// <summary>
@@ -5042,7 +5056,7 @@ namespace Contensive.Core.Controllers {
             string a = "";
             if (!string.IsNullOrEmpty(Arg)) {
                 a = Arg;
-                a = genericController.vbReplace(a, Environment.NewLine, "#0013#");
+                a = genericController.vbReplace(a, "\r\n", "#0013#");
                 a = genericController.vbReplace(a, "\n", "#0013#");
                 a = genericController.vbReplace(a, "\r", "#0013#");
                 a = genericController.vbReplace(a, "&", "#0038#");
@@ -5101,7 +5115,7 @@ namespace Contensive.Core.Controllers {
             //				for (SourcePointer = 1; SourcePointer <= tempVar; SourcePointer++)
             //				{
             //					Character = localSource.Substring(SourcePointer - 1, 1);
-            //					if (genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, Microsoft.VisualBasic.Constants.vbTextCompare) != 0)
+            //					if (genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, 1) != 0)
             //					{
             //						result = result + Character;
             //					}
@@ -5216,9 +5230,9 @@ namespace Contensive.Core.Controllers {
         //				//
         //				// limit CRLF to 2
         //				//
-        //				while (vbInstr(result, "\n" + "\n" + "\n") != 0)
+        //				while (vbInstr(result, "\n\n\n") != 0)
         //				{
-        //					result = vbReplace(result, "\n" + "\n" + "\n", "\n" + "\n");
+        //					result = vbReplace(result, "\n\n\n", "\n\n");
         //				}
         //				//
         //				// limit spaces to 1
@@ -5409,7 +5423,7 @@ namespace Contensive.Core.Controllers {
                 int Pos = 0;
                 //
                 if (!string.IsNullOrEmpty(SrcOptionList)) {
-                    SrcOptions = Microsoft.VisualBasic.Strings.Split(SrcOptionList.Replace(Environment.NewLine, "\r").Replace("\n", "\r"), "\r", -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                    SrcOptions = genericController.customSplit(SrcOptionList.Replace("\r\n", "\r").Replace("\n", "\r"), "\r");
                     for (var Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
                         key = SrcOptions[Ptr].Replace("\t", "");
                         if (!string.IsNullOrEmpty(key)) {
@@ -5552,17 +5566,22 @@ namespace Contensive.Core.Controllers {
         //
         internal static string removeScriptTag(string source) {
             string result = source;
-            int StartPos = genericController.vbInstr(1, result, "<script", Microsoft.VisualBasic.Constants.vbTextCompare);
+            int StartPos = genericController.vbInstr(1, result, "<script", 1);
             if (StartPos != 0) {
-                int EndPos = genericController.vbInstr(StartPos, result, "</script", Microsoft.VisualBasic.Constants.vbTextCompare);
+                int EndPos = genericController.vbInstr(StartPos, result, "</script", 1);
                 if (EndPos != 0) {
-                    EndPos = genericController.vbInstr(EndPos, result, ">", Microsoft.VisualBasic.Constants.vbTextCompare);
+                    EndPos = genericController.vbInstr(EndPos, result, ">", 1);
                     if (EndPos != 0) {
                         result = result.Substring(0, StartPos - 1) + result.Substring(EndPos);
                     }
                 }
             }
             return result;
+        }
+        //
+        //
+        internal static string[] customSplit( string src, string delimiter ) {
+            return src.Split(  delimiter.ToCharArray());
         }
     }
 }

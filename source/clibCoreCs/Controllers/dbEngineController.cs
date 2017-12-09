@@ -130,10 +130,10 @@ namespace Contensive.Core.Controllers {
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         using (SqlCommand cmdSQL = new SqlCommand()) {
-                            cmdSQL.CommandType = Data.CommandType.Text;
+                            cmdSQL.CommandType = CommandType.Text;
                             cmdSQL.CommandText = sql;
                             cmdSQL.Connection = connSQL;
-                            using (dynamic adptSQL = new SqlClient.SqlDataAdapter(cmdSQL)) {
+                            using (dynamic adptSQL = new System.Data.SqlClient.SqlDataAdapter(cmdSQL)) {
                                 adptSQL.Fill(returnData);
                             }
                         }

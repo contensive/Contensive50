@@ -264,7 +264,7 @@ namespace Contensive.Core {
                 FileInfo[] fi = cpCore.privateFiles.getFileList(pathFolderName);
                 result = cpCore.privateFiles.convertFileINfoArrayToParseString(fi);
             } else if (cpCore.cdnFiles.isinPhysicalPath(pathFolderName)) {
-                IOileInfo[] fi = cpCore.cdnFiles.getFileList(pathFolderName);
+                FileInfo[] fi = cpCore.cdnFiles.getFileList(pathFolderName);
                 result = cpCore.cdnFiles.convertFileINfoArrayToParseString(fi);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));
@@ -282,13 +282,13 @@ namespace Contensive.Core {
         public override string folderList(string pathFolderName) {
             string result = "";
             if (cpCore.appRootFiles.isinPhysicalPath(pathFolderName)) {
-                IO.DirectoryInfo[] fi = cpCore.appRootFiles.getFolderList(pathFolderName);
+                DirectoryInfo[] fi = cpCore.appRootFiles.getFolderList(pathFolderName);
                 result = cpCore.appRootFiles.convertDirectoryInfoArrayToParseString(fi);
             } else if (cpCore.privateFiles.isinPhysicalPath(pathFolderName)) {
-                IO.DirectoryInfo[] fi = cpCore.privateFiles.getFolderList(pathFolderName);
+                DirectoryInfo[] fi = cpCore.privateFiles.getFolderList(pathFolderName);
                 result = cpCore.privateFiles.convertDirectoryInfoArrayToParseString(fi);
             } else if (cpCore.cdnFiles.isinPhysicalPath(pathFolderName)) {
-                IO.DirectoryInfo[] fi = cpCore.cdnFiles.getFolderList(pathFolderName);
+                DirectoryInfo[] fi = cpCore.cdnFiles.getFolderList(pathFolderName);
                 result = cpCore.cdnFiles.convertDirectoryInfoArrayToParseString(fi);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));

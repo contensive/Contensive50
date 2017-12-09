@@ -141,7 +141,7 @@ namespace Contensive.Core.Controllers {
                         for (Ptr = 1; Ptr < Cnt; Ptr++) {
                             PosScriptEnd = genericController.vbInstr(1, splittest[Ptr], ">");
                             if (PosScriptEnd > 0) {
-                                PosEndScript = genericController.vbInstr(PosScriptEnd, splittest[Ptr], "</script", Microsoft.VisualBasic.Constants.vbTextCompare);
+                                PosEndScript = genericController.vbInstr(PosScriptEnd, splittest[Ptr], "</script");
                                 if (PosEndScript > 0) {
                                     Array.Resize(ref Blobs, BlobCnt + 1);
                                     Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
@@ -155,13 +155,13 @@ namespace Contensive.Core.Controllers {
                     //
                     // remove all styles
                     //
-                    splittest = Microsoft.VisualBasic.Strings.Split(WorkingSrc, "<style", -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                    splittest = genericController.customSplit(WorkingSrc, "<style");
                     Cnt = splittest.GetUpperBound(0) + 1;
                     if (Cnt > 1) {
                         for (Ptr = 1; Ptr < Cnt; Ptr++) {
                             PosScriptEnd = genericController.vbInstr(1, splittest[Ptr], ">");
                             if (PosScriptEnd > 0) {
-                                PosEndScript = genericController.vbInstr(PosScriptEnd, splittest[Ptr], "</style", Microsoft.VisualBasic.Constants.vbTextCompare);
+                                PosEndScript = genericController.vbInstr(PosScriptEnd, splittest[Ptr], "</style", 1);
                                 if (PosEndScript > 0) {
                                     Array.Resize(ref Blobs, BlobCnt + 1);
                                     Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
@@ -175,7 +175,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // remove comments
                     //
-                    splittest = Microsoft.VisualBasic.Strings.Split(WorkingSrc, "<!--", -1, Microsoft.VisualBasic.CompareMethod.Binary);
+                    splittest = genericController.customSplit(WorkingSrc, "<!--");
                     Cnt = splittest.GetUpperBound(0) + 1;
                     if (Cnt > 1) {
                         for (Ptr = 1; Ptr < Cnt; Ptr++) {
@@ -283,10 +283,10 @@ namespace Contensive.Core.Controllers {
                             if (TagEnd == 0) {
                                 TagStart = 0;
                             } else {
-                                TagStart = genericController.vbInstr(TagEnd, WorkingSrc, TagStartString, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                TagStart = genericController.vbInstr(TagEnd, WorkingSrc, TagStartString, 1);
                             }
                             while (TagStart != 0 && (WorkingSrc.Substring(TagStart, 1) == " ")) {
-                                TagStart = genericController.vbInstr(TagStart + 1, WorkingSrc, TagStartString, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                TagStart = genericController.vbInstr(TagStart + 1, WorkingSrc, TagStartString, 1);
                             }
                         }
                         //
@@ -938,7 +938,7 @@ namespace Contensive.Core.Controllers {
                         SrcBody = ReplaceBlob(SplitSrc);
                     } else {
                         SrcTag = ReplaceBlob(SplitSrc.Substring(0, Ptr));
-                        SrcBody = ReplaceBlob(SplitSrc.Substring[Ptr]);
+                        SrcBody = ReplaceBlob(SplitSrc.Substring(Ptr));
                     }
                     if (Ptr == 0) {
                         if (ElementPtr == 0) {

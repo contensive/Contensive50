@@ -257,7 +257,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="cmdDetail"></param>
         /// <param name="BlockDuplicates"></param>
         /// <returns></returns>
-        public bool addTaskToQueue(coreClass cpSiteCore, string Command, cmdDetailClass cmdDetail, bool BlockDuplicates) {
+        static public bool addTaskToQueue(coreClass cpSiteCore, string Command, cmdDetailClass cmdDetail, bool BlockDuplicates) {
             bool returnTaskAdded = true;
             try {
                 string LcaseCommand = null;

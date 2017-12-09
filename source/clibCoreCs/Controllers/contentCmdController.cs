@@ -10,6 +10,8 @@ using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using System.Linq;
+using System.Data;
 //
 namespace Contensive.Core.Controllers {
     public class contentCmdController {
@@ -326,7 +328,7 @@ namespace Contensive.Core.Controllers {
                 htmlDoc = new Controllers.htmlController(cpCore);
                 //
                 cmdSrc = cmdSrc.Trim(' ');
-                whiteChrs = "\r" + "\n" + "\t" + " ";
+                whiteChrs = "\r\n\t ";
                 do {
                     trimming = false;
                     trimLen = cmdSrc.Length;
@@ -397,7 +399,7 @@ namespace Contensive.Core.Controllers {
                         // JSON is a command list in the form of an array, like:
                         //   [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
                         //
-                        cmdCollection = cpCore.json.Deserialize<Collection>(cmdSrc);
+                        cmdCollection = cpCore.json.Deserialize<Collection<object>>(cmdSrc);
                         //If True Then
                         //End If
                         //If (LCase(TypeName(cmdDictionaryOrCollection)) <> "collection") Then
@@ -442,7 +444,6 @@ namespace Contensive.Core.Controllers {
                                     // syntax error, must be a space between cmd and argument
                                     //
                                     throw new ApplicationException("Error parsing content command [" + cmdSrc + "], expected a space between command and argument around position " + Pos);
-                                    return null;
                                 } else {
                                     cmdArg = (cmdText.Substring(Pos)).Trim(' ');
                                     cmdText = cmdText.Substring(1, Pos - 2);
@@ -478,10 +479,9 @@ namespace Contensive.Core.Controllers {
                             //   { "text name": "my text" }
                             //
                             cmdDictionaryOrCollection = cpCore.json.Deserialize<object>(cmdArg);
-                            string cmdDictionaryOrCollectionTypeName = Microsoft.VisualBasic.Information.TypeName(cmdDictionaryOrCollection).ToLower();
+                            string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLower();
                             if ((cmdDictionaryOrCollectionTypeName != "dictionary") & (cmdDictionaryOrCollectionTypeName != "dictionary(of string,object)")) {
                                 throw new ApplicationException("Error parsing JSON command argument list, expected a single command, command list [" + cmdSrc + "]");
-                                return null;
                             } else {
                                 //
                                 // create command array of one command
@@ -518,7 +518,7 @@ namespace Contensive.Core.Controllers {
                         //   D - { "command" : { "name" : "The Name"} }
                         //   E - { "command" : { "name" : "The Name" , "secondArgument" : "secondValue" } }
                         //
-                        string cmdTypeName = Microsoft.VisualBasic.Information.TypeName(cmd).ToLower();
+                        string cmdTypeName = cmd.GetType().FullName.ToLower();
                         if (cmdTypeName == "string") {
                             //
                             // case A & B, the cmdDef is a string
@@ -535,8 +535,8 @@ namespace Contensive.Core.Controllers {
                                 // syntax error
                                 //
                             } else {
-                                string cmdDefKey = cmdDef.Keys(0);
-                                string cmdDefValueTypeName = Microsoft.VisualBasic.Information.TypeName(cmdDef[cmdDefKey]).ToLower();
+                                string cmdDefKey = cmdDef.Keys.First();
+                                string cmdDefValueTypeName = cmdDef[cmdDefKey].GetType().FullName.ToLower();
                                 //
                                 // command is the key for these cases
                                 //
@@ -554,9 +554,6 @@ namespace Contensive.Core.Controllers {
                                     // syntax error, bad command
                                     //
                                     throw new ApplicationException("Error parsing JSON command list, , command list [" + cmdSrc + "]");
-                                    //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                    //Microsoft.VisualBasic.Information.Err().Clear();
-                                    return null;
                                 }
                             }
                         } else {
@@ -564,9 +561,6 @@ namespace Contensive.Core.Controllers {
                             // syntax error
                             //
                             throw new ApplicationException("Error parsing JSON command list, , command list [" + cmdSrc + "]");
-                            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                            //Microsoft.VisualBasic.Information.Err().Clear();
-                            return null;
                         }
                         //
                         // execute the cmd with cmdArgDef dictionary
@@ -846,13 +840,11 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     addonArgDict.Add("cmdAccumulator", CmdAccumulator);
-                                    //ArgOptionString &= "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
-                                    //ArgOptionString = Mid(ArgOptionString, 2)
-                                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                    var executeContext = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                         addonType = Context,
                                         cssContainerClass = "",
                                         cssContainerId = "",
-                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                        hostRecord = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext() {
                                             contentName = "",
                                             fieldName = "",
                                             recordId = 0
@@ -891,11 +883,11 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     addonArgDict.Add("cmdAccumulator", CmdAccumulator);
-                                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                    var executeContext = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                         addonType = Context,
                                         cssContainerClass = "",
                                         cssContainerId = "",
-                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                        hostRecord = new Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext() {
                                             contentName = "",
                                             fieldName = "",
                                             recordId = 0

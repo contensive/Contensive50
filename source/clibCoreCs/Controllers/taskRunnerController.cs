@@ -173,9 +173,9 @@ namespace Contensive.Core.Controllers {
                                     // for now run an sql to get processes, eventually cache in variant cache
                                     recordsRemaining = false;
                                     sql = ""
-                                    + Environment.NewLine + " BEGIN TRANSACTION"
-                                    + Environment.NewLine + " update cctasks set cmdRunner=" + cpSite.core.db.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
-                                    + Environment.NewLine + " COMMIT TRANSACTION";
+                                    + "\r\n BEGIN TRANSACTION"
+                                    + "\r\n update cctasks set cmdRunner=" + cpSite.core.db.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
+                                    + "\r\n COMMIT TRANSACTION";
                                     cpSite.core.db.executeQuery(sql);
                                     CS = cpSite.core.db.csOpen("tasks", "(cmdRunner=" + cpSite.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id");
                                     if (cpSite.core.db.csOk(CS)) {
@@ -193,7 +193,7 @@ namespace Contensive.Core.Controllers {
                                         //
                                         Console.WriteLine("taskRunnerService.runTasks, command=[" + command + "], cmdDetailText=[" + cmdDetailText + "]");
                                         //
-                                        switch (Convert.ToInt32(command.ToLower())) {
+                                        switch ((command.ToLower())) {
                                             case taskQueueCommandEnumModule.runAddon:
                                                 cpSite.core.addon.execute(Models.Entity.addonModel.create(cpSite.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,

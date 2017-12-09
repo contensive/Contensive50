@@ -95,7 +95,7 @@ Namespace Contensive.Core
         ' deprecated 
         '
         <Obsolete("Use GetTableId instead.", True)>
-        Public Overrides Function dbGetTableID(ByVal TableName As String) As Integer
+        Public Overrides Function DbGetTableID(ByVal TableName As String) As Integer
             Return GetTableID(TableName)
         End Function
         '

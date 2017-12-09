@@ -438,10 +438,10 @@ namespace Contensive.Core.Models.Context {
                         propertyCacheCnt = 0;
                         propertyCache = new string[3, dt.Rows.Count];
                         foreach (DataRow dr in dt.Rows) {
-                            Name = genericController.encodeText(dr(0));
+                            Name = genericController.encodeText(dr[0]);
                             propertyCache[0, propertyCacheCnt] = Name;
-                            propertyCache[1, propertyCacheCnt] = genericController.encodeText(dr(1));
-                            propertyCache[2, propertyCacheCnt] = genericController.EncodeInteger(dr(2)).ToString();
+                            propertyCache[1, propertyCacheCnt] = genericController.encodeText(dr[1]);
+                            propertyCache[2, propertyCacheCnt] = genericController.EncodeInteger(dr[2]).ToString();
                             propertyCache_nameIndex.setPtr(Name.ToLower(), propertyCacheCnt);
                             propertyCacheCnt += 1;
                         }

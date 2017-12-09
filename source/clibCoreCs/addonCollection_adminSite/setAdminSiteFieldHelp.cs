@@ -10,6 +10,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Contensive.Core;
 using Contensive.Core.Models.Entity;
+using Contensive.Core.Models.Complex;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
@@ -40,7 +41,7 @@ namespace Contensive.Addons.AdminSite {
                     help.save(cpCore);
                     contentFieldModel contentField = contentFieldModel.create(cpCore, fieldId);
                     if (contentField != null) {
-                        Contensive.Core.Models.Complex.cdefModel.invalidateCache(cpCore, contentField.ContentID);
+                        cdefModel.invalidateCache(cpCore, contentField.ContentID);
                     }
                 }
             } catch (Exception ex) {

@@ -13,6 +13,7 @@ using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using Contensive.Core.Models.Complex;
 //
 namespace Contensive.Addons.Core {
     public class processRedirectMethodClass : Contensive.BaseClasses.AddonBaseClass {
@@ -34,7 +35,7 @@ namespace Contensive.Addons.Core {
                 cpCore.doc.redirectContentID = cpCore.docProperties.getInteger(rnRedirectContentId);
                 cpCore.doc.redirectRecordID = cpCore.docProperties.getInteger(rnRedirectRecordId);
                 if (cpCore.doc.redirectContentID != 0 & cpCore.doc.redirectRecordID != 0) {
-                    string ContentName = Contensive.Core.Models.Complex.cdefModel.getContentNameByID(cpCore, cpCore.doc.redirectContentID);
+                    string ContentName = cdefModel.getContentNameByID(cpCore, cpCore.doc.redirectContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         iisController.main_RedirectByRecord_ReturnStatus(cpCore, ContentName, cpCore.doc.redirectRecordID);
                         result = "";

@@ -13,6 +13,7 @@ using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -66,7 +67,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // bad email address
                 //
-            } else if (blockList.IndexOf(Environment.NewLine + EmailAddress + "\t") >= 0) {
+            } else if (blockList.IndexOf("\r\n" + EmailAddress + "\t") >= 0) {
                 //
                 // They are already in the list
                 //
@@ -74,7 +75,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // add them to the list
                 //
-                email_BlockList_Local = getBlockList() + Environment.NewLine + EmailAddress + "\t" + DateTime.Now;
+                email_BlockList_Local = getBlockList() + "\r\n" + EmailAddress + "\t" + DateTime.Now;
                 cpcore.privateFiles.saveFile("Config\\SMTPBlockList.txt", email_BlockList_Local);
                 email_BlockList_LocalLoaded = false;
             }
@@ -114,7 +115,7 @@ namespace Contensive.Core.Controllers {
                     // block
                 } else if ((FromAddress.IndexOf("@") + 1 == 0) || (FromAddress.IndexOf(".") + 1 == 0)) {
                     // block
-                } else if (0 != genericController.vbInstr(1, getBlockList(), Environment.NewLine + ToAddress + Environment.NewLine, Microsoft.VisualBasic.Constants.vbTextCompare)) {
+                } else if (0 != genericController.vbInstr(1, getBlockList(), "\r\n" + ToAddress + "\r\n", 1)) {
                     //
                     // They are in the block list
                     //
@@ -768,21 +769,21 @@ namespace Contensive.Core.Controllers {
                     iSendTo = cpcore.siteProperties.getText("TrapEmail");
                     iSendSubject = "EmailForm with bad Sendto address";
                     Message = "Subject: " + iSendSubject;
-                    Message = Message + Environment.NewLine;
+                    Message = Message + "\r\n";
                 }
-                Message = Message + "The form was submitted " + cpcore.doc.profileStartTime + Environment.NewLine;
-                Message = Message + Environment.NewLine;
-                Message = Message + "All text fields are included, completed or not." + Environment.NewLine;
-                Message = Message + "Only those checkboxes that are checked are included." + Environment.NewLine;
-                Message = Message + "Entries are not in the order they appeared on the form." + Environment.NewLine;
-                Message = Message + Environment.NewLine;
-                foreach (string key in cpcore.docProperties.getKeyList) {
+                Message = Message + "The form was submitted " + cpcore.doc.profileStartTime + "\r\n";
+                Message = Message + "\r\n";
+                Message = Message + "All text fields are included, completed or not.\r\n";
+                Message = Message + "Only those checkboxes that are checked are included.\r\n";
+                Message = Message + "Entries are not in the order they appeared on the form.\r\n";
+                Message = Message + "\r\n";
+                foreach (string key in cpcore.docProperties.getKeyList()) {
                     var tempVar = cpcore.docProperties.getProperty(key);
                     if (tempVar.IsForm) {
                         if (genericController.vbUCase(tempVar.Value) == "ON") {
-                            Message = Message + tempVar.Name + ": Yes" + Environment.NewLine + Environment.NewLine;
+                            Message = Message + tempVar.Name + ": Yes\r\n\r\n";
                         } else {
-                            Message = Message + tempVar.Name + ": " + tempVar.Value + Environment.NewLine + Environment.NewLine;
+                            Message = Message + tempVar.Name + ": " + tempVar.Value + "\r\n\r\n";
                         }
                     }
                 }
@@ -1010,12 +1011,12 @@ namespace Contensive.Core.Controllers {
                                 if (string.IsNullOrEmpty(Message)) {
                                     //hint = "180"
                                     Message = "This email was sent in reply to a request at " + cpcore.webServer.requestDomain + " for the username and password associated with this email address. ";
-                                    Message = Message + "If this request was made by you, please return to the login screen and use the following:" + Environment.NewLine;
-                                    Message = Message + Environment.NewLine;
+                                    Message = Message + "If this request was made by you, please return to the login screen and use the following:\r\n";
+                                    Message = Message + "\r\n";
                                 } else {
                                     //hint = "190"
-                                    Message = Message + Environment.NewLine;
-                                    Message = Message + "Additional user accounts with the same email address: " + Environment.NewLine;
+                                    Message = Message + "\r\n";
+                                    Message = Message + "Additional user accounts with the same email address: \r\n";
                                 }
                                 //
                                 // username
@@ -1047,7 +1048,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     //hint = "260"
-                                    Message = Message + " username: " + Username + Environment.NewLine;
+                                    Message = Message + " username: " + Username + "\r\n";
                                 }
                                 //hint = "270"
                                 if (usernameOK) {
@@ -1073,7 +1074,7 @@ namespace Contensive.Core.Controllers {
                                         updateUser = true;
                                     }
                                     //hint = "340"
-                                    Message = Message + " password: " + Password + Environment.NewLine;
+                                    Message = Message + " password: " + Password + "\r\n";
                                     returnREsult = true;
                                     if (updateUser) {
                                         //hint = "350"

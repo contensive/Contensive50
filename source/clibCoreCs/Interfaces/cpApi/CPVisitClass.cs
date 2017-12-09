@@ -51,14 +51,10 @@ namespace Contensive.Core {
             this.disposed = true;
         }
 
-        public override bool CookieSupport //Inherits BaseClasses.CPVisitBaseClass.CookieSupport
+        public override bool CookieSupport
         {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.cookieSupport;
-                } else {
-                    return false;
-                }
+                return cpCore.doc.authContext.visit.CookieSupport;
             }
         }
         //
@@ -76,70 +72,56 @@ namespace Contensive.Core {
         //
         public override int Id {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.id;
-                } else {
-                    return 0;
-                }
-            }
-        }
-
-        public override DateTime LastTime //Inherits BaseClasses.CPVisitBaseClass.LastTime
-        {
-            get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.lastvisitTime;
-                } else {
-                    return new DateTime();
-                }
-            }
-        }
-
-        public override int LoginAttempts //Inherits BaseClasses.CPVisitBaseClass.LoginAttempts
-        {
-            get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.loginAttempts;
-                } else {
-                    return 0;
-                }
-            }
-        }
-
-        public override string Name //Inherits BaseClasses.CPVisitBaseClass.Name
-        {
-            get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.name;
-                } else {
-                    return "";
-                }
-            }
-        }
-
-        public override int Pages //Inherits BaseClasses.CPVisitBaseClass.Pages
-        {
-            get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.pagevisits;
-                } else {
-                    return 0;
-                }
-            }
-        }
-
-        public override string Referer //Inherits BaseClasses.CPVisitBaseClass.Referer
-        {
-            get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.http_referer;
-                } else {
-                    return "";
-                }
+                return cpCore.doc.authContext.visit.id;
             }
         }
         //
+        //=======================================================================================================
         //
+        public override DateTime LastTime
+        {
+            get {
+                return cpCore.doc.authContext.visit.LastVisitTime;
+            }
+        }
+        //
+        //=======================================================================================================
+        //
+        public override int LoginAttempts
+        {
+            get {
+                return cpCore.doc.authContext.visit.LoginAttempts;
+            }
+        }
+        //
+        //=======================================================================================================
+        //
+        public override string Name
+        {
+            get {
+                return cpCore.doc.authContext.visit.Name;
+            }
+        }
+        //
+        //=======================================================================================================
+        //
+        public override int Pages
+        {
+            get {
+                return cpCore.doc.authContext.visit.PageVisits;
+            }
+        }
+        //
+        //=======================================================================================================
+        //
+        public override string Referer
+        {
+            get {
+                return cpCore.doc.authContext.visit.HTTP_REFERER;
+            }
+        }
+        //
+        //=======================================================================================================
         //
         public override void SetProperty(string PropertyName, string Value, int TargetVisitId = 0) {
             if (TargetVisitId == 0) {
@@ -148,8 +130,6 @@ namespace Contensive.Core {
                 cpCore.visitProperty.setProperty(PropertyName, Value, TargetVisitId);
             }
         }
-        //
-        //=======================================================================================================
         //
         //=======================================================================================================
         //
@@ -189,33 +169,23 @@ namespace Contensive.Core {
             return GetProperty(FieldName, DefaultValue);
         }
 
-        public override int StartDateValue //Inherits BaseClasses.CPVisitBaseClass.StartDateValue
+        public override int StartDateValue
         {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.startDateValue;
-                } else {
-                    return 0;
-                }
+                return cpCore.doc.authContext.visit.StartDateValue;
             }
         }
 
-        public override DateTime StartTime //Inherits BaseClasses.CPVisitBaseClass.StartTime
+        public override DateTime StartTime
         {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.startTime;
-                } else {
-                    return new DateTime();
-                }
+                return cpCore.doc.authContext.visit.StartTime;
             }
         }
         //
         //
         //
         private void appendDebugLog(string copy) {
-            //My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.visit, " & copy & vbCrLf, True)
-            // 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
         }
         //
         // testpoint

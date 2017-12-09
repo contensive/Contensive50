@@ -51,7 +51,7 @@ namespace Contensive.Core.Controllers {
             } else if (localStore == null) {
                 //
                 // -- load local store 
-                localStore = getinteger(propertyName, defaultValue);
+                localStore = getInteger(propertyName, defaultValue);
             }
             return Convert.ToInt32(localStore);
         }
@@ -204,9 +204,9 @@ namespace Contensive.Core.Controllers {
                         return 0;
                     } else {
                         if (_childListAddonID == null) {
-                            _childListAddonID = getinteger("ChildListAddonID", 0);
+                            _childListAddonID = getInteger("ChildListAddonID", 0);
                             if (_childListAddonID == 0) {
-                                int CS = cpCore.db.csOpen(cnAddons, "ccguid='" + addonGuidChildList + "'", "", "", "", "", "", "ID");
+                                int CS = cpCore.db.csOpen(cnAddons, "ccguid='" + addonGuidChildList + "'", "", true, 0, false, false, "ID");
                                 if (cpCore.db.csOk(CS)) {
                                     _childListAddonID = cpCore.db.csGetInteger(CS, "ID");
                                 }
@@ -504,7 +504,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="PropertyName"></param>
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
-        public int getinteger(string PropertyName, int DefaultValue = 0) {
+        public int getInteger(string PropertyName, int DefaultValue = 0) {
             return genericController.EncodeInteger(getText(PropertyName, DefaultValue.ToString()));
         }
         //

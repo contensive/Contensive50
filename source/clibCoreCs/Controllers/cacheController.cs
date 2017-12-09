@@ -150,7 +150,7 @@ namespace Contensive.Core.Controllers {
 					{
 						string[] cacheEndpointSplit = cacheEndpoint.Split(':');
 						int cacheEndpointPort = 11211;
-						if (cacheEndpointSplit.Count() > 1)
+						if (cacheEndpointSplit.GetUpperBound(0) > 1)
 						{
 							cacheEndpointPort = genericController.EncodeInteger(cacheEndpointSplit[1]);
 						}
@@ -411,7 +411,7 @@ namespace Contensive.Core.Controllers {
 						//
 						// -- local memory cache
 						//Dim cache As ObjectCache = MemoryCache.Default
-						result = (cacheWrapperClass)MemoryCache.Default(wrapperKey);
+						result = (cacheWrapperClass)MemoryCache.Default[wrapperKey];
 						if (result != null)
 						{
 							appendCacheLog("getCacheWrapper(" + key + "), memoryCache hit");

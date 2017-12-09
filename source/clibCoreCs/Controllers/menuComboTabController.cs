@@ -90,7 +90,7 @@ namespace Contensive.Core.Controllers {
                     //
                     TabWrapperID = "TabWrapper" + genericController.GetRandomInteger();
                     TabBlank = GetTabBlank();
-                    result = result + "<script language=\"JavaScript\" src=\"/ccLib/clientside/ccDynamicTab.js\" type=\"text/javascript\"></script>" + Environment.NewLine;
+                    result = result + "<script language=\"JavaScript\" src=\"/ccLib/clientside/ccDynamicTab.js\" type=\"text/javascript\"></script>\r\n";
                     result = result + "<table border=0 cellspacing=0 cellpadding=0 width=\"100%\"><tr>";
                     for (TabPtr = 0; TabPtr < TabsCnt; TabPtr++) {
                         TabStyle = Tabs[TabPtr].ContainerClass;
@@ -157,7 +157,7 @@ namespace Contensive.Core.Controllers {
                     }
                     result = result + "<td width=\"100%\" class=\"" + TabEndStyle + "\">&nbsp;</td></tr></table>";
                     result = result + "<div ID=\"" + TabWrapperID + "\" class=\"" + TabBodyCollectionWrapStyle + "\">" + TabBody + "</div>";
-                    result = result + "<script type=text/javascript>" + JSClose + "</script>" + Environment.NewLine;
+                    result = result + "<script type=text/javascript>" + JSClose + "</script>\r\n";
                     TabsCnt = 0;
                 }
             } catch (Exception ex) {
@@ -171,51 +171,51 @@ namespace Contensive.Core.Controllers {
         public string GetTabBlank() {
             string result = "";
             try {
-                result = result + "<!--" + Environment.NewLine + "Tab Replace-TabID" + Environment.NewLine + "-->"
+                result = result + "<!--\r\nTab Replace-TabID\r\n-->"
                 + "<table cellspacing=0 cellPadding=0 border=0 id=Replace-TabID>";
-                result = result + Environment.NewLine + "<tr>"
-                    + Environment.NewLine + "<td id=Replace-TabIDR00 colspan=2 class=\"\" height=1 width=2></td>"
-                    + Environment.NewLine + "<td id=Replace-TabIDR01 colspan=1 class=\"Replace-StyleEdge\" height=1></td>"
-                    + Environment.NewLine + "<td id=Replace-TabIDR02 colspan=3 class=\"\" height=1 width=3></td>"
-                    + Environment.NewLine + "</tr>";
+                result = result + "\r\n<tr>"
+                    + "\r\n<td id=Replace-TabIDR00 colspan=2 class=\"\" height=1 width=2></td>"
+                    + "\r\n<td id=Replace-TabIDR01 colspan=1 class=\"Replace-StyleEdge\" height=1></td>"
+                    + "\r\n<td id=Replace-TabIDR02 colspan=3 class=\"\" height=1 width=3></td>"
+                    + "\r\n</tr>";
                 //result = result _
                 //    & vbCrLf & "<tr>" _
                 //    & vbCrLf & "<td id=Replace-TabIDR00 colspan=2 class="""" height=1 width=2><img src=""/ccLib/images/spacer.gif"" width=2 height=1></td>" _
                 //    & vbCrLf & "<td id=Replace-TabIDR01 colspan=1 class=""Replace-StyleEdge"" height=1></td>" _
                 //    & vbCrLf & "<td id=Replace-TabIDR02 colspan=3 class="""" height=1 width=3><img src=""/ccLib/images/spacer.gif"" width=3 height=1></td>" _
                 //    & vbCrLf & "</tr>"
-                result = result + Environment.NewLine + "<tr>"
-                + Environment.NewLine + "<td id=Replace-TabIDR10 colspan=1 class=\"\" height=1 width=1></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR11 colspan=1 class=\"Replace-StyleEdge\" height=1 width=1></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR12 colspan=1 class=\"Replace-StyleHit\" height=1></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR13 colspan=1 class=\"Replace-StyleEdge\" height=1 width=1></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR14 colspan=2 class=\"\" height=1 width=2></td>"
-                + Environment.NewLine + "</tr>";
-                result = result + Environment.NewLine + "<tr>"
-                + Environment.NewLine + "<td id=Replace-TabIDR20 colspan=1 height=2 class=\"Replace-StyleEdge\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR21 colspan=1 height=2 Class=\"Replace-StyleHit\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR22 colspan=1 height=2 Class=\"Replace-StyleHit\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR23 colspan=1 height=2 Class=\"Replace-StyleHit\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR24 colspan=1 height=2 width=1 class=\"Replace-StyleEdge\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR25 colspan=1 height=2 width=1 Class=\"\"></td>"
-                + Environment.NewLine + "</tr>";
-                result = result + Environment.NewLine + "<tr>"
-                + Environment.NewLine + "<td id=Replace-TabIDR30 class=\"Replace-StyleEdge\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR31 Class=\"Replace-StyleHit\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR32 Class=\"Replace-StyleHit\" style=\"padding-right:10px;padding-left:10px;padding-bottom:2px;\">Replace-HotSpot</td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR33 Class=\"Replace-StyleHit\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR34 class=\"Replace-StyleEdge\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR35 class=\"\"></td>"
-                + Environment.NewLine + "</tr>";
-                result = result + Environment.NewLine + "<tr>"
-                + Environment.NewLine + "<td id=Replace-TabIDR40 class=\"Replace-StyleEdge\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR41 Class=\"Replace-StyleHit\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR42 Class=\"Replace-StyleHit\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR43 Class=\"Replace-StyleHit\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR44 class=\"Replace-StyleEdge\"></td>"
-                + Environment.NewLine + "<td id=Replace-TabIDR45 class=\"\" ></td>"
-                + Environment.NewLine + "</tr>"
-                + Environment.NewLine + "</table>";
+                result = result + "\r\n<tr>"
+                + "\r\n<td id=Replace-TabIDR10 colspan=1 class=\"\" height=1 width=1></td>"
+                + "\r\n<td id=Replace-TabIDR11 colspan=1 class=\"Replace-StyleEdge\" height=1 width=1></td>"
+                + "\r\n<td id=Replace-TabIDR12 colspan=1 class=\"Replace-StyleHit\" height=1></td>"
+                + "\r\n<td id=Replace-TabIDR13 colspan=1 class=\"Replace-StyleEdge\" height=1 width=1></td>"
+                + "\r\n<td id=Replace-TabIDR14 colspan=2 class=\"\" height=1 width=2></td>"
+                + "\r\n</tr>";
+                result = result + "\r\n<tr>"
+                + "\r\n<td id=Replace-TabIDR20 colspan=1 height=2 class=\"Replace-StyleEdge\"></td>"
+                + "\r\n<td id=Replace-TabIDR21 colspan=1 height=2 Class=\"Replace-StyleHit\"></td>"
+                + "\r\n<td id=Replace-TabIDR22 colspan=1 height=2 Class=\"Replace-StyleHit\"></td>"
+                + "\r\n<td id=Replace-TabIDR23 colspan=1 height=2 Class=\"Replace-StyleHit\"></td>"
+                + "\r\n<td id=Replace-TabIDR24 colspan=1 height=2 width=1 class=\"Replace-StyleEdge\"></td>"
+                + "\r\n<td id=Replace-TabIDR25 colspan=1 height=2 width=1 Class=\"\"></td>"
+                + "\r\n</tr>";
+                result = result + "\r\n<tr>"
+                + "\r\n<td id=Replace-TabIDR30 class=\"Replace-StyleEdge\"></td>"
+                + "\r\n<td id=Replace-TabIDR31 Class=\"Replace-StyleHit\"></td>"
+                + "\r\n<td id=Replace-TabIDR32 Class=\"Replace-StyleHit\" style=\"padding-right:10px;padding-left:10px;padding-bottom:2px;\">Replace-HotSpot</td>"
+                + "\r\n<td id=Replace-TabIDR33 Class=\"Replace-StyleHit\"></td>"
+                + "\r\n<td id=Replace-TabIDR34 class=\"Replace-StyleEdge\"></td>"
+                + "\r\n<td id=Replace-TabIDR35 class=\"\"></td>"
+                + "\r\n</tr>";
+                result = result + "\r\n<tr>"
+                + "\r\n<td id=Replace-TabIDR40 class=\"Replace-StyleEdge\"></td>"
+                + "\r\n<td id=Replace-TabIDR41 Class=\"Replace-StyleHit\"></td>"
+                + "\r\n<td id=Replace-TabIDR42 Class=\"Replace-StyleHit\"></td>"
+                + "\r\n<td id=Replace-TabIDR43 Class=\"Replace-StyleHit\"></td>"
+                + "\r\n<td id=Replace-TabIDR44 class=\"Replace-StyleEdge\"></td>"
+                + "\r\n<td id=Replace-TabIDR45 class=\"\" ></td>"
+                + "\r\n</tr>"
+                + "\r\n</table>";
             } catch (Exception ex) {
                 throw;
             }

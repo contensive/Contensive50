@@ -156,7 +156,7 @@ namespace Contensive.Core.Models.Entity {
         public int id { get; set; }
         public string name { get; set; }
         public string ccguid { get; set; }
-        public bool Active { get; set; }
+        public bool active { get; set; }
         public int ContentControlID { get; set; }
         public int CreatedBy { get; set; }
         public int CreateKey { get; set; }
@@ -576,13 +576,13 @@ namespace Contensive.Core.Models.Entity {
                     }
                     int recordId = cs.getInteger("id");
                     //INSTANT C# NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
-                    int value = 0;
+                    //int value = 0;
                     //INSTANT C# NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
-                    bool value = false;
+                    //bool value = false;
                     //INSTANT C# NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
                     DateTime value = default(DateTime);
                     //INSTANT C# NOTE: There is no C# equivalent to VB's implicit 'once only' variable initialization within loops, so the following variable declaration has been placed prior to the loop:
-                    double value = 0;
+                    //double value = 0;
                     foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         switch (instanceProperty.Name.ToLower()) {
                             case "id":
@@ -592,30 +592,30 @@ namespace Contensive.Core.Models.Entity {
                                 if (string.IsNullOrEmpty(ccguid)) {
                                     ccguid = Controllers.genericController.getGUID();
                                 }
-                                string value = instanceProperty.GetValue(this, null).ToString();
-                                cs.setField(instanceProperty.Name, value);
+                                //string value = instanceProperty.GetValue(this, null).ToString();
+                                cs.setField(instanceProperty.Name, instanceProperty.GetValue(this, null).ToString());
                                 break;
                             default:
                                 switch (instanceProperty.PropertyType.Name) {
                                     case "Int32":
-                                        //										Dim value As Integer
-                                        int.TryParse(instanceProperty.GetValue(this, null).ToString(), out value);
-                                        cs.setField(instanceProperty.Name, value);
+                                        Int32 valueInt32;
+                                        int.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueInt32);
+                                        cs.setField(instanceProperty.Name, valueInt32);
                                         break;
                                     case "Boolean":
-                                        //										Dim value As Boolean
-                                        bool.TryParse(instanceProperty.GetValue(this, null).ToString(), out value);
-                                        cs.setField(instanceProperty.Name, value);
+                                        bool valueBool;
+                                        bool.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueBool);
+                                        cs.setField(instanceProperty.Name, valueBool);
                                         break;
                                     case "DateTime":
-                                        //										Dim value As Date
-                                        DateTime.TryParse(instanceProperty.GetValue(this, null).ToString(), out value);
-                                        cs.setField(instanceProperty.Name, value);
+                                        DateTime valueDate;
+                                        DateTime.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueDate);
+                                        cs.setField(instanceProperty.Name, valueDate);
                                         break;
                                     case "Double":
-                                        //										Dim value As Double
-                                        double.TryParse(instanceProperty.GetValue(this, null).ToString(), out value);
-                                        cs.setField(instanceProperty.Name, value);
+                                        double valueDbl;
+                                        double.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueDbl);
+                                        cs.setField(instanceProperty.Name, valueDbl);
                                         break;
                                     case "fieldTypeTextFile":
                                     case "fieldTypeJavascriptFile":
@@ -742,8 +742,8 @@ namespace Contensive.Core.Models.Entity {
                                         //    End If
                                         break;
                                     default:
-                                        string value = instanceProperty.GetValue(this, null).ToString();
-                                        cs.setField(instanceProperty.Name, value);
+                                        //string value = instanceProperty.GetValue(this, null).ToString();
+                                        cs.setField(instanceProperty.Name, instanceProperty.GetValue(this, null).ToString());
                                         break;
                                 }
                                 break;
@@ -833,12 +833,12 @@ namespace Contensive.Core.Models.Entity {
         //
         //====================================================================================================
         protected static List<T> createList<T>(coreClass cpCore, string sqlCriteria) where T : baseModel {
-            return createList<T>(cpCore, sqlCriteria, "id", new List<string>);
+            return createList<T>(cpCore, sqlCriteria, "id", new List<string> { });
         }
         //
         //====================================================================================================
         protected static List<T> createList<T>(coreClass cpCore, string sqlCriteria, string sqlOrderBy) where T : baseModel {
-            return createList<T>(cpCore, sqlCriteria, sqlOrderBy, new List<string>);
+            return createList<T>(cpCore, sqlCriteria, sqlOrderBy, new List<string> { });
         }
         //
         //====================================================================================================
@@ -1048,19 +1048,19 @@ namespace Contensive.Core.Models.Entity {
                                 default:
                                     switch (resultProperty.PropertyType.Name) {
                                         case "Int32":
-                                            resultProperty.SetValue(instance, genericController.EncodeInteger(CDef.fields(resultProperty.Name).defaultValue), null);
+                                            resultProperty.SetValue(instance, genericController.EncodeInteger(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         case "Boolean":
-                                            resultProperty.SetValue(instance, genericController.EncodeBoolean(CDef.fields(resultProperty.Name).defaultValue), null);
+                                            resultProperty.SetValue(instance, genericController.EncodeBoolean(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         case "DateTime":
-                                            resultProperty.SetValue(instance, genericController.EncodeDate(CDef.fields(resultProperty.Name).defaultValue), null);
+                                            resultProperty.SetValue(instance, genericController.EncodeDate(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         case "Double":
-                                            resultProperty.SetValue(instance, genericController.EncodeNumber(CDef.fields(resultProperty.Name).defaultValue), null);
+                                            resultProperty.SetValue(instance, genericController.EncodeNumber(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         default:
-                                            resultProperty.SetValue(instance, CDef.fields(resultProperty.Name).defaultValue, null);
+                                            resultProperty.SetValue(instance, CDef.fields[resultProperty.Name].defaultValue, null);
                                             break;
                                     }
                                     break;

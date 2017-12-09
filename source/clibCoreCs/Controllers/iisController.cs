@@ -119,7 +119,7 @@ namespace Contensive.Core.Controllers {
                 runProcess(cpCore, Cmd, arg, true);
                 Copy = cpCore.privateFiles.readFile(LogFilename);
                 cpCore.privateFiles.deleteFile(LogFilename);
-                Copy = genericController.vbReplace(Copy, Environment.NewLine, "\\n");
+                Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = genericController.vbReplace(Copy, "\r", "\\n");
                 Copy = genericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
@@ -145,7 +145,7 @@ namespace Contensive.Core.Controllers {
                 runProcess(cpCore, Cmd, "", true);
                 Copy = cpCore.privateFiles.readFile(LogFilename);
                 cpCore.privateFiles.deleteFile(LogFilename);
-                Copy = genericController.vbReplace(Copy, Environment.NewLine, "\\n");
+                Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = genericController.vbReplace(Copy, "\r", "\\n");
                 Copy = genericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
@@ -171,7 +171,7 @@ namespace Contensive.Core.Controllers {
                 runProcess(cpCore, Cmd, "", true);
                 Copy = cpCore.privateFiles.readFile(LogFilename);
                 cpCore.privateFiles.deleteFile(LogFilename);
-                Copy = genericController.vbReplace(Copy, Environment.NewLine, "\\n");
+                Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = genericController.vbReplace(Copy, "\r", "\\n");
                 Copy = genericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
@@ -192,7 +192,7 @@ namespace Contensive.Core.Controllers {
                 appPoolColl = serverManager.ApplicationPools;
                 foreach (ApplicationPool appPool in appPoolColl) {
                     if (appPool.Name.ToLower() == appName.ToLower()) {
-                        if (appPool.Start == ObjectState.Started) {
+                        if (appPool.Start() == ObjectState.Started) {
                             appPool.Recycle();
                         }
                     }
@@ -433,7 +433,7 @@ namespace Contensive.Core.Controllers {
                         cpCore.domainLegacyCache.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew);
                         //
                         // -- update database
-                        domainModel domain = domainModel.add(cpCore, ref new List<string>());
+                        domainModel domain = domainModel.add(cpCore);
                         cpCore.domainLegacyCache.domainDetails.id = domain.id;
                         domain.name = requestDomain;
                         domain.TypeID = 1;
@@ -472,7 +472,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // normal domain, leave it
                         //
-                    } else if (genericController.vbInstr(1, requestPathPage, "/" + cpCore.serverConfig.appConfig.adminRoute, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                    } else if (genericController.vbInstr(1, requestPathPage, "/" + cpCore.serverConfig.appConfig.adminRoute, 1) != 0) {
                         //
                         // forwarding does not work in the admin site
                         //
@@ -729,34 +729,34 @@ namespace Contensive.Core.Controllers {
                             //   crlf delimited list of name,value,expires,domain,path,secure
                             //
                             if (bufferCookies != "") {
-                                bufferCookies = bufferCookies + Environment.NewLine;
+                                bufferCookies = bufferCookies + "\r\n";
                             }
                             bufferCookies = bufferCookies + CookieName;
-                            bufferCookies = bufferCookies + Environment.NewLine + iCookieValue;
+                            bufferCookies = bufferCookies + "\r\n" + iCookieValue;
                             //
                             s = "";
                             if (!isMinDate(DateExpires)) {
                                 s = DateExpires.ToString();
                             }
-                            bufferCookies = bufferCookies + Environment.NewLine + s;
+                            bufferCookies = bufferCookies + "\r\n" + s;
                             //
                             s = "";
                             if (!isMissing(domain)) {
                                 s = genericController.encodeText(domain);
                             }
-                            bufferCookies = bufferCookies + Environment.NewLine + s;
+                            bufferCookies = bufferCookies + "\r\n" + s;
                             //
                             s = "/";
                             if (!isMissing(Path)) {
                                 s = genericController.encodeText(Path);
                             }
-                            bufferCookies = bufferCookies + Environment.NewLine + s;
+                            bufferCookies = bufferCookies + "\r\n" + s;
                             //
                             s = "false";
                             if (genericController.EncodeBoolean(Secure)) {
                                 s = "true";
                             }
-                            bufferCookies = bufferCookies + Environment.NewLine + s;
+                            bufferCookies = bufferCookies + "\r\n" + s;
                         }
                     }
                 }
@@ -785,9 +785,9 @@ namespace Contensive.Core.Controllers {
                 //
                 if (cpCore.doc.continueProcessing) {
                     if (bufferResponseHeader != "") {
-                        bufferResponseHeader = bufferResponseHeader + Environment.NewLine;
+                        bufferResponseHeader = bufferResponseHeader + "\r\n";
                     }
-                    bufferResponseHeader = bufferResponseHeader + genericController.vbReplace(genericController.encodeText(HeaderName), Environment.NewLine, "") + Environment.NewLine + genericController.vbReplace(genericController.encodeText(HeaderValue), Environment.NewLine, "");
+                    bufferResponseHeader = bufferResponseHeader + genericController.vbReplace(genericController.encodeText(HeaderName), "\r\n", "") + "\r\n" + genericController.vbReplace(genericController.encodeText(HeaderValue), "\r\n", "");
                 }
                 //
                 return;

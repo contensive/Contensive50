@@ -123,7 +123,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // should never return an error to the iDaemon
                                 //
-                                Microsoft.VisualBasic.FileIO.FileSystem.WriteAllText("C:\\clibIpDaemonDebug.log", Environment.NewLine + DateTime.Now.ToString() + " " + "Exception in callback, hintPrefixes=[" + hintPrefixes + "], hint=[" + Hint + "], ex=[" + ex.Message + "/" + ex.StackTrace + "]", true);
+                                Microsoft.VisualBasic.FileIO.FileSystem.WriteAllText("C:\\clibIpDaemonDebug.log", "\r\n" + DateTime.Now.ToString() + " Exception in callback, hintPrefixes=[" + hintPrefixes + "], hint=[" + Hint + "], ex=[" + ex.Message + "/" + ex.StackTrace + "]", true);
                                 responseString = "";
                             }
                             Hint += ",set buffer from responseString";
@@ -148,13 +148,13 @@ namespace Contensive.Core.Controllers {
                 //
                 //
                 //
-                Microsoft.VisualBasic.FileIO.FileSystem.WriteAllText("C:\\clibIpDaemonDebug.log", Environment.NewLine + DateTime.Now.ToString() + " " + "HttpListenerException, hintPrefixes=[" + hintPrefixes + "], hint=[" + Hint + "], ex=[" + ex.Message + "/" + ex.StackTrace + "]", true);
+                Microsoft.VisualBasic.FileIO.FileSystem.WriteAllText("C:\\clibIpDaemonDebug.log", "\r\n" + DateTime.Now.ToString() + " HttpListenerException, hintPrefixes=[" + hintPrefixes + "], hint=[" + Hint + "], ex=[" + ex.Message + "/" + ex.StackTrace + "]", true);
                 //Throw
             } catch (Exception ex) {
                 //
                 //
                 //
-                Microsoft.VisualBasic.FileIO.FileSystem.WriteAllText("C:\\clibIpDaemonDebug.log", Environment.NewLine + DateTime.Now.ToString() + " " + "Exception, hintPrefixes=[" + hintPrefixes + "], hint=[" + Hint + "], ex=[" + ex.Message + "/" + ex.StackTrace + "]", true);
+                Microsoft.VisualBasic.FileIO.FileSystem.WriteAllText("C:\\clibIpDaemonDebug.log", "\r\n" + DateTime.Now.ToString() + " Exception, hintPrefixes=[" + hintPrefixes + "], hint=[" + Hint + "], ex=[" + ex.Message + "/" + ex.StackTrace + "]", true);
                 //Throw
             }
         }

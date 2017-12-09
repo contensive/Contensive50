@@ -12,6 +12,7 @@ using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using Contensive.Core.Models.Complex;
 //
 namespace Contensive.Core.Controllers {
     public partial class dbController : IDisposable {
@@ -35,9 +36,9 @@ namespace Contensive.Core.Controllers {
         private bool dbEnabled { get; set; } = true;
         //
         // simple lazy cache so it only calculates conn string once
-        private Dictionary<string, string> connectionStringDict { get; set; } = new Dictionary<string, string>(); 
+        private Dictionary<string, string> connectionStringDict { get; set; } = new Dictionary<string, string>();
         //
-        private ContentSetType2[] contentSetStore { get; set; }
+        private ContentSetType2[] contentSetStore;
         //
         // The number of elements being used
         private int contentSetStoreCount { get; set; }
@@ -298,7 +299,7 @@ namespace Contensive.Core.Controllers {
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         using (SqlCommand cmdSQL = new SqlCommand()) {
-                            cmdSQL.CommandType = Data.CommandType.Text;
+                            cmdSQL.CommandType = CommandType.Text;
                             cmdSQL.CommandText = sql;
                             cmdSQL.Connection = connSQL;
                             using (dynamic adptSQL = new System.Data.SqlClient.SqlDataAdapter(cmdSQL)) {
@@ -381,7 +382,7 @@ namespace Contensive.Core.Controllers {
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         using (SqlCommand cmdSQL = new SqlCommand()) {
-                            cmdSQL.CommandType = Data.CommandType.Text;
+                            cmdSQL.CommandType = CommandType.Text;
                             cmdSQL.CommandText = sql;
                             cmdSQL.Connection = connSQL;
                             recordsAffected = cmdSQL.ExecuteNonQuery();
@@ -408,7 +409,7 @@ namespace Contensive.Core.Controllers {
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         using (SqlCommand cmdSQL = new SqlCommand()) {
-                            cmdSQL.CommandType = Data.CommandType.Text;
+                            cmdSQL.CommandType = CommandType.Text;
                             cmdSQL.CommandText = sql;
                             cmdSQL.Connection = connSQL;
                             cmdSQL.ExecuteNonQueryAsync();
@@ -432,7 +433,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="sqlList"></param>
         public void updateTableRecord(string DataSourceName, string TableName, string Criteria, sqlFieldListClass sqlList) {
             try {
-                string SQL = "update " + TableName + " set " + sqlList.getNameValueList + " where " + Criteria + ";";
+                string SQL = "update " + TableName + " set " + sqlList.getNameValueList() + " where " + Criteria + ";";
                 executeNonQuery(SQL, DataSourceName);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -509,7 +510,7 @@ namespace Contensive.Core.Controllers {
         public void insertTableRecord(string DataSourceName, string TableName, sqlFieldListClass sqlList) {
             try {
                 if (sqlList.count > 0) {
-                    string sql = "INSERT INTO " + TableName + "(" + sqlList.getNameList + ")values(" + sqlList.getValueList + ")";
+                    string sql = "INSERT INTO " + TableName + "(" + sqlList.getNameList() + ")values(" + sqlList.getValueList() + ")";
                     DataTable dt = executeQuery(sql, DataSourceName);
                     dt.Dispose();
                 }
@@ -1292,8 +1293,8 @@ namespace Contensive.Core.Controllers {
                             Cnt = SortFields.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 SortField = SortFields[Ptr].ToLower();
-                                SortField = genericController.vbReplace(SortField, "asc", "", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                                SortField = genericController.vbReplace(SortField, "desc", "", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                SortField = genericController.vbReplace(SortField, "asc", "", 1, 99, 1);
+                                SortField = genericController.vbReplace(SortField, "desc", "", 1, 99, 1);
                                 SortField = SortField.Trim(' ');
                                 if (!CDef.selectList.Contains(SortField)) {
                                     //throw (New ApplicationException("Unexpected exception"))
@@ -1336,16 +1337,16 @@ namespace Contensive.Core.Controllers {
                         }
                         if ((!string.IsNullOrEmpty(iSelectFieldList)) && (iSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) + 1 == 0)) {
                             TestUcaseFieldList = genericController.vbUCase("," + iSelectFieldList + ",");
-                            if (genericController.vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                            if (genericController.vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", 1) == 0) {
                                 iSelectFieldList = iSelectFieldList + ",ContentControlID";
                             }
-                            if (genericController.vbInstr(1, TestUcaseFieldList, ",NAME,", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                            if (genericController.vbInstr(1, TestUcaseFieldList, ",NAME,", 1) == 0) {
                                 iSelectFieldList = iSelectFieldList + ",Name";
                             }
-                            if (genericController.vbInstr(1, TestUcaseFieldList, ",ID,", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                            if (genericController.vbInstr(1, TestUcaseFieldList, ",ID,", 1) == 0) {
                                 iSelectFieldList = iSelectFieldList + ",ID";
                             }
-                            if (genericController.vbInstr(1, TestUcaseFieldList, ",ACTIVE,", Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                            if (genericController.vbInstr(1, TestUcaseFieldList, ",ACTIVE,", 1) == 0) {
                                 iSelectFieldList = iSelectFieldList + ",ACTIVE";
                             }
                         }
@@ -1753,7 +1754,7 @@ namespace Contensive.Core.Controllers {
                                 for (ColumnPointer = 0; ColumnPointer < tempVar.ResultColumnCount; ColumnPointer++) {
                                     if (tempVar.fieldNames[ColumnPointer] == fieldNameTrimUpper) {
                                         returnValue = tempVar.readCache[ColumnPointer, 0];
-                                        if ((tempVar.Updateable & (tempVar.ContentName != "") & (!string.IsNullOrEmpty(FieldName))) != 0) {
+                                        if ((tempVar.Updateable & (tempVar.ContentName != "") & (!string.IsNullOrEmpty(FieldName)))) {
                                             if (tempVar.CDef.fields[FieldName.ToLower()].Scramble) {
                                                 returnValue = genericController.TextDeScramble(cpCore, genericController.encodeText(returnValue));
                                             }
@@ -2461,7 +2462,7 @@ namespace Contensive.Core.Controllers {
                 if (RecordID <= 0) {
                     // no error, return -1 - Throw New ArgumentException("recordId is not valid [" & RecordID & "]")
                 } else {
-                    returnResult = csOpen(ContentName, "(ID=" + encodeSQLNumber(RecordID) + ")",, false, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+                    returnResult = csOpen(ContentName, "(ID=" + encodeSQLNumber(RecordID) + ")","", false, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -2728,7 +2729,7 @@ namespace Contensive.Core.Controllers {
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                                     //
                                                     // -- First try Lookup Content
-                                                    CSLookup = csOpen(LookupContentName, "ID=" + encodeSQLNumber(genericController.EncodeInteger(FieldValueVariant)),,, "",,, "name", 1);
+                                                    CSLookup = csOpen(LookupContentName, "ID=" + encodeSQLNumber(genericController.EncodeInteger(FieldValueVariant)),"",true, 0,false,false, "name", 1);
                                                     if (csOk(CSLookup)) {
                                                         fieldValue = csGetText(CSLookup, "name");
                                                     }
@@ -2958,7 +2959,7 @@ namespace Contensive.Core.Controllers {
                                                         path = PathFilename.Substring(0, Pos);
                                                         FilenameRev = 1;
                                                         if (!genericController.vbIsNumeric(fileNameNoExt)) {
-                                                            Pos = genericController.vbInstr(1, fileNameNoExt, ".r", Microsoft.VisualBasic.Constants.vbTextCompare);
+                                                            Pos = genericController.vbInstr(1, fileNameNoExt, ".r", 1);
                                                             if (Pos > 0) {
                                                                 FilenameRev = genericController.EncodeInteger(fileNameNoExt.Substring(Pos + 1));
                                                                 FilenameRev = FilenameRev + 1;
@@ -4239,7 +4240,7 @@ namespace Contensive.Core.Controllers {
                 } else if (string.IsNullOrEmpty(RecordGuid)) {
                     throw new ArgumentException("RecordGuid cannot be blank");
                 } else {
-                    int CS = csOpen(ContentName, "ccguid=" + encodeSQLText(RecordGuid), "ID",,,,, "ID");
+                    int CS = csOpen(ContentName, "ccguid=" + encodeSQLText(RecordGuid), "ID",true,0,false,false, "ID");
                     if (csOk(CS)) {
                         returnResult = csGetInteger(CS, "ID");
                     }
@@ -4632,7 +4633,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Read in a record from the table to get fields
                 //----------------------------------------------------------------
                 //
-                DataTable dt = cpCore.db.openTable(DataSource.Name, TableName, "", "",, 1);
+                DataTable dt = cpCore.db.openTable(DataSource.Name, TableName, "", "","", 1);
                 if (dt.Rows.Count == 0) {
                     dt.Dispose();
                     //
@@ -4665,7 +4666,7 @@ namespace Contensive.Core.Controllers {
                         if (dt.Rows.Count == 0) {
                             throw new ApplicationException("Content Definition [" + ContentName + "] could Not be selected by name after it was inserted");
                         } else {
-                            ContentID = genericController.EncodeInteger(dt(0)["ID"]);
+                            ContentID = genericController.EncodeInteger(dt.Rows[0]["ID"]);
                             cpCore.db.executeQuery("update ccContent Set CreateKey=0 where id=" + ContentID);
                         }
                         dt.Dispose();
@@ -4691,7 +4692,7 @@ namespace Contensive.Core.Controllers {
                         string UcaseTableColumnName = genericController.vbUCase(dcTableColumns.ColumnName);
                         ContentFieldFound = false;
                         foreach (DataRow drContentRecords in dtFields.Rows) {
-                            if (genericController.vbUCase(genericController.encodeText(drContentRecords("name"))) == UcaseTableColumnName) {
+                            if (genericController.vbUCase(genericController.encodeText(drContentRecords["name"])) == UcaseTableColumnName) {
                                 ContentFieldFound = true;
                                 break;
                             }
@@ -4960,7 +4961,7 @@ namespace Contensive.Core.Controllers {
                     foreach (DataRow dr in dt.Rows) {
                         cPtr = 0;
                         foreach (DataColumn cell in dt.Columns) {
-                            rows[cPtr, rPtr] = genericController.encodeText(dr(cell));
+                            rows[cPtr, rPtr] = genericController.encodeText(dr[cell]);
                             cPtr += 1;
                         }
                         rPtr += 1;
@@ -5071,7 +5072,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // First try main_ContentWatch table for a link
                     //
-                    CSPointer = csOpen("Content Watch", "ContentRecordKey=" + encodeSQLText(ContentRecordKey),,,,,, "Link,Clicks");
+                    CSPointer = csOpen("Content Watch", "ContentRecordKey=" + encodeSQLText(ContentRecordKey),"",true,0,false,false, "Link,Clicks");
                     if (csOk(CSPointer)) {
                         result = cpCore.db.csGetText(CSPointer, "Link");
                     }
@@ -5089,7 +5090,7 @@ namespace Contensive.Core.Controllers {
                                 RecordID = genericController.EncodeInteger(KeySplit[1]);
                                 if (!string.IsNullOrEmpty(ContentName) & RecordID != 0) {
                                     if (Models.Complex.cdefModel.getContentTablename(cpCore, ContentName) == "ccPageContent") {
-                                        CSPointer = cpCore.db.csOpenRecord(ContentName, RecordID,,, "TemplateID,ParentID");
+                                        CSPointer = cpCore.db.csOpenRecord(ContentName, RecordID,false,false, "TemplateID,ParentID");
                                         if (csOk(CSPointer)) {
                                             recordfound = true;
                                             templateId = csGetInteger(CSPointer, "TemplateID");
@@ -5105,7 +5106,7 @@ namespace Contensive.Core.Controllers {
                                         } else {
 
                                             if (templateId != 0) {
-                                                CSPointer = cpCore.db.csOpenRecord("Page Templates", templateId,,, "Link");
+                                                CSPointer = cpCore.db.csOpenRecord("Page Templates", templateId,false,false, "Link");
                                                 if (csOk(CSPointer)) {
                                                     result = csGetText(CSPointer, "Link");
                                                 }
@@ -5194,7 +5195,7 @@ namespace Contensive.Core.Controllers {
             int result = 0;
             int CS = 0;
             tempGetTableID = -1;
-            CS = cpCore.db.csOpenSql("Select ID from ccTables where name=" + cpCore.db.encodeSQLText(TableName),, 1);
+            CS = cpCore.db.csOpenSql("Select ID from ccTables where name=" + cpCore.db.encodeSQLText(TableName),"", 1);
             if (cpCore.db.csOk(CS)) {
                 result = cpCore.db.csGetInteger(CS, "ID");
             }
@@ -5213,13 +5214,13 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public int csOpenRecord(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(genericController.encodeText(ContentName), "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")",, false, cpCore.doc.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(genericController.encodeText(ContentName), "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")","", false, cpCore.doc.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         //========================================================================
         //
         public int cs_open2(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(ContentName, "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")",, false, cpCore.doc.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(ContentName, "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")","", false, cpCore.doc.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         //========================================================================

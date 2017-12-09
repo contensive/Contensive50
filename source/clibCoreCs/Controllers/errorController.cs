@@ -33,7 +33,7 @@ namespace Contensive.Core.Controllers {
         //
         public static void error_AddUserError(coreClass cpCore, string Message) {
             if (cpCore.doc.debug_iUserError.IndexOf(Message, System.StringComparison.OrdinalIgnoreCase) + 1 == 0) {
-                cpCore.doc.debug_iUserError = cpCore.doc.debug_iUserError + "\r" + "<li class=\"ccError\">" + genericController.encodeText(Message) + "</LI>";
+                cpCore.doc.debug_iUserError = cpCore.doc.debug_iUserError + "\r<li class=\"ccError\">" + genericController.encodeText(Message) + "</LI>";
             }
         }
         //
@@ -46,7 +46,7 @@ namespace Contensive.Core.Controllers {
             string temperror_GetUserError = null;
             temperror_GetUserError = genericController.encodeText(cpcore.doc.debug_iUserError);
             if (!string.IsNullOrEmpty(temperror_GetUserError)) {
-                temperror_GetUserError = "<ul class=\"ccError\">" + genericController.htmlIndent(temperror_GetUserError) + "\r" + "</ul>";
+                temperror_GetUserError = "<ul class=\"ccError\">" + genericController.htmlIndent(temperror_GetUserError) + "\r</ul>";
                 temperror_GetUserError = UserErrorHeadline + "" + temperror_GetUserError;
                 cpcore.doc.debug_iUserError = "";
             }
@@ -68,7 +68,7 @@ namespace Contensive.Core.Controllers {
                         foreach (string exMsg in cpcore.doc.errList) {
                             returnHtmlList += cr2 + "<li class=\"ccExceptionListRow\">" + cr3 + cpcore.html.convertTextToHTML(exMsg) + cr2 + "</li>";
                         }
-                        returnHtmlList = "\r" + "<ul class=\"ccExceptionList\">" + returnHtmlList + "\r" + "</ul>";
+                        returnHtmlList = "\r<ul class=\"ccExceptionList\">" + returnHtmlList + "\r</ul>";
                     }
                 }
             } catch (Exception ex) {

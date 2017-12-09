@@ -109,7 +109,7 @@ namespace Contensive.Core.Controllers {
                 //
                 ArrayPointer = -1;
                 if (store.ArrayCount > 0) {
-                    UcaseTargetKey = genericController.vbReplace(Key.ToUpper(), Environment.NewLine, "");
+                    UcaseTargetKey = genericController.vbReplace(Key.ToUpper(), "\r\n", "");
                     LowGuess = -1;
                     HighGuess = store.ArrayCount - 1;
                     while ((HighGuess - LowGuess) > 1) {
@@ -149,7 +149,7 @@ namespace Contensive.Core.Controllers {
                 string UcaseKey = null;
                 test = "";
                 //
-                UcaseKey = genericController.vbReplace(Key.ToUpper(), Environment.NewLine, "");
+                UcaseKey = genericController.vbReplace(Key.ToUpper(), "\r\n", "");
                 //UcaseKey = genericController.vbUCase(Key)
                 store.ArrayPointer = GetArrayPointer(Key);
                 if (store.ArrayPointer > -1) {
@@ -182,7 +182,7 @@ namespace Contensive.Core.Controllers {
             try {
                 string keyToSave;
                 //
-                keyToSave = genericController.vbReplace(Key.ToUpper(), Environment.NewLine, "");
+                keyToSave = genericController.vbReplace(Key.ToUpper(), "\r\n", "");
                 //
                 if (store.ArrayCount >= store.ArraySize) {
                     store.ArraySize = store.ArraySize + KeyPointerArrayChunk;

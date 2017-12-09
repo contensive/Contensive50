@@ -51,14 +51,10 @@ namespace Contensive.Core {
             this.disposed = true;
         }
 
-        public override bool ForceBrowserMobile //Inherits BaseClasses.CPVisitorBaseClass.ForceBrowserMobile
+        public override bool ForceBrowserMobile
         {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visitor.forceBrowserMobile;
-                } else {
-                    return false;
-                }
+                return genericController.EncodeBoolean(cpCore.doc.authContext.visitor.ForceBrowserMobile);
             }
         }
 
@@ -110,25 +106,17 @@ namespace Contensive.Core {
             return GetProperty(FieldName, DefaultValue);
         }
 
-        public override int Id //Inherits BaseClasses.CPVisitorBaseClass.Id
+        public override int Id
         {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visitor.id;
-                } else {
-                    return 0;
-                }
+                return cpCore.doc.authContext.visitor.ID;
             }
         }
 
         public override bool IsNew //Inherits BaseClasses.CPVisitorBaseClass.IsNew
         {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.VisitorNew;
-                } else {
-                    return false;
-                }
+                return cpCore.doc.authContext.visit.VisitorNew;
             }
         }
 
@@ -143,19 +131,13 @@ namespace Contensive.Core {
 
         public override int UserId {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visitor.memberID;
-                } else {
-                    return 0;
-                }
+                return cpCore.doc.authContext.visitor.MemberID;
             }
         }
         //
         //
         //
         private void appendDebugLog(string copy) {
-            //My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.visitor, " & copy & vbCrLf, True)
-            // 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
         }
         //
         // testpoint

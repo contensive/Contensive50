@@ -10,6 +10,7 @@ using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using System.Data;
 //
 
 namespace Contensive.Core.Controllers {

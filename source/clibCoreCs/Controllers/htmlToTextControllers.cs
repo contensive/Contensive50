@@ -17,25 +17,20 @@ using static Contensive.Core.constants;
 namespace Contensive.Core.Controllers {
     public class htmlToTextControllers {
         //
-        private coreClass cpCore;
-        //
-        public bool ConvertLinksToText;
-        //
         //====================================================================================================
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="cpCore"></param>
         /// <remarks></remarks>
-        public htmlToTextControllers(coreClass cpCore) {
-            this.cpCore = cpCore;
+        public htmlToTextControllers() {
         }
         //
         //========================================================================
         // Decode an HTML document back into plain text
         //========================================================================
         //
-        public string convert(string Body) {
+        static public string convert(coreClass cpCore, string Body) {
             string result = Body;
             try {
                 string TextTest = null;
@@ -105,7 +100,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             // ----- break
                                             //
-                                            ElementText = Environment.NewLine;
+                                            ElementText = "\r\n";
                                             break;
                                         case "DIV":
                                         case "TD":
@@ -135,7 +130,7 @@ namespace Contensive.Core.Controllers {
                                                 //
                                                 // new line
                                                 //
-                                                ElementText = Environment.NewLine;
+                                                ElementText = "\r\n";
                                             }
                                             break;
                                         case "/DIV":
@@ -162,7 +157,7 @@ namespace Contensive.Core.Controllers {
                                                 //
                                                 // new line
                                                 //
-                                                ElementText = Environment.NewLine;
+                                                ElementText = "\r\n";
                                             }
                                             //Case "/OL", "/UL"
                                             //    '
@@ -180,7 +175,7 @@ namespace Contensive.Core.Controllers {
                                             // ----- end anchor, put the URL in parantheses
                                             //
                                             ElementText = "";
-                                            if (ConvertLinksToText && (!string.IsNullOrEmpty(LastHRef))) {
+                                            if ((!string.IsNullOrEmpty(LastHRef))) {
                                                 ElementText = " (" + LastHRef + ") ";
                                             }
                                             LastHRef = "";
@@ -279,23 +274,23 @@ namespace Contensive.Core.Controllers {
                     // Remove lines that are just spaces
                     //
                     LoopCount = 0;
-                    while ((result.IndexOf(Environment.NewLine + " ") + 1 != 0) && (LoopCount < 1000)) {
-                        result = genericController.vbReplace(result, Environment.NewLine + " ", Environment.NewLine);
+                    while ((result.IndexOf("\r\n ") + 1 != 0) && (LoopCount < 1000)) {
+                        result = genericController.vbReplace(result, "\r\n ", "\r\n");
                         LoopCount += 1;
                     }
                     //
                     // remove long sets of extra line feeds
                     //
                     LoopCount = 0;
-                    while ((result.IndexOf(Environment.NewLine + Environment.NewLine + Environment.NewLine) + 1 != 0) && (LoopCount < 1000)) {
-                        result = genericController.vbReplace(result, Environment.NewLine + Environment.NewLine + Environment.NewLine, Environment.NewLine + Environment.NewLine);
+                    while ((result.IndexOf("\r\n\r\n\r\n") + 1 != 0) && (LoopCount < 1000)) {
+                        result = genericController.vbReplace(result, "\r\n\r\n\r\n", "\r\n\r\n");
                         LoopCount += 1;
                     }
                     //
                     // Trim CR from the start
                     //
                     LoopCount = 0;
-                    while ((result.IndexOf(Environment.NewLine) + 1 == 1) && (LoopCount < 1000)) {
+                    while ((result.IndexOf("\r\n") + 1 == 1) && (LoopCount < 1000)) {
                         result = result.Substring(2);
                         LoopCount += 1;
                     }
@@ -391,11 +386,9 @@ namespace Contensive.Core.Controllers {
         // Remove all but a..z, A..Z
         //=============================================================================
         //
-        private string DecodeHTML_RemoveWhiteSpace(string DirtyText) {
+        private string DecodeHTML_RemoveWhiteSpace(coreClass cpCore, string DirtyText) {
             string tempDecodeHTML_RemoveWhiteSpace = null;
             try {
-                //
-                string WorkingText = null;
                 int Pointer = 0;
                 int SpaceCounter = 0;
                 string ChrTest = null;
@@ -407,7 +400,7 @@ namespace Contensive.Core.Controllers {
                 tempDecodeHTML_RemoveWhiteSpace = "";
                 if (!IsNull(DirtyText)) {
                     if (!string.IsNullOrEmpty(DirtyText)) {
-                        BodyBuffer = genericController.vbReplace(DirtyText, Environment.NewLine, "\r");
+                        BodyBuffer = genericController.vbReplace(DirtyText, "\r\n", "\r");
                         BodyBuffer = genericController.vbReplace(BodyBuffer, "\n", "\r");
                         //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(BodyBuffer) for every iteration:
                         int tempVar = BodyBuffer.Length;
@@ -419,7 +412,7 @@ namespace Contensive.Core.Controllers {
                                 SpaceCounter = 0;
                             } else {
                                 if (AscTest == Microsoft.VisualBasic.Strings.Asc("\r")) {
-                                    tempDecodeHTML_RemoveWhiteSpace = tempDecodeHTML_RemoveWhiteSpace + Environment.NewLine;
+                                    tempDecodeHTML_RemoveWhiteSpace = tempDecodeHTML_RemoveWhiteSpace + "\r\n";
                                     SpaceCounter = 0;
                                 } else if (ChrTest == " ") {
                                     if (SpaceCounter == 0) {
@@ -433,19 +426,9 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                return tempDecodeHTML_RemoveWhiteSpace.Trim(' ');
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-            //Microsoft.VisualBasic.Information.Err().Clear();
-            //INSTANT C# TODO TASK: The '//Resume Next' statement is not converted by Instant C#:
-            //Resume Next
-
             return tempDecodeHTML_RemoveWhiteSpace;
         }
     }

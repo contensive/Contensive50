@@ -50,11 +50,7 @@ namespace Contensive.Core {
 
         public override string fromAddressDefault {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.isAuthenticatedMember(cpCore);
-                } else {
-                    return false;
-                }
+                return cpCore.siteProperties.getText("EMAILFROMADDRESS");
             }
         }
         //==========================================================================================
@@ -67,7 +63,7 @@ namespace Contensive.Core {
         /// <param name="Body"></param>
         /// <param name="SendImmediately"></param>
         /// <param name="BodyIsHTML"></param>
-        public override void Send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) {
+        public override void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) {
             try {
                 cpCore.email.send(ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0);
             } catch (Exception ex) {
@@ -82,7 +78,7 @@ namespace Contensive.Core {
         /// <param name="ToAddress"></param>
         /// <param name="FromAddress"></param>
         /// <param name="Subject"></param>
-        public override void SendForm(string ToAddress, string FromAddress, string Subject) {
+        public override void sendForm(string ToAddress, string FromAddress, string Subject) {
             try {
                 cpCore.email.sendForm(ToAddress, FromAddress, Subject);
             } catch (Exception ex) {
@@ -100,7 +96,7 @@ namespace Contensive.Core {
         /// <param name="Body"></param>
         /// <param name="SendImmediately"></param>
         /// <param name="BodyIsHTML"></param>
-        public override void SendGroup(string GroupList, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) {
+        public override void sendGroup(string GroupList, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) {
             try {
                 cpCore.email.sendGroup(GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML);
             } catch (Exception ex) {
@@ -109,18 +105,18 @@ namespace Contensive.Core {
             }
         }
 
-        public override void SendPassword(string UserEmailAddress) //Inherits BaseClasses.CPEmailBaseClass.SendPassword
+        public override void sendPassword(string UserEmailAddress) //Inherits BaseClasses.CPEmailBaseClass.SendPassword
         {
             if (true) {
                 cpCore.email.sendPassword(UserEmailAddress);
             }
         }
 
-        public override void SendSystem(string EmailName, string AdditionalCopy = "", int AdditionalUserID = 0) {
+        public override void sendSystem(string EmailName, string AdditionalCopy = "", int AdditionalUserID = 0) {
             cpCore.email.sendSystem(EmailName, AdditionalCopy, AdditionalUserID);
         }
 
-        public override void SendUser(string toUserId, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) //Inherits BaseClasses.CPEmailBaseClass.SendUser
+        public override void sendUser(string toUserId, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) //Inherits BaseClasses.CPEmailBaseClass.SendUser
         {
             int userId = 0;
             if (genericController.vbIsNumeric(toUserId)) {

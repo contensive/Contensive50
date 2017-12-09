@@ -183,7 +183,7 @@ namespace Contensive.Core.Controllers {
                 Key = encodeDocPropertyKey(RequestName);
                 if (!string.IsNullOrEmpty(Key)) {
                     if (docPropertiesDict.ContainsKey(Key)) {
-                        return docPropertiesDict(Key);
+                        return docPropertiesDict[Key];
                     }
                 }
             } catch (Exception ex) {
@@ -267,7 +267,7 @@ namespace Contensive.Core.Controllers {
             string returnString = "";
             try {
                 foreach (string key in getKeyList()) {
-                    returnString += "" + "&" + genericController.encodeLegacyOptionStringArgument(key) + "=" + encodeLegacyOptionStringArgument(getProperty(key).Value);
+                    returnString += "&" + genericController.encodeLegacyOptionStringArgument(key) + "=" + encodeLegacyOptionStringArgument(getProperty(key).Value);
                 }
             } catch (Exception ex) {
                 throw (ex);

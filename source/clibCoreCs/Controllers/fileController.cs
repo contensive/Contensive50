@@ -15,6 +15,7 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
 using System.IO;
+using ICSharpCode.SharpZipLib.Zip;
 using Contensive.Core.Models;
 using Contensive.Core.Models.Context;
 //
@@ -714,7 +715,7 @@ namespace Contensive.Core.Controllers {
             string returnString = "";
             if (FileInfo.Length > 0) {
                 foreach (FileInfo fi in FileInfo) {
-                    returnString += Environment.NewLine + fi.Name + "\t" + (int)fi.Attributes + "\t" + fi.CreationTime + "\t" + fi.LastAccessTime + "\t" + fi.LastWriteTime + "\t" + fi.Length + "\t" + fi.Extension;
+                    returnString += "\r\n" + fi.Name + "\t" + (int)fi.Attributes + "\t" + fi.CreationTime + "\t" + fi.LastAccessTime + "\t" + fi.LastWriteTime + "\t" + fi.Length + "\t" + fi.Extension;
                 }
                 returnString = returnString.Substring(2);
             }
@@ -726,7 +727,7 @@ namespace Contensive.Core.Controllers {
             string returnString = "";
             if (DirectoryInfo.Length > 0) {
                 foreach (DirectoryInfo di in DirectoryInfo) {
-                    returnString += Environment.NewLine + di.Name + "\t" + (int)di.Attributes + "\t" + di.CreationTime + "\t" + di.LastAccessTime + "\t" + di.LastWriteTime + "\t" + "0" + "\t" + di.Extension;
+                    returnString += "\r\n" + di.Name + "\t" + (int)di.Attributes + "\t" + di.CreationTime + "\t" + di.LastAccessTime + "\t" + di.LastWriteTime + "\t0\t" + di.Extension;
                 }
                 returnString = returnString.Substring(2);
             }
@@ -749,7 +750,7 @@ namespace Contensive.Core.Controllers {
                     pathFilename = normalizePathFilename(pathFilename);
                     URLLink = genericController.vbReplace(Link, " ", "%20");
                     HTTP.timeout = 600;
-                    HTTP.getUrlToFile(ref Convert.ToString(URLLink), convertToAbsPath(pathFilename));
+                    HTTP.getUrlToFile(Convert.ToString(URLLink), convertToAbsPath(pathFilename));
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -769,7 +770,7 @@ namespace Contensive.Core.Controllers {
         public void UnzipFile(string PathFilename) {
             try {
                 //
-                FastZip fastZip = new FastZip();
+          FastZip fastZip = new FastZip();
                 string fileFilter = null;
                 string absPathFilename = null;
                 string path = string.Empty;

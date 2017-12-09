@@ -645,8 +645,8 @@ namespace Contensive.Core {
                         }
                         //
                         emailWorkingStyles = emailStyles;
-                        emailWorkingStyles = genericController.vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart + "<!-- ", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                        emailWorkingStyles = genericController.vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" + StyleSheetEnd, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                        emailWorkingStyles = genericController.vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart + "<!-- ", 1, 99, 1);
+                        emailWorkingStyles = genericController.vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" + StyleSheetEnd, 1, 99, 1);
                         //
                         // Create the clickflag to be added to all anchors
                         //
@@ -695,7 +695,7 @@ namespace Contensive.Core {
                         // Spam Footer under template
                         // remove the marker for any other place in the email then add it as needed
                         //
-                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, rnEmailBlockRecipientEmail, "", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, rnEmailBlockRecipientEmail, "", 1, 99, 1);
                         if (AllowSpamFooter) {
                             //
                             // non-authorable, default true - leave it as an option in case there is an important exception

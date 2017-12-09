@@ -58,8 +58,8 @@ namespace Contensive.Core.Controllers {
                     // section blocked, just return the login box in the page content
                     //
                     returnBody = ""
-                        + "\r" + "<div class=\"ccLoginPageCon\">"
-                        + genericController.htmlIndent(PageContent) + "\r" + "</div>"
+                        + "\r<div class=\"ccLoginPageCon\">"
+                        + genericController.htmlIndent(PageContent) + "\r</div>"
                         + "";
                 } else if (!cpCore.doc.continueProcessing) {
                     //
@@ -305,12 +305,12 @@ namespace Contensive.Core.Controllers {
                 if (ContentPadding > 0) {
                     //
                     tempgetContentBoxWrapper = ""
-                        + "\r" + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0>"
+                        + "\r<table border=0 width=\"100%\" cellspacing=0 cellpadding=0>"
                         + cr2 + "<tr>"
                         + cr3 + "<td style=\"padding:" + ContentPadding + "px\">"
                         + genericController.htmlIndent(genericController.htmlIndent(genericController.htmlIndent(tempgetContentBoxWrapper))) + cr3 + "</td>"
                         + cr2 + "</tr>"
-                        + "\r" + "</table>";
+                        + "\r</table>";
                     //            main_GetContentBoxWrapper = "" _
                     //                & cr & "<table border=0 width=""100%"" cellspacing=0 cellpadding=" & ContentPadding & ">" _
                     //                & cr2 & "<tr>" _
@@ -321,13 +321,13 @@ namespace Contensive.Core.Controllers {
                     //                & cr & "</table>"
                 }
                 tempgetContentBoxWrapper = ""
-                    + "\r" + "<div class=\"contentBox\">"
-                    + genericController.htmlIndent(tempgetContentBoxWrapper) + "\r" + "</div>";
+                    + "\r<div class=\"contentBox\">"
+                    + genericController.htmlIndent(tempgetContentBoxWrapper) + "\r</div>";
             } else {
                 //
                 tempgetContentBoxWrapper = ""
-                    + "\r" + "<div class=\"contentBox\" style=\"padding:" + ContentPadding + "px\">"
-                    + genericController.htmlIndent(tempgetContentBoxWrapper) + "\r" + "</div>";
+                    + "\r<div class=\"contentBox\" style=\"padding:" + ContentPadding + "px\">"
+                    + genericController.htmlIndent(tempgetContentBoxWrapper) + "\r</div>";
             }
             return tempgetContentBoxWrapper;
         }
@@ -363,16 +363,9 @@ namespace Contensive.Core.Controllers {
                     cpcore.db.csSave2(CS);
                     //Call cpcore.workflow.publishEdit("Copy Content", genericController.EncodeInteger(cpcore.db.cs_get(CS, "ID")))
                 }
-                //
-                return tempgetDefaultBlockMessage;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                cpcore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetDefaultBlockMessage")
             return tempgetDefaultBlockMessage;
         }
         //
@@ -395,27 +388,27 @@ namespace Contensive.Core.Controllers {
                     ContactPhone = (cpCore.db.csGetText(CS, "Phone"));
                     ContactEmail = (cpCore.db.csGetText(CS, "Email"));
                     if (!string.IsNullOrEmpty(ContactName)) {
-                        Copy = Copy + "For more information, please contact " + ContactName;
+                        Copy += "For more information, please contact " + ContactName;
                         if (string.IsNullOrEmpty(ContactEmail)) {
                             if (!string.IsNullOrEmpty(ContactPhone)) {
-                                Copy = Copy + " by phone at " + ContactPhone;
+                                Copy += " by phone at " + ContactPhone;
                             }
                         } else {
-                            Copy = Copy + " by <A href=\"mailto:" + ContactEmail + "\">email</A>";
+                            Copy += " by <A href=\"mailto:" + ContactEmail + "\">email</A>";
                             if (!string.IsNullOrEmpty(ContactPhone)) {
-                                Copy = Copy + " or by phone at " + ContactPhone;
+                                Copy += " or by phone at " + ContactPhone;
                             }
                         }
                         Copy = Copy;
                     } else {
                         if (string.IsNullOrEmpty(ContactEmail)) {
                             if (!string.IsNullOrEmpty(ContactPhone)) {
-                                Copy = Copy + "For more information, please call " + ContactPhone;
+                                Copy += "For more information, please call " + ContactPhone;
                             }
                         } else {
-                            Copy = Copy + "For more information, please <A href=\"mailto:" + ContactEmail + "\">email</A>";
+                            Copy += "For more information, please <A href=\"mailto:" + ContactEmail + "\">email</A>";
                             if (!string.IsNullOrEmpty(ContactPhone)) {
-                                Copy = Copy + ", or call " + ContactPhone;
+                                Copy += ", or call " + ContactPhone;
                             }
                             Copy = Copy;
                         }
@@ -479,11 +472,11 @@ namespace Contensive.Core.Controllers {
                     // -- add a 0, then repeat until another 0 is found, or there is a repeat
                     cpcore.doc.pageToRootList = new List<Models.Entity.pageContentModel>();
                     List<int> usedPageIdList = new List<int>();
-                    object targetPageId = requestedPage.id;
+                    int targetPageId = requestedPage.id;
                     usedPageIdList.Add(0);
                     while (!usedPageIdList.Contains(targetPageId)) {
                         usedPageIdList.Add(targetPageId);
-                        pageContentModel targetpage = pageContentModel.create(cpcore, targetPageId, ref new List<string>());
+                        pageContentModel targetpage = pageContentModel.create(cpcore, targetPageId );
                         if (targetpage == null) {
                             break;
                         } else {
@@ -507,14 +500,14 @@ namespace Contensive.Core.Controllers {
                     cpcore.doc.template = null;
                     foreach (Models.Entity.pageContentModel page in cpcore.doc.pageToRootList) {
                         if (page.TemplateID > 0) {
-                            cpcore.doc.template = pageTemplateModel.create(cpcore, page.TemplateID, ref new List<string>());
+                            cpcore.doc.template = pageTemplateModel.create(cpcore, page.TemplateID );
                             if (cpcore.doc.template == null) {
                                 //
                                 // -- templateId is not valid
                                 page.TemplateID = 0;
                                 page.save(cpcore);
                             } else {
-                                if (page == cpcore.doc.pageToRootList.First) {
+                                if (page == cpcore.doc.pageToRootList.First()) {
                                     cpcore.doc.templateReason = "This template was used because it is selected by the current page.";
                                 } else {
                                     cpcore.doc.templateReason = "This template was used because it is selected one of this page's parents [" + page.name + "].";
@@ -529,7 +522,7 @@ namespace Contensive.Core.Controllers {
                         // -- get template from domain
                         if (domain != null) {
                             if (domain.DefaultTemplateId > 0) {
-                                cpcore.doc.template = pageTemplateModel.create(cpcore, domain.DefaultTemplateId, ref new List<string>());
+                                cpcore.doc.template = pageTemplateModel.create(cpcore, domain.DefaultTemplateId );
                                 if (cpcore.doc.template == null) {
                                     //
                                     // -- domain templateId is not valid
@@ -541,7 +534,7 @@ namespace Contensive.Core.Controllers {
                         if (cpcore.doc.template == null) {
                             //
                             // -- get template named Default
-                            cpcore.doc.template = pageTemplateModel.createByName(cpcore, defaultTemplateName, ref new List<string>());
+                            cpcore.doc.template = pageTemplateModel.createByName(cpcore, defaultTemplateName);
                             if (cpcore.doc.template == null) {
                                 //
                                 // -- ceate new template named Default
@@ -715,15 +708,15 @@ namespace Contensive.Core.Controllers {
                     // Add the Referrer to the Admin Msg
                     //
                     if (cpcore.webServer.requestReferer != "") {
-                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningPageID=", Microsoft.VisualBasic.Constants.vbTextCompare);
+                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningPageID=", 1);
                         if (Pos != 0) {
                             cpcore.webServer.requestReferrer = cpcore.webServer.requestReferrer.Substring(0, Pos - 2);
                         }
-                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningMsg=", Microsoft.VisualBasic.Constants.vbTextCompare);
+                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningMsg=", 1);
                         if (Pos != 0) {
                             cpcore.webServer.requestReferrer = cpcore.webServer.requestReferrer.Substring(0, Pos - 2);
                         }
-                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "blockcontenttracking=", Microsoft.VisualBasic.Constants.vbTextCompare);
+                        Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "blockcontenttracking=", 1);
                         if (Pos != 0) {
                             cpcore.webServer.requestReferrer = cpcore.webServer.requestReferrer.Substring(0, Pos - 2);
                         }
@@ -876,7 +869,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                cpcore.handleException(ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("cpCoreClass.IsChildRecord")
@@ -1034,7 +1027,7 @@ namespace Contensive.Core.Controllers {
                             foreach (string key in cpCore.docProperties.getKeyList()) {
                                 docPropertiesClass docProperty = cpCore.docProperties.getProperty(key);
                                 if (key.ToLower() != "contensiveuserform") {
-                                    Copy += docProperty.Name + "=" + docProperty.Value + Environment.NewLine;
+                                    Copy += docProperty.Name + "=" + docProperty.Value + "\r\n";
                                 }
                             }
                             cpCore.db.csSet(cs, "copy", Copy);
@@ -1226,7 +1219,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // Set Child Pages Found and clear caches
                                                     //
-                                                    CSClip = cpCore.db.csOpenRecord(ClipParentContentName, ClipParentRecordID,,, "ChildPagesFound");
+                                                    CSClip = cpCore.db.csOpenRecord(ClipParentContentName, ClipParentRecordID,false,false, "ChildPagesFound");
                                                     if (cpCore.db.csOk(CSClip)) {
                                                         cpCore.db.csSet(CSClip, "ChildPagesFound", true.ToString());
                                                     }
@@ -1293,7 +1286,7 @@ namespace Contensive.Core.Controllers {
                         // build link variations needed later
                         //
                         //
-                        Pos = genericController.vbInstr(1, cpCore.webServer.requestPathPage, "://", Microsoft.VisualBasic.Constants.vbTextCompare);
+                        Pos = genericController.vbInstr(1, cpCore.webServer.requestPathPage, "://", 1);
                         if (Pos != 0) {
                             LinkNoProtocol = cpCore.webServer.requestPathPage.Substring(Pos + 2);
                             Pos = genericController.vbInstr(Pos + 3, cpCore.webServer.requestPathPage, "/", Microsoft.VisualBasic.Constants.vbBinaryCompare);
@@ -1331,7 +1324,7 @@ namespace Contensive.Core.Controllers {
                             + "or(SourceLink=" + cpCore.db.encodeSQLText(LinkFullPathNoSlash) + ")"
                             + ")";
                         isLinkForward = false;
-                        Sql = cpCore.db.GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID",, 1);
+                        Sql = cpCore.db.GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID","", 1);
                         CSPointer = cpCore.db.csOpenSql(Sql);
                         if (cpCore.db.csOk(CSPointer)) {
                             //
@@ -1375,7 +1368,7 @@ namespace Contensive.Core.Controllers {
                                 string sqlLinkAliasCriteria = "(name=" + cpCore.db.encodeSQLText(linkAliasTest1) + ")or(name=" + cpCore.db.encodeSQLText(linkAliasTest2) + ")";
                                 List<Models.Entity.linkAliasModel> linkAliasList = linkAliasModel.createList(cpCore, sqlLinkAliasCriteria, "id desc");
                                 if (linkAliasList.Count > 0) {
-                                    linkAliasModel linkAlias = linkAliasList.First;
+                                    linkAliasModel linkAlias = linkAliasList.First();
                                     string LinkQueryString = rnPageId + "=" + linkAlias.PageID + "&" + linkAlias.QueryStringSuffix;
                                     cpCore.docProperties.setProperty(rnPageId, linkAlias.PageID.ToString(), false);
                                     string[] nameValuePairs = linkAlias.QueryStringSuffix.Split('&');
@@ -1420,7 +1413,7 @@ namespace Contensive.Core.Controllers {
                     // ----- do anonymous access blocking
                     //
                     if (!cpCore.doc.authContext.isAuthenticated) {
-                        if ((cpCore.webServer.requestPath != "/") & genericController.vbInstr(1, "/" + cpCore.serverConfig.appConfig.adminRoute, cpCore.webServer.requestPath, Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                        if ((cpCore.webServer.requestPath != "/") & genericController.vbInstr(1, "/" + cpCore.serverConfig.appConfig.adminRoute, cpCore.webServer.requestPath, 1) != 0) {
                             //
                             // admin page is excluded from custom blocking
                             //
@@ -1638,7 +1631,7 @@ namespace Contensive.Core.Controllers {
                 string SQL = null;
                 string Formhtml = string.Empty;
                 string FormInstructions = string.Empty;
-                main_FormPagetype f = null;
+                main_FormPagetype f ;
                 int Ptr = 0;
                 int CSPeople = 0;
                 bool IsInGroup = false;
@@ -1831,12 +1824,12 @@ namespace Contensive.Core.Controllers {
                 int CSPeople = 0;
                 //
                 if (true) {
-                    PtrFront = genericController.vbInstr(1, Formhtml, "{{REPEATSTART", Microsoft.VisualBasic.Constants.vbTextCompare);
+                    PtrFront = genericController.vbInstr(1, Formhtml, "{{REPEATSTART", 1);
                     if (PtrFront > 0) {
                         PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}");
                         if (PtrBack > 0) {
                             result.PreRepeat = Formhtml.Substring(0, PtrFront - 1);
-                            PtrFront = genericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", Microsoft.VisualBasic.Constants.vbTextCompare);
+                            PtrFront = genericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", 1);
                             if (PtrFront > 0) {
                                 result.RepeatCell = Formhtml.Substring(PtrBack + 1, PtrFront - PtrBack - 2);
                                 PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}");
@@ -1925,7 +1918,7 @@ namespace Contensive.Core.Controllers {
                 bool GroupValue = false;
                 int GroupRowPtr = 0;
                 int FormPageID = 0;
-                main_FormPagetype f = null;
+                main_FormPagetype f;
                 bool IsRetry = false;
                 string CaptionSpan = null;
                 string Caption = null;
@@ -1968,8 +1961,8 @@ namespace Contensive.Core.Controllers {
                             }
                             if (cpcore.db.csOk(CSPeople)) {
                                 Body = f.RepeatCell;
-                                Body = genericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
-                                Body = genericController.vbReplace(Body, "{{FIELD}}", cpcore.html.html_GetFormInputCS(CSPeople, "People", tempVar.PeopleField), 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                                Body = genericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
+                                Body = genericController.vbReplace(Body, "{{FIELD}}", cpcore.html.html_GetFormInputCS(CSPeople, "People", tempVar.PeopleField), 1, 99, 1);
                                 RepeatBody = RepeatBody + Body;
                                 HasRequiredFields = HasRequiredFields || tempVar.REquired;
                             }
@@ -1980,7 +1973,7 @@ namespace Contensive.Core.Controllers {
                             //
                             GroupValue = cpcore.doc.authContext.IsMemberOfGroup2(cpcore, tempVar.GroupName);
                             Body = f.RepeatCell;
-                            Body = genericController.vbReplace(Body, "{{CAPTION}}", cpcore.html.html_GetFormInputCheckBox2("Group" + tempVar.GroupName, GroupValue), 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                            Body = genericController.vbReplace(Body, "{{CAPTION}}", cpcore.html.html_GetFormInputCheckBox2("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
                             Body = genericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
                             RepeatBody = RepeatBody + Body;
                             GroupRowPtr = GroupRowPtr + 1;
@@ -1991,7 +1984,7 @@ namespace Contensive.Core.Controllers {
                 cpcore.db.csClose(ref CSPeople);
                 if (HasRequiredFields) {
                     Body = f.RepeatCell;
-                    Body = genericController.vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                    Body = genericController.vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, 1);
                     Body = genericController.vbReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields");
                     RepeatBody = RepeatBody + Body;
                 }
@@ -2004,7 +1997,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                cpCore.handleException(ex);
+                cpcore.handleException(ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("main_GetFormPage")
@@ -2139,7 +2132,7 @@ namespace Contensive.Core.Controllers {
                     BlockedPages = BlockedRecordIDList.Split(',');
                     BlockedPageRecordID = genericController.EncodeInteger(BlockedPages[BlockedPages.GetUpperBound(0)]);
                     if (BlockedPageRecordID != 0) {
-                        CS = cpCore.db.csOpenRecord("Page Content", BlockedPageRecordID,, "", "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
+                        CS = cpCore.db.csOpenRecord("Page Content", BlockedPageRecordID,false, false, "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
                         if (cpCore.db.csOk(CS)) {
                             BlockSourceID = cpCore.db.csGetInteger(CS, "BlockSourceID");
                             ContentPadding = cpCore.db.csGetInteger(CS, "ContentPadding");
@@ -2255,7 +2248,7 @@ namespace Contensive.Core.Controllers {
                     returnHtml = cpCore.html.executeContentCommands(null, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
                     returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (cpCore.doc.refreshQueryString != "") {
-                        returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + cpCore.doc.refreshQueryString, 1, 99, Microsoft.VisualBasic.Constants.vbTextCompare);
+                        returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + cpCore.doc.refreshQueryString, 1, 99, 1);
                     }
                     //
                     // Add in content padding required for integration with the template
@@ -2547,7 +2540,7 @@ namespace Contensive.Core.Controllers {
                     BreadCrumbDelimiter = cpcore.siteProperties.getText("BreadCrumbDelimiter", " &gt; ");
                     breadCrumb = cpcore.doc.getReturnBreadcrumb(RootPageContentName, cpcore.doc.page.ParentID, rootPageId, "", ArchivePage, BreadCrumbDelimiter);
                     if (!string.IsNullOrEmpty(breadCrumb)) {
-                        breadCrumb = "\r" + "<p class=\"ccPageListNavigation\">" + BreadCrumbPrefix + " " + breadCrumb + "</p>";
+                        breadCrumb = "\r<p class=\"ccPageListNavigation\">" + BreadCrumbPrefix + " " + breadCrumb + "</p>";
                     }
                 }
                 result = result + breadCrumb;
@@ -2564,7 +2557,7 @@ namespace Contensive.Core.Controllers {
                             QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, true);
                             string Caption = cpcore.siteProperties.getText("PagePrinterVersionCaption", "Printer Version");
                             Caption = genericController.vbReplace(Caption, " ", "&nbsp;");
-                            IconRow = IconRow + "\r" + "&nbsp;&nbsp;<a href=\"" + genericController.encodeHTML(cpcore.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\"><img alt=\"image\" src=\"/ccLib/images/IconSmallPrinter.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp<a href=\"" + genericController.encodeHTML(cpcore.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
+                            IconRow = IconRow + "\r&nbsp;&nbsp;<a href=\"" + genericController.encodeHTML(cpcore.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\"><img alt=\"image\" src=\"/ccLib/images/IconSmallPrinter.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp<a href=\"" + genericController.encodeHTML(cpcore.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
                         }
                         if (cpcore.doc.page.AllowEmailPage) {
                             string QueryString = cpcore.doc.refreshQueryString;
@@ -2574,12 +2567,12 @@ namespace Contensive.Core.Controllers {
                             string EmailBody = cpcore.webServer.requestProtocol + cpcore.webServer.requestDomain + cpcore.webServer.requestPathPage + QueryString;
                             string Caption = cpcore.siteProperties.getText("PageAllowEmailCaption", "Email This Page");
                             Caption = genericController.vbReplace(Caption, " ", "&nbsp;");
-                            IconRow = IconRow + "\r" + "&nbsp;&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\"><img alt=\"image\" src=\"/ccLib/images/IconSmallEmail.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
+                            IconRow = IconRow + "\r&nbsp;&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\"><img alt=\"image\" src=\"/ccLib/images/IconSmallEmail.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
                         }
                     }
                     if (!string.IsNullOrEmpty(IconRow)) {
-                        result = result + "\r" + "<div style=\"text-align:right;\">"
-                        + genericController.htmlIndent(IconRow) + "\r" + "</div>";
+                        result = result + "\r<div style=\"text-align:right;\">"
+                        + genericController.htmlIndent(IconRow) + "\r</div>";
                     }
                 }
                 //
@@ -2594,7 +2587,7 @@ namespace Contensive.Core.Controllers {
                     //
                     if (cpcore.doc.page.Headline != "") {
                         string headline = cpcore.html.main_encodeHTML(cpcore.doc.page.Headline);
-                        Cell = Cell + "\r" + "<h1>" + headline + "</h1>";
+                        Cell = Cell + "\r<h1>" + headline + "</h1>";
                         //
                         // Add AC end here to force the end of any left over AC tags (like language)
                         Cell = Cell + ACTagEnd;
@@ -2605,15 +2598,15 @@ namespace Contensive.Core.Controllers {
                         //
                         // Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
                         if (cpcore.doc.authContext.isEditing(pageContentModel.contentName)) {
-                            bodyCopy = "\r" + "<p><!-- Empty Content Placeholder --></p>";
+                            bodyCopy = "\r<p><!-- Empty Content Placeholder --></p>";
                         }
                     } else {
                         bodyCopy = bodyCopy + "\r" + ACTagEnd;
                     }
                     //
                     // ----- Wrap content body
-                    Cell = Cell + "\r" + "<!-- ContentBoxBodyStart -->"
-                        + genericController.htmlIndent(bodyCopy) + "\r" + "<!-- ContentBoxBodyEnd -->";
+                    Cell = Cell + "\r<!-- ContentBoxBodyStart -->"
+                        + genericController.htmlIndent(bodyCopy) + "\r<!-- ContentBoxBodyEnd -->";
                     //
                     // ----- Child pages
                     if (allowChildListComposite || cpcore.doc.authContext.isEditingAnything()) {
@@ -2639,28 +2632,28 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // ----- End Text Search
-                result = result + "\r" + "<!-- TextSearchStart -->"
-                    + genericController.htmlIndent(Cell) + "\r" + "<!-- TextSearchEnd -->";
+                result = result + "\r<!-- TextSearchStart -->"
+                    + genericController.htmlIndent(Cell) + "\r<!-- TextSearchEnd -->";
                 //
                 // ----- Page See Also
                 if (cpcore.doc.page.AllowSeeAlso) {
-                    result = result + "\r" + "<div>"
-                        + genericController.htmlIndent(getSeeAlso(cpcore, pageContentModel.contentName, cpcore.doc.page.id)) + "\r" + "</div>";
+                    result = result + "\r<div>"
+                        + genericController.htmlIndent(getSeeAlso(cpcore, pageContentModel.contentName, cpcore.doc.page.id)) + "\r</div>";
                 }
                 //
                 // ----- Allow More Info
                 if ((cpcore.doc.page.ContactMemberID != 0) & cpcore.doc.page.AllowMoreInfo) {
-                    result = result + "\r" + "<ac TYPE=\"" + ACTypeContact + "\">";
+                    result = result + "\r<ac TYPE=\"" + ACTypeContact + "\">";
                 }
                 //
                 // ----- Feedback
                 if ((cpcore.doc.page.ContactMemberID != 0) & cpcore.doc.page.AllowFeedback) {
-                    result = result + "\r" + "<ac TYPE=\"" + ACTypeFeedback + "\">";
+                    result = result + "\r<ac TYPE=\"" + ACTypeFeedback + "\">";
                 }
                 //
                 // ----- Last Modified line
                 if ((cpcore.doc.page.ModifiedDate != DateTime.MinValue) & cpcore.doc.page.AllowLastModifiedFooter) {
-                    result = result + "\r" + "<p>This page was last modified " + cpcore.doc.page.ModifiedDate.ToString("G");
+                    result = result + "\r<p>This page was last modified " + cpcore.doc.page.ModifiedDate.ToString("G");
                     if (cpcore.doc.authContext.isAuthenticatedAdmin(cpcore)) {
                         if (cpcore.doc.page.ModifiedBy == 0) {
                             result = result + " (admin only: modified by unknown)";
@@ -2678,7 +2671,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Last Reviewed line
                 if ((cpcore.doc.page.DateReviewed != DateTime.MinValue) & cpcore.doc.page.AllowReviewedFooter) {
-                    result = result + "\r" + "<p>This page was last reviewed " + cpcore.doc.page.DateReviewed.ToString("");
+                    result = result + "\r<p>This page was last reviewed " + cpcore.doc.page.DateReviewed.ToString("");
                     if (cpcore.doc.authContext.isAuthenticatedAdmin(cpcore)) {
                         if (cpcore.doc.page.ReviewedBy == 0) {
                             result = result + " (by unknown)";
@@ -2698,7 +2691,7 @@ namespace Contensive.Core.Controllers {
                 if (cpcore.doc.page.AllowMessageFooter) {
                     string pageContentMessageFooter = cpcore.siteProperties.getText("PageContentMessageFooter", "");
                     if (!string.IsNullOrEmpty(pageContentMessageFooter)) {
-                        result = result + "\r" + "<p>" + pageContentMessageFooter + "</p>";
+                        result = result + "\r<p>" + pageContentMessageFooter + "</p>";
                     }
                 }
                 //Call cpcore.db.cs_Close(CS)
@@ -2752,7 +2745,7 @@ namespace Contensive.Core.Controllers {
                         while (cpcore.db.csOk(CS)) {
                             SeeAlsoLink = (cpcore.db.csGetText(CS, "Link"));
                             if (!string.IsNullOrEmpty(SeeAlsoLink)) {
-                                result = result + "\r" + "<li class=\"ccListItem\">";
+                                result = result + "\r<li class=\"ccListItem\">";
                                 if (genericController.vbInstr(1, SeeAlsoLink, "://") == 0) {
                                     SeeAlsoLink = cpcore.webServer.requestProtocol + SeeAlsoLink;
                                 }
@@ -2773,14 +2766,14 @@ namespace Contensive.Core.Controllers {
                         //
                         if (IsEditingLocal) {
                             SeeAlsoCount = SeeAlsoCount + 1;
-                            result = result + "\r" + "<li class=\"ccListItem\">" + cpcore.html.main_GetRecordAddLink("See Also", "RecordID=" + iRecordID + ",ContentID=" + ContentID) + "</LI>";
+                            result = result + "\r<li class=\"ccListItem\">" + cpcore.html.main_GetRecordAddLink("See Also", "RecordID=" + iRecordID + ",ContentID=" + ContentID) + "</LI>";
                         }
                     }
                     //
                     if (SeeAlsoCount == 0) {
                         result = "";
                     } else {
-                        result = "<p>See Also" + "\r" + "<ul class=\"ccList\">" + genericController.htmlIndent(result) + "\r" + "</ul></p>";
+                        result = "<p>See Also\r<ul class=\"ccList\">" + genericController.htmlIndent(result) + "\r</ul></p>";
                     }
                 }
             } catch (Exception ex) {

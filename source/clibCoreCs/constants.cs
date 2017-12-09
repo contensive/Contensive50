@@ -83,16 +83,16 @@ namespace Contensive.Core {
         //
         public const string PageChildListInstanceID = "{ChildPageList}";
         //
-        public const string cr = "\r\n" + "\t";
+        public const string cr = "\r\n\t";
         public const string cr2 = cr + "\t";
         public const string cr3 = cr2 + "\t";
         public const string cr4 = cr3 + "\t";
         public const string cr5 = cr4 + "\t";
         public const string cr6 = cr5 + "\t";
         //
-        public const string AddonOptionConstructor_BlockNoAjax = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]" + "\r\n" + "css Container id" + "\r\n" + "css Container class";
-        public const string AddonOptionConstructor_Block = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]" + "\r\n" + "As Ajax=[If Add-on is Ajax:0|Yes:1]" + "\r\n" + "css Container id" + "\r\n" + "css Container class";
-        public const string AddonOptionConstructor_Inline = "As Ajax=[If Add-on is Ajax:0|Yes:1]" + "\r\n" + "css Container id" + "\r\n" + "css Container class";
+        public const string AddonOptionConstructor_BlockNoAjax = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]\r\ncss Container id\r\ncss Container class";
+        public const string AddonOptionConstructor_Block = "Wrapper=[Default:0|None:-1|ListID(Wrappers)]\r\nAs Ajax=[If Add-on is Ajax:0|Yes:1]\r\ncss Container id\r\ncss Container class";
+        public const string AddonOptionConstructor_Inline = "As Ajax=[If Add-on is Ajax:0|Yes:1]\r\ncss Container id\r\ncss Container class";
         //
         // Constants used as arguments to SiteBuilderClass.CreateNewSite
         //
@@ -984,7 +984,7 @@ namespace Contensive.Core {
         //
         // ----- text delimiter that divides the text and html parts of an email message stored in the queue folder
         //
-        public const string EmailTextHTMLDelimiter = "\r\n" + " ----- End Text Begin HTML -----" + "\r\n";
+        public const string EmailTextHTMLDelimiter = "\r\n ----- End Text Begin HTML -----\r\n";
         //
         //------------------------------------------------------------------------
         //   Common RequestName Variables
@@ -1166,7 +1166,7 @@ namespace Contensive.Core {
                                                         //
         public const string DefaultSpamFooter = "<p>To block future emails from this site, <link>click here</link></p>";
         //
-        public const string FeedbackFormNotSupportedComment = "<!--" + "\r\n" + "Feedback form is not supported in this context" + "\r\n" + "-->";
+        public const string FeedbackFormNotSupportedComment = "<!--\r\nFeedback form is not supported in this context\r\n-->";
         //
         //-------------------------------------------------------------------------------------
         //   Page Content constants
@@ -1183,11 +1183,11 @@ namespace Contensive.Core {
         public const string TemplateDefaultName = "Default";
         //Public Const TemplateDefaultBody As String = "<!--" & vbCrLf & "Default Template - edit this Page Template, or select a different template for your page or section" & vbCrLf & "-->{{DYNAMICMENU?MENU=}}<br>{{CONTENT}}"
         public const string TemplateDefaultBody = ""
-            + Environment.NewLine + "\t" + "<!--"
-            + Environment.NewLine + "\t" + "Default Template - edit this Page Template, or select a different template for your page or section"
-            + Environment.NewLine + "\t" + "-->"
-            + Environment.NewLine + "\t" + "{% {\"addon\":{\"addon\":\"menu\",\"menu\":\"Default\"}} %}"
-            + Environment.NewLine + "\t" + "{% \"content box\" %}";
+            + "\r\n\t<!--"
+            + "\r\n\tDefault Template - edit this Page Template, or select a different template for your page or section"
+            + "\r\n\t-->"
+            + "\r\n\t{% {\"addon\":{\"addon\":\"menu\",\"menu\":\"Default\"}} %}"
+            + "\r\n\t{% \"content box\" %}";
         public const string TemplateDefaultBodyTag = "<body class=\"ccBodyWeb\">";
         //
         //=======================================================================

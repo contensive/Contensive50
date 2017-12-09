@@ -13,6 +13,7 @@ using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using Contensive.Core.Models.Complex;
 //
 namespace Contensive.Addons.Core {
     public class processPayPalConformMethodClass : Contensive.BaseClasses.AddonBaseClass {
@@ -49,7 +50,7 @@ namespace Contensive.Addons.Core {
                         cpCore.db.csSet(CS, "ShipState", cpCore.docProperties.getText("address_state"));
                         cpCore.db.csSet(CS, "ShipZip", cpCore.docProperties.getText("address_zip"));
                         cpCore.db.csSet(CS, "BilleMail", cpCore.docProperties.getText("payer_email"));
-                        cpCore.db.csSet(CS, "ContentControlID", Contensive.Core.Models.Complex.cdefModel.getContentId(cpCore, "Orders Completed"));
+                        cpCore.db.csSet(CS, "ContentControlID", cdefModel.getContentId(cpCore, "Orders Completed"));
                         cpCore.db.csSave2(CS);
                     }
                     cpCore.db.csClose(ref CS);

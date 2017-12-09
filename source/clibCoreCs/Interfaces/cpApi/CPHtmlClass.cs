@@ -401,9 +401,9 @@ namespace Contensive.Core {
                     // no textarea
                     //
                     if (TabCnt > 0 && TabCnt < 99) {
-                        tempIndent = SourceHtml.Replace(Environment.NewLine, Environment.NewLine + new string(Convert.ToChar("\t"), TabCnt));
+                        tempIndent = SourceHtml.Replace("\r\n", "\r\n" + new string(Convert.ToChar("\t"), TabCnt));
                     } else {
-                        tempIndent = SourceHtml.Replace(Environment.NewLine, Environment.NewLine + "\t");
+                        tempIndent = SourceHtml.Replace("\r\n", "\r\n\t");
                     }
                     //Indent = genericController.vbReplace(SourceHtml, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
                 } else {
@@ -487,7 +487,7 @@ namespace Contensive.Core {
                             + "<div  class=\"ccHintWrapperContent\">"
                             + "<b>Administrator</b>"
                             + "<BR>"
-                            + "<BR>" + cp.Utils.encodeText(innerHtml) + "</div>"
+                            + "<BR>" + genericController.encodeText(innerHtml) + "</div>"
                         + "</div>";
                 }
             } catch (Exception ex) {

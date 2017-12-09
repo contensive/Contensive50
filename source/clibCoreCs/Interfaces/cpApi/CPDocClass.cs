@@ -64,18 +64,12 @@ namespace Contensive.Core {
         /// Returns the page content
         /// </summary>
         /// <returns></returns>
-        public override string content {
+        public override string Content {
             get {
-                if (true) {
-                    return cpCore.doc.bodyContent;
-                } else {
-                    return "";
-                }
+                return cpCore.doc.bodyContent;
             }
             set {
-                if (true) {
-                    cpCore.doc.bodyContent = value;
-                }
+                cpCore.doc.bodyContent = value;
             }
         }
         //
@@ -85,13 +79,9 @@ namespace Contensive.Core {
         /// </summary>
         /// <returns></returns>
         [Obsolete("Use addon navigation.", true)]
-        public override string navigationStructure {
+        public override string NavigationStructure {
             get {
-                if (true) {
-                    return "";
-                } else {
-                    return "";
-                }
+                return string.Empty ;
             }
         }
         //
@@ -100,18 +90,12 @@ namespace Contensive.Core {
         /// Returns to the current value of NoFollow, set by addon execution
         /// </summary>
         /// <returns></returns>
-        public override bool noFollow {
+        public override bool NoFollow {
             get {
-                if (true) {
-                    return cpCore.webServer.response_NoFollow;
-                } else {
-                    return false;
-                }
+                return cpCore.webServer.response_NoFollow;
             }
             set {
-                if (true) {
-                    cpCore.webServer.response_NoFollow = value;
-                }
+                cpCore.webServer.response_NoFollow = value;
             }
         }
         //
@@ -120,7 +104,7 @@ namespace Contensive.Core {
         /// returns the pageId
         /// </summary>
         /// <returns></returns>
-        public override int pageId {
+        public override int PageId {
             get {
                 if (cpCore.doc.page == null) {
                     return 0;
@@ -135,10 +119,10 @@ namespace Contensive.Core {
         /// returns the page name, set by the pagemenager addon
         /// </summary>
         /// <returns></returns>
-        public override string pageName {
+        public override string PageName {
             get {
                 if (cpCore.doc.page == null) {
-                    return "";
+                    return string.Empty;
                 } else {
                     return cpCore.doc.page.name;
                 }
@@ -150,7 +134,7 @@ namespace Contensive.Core {
         /// returns the current value of refreshquerystring 
         /// </summary>
         /// <returns></returns>
-        public override string refreshQueryString {
+        public override string RefreshQueryString {
             get {
                 return cpCore.doc.refreshQueryString;
             }
@@ -160,9 +144,8 @@ namespace Contensive.Core {
         /// <summary>
         /// Returns the value of sectionId
         /// </summary>
-
         [Obsolete("Section is no longer supported", true)]
-        public override int sectionId {
+        public override int SectionId {
             get {
                 return 0;
             }
@@ -173,13 +156,9 @@ namespace Contensive.Core {
         /// the time and date when this document was started 
         /// </summary>
         /// <returns></returns>
-        public override DateTime startTime {
+        public override DateTime StartTime {
             get {
-                if (true) {
-                    return cpCore.doc.profileStartTime;
-                } else {
-                    return new DateTime();
-                }
+                return cpCore.doc.profileStartTime;
             }
         }
         //
@@ -188,7 +167,7 @@ namespace Contensive.Core {
         /// returns the id of the template, as set by the page manager
         /// </summary>
         /// <returns></returns>
-        public override int templateId {
+        public override int TemplateId {
             get {
                 if (cpCore.doc != null) {
                     if (cpCore.doc.template != null) {
@@ -224,90 +203,66 @@ namespace Contensive.Core {
         /// adds a javascript tag to the head of the document
         /// </summary>
         /// <param name="HeadTag"></param>
-        public override void addHeadTag(string HeadTag) {
-            if (true) {
-                cpCore.html.addHeadTag(HeadTag);
-            }
+        public override void AddHeadTag(string HeadTag) {
+            cpCore.html.addHeadTag(HeadTag);
         }
         //
         //====================================================================================================
         //
-        public override void addMetaDescription(string MetaDescription) {
-            if (true) {
-                cpCore.html.addMetaDescription(MetaDescription);
-            }
+        public override void AddMetaDescription(string MetaDescription) {
+            cpCore.html.addMetaDescription(MetaDescription);
         }
         //
         //====================================================================================================
         //
-        public override void addMetaKeywordList(string MetaKeywordList) {
-            if (true) {
-                cpCore.html.addMetaKeywordList(MetaKeywordList);
-            }
+        public override void AddMetaKeywordList(string MetaKeywordList) {
+            cpCore.html.addMetaKeywordList(MetaKeywordList);
         }
         //
         //====================================================================================================
         //
-        public override void addOnLoadJavascript(string NewCode) {
-            if (true) {
-                cpCore.html.addScriptCode_onLoad(NewCode, "");
-            }
+        public override void AddOnLoadJavascript(string NewCode) {
+            cpCore.html.addScriptCode_onLoad(NewCode, "");
         }
         //
         //====================================================================================================
         //
-        public override void addTitle(string PageTitle) {
-            if (true) {
-                cpCore.html.addTitle(PageTitle);
-            }
+        public override void AddTitle(string PageTitle) {
+            cpCore.html.addTitle(PageTitle);
         }
         //
         //====================================================================================================
         //
-        public override void addRefreshQueryString(string Name, string Value) {
-            if (true) {
-                cpCore.doc.addRefreshQueryString(Name, Value);
-            }
+        public override void AddRefreshQueryString(string Name, string Value) {
+            cpCore.doc.addRefreshQueryString(Name, Value);
         }
         //
         //====================================================================================================
         //
-        public override void addHeadStyle(string StyleSheet) {
-            if (true) {
-                addHeadTag(Environment.NewLine + "\t" + "<style type=\"text/css\">" + Environment.NewLine + "\t" + "\t" + StyleSheet + Environment.NewLine + "\t" + "</style>");
-            }
+        public override void AddHeadStyle(string StyleSheet) {
+            AddHeadTag("\r\n\t<style type=\"text/css\">\r\n\t\t" + StyleSheet + "\r\n\t</style>");
         }
         //
         //====================================================================================================
         //
-        public override void addHeadStyleLink(string StyleSheetLink) {
+        public override void AddHeadStyleLink(string StyleSheetLink) {
             cpCore.html.addStyleLink(StyleSheetLink, "");
         }
         //
         //====================================================================================================
         //
-        public override void addBodyEnd(string NewCode) {
-            if (true) {
-                cpCore.doc.htmlForEndOfBody += NewCode;
-            }
+        public override void AddBodyEnd(string NewCode) {
+            cpCore.doc.htmlForEndOfBody += NewCode;
         }
         //
         //====================================================================================================
         //
-        public override string body {
+        public override string Body {
             get {
-                string tempbody = null;
-                if (true) {
-                    tempbody = cpCore.doc.docBodyFilter;
-                } else {
-                    return "";
-                }
-                return tempbody;
+                return cpCore.doc.docBodyFilter;
             }
             set {
-                if (true) {
-                    cpCore.doc.docBodyFilter = value;
-                }
+                cpCore.doc.docBodyFilter = value;
             }
         }
 
@@ -315,9 +270,9 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", true)]
-        public override string siteStylesheet {
+        public override string SiteStylesheet {
             get {
-                return ""; //cpCore.html.html_getStyleSheet2(0, 0)
+                return "";
             }
         }
         //
@@ -353,7 +308,7 @@ namespace Contensive.Core {
                 a = genericController.vbReplace(a, "#0044#", ",");
                 a = genericController.vbReplace(a, "#0061#", "=");
                 a = genericController.vbReplace(a, "#0038#", "&");
-                a = genericController.vbReplace(a, "#0013#", Environment.NewLine);
+                a = genericController.vbReplace(a, "#0013#", "\r\n");
                 tempdecodeLegacyOptionStringArgument = a;
             }
             return tempdecodeLegacyOptionStringArgument;
@@ -401,8 +356,6 @@ namespace Contensive.Core {
         //
         //=======================================================================================================
         //
-        //=======================================================================================================
-        //
         public override bool IsProperty(string FieldName) {
             return cpCore.docProperties.containsKey(FieldName);
         }
@@ -412,145 +365,44 @@ namespace Contensive.Core {
         public override void SetProperty(string FieldName, string FieldValue) {
             cpCore.docProperties.setProperty(FieldName, FieldValue);
         }
-        //'
-        //'=======================================================================================================
-        //' Deprecated ------------ us GetProperty and Setproperty
-        //' IsVar
-        //'   like GlobalVar, but it includes the OptionString
-        //'   a set Var adds an etry to LocalVars
-        //'=======================================================================================================
-        //'
-        //Public Overrides Property var(ByVal Name As String) As String
-        //    Get
-        //        Return cpCore.docProperties.getText(Name)
-        //        'Dim lcName As String
-        //        'If Name = "" Then
-        //        '    var = ""
-        //        'Else
-        //        '    lcName = Name.ToLower
-        //        '    If LocalVars.Contains(lcName) Then
-        //        '        var = LocalVars(lcName)
-        //        '    Else
-        //        '        var = globalVar(lcName)
-        //        '    End If
-        //        'End If
-        //        'Call tp("Property var get exit, " & Name & "=" & var)
-        //    End Get
-        //    Set(ByVal value As String)
-        //        cpCore.docProperties.setProperty(Name, value)
-        //        'Dim lcName As String
-        //        ''Dim valueObj As String = ""
-        //        ''If Not value Is Nothing Then
-        //        ''    valueObj = value
-        //        ''End If
-        //        'value = genericController.encodeText(value)
-        //        'Call appendDebugLog("var set, " & Name & "=" & value.ToString)
-        //        'If Name <> "" Then
-        //        '    lcName = Name.ToLower
-        //        '    If LocalVars.Contains(lcName) Then
-        //        '        Call LocalVars.Remove(lcName)
-        //        '        If value = "" Then
-        //        '            LocalVarNameList = genericController.vbReplace(LocalVarNameList, vbCrLf & lcName, "", , , CompareMethod.Text)
-        //        '        Else
-        //        '            Call LocalVars.Add(value, lcName)
-        //        '            Call tp("Property var set, name found in localVars, removed and re-added, LocalVarNameList=" & LocalVarNameList)
-        //        '        End If
-        //        '    ElseIf value <> "" Then
-        //        '        Call LocalVars.Add(value, lcName)
-        //        '        LocalVarNameList = LocalVarNameList & vbCrLf & lcName
-        //        '        Call tp("Property var set, name not found in localVars so it was added, LocalVarNameList=" & LocalVarNameList)
-        //        '    End If
-        //        'End If
-        //    End Set
-        //End Property
-        //'
-        //'=======================================================================================================
-        //' Deprecated ------------ us GetProperty and Setproperty
-        //' GlobalVar
-        //'   Like ViewingProperties but includes stream
-        //'   returns
-        //'       matches to ViewingProperties
-        //'       then matches to Stream
-        //'=======================================================================================================
-        //'
-        //Public Overrides Property globalVar(ByVal Name As String) As String
-        //    Get
-        //        Return cpCore.docProperties.getText(Name)
-        //        'Dim lcName As String
-        //        'If True Then
-        //        '    If Name = "" Then
-        //        '        globalVar = ""
-        //        '    Else
-        //        '        lcName = Name.ToLower
-        //        '        If cpCore.main_IsViewingProperty(lcName) Then
-        //        '            globalVar = cpCore.docProperties.getText(lcName)
-        //        '        Else
-        //        '            globalVar = cpCore.docProperties.getText(lcName)
-        //        '        End If
-        //        '    End If
-        //        'Else
-        //        '    globalVar = ""
-        //        'End If
-        //    End Get
-        //    Set(ByVal value As String)
-        //        cpCore.docProperties.setProperty(Name, value)
-        //        'If True Then
-        //        '    Call cpCore.docProperties.setProperty(Name.ToLower, value)
-        //        'End If
-        //    End Set
-        //End Property
-        //'
-        //'=======================================================================================================
-        //' Deprecated ------------ us GetProperty and Setproperty
-        //' IsGlobalVar 
-        //'   returns true if
-        //'       IsViewingProperties is true or InStream is true
-        //'=======================================================================================================
-        //'
-        //Public Overrides ReadOnly Property isGlobalVar(ByVal Name As String) As Boolean
-        //    Get
-        //        Return False
-        //        'Dim lcName As String
-        //        'If True Then
-        //        '    If Name = "" Then
-        //        '        isGlobalVar = ""
-        //        '    Else
-        //        '        lcName = Name.ToLower
-        //        '        isGlobalVar = cpCore.main_IsViewingProperty(lcName)
-        //        '        If Not isGlobalVar Then
-        //        '            isGlobalVar = cpCore.docProperties.containsKey(lcName)
-        //        '        End If
-        //        '    End If
-        //        'Else
-        //        '    isGlobalVar = False
-        //        'End If
-        //    End Get
-        //End Property
-        //'
-        //'=======================================================================================================
-        //' Deprecated ------------ us GetProperty and Setproperty
-        //' IsVar
-        //'   returns true if
-        //'       matches to GlobalVars or LocalVars collections
-        //'=======================================================================================================
-        //'
-        //Public Overrides ReadOnly Property isVar(ByVal Name As String) As Boolean
-        //    Get
-        //        Return cpCore.docProperties.containsKey(Name)
-        //        'Dim lcName As String
-        //        'If Name = "" Then
-        //        '    isVar = False
-        //        'Else
-        //        '    lcName = Name.ToLower
-        //        '    isVar = LocalVars.Contains(lcName)
-        //        '    If Not isVar Then
-        //        '        isVar = isGlobalVar(lcName)
-        //        '    End If
-        //        'End If
-        //    End Get
-        //End Property
         //
+        //=======================================================================================================
         //
+        public override void Var(string Index, string Value) {
+            cpCore.docProperties.getText(Index);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override string get_GlobalVar(string Index) {
+            throw new NotImplementedException();
+        }
+        //
+        //=======================================================================================================
+        //
+        public override bool get_IsGlobalVar(string Index) {
+            throw new NotImplementedException();
+        }
+        //
+        //=======================================================================================================
+        //
+        public override bool get_IsVar(string Index) {
+            throw new NotImplementedException();
+        }
+        //
+        //=======================================================================================================
+        //
+        public override string get_Var(string Index) {
+            throw new NotImplementedException();
+        }
+        //
+        //=======================================================================================================
+        //
+        public override void set_GlobalVar(string Index, string Value) {
+            throw new NotImplementedException();
+        }
+        //
+        //=======================================================================================================
         //
         public override bool IsAdminSite {
             get {
@@ -558,7 +410,7 @@ namespace Contensive.Core {
                 try {
                     returnIsAdmin = (cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
                 } catch (Exception ex) {
-                    cpCore.handleException(ex); // "unexpected error in IsAdminSite")
+                    cpCore.handleException(ex); 
                     throw;
                 }
                 return returnIsAdmin;
@@ -567,30 +419,17 @@ namespace Contensive.Core {
         //
         //=======================================================================================================
         //
-        // debugging -- append to logfile
-        //
-        //=======================================================================================================
-        //
         private void appendDebugLog(string copy) {
-            //My.Computer.FileSystem.WriteAllText("c:\clibCpDocDebug.log", Now & " - cp.doc, " & copy & vbCrLf, True)
-            // 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
         }
         //
         //=======================================================================================================
-        //
         // debugging -- testpoint
         //
-        //=======================================================================================================
-        //
         private void tp(string msg) {
-            //Call appendDebugLog(msg)
         }
         //
         //=======================================================================================================
-        //
         // IDisposable support
-        //
-        //=======================================================================================================
         //
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.

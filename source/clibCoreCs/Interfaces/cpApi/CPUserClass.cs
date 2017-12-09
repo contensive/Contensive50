@@ -13,6 +13,7 @@ using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
+using Contensive.Core.Models.Context;
 //
 namespace Contensive.Core {
     public class CPUserClass : BaseClasses.CPUserBaseClass, IDisposable {
@@ -88,7 +89,8 @@ namespace Contensive.Core {
                     localId = CP.core.doc.authContext.user.id;
                     if (localId == 0) {
                         localId = CP.core.db.insertContentRecordGetID("people", 0);
-                        CP.core.doc.authContext.recognizeById(cpCore, localId, CP.core.doc.authContext);
+
+                        CP.core.doc.authContext.recognizeById(cpCore, localId, ref CP.core.doc.authContext);
                     }
                 }
                 return localId;
@@ -281,7 +283,7 @@ namespace Contensive.Core {
         public override bool IsWorkflowRendering //Inherits BaseClasses.CPUserBaseClass.IsWorkflowRendering
         {
             get {
-                return CP.core.doc.authContext.isWorkflowRendering;
+                return CP.core.doc.authContext.isWorkflowRendering();
             }
         }
         //
@@ -371,7 +373,7 @@ namespace Contensive.Core {
         public override bool IsNewLoginOK(string Username, string Password) {
             string errorMessage = "";
             int errorCode = 0;
-            return CP.core.doc.authContext.isNewLoginOK(cpCore, Username, Password, errorMessage, errorCode);
+            return CP.core.doc.authContext.isNewLoginOK(cpCore, Username, Password, ref errorMessage, ref errorCode);
         }
         //
         //====================================================================================================
@@ -395,7 +397,8 @@ namespace Contensive.Core {
         //
         public override bool Recognize(int UserID) //Inherits BaseClasses.CPUserBaseClass.Recognize
         {
-            return CP.core.doc.authContext.recognizeById(cpCore, UserID, CP.core.doc.authContext);
+            authContextModel authContext = CP.core.doc.authContext;
+            return CP.core.doc.authContext.recognizeById(cpCore, UserID, ref authContext);
         }
         //
         //====================================================================================================

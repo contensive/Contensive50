@@ -10,6 +10,8 @@ using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 using System.IO;
+using System.Data;
+using System.Threading;
 //
 //
 namespace Contensive.Core {
@@ -1448,7 +1450,7 @@ namespace Contensive.Core {
                         return_ErrorMessage = "";
                         //
                         // -- pause for a second between fetches to pace the server (<10 hits in 10 seconds)
-                        Threading.Thread.Sleep(downloadDelay);
+                        Thread.Sleep(downloadDelay);
                         //
                         // -- download file
                         System.Net.WebRequest rq = System.Net.WebRequest.Create(URL);
@@ -1683,6 +1685,10 @@ namespace Contensive.Core {
                 throw ex;
             }
             return UpgradeOK;
+        }
+        public static bool installCollectionFromRemoteRepo(coreClass cpCore, string CollectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild){
+            var tmpList = new List<string> { };
+            return installCollectionFromRemoteRepo(cpCore, CollectionGuid, ref return_ErrorMessage,ImportFromCollectionsGuidList, IsNewBuild, ref tmpList);
         }
         //
         //====================================================================================================
@@ -1925,7 +1931,7 @@ namespace Contensive.Core {
                                                                                     }
                                                                                 }
                                                                                 if (!string.IsNullOrEmpty(LibGUID)) {
-                                                                                    if (genericController.vbInstr(1, LibGUID, "58c9", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                                                                    if (genericController.vbInstr(1, LibGUID, "58c9", 1) != 0) {
                                                                                         LibGUID = LibGUID;
                                                                                     }
                                                                                     if ((!string.IsNullOrEmpty(LibGUID)) & (LibGUID == LocalGuid) & ((string.IsNullOrEmpty(LibContensiveVersion)) || (string.CompareOrdinal(LibContensiveVersion, cpCore.codeVersion()) <= 0))) {
@@ -1935,7 +1941,7 @@ namespace Contensive.Core {
                                                                                         if (allowLogging) {
                                                                                             logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Library collection node found that matches");
                                                                                         }
-                                                                                        if (genericController.vbInstr(1, LibGUID, "58c9", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                                                                        if (genericController.vbInstr(1, LibGUID, "58c9", 1) != 0) {
                                                                                             LibGUID = LibGUID;
                                                                                         }
                                                                                         if (!DateHelper.IsDate(LibLastChangeDateStr)) {
@@ -2150,8 +2156,7 @@ namespace Contensive.Core {
                                 logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, processing xml file [" + Filename + "]");
                                 //hint = hint & ",320"
                                 CollectionFile = new XmlDocument();
-
-                                object loadOk = true;
+                                bool loadOk = true;
                                 try {
                                     CollectionFile.LoadXml(cpCore.privateFiles.readFile(tmpInstallPath + Filename));
                                 } catch (Exception ex) {
@@ -2349,7 +2354,7 @@ namespace Contensive.Core {
                                                         }
                                                         string statusMsg = "Installing collection [" + ChildCollectionName + ", " + ChildCollectionGUID + "] referenced from collection [" + Collectionname + "]";
                                                         logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" + ChildCollectionName + "], childCollectionGuid [" + ChildCollectionGUID + "]");
-                                                        if (genericController.vbInstr(1, CollectionVersionPath, ChildCollectionGUID, Microsoft.VisualBasic.Constants.vbTextCompare) == 0) {
+                                                        if (genericController.vbInstr(1, CollectionVersionPath, ChildCollectionGUID, 1) == 0) {
                                                             if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                 //
                                                                 // -- Needs a GUID to install
@@ -2494,7 +2499,7 @@ namespace Contensive.Core {
                     //
                     string CollectionVersionFolder = cpCore.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName + "\\";
                     FileInfo[] srcFileInfoArray = cpCore.privateFiles.getFileList(CollectionVersionFolder);
-                    if (srcFileInfoArray.Count() == 0) {
+                    if (srcFileInfoArray.Length == 0) {
                         result = false;
                         return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>";
                     } else {
@@ -2637,7 +2642,7 @@ namespace Contensive.Core {
 
                                                             switch (resourceType.ToLower()) {
                                                                 case "www":
-                                                                    wwwFileList = wwwFileList + Environment.NewLine + DstFilePath + filename;
+                                                                    wwwFileList = wwwFileList + "\r\n" + DstFilePath + filename;
                                                                     logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + cpCore.serverConfig.appConfig.appRootFilesPath + DstFilePath + "].");
                                                                     //Call logcontroller.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & "].")
                                                                     cpCore.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, DstFilePath + filename, cpCore.appRootFiles);
@@ -2649,7 +2654,7 @@ namespace Contensive.Core {
                                                                     break;
                                                                 case "file":
                                                                 case "content":
-                                                                    ContentFileList = ContentFileList + Environment.NewLine + DstFilePath + filename;
+                                                                    ContentFileList = ContentFileList + "\r\n" + DstFilePath + filename;
                                                                     logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + DstFilePath + "].");
                                                                     cpCore.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, DstFilePath + filename, cpCore.cdnFiles);
                                                                     if (genericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
@@ -2661,7 +2666,7 @@ namespace Contensive.Core {
                                                                     if (assembliesInZip.Contains(filename.ToLower())) {
                                                                         assembliesInZip.Remove(filename.ToLower());
                                                                     }
-                                                                    ExecFileList = ExecFileList + Environment.NewLine + filename;
+                                                                    ExecFileList = ExecFileList + "\r\n" + filename;
                                                                     break;
                                                             }
                                                             break;
@@ -2676,7 +2681,7 @@ namespace Contensive.Core {
                                                             if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                 ChildCollectionGUID = CDefSection.InnerText;
                                                             }
-                                                            if (ImportFromCollectionsGuidList + "," + CollectionGuid.IndexOf(ChildCollectionGUID, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                                                            if ((ImportFromCollectionsGuidList + "," + CollectionGuid).IndexOf(ChildCollectionGUID, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
                                                                 //
                                                                 // circular import detected, this collection is already imported
                                                                 //
@@ -2716,7 +2721,7 @@ namespace Contensive.Core {
                                                 //
                                                 // -- any assemblies found in the zip that were not part of the resources section need to be added
                                                 foreach (string filename in assembliesInZip) {
-                                                    ExecFileList = ExecFileList + Environment.NewLine + filename;
+                                                    ExecFileList = ExecFileList + "\r\n" + filename;
                                                 }
                                                 //
                                                 //-------------------------------------------------------------------------------
@@ -2814,7 +2819,7 @@ namespace Contensive.Core {
                                                                 // old cdef xection -- take the inner
                                                                 //
                                                                 foreach (XmlNode ChildNode in CDefSection.ChildNodes) {
-                                                                    CollectionWrapper += Environment.NewLine + ChildNode.OuterXml;
+                                                                    CollectionWrapper += "\r\n" + ChildNode.OuterXml;
                                                                 }
                                                                 break;
                                                             case "cdef":
@@ -2943,19 +2948,19 @@ namespace Contensive.Core {
                                                                                         // found by guid, use guid in list and save name
                                                                                         //
                                                                                         cpCore.db.csSet(cs, "name", ContentRecordName);
-                                                                                        DataRecordList = DataRecordList + Environment.NewLine + ContentName + "," + ContentRecordGuid;
+                                                                                        DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
                                                                                     } else if (recordfound) {
                                                                                         //
                                                                                         // record found by name, use name is list but do not add guid
                                                                                         //
-                                                                                        DataRecordList = DataRecordList + Environment.NewLine + ContentName + "," + ContentRecordName;
+                                                                                        DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordName;
                                                                                     } else {
                                                                                         //
                                                                                         // record was created
                                                                                         //
                                                                                         cpCore.db.csSet(cs, "ccguid", ContentRecordGuid);
                                                                                         cpCore.db.csSet(cs, "name", ContentRecordName);
-                                                                                        DataRecordList = DataRecordList + Environment.NewLine + ContentName + "," + ContentRecordGuid;
+                                                                                        DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
                                                                                     }
                                                                                 }
                                                                                 cpCore.db.csClose(ref cs);
@@ -3127,7 +3132,7 @@ namespace Contensive.Core {
                                                                 if (!string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                     int ChildCollectionID = 0;
                                                                     int cs = -1;
-                                                                    cs = cpCore.db.csOpen("Add-on Collections", "ccguid=" + cpCore.db.encodeSQLText(ChildCollectionGUID),,,,,, "id");
+                                                                    cs = cpCore.db.csOpen("Add-on Collections", "ccguid=" + cpCore.db.encodeSQLText(ChildCollectionGUID));
                                                                     if (cpCore.db.csOk(cs)) {
                                                                         ChildCollectionID = cpCore.db.csGetInteger(cs, "id");
                                                                     }
@@ -3398,7 +3403,7 @@ namespace Contensive.Core {
                 returnXml = cpCore.privateFiles.readFile(collectionFilePathFilename);
                 if (string.IsNullOrEmpty(returnXml)) {
                     FolderList = cpCore.privateFiles.getFolderList(cpCore.addon.getPrivateFilesAddonPath());
-                    if (FolderList.Count() > 0) {
+                    if (FolderList.Length > 0) {
                         foreach (DirectoryInfo folder in FolderList) {
                             FolderName = folder.Name;
                             Pos = genericController.vbInstr(1, FolderName, "\t");
@@ -3412,26 +3417,26 @@ namespace Contensive.Core {
                                         CollectionGuid = CollectionGuid.Substring(0, 8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
                                         CollectionGuid = "{" + CollectionGuid + "}";
                                         SubFolderList = cpCore.privateFiles.getFolderList(cpCore.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
-                                        if (SubFolderList.Count() > 0) {
-                                            SubFolder = SubFolderList[SubFolderList.Count() - 1];
+                                        if (SubFolderList.Length > 0) {
+                                            SubFolder = SubFolderList[SubFolderList.Length - 1];
                                             FolderName = FolderName + "\\" + SubFolder.Name;
                                             LastChangeDate = SubFolder.Name.Substring(4, 2) + "/" + SubFolder.Name.Substring(6, 2) + "/" + SubFolder.Name.Substring(0, 4);
                                             if (!DateHelper.IsDate(LastChangeDate)) {
                                                 LastChangeDate = "";
                                             }
                                         }
-                                        returnXml = returnXml + Environment.NewLine + "\t" + "<Collection>";
-                                        returnXml = returnXml + Environment.NewLine + "\t" + "\t" + "<name>" + Collectionname + "</name>";
-                                        returnXml = returnXml + Environment.NewLine + "\t" + "\t" + "<guid>" + CollectionGuid + "</guid>";
-                                        returnXml = returnXml + Environment.NewLine + "\t" + "\t" + "<lastchangedate>" + LastChangeDate + "</lastchangedate>";
-                                        returnXml += Environment.NewLine + "\t" + "\t" + "<path>" + FolderName + "</path>";
-                                        returnXml = returnXml + Environment.NewLine + "\t" + "</Collection>";
+                                        returnXml = returnXml + "\r\n\t<Collection>";
+                                        returnXml = returnXml + "\r\n\t\t<name>" + Collectionname + "</name>";
+                                        returnXml = returnXml + "\r\n\t\t<guid>" + CollectionGuid + "</guid>";
+                                        returnXml = returnXml + "\r\n\t\t<lastchangedate>" + LastChangeDate + "</lastchangedate>";
+                                        returnXml += "\r\n\t\t<path>" + FolderName + "</path>";
+                                        returnXml = returnXml + "\r\n\t</Collection>";
                                     }
                                 }
                             }
                         }
                     }
-                    returnXml = "<CollectionList>" + returnXml + Environment.NewLine + "</CollectionList>";
+                    returnXml = "<CollectionList>" + returnXml + "\r\n</CollectionList>";
                     cpCore.privateFiles.saveFile(collectionFilePathFilename, returnXml);
                 }
             } catch (Exception ex) {
@@ -3729,7 +3734,7 @@ namespace Contensive.Core {
             try {
                 int CS;
                 //
-                CS = cpCore.db.csOpen(cnNavigatorEntries, "ccguid=" + cpCore.db.encodeSQLText(ccGuid), "ID",,,,, "ID");
+                CS = cpCore.db.csOpen(cnNavigatorEntries, "ccguid=" + cpCore.db.encodeSQLText(ccGuid), "ID",true,0,false,false, "ID");
                 if (cpCore.db.csOk(CS)) {
                     navId = cpCore.db.csGetInteger(CS, "id");
                 }
@@ -3771,7 +3776,7 @@ namespace Contensive.Core {
                             // can not copy dll or exe
                             //
                             //Filename = Filename
-                        } else if ("," + BlockFileList + ",".IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                        } else if (("," + BlockFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
                             //
                             // can not copy the current collection file
                             //
@@ -3788,7 +3793,7 @@ namespace Contensive.Core {
                     //
                     FolderInfoArray = cpCore.privateFiles.getFolderList(SrcFolder);
                     foreach (DirectoryInfo folder in FolderInfoArray) {
-                        if ("," + BlockFolderList + ",".IndexOf("," + folder.Name + ",", System.StringComparison.OrdinalIgnoreCase) + 1 == 0) {
+                        if (("," + BlockFolderList + ",").IndexOf("," + folder.Name + ",", System.StringComparison.OrdinalIgnoreCase) + 1 == 0) {
                             CopyInstallToDst(cpCore, SrcPath + folder.Name + "\\", DstPath + folder.Name + "\\", BlockFileList, "");
                         }
                     }
@@ -3816,7 +3821,7 @@ namespace Contensive.Core {
                 if (cpCore.privateFiles.pathExists(SrcFolder)) {
                     FileInfoArray = cpCore.privateFiles.getFileList(SrcFolder);
                     foreach (FileInfo file in FileInfoArray) {
-                        if ("," + ExcludeFileList + ",".IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                        if (("," + ExcludeFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
                             //
                             // can not copy the current collection file
                             //
@@ -3825,7 +3830,7 @@ namespace Contensive.Core {
                             //
                             // copy this file to destination
                             //
-                            result = result + Environment.NewLine + SubFolder + file.Name;
+                            result = result + "\r\n" + SubFolder + file.Name;
                             //runAtServer.IPAddress = "127.0.0.1"
                             //runAtServer.Port = "4531"
                             //QS = "SrcFile=" & encodeRequestVariable(SrcPath & Filename) & "&DstFile=" & encodeRequestVariable(DstPath & Filename)
@@ -3906,7 +3911,7 @@ namespace Contensive.Core {
                         navTypeId = NavTypeIDAddon;
                     }
                     Criteria = "(" + AddonGuidFieldName + "=" + cpCore.db.encodeSQLText(addonGuid) + ")";
-                    CS = cpCore.db.csOpen(cnAddons, Criteria,, false);
+                    CS = cpCore.db.csOpen(cnAddons, Criteria,"", false);
                     if (cpCore.db.csOk(CS)) {
                         //
                         // Update the Addon
@@ -3918,7 +3923,7 @@ namespace Contensive.Core {
                         //
                         cpCore.db.csClose(ref CS);
                         Criteria = "(name=" + cpCore.db.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
-                        CS = cpCore.db.csOpen(cnAddons, Criteria,, false);
+                        CS = cpCore.db.csOpen(cnAddons, Criteria,"", false);
                         if (cpCore.db.csOk(CS)) {
                             logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                         }
@@ -4143,7 +4148,7 @@ namespace Contensive.Core {
                                             if (string.IsNullOrEmpty(ArgumentList)) {
                                                 ArgumentList = NewValue;
                                             } else if (NewValue != FieldValue) {
-                                                ArgumentList = ArgumentList + Environment.NewLine + NewValue;
+                                                ArgumentList = ArgumentList + "\r\n" + NewValue;
                                             }
                                         }
                                         break;
@@ -4159,7 +4164,7 @@ namespace Contensive.Core {
                                         if (NewValue.Substring(NewValue.Length - 1) != "}") {
                                             NewValue = NewValue + "}";
                                         }
-                                        StyleSheet = StyleSheet + Environment.NewLine + NodeName + " " + NewValue;
+                                        StyleSheet = StyleSheet + "\r\n" + NodeName + " " + NewValue;
                                         //Case "includesharedstyle"
                                         //    '
                                         //    ' added 9/3/2012
@@ -4212,7 +4217,7 @@ namespace Contensive.Core {
                                         test = genericController.vbReplace(test, "\n", "");
                                         test = genericController.vbReplace(test, "\t", "");
                                         if (!string.IsNullOrEmpty(test)) {
-                                            StyleSheet = StyleSheet + Environment.NewLine + PageInterfaceWithinLoop.InnerText;
+                                            StyleSheet = StyleSheet + "\r\n" + PageInterfaceWithinLoop.InnerText;
                                         }
                                         break;
                                     case "template":
@@ -4490,7 +4495,7 @@ namespace Contensive.Core {
                     }
                     AddOnType = GetXMLAttribute(cpCore, IsFound, AddonNode, "type", "");
                     Criteria = "(" + AddonGuidFieldName + "=" + cpCore.db.encodeSQLText(AOGuid) + ")";
-                    CS = cpCore.db.csOpen(cnAddons, Criteria,, false);
+                    CS = cpCore.db.csOpen(cnAddons, Criteria,"", false);
                     if (cpCore.db.csOk(CS)) {
                         //
                         // Update the Addon
@@ -4502,7 +4507,7 @@ namespace Contensive.Core {
                         //
                         cpCore.db.csClose(ref CS);
                         Criteria = "(name=" + cpCore.db.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
-                        CS = cpCore.db.csOpen(cnAddons, Criteria,, false);
+                        CS = cpCore.db.csOpen(cnAddons, Criteria,"", false);
                     }
                     if (!cpCore.db.csOk(CS)) {
                         //
@@ -4592,7 +4597,7 @@ namespace Contensive.Core {
         //        Dim Cmd As String
         //        Dim CollectionRootPath As String
         //        Dim Pos As Integer
-        //        Dim FolderList As IO.DirectoryInfo()
+        //        Dim FolderList As DirectoryInfo()
         //        Dim LocalPath As String
         //        Dim LocalGuid As String
         //        Dim Doc As New XmlDocument
@@ -4694,7 +4699,7 @@ namespace Contensive.Core {
         //                                        Call AppendClassLogFile("Server", "RegisterAddonFolder", "no subfolders found in physical path [" & Path & "], skipping")
         //                                        '
         //                                    Else
-        //                                        For Each dir As IO.DirectoryInfo In FolderList
+        //                                        For Each dir As DirectoryInfo In FolderList
         //                                            IsActiveFolder = False
         //                                            '
         //                                            ' register or unregister all files in this folder
@@ -4715,7 +4720,7 @@ namespace Contensive.Core {
         //                                                End If
         //                                                ' 20161005 - no longer need to register activeX
         //                                                'FileList = cpCore.app.privateFiles.GetFolderFiles(Path & "\" & dir.Name)
-        //                                                'For Each file As IO.FileInfo In FileList
+        //                                                'For Each file As FileInfo In FileList
         //                                                '    If Right(file.Name, 4) = ".dll" Then
         //                                                '        If IsActiveFolder Then
         //                                                '            '
@@ -5455,15 +5460,15 @@ namespace Contensive.Core {
                                                     tempVar2.lookupList = GetXMLAttribute(cpCore, Found, CDefChildNode, "LookupList", DefaultCDefField.lookupList);
                                                     tempVar2.ManyToManyRulePrimaryField = GetXMLAttribute(cpCore, Found, CDefChildNode, "ManyToManyRulePrimaryField", DefaultCDefField.ManyToManyRulePrimaryField);
                                                     tempVar2.ManyToManyRuleSecondaryField = GetXMLAttribute(cpCore, Found, CDefChildNode, "ManyToManyRuleSecondaryField", DefaultCDefField.ManyToManyRuleSecondaryField);
-                                                    tempVar2.lookupContentName(cpCore) = GetXMLAttribute(cpCore, Found, CDefChildNode, "LookupContent", DefaultCDefField.get_lookupContentName(cpCore));
+                                                    tempVar2.set_lookupContentName(cpCore,GetXMLAttribute(cpCore, Found, CDefChildNode, "LookupContent", DefaultCDefField.get_lookupContentName(cpCore)));
                                                     // isbase should be set if the base file is loading, regardless of the state of any isBaseField attribute -- which will be removed later
                                                     // case 1 - when the application collection is loaded from the exported xml file, isbasefield must follow the export file although the data is not the base collection
                                                     // case 2 - when the base file is loaded, all fields must include the attribute
                                                     //Return_Collection.CDefExt(CDefPtr).Fields(FieldPtr).IsBaseField = IsccBaseFile
                                                     tempVar2.isBaseField = GetXMLAttributeBoolean(cpCore, Found, CDefChildNode, "IsBaseField", false) || IsccBaseFile;
-                                                    tempVar2.RedirectContentName(cpCore) = GetXMLAttribute(cpCore, Found, CDefChildNode, "RedirectContent", DefaultCDefField.get_RedirectContentName(cpCore));
-                                                    tempVar2.ManyToManyContentName(cpCore) = GetXMLAttribute(cpCore, Found, CDefChildNode, "ManyToManyContent", DefaultCDefField.get_ManyToManyContentName(cpCore));
-                                                    tempVar2.ManyToManyRuleContentName(cpCore) = GetXMLAttribute(cpCore, Found, CDefChildNode, "ManyToManyRuleContent", DefaultCDefField.get_ManyToManyRuleContentName(cpCore));
+                                                    tempVar2.set_RedirectContentName(cpCore, GetXMLAttribute(cpCore, Found, CDefChildNode, "RedirectContent", DefaultCDefField.get_RedirectContentName(cpCore)));
+                                                    tempVar2.set_ManyToManyContentName(cpCore, GetXMLAttribute(cpCore, Found, CDefChildNode, "ManyToManyContent", DefaultCDefField.get_ManyToManyContentName(cpCore)));
+                                                    tempVar2.set_ManyToManyRuleContentName(cpCore, GetXMLAttribute(cpCore, Found, CDefChildNode, "ManyToManyRuleContent", DefaultCDefField.get_ManyToManyRuleContentName(cpCore)));
                                                     tempVar2.isModifiedSinceInstalled = GetXMLAttributeBoolean(cpCore, Found, CDefChildNode, "IsModified", DefaultCDefField.isModifiedSinceInstalled);
                                                     tempVar2.installedByCollectionGuid = GetXMLAttribute(cpCore, Found, CDefChildNode, "installedByCollectionId", DefaultCDefField.installedByCollectionGuid);
                                                     tempVar2.dataChanged = setAllDataChanged;
@@ -5803,7 +5808,7 @@ namespace Contensive.Core {
                             logController.appendInstallLog(cpCore, "creating sql table [" + workingCdef.ContentTableName + "], datasource [" + workingCdef.ContentDataSourceName + "]");
                             if (genericController.vbLCase(workingCdef.ContentDataSourceName) == "default" || workingCdef.ContentDataSourceName == "") {
                                 TableName = workingCdef.ContentTableName;
-                                if (genericController.vbInstr(1, "," + UsedTables + ",", "," + TableName + ",", Microsoft.VisualBasic.Constants.vbTextCompare) != 0) {
+                                if (genericController.vbInstr(1, "," + UsedTables + ",", "," + TableName + ",", 1) != 0) {
                                     TableName = TableName;
                                 } else {
                                     UsedTables = UsedTables + "," + TableName;
@@ -6038,7 +6043,7 @@ namespace Contensive.Core {
                                     StyleLine = SiteStyleSplit[SiteStylePtr];
                                     PosNameLineEnd = StyleLine.LastIndexOf("{") + 1;
                                     if (PosNameLineEnd > 0) {
-                                        PosNameLineStart = StyleLine.LastIndexOf(Environment.NewLine, PosNameLineEnd - 1) + 1;
+                                        PosNameLineStart = StyleLine.LastIndexOf("\r\n", PosNameLineEnd - 1) + 1;
                                         if (PosNameLineStart > 0) {
                                             //
                                             // Check this site style for a match with the NewStyleName
@@ -6051,7 +6056,7 @@ namespace Contensive.Core {
                                                     //
                                                     // Found - Update style
                                                     //
-                                                    SiteStyleSplit[SiteStylePtr] = Environment.NewLine + tempVar4.Name + " {" + NewStyleValue;
+                                                    SiteStyleSplit[SiteStylePtr] = "\r\n" + tempVar4.Name + " {" + NewStyleValue;
                                                 }
                                                 break;
                                             }
@@ -6063,15 +6068,15 @@ namespace Contensive.Core {
                             // Add or update the stylesheet
                             //
                             if (!Found) {
-                                StyleSheetAdd = StyleSheetAdd + Environment.NewLine + NewStyleName + " {" + NewStyleValue + "}";
+                                StyleSheetAdd = StyleSheetAdd + "\r\n" + NewStyleName + " {" + NewStyleValue + "}";
                             }
                         }
                     }
                     SiteStyles = string.Join("}", SiteStyleSplit);
                     if (!string.IsNullOrEmpty(StyleSheetAdd)) {
-                        SiteStyles = SiteStyles + Environment.NewLine + Environment.NewLine + "/*"
-                        + Environment.NewLine + "Styles added " + DateTime.Now + Environment.NewLine + "*/"
-                        + Environment.NewLine + StyleSheetAdd;
+                        SiteStyles = SiteStyles + "\r\n\r\n/*"
+                        + "\r\nStyles added " + DateTime.Now + "\r\n*/"
+                        + "\r\n" + StyleSheetAdd;
                     }
                     cpCore.appRootFiles.saveFile("templates/styles.css", SiteStyles);
                     //
@@ -6145,7 +6150,7 @@ namespace Contensive.Core {
                     //
                     // get contentid and protect content with IsBaseContent true
                     //
-                    SQL = cpCore.db.GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" + cpCore.db.encodeSQLText(ContentName), "ID",, 1);
+                    SQL = cpCore.db.GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" + cpCore.db.encodeSQLText(ContentName), "ID","", 1);
                     rs = cpCore.db.executeQuery(SQL);
                     if (isDataTableOk(rs)) {
                         if (rs.Rows.Count > 0) {

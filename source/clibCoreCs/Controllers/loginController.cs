@@ -42,20 +42,20 @@ namespace Contensive.Core.Controllers {
                     Body = getLoginForm(cpcore);
                 }
                 Body = ""
-                    + "\r" + "<p class=\"ccAdminNormal\">You are attempting to enter an access controlled area. Continue only if you have authority to enter this area. Information about your visit will be recorded for security purposes.</p>"
+                    + "\r<p class=\"ccAdminNormal\">You are attempting to enter an access controlled area. Continue only if you have authority to enter this area. Information about your visit will be recorded for security purposes.</p>"
                     + Body + "";
                 //
                 Body = ""
-                    + cpcore.html.main_GetPanel(Body, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) + "\r" + "<p>&nbsp;</p>"
-                    + "\r" + "<p>&nbsp;</p>"
-                    + "\r" + "<p style=\"text-align:center\"><a href=\"http://www.Contensive.com\" target=\"_blank\"><img src=\"/ccLib/images/ccLibLogin.GIF\" width=\"80\" height=\"33\" border=\"0\" alt=\"Contensive Content Control\" ></A></p>"
-                    + "\r" + "<p style=\"text-align:center\" class=\"ccAdminSmall\">The content on this web site is managed and delivered by the Contensive Site Management Server. If you do not have member access, please use your back button to return to the public area.</p>"
+                    + cpcore.html.main_GetPanel(Body, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) + "\r<p>&nbsp;</p>"
+                    + "\r<p>&nbsp;</p>"
+                    + "\r<p style=\"text-align:center\"><a href=\"http://www.Contensive.com\" target=\"_blank\"><img src=\"/ccLib/images/ccLibLogin.GIF\" width=\"80\" height=\"33\" border=\"0\" alt=\"Contensive Content Control\" ></A></p>"
+                    + "\r<p style=\"text-align:center\" class=\"ccAdminSmall\">The content on this web site is managed and delivered by the Contensive Site Management Server. If you do not have member access, please use your back button to return to the public area.</p>"
                     + "";
                 //
                 // --- create an outer table to hold the form
                 //
                 Body = ""
-                    + "\r" + "<div class=\"ccCon\" style=\"width:400px;margin:100px auto 0 auto;\">"
+                    + "\r<div class=\"ccCon\" style=\"width:400px;margin:100px auto 0 auto;\">"
                     + htmlIndent(cpcore.html.main_GetPanelHeader("Login")) + htmlIndent(Body) + "</div>";
                 //
                 returnREsult = Body;
@@ -123,10 +123,10 @@ namespace Contensive.Core.Controllers {
                         Caption = "Username";
                     }
                     //
-                    loginForm = loginForm + "\r" + "<tr>"
+                    loginForm = loginForm + "\r<tr>"
                     + cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>"
-                    + cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input ID=\"LoginUsernameInput\" NAME=\"" + "username\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" ></td>"
-                    + "\r" + "</tr>";
+                    + cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input ID=\"LoginUsernameInput\" NAME=\"username\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" ></td>"
+                    + "\r</tr>";
                     //
                     // ----- Password
                     //
@@ -135,57 +135,57 @@ namespace Contensive.Core.Controllers {
                     } else {
                         Caption = "Password";
                     }
-                    loginForm = loginForm + "\r" + "<tr>"
+                    loginForm = loginForm + "\r<tr>"
                     + cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>"
-                    + cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\" ><input NAME=\"" + "password\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" type=\"password\"></td>"
-                    + "\r" + "</tr>"
+                    + cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\" ><input NAME=\"password\" VALUE=\"\" SIZE=\"20\" MAXLENGTH=\"50\" type=\"password\"></td>"
+                    + "\r</tr>"
                     + "";
                     //
                     // ----- autologin support
                     //
                     if (genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("AllowAutoLogin", false))) {
-                        loginForm = loginForm + "\r" + "<tr>"
+                        loginForm = loginForm + "\r<tr>"
                         + cr2 + "<td align=\"right\">&nbsp;</td>"
                         + cr2 + "<td align=\"left\" >"
                         + cr3 + "<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
                         + cr4 + "<tr>"
-                        + cr5 + "<td valign=\"top\" width=\"20\"><input type=\"checkbox\" name=\"" + "autologin\" value=\"ON\" checked></td>"
+                        + cr5 + "<td valign=\"top\" width=\"20\"><input type=\"checkbox\" name=\"autologin\" value=\"ON\" checked></td>"
                         + cr5 + "<td valign=\"top\" width=\"100%\">" + SpanClassAdminNormal + "Login automatically from this computer</span></td>"
                         + cr4 + "</tr>"
                         + cr3 + "</table>"
                         + cr2 + "</td>"
-                        + "\r" + "</tr>";
+                        + "\r</tr>";
                     }
-                    loginForm = loginForm + "\r" + "<tr>"
+                    loginForm = loginForm + "\r<tr>"
                         + cr2 + "<td colspan=\"2\">&nbsp;</td>"
-                        + "\r" + "</tr>"
+                        + "\r</tr>"
                         + "";
                     loginForm = ""
-                        + "\r" + "<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
-                        + htmlIndent(loginForm) + "\r" + "</table>"
+                        + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
+                        + htmlIndent(loginForm) + "\r</table>"
                         + "";
                     loginForm = loginForm + cpcore.html.html_GetFormInputHidden("Type", FormTypeLogin) + cpcore.html.html_GetFormInputHidden("email", cpcore.doc.authContext.user.Email) + cpcore.html.main_GetPanelButtons(ButtonLogin, "Button") + "";
                     loginForm = ""
-                        + cpcore.html.html_GetFormStart(QueryString) + htmlIndent(loginForm) + "\r" + "</form>"
+                        + cpcore.html.html_GetFormStart(QueryString) + htmlIndent(loginForm) + "\r</form>"
                         + "";
 
                     //-------
 
                     Panel = ""
-                        + errorController.error_GetUserError(cpcore) + "\r" + "<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
+                        + errorController.error_GetUserError(cpcore) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
                     //
                     // ----- Password Form
                     //
                     if (genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("allowPasswordEmail", true))) {
                         Panel = ""
-                            + Panel + "\r" + "<p class=\"ccAdminNormal\"><b>Forget your password?</b></p>"
-                            + "\r" + "<p class=\"ccAdminNormal\">If you are a member of the system and can not remember your password, enter your email address below and we will email your matching username and password.</p>"
+                            + Panel + "\r<p class=\"ccAdminNormal\"><b>Forget your password?</b></p>"
+                            + "\r<p class=\"ccAdminNormal\">If you are a member of the system and can not remember your password, enter your email address below and we will email your matching username and password.</p>"
                             + getSendPasswordForm(cpcore) + "";
                     }
                     //
                     returnHtml = ""
-                        + "\r" + "<div class=\"ccLoginFormCon\">"
-                        + htmlIndent(Panel) + "\r" + "</div>"
+                        + "\r<div class=\"ccLoginFormCon\">"
+                        + htmlIndent(Panel) + "\r</div>"
                         + "";
                 }
             } catch (Exception ex) {
@@ -249,10 +249,10 @@ namespace Contensive.Core.Controllers {
                 //
                 if (cpcore.siteProperties.getBoolean("allowPasswordEmail", true)) {
                     returnResult = ""
-                    + "\r" + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
+                    + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                     + cr2 + "<tr>"
                     + cr3 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + "Email</span></td>"
-                    + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"" + "email\" VALUE=\"" + genericController.encodeHTML(cpcore.doc.authContext.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
+                    + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + genericController.encodeHTML(cpcore.doc.authContext.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
                     + cr2 + "</tr>"
                     + cr2 + "<tr>"
                     + cr3 + "<td colspan=\"2\">&nbsp;</td>"
@@ -261,7 +261,7 @@ namespace Contensive.Core.Controllers {
                     + cr3 + "<td colspan=\"2\">"
                     + htmlIndent(htmlIndent(cpcore.html.main_GetPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>"
                     + cr2 + "</tr>"
-                    + "\r" + "</table>"
+                    + "\r</table>"
                     + "";
                     //
                     // write out all of the form input (except state) to hidden fields so they can be read after login
@@ -269,7 +269,7 @@ namespace Contensive.Core.Controllers {
                     //
                     returnResult = ""
                     + returnResult + cpcore.html.html_GetFormInputHidden("Type", FormTypeSendPassword) + "";
-                    foreach (string key in cpcore.docProperties.getKeyList) {
+                    foreach (string key in cpcore.docProperties.getKeyList()) {
                         var tempVar = cpcore.docProperties.getProperty(key);
                         if (tempVar.IsForm) {
                             switch (genericController.vbUCase(tempVar.Name)) {
@@ -291,7 +291,7 @@ namespace Contensive.Core.Controllers {
                     QueryString = genericController.ModifyQueryString(QueryString, "S", "");
                     QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "");
                     returnResult = ""
-                    + cpcore.html.html_GetFormStart(QueryString) + htmlIndent(returnResult) + "\r" + "</form>"
+                    + cpcore.html.html_GetFormStart(QueryString) + htmlIndent(returnResult) + "\r</form>"
                     + "";
                 }
             } catch (Exception ex) {
@@ -386,7 +386,7 @@ namespace Contensive.Core.Controllers {
                 if (!genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("AllowMemberJoin", false))) {
                     errorController.error_AddUserError(cpcore, "This site does not accept public main_MemberShip.");
                 } else {
-                    if (!cpcore.doc.authContext.isNewLoginOK(cpcore, loginForm_Username, loginForm_Password, ErrorMessage, errorCode)) {
+                    if (!cpcore.doc.authContext.isNewLoginOK(cpcore, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
                         errorController.error_AddUserError(cpcore, ErrorMessage);
                     } else {
                         if (!(cpcore.doc.debug_iUserError != "")) {
