@@ -115,7 +115,7 @@ namespace Contensive.Core.Controllers {
                     pathFilename = normalizePathFilename(pathFilename);
                     int lastSlashPos = pathFilename.LastIndexOf("\\");
                     if (lastSlashPos >= 0) {
-                        path = pathFilename.Substring(0, lastSlashPos + 1);
+                        path = pathFilename.Left( lastSlashPos + 1);
                         filename = pathFilename.Substring(lastSlashPos + 1);
                     } else {
                         path = "";
@@ -317,7 +317,7 @@ namespace Contensive.Core.Controllers {
                     if (!Directory.Exists(WorkingPath)) {
                         Position = genericController.vbInstr(1, WorkingPath, "\\");
                         while (Position != 0) {
-                            PartialPath = WorkingPath.Substring(0, Position - 1);
+                            PartialPath = WorkingPath.Left( Position - 1);
                             if (!Directory.Exists(PartialPath)) {
                                 Directory.CreateDirectory(PartialPath);
                             }
@@ -387,7 +387,7 @@ namespace Contensive.Core.Controllers {
                 if (!string.IsNullOrEmpty(PathName)) {
                     string localPath = joinPath(rootLocalPath, PathName);
                     if (localPath.Substring(localPath.Length - 1) == "\\") {
-                        localPath = localPath.Substring(0, localPath.Length - 1);
+                        localPath = localPath.Left( localPath.Length - 1);
                     }
                     if (pathExists(PathName)) {
                         Directory.Delete(localPath, true);
@@ -580,7 +580,7 @@ namespace Contensive.Core.Controllers {
                         srcFullPathFilename = joinPath(rootLocalPath, SourcePathFilename);
                         Pos = SourcePathFilename.LastIndexOf("\\") + 1;
                         if (Pos >= 0) {
-                            sourceFullPath = SourcePathFilename.Substring(0, Pos);
+                            sourceFullPath = SourcePathFilename.Left( Pos);
                         }
                         if (true) {
                             if (string.IsNullOrEmpty(DestinationFilename)) {
@@ -618,7 +618,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // Drive Space
                 //
-                driveLetter = rootLocalPath.Substring(0, 1);
+                driveLetter = rootLocalPath.Left( 1);
                 scriptingDrive = new DriveInfo(driveLetter);
                 if (scriptingDrive.IsReady) {
                     returnSize = scriptingDrive.AvailableFreeSpace;
@@ -750,7 +750,7 @@ namespace Contensive.Core.Controllers {
                     pathFilename = normalizePathFilename(pathFilename);
                     URLLink = genericController.vbReplace(Link, " ", "%20");
                     HTTP.timeout = 600;
-                    HTTP.getUrlToFile(Convert.ToString(URLLink), convertToAbsPath(pathFilename));
+                    HTTP.getUrlToFile(encodeText(URLLink), convertToAbsPath(pathFilename));
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -867,7 +867,7 @@ namespace Contensive.Core.Controllers {
                 return string.Empty;
             } else {
                 path = normalizePathFilename(path);
-                if (path.Substring(0, 1) == "\\") {
+                if (path.Left( 1) == "\\") {
                     path = path.Substring(1);
                 }
                 if (path.Substring(path.Length - 1, 1) != "\\") {

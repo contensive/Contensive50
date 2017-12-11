@@ -323,9 +323,9 @@ namespace Contensive.Core.Controllers {
             string TaskName = null;
             //
             if (string.IsNullOrEmpty(ExportName)) {
-                TaskName = Convert.ToString(DateTime.Now) + " snapshot of unnamed data";
+                TaskName = encodeText(DateTime.Now) + " snapshot of unnamed data";
             } else {
-                TaskName = Convert.ToString(DateTime.Now) + " snapshot of " + genericController.vbLCase(ExportName);
+                TaskName = encodeText(DateTime.Now) + " snapshot of " + genericController.vbLCase(ExportName);
             }
             CS = cpCore.db.csInsertRecord("Tasks", RequestedByMemberID);
             if (cpCore.db.csOk(CS)) {

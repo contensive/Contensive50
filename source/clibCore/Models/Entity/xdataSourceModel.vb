@@ -55,8 +55,8 @@
 '        ''' </summary>
 '        ''' <param name="cp"></param>
 '        ''' <param name="recordId"></param>
-'        Public Shared Function getObject(cpcore As coreClass, recordId As Integer, ByRef adminMessageList As List(Of String)) As Models.Entity.dataSourceModel
-'            Dim returnModel As Models.Entity.dataSourceModel = Nothing
+'        Public Shared Function getObject(cpcore As coreClass, recordId As Integer, ByRef adminMessageList As List(Of String)) As dataSourceModel
+'            Dim returnModel As dataSourceModel = Nothing
 '            Try
 '                Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
 '                Dim recordCacheName As String = primaryContentName & "CachedModelRecordId" & recordId
@@ -90,7 +90,7 @@
 '        ''' called only from getObject. Load the model from the Db without cache. If there are any properties or objects that cannot be used from cache, do not include them here either, load in getObject()
 '        ''' </summary>
 '        ''' <param name="recordId"></param>
-'        Private Shared Function getObjectNoCache(cpcore As coreClass, recordId As Integer) As Models.Entity.dataSourceModel
+'        Private Shared Function getObjectNoCache(cpcore As coreClass, recordId As Integer) As dataSourceModel
 '            Dim returnNewModel As New dataSourceModel()
 '            Try
 '                Dim cs As New csController(cpcore)

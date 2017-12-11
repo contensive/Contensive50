@@ -119,12 +119,12 @@ namespace Contensive.Core.Controllers {
                         // ----- Update Email Result Log
                         //
                         if (!string.IsNullOrEmpty(ResultLogPathPage)) {
-                            cpCore.appRootFiles.appendFile(ResultLogPathPage, Convert.ToString(DateTime.Now) + " delivery attempted to " + EmailTo + "," + SendResult + "\r\n");
+                            cpCore.appRootFiles.appendFile(ResultLogPathPage, encodeText(DateTime.Now) + " delivery attempted to " + EmailTo + "," + SendResult + "\r\n");
                         }
                         //
                         // ----- Update the System Email Log
                         //
-                        LogLine = "\"" + Convert.ToString(DateTime.Now) + "\",\"To[" + EmailTo + "]\",\"From[" + EmailFrom + "]\",\"Bounce[" + BounceAddress + "]\",\"Subject[" + EmailSubject + "]\",\"Result[" + SendResult + "]\"\r\n";
+                        LogLine = "\"" + encodeText(DateTime.Now) + "\",\"To[" + EmailTo + "]\",\"From[" + EmailFrom + "]\",\"Bounce[" + BounceAddress + "]\",\"Subject[" + EmailSubject + "]\",\"Result[" + SendResult + "]\"\r\n";
                         logController.appendLog(cpCore, LogLine, "email");
                     }
                 }
@@ -132,9 +132,6 @@ namespace Contensive.Core.Controllers {
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
-                //Mailer = Nothing
-                //converthtmlToText = Nothing
-                tempsendEmail5 = "There was an unexpected error sending the email.";
             }
             return tempsendEmail5;
         }
@@ -175,7 +172,7 @@ namespace Contensive.Core.Controllers {
                 Copy += genericController.encodeText(SubjectMessage) + "\r\n";
                 Copy += genericController.encodeText(HTML) + "\r\n";
                 Copy += genericController.encodeText(BodyMessage);
-                Filename = "Out" + Convert.ToString(genericController.GetRandomInteger()) + ".txt";
+                Filename = "Out" + encodeText(genericController.GetRandomInteger()) + ".txt";
                 //
                 cpCore.appRootFiles.saveFile(iEmailOutPath + Filename, Copy);
             } catch( Exception ex ) {
@@ -240,7 +237,7 @@ namespace Contensive.Core.Controllers {
                     // Decode the file into the email arguments
                     //
                     string Line0 = ReadLine(ref Copy);
-                    if (genericController.vbUCase(Line0.Substring(0, 11)) == "CONTENSIVE ") {
+                    if (genericController.vbUCase(Line0.Left( 11)) == "CONTENSIVE ") {
                         //
                         // Email record (LINE0 IS CONENSIVE AND VERSION)
                         //
@@ -251,7 +248,7 @@ namespace Contensive.Core.Controllers {
                         BounceAddress = ReadLine(ref Copy);
                         ReplyToAddress = ReadLine(ref Copy);
                         EmailSubject = ReadLine(ref Copy);
-                        HTML = genericController.EncodeBoolean(ReadLine(ref Copy));
+                        HTML = genericController.encodeBoolean(ReadLine(ref Copy));
                         //
                         // removed this because the addqueue did not put it in
                         //
@@ -266,7 +263,7 @@ namespace Contensive.Core.Controllers {
                         EmailTo = ReadLine(ref Copy);
                         EmailFrom = ReadLine(ref Copy);
                         EmailSubject = ReadLine(ref Copy);
-                        HTML = genericController.EncodeBoolean(ReadLine(ref Copy));
+                        HTML = genericController.encodeBoolean(ReadLine(ref Copy));
                         EmailBody = Copy;
                     }
                     if ((!string.IsNullOrEmpty(EmailSMTP)) & (!string.IsNullOrEmpty(EmailTo)) & (!string.IsNullOrEmpty(EmailFrom))) {
@@ -296,7 +293,7 @@ namespace Contensive.Core.Controllers {
             try {
                 int EOL = genericController.vbInstr(1, Body, "\r\n");
                 if (EOL != 0) {
-                    line = Body.Substring(0, EOL - 1);
+                    line = Body.Left( EOL - 1);
                     Body = Body.Substring(EOL + 1);
                 }
             } catch (Exception ex) {

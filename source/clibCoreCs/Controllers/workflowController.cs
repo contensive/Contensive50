@@ -777,7 +777,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // No references to this table
                     //
-                    throw (new ApplicationException("TableID [" + TableID + "] could not be found in any ccContent.ContentTableID"));
+                    //throw (new ApplicationException("TableID [" + TableID + "] could not be found in any ccContent.ContentTableID"));
                     result = "(1=0)";
                 } else if (ContentCnt == 1) {
                     //

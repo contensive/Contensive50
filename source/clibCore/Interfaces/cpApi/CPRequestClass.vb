@@ -1,6 +1,8 @@
 
 Imports Contensive.BaseClasses
 Imports Contensive.Core.Controllers
+Imports Contensive.Core.Models.Entity
+Imports Contensive.Core.Models.Complex
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
@@ -199,7 +201,7 @@ Namespace Contensive.Core
                 If (cpCore.doc.authContext.userLanguage Is Nothing) Then
                     Return ""
                 End If
-                Dim userLanguage As Models.Entity.LanguageModel = Models.Entity.LanguageModel.create(cpCore, cpCore.doc.authContext.user.LanguageID, New List(Of String))
+                Dim userLanguage As LanguageModel = LanguageModel.create(cpCore, cpCore.doc.authContext.user.LanguageID, New List(Of String))
                 If (userLanguage IsNot Nothing) Then
                     Return userLanguage.Name
                 End If

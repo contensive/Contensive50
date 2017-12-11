@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Contensive.Core;
+using Contensive.Core.Models.Entity;
 
 namespace  Contensive.CLI {
     class configureClass {
@@ -45,7 +46,7 @@ namespace  Contensive.CLI {
                     cp.core.serverConfig.localDataDriveLetter = cliController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDataDriveLetter);
                     //
                     // -- Sql Server Driver
-                    cp.core.serverConfig.defaultDataSourceType = Contensive.Core.Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative;
+                    cp.core.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative;
                     //
                     // -- Sql Server end-point
                     Console.Write("\n\nSql Server endpoint. Use (local) for Sql Server on this machine, or the AWS RDS endpoint (url:port):");

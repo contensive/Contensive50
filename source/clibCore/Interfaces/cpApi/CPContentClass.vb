@@ -254,7 +254,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub DeleteContent(ContentName As String)
-            Models.Entity.contentModel.delete(cpCore, Models.Complex.cdefModel.getContentId(cpCore, ContentName))
+            contentModel.delete(cpCore, Models.Complex.cdefModel.getContentId(cpCore, ContentName))
         End Sub
         '
         '====================================================================================================
@@ -319,7 +319,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function AddContent(ContentName As String, sqlTableName As String, dataSourceName As String) As Integer
             Return Models.Complex.cdefModel.addContent(cpCore, True _
-                , Models.Entity.dataSourceModel.create(cpCore, dataSourceName, New List(Of String)) _
+                , dataSourceModel.create(cpCore, dataSourceName, New List(Of String)) _
                 , sqlTableName _
                 , ContentName _
                 , False _

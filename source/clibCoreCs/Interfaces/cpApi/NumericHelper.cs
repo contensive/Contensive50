@@ -42,7 +42,7 @@ public static class NumericHelper {
         //try the entire string, then progressively smaller substrings to replicate the behavior of VB's 'Val', which ignores trailing characters after a recognizable value:
         for (int size = expression.Length; size > 0; size--) {
             double testDouble;
-            if (double.TryParse(expression.Substring(0, size), out testDouble))
+            if (double.TryParse(expression.Left( size), out testDouble))
                 return testDouble;
         }
 

@@ -111,7 +111,6 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
                 throw;
             }
-            return 0;
         }
         //
         //=============================================================================================
@@ -154,7 +153,7 @@ namespace Contensive.Core.Controllers {
         //
         public bool getBoolean(string RequestName) {
             try {
-                return genericController.EncodeBoolean(getProperty(RequestName).Value);
+                return genericController.encodeBoolean(getProperty(RequestName).Value);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -238,11 +237,11 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(nameValuePair)) {
                         if (genericController.vbInstr(1, nameValuePair, "=") != 0) {
                             ValuePair = nameValuePair.Split('=');
-                            key = DecodeResponseVariable(Convert.ToString(ValuePair[0]));
+                            key = DecodeResponseVariable(encodeText(ValuePair[0]));
                             if (!string.IsNullOrEmpty(key)) {
                                 docProperty.Name = key;
                                 if (ValuePair.GetUpperBound(0) > 0) {
-                                    docProperty.Value = DecodeResponseVariable(Convert.ToString(ValuePair[1]));
+                                    docProperty.Value = DecodeResponseVariable(encodeText(ValuePair[1]));
                                 }
                                 docProperty.IsForm = false;
                                 docProperty.IsFile = false;

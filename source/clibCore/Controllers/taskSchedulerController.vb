@@ -4,6 +4,8 @@ Option Strict On
 '
 Imports Contensive.Core
 Imports Contensive.Core.Controllers
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
 '
 Namespace Contensive.Core.Controllers
 #Const includeTracing = False
@@ -154,18 +156,18 @@ Namespace Contensive.Core.Controllers
                 '
                 logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks")
                 '
-                For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cpClusterCore.serverConfig.apps
+                For Each kvp As KeyValuePair(Of String, serverConfigModel.appConfigModel) In cpClusterCore.serverConfig.apps
                     '
                     ' schedule tasks for this app
                     '
                     logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" & kvp.Value.name & "]")
                     '
                     Using cpSite As New CPClass(kvp.Value.name)
-                        If (Not (cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK)) Then
+                        If (Not (cpSite.core.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK)) Then
                             '
                             logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app status not ok")
                             '
-                        ElseIf (Not (cpSite.core.serverConfig.appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal)) Then
+                        ElseIf (Not (cpSite.core.serverConfig.appConfig.appMode = serverConfigModel.appModeEnum.normal)) Then
                             '
                             logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app mode not normal")
                             '

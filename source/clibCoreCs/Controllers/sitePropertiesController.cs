@@ -53,7 +53,7 @@ namespace Contensive.Core.Controllers {
                 // -- load local store 
                 localStore = getInteger(propertyName, defaultValue);
             }
-            return Convert.ToInt32(localStore);
+            return EncodeInteger(localStore);
         }
         //
         //====================================================================================================
@@ -68,7 +68,7 @@ namespace Contensive.Core.Controllers {
                 // -- load local store 
                 localStore = getBoolean(propertyName, defaultValue);
             }
-            return Convert.ToBoolean(localStore);
+            return encodeBoolean(localStore);
         }
         //
         //====================================================================================================
@@ -224,7 +224,7 @@ namespace Contensive.Core.Controllers {
                                     }
                                     cpCore.db.csClose(ref CS);
                                 }
-                                setProperty("ChildListAddonID", Convert.ToString(_childListAddonID));
+                                setProperty("ChildListAddonID", encodeText(_childListAddonID));
                             }
                         }
                     }
@@ -232,7 +232,7 @@ namespace Contensive.Core.Controllers {
                     cpCore.handleException(ex);
                     throw;
                 }
-                return Convert.ToInt32(_childListAddonID);
+                return EncodeInteger(_childListAddonID);
             }
         }
         private int? _childListAddonID = null;
@@ -516,7 +516,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public bool getBoolean(string PropertyName, bool DefaultValue = false) {
-            return genericController.EncodeBoolean(getText(PropertyName, DefaultValue.ToString()));
+            return genericController.encodeBoolean(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================
@@ -542,9 +542,9 @@ namespace Contensive.Core.Controllers {
                 } else {
                     if (_allowCache_notCached == null) {
                         bool propertyFound = false;
-                        _allowCache_notCached = genericController.EncodeBoolean(getTextFromDb("AllowBake", "0", ref propertyFound));
+                        _allowCache_notCached = genericController.encodeBoolean(getTextFromDb("AllowBake", "0", ref propertyFound));
                     }
-                    return Convert.ToBoolean(_allowCache_notCached);
+                    return encodeBoolean(_allowCache_notCached);
                 }
             }
         }

@@ -715,7 +715,7 @@ namespace Contensive.Core {
                         if (routeTest.IndexOf("/") < 0) {
                             break;
                         }
-                        routeTest = routeTest.Substring(0, routeTest.LastIndexOf("/"));
+                        routeTest = routeTest.Left( routeTest.LastIndexOf("/"));
                         routeCnt -= 1;
                     } while ((routeCnt > 0) && (!routeFound));
                     //
@@ -874,7 +874,7 @@ namespace Contensive.Core {
                 //    for (var Ptr = 0; Ptr < ArgCnt; Ptr++) {
                 //        int Pos = genericController.vbInstr(1, ArgArray[Ptr], "=");
                 //        if (Pos > 0) {
-                //            ArgName[Ptr] = genericController.DecodeResponseVariable(ArgArray[Ptr].Substring(0, Pos - 1));
+                //            ArgName[Ptr] = genericController.DecodeResponseVariable(ArgArray[Ptr].Left( Pos - 1));
                 //            ArgValue[Ptr] = genericController.DecodeResponseVariable(ArgArray[Ptr].Substring(Pos));
                 //        }
                 //    }
@@ -980,7 +980,7 @@ namespace Contensive.Core {
                 //                            int Pos = genericController.vbInstr(1, SetPairs[Ptr], "=");
                 //                            if (Pos > 0) {
                 //                                string FieldValue = genericController.DecodeResponseVariable(SetPairs[Ptr].Substring(Pos));
-                //                                string FieldName = genericController.DecodeResponseVariable(SetPairs[Ptr].Substring(0, Pos - 1));
+                //                                string FieldName = genericController.DecodeResponseVariable(SetPairs[Ptr].Left( Pos - 1));
                 //                                if (!Models.Complex.cdefModel.isContentFieldSupported(this, ContentName, FieldName)) {
                 //                                    string errorMessage = "result, QueryTypeUpdateContent, key [" + RemoteKey + "], bad field [" + FieldName + "] skipped";
                 //                                    throw (new ApplicationException(errorMessage));
@@ -1211,7 +1211,7 @@ namespace Contensive.Core {
                                     //
                                     // If visit tracking, save the viewing record
                                     //
-                                    string ViewingName = ((string)(doc.authContext.visit.id + "." + doc.authContext.visit.PageVisits)).Substring(0, 10);
+                                    string ViewingName = ((string)(doc.authContext.visit.id + "." + doc.authContext.visit.PageVisits)).Left( 10);
                                     int PageID = 0;
                                     if (_doc != null) {
                                         if (doc.page != null) {
@@ -1228,7 +1228,7 @@ namespace Contensive.Core {
                                     string SQL = "insert into ccviewings ("
                                         + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID,ExcludeFromAnalytics,pagetitle"
                                         + ")values("
-                                        + " " + db.encodeSQLText(ViewingName) + "," + db.encodeSQLNumber(doc.authContext.visit.id) + "," + db.encodeSQLNumber(doc.authContext.user.id) + "," + db.encodeSQLText(webServer.requestDomain) + "," + db.encodeSQLText(webServer.requestPath) + "," + db.encodeSQLText(webServer.requestPage) + "," + db.encodeSQLText(webServer.requestQueryString.Substring(0, 255)) + "," + db.encodeSQLText(requestFormSerialized.Substring(0, 255)) + "," + db.encodeSQLText(webServer.requestReferrer.Substring(0, 255)) + "," + db.encodeSQLDate(doc.profileStartTime) + "," + db.encodeSQLBoolean(doc.authContext.visit_stateOK) + "," + db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(this, "Viewings")) + "," + db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) + ",1"
+                                        + " " + db.encodeSQLText(ViewingName) + "," + db.encodeSQLNumber(doc.authContext.visit.id) + "," + db.encodeSQLNumber(doc.authContext.user.id) + "," + db.encodeSQLText(webServer.requestDomain) + "," + db.encodeSQLText(webServer.requestPath) + "," + db.encodeSQLText(webServer.requestPage) + "," + db.encodeSQLText(webServer.requestQueryString.Left( 255)) + "," + db.encodeSQLText(requestFormSerialized.Left( 255)) + "," + db.encodeSQLText(webServer.requestReferrer.Left( 255)) + "," + db.encodeSQLDate(doc.profileStartTime) + "," + db.encodeSQLBoolean(doc.authContext.visit_stateOK) + "," + db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(this, "Viewings")) + "," + db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) + ",1"
                                         + "," + db.encodeSQLNumber(0) + "," + db.encodeSQLNumber(PageID);
                                     SQL += "," + db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics);
                                     SQL += "," + db.encodeSQLText(pagetitle);

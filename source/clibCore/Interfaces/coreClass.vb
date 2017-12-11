@@ -5,6 +5,7 @@ Option Explicit On
 Imports System.Reflection
 Imports Contensive.BaseClasses
 Imports Contensive.Core.Controllers
+Imports Contensive.Core.Models.Complex
 Imports Contensive.Core.Models.Context
 Imports Contensive.Core.Models.Entity
 '
@@ -18,7 +19,7 @@ Namespace Contensive.Core
         '   -- provides object dependancy injection
         '
         Friend Property cp_forAddonExecutionOnly As CPClass
-        Public Property serverConfig As Models.Entity.serverConfigModel
+        Public Property serverConfig As serverConfigModel
         '
         '===================================================================================================
         ''' <summary>
@@ -42,15 +43,15 @@ Namespace Contensive.Core
         Private _assemblySkipList_CountWhenLoaded As Integer
         '
         '===================================================================================================
-        Public ReadOnly Property dataSourceDictionary() As Dictionary(Of String, Models.Entity.dataSourceModel)
+        Public ReadOnly Property dataSourceDictionary() As Dictionary(Of String, dataSourceModel)
             Get
                 If (_dataSources Is Nothing) Then
-                    _dataSources = Models.Entity.dataSourceModel.getNameDict(Me)
+                    _dataSources = dataSourceModel.getNameDict(Me)
                 End If
                 Return _dataSources
             End Get
         End Property
-        Private _dataSources As Dictionary(Of String, Models.Entity.dataSourceModel) = Nothing
+        Private _dataSources As Dictionary(Of String, dataSourceModel) = Nothing
         '
         '===================================================================================================
         Public ReadOnly Property email As emailController
@@ -335,15 +336,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property domainLegacyCache() As Models.Entity.domainLegacyModel
+        Public ReadOnly Property domainLegacyCache() As domainLegacyModel
             Get
                 If (_domains Is Nothing) Then
-                    _domains = New Models.Entity.domainLegacyModel(Me)
+                    _domains = New domainLegacyModel(Me)
                 End If
                 Return _domains
             End Get
         End Property
-        Private _domains As Models.Entity.domainLegacyModel = Nothing
+        Private _domains As domainLegacyModel = Nothing
         '
         '===================================================================================================
         Public ReadOnly Property json() As System.Web.Script.Serialization.JavaScriptSerializer
@@ -413,8 +414,8 @@ Namespace Contensive.Core
             ' -- create default auth objects for non-user methods, or until auth is available
             doc.authContext = New authContextModel(Me)
             '
-            serverConfig = Models.Entity.serverConfigModel.getObject(Me)
-            Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
+            serverConfig = serverConfigModel.getObject(Me)
+            Me.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative
             webServer.iisContext = Nothing
             constructorInitialize()
         End Sub
@@ -425,7 +426,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cp As CPClass, serverConfig As Models.Entity.serverConfigModel)
+        Public Sub New(cp As CPClass, serverConfig As serverConfigModel)
             MyBase.New()
             Me.cp_forAddonExecutionOnly = cp
             '
@@ -433,8 +434,8 @@ Namespace Contensive.Core
             doc.authContext = New authContextModel(Me)
             '
             Me.serverConfig = serverConfig
-            Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK
+            Me.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative
+            Me.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK
             webServer.iisContext = Nothing
             constructorInitialize()
         End Sub
@@ -445,7 +446,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cp As CPClass, serverConfig As Models.Entity.serverConfigModel, httpContext As System.Web.HttpContext)
+        Public Sub New(cp As CPClass, serverConfig As serverConfigModel, httpContext As System.Web.HttpContext)
             MyBase.New()
             Me.cp_forAddonExecutionOnly = cp
             '
@@ -453,8 +454,8 @@ Namespace Contensive.Core
             doc.authContext = New authContextModel(Me)
             '
             Me.serverConfig = serverConfig
-            Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK
+            Me.serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative
+            Me.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK
             webServer.initWebContext(httpContext)
             constructorInitialize()
         End Sub
@@ -472,8 +473,8 @@ Namespace Contensive.Core
             ' -- create default auth objects for non-user methods, or until auth is available
             doc.authContext = New authContextModel(Me)
             '
-            serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
-            serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
+            serverConfig = serverConfigModel.getObject(Me, applicationName)
+            serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative
             If (serverConfig.appConfig IsNot Nothing) Then
                 webServer.iisContext = Nothing
                 constructorInitialize()
@@ -494,8 +495,8 @@ Namespace Contensive.Core
             ' -- create default auth objects for non-user methods, or until auth is available
             doc.authContext = New authContextModel(Me)
             '
-            serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
-            serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
+            serverConfig = serverConfigModel.getObject(Me, applicationName)
+            serverConfig.defaultDataSourceType = dataSourceModel.dataSourceTypeEnum.sqlServerNative
             If (serverConfig.appConfig IsNot Nothing) Then
                 Call webServer.initWebContext(httpContext)
                 constructorInitialize()
@@ -762,7 +763,7 @@ Namespace Contensive.Core
                             Case CPSiteBaseClass.routeTypeEnum.linkForward
                                 '
                                 ' -- link forward
-                                Dim linkForward As Models.Entity.linkForwardModel = Models.Entity.linkForwardModel.create(Me, route.linkForwardId)
+                                Dim linkForward As linkForwardModel = linkForwardModel.create(Me, route.linkForwardId)
                                 Return webServer.redirect(linkForward.DestinationLink, "Link Forward #" & linkForward.id & ", " & linkForward.name)
                         End Select
                     End If
@@ -796,7 +797,7 @@ Namespace Contensive.Core
                             .personalizationAuthenticated = doc.authContext.visit.VisitAuthenticated,
                             .personalizationPeopleId = doc.authContext.user.id
                         }
-                        Return Me.addon.execute(Models.Entity.addonModel.create(Me, defaultAddonId), executeContext)
+                        Return Me.addon.execute(addonModel.create(Me, defaultAddonId), executeContext)
                     End If
                     '
                     ' -- no route
@@ -885,7 +886,7 @@ Namespace Contensive.Core
                         ' Use user definied query
                         '
                         Dim SQLQuery As String = db.csGetText(CS, "sqlquery")
-                        'DataSource = Models.Entity.dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
+                        'DataSource = dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
                         maxRows = db.csGetInteger(CS, "maxrows")
                         QueryType = db.csGetInteger(CS, "QueryTypeID")
                         ContentName = db.csGet(CS, "ContentID")
@@ -1092,7 +1093,7 @@ Namespace Contensive.Core
                     '
                     ' -- server mode, there is no application
                     doc.authContext = Models.Context.authContextModel.create(Me, False)
-                ElseIf ((serverConfig.appConfig.appMode <> Models.Entity.serverConfigModel.appModeEnum.normal) Or (serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.appStatusEnum.OK)) Then
+                ElseIf ((serverConfig.appConfig.appMode <> serverConfigModel.appModeEnum.normal) Or (serverConfig.appConfig.appStatus <> serverConfigModel.appStatusEnum.OK)) Then
                     '
                     ' -- application is not ready, might be error, or in maintainence mode
                     doc.authContext = Models.Context.authContextModel.create(Me, False)

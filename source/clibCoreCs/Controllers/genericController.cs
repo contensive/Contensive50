@@ -33,14 +33,9 @@ namespace Contensive.Core.Controllers {
         /// <param name="CP"></param>
         /// <param name="registryFormat"></param>
         /// <returns></returns>
-        public static string getGUID() {
-            bool tempVar = false;
-            return getGUID(ref tempVar);
-        }
-
-        //INSTANT C# NOTE: Overloaded method(s) are created above to convert the following method having optional parameters:
-        //ORIGINAL LINE: Public Shared Function getGUID(Optional ByRef registryFormat As Boolean = False) As String
-        public static string getGUID(ref bool registryFormat) {
+        public static string getGUID() => getGUID(false);
+        //
+        public static string getGUID(bool registryFormat) {
             string result = "";
             Guid g = Guid.NewGuid();
             if (g != Guid.Empty) {
@@ -52,201 +47,6 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //    '
-        //    '==========================================================================
-        //    '   Convert a variant to an long (long)
-        //    '   returns 0 if the input is not an integer
-        //    '   if float, rounds to integer
-        //    '==========================================================================
-        //    '
-        //    Public shared Function EncodeInteger(ExpressionVariant As Object) As Integer
-        //        ' 7/14/2009 - cover the overflow case, return 0
-        //        //On Error //Resume Next
-        //        '
-        //        If Not IsArray(ExpressionVariant) Then
-        //            If Not IsMissing(ExpressionVariant) Then
-        //                If Not IsNull(ExpressionVariant) Then
-        //                    If ExpressionVariant <> "" Then
-        //                        If vbIsNumeric(ExpressionVariant) Then
-        //                            encodeInteger = CLng(ExpressionVariant)
-        //                        End If
-        //                    End If
-        //                End If
-        //            End If
-        //        End If
-        //        '
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //        Err.Clear()
-        //        encodeInteger = 0
-        //    End Function
-        //    '
-        //    '==========================================================================
-        //    '   Convert a variant to a number (double)
-        //    '   returns 0 if the input is not a number
-        //    '==========================================================================
-        //    '
-        //    Public shared Function encodeNumber(ExpressionVariant As Object) As Double
-        //        On Error GoTo ErrorTrap
-        //        '
-        //        'encodeNumber = 0
-        //        If Not IsMissing(ExpressionVariant) Then
-        //            If Not IsNull(ExpressionVariant) Then
-        //                If ExpressionVariant <> "" Then
-        //                    If vbIsNumeric(ExpressionVariant) Then
-        //                        encodeNumber = ExpressionVariant
-        //                    End If
-        //                End If
-        //            End If
-        //        End If
-        //        '
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //        Err.Clear()
-        //        encodeNumber = 0
-        //    End Function
-        //    '
-        //    '==========================================================================
-        //    '   Convert a variant to a date
-        //    '   returns 0 if the input is not a number
-        //    '==========================================================================
-        //    '
-        //    Public shared Function  EncodeDate(ExpressionVariant As Object) As Date
-        //        On Error GoTo ErrorTrap
-        //        '
-        //        '    encodeDate = CDate(ExpressionVariant)
-        //        '    encodeDate = CDate("1/1/1980")
-        //        'encodeDate = Date.MinValue
-        //        If Not IsMissing(ExpressionVariant) Then
-        //            If Not IsNull(ExpressionVariant) Then
-        //                If ExpressionVariant <> "" Then
-        //                    If IsDate(ExpressionVariant) Then
-        //                        encodeDate = ExpressionVariant
-        //                    End If
-        //                End If
-        //            End If
-        //        End If
-        //        '
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //        Err.Clear()
-        //        encodeDate = Date.MinValue
-        //    End Function
-        //    '
-        //    '==========================================================================
-        //    '   Convert a variant to a boolean
-        //    '   Returns true if input is not false, else false
-        //    '==========================================================================
-        //    '
-        //    Public shared Function EncodeBoolean(ExpressionVariant As Object) As Boolean
-        //        On Error GoTo ErrorTrap
-        //        '
-        //        'encodeBoolean = False
-        //        If Not IsMissing(ExpressionVariant) Then
-        //            If Not IsNull(ExpressionVariant) Then
-        //                If ExpressionVariant <> "" Then
-        //                    If vbIsNumeric(ExpressionVariant) Then
-        //                        If ExpressionVariant <> "0" Then
-        //                            If ExpressionVariant <> 0 Then
-        //                                encodeBoolean = True
-        //                            End If
-        //                        End If
-        //                    ElseIf vbUCase(ExpressionVariant) = "ON" Then
-        //                        encodeBoolean = True
-        //                    ElseIf vbUCase(ExpressionVariant) = "YES" Then
-        //                        encodeBoolean = True
-        //                    ElseIf vbUCase(ExpressionVariant) = "TRUE" Then
-        //                        encodeBoolean = True
-        //                    Else
-        //                        encodeBoolean = False
-        //                    End If
-        //                End If
-        //            End If
-        //        End If
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //        Err.Clear()
-        //        encodeBoolean = False
-        //    End Function
-        //    '
-        //    '==========================================================================
-        //    '   Convert a variant into 0 or 1
-        //    '   Returns 1 if input is not false, else 0
-        //    '==========================================================================
-        //    '
-        //    Public shared Function encodeBit(ExpressionVariant As Object) As Integer
-        //        On Error GoTo ErrorTrap
-        //        '
-        //        'encodeBit = 0
-        //        If EncodeBoolean(ExpressionVariant) Then
-        //            encodeBit = 1
-        //        End If
-        //        '
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //        Err.Clear()
-        //        encodeBit = 0
-        //    End Function
-        //    '
-        //    '==========================================================================
-        //    '   Convert a variant to a string
-        //    '   returns emptystring if the input is not a string
-        //    '==========================================================================
-        //    '
-        //    Public shared Function encodeText(ExpressionVariant As Object) As String
-        //        On Error GoTo ErrorTrap
-        //        '
-        //        'encodeText = ""
-        //        If Not IsMissing(ExpressionVariant) Then
-        //            If Not IsNull(ExpressionVariant) Then
-        //                encodeText = CStr(ExpressionVariant)
-        //            End If
-        //        End If
-        //        '
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //        Err.Clear()
-        //        encodeText = ""
-        //    End Function
-        //    '
-        //    '==========================================================================
-        //    '   Converts a possibly missing value to variant
-        //    '==========================================================================
-        //    '
-        //    Public shared Function encodeMissingText(ExpressionVariant As Object, DefaultVariant As Object) As Object
-        //        'On Error GoTo ErrorTrap
-        //        '
-        //        If IsMissing(ExpressionVariant) Then
-        //            encodeMissing = DefaultVariant
-        //        Else
-        //            encodeMissing = ExpressionVariant
-        //        End If
-        //        '
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //        Err.Clear()
-        //    End Function
         //
         //
         //
@@ -258,641 +58,13 @@ namespace Contensive.Core.Controllers {
             return returnText;
         }
         //
+        public static int encodeEmptyInteger(string sourceText, int DefaultInteger) => EncodeInteger(encodeEmptyText(sourceText, DefaultInteger.ToString()));
         //
+        public static DateTime encodeEmptyDate(string sourceText, DateTime DefaultDate) => EncodeDate(encodeEmptyText(sourceText, DefaultDate.ToString()));
         //
-        public static int encodeEmptyInteger(string sourceText, int DefaultInteger) {
-            return EncodeInteger(encodeEmptyText(sourceText, DefaultInteger.ToString()));
-        }
+        public static double encodeEmptyNumber(string sourceText, double DefaultNumber) => EncodeNumber(encodeEmptyText(sourceText, DefaultNumber.ToString()));
         //
-        //
-        //
-        public static DateTime encodeEmptyDate(string sourceText, DateTime DefaultDate) {
-            return EncodeDate(encodeEmptyText(sourceText, DefaultDate.ToString()));
-        }
-        //
-        //
-        //
-        public static double encodeEmptyNumber(string sourceText, double DefaultNumber) {
-            return EncodeNumber(encodeEmptyText(sourceText, DefaultNumber.ToString()));
-        }
-        //
-        //
-        //
-        public static bool encodeEmptyBoolean(string sourceText, bool DefaultState) {
-            return EncodeBoolean(encodeEmptyText(sourceText, DefaultState.ToString()));
-        }
-        //    '
-        //    '================================================================================================================
-        //    '   Separate a URL into its host, path, page parts
-        //    '================================================================================================================
-        //    '
-        //    Public shared sub SeparateURL(ByVal SourceURL As String, ByRef Protocol As String, ByRef Host As String, ByRef Path As String, ByRef Page As String, ByRef QueryString As String)
-        //        'On Error GoTo ErrorTrap
-        //        '
-        //        '   Divide the URL into URLHost, URLPath, and URLPage
-        //        '
-        //        Dim WorkingURL As String
-        //        Dim Position As Integer
-        //        '
-        //        ' Get Protocol (before the first :)
-        //        '
-        //        WorkingURL = SourceURL
-        //        Position = vbInstr(1, WorkingURL, ":")
-        //        'Position = vbInstr(1, WorkingURL, "://")
-        //        If Position <> 0 Then
-        //            Protocol = Mid(WorkingURL, 1, Position + 2)
-        //            WorkingURL = Mid(WorkingURL, Position + 3)
-        //        End If
-        //        '
-        //        ' compatibility fix
-        //        '
-        //        If vbInstr(1, WorkingURL, "//") = 1 Then
-        //            If Protocol = "" Then
-        //                Protocol = "http:"
-        //            End If
-        //            Protocol = Protocol & "//"
-        //            WorkingURL = Mid(WorkingURL, 3)
-        //        End If
-        //        '
-        //        ' Get QueryString
-        //        '
-        //        Position = vbInstr(1, WorkingURL, "?")
-        //        If Position > 0 Then
-        //            QueryString = Mid(WorkingURL, Position)
-        //            WorkingURL = Mid(WorkingURL, 1, Position - 1)
-        //        End If
-        //        '
-        //        ' separate host from pathpage
-        //        '
-        //        'iURLHost = WorkingURL
-        //        Position = vbInstr(WorkingURL, "/")
-        //        If (Position = 0) And (Protocol = "") Then
-        //            '
-        //            ' Page without path or host
-        //            '
-        //            Page = WorkingURL
-        //            Path = ""
-        //            Host = ""
-        //        ElseIf (Position = 0) Then
-        //            '
-        //            ' host, without path or page
-        //            '
-        //            Page = ""
-        //            Path = "/"
-        //            Host = WorkingURL
-        //        Else
-        //            '
-        //            ' host with a path (at least)
-        //            '
-        //            Path = Mid(WorkingURL, Position)
-        //            Host = Mid(WorkingURL, 1, Position - 1)
-        //            '
-        //            ' separate page from path
-        //            '
-        //            Position = InStrRev(Path, "/")
-        //            If Position = 0 Then
-        //                '
-        //                ' no path, just a page
-        //                '
-        //                Page = Path
-        //                Path = "/"
-        //            Else
-        //                Page = Mid(Path, Position + 1)
-        //                Path = Mid(Path, 1, Position)
-        //            End If
-        //        End If
-        //        Exit Sub
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //        Err.Clear()
-        //    End Sub
-        //    '
-        //    '================================================================================================================
-        //    '   Separate a URL into its host, path, page parts
-        //    '================================================================================================================
-        //    '
-        //    Public shared sub ParseURL(ByVal SourceURL As String, ByRef Protocol As String, ByRef Host As String, ByRef Port As String, ByRef Path As String, ByRef Page As String, ByRef QueryString As String)
-        //        'On Error GoTo ErrorTrap
-        //        '
-        //        '   Divide the URL into URLHost, URLPath, and URLPage
-        //        '
-        //        Dim iURLWorking As String               ' internal storage for GetURL functions
-        //        Dim iURLProtocol As String
-        //        Dim iURLHost As String
-        //        Dim iURLPort As String
-        //        Dim iURLPath As String
-        //        Dim iURLPage As String
-        //        Dim iURLQueryString As String
-        //        Dim Position As Integer
-        //        '
-        //        iURLWorking = SourceURL
-        //        Position = vbInstr(1, iURLWorking, "://")
-        //        If Position <> 0 Then
-        //            iURLProtocol = Mid(iURLWorking, 1, Position + 2)
-        //            iURLWorking = Mid(iURLWorking, Position + 3)
-        //        End If
-        //        '
-        //        ' separate Host:Port from pathpage
-        //        '
-        //        iURLHost = iURLWorking
-        //        Position = vbInstr(iURLHost, "/")
-        //        If Position = 0 Then
-        //            '
-        //            ' just host, no path or page
-        //            '
-        //            iURLPath = "/"
-        //            iURLPage = ""
-        //        Else
-        //            iURLPath = Mid(iURLHost, Position)
-        //            iURLHost = Mid(iURLHost, 1, Position - 1)
-        //            '
-        //            ' separate page from path
-        //            '
-        //            Position = InStrRev(iURLPath, "/")
-        //            If Position = 0 Then
-        //                '
-        //                ' no path, just a page
-        //                '
-        //                iURLPage = iURLPath
-        //                iURLPath = "/"
-        //            Else
-        //                iURLPage = Mid(iURLPath, Position + 1)
-        //                iURLPath = Mid(iURLPath, 1, Position)
-        //            End If
-        //        End If
-        //        '
-        //        ' Divide Host from Port
-        //        '
-        //        Position = vbInstr(iURLHost, ":")
-        //        If Position = 0 Then
-        //            '
-        //            ' host not given, take a guess
-        //            '
-        //            Select Case vbUCase(iURLProtocol)
-        //                Case "FTP://"
-        //                    iURLPort = "21"
-        //                Case "HTTP://", "HTTPS://"
-        //                    iURLPort = "80"
-        //                Case Else
-        //                    iURLPort = "80"
-        //            End Select
-        //        Else
-        //            iURLPort = Mid(iURLHost, Position + 1)
-        //            iURLHost = Mid(iURLHost, 1, Position - 1)
-        //        End If
-        //        Position = vbInstr(1, iURLPage, "?")
-        //        If Position > 0 Then
-        //            iURLQueryString = Mid(iURLPage, Position)
-        //            iURLPage = Mid(iURLPage, 1, Position - 1)
-        //        End If
-        //        Protocol = iURLProtocol
-        //        Host = iURLHost
-        //        Port = iURLPort
-        //        Path = iURLPath
-        //        Page = iURLPage
-        //        QueryString = iURLQueryString
-        //        Exit Sub
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //        Err.Clear()
-        //    End Sub
-        //    '
-        //    '
-        //    '
-        //    Function DecodeGMTDate(GMTDate As String) As Date
-        //        'On Error GoTo ErrorTrap
-        //        '
-        //        Dim WorkString As String
-        //        DecodeGMTDate = 0
-        //        If GMTDate <> "" Then
-        //            WorkString = Mid(GMTDate, 6, 11)
-        //            If IsDate(WorkString) Then
-        //                DecodeGMTDate = CDate(WorkString)
-        //                WorkString = Mid(GMTDate, 18, 8)
-        //                If IsDate(WorkString) Then
-        //                    DecodeGMTDate = DecodeGMTDate + CDate(WorkString) + 4 / 24
-        //                End If
-        //            End If
-        //        End If
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //    End Function
-        //    '
-        //    '
-        //    '
-        //    Function EncodeGMTDate(MSDate As Date) As String
-        //        'On Error GoTo ErrorTrap
-        //        '
-        //        Dim WorkString As String
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //    End Function
-        //    '
-        //    '=================================================================================
-        //    '   Renamed to catch all the cases that used it in addons
-        //    '
-        //    '   Do not use this routine in Addons to get the addon option string value
-        //    '   to get the value in an option string, use cmc.csv_getAddonOption("name")
-        //    '
-        //    ' Get the value of a name in a string of name value pairs parsed with vrlf and =
-        //    '   the legacy line delimiter was a '&' -> name1=value1&name2=value2"
-        //    '   new format is "name1=value1 crlf name2=value2 crlf ..."
-        //    '   There can be no extra spaces between the delimiter, the name and the "="
-        //    '=================================================================================
-        //    '
-        //    Function getSimpleNameValue(Name As String, ArgumentString As String, DefaultValue As String, Delimiter As String) As String
-        //        'Function getArgument(Name As String, ArgumentString As String, Optional DefaultValue as object, Optional Delimiter As String) As String
-        //        '
-        //        Dim WorkingString As String
-        //        Dim iDefaultValue As String
-        //        Dim NameLength As Integer
-        //        Dim ValueStart As Integer
-        //        Dim ValueEnd As Integer
-        //        Dim IsQuoted As Boolean
-        //        '
-        //        ' determine delimiter
-        //        '
-        //        If Delimiter = "" Then
-        //            '
-        //            ' If not explicit
-        //            '
-        //            If vbInstr(1, ArgumentString, vbCrLf) <> 0 Then
-        //                '
-        //                ' crlf can only be here if it is the delimiter
-        //                '
-        //                Delimiter = vbCrLf
-        //            Else
-        //                '
-        //                ' either only one option, or it is the legacy '&' delimit
-        //                '
-        //                Delimiter = "&"
-        //            End If
-        //        End If
-        //        iDefaultValue = encodeMissingText(DefaultValue, "")
-        //        WorkingString = ArgumentString
-        //        getSimpleNameValue = iDefaultValue
-        //        If WorkingString <> "" Then
-        //            WorkingString = Delimiter & WorkingString & Delimiter
-        //            ValueStart = vbInstr(1, WorkingString, Delimiter & Name & "=", vbTextCompare)
-        //            If ValueStart <> 0 Then
-        //                NameLength = Len(Name)
-        //                ValueStart = ValueStart + Len(Delimiter) + NameLength + 1
-        //                If Mid(WorkingString, ValueStart, 1) = """" Then
-        //                    IsQuoted = True
-        //                    ValueStart = ValueStart + 1
-        //                End If
-        //                If IsQuoted Then
-        //                    ValueEnd = vbInstr(ValueStart, WorkingString, """" & Delimiter)
-        //                Else
-        //                    ValueEnd = vbInstr(ValueStart, WorkingString, Delimiter)
-        //                End If
-        //                If ValueEnd = 0 Then
-        //                    getSimpleNameValue = Mid(WorkingString, ValueStart)
-        //                Else
-        //                    getSimpleNameValue = Mid(WorkingString, ValueStart, ValueEnd - ValueStart)
-        //                End If
-        //            End If
-        //        End If
-        //        '
-
-        //        Exit Function
-        //        '
-        //        ' ----- ErrorTrap
-        //        '
-        ////ErrorTrap:
-        //    End Function
-        //    '
-        //    '=================================================================================
-        //    '   Do not use this code
-        //    '
-        //    '   To retrieve a value from an option string, use cmc.csv_getAddonOption("name")
-        //    '
-        //    '   This was left here to work through any code issues that might arrise during
-        //    '   the conversion.
-        //    '
-        //    '   Return the value from a name value pair, parsed with =,&[|].
-        //    '   For example:
-        //    '       name=Jay[Jay|Josh|Dwayne]
-        //    '       the answer is Jay. If a select box is displayed, it is a dropdown of all three
-        //    '=================================================================================
-        //    '
-        //    Public shared Function GetAggrOption_old(Name As String, SegmentCMDArgs As String) As String
-        //        '
-        //        Dim Pos As Integer
-        //        '
-        //        GetAggrOption_old = getSimpleNameValue(Name, SegmentCMDArgs, "", vbCrLf)
-        //        '
-        //        ' remove the manual select list syntax "answer[choice1|choice2]"
-        //        '
-        //        Pos = vbInstr(1, GetAggrOption_old, "[")
-        //        If Pos <> 0 Then
-        //            GetAggrOption_old = Left(GetAggrOption_old, Pos - 1)
-        //        End If
-        //        '
-        //        ' remove any function syntax "answer{selectcontentname RSS Feeds}"
-        //        '
-        //        Pos = vbInstr(1, GetAggrOption_old, "{")
-        //        If Pos <> 0 Then
-        //            GetAggrOption_old = Left(GetAggrOption_old, Pos - 1)
-        //        End If
-        //        '
-        //    End Function
-        //    '
-        //    '=================================================================================
-        //    '   Do not use this code
-        //    '
-        //    '   To retrieve a value from an option string, use cmc.csv_getAddonOption("name")
-        //    '
-        //    '   This was left here to work through any code issues that might arrise during
-        //    '   Compatibility for GetArgument
-        //    '=================================================================================
-        //    '
-        //Function getNameValue_old(Name As String, ArgumentString As String, Optional DefaultValue as string = "") As String
-        //        getNameValue_old = getSimpleNameValue(Name, ArgumentString, DefaultValue, vbCrLf)
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    '   encodeSQLText
-        //    '========================================================================
-        //    '
-        //    Public shared Function encodeSQLText(ExpressionVariant As Object) As String
-        //        'On Error GoTo ErrorTrap
-        //        '
-        //        'Dim MethodName As String
-        //        '
-        //        'MethodName = "encodeSQLText"
-        //        '
-        //        If IsNull(ExpressionVariant) Then
-        //            encodeSQLText = "null"
-        //        ElseIf IsMissing(ExpressionVariant) Then
-        //            encodeSQLText = "null"
-        //        ElseIf ExpressionVariant = "" Then
-        //            encodeSQLText = "null"
-        //        Else
-        //            encodeSQLText = CStr(ExpressionVariant)
-        //            ' ??? this should not be here -- to correct a field used in a CDef, truncate in SaveCS by fieldtype
-        //            'encodeSQLText = Left(ExpressionVariant, 255)
-        //            'remove-can not find a case where | is not allowed to be saved.
-        //            'encodeSQLText = vbReplace(encodeSQLText, "|", "_")
-        //            encodeSQLText = "'" & vbReplace(encodeSQLText, "'", "''") & "'"
-        //        End If
-        //        Exit Function
-        //        '
-        //        ' ----- Error Trap
-        //        '
-        ////ErrorTrap:
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    '   encodeSQLLongText
-        //    '========================================================================
-        //    '
-        //    Public shared Function encodeSQLLongText(ExpressionVariant As Object) As String
-        //        'On Error GoTo ErrorTrap
-        //        '
-        //        'Dim MethodName As String
-        //        '
-        //        'MethodName = "encodeSQLLongText"
-        //        '
-        //        If IsNull(ExpressionVariant) Then
-        //            encodeSQLLongText = "null"
-        //        ElseIf IsMissing(ExpressionVariant) Then
-        //            encodeSQLLongText = "null"
-        //        ElseIf ExpressionVariant = "" Then
-        //            encodeSQLLongText = "null"
-        //        Else
-        //            encodeSQLLongText = ExpressionVariant
-        //            'encodeSQLLongText = vbReplace(ExpressionVariant, "|", "_")
-        //            encodeSQLLongText = "'" & vbReplace(encodeSQLLongText, "'", "''") & "'"
-        //        End If
-        //        Exit Function
-        //        '
-        //        ' ----- Error Trap
-        //        '
-        ////ErrorTrap:
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    '   encodeSQLDate
-        //    '       encode a date variable to go in an sql expression
-        //    '========================================================================
-        //    '
-        //    Public shared Function encodeSQLDate(ExpressionVariant As Object) As String
-        //        'On Error GoTo ErrorTrap
-        //        '
-        //        Dim TimeVar As Date
-        //        Dim TimeValuething As Single
-        //        Dim TimeHours As Integer
-        //        Dim TimeMinutes As Integer
-        //        Dim TimeSeconds As Integer
-        //        'Dim MethodName As String
-        //        ''
-        //        'MethodName = "encodeSQLDate"
-        //        '
-        //        If IsNull(ExpressionVariant) Then
-        //            encodeSQLDate = "null"
-        //        ElseIf IsMissing(ExpressionVariant) Then
-        //            encodeSQLDate = "null"
-        //        ElseIf ExpressionVariant = "" Then
-        //            encodeSQLDate = "null"
-        //        ElseIf IsDate(ExpressionVariant) Then
-        //            TimeVar = CDate(ExpressionVariant)
-        //            If TimeVar = 0 Then
-        //                encodeSQLDate = "null"
-        //            Else
-        //                TimeValuething = 86400.0! * (TimeVar - Int(TimeVar + 0.000011!))
-        //                TimeHours = Int(TimeValuething / 3600.0!)
-        //                If TimeHours >= 24 Then
-        //                    TimeHours = 23
-        //                End If
-        //                TimeMinutes = Int(TimeValuething / 60.0!) - (TimeHours * 60)
-        //                If TimeMinutes >= 60 Then
-        //                    TimeMinutes = 59
-        //                End If
-        //                TimeSeconds = TimeValuething - (TimeHours * 3600.0!) - (TimeMinutes * 60.0!)
-        //                If TimeSeconds >= 60 Then
-        //                    TimeSeconds = 59
-        //                End If
-        //                encodeSQLDate = "{ts '" & Year(ExpressionVariant) & "-" & Right("0" & Month(ExpressionVariant), 2) & "-" & Right("0" & Day(ExpressionVariant), 2) & " " & Right("0" & TimeHours, 2) & ":" & Right("0" & TimeMinutes, 2) & ":" & Right("0" & TimeSeconds, 2) & "'}"
-        //            End If
-        //        Else
-        //            encodeSQLDate = "null"
-        //        End If
-        //        Exit Function
-        //        '
-        //        ' ----- Error Trap
-        //        '
-        ////ErrorTrap:
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    '   encodeSQLNumber
-        //    '       encode a number variable to go in an sql expression
-        //    '========================================================================
-        //    '
-        //    Function encodeSQLNumber(ExpressionVariant As Object) As String
-        //        'On Error GoTo ErrorTrap
-        //        '
-        //        'Dim MethodName As String
-        //        ''
-        //        'MethodName = "encodeSQLNumber"
-        //        '
-        //        If IsNull(ExpressionVariant) Then
-        //            encodeSQLNumber = "null"
-        //        ElseIf IsMissing(ExpressionVariant) Then
-        //            encodeSQLNumber = "null"
-        //        ElseIf ExpressionVariant = "" Then
-        //            encodeSQLNumber = "null"
-        //        ElseIf vbIsNumeric(ExpressionVariant) Then
-        //            Select Case VarType(ExpressionVariant)
-        //                Case vbBoolean
-        //                    If ExpressionVariant Then
-        //                        encodeSQLNumber = SQLTrue
-        //                    Else
-        //                        encodeSQLNumber = SQLFalse
-        //                    End If
-        //                Case Else
-        //                    encodeSQLNumber = ExpressionVariant
-        //            End Select
-        //        Else
-        //            encodeSQLNumber = "null"
-        //        End If
-        //        Exit Function
-        //        '
-        //        ' ----- Error Trap
-        //        '
-        ////ErrorTrap:
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    '   encodeSQLBoolean
-        //    '       encode a boolean variable to go in an sql expression
-        //    '========================================================================
-        //    '
-        //    Public shared Function encodeSQLBoolean(ExpressionVariant As Object) As String
-        //        '
-        //        Dim src As String
-        //        '
-        //        encodeSQLBoolean = SQLFalse
-        //        If EncodeBoolean(ExpressionVariant) Then
-        //            encodeSQLBoolean = SQLTrue
-        //        End If
-        //        '    If Not IsNull(ExpressionVariant) Then
-        //        '        If Not IsMissing(ExpressionVariant) Then
-        //        '            If ExpressionVariant <> False Then
-        //        '                    encodeSQLBoolean = SQLTrue
-        //        '                End If
-        //        '            End If
-        //        '        End If
-        //        '    End If
-        //        '
-        //    End Function
-        //    '
-        //    '========================================================================
-        //    '   Gets the next line from a string, and removes the line
-        //    '========================================================================
-        //    '
-        //    Public shared Function getLine(Body As String) As String
-        //        Dim EOL As String
-        //        Dim NextCR As Integer
-        //        Dim NextLF As Integer
-        //        Dim BOL As Integer
-        //        '
-        //        NextCR = vbInstr(1, Body, vbCr)
-        //        NextLF = vbInstr(1, Body, vbLf)
-
-        //        If NextCR <> 0 Or NextLF <> 0 Then
-        //            If NextCR <> 0 Then
-        //                If NextLF <> 0 Then
-        //                    If NextCR < NextLF Then
-        //                        EOL = NextCR - 1
-        //                        If NextLF = NextCR + 1 Then
-        //                            BOL = NextLF + 1
-        //                        Else
-        //                            BOL = NextCR + 1
-        //                        End If
-
-        //                    Else
-        //                        EOL = NextLF - 1
-        //                        BOL = NextLF + 1
-        //                    End If
-        //                Else
-        //                    EOL = NextCR - 1
-        //                    BOL = NextCR + 1
-        //                End If
-        //            Else
-        //                EOL = NextLF - 1
-        //                BOL = NextLF + 1
-        //            End If
-        //            getLine = Mid(Body, 1, EOL)
-        //            Body = Mid(Body, BOL)
-        //        Else
-        //            getLine = Body
-        //            Body = ""
-        //        End If
-
-        //        'EOL = vbInstr(1, Body, vbCrLf)
-
-        //        'If EOL <> 0 Then
-        //        '    getLine = Mid(Body, 1, EOL - 1)
-        //        '    Body = Mid(Body, EOL + 2)
-        //        '    End If
-        //        '
-        //    End Function
-        //    '
-        //    '=================================================================================
-        //    '   Get a Random Long Value
-        //    '=================================================================================
-        //    '
-        //    Public shared Function GetRandomInteger() As Integer
-        //        '
-        //        Dim RandomBase As Integer
-        //        Dim RandomLimit As Integer
-        //        '
-        //        RandomBase =Threading.Thread.CurrentThread.ManagedThreadId
-        //        RandomBase = RandomBase And ((2 ^ 30) - 1)
-        //        RandomLimit = (2 ^ 31) - RandomBase - 1
-        //        Randomize()
-        //        GetRandomInteger = RandomBase + (Rnd * RandomLimit)
-        //        '
-        //    End Function
-        //    '
-        //    '=================================================================================
-        //    '
-        //    '=================================================================================
-        //    '
-        //    Public shared Function isDataTableOk(RS As Object) As Boolean
-        //        isDataTableOk = False
-        //        If (isDataTableOk(rs)) Then
-        //            If true Then
-        //                If Not rs.rows.count=0 Then
-        //                    isDataTableOk = True
-        //                End If
-        //            End If
-        //        End If
-        //    End Function
-        //    '
-        //    '=================================================================================
-        //    '
-        //    '=================================================================================
-        //    '
-        //    Public shared sub closeDataTable(RS As Object)
-        //        If (isDataTableOk(rs)) Then
-        //            If true Then
-        //                Call 'RS.Close()
-        //            End If
-        //        End If
-        //    End Sub
+        public static bool encodeEmptyBoolean(string sourceText, bool DefaultState) => encodeBoolean(encodeEmptyText(sourceText, DefaultState.ToString()));
         //
         //=============================================================================
         // Create the part of the sql where clause that is modified by the user
@@ -902,23 +74,22 @@ namespace Contensive.Core.Controllers {
         //=============================================================================
         //
         public static string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true) {
-            string tempModifyQueryString = null;
+            string result = null;
             //
-            if (WorkingQuery.IndexOf("?") > 0) {
-                tempModifyQueryString = modifyLinkQuery(WorkingQuery, QueryName, QueryValue, AddIfMissing);
+            if (WorkingQuery.IndexOf("?") >= 0) {
+                result = modifyLinkQuery(WorkingQuery, QueryName, QueryValue, AddIfMissing);
             } else {
-                tempModifyQueryString = (modifyLinkQuery("?" + WorkingQuery, QueryName, QueryValue, AddIfMissing)).Substring(1);
+                result = modifyLinkQuery("?" + WorkingQuery, QueryName, QueryValue, AddIfMissing);
+                if ( result.Length>0) {
+                    result = result.Substring(1);
+                }
             }
-            return tempModifyQueryString;
+            return result;
         }
         //
-        public static string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue, bool AddIfMissing = true) {
-            return ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
-        }
+        public static string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue, bool AddIfMissing = true) => ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
         //
-        public static string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue, bool AddIfMissing = true) {
-            return ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
-        }
+        public static string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue, bool AddIfMissing = true) => ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString(), AddIfMissing);
         //
         //=============================================================================
         /// <summary>
@@ -943,7 +114,7 @@ namespace Contensive.Core.Controllers {
                 //
                 iAddIfMissing = AddIfMissing;
                 if (vbInstr(1, Link, "?") != 0) {
-                    tempmodifyLinkQuery = Link.Substring(0, vbInstr(1, Link, "?") - 1);
+                    tempmodifyLinkQuery = Link.Left( vbInstr(1, Link, "?") - 1);
                     QueryString = Link.Substring(tempmodifyLinkQuery.Length + 1);
                 } else {
                     tempmodifyLinkQuery = Link;
@@ -989,11 +160,11 @@ namespace Contensive.Core.Controllers {
                         // element found and needs to be removed
                         //
                         QueryString = vbReplace(QueryString, "&&", "&");
-                        if (QueryString.Substring(0, 1) == "&") {
+                        if (QueryString.Left( 1) == "&") {
                             QueryString = QueryString.Substring(1);
                         }
                         if (QueryString.Substring(QueryString.Length - 1) == "&") {
-                            QueryString = QueryString.Substring(0, QueryString.Length - 1);
+                            QueryString = QueryString.Left( QueryString.Length - 1);
                         }
                     }
                 }
@@ -1254,7 +425,7 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(CharCodeString)) {
                         if (vbIsNumeric(CharCodeString)) {
                             CharCode = EncodeInteger(CharCodeString);
-                            s = s.Substring(0, Pos - 1) + Convert.ToChar(CharCode) + s.Substring(posEnd - 1);
+                            s = s.Left( Pos - 1) + Convert.ToChar(CharCode) + s.Substring(posEnd - 1);
                         }
                     }
                     //
@@ -1312,7 +483,7 @@ namespace Contensive.Core.Controllers {
                     // text area found, isolate it and indent before and after
                     //
                     posEnd = vbInstr(posStart, Source, "</textarea>", Microsoft.VisualBasic.CompareMethod.Text);
-                    pre = Source.Substring(0, posStart - 1);
+                    pre = Source.Left( posStart - 1);
                     if (posEnd == 0) {
                         target = Source.Substring(posStart - 1);
                         post = "";
@@ -1327,7 +498,7 @@ namespace Contensive.Core.Controllers {
                 // cdata found, isolate it and indent before and after
                 //
                 posEnd = vbInstr(posStart, Source, "]]>", Microsoft.VisualBasic.CompareMethod.Text);
-                pre = Source.Substring(0, posStart - 1);
+                pre = Source.Left( posStart - 1);
                 if (posEnd == 0) {
                     target = Source.Substring(posStart - 1);
                     post = "";
@@ -2064,7 +1235,7 @@ namespace Contensive.Core.Controllers {
             int WorkLong = 0;
             //
             tempGetGMTFromDate = "";
-            if (DateHelper.IsDate(DateValue)) {
+            if (dateController.IsDate(DateValue)) {
                 switch ((int)DateValue.DayOfWeek) {
                     case 0:
                         tempGetGMTFromDate = "Sun, ";
@@ -2135,7 +1306,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
                 //
-                tempGetGMTFromDate = tempGetGMTFromDate + Convert.ToString(DateValue.Year) + " ";
+                tempGetGMTFromDate = tempGetGMTFromDate + encodeText(DateValue.Year) + " ";
                 //
                 WorkLong = DateValue.Hour;
                 if (WorkLong < 10) {
@@ -2510,7 +1681,7 @@ namespace Contensive.Core.Controllers {
                     if (Pos > 0) {
                         Pos = vbInstr(Pos + 3, LinkHost, "/");
                         if (Pos > 0) {
-                            LinkHost = LinkHost.Substring(0, Pos - 1);
+                            LinkHost = LinkHost.Left( Pos - 1);
                         }
                         tempIsLinkToThisHost = (vbLCase(Host) == LinkHost);
                         if (!tempIsLinkToThisHost) {
@@ -2544,7 +1715,7 @@ namespace Contensive.Core.Controllers {
                     tempIsLinkToThisHost = true;
                 }
                 if (!tempIsLinkToThisHost) {
-                    Link = Link;
+                    //Link = Link;
                 }
             } catch (Exception ex) {
                 throw;
@@ -2629,7 +1800,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // icon is an Absolute URL - leave it
                 //
-            } else if (IconFilename.Substring(0, 1) == "/") {
+            } else if (IconFilename.Left( 1) == "/") {
                 //
                 // icon is Root Relative, leave it
                 //
@@ -2759,7 +1930,7 @@ namespace Contensive.Core.Controllers {
             Position = vbInstr(1, WorkingURL, ":");
             //Position = vbInstr(1, WorkingURL, "://")
             if (Position != 0) {
-                Protocol = WorkingURL.Substring(0, Position + 2);
+                Protocol = WorkingURL.Left( Position + 2);
                 WorkingURL = WorkingURL.Substring(Position + 2);
             }
             //
@@ -2778,7 +1949,7 @@ namespace Contensive.Core.Controllers {
             Position = vbInstr(1, WorkingURL, "?");
             if (Position > 0) {
                 QueryString = WorkingURL.Substring(Position - 1);
-                WorkingURL = WorkingURL.Substring(0, Position - 1);
+                WorkingURL = WorkingURL.Left( Position - 1);
             }
             //
             // separate host from pathpage
@@ -2804,7 +1975,7 @@ namespace Contensive.Core.Controllers {
                 // host with a path (at least)
                 //
                 Path = WorkingURL.Substring(Position - 1);
-                Host = WorkingURL.Substring(0, Position - 1);
+                Host = WorkingURL.Left( Position - 1);
                 //
                 // separate page from path
                 //
@@ -2817,7 +1988,7 @@ namespace Contensive.Core.Controllers {
                     Path = "/";
                 } else {
                     Page = Path.Substring(Position);
-                    Path = Path.Substring(0, Position);
+                    Path = Path.Left( Position);
                 }
             }
         }
@@ -2842,7 +2013,7 @@ namespace Contensive.Core.Controllers {
             iURLWorking = SourceURL;
             Position = vbInstr(1, iURLWorking, "://");
             if (Position != 0) {
-                iURLProtocol = iURLWorking.Substring(0, Position + 2);
+                iURLProtocol = iURLWorking.Left( Position + 2);
                 iURLWorking = iURLWorking.Substring(Position + 2);
             }
             //
@@ -2858,7 +2029,7 @@ namespace Contensive.Core.Controllers {
                 iURLPage = "";
             } else {
                 iURLPath = iURLHost.Substring(Position - 1);
-                iURLHost = iURLHost.Substring(0, Position - 1);
+                iURLHost = iURLHost.Left( Position - 1);
                 //
                 // separate page from path
                 //
@@ -2871,7 +2042,7 @@ namespace Contensive.Core.Controllers {
                     iURLPath = "/";
                 } else {
                     iURLPage = iURLPath.Substring(Position);
-                    iURLPath = iURLPath.Substring(0, Position);
+                    iURLPath = iURLPath.Left( Position);
                 }
             }
             //
@@ -2896,12 +2067,12 @@ namespace Contensive.Core.Controllers {
                 }
             } else {
                 iURLPort = iURLHost.Substring(Position);
-                iURLHost = iURLHost.Substring(0, Position - 1);
+                iURLHost = iURLHost.Left( Position - 1);
             }
             Position = vbInstr(1, iURLPage, "?");
             if (Position > 0) {
                 iURLQueryString = iURLPage.Substring(Position - 1);
-                iURLPage = iURLPage.Substring(0, Position - 1);
+                iURLPage = iURLPage.Left( Position - 1);
             }
             Protocol = iURLProtocol;
             Host = iURLHost;
@@ -2922,9 +2093,9 @@ namespace Contensive.Core.Controllers {
             tempDecodeGMTDate = Convert.ToDateTime("12:00:00 AM");
             if (!string.IsNullOrEmpty(GMTDate)) {
                 HourPart = EncodeNumber(GMTDate.Substring(5, 11));
-                if (DateHelper.IsDate(HourPart)) {
+                if (dateController.IsDate(HourPart)) {
                     YearPart = EncodeNumber(GMTDate.Substring(17, 8));
-                    if (DateHelper.IsDate(YearPart)) {
+                    if (dateController.IsDate(YearPart)) {
                         tempDecodeGMTDate = DateTime.FromOADate(YearPart + (HourPart + 4) / 24);
                     }
                 }
@@ -3094,8 +2265,8 @@ namespace Contensive.Core.Controllers {
         //=================================================================================
         //
         public static int GetRandomInteger() {
-            int RandomBase = Convert.ToInt32((Math.Pow(2, 30)) - 1); ;
-            int RandomLimit = Convert.ToInt32((Math.Pow(2, 31)) - RandomBase - 1);
+            int RandomBase = EncodeInteger((Math.Pow(2, 30)) - 1); ;
+            int RandomLimit = EncodeInteger((Math.Pow(2, 31)) - RandomBase - 1);
             return (new Random()).Next(RandomBase, RandomLimit);
         }
         //
@@ -3149,7 +2320,7 @@ namespace Contensive.Core.Controllers {
             string QueryString = null;
             //
             if (vbInstr(1, Link, "?") != 0) {
-                tempModifyLinkQueryString = Link.Substring(0, vbInstr(1, Link, "?") - 1);
+                tempModifyLinkQueryString = Link.Left( vbInstr(1, Link, "?") - 1);
                 QueryString = Link.Substring(tempModifyLinkQueryString.Length + 1);
             } else {
                 tempModifyLinkQueryString = Link;
@@ -3195,11 +2366,11 @@ namespace Contensive.Core.Controllers {
                     // element found and needs to be removed
                     //
                     QueryString = vbReplace(QueryString, "&&", "&");
-                    if (QueryString.Substring(0, 1) == "&") {
+                    if (QueryString.Left( 1) == "&") {
                         QueryString = QueryString.Substring(1);
                     }
                     if (QueryString.Substring(QueryString.Length - 1) == "&") {
-                        QueryString = QueryString.Substring(0, QueryString.Length - 1);
+                        QueryString = QueryString.Left( QueryString.Length - 1);
                     }
                 }
             }
@@ -3482,11 +2653,9 @@ namespace Contensive.Core.Controllers {
         //   Adds a span around the copy with the class name provided
         //========================================================================
         //
-        public static string AddSpan(string Copy, string ClassName) {
-            //
-            return "<SPAN Class=\"" + ClassName + "\">" + Copy + "</SPAN>";
-            //
-        }
+        public static string AddSpan(string Copy, string ClassName) => "<span class=\"" + ClassName + "\">" + Copy + "</span>";
+        public static string AddSpan(string Copy) => "<span>" + Copy + "</span>";
+        public static string AddSpan() => "<span/>";
         //
         //========================================================================
         // DecodeResponseVariable
@@ -3517,7 +2686,7 @@ namespace Contensive.Core.Controllers {
                 if (((string.CompareOrdinal(Digit0, "0") >= 0) && (string.CompareOrdinal(Digit0, "9") <= 0)) || ((string.CompareOrdinal(Digit0, "A") >= 0) && (string.CompareOrdinal(Digit0, "F") <= 0))) {
                     if (((string.CompareOrdinal(Digit1, "0") >= 0) && (string.CompareOrdinal(Digit1, "9") <= 0)) || ((string.CompareOrdinal(Digit1, "A") >= 0) && (string.CompareOrdinal(Digit1, "F") <= 0))) {
                         ESCValue = int.Parse("&H" + ESCString.Substring(1));
-                        tempDecodeResponseVariable = tempDecodeResponseVariable.Substring(0, Position - 1) + Convert.ToChar(ESCValue) + tempDecodeResponseVariable.Substring(Position + 2);
+                        tempDecodeResponseVariable = tempDecodeResponseVariable.Left( Position - 1) + Convert.ToChar(ESCValue) + tempDecodeResponseVariable.Substring(Position + 2);
                         //  & vbReplace(DecodeResponseVariable, ESCString, Chr(ESCValue), Position, 1)
                     }
                 }
@@ -3684,7 +2853,7 @@ namespace Contensive.Core.Controllers {
             if (!string.IsNullOrEmpty(WordList)) {
                 QuoteSplit = WordList.Split("\"".ToCharArray());
                 QuoteSplitCount = QuoteSplit.GetUpperBound(0) + 1;
-                InQuote = (string.IsNullOrEmpty(WordList.Substring(0, 1)));
+                InQuote = (string.IsNullOrEmpty(WordList.Left( 1)));
                 for (QuoteSplitPointer = 0; QuoteSplitPointer < QuoteSplitCount; QuoteSplitPointer++) {
                     Fragment = QuoteSplit[QuoteSplitPointer];
                     if (string.IsNullOrEmpty(Fragment)) {
@@ -3841,14 +3010,14 @@ namespace Contensive.Core.Controllers {
                 //
                 // HTTP
                 //
-                Protocol = WorkingLink.Substring(0, 7);
+                Protocol = WorkingLink.Left( 7);
             } else if (vbInstr(1, WorkingLink, "HTTPS://", 1) == 1) {
                 //
                 // HTTPS
                 //
                 // try this -- a ssl link can not be shortened
                 return WorkingLink;
-                Protocol = WorkingLink.Substring(0, 8);
+                Protocol = WorkingLink.Left( 8);
             }
             if (!string.IsNullOrEmpty(Protocol)) {
                 //
@@ -3907,7 +3076,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // quick - virtual hosted and link starts at AppRootPath
                     //
-                } else if ((!VirtualHosted) && (Link.Substring(0, 1) == "/") && (Link.IndexOf(AppRootPath, System.StringComparison.OrdinalIgnoreCase) + 1 == 1)) {
+                } else if ((!VirtualHosted) && (Link.Left( 1) == "/") && (Link.IndexOf(AppRootPath, System.StringComparison.OrdinalIgnoreCase) + 1 == 1)) {
                     //
                     // quick - not virtual hosted and link starts at Root
                     //
@@ -3959,11 +3128,8 @@ namespace Contensive.Core.Controllers {
             //
             string UcaseAnchorText = null;
             int LinkPosition = 0;
-            string MethodName = null;
             string iAnchorTag = null;
             string iAnchorText = null;
-            //
-            MethodName = "GetLinkedText";
             //
             tempGetLinkedText = "";
             iAnchorTag = AnchorTag;
@@ -3977,10 +3143,10 @@ namespace Contensive.Core.Controllers {
                     tempGetLinkedText = iAnchorText;
                     LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>") + 1;
                     while (LinkPosition > 1) {
-                        tempGetLinkedText = tempGetLinkedText.Substring(0, LinkPosition - 1) + "</A>" + tempGetLinkedText.Substring(LinkPosition + 6);
+                        tempGetLinkedText = tempGetLinkedText.Left( LinkPosition - 1) + "</A>" + tempGetLinkedText.Substring(LinkPosition + 6);
                         LinkPosition = UcaseAnchorText.LastIndexOf("<LINK>", LinkPosition - 2) + 1;
                         if (LinkPosition != 0) {
-                            tempGetLinkedText = tempGetLinkedText.Substring(0, LinkPosition - 1) + iAnchorTag + tempGetLinkedText.Substring(LinkPosition + 5);
+                            tempGetLinkedText = tempGetLinkedText.Left( LinkPosition - 1) + iAnchorTag + tempGetLinkedText.Substring(LinkPosition + 5);
                         }
                         LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>", LinkPosition - 1) + 1;
                     }
@@ -4002,7 +3168,7 @@ namespace Contensive.Core.Controllers {
                 SegMax = SegSplit.GetUpperBound(0);
                 if (SegMax >= 0) {
                     for (SegPtr = 0; SegPtr <= SegMax; SegPtr++) {
-                        SegSplit[SegPtr] = vbUCase(SegSplit[SegPtr].Substring(0, 1)) + vbLCase(SegSplit[SegPtr].Substring(1));
+                        SegSplit[SegPtr] = vbUCase(SegSplit[SegPtr].Left( 1)) + vbLCase(SegSplit[SegPtr].Substring(1));
                     }
                 }
                 tempEncodeInitialCaps = string.Join(" ", SegSplit);
@@ -4021,7 +3187,7 @@ namespace Contensive.Core.Controllers {
             if (Pos != 0) {
                 PosEnd = vbInstr(Pos, Source, ">");
                 if (PosEnd > 0) {
-                    tempRemoveTag = Source.Substring(0, Pos - 1) + Source.Substring(PosEnd);
+                    tempRemoveTag = Source.Left( Pos - 1) + Source.Substring(PosEnd);
                 }
             }
             return tempRemoveTag;
@@ -4057,14 +3223,14 @@ namespace Contensive.Core.Controllers {
                 }
                 if (vbUCase(tempGetSingular.Substring(tempGetSingular.Length - 3)) == "IES") {
                     if (UpperCase) {
-                        tempGetSingular = tempGetSingular.Substring(0, tempGetSingular.Length - 3) + "Y";
+                        tempGetSingular = tempGetSingular.Left( tempGetSingular.Length - 3) + "Y";
                     } else {
-                        tempGetSingular = tempGetSingular.Substring(0, tempGetSingular.Length - 3) + "y";
+                        tempGetSingular = tempGetSingular.Left( tempGetSingular.Length - 3) + "y";
                     }
                 } else if (vbUCase(tempGetSingular.Substring(tempGetSingular.Length - 2)) == "SS") {
                     // nothing
                 } else if (vbUCase(tempGetSingular.Substring(tempGetSingular.Length - 1)) == "S") {
-                    tempGetSingular = tempGetSingular.Substring(0, tempGetSingular.Length - 1);
+                    tempGetSingular = tempGetSingular.Left( tempGetSingular.Length - 1);
                 } else {
                     // nothing
                 }
@@ -4161,13 +3327,13 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static bool EncodeBoolean(object Expression) {
+        public static bool encodeBoolean(object Expression) {
             bool tempEncodeBoolean = false;
             tempEncodeBoolean = false;
             if (Expression is bool) {
                 tempEncodeBoolean = (bool)Expression;
             } else if (vbIsNumeric(Expression)) {
-                tempEncodeBoolean = (Convert.ToString(Expression) != "0");
+                tempEncodeBoolean = (encodeText(Expression) != "0");
             } else if (Expression is string) {
                 switch (Expression.ToString().ToLower().Trim()) {
                     case "on":
@@ -4185,7 +3351,7 @@ namespace Contensive.Core.Controllers {
         public static DateTime EncodeDate(object Expression) {
             DateTime tempEncodeDate = default(DateTime);
             tempEncodeDate = DateTime.MinValue;
-            if (DateHelper.IsDate(Expression)) {
+            if (dateController.IsDate(Expression)) {
                 tempEncodeDate = Convert.ToDateTime(Expression);
                 //If EncodeDate < #1/1/1990# Then
                 //    EncodeDate = Date.MinValue
@@ -4232,7 +3398,7 @@ namespace Contensive.Core.Controllers {
                         EOL = NextLF - 1;
                         BOL = NextLF + 1;
                     }
-                    returnFirstLine = Body.Substring(0, EOL);
+                    returnFirstLine = Body.Left( EOL);
                     Body = Body.Substring(BOL - 1);
                 } else {
                     returnFirstLine = Body;
@@ -4533,7 +3699,7 @@ namespace Contensive.Core.Controllers {
         //public static string GetURLEncoder()
         //{
         //	Microsoft.VisualBasic.VBMath.Randomize();
-        //	return Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(1000000000 + (Microsoft.VisualBasic.VBMath.Rnd() * 899999999)))));
+        //	return encodeText(EncodeInteger(Math.Floor(EncodeNumber(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + encodeText(EncodeInteger(Math.Floor(EncodeNumber(1 + (Microsoft.VisualBasic.VBMath.Rnd() * 8))))) + encodeText(EncodeInteger(Math.Floor(EncodeNumber(1000000000 + (Microsoft.VisualBasic.VBMath.Rnd() * 899999999)))));
         //}
         //
         //
@@ -4605,7 +3771,7 @@ namespace Contensive.Core.Controllers {
             int returnSeconds = 0;
             DateTime oldDate = new DateTime(1900, 1, 1);
             if (sourceDate.CompareTo(oldDate) > 0) {
-                returnSeconds = Convert.ToInt32(sourceDate.Subtract(oldDate).TotalSeconds);
+                returnSeconds = EncodeInteger(sourceDate.Subtract(oldDate).TotalSeconds);
             }
             return returnSeconds;
         }
@@ -4760,11 +3926,11 @@ namespace Contensive.Core.Controllers {
                     while (normalizedRoute.IndexOf("//") >= 0) {
                         normalizedRoute = normalizedRoute.Replace("//", "/");
                     }
-                    if (normalizedRoute.Substring(0, 1).Equals("/")) {
+                    if (normalizedRoute.Left( 1).Equals("/")) {
                         normalizedRoute = normalizedRoute.Substring(1);
                     }
                     if (normalizedRoute.Substring(normalizedRoute.Length - 1, 1) == "/") {
-                        normalizedRoute = normalizedRoute.Substring(0, normalizedRoute.Length - 1);
+                        normalizedRoute = normalizedRoute.Left( normalizedRoute.Length - 1);
                     }
                 }
             } catch (Exception ex) {
@@ -4795,7 +3961,7 @@ namespace Contensive.Core.Controllers {
         public static bool isGuid(string Source) {
             bool returnValue = false;
             try {
-                if ((Source.Length == 38) && (Source.Substring(0, 1) == "{") && (Source.Substring(Source.Length - 1) == "}")) {
+                if ((Source.Length == 38) && (Source.Left( 1) == "{") && (Source.Substring(Source.Length - 1) == "}")) {
                     //
                     // Good to go
                     //
@@ -5017,16 +4183,20 @@ namespace Contensive.Core.Controllers {
         /// <param name="Expression"></param>
         /// <returns></returns>
         public static bool vbIsNumeric(object Expression) {
-            if (Expression is DateTime) {
-                return false;
-            } else if (Expression == null) {
-                return false;
-            } else if ((Expression is int) || (Expression is Int16) || (Expression is Int32) || (Expression is Int64) || (Expression is decimal) || (Expression is float) || (Expression is double) || (Expression is bool)) {
-                return true;
-            } else if (Expression is string) {
-                double output = 0;
-                return double.TryParse((string)Expression, out output);
-            } else {
+            try {
+                if (Expression is DateTime) {
+                    return false;
+                } else if (Expression == null) {
+                    return false;
+                } else if ((Expression is int) || (Expression is Int16) || (Expression is Int32) || (Expression is Int64) || (Expression is decimal) || (Expression is float) || (Expression is double) || (Expression is bool)) {
+                    return true;
+                } else if (Expression is string) {
+                    double output = 0;
+                    return double.TryParse((string)Expression, out output);
+                } else {
+                    return false;
+                }
+            } catch {
                 return false;
             }
         }
@@ -5038,7 +4208,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="srcDate"></param>
         /// <returns></returns>
         public static int convertDateToDayPtr(DateTime srcDate) {
-            return Convert.ToInt32(DateHelper.DateDiff(DateHelper.DateInterval.Day, srcDate, DateTime.MinValue));
+            return EncodeInteger(dateController.DateDiff(dateController.DateInterval.Day, srcDate, DateTime.MinValue));
         }
         //
         //====================================================================================================
@@ -5087,7 +4257,7 @@ namespace Contensive.Core.Controllers {
         public static bool common_isGuid(string guid) {
             bool returnIsGuid = false;
             try {
-                returnIsGuid = (guid.Length == 38) && (guid.Substring(0, 1) == "{") && (guid.Substring(guid.Length - 1) == "}");
+                returnIsGuid = (guid.Length == 38) && (guid.Left( 1) == "{") && (guid.Substring(guid.Length - 1) == "}");
             } catch (Exception ex) {
                 throw (ex);
             }
@@ -5121,7 +4291,7 @@ namespace Contensive.Core.Controllers {
             //					}
             //					else
             //					{
-            //						result = result + "%" + Convert.ToString(Microsoft.VisualBasic.Strings.Asc(Character), 16).ToUpper();
+            //						result = result + "%" + encodeText(Microsoft.VisualBasic.Strings.Asc(Character), 16).ToUpper();
             //					}
             //				}
             //			}
@@ -5263,7 +4433,7 @@ namespace Contensive.Core.Controllers {
                 // icon is an Absolute URL - leave it
                 //
                 return returnLink;
-            } else if (returnLink.Substring(0, 1) == "/") {
+            } else if (returnLink.Left( 1) == "/") {
                 //
                 // icon is Root Relative, leave it
                 //
@@ -5296,10 +4466,10 @@ namespace Contensive.Core.Controllers {
                     result = iAnchorText;
                     LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>") + 1;
                     while (LinkPosition > 1) {
-                        result = result.Substring(0, LinkPosition - 1) + "</a>" + result.Substring(LinkPosition + 6);
+                        result = result.Left( LinkPosition - 1) + "</a>" + result.Substring(LinkPosition + 6);
                         LinkPosition = UcaseAnchorText.LastIndexOf("<LINK>", LinkPosition - 2) + 1;
                         if (LinkPosition != 0) {
-                            result = result.Substring(0, LinkPosition - 1) + iAnchorTag + result.Substring(LinkPosition + 5);
+                            result = result.Left( LinkPosition - 1) + iAnchorTag + result.Substring(LinkPosition + 5);
                         }
                         LinkPosition = UcaseAnchorText.LastIndexOf("</LINK>", LinkPosition - 1) + 1;
                     }
@@ -5312,7 +4482,7 @@ namespace Contensive.Core.Controllers {
             string requestFormSerialized = "";
             if (nameValueDict.Count > 0) {
                 foreach (KeyValuePair<string, string> kvp in nameValueDict) {
-                    requestFormSerialized += "&" + EncodeURL(kvp.Key.Substring(0, 255)) + "=" + EncodeURL(kvp.Value.Substring(0, 255));
+                    requestFormSerialized += "&" + EncodeURL(kvp.Key.Left( 255)) + "=" + EncodeURL(kvp.Value.Left( 255));
                     if (requestFormSerialized.Length > 255) {
                         break;
                     }
@@ -5381,7 +4551,7 @@ namespace Contensive.Core.Controllers {
             if (!string.IsNullOrEmpty(result)) {
                 int slashpos = PathFilename.Replace("/", "\\").LastIndexOf("\\");
                 if ((slashpos >= 0) && (slashpos < PathFilename.Length)) {
-                    result = PathFilename.Substring(0, slashpos + 1);
+                    result = PathFilename.Left( slashpos + 1);
                 }
             }
             return result;
@@ -5431,7 +4601,7 @@ namespace Contensive.Core.Controllers {
                             Pos = genericController.vbInstr(1, key, "=");
                             if (Pos > 0) {
                                 value = key.Substring(Pos);
-                                key = key.Substring(0, Pos - 1);
+                                key = key.Left( Pos - 1);
                             }
                             returnList.Add(key, value);
                         }
@@ -5468,7 +4638,7 @@ namespace Contensive.Core.Controllers {
                 // First characger must be _
                 // Second character is the scramble version 'a' is the starting system
                 //
-                if (Source.Substring(0, 2) != "_a") {
+                if (Source.Left( 2) != "_a") {
                     returnCopy = Copy;
                 } else {
                     Source = Source.Substring(2);
@@ -5572,7 +4742,7 @@ namespace Contensive.Core.Controllers {
                 if (EndPos != 0) {
                     EndPos = genericController.vbInstr(EndPos, result, ">", 1);
                     if (EndPos != 0) {
-                        result = result.Substring(0, StartPos - 1) + result.Substring(EndPos);
+                        result = result.Left( StartPos - 1) + result.Substring(EndPos);
                     }
                 }
             }

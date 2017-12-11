@@ -10,6 +10,7 @@ Imports Contensive.Core
 Imports Contensive.Core.Models
 Imports Contensive.Core.Models.Entity
 Imports Contensive.Core.Models.Context
+Imports Contensive.Core.Models.Complex
 
 Namespace Contensive.Core.Controllers
     Public Class dbController
@@ -135,7 +136,7 @@ Namespace Contensive.Core.Controllers
                 Else
                     '
                     ' -- lookup dataSource
-                    Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName)
+                    Dim normalizedDataSourceName As String = dataSourceModel.normalizeDataSourceName(dataSourceName)
                     If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
                         '
                         ' -- default datasource
@@ -188,7 +189,7 @@ Namespace Contensive.Core.Controllers
             '
             Dim returnConnString As String = ""
             Try
-                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName)
+                Dim normalizedDataSourceName As String = dataSourceModel.normalizeDataSourceName(dataSourceName)
                 Dim defaultConnString As String = ""
                 Dim serverUrl As String = cpCore.serverConfig.defaultDataSourceAddress
                 If (serverUrl.IndexOf(":") > 0) Then
@@ -519,7 +520,7 @@ Namespace Contensive.Core.Controllers
                 saveTransactionLog_InProcess = True
                 '
                 ' -- block before appStatus OK because need site properties
-                If (cpCore.serverConfig.enableLogging) And (cpCore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK) Then
+                If (cpCore.serverConfig.enableLogging) And (cpCore.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK) Then
                     If (cpCore.siteProperties.allowTransactionLog) Then
                         Dim LogEntry As String = ("duration [" & ElapsedMilliseconds & "], sql [" & sql & "]").Replace(vbCr, "").Replace(vbLf, "")
                         logController.appendLog(cpCore, LogEntry, "DbTransactions")
@@ -4202,7 +4203,7 @@ Namespace Contensive.Core.Controllers
         '''' </summary>
         '''' <returns></returns>
         'Public Function checkHealth() As applicationStatusEnum
-        '    Dim returnStatus As applicationStatusEnum = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusLoading
+        '    Dim returnStatus As applicationStatusEnum = serverConfigModel.applicationStatusEnum.ApplicationStatusLoading
         '    Try
         '        '
         '        Try
@@ -4214,11 +4215,11 @@ Namespace Contensive.Core.Controllers
         '            Dim testDt As DataTable
         '            testDt = executeSql("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='ccContent'")
         '            If testDt.Rows.Count <> 1 Then
-        '                cpcore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        '                cpcore.serverConfig.appConfig.appStatus = serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         '            End If
         '            testDt.Dispose()
         '        Catch ex As Exception
-        '            cpcore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        '            cpcore.serverConfig.appConfig.appStatus = serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         '        End Try
         '        '
         '        '--------------------------------------------------------------------------
@@ -4230,7 +4231,7 @@ Namespace Contensive.Core.Controllers
         '            '
         '            ' Bad Db and no upgrade - exit
         '            '
-        '            cpcore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
+        '            cpcore.serverConfig.appConfig.appStatus = serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
         '        Else
         '        End If
         '    Catch ex As Exception
@@ -4290,7 +4291,7 @@ Namespace Contensive.Core.Controllers
         '    Dim returndataSourceName As String = "default"
         '    Try
         '        If (DataSourceID > 0) Then
-        '            For Each kvp As KeyValuePair(Of String, Models.Entity.dataSourceModel) In dataSources
+        '            For Each kvp As KeyValuePair(Of String, dataSourceModel) In dataSources
         '                If (kvp.Value.id = DataSourceID) Then
         '                    returndataSourceName = kvp.Value.name
         '                End If
@@ -4298,11 +4299,11 @@ Namespace Contensive.Core.Controllers
         '            If String.IsNullOrEmpty(returndataSourceName) Then
         '                Using dt As DataTable = executeSql("select name,connString from ccDataSources where id=" & DataSourceID)
         '                    If dt.Rows.Count > 0 Then
-        '                        Dim dataSource As New Models.Entity.dataSourceModel
+        '                        Dim dataSource As New dataSourceModel
         '                        With dataSource
         '                            .id = genericController.EncodeInteger(dt(0).Item("id"))
         '                            .ConnString = genericController.encodeText(dt(0).Item("connString"))
-        '                            .name = Models.Entity.dataSourceModel.normalizeDataSourceName(genericController.encodeText(dt(0).Item("name")))
+        '                            .name = dataSourceModel.normalizeDataSourceName(genericController.encodeText(dt(0).Item("name")))
         '                            returndataSourceName = .name
         '                        End With
         '                    End If

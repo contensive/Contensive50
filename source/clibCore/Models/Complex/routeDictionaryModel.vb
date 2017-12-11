@@ -36,8 +36,8 @@ Namespace Contensive.Core.Models.Complex
                     End If
                     '
                     ' -- remote methods
-                    Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.createList_RemoteMethods(cpCore, New List(Of String))
-                    For Each remoteMethod As Contensive.Core.Models.Entity.addonModel In remoteMethods
+                    Dim remoteMethods As List(Of addonModel) = addonModel.createList_RemoteMethods(cpCore, New List(Of String))
+                    For Each remoteMethod As addonModel In remoteMethods
                         Dim route As String = genericController.normalizeRoute(remoteMethod.name)
                         If (Not String.IsNullOrEmpty(route)) Then
                             If (uniqueRouteList.Contains(route)) Then
@@ -54,8 +54,8 @@ Namespace Contensive.Core.Models.Complex
                     Next
                     '
                     ' -- link forwards
-                    Dim linkForwards As List(Of Models.Entity.linkForwardModel) = Models.Entity.linkForwardModel.createList(cpCore, "name Is Not null")
-                    For Each linkForward As Models.Entity.linkForwardModel In linkForwards
+                    Dim linkForwards As List(Of linkForwardModel) = linkForwardModel.createList(cpCore, "name Is Not null")
+                    For Each linkForward As linkForwardModel In linkForwards
                         Dim route As String = genericController.normalizeRoute(linkForward.name)
                         If (Not String.IsNullOrEmpty(route)) Then
                             If (uniqueRouteList.Contains(route)) Then
@@ -72,8 +72,8 @@ Namespace Contensive.Core.Models.Complex
                     Next
                     '
                     ' -- link aliases
-                    Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpCore, "name Is Not null")
-                    For Each linkAlias As Models.Entity.linkAliasModel In linkAliasList
+                    Dim linkAliasList As List(Of linkAliasModel) = linkAliasModel.createList(cpCore, "name Is Not null")
+                    For Each linkAlias As linkAliasModel In linkAliasList
                         Dim route As String = genericController.normalizeRoute(linkAlias.name)
                         If (Not String.IsNullOrEmpty(route)) Then
                             If (uniqueRouteList.Contains(route)) Then

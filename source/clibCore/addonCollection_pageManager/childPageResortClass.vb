@@ -52,7 +52,7 @@ Namespace Contensive.Addons.PageManager
                                 End If
                             Next
                             '
-                            Dim parentPage As Models.Entity.pageContentModel = pageContentModel.create(cpCore, parentPageId, New List(Of String))
+                            Dim parentPage As pageContentModel = pageContentModel.create(cpCore, parentPageId, New List(Of String))
                             If (parentPage Is Nothing) Then
                                 '
                                 ' -- parent page is not valid
@@ -60,7 +60,7 @@ Namespace Contensive.Addons.PageManager
                             Else
                                 '
                                 ' -- verify page set to required sort method Id
-                                Dim sortMethod As Models.Entity.sortMethodModel = sortMethodModel.createByName(cpCore, "By Alpha Sort Order Field")
+                                Dim sortMethod As sortMethodModel = sortMethodModel.createByName(cpCore, "By Alpha Sort Order Field")
                                 If (sortMethod Is Nothing) Then
                                     sortMethod = sortMethodModel.createByName(cpCore, "Alpha Sort Order Field")
                                 End If
@@ -86,7 +86,7 @@ Namespace Contensive.Addons.PageManager
                                         cp.Site.ErrorReport(New ApplicationException("child page id is invalid from remote request [" & pageCommaList & "]"))
                                     Else
                                         Dim SortOrder As String = CStr(100000 + (pagePtr * 10))
-                                        Dim childPage As Models.Entity.pageContentModel = pageContentModel.create(cpCore, childPageId, New List(Of String))
+                                        Dim childPage As pageContentModel = pageContentModel.create(cpCore, childPageId, New List(Of String))
                                         If (childPage.SortOrder <> SortOrder) Then
                                             childPage.SortOrder = SortOrder
                                             childPage.save(cpCore)

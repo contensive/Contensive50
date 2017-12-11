@@ -4,6 +4,7 @@ Option Strict On
 
 Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Models.Entity
 
 '
 ' findReplace as integer to as integer
@@ -829,7 +830,7 @@ Namespace Contensive.Core.Controllers
                                     .personalizationPeopleId = personalizationPeopleId,
                                     .instanceArguments = addonArgDict
                                 }
-                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, addonName)
+                                Dim addon As addonModel = addonModel.createByName(cpCore, addonName)
                                 If (addon Is Nothing) Then
                                     cpCore.handleException(New ApplicationException("Add-on [" & addonName & "] could not be found executing command in content [" & cmdSrc & "]"))
                                 Else
@@ -869,7 +870,7 @@ Namespace Contensive.Core.Controllers
                                     .personalizationPeopleId = personalizationPeopleId,
                                     .instanceArguments = addonArgDict
                                 }
-                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, addonName)
+                                Dim addon As addonModel = addonModel.createByName(cpCore, addonName)
                                 CmdAccumulator = cpCore.addon.execute(addon, executeContext)
 
 
@@ -904,7 +905,7 @@ Namespace Contensive.Core.Controllers
                                 '    .personalizationPeopleId = personalizationPeopleId,
                                 '    .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, ArgOptionString)
                                 '}
-                                'Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, addonName)
+                                'Dim addon As addonModel = addonModel.createByName(cpCore, addonName)
                                 'CmdAccumulator = cpCore.addon.execute(addon, executeContext)
                                 ''CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                 ''CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)

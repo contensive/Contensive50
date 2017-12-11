@@ -305,7 +305,7 @@ namespace Contensive.Core.Models.Context {
         /// <param name="keyId"></param>
         /// <returns></returns>
         public bool getBoolean(string propertyName, bool defaultValue, int keyId) {
-            return genericController.EncodeBoolean(getText(propertyName, genericController.encodeText(defaultValue), keyId));
+            return genericController.encodeBoolean(getText(propertyName, genericController.encodeText(defaultValue), keyId));
         }
         //
         //====================================================================================================

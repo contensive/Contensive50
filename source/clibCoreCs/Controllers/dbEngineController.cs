@@ -61,7 +61,7 @@ namespace Contensive.Core.Controllers {
             try {
                 string serverUrl = cpCore.serverConfig.defaultDataSourceAddress;
                 if (serverUrl.IndexOf(":") > 0) {
-                    serverUrl = serverUrl.Substring(0, serverUrl.IndexOf(":"));
+                    serverUrl = serverUrl.Left( serverUrl.IndexOf(":"));
                 }
                 returnConnString += ""
                     + "server=" + serverUrl + ";"

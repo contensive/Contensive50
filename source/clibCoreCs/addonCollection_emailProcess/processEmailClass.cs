@@ -83,7 +83,7 @@ namespace Contensive.Core {
                 using (CPClass cp = new CPClass(appConfig.name)) {
                     cpCore.db.sqlCommandTimeout = 120;
                     EmailServiceLastCheck = (cpCore.siteProperties.getDate("EmailServiceLastCheck"));
-                    cpCore.siteProperties.setProperty("EmailServiceLastCheck", Convert.ToString(DateTime.Now));
+                    cpCore.siteProperties.setProperty("EmailServiceLastCheck", encodeText(DateTime.Now));
                     IsNewHour = (DateTime.Now - EmailServiceLastCheck).TotalHours > 1;
                     IsNewDay = EmailServiceLastCheck.Date != DateTime.Now.Date;
                     //
@@ -142,15 +142,7 @@ namespace Contensive.Core {
                 //
                 // Open the email records
                 //
-                if (true) {
-                    FieldList = "TestMemberID,ToAll,ScheduleDate,Sent,ModifiedBy,AddLinkEID,AllowSpamFooter,CopyFilename,Subject,FromAddress,EmailTemplateID,BlockSiteStyles,stylesFilename";
-                    //FieldList = "TestMemberID,ToAll,ScheduleDate,Sent,ModifiedBy,AddLinkEID,AllowSpamFooter,CopyFilename,Subject,FromAddress,EmailTemplateID"
-                    //FieldList = "TestMemberID,ToAll,ScheduleDate,Sent,ModifiedBy,AddLinkEID,AllowSpamFooter,CopyFilename,Subject,FromAddress,InlineStyles,EmailTemplateID"
-                } else {
-                    FieldList = "TestMemberID,ToAll,ScheduleDate,Sent,ModifiedBy,AddLinkEID,AllowSpamFooter,CopyFilename,Subject,FromAddress,EmailTemplateID,0 as BlockSiteStyles,'' as stylesFilename";
-                    //FieldList = "TestMemberID,ToAll,ScheduleDate,Sent,ModifiedBy,AddLinkEID,AllowSpamFooter,CopyFilename,Subject,FromAddress,EmailTemplateID"
-                    //FieldList = "TestMemberID,ToAll,ScheduleDate,Sent,ModifiedBy,AddLinkEID,AllowSpamFooter,CopyFilename,Subject,FromAddress,InlineStyles,EmailTemplateID"
-                }
+                FieldList = "TestMemberID,ToAll,ScheduleDate,Sent,ModifiedBy,AddLinkEID,AllowSpamFooter,CopyFilename,Subject,FromAddress,EmailTemplateID,BlockSiteStyles,stylesFilename";
                 Criteria = "(ccemail.active<>0)"
                     + " and (ccemail.Sent=0)"
                     + " and (ccemail.submitted<>0)"
@@ -608,7 +600,7 @@ namespace Contensive.Core {
                 //buildversion = cpCore.app.dataBuildVersion
                 CSLog = cpCore.db.csInsertRecord("Email Log", 0);
                 if (cpCore.db.csOk(CSLog)) {
-                    cpCore.db.csSet(CSLog, "Name", "Sent " + Convert.ToString(DateTime.Now));
+                    cpCore.db.csSet(CSLog, "Name", "Sent " + encodeText(DateTime.Now));
                     cpCore.db.csSet(CSLog, "EmailDropID", EmailDropID);
                     cpCore.db.csSet(CSLog, "EmailID", emailID);
                     cpCore.db.csSet(CSLog, "MemberID", MemberID);

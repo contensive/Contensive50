@@ -19,13 +19,13 @@ Namespace Contensive.Core.Models.Context
         Private Property cpCore As coreClass
         '
         ' -- the visit is the collection of pages, constructor creates default non-authenticated instance
-        Public Property visit As Models.Entity.visitModel
+        Public Property visit As visitModel
         '
         ' -- visitor represents the browser, constructor creates default non-authenticated instance
-        Public Property visitor As Models.Entity.visitorModel
+        Public Property visitor As visitorModel
         '
         ' -- user is the person at the keyboad, constructor creates default non-authenticated instance
-        Public Property user As Models.Entity.personModel
+        Public Property user As personModel
         ''' <summary>
         ''' userLanguage will return a valid populated language object
         ''' </summary>
@@ -113,9 +113,9 @@ Namespace Contensive.Core.Models.Context
         ''' </summary>
         Public Sub New(cpCore As coreClass)
             Me.cpCore = cpCore
-            visit = New Models.Entity.visitModel()
-            visitor = New Models.Entity.visitorModel()
-            user = New Models.Entity.personModel()
+            visit = New visitModel()
+            visitor = New visitorModel()
+            user = New personModel()
             'authContextUser = New authContextUserModel()
         End Sub
         '
@@ -156,9 +156,9 @@ Namespace Contensive.Core.Models.Context
                         main_appNameCookiePrefix = genericController.vbLCase(genericController.main_encodeCookieName(cpCore.serverConfig.appConfig.name))
                         '
                         resultAuthContext = New authContextModel(cpCore)
-                        'resultAuthContext.visit = New Models.Entity.visitModel
-                        'resultAuthContext.visitor = New Models.Entity.visitorModel
-                        'resultAuthContext.user = New Models.Entity.personModel
+                        'resultAuthContext.visit = New visitModel
+                        'resultAuthContext.visitor = New visitorModel
+                        'resultAuthContext.user = New personModel
                         '
                         visitCookieTimestamp = Date.MinValue
                         'resultAuthContext.visit.ID = 0
@@ -220,15 +220,15 @@ Namespace Contensive.Core.Models.Context
                                 '
                                 ' -- Visit is good, setup visit, then secondary visitor/user if possible
                                 With resultAuthContext
-                                    .visit = Models.Entity.visitModel.create(cpCore, cookieVisitId, New List(Of String))
+                                    .visit = visitModel.create(cpCore, cookieVisitId, New List(Of String))
                                     If (.visit Is Nothing) Then
                                         '
                                         ' -- visit record is missing, create a new visit
-                                        .visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
+                                        .visit = visitModel.add(cpCore, New List(Of String))
                                     ElseIf .visit.LastVisitTime.AddHours(1) < cpCore.doc.profileStartTime Then
                                         '
                                         ' -- visit has expired, create new visit
-                                        .visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
+                                        .visit = visitModel.add(cpCore, New List(Of String))
                                     Else
                                         '
                                         ' -- visit object is valid, share its data with other objects
@@ -242,7 +242,7 @@ Namespace Contensive.Core.Models.Context
                                         If (.visit.VisitorID > 0) Then
                                             '
                                             ' -- try visit's visitor object
-                                            Dim testVisitor As Models.Entity.visitorModel = Models.Entity.visitorModel.create(cpCore, .visit.VisitorID, New List(Of String))
+                                            Dim testVisitor As visitorModel = visitorModel.create(cpCore, .visit.VisitorID, New List(Of String))
                                             If (testVisitor IsNot Nothing) Then
                                                 .visitor = testVisitor
                                             End If
@@ -250,7 +250,7 @@ Namespace Contensive.Core.Models.Context
                                         If (.visit.MemberID > 0) Then
                                             '
                                             ' -- try visit's person object
-                                            Dim testUser As Models.Entity.personModel = Models.Entity.personModel.create(cpCore, resultAuthContext.visit.MemberID, New List(Of String))
+                                            Dim testUser As personModel = personModel.create(cpCore, resultAuthContext.visit.MemberID, New List(Of String))
                                             If (testUser IsNot Nothing) Then
                                                 .user = testUser
                                             End If
@@ -264,7 +264,7 @@ Namespace Contensive.Core.Models.Context
                             If (resultAuthContext.visit.id = 0) Then
                                 '
                                 ' -- create new visit record
-                                resultAuthContext.visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
+                                resultAuthContext.visit = visitModel.add(cpCore, New List(Of String))
                                 If resultAuthContext.visit.Name = "" Then
                                     resultAuthContext.visit.Name = "User"
                                 End If
@@ -301,7 +301,7 @@ Namespace Contensive.Core.Models.Context
                                         If cookieVisitorId <> 0 Then
                                             '
                                             ' -- visitor cookie good
-                                            Dim testVisitor As Models.Entity.visitorModel = Models.Entity.visitorModel.create(cpCore, cookieVisitorId, New List(Of String))
+                                            Dim testVisitor As visitorModel = visitorModel.create(cpCore, cookieVisitorId, New List(Of String))
                                             If (testVisitor IsNot Nothing) Then
                                                 resultAuthContext.visitor = testVisitor
                                                 visitor_changes = True
@@ -313,7 +313,7 @@ Namespace Contensive.Core.Models.Context
                                 If (resultAuthContext.visitor.ID = 0) Then
                                     '
                                     ' -- create new visitor
-                                    resultAuthContext.visitor = Models.Entity.visitorModel.add(cpCore, New List(Of String))
+                                    resultAuthContext.visitor = visitorModel.add(cpCore, New List(Of String))
                                     visitor_changes = False
                                     '
                                     resultAuthContext.visit.VisitorNew = True
@@ -330,7 +330,7 @@ Namespace Contensive.Core.Models.Context
                                         If (cpCore.siteProperties.AllowAutoLogin And resultAuthContext.user.AutoLogin And resultAuthContext.visit.CookieSupport) Then
                                             '
                                             ' -- they allow it, now Check if they were logged in on their last visit
-                                            Dim lastVisit As Models.Entity.visitModel = Models.Entity.visitModel.getLastVisitByVisitor(cpCore, resultAuthContext.visit.id, resultAuthContext.visitor.ID)
+                                            Dim lastVisit As visitModel = visitModel.getLastVisitByVisitor(cpCore, resultAuthContext.visit.id, resultAuthContext.visitor.ID)
                                             If (lastVisit IsNot Nothing) Then
                                                 If (lastVisit.VisitAuthenticated And (lastVisit.MemberID = resultAuthContext.visit.id)) Then
                                                     If resultAuthContext.authenticateById(cpCore, resultAuthContext.user.id, resultAuthContext) Then
@@ -476,7 +476,7 @@ Namespace Contensive.Core.Models.Context
                             If (resultAuthContext.visitor.ID = 0) Then
                                 '
                                 ' -- create new visitor
-                                resultAuthContext.visitor = Models.Entity.visitorModel.add(cpCore, New List(Of String))
+                                resultAuthContext.visitor = visitorModel.add(cpCore, New List(Of String))
                                 visitor_changes = False
                                 '
                                 resultAuthContext.visit.VisitorNew = True
@@ -513,7 +513,7 @@ Namespace Contensive.Core.Models.Context
                                 If Not TrackGuests Then
                                     '
                                     ' -- do not track guests at all
-                                    resultAuthContext.user = New Models.Entity.personModel
+                                    resultAuthContext.user = New personModel
                                     resultAuthContext.user.Name = DefaultMemberName
                                     user_changes = False
                                     resultAuthContext.visitor.MemberID = 0
@@ -526,7 +526,7 @@ Namespace Contensive.Core.Models.Context
                                     If resultAuthContext.visit.CookieSupport Then
                                         '
                                         ' -- cookies supported, not first hit and not spider
-                                        resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
+                                        resultAuthContext.user = personModel.add(cpCore, New List(Of String))
                                         user_changes = True
                                         resultAuthContext.visitor.MemberID = resultAuthContext.user.id
                                         visitor_changes = True
@@ -537,14 +537,14 @@ Namespace Contensive.Core.Models.Context
                                             '
                                             ' -- create people for non-cookies too
                                             '
-                                            resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
+                                            resultAuthContext.user = personModel.add(cpCore, New List(Of String))
                                             resultAuthContext.user.Name = resultAuthContext.visit.Name
                                             user_changes = True
                                         Else
                                             '
                                             ' set defaults for people object, but no record
                                             '
-                                            resultAuthContext.user = New Models.Entity.personModel
+                                            resultAuthContext.user = New personModel
                                             resultAuthContext.user.Name = DefaultMemberName
                                             user_changes = True
                                         End If
@@ -723,7 +723,7 @@ Namespace Contensive.Core.Models.Context
                 '
                 ' Clear MemberID for this page
                 '
-                user = Models.Entity.personModel.add(cpCore, New List(Of String))
+                user = personModel.add(cpCore, New List(Of String))
                 '
                 visit.VisitAuthenticated = False
                 visit.saveObject(cpCore)
@@ -1131,12 +1131,12 @@ Namespace Contensive.Core.Models.Context
             Dim returnResult As Boolean = False
             Try
                 If authContext.visitor.ID = 0 Then
-                    authContext.visitor = Models.Entity.visitorModel.add(cpCore, New List(Of String))
+                    authContext.visitor = visitorModel.add(cpCore, New List(Of String))
                 End If
                 If authContext.visit.id = 0 Then
-                    authContext.visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
+                    authContext.visit = visitModel.add(cpCore, New List(Of String))
                 End If
-                authContext.user = Models.Entity.personModel.create(cpCore, userId, New List(Of String))
+                authContext.user = personModel.create(cpCore, userId, New List(Of String))
                 authContext.visitor.MemberID = authContext.user.id
                 authContext.visit.MemberID = authContext.user.id
                 authContext.visit.VisitAuthenticated = False

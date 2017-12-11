@@ -57,7 +57,7 @@ Namespace Contensive.Core.Controllers
                         Dim posDot As Integer = 0
                         Dim loopCnt As Integer = 10
                         Do
-                            cpCore.doc.domain = Models.Entity.domainModel.createByName(cpCore, domainTest, New List(Of String))
+                            cpCore.doc.domain = domainModel.createByName(cpCore, domainTest, New List(Of String))
                             posDot = domainTest.IndexOf("."c)
                             If ((posDot >= 0) And (domainTest.Length > 1)) Then
                                 domainTest = domainTest.Substring(posDot + 1)
@@ -91,7 +91,7 @@ Namespace Contensive.Core.Controllers
 
                     '
                     ' -- execute template Dependencies
-                    Dim templateAddonList As List(Of Models.Entity.addonModel) = addonModel.createList_templateDependencies(cpCore, cpCore.doc.template.ID)
+                    Dim templateAddonList As List(Of addonModel) = addonModel.createList_templateDependencies(cpCore, cpCore.doc.template.ID)
                     For Each addon As addonModel In templateAddonList
                         Dim AddonStatusOK As Boolean = True
                         returnHtml &= cpCore.addon.executeDependency(addon, executeContext)
@@ -99,7 +99,7 @@ Namespace Contensive.Core.Controllers
                     Next
                     '
                     ' -- execute page Dependencies
-                    Dim pageAddonList As List(Of Models.Entity.addonModel) = addonModel.createList_pageDependencies(cpCore, cpCore.doc.page.id)
+                    Dim pageAddonList As List(Of addonModel) = addonModel.createList_pageDependencies(cpCore, cpCore.doc.page.id)
                     For Each addon As addonModel In pageAddonList
                         Dim AddonStatusOK As Boolean = True
                         returnHtml &= cpCore.addon.executeDependency(addon, executeContext)
@@ -186,14 +186,14 @@ Namespace Contensive.Core.Controllers
                         If downloadId <> 0 Then
                             '
                             ' -- lookup record and set clicks
-                            Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, downloadId)
+                            Dim file As libraryFilesModel = libraryFilesModel.create(cpCore, downloadId)
                             If (file IsNot Nothing) Then
                                 file.Clicks += 1
                                 file.save(cpCore)
                                 If file.Filename <> "" Then
                                     '
                                     ' -- create log entry
-                                    Dim log As Models.Entity.libraryFileLogModel = Models.Entity.libraryFileLogModel.add(cpCore)
+                                    Dim log As libraryFileLogModel = libraryFileLogModel.add(cpCore)
                                     If (log IsNot Nothing) Then
                                         log.FileID = file.id
                                         log.VisitID = cpCore.doc.authContext.visit.id
@@ -473,9 +473,9 @@ Namespace Contensive.Core.Controllers
                             '
                             If (linkAliasTest1 & linkAliasTest2 <> "") Then
                                 Dim sqlLinkAliasCriteria As String = "(name=" & cpCore.db.encodeSQLText(linkAliasTest1) & ")or(name=" & cpCore.db.encodeSQLText(linkAliasTest2) & ")"
-                                Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpCore, sqlLinkAliasCriteria, "id desc")
+                                Dim linkAliasList As List(Of linkAliasModel) = linkAliasModel.createList(cpCore, sqlLinkAliasCriteria, "id desc")
                                 If (linkAliasList.Count > 0) Then
-                                    Dim linkAlias As Models.Entity.linkAliasModel = linkAliasList.First
+                                    Dim linkAlias As linkAliasModel = linkAliasList.First
                                     Dim LinkQueryString As String = rnPageId & "=" & linkAlias.PageID & "&" & linkAlias.QueryStringSuffix
                                     cpCore.docProperties.setProperty(rnPageId, linkAlias.PageID.ToString(), False)
                                     Dim nameValuePairs As String() = Split(linkAlias.QueryStringSuffix, "&")
@@ -559,7 +559,7 @@ Namespace Contensive.Core.Controllers
                     ' -- check secure certificate required
                     Dim SecureLink_Template_Required As Boolean = cpCore.doc.template.IsSecure
                     Dim SecureLink_Page_Required As Boolean = False
-                    For Each page As Models.Entity.pageContentModel In cpCore.doc.pageToRootList
+                    For Each page As pageContentModel In cpCore.doc.pageToRootList
                         If cpCore.doc.page.IsSecure Then
                             SecureLink_Page_Required = True
                             Exit For
@@ -590,7 +590,7 @@ Namespace Contensive.Core.Controllers
                     ' -- if endpoint is domain + route (link alias), the route determines the page, which may determine the cpCore.doc.template. If this template is not allowed for this domain, redirect to the domain's landingcpCore.doc.page.
                     '
                     Sql = "(domainId=" & cpCore.doc.domain.id & ")"
-                    Dim allowTemplateRuleList As List(Of Models.Entity.TemplateDomainRuleModel) = Models.Entity.TemplateDomainRuleModel.createList(cpCore, Sql)
+                    Dim allowTemplateRuleList As List(Of TemplateDomainRuleModel) = TemplateDomainRuleModel.createList(cpCore, Sql)
                     If (allowTemplateRuleList.Count = 0) Then
                         '
                         ' -- current template has no domain preference, use current
@@ -1525,8 +1525,8 @@ ErrorTrap:
                     ' -- OnPageStartEvent
                     cpCore.doc.bodyContent = returnHtml
                     executeContext.addonType = CPUtilsBaseClass.addonContext.ContextOnPageStart
-                    Dim addonList As List(Of addonModel) = Models.Entity.addonModel.createList_OnPageStartEvent(cpCore, New List(Of String))
-                    For Each addon As Models.Entity.addonModel In addonList
+                    Dim addonList As List(Of addonModel) = addonModel.createList_OnPageStartEvent(cpCore, New List(Of String))
+                    For Each addon As addonModel In addonList
                         cpCore.doc.bodyContent = cpCore.addon.execute(addon, executeContext) & cpCore.doc.bodyContent
                         'AddonContent = cpCore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                     Next
@@ -1726,11 +1726,11 @@ ErrorTrap:
                             Cell = Cell & cpcore.html.html_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.")
                         End If
                         Dim AddonStatusOK As Boolean = False
-                        Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, cpcore.siteProperties.childListAddonID)
+                        Dim addon As addonModel = addonModel.create(cpcore, cpcore.siteProperties.childListAddonID)
                         Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
                             .addonType = CPUtilsBaseClass.addonContext.ContextPage,
                             .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
-                                .contentName = Models.Entity.pageContentModel.contentName,
+                                .contentName = pageContentModel.contentName,
                                 .fieldName = "",
                                 .recordId = cpcore.doc.page.id
                             },
@@ -1739,7 +1739,7 @@ ErrorTrap:
                             .wrapperID = cpcore.siteProperties.defaultWrapperID
                         }
                         Cell &= cpcore.addon.execute(addon, executeContext)
-                        'Cell = Cell & cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", cpcore.doc.page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, cpcore.doc.page.id, "", PageChildListInstanceID, False, cpcore.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
+                        'Cell = Cell & cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", cpcore.doc.page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, cpcore.doc.page.id, "", PageChildListInstanceID, False, cpcore.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
                     End If
                 End If
                 '
@@ -2159,7 +2159,7 @@ ErrorTrap:
                 RootPageContentName = "Page Content"
                 '
                 ' -- validate domain
-                'domain = Models.Entity.domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
+                'domain = domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
                 If (cpCore.doc.domain Is Nothing) Then
                     '
                     ' -- domain not listed, this is now an error
@@ -2200,13 +2200,13 @@ ErrorTrap:
                 ''
                 '' -- build parentpageList (first = current page, last = root)
                 '' -- add a 0, then repeat until another 0 is found, or there is a repeat
-                'pageToRootList = New List(Of Models.Entity.pageContentModel)()
+                'pageToRootList = New List(Of pageContentModel)()
                 'Dim usedPageIdList As New List(Of Integer)()
                 'Dim targetPageId = PageID
                 'usedPageIdList.Add(0)
                 'Do While (Not usedPageIdList.Contains(targetPageId))
                 '    usedPageIdList.Add(targetPageId)
-                '    Dim targetpage As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpCore, targetPageId, New List(Of String))
+                '    Dim targetpage As pageContentModel = pageContentModel.create(cpCore, targetPageId, New List(Of String))
                 '    If (targetpage Is Nothing) Then
                 '        Exit Do
                 '    Else
@@ -2223,10 +2223,10 @@ ErrorTrap:
                 'page = pageToRootList.First
                 ''
                 '' -- get template from pages
-                'Dim template As Models.Entity.pageTemplateModel = Nothing
-                'For Each page As Models.Entity.pageContentModel In pageToRootList
+                'Dim template As pageTemplateModel = Nothing
+                'For Each page As pageContentModel In pageToRootList
                 '    If page.TemplateID > 0 Then
-                '        template = Models.Entity.pageTemplateModel.create(cpCore, page.TemplateID, New List(Of String))
+                '        template = pageTemplateModel.create(cpCore, page.TemplateID, New List(Of String))
                 '        If (template IsNot Nothing) Then
                 '            If (page Is page) Then
                 '                templateReason = "This template was used because it is selected by the current page."
@@ -2242,12 +2242,12 @@ ErrorTrap:
                 '    '
                 '    ' -- get template from domain
                 '    If (domain IsNot Nothing) Then
-                '        template = Models.Entity.pageTemplateModel.create(cpCore, domain.DefaultTemplateId, New List(Of String))
+                '        template = pageTemplateModel.create(cpCore, domain.DefaultTemplateId, New List(Of String))
                 '    End If
                 '    If (template Is Nothing) Then
                 '        '
                 '        ' -- get template named Default
-                '        template = Models.Entity.pageTemplateModel.createByName(cpCore, "default", New List(Of String))
+                '        template = pageTemplateModel.createByName(cpCore, "default", New List(Of String))
                 '    End If
                 'End If
                 '
@@ -2486,13 +2486,13 @@ ErrorTrap:
                     '
                     ' -- build parentpageList (first = current page, last = root)
                     ' -- add a 0, then repeat until another 0 is found, or there is a repeat
-                    cpcore.doc.pageToRootList = New List(Of Models.Entity.pageContentModel)()
+                    cpcore.doc.pageToRootList = New List(Of pageContentModel)()
                     Dim usedPageIdList As New List(Of Integer)()
                     Dim targetPageId = requestedPage.id
                     usedPageIdList.Add(0)
                     Do While (Not usedPageIdList.Contains(targetPageId))
                         usedPageIdList.Add(targetPageId)
-                        Dim targetpage As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpcore, targetPageId, New List(Of String))
+                        Dim targetpage As pageContentModel = pageContentModel.create(cpcore, targetPageId, New List(Of String))
                         If (targetpage Is Nothing) Then
                             Exit Do
                         Else
@@ -2514,9 +2514,9 @@ ErrorTrap:
                     '
                     ' -- get template from pages
                     cpcore.doc.template = Nothing
-                    For Each page As Models.Entity.pageContentModel In cpcore.doc.pageToRootList
+                    For Each page As pageContentModel In cpcore.doc.pageToRootList
                         If page.TemplateID > 0 Then
-                            cpcore.doc.template = Models.Entity.pageTemplateModel.create(cpcore, page.TemplateID, New List(Of String))
+                            cpcore.doc.template = pageTemplateModel.create(cpcore, page.TemplateID, New List(Of String))
                             If (cpcore.doc.template Is Nothing) Then
                                 '
                                 ' -- templateId is not valid
@@ -2538,7 +2538,7 @@ ErrorTrap:
                         ' -- get template from domain
                         If (domain IsNot Nothing) Then
                             If (domain.DefaultTemplateId > 0) Then
-                                cpcore.doc.template = Models.Entity.pageTemplateModel.create(cpcore, domain.DefaultTemplateId, New List(Of String))
+                                cpcore.doc.template = pageTemplateModel.create(cpcore, domain.DefaultTemplateId, New List(Of String))
                                 If (cpcore.doc.template Is Nothing) Then
                                     '
                                     ' -- domain templateId is not valid
@@ -2550,11 +2550,11 @@ ErrorTrap:
                         If (cpcore.doc.template Is Nothing) Then
                             '
                             ' -- get template named Default
-                            cpcore.doc.template = Models.Entity.pageTemplateModel.createByName(cpcore, defaultTemplateName, New List(Of String))
+                            cpcore.doc.template = pageTemplateModel.createByName(cpcore, defaultTemplateName, New List(Of String))
                             If (cpcore.doc.template Is Nothing) Then
                                 '
                                 ' -- ceate new template named Default
-                                cpcore.doc.template = Models.Entity.pageTemplateModel.add(cpcore, New List(Of String))
+                                cpcore.doc.template = pageTemplateModel.add(cpcore, New List(Of String))
                                 cpcore.doc.template.Name = defaultTemplateName
                                 cpcore.doc.template.BodyHTML = cpcore.appRootFiles.readFile(defaultTemplateHomeFilename)
                                 cpcore.doc.template.save(cpcore)
@@ -2593,7 +2593,7 @@ ErrorTrap:
         '---------------------------------------------------------------------------
         '
         Public Shared Function getLandingPage(cpcore As coreClass, domain As domainModel) As pageContentModel
-            Dim landingPage As Models.Entity.pageContentModel = Nothing
+            Dim landingPage As pageContentModel = Nothing
             Try
                 If (domain Is Nothing) Then
                     '
@@ -2792,7 +2792,7 @@ ErrorTrap:
                 '
                 ' -- domain -- determine if the domain has any template requirements, and if so, is this template allowed
                 Dim SqlCriteria As String = "(domainId=" & cpcore.doc.domain.id & ")"
-                Dim allowTemplateRuleList As List(Of Models.Entity.TemplateDomainRuleModel) = Models.Entity.TemplateDomainRuleModel.createList(cpcore, SqlCriteria)
+                Dim allowTemplateRuleList As List(Of TemplateDomainRuleModel) = TemplateDomainRuleModel.createList(cpcore, SqlCriteria)
                 Dim templateAllowed As Boolean = False
                 For Each rule As TemplateDomainRuleModel In allowTemplateRuleList
                     If (rule.templateId = cpcore.doc.template.ID) Then

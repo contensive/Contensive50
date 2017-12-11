@@ -151,15 +151,24 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override void OpenCopy(string copyRecordNameOrGuid) {
-            CPCSClass cs = cp.CSNew();
             try {
                 accum = "";
-                if (!string.IsNullOrEmpty(copyRecordNameOrGuid)) {
-                    cs.Open("copy content", "(name=" + cp.Db.EncodeSQLText(copyRecordNameOrGuid) + ")or(ccGuid=" + cp.Db.EncodeSQLText(copyRecordNameOrGuid) + ")", "id",true, "copy");
-                    if (cs.OK()) {
-                        accum = cs.GetText("copy");
-                    }
-                    cs.Close();
+                copyContentModel copy;
+                if (vbIsNumeric(copyRecordNameOrGuid)) {
+                    //
+                    // -- recordId
+                    copy = copyContentModel.create(cpCore, genericController.EncodeInteger(copyRecordNameOrGuid));
+                } else if (genericController.isGuid(copyRecordNameOrGuid)) {
+                    //
+                    // -- record name
+                    copy = copyContentModel.createByName(cpCore, copyRecordNameOrGuid);
+                } else {
+                    //
+                    // -- record guid
+                    copy = copyContentModel.create(cpCore, copyRecordNameOrGuid);
+                }
+                if (copy != null ) {
+                    accum = copy.copy;
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -185,14 +194,23 @@ namespace Contensive.Core {
         //
         public override void OpenLayout(string layoutRecordNameOrGuid) {
             try {
-                CPCSClass cs = cp.CSNew();
                 accum = "";
-                if (!string.IsNullOrEmpty(layoutRecordNameOrGuid)) {
-                    cs.Open("layouts", "(name=" + cp.Db.EncodeSQLText(layoutRecordNameOrGuid) + ")or(ccGuid=" + cp.Db.EncodeSQLText(layoutRecordNameOrGuid) + ")", "id", false, "layout");
-                    if (cs.OK()) {
-                        accum = cs.GetText("layout");
-                    }
-                    cs.Close();
+                layoutModel copy;
+                if (vbIsNumeric(layoutRecordNameOrGuid)) {
+                    //
+                    // -- recordId
+                    copy = layoutModel.create(cpCore, genericController.EncodeInteger(layoutRecordNameOrGuid));
+                } else if (genericController.isGuid(layoutRecordNameOrGuid)) {
+                    //
+                    // -- record name
+                    copy = layoutModel.createByName(cpCore, layoutRecordNameOrGuid);
+                } else {
+                    //
+                    // -- record guid
+                    copy = layoutModel.create(cpCore, layoutRecordNameOrGuid);
+                }
+                if (copy != null) {
+                    accum = copy.Layout;
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);

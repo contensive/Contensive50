@@ -114,7 +114,7 @@ namespace Contensive.Core.Controllers {
                     HighGuess = store.ArrayCount - 1;
                     while ((HighGuess - LowGuess) > 1) {
                         // 20150823 jk added to prevent implicit conversion
-                        PointerGuess = Convert.ToInt32(Math.Floor((HighGuess + LowGuess) / 2.0));
+                        PointerGuess = EncodeInteger(Math.Floor((HighGuess + LowGuess) / 2.0));
                         //PointerGuess = (HighGuess + LowGuess) / 2
                         if (UcaseTargetKey == store.UcaseKeyArray[PointerGuess]) {
                             HighGuess = PointerGuess;

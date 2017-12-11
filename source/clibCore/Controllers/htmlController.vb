@@ -3911,7 +3911,7 @@ ErrorTrap:
                                                                     .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, AddonOptionStringHTMLEncoded),
                                                                     .instanceGuid = ACInstanceID
                                                                 }
-                                                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.createByName(cpCore, ACName)
+                                                                Dim addon As addonModel = addonModel.createByName(cpCore, ACName)
                                                                 Copy = cpCore.addon.execute(addon, executeContext)
                                                                 'Copy = cpCore.addon.execute_legacy6(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                                         End Select
@@ -4069,7 +4069,7 @@ ErrorTrap:
                                                     ACAttrHSpace = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"))
                                                     ACAttrAlign = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"))
                                                     '
-                                                    Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, ACAttrRecordID)
+                                                    Dim file As libraryFilesModel = libraryFilesModel.create(cpCore, ACAttrRecordID)
                                                     If (file IsNot Nothing) Then
                                                         Filename = file.Filename
                                                         Filename = genericController.vbReplace(Filename, "\", "/")
@@ -4149,7 +4149,7 @@ ErrorTrap:
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
                                                 ElseIf EncodeImages Then
                                                     '
-                                                    Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, ACAttrRecordID)
+                                                    Dim file As libraryFilesModel = libraryFilesModel.create(cpCore, ACAttrRecordID)
                                                     If (file IsNot Nothing) Then
                                                         If ACAttrAlt = "" Then
                                                             ACAttrAlt = genericController.encodeText(file.AltText)
@@ -4757,7 +4757,7 @@ ErrorTrap:
                                                                                 '
                                                                                 ' Get the record values
                                                                                 '
-                                                                                Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, RecordID)
+                                                                                Dim file As libraryFilesModel = libraryFilesModel.create(cpCore, RecordID)
                                                                                 If (file IsNot Nothing) Then
                                                                                     RecordVirtualFilename = file.Filename
                                                                                     RecordWidth = file.pxWidth
@@ -6442,7 +6442,7 @@ ErrorTrap:
                                                     .personalizationPeopleId = iPersonalizationPeopleId,
                                                     .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
                                                 }
-                                                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpCore, addonGuidDynamicForm)
+                                                Dim addon As addonModel = addonModel.create(cpCore, addonGuidDynamicForm)
                                                 result &= cpCore.addon.execute(addon, executeContext)
                                             Case ACTypeChildList
                                                 '
@@ -6554,10 +6554,10 @@ ErrorTrap:
                                     .instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
                                 }
                                     If AddonGuid <> "" Then
-                                        Copy = cpCore.addon.execute(Models.Entity.addonModel.create(cpCore, AddonGuid), executeContext)
+                                        Copy = cpCore.addon.execute(addonModel.create(cpCore, AddonGuid), executeContext)
                                         'Copy = cpCore.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                     Else
-                                        Copy = cpCore.addon.execute(Models.Entity.addonModel.createByName(cpCore, AddonName), executeContext)
+                                        Copy = cpCore.addon.execute(addonModel.createByName(cpCore, AddonName), executeContext)
                                         'Copy = cpCore.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                     End If
                                 End If
@@ -6771,7 +6771,7 @@ ErrorTrap:
                                 RecordID = genericController.EncodeInteger(TableSplit(2))
                                 FilenameSegment = TableSplit(3)
                                 If (LCase(TableName) = "cclibraryfiles") And (LCase(FieldName) = "filename") And (RecordID <> 0) Then
-                                    Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, RecordID)
+                                    Dim file As libraryFilesModel = libraryFilesModel.create(cpCore, RecordID)
                                     If (file IsNot Nothing) Then
                                         ''hint = hint & ",060"
                                         FieldName = "filename"
@@ -6971,8 +6971,8 @@ ErrorTrap:
                                                                     ' There has been a change
                                                                     '
                                                                     Dim NewRecordFilename As String
-                                                                    Dim ImageHeight As Integer
-                                                                    Dim ImageWidth As Integer
+                                                                    'Dim ImageHeight As Integer
+                                                                    'Dim ImageWidth As Integer
                                                                     NewRecordFilename = RecordVirtualPath & RecordFilenameNoExt & "." & RecordFilenameExt
                                                                     '
                                                                     ' realtime image updates replace without creating new size - that is for the edit interface

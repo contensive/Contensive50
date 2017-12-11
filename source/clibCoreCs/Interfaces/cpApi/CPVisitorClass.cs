@@ -54,7 +54,7 @@ namespace Contensive.Core {
         public override bool ForceBrowserMobile
         {
             get {
-                return genericController.EncodeBoolean(cpCore.doc.authContext.visitor.ForceBrowserMobile);
+                return genericController.encodeBoolean(cpCore.doc.authContext.visitor.ForceBrowserMobile);
             }
         }
 
@@ -71,7 +71,7 @@ namespace Contensive.Core {
         //=======================================================================================================
         //
         public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return genericController.EncodeBoolean(GetProperty(PropertyName, DefaultValue));
+            return genericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
         }
         //
         //=======================================================================================================

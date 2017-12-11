@@ -1,14 +1,20 @@
 ﻿
-//----------------------------------------------------------------------------------------
-//	Copyright © 2003 - 2017 Tangible Software Solutions Inc.
-//	This class can be used by anyone provided that the copyright notice remains intact.
-//
-//	The methods in this class replicate the behavior of IsDate and DateDiff.
-//----------------------------------------------------------------------------------------
 using System;
+using System.Reflection;
+using System.Xml;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using Contensive.Core;
+using Contensive.Core.Models.Entity;
+using Contensive.Core.Controllers;
+using static Contensive.Core.Controllers.genericController;
+using static Contensive.Core.constants;
+using Contensive.BaseClasses;
+//
 using System.Globalization;
 
-public static class DateHelper {
+public static class dateController {
     public static bool IsDate(object expression) {
         if (expression == null)
             return false;

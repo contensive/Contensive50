@@ -105,7 +105,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Error Messages
                     //
-                    if (genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("allowEmailLogin", false))) {
+                    if (genericController.encodeBoolean(cpcore.siteProperties.getBoolean("allowEmailLogin", false))) {
                         usernameMsg = "<b>To login, enter your username or email address with your password.</b></p>";
                     } else {
                         usernameMsg = "<b>To login, enter your username and password.</b></p>";
@@ -117,7 +117,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Username
                     //
-                    if (genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("allowEmailLogin", false))) {
+                    if (genericController.encodeBoolean(cpcore.siteProperties.getBoolean("allowEmailLogin", false))) {
                         Caption = "Username&nbsp;or&nbsp;Email";
                     } else {
                         Caption = "Username";
@@ -130,7 +130,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Password
                     //
-                    if (genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("allowNoPasswordLogin", false))) {
+                    if (genericController.encodeBoolean(cpcore.siteProperties.getBoolean("allowNoPasswordLogin", false))) {
                         Caption = "Password&nbsp;(optional)";
                     } else {
                         Caption = "Password";
@@ -143,7 +143,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- autologin support
                     //
-                    if (genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("AllowAutoLogin", false))) {
+                    if (genericController.encodeBoolean(cpcore.siteProperties.getBoolean("AllowAutoLogin", false))) {
                         loginForm = loginForm + "\r<tr>"
                         + cr2 + "<td align=\"right\">&nbsp;</td>"
                         + cr2 + "<td align=\"left\" >"
@@ -176,7 +176,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Password Form
                     //
-                    if (genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("allowPasswordEmail", true))) {
+                    if (genericController.encodeBoolean(cpcore.siteProperties.getBoolean("allowPasswordEmail", true))) {
                         Panel = ""
                             + Panel + "\r<p class=\"ccAdminNormal\"><b>Forget your password?</b></p>"
                             + "\r<p class=\"ccAdminNormal\">If you are a member of the system and can not remember your password, enter your email address below and we will email your matching username and password.</p>"
@@ -383,7 +383,7 @@ namespace Contensive.Core.Controllers {
                 loginForm_Username = cpcore.docProperties.getText("username");
                 loginForm_Password = cpcore.docProperties.getText("password");
                 //
-                if (!genericController.EncodeBoolean(cpcore.siteProperties.getBoolean("AllowMemberJoin", false))) {
+                if (!genericController.encodeBoolean(cpcore.siteProperties.getBoolean("AllowMemberJoin", false))) {
                     errorController.error_AddUserError(cpcore, "This site does not accept public main_MemberShip.");
                 } else {
                     if (!cpcore.doc.authContext.isNewLoginOK(cpcore, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {

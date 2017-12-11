@@ -1291,7 +1291,7 @@ ErrorTrap:
                     '
                     ' fixup the string so it can be reduced by each field found, leaving and empty string if all correct
                     '
-                    Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
+                    Dim datasource As dataSourceModel = dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
                     'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
                     For Each keyValuePair In adminContent.fields
                         Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value

@@ -108,22 +108,14 @@ namespace Contensive.Core {
         //
         public override string CheckBox(string HtmlName, bool HtmlValue = false, string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.CheckBox
         {
-            if (true) {
-                return cpCore.html.html_GetFormInputCheckBox(HtmlName, HtmlValue.ToString(), HtmlId);
-            } else {
-                return "";
-            }
+            return cpCore.html.html_GetFormInputCheckBox(HtmlName, HtmlValue.ToString(), HtmlId);
         }
         //
         //
         //
         public override string CheckList(string HtmlName, string PrimaryContentName, int PrimaryRecordId, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectSQLCriteria = "", string CaptionFieldName = "", bool IsReadOnly = false, string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.CheckList
         {
-            if (true) {
-                return cpCore.html.getCheckList2(HtmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly);
-            } else {
-                return "";
-            }
+            return cpCore.html.getCheckList2(HtmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly);
         }
         //
         //
@@ -411,7 +403,7 @@ namespace Contensive.Core {
                     // text area found, isolate it and indent before and after
                     //
                     posEnd = genericController.vbInstr(posStart, SourceHtml, "</textarea>", Microsoft.VisualBasic.CompareMethod.Text);
-                    pre = SourceHtml.Substring(0, posStart - 1);
+                    pre = SourceHtml.Left( posStart - 1);
                     if (posEnd == 0) {
                         target = SourceHtml.Substring(posStart - 1);
                         post = "";
@@ -426,7 +418,7 @@ namespace Contensive.Core {
                 // cdata found, isolate it and indent before and after
                 //
                 posEnd = genericController.vbInstr(posStart, SourceHtml, "]]>", Microsoft.VisualBasic.CompareMethod.Text);
-                pre = SourceHtml.Substring(0, posStart - 1);
+                pre = SourceHtml.Left( posStart - 1);
                 if (posEnd == 0) {
                     target = SourceHtml.Substring(posStart - 1);
                     post = "";

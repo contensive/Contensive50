@@ -39,7 +39,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="context"></param>
         ''' <returns></returns>
         ''' 
-        Public Function executeDependency(addon As Models.Entity.addonModel, context As CPUtilsBaseClass.addonExecuteContext) As String
+        Public Function executeDependency(addon As addonModel, context As CPUtilsBaseClass.addonExecuteContext) As String
             Dim saveContextIsIncludeAddon As Boolean = context.isIncludeAddon
             context.isIncludeAddon = True
             Dim result As String = execute(addon, context)
@@ -54,7 +54,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="addon"></param>
         ''' <param name="executeContext"></param>
         ''' <returns></returns>
-        Public Function execute(addon As Models.Entity.addonModel, executeContext As CPUtilsBaseClass.addonExecuteContext) As String
+        Public Function execute(addon As addonModel, executeContext As CPUtilsBaseClass.addonExecuteContext) As String
             Dim result As String = String.Empty
             Dim rootLevelAddon As Boolean = cpCore.doc.addonsCurrentlyRunningIdList.Count.Equals(0)
             Try
@@ -83,9 +83,9 @@ Namespace Contensive.Core.Controllers
                     cpCore.doc.addonsCurrentlyRunningIdList.Add(addon.id)
                     '
                     ' -- run included add-ons before their parent
-                    Dim addonIncludeRules As List(Of Models.Entity.addonIncludeRuleModel) = Models.Entity.addonIncludeRuleModel.createList(cpCore, "(addonid=" & addon.id & ")")
+                    Dim addonIncludeRules As List(Of addonIncludeRuleModel) = addonIncludeRuleModel.createList(cpCore, "(addonid=" & addon.id & ")")
                     If addonIncludeRules.Count > 0 Then
-                        For Each addonRule As Models.Entity.addonIncludeRuleModel In addonIncludeRules
+                        For Each addonRule As addonIncludeRuleModel In addonIncludeRules
                             If addonRule.IncludedAddonID > 0 Then
                                 Dim dependentAddon As addonModel = addonModel.create(cpCore, addonRule.IncludedAddonID)
                                 If (dependentAddon Is Nothing) Then
@@ -381,7 +381,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' -- DotNet
                         If addon.DotNetClass <> "" Then
-                            result &= execute_Assembly(addon, Models.Entity.AddonCollectionModel.create(cpCore, addon.CollectionID))
+                            result &= execute_Assembly(addon, AddonCollectionModel.create(cpCore, addon.CollectionID))
                         End If
                         '
                         ' -- RemoteAssetLink
@@ -1375,7 +1375,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="ReplaceValues"></param>
         ''' <returns></returns>
         ''' <remarks>long run, use either csscript.net, or use .net tools to build compile/run funtion</remarks>
-        Private Function execute_Script(ByRef addon As Models.Entity.addonModel, ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String) As String
+        Private Function execute_Script(ByRef addon As addonModel, ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String) As String
             Dim returnText As String = ""
             Try
                 Dim engine As New Microsoft.ClearScript.Windows.VBScriptEngine()
@@ -1546,7 +1546,7 @@ Namespace Contensive.Core.Controllers
         '
         '
         '
-        Private Function execute_Assembly(addon As Models.Entity.addonModel, addonCollection As Models.Entity.AddonCollectionModel) As String
+        Private Function execute_Assembly(addon As addonModel, addonCollection As AddonCollectionModel) As String
             Dim result As String = ""
             Try
                 Dim AddonFound As Boolean = False
@@ -1801,7 +1801,7 @@ Namespace Contensive.Core.Controllers
         Public Function executeAddonAsProcess(ByVal AddonIDGuidOrName As String, Optional ByVal OptionString As String = "") As String
             Dim result As String = ""
             Try
-                Dim addon As Models.Entity.addonModel = Nothing
+                Dim addon As addonModel = Nothing
                 If (EncodeInteger(AddonIDGuidOrName) > 0) Then
                     addon = cpCore.addonCache.getAddonById(EncodeInteger(AddonIDGuidOrName))
                 ElseIf (genericController.isGuid(AddonIDGuidOrName)) Then
@@ -2197,7 +2197,7 @@ ErrorTrap:
                 '
                 If cpCore.doc.authContext.isAuthenticated() And True Then
                     If cpCore.doc.authContext.isEditingAnything() Then
-                        Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpCore, addonId)
+                        Dim addon As addonModel = addonModel.create(cpCore, addonId)
                         CopyHeader = CopyHeader _
                             & "<div class=""ccHeaderCon"">" _
                             & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
@@ -3676,11 +3676,11 @@ ErrorTrap:
             Return result
         End Function
         '
-        Private Function getAddonDescription(cpcore As coreClass, addon As Models.Entity.addonModel) As String
+        Private Function getAddonDescription(cpcore As coreClass, addon As addonModel) As String
             Dim addonDescription As String = "[invalid addon]"
             If (addon IsNot Nothing) Then
                 Dim collectionName As String = "invalid collection or collection not set"
-                Dim collection As Models.Entity.AddonCollectionModel = Models.Entity.AddonCollectionModel.create(cpcore, addon.CollectionID)
+                Dim collection As AddonCollectionModel = AddonCollectionModel.create(cpcore, addon.CollectionID)
                 If (collection IsNot Nothing) Then
                     collectionName = collection.name
                 End If

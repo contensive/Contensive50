@@ -42,7 +42,7 @@ Namespace Contensive.Addons.Core
                             If emailDropId <> 0 Then
                                 Dim emailDrop As emailDropModel = emailDropModel.create(cpCore, emailDropId)
                                 If (emailDrop IsNot Nothing) Then
-                                    Dim log As New Models.Entity.emailLogModel() With {
+                                    Dim log As New emailLogModel() With {
                                         .name = "User " & recipient.name & " clicked linked spam block from email drop " & emailDrop.name & " at " & cpCore.doc.profileStartTime.ToString(),
                                         .EmailDropID = emailDrop.id,
                                         .MemberID = recipient.id,

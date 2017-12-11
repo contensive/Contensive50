@@ -1227,8 +1227,8 @@ Namespace Contensive.Core.Models.Complex
                             ' ----- Load CDef
                             '
                             If clearMetaCache Then
-                                cpcore.cache.invalidateAllObjectsInContent(Models.Entity.contentModel.contentName.ToLower())
-                                cpcore.cache.invalidateAllObjectsInContent(Models.Entity.contentFieldModel.contentName.ToLower())
+                                cpcore.cache.invalidateAllObjectsInContent(contentModel.contentName.ToLower())
+                                cpcore.cache.invalidateAllObjectsInContent(contentFieldModel.contentName.ToLower())
                                 cpcore.doc.clearMetaData()
                             End If
                         End If

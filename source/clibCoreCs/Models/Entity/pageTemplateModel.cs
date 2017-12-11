@@ -505,7 +505,7 @@ namespace Contensive.Core.Models.Entity {
                 } else if (CDef.Id <= 0) {
                     throw new ApplicationException("content [" + primaryContentName + "] could Not be found.");
                 } else {
-                    instance.Active = genericController.EncodeBoolean(CDef.fields["Active"].defaultValue);
+                    instance.Active = genericController.encodeBoolean(CDef.fields["Active"].defaultValue);
                     instance.BodyHTML = genericController.encodeText(CDef.fields["BodyHTML"].defaultValue);
                     // instance.BodyTag = genericController.encodeText(.fields["BodyTag"].defaultValue)
                     instance.ccGuid = genericController.encodeText(CDef.fields["ccGuid"].defaultValue);
@@ -513,7 +513,7 @@ namespace Contensive.Core.Models.Entity {
                     instance.CreatedBy = genericController.EncodeInteger(CDef.fields["CreatedBy"].defaultValue);
                     instance.CreateKey = genericController.EncodeInteger(CDef.fields["CreateKey"].defaultValue);
                     instance.DateAdded = genericController.EncodeDate(CDef.fields["DateAdded"].defaultValue);
-                    instance.IsSecure = genericController.EncodeBoolean(CDef.fields["IsSecure"].defaultValue);
+                    instance.IsSecure = genericController.encodeBoolean(CDef.fields["IsSecure"].defaultValue);
                     // instance.JSEndBody = genericController.encodeText(.fields["JSEndBody"].defaultValue)
                     // instance.JSFilename = genericController.encodeText(.fields["JSFilename"].defaultValue)
                     // instance.JSHead = genericController.encodeText(.fields["JSHead"].defaultValue)

@@ -15,7 +15,7 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
 using Microsoft.Web.Administration;
-
+//
 namespace Contensive.Core.Controllers {
     /// <summary>
     /// Code dedicated to processing iis input and output. lazy Constructed. (see coreHtmlClass for html processing)
@@ -220,15 +220,15 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- basic request environment
                 requestDomain = iisContext.Request.ServerVariables["SERVER_NAME"];
-                requestPathPage = Convert.ToString(iisContext.Request.ServerVariables["SCRIPT_NAME"]);
-                requestReferrer = Convert.ToString(iisContext.Request.ServerVariables["HTTP_REFERER"]);
-                requestSecure = Convert.ToBoolean(iisContext.Request.ServerVariables["SERVER_PORT_SECURE"]);
-                requestRemoteIP = Convert.ToString(iisContext.Request.ServerVariables["REMOTE_ADDR"]);
-                requestBrowser = Convert.ToString(iisContext.Request.ServerVariables["HTTP_USER_AGENT"]);
-                requestLanguage = Convert.ToString(iisContext.Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"]);
-                requestHttpAccept = Convert.ToString(iisContext.Request.ServerVariables["HTTP_ACCEPT"]);
-                requestHttpAcceptCharset = Convert.ToString(iisContext.Request.ServerVariables["HTTP_ACCEPT_CHARSET"]);
-                requestHttpProfile = Convert.ToString(iisContext.Request.ServerVariables["HTTP_PROFILE"]);
+                requestPathPage = encodeText(iisContext.Request.ServerVariables["SCRIPT_NAME"]);
+                requestReferrer = encodeText(iisContext.Request.ServerVariables["HTTP_REFERER"]);
+                requestSecure = encodeBoolean(iisContext.Request.ServerVariables["SERVER_PORT_SECURE"]);
+                requestRemoteIP = encodeText(iisContext.Request.ServerVariables["REMOTE_ADDR"]);
+                requestBrowser = encodeText(iisContext.Request.ServerVariables["HTTP_USER_AGENT"]);
+                requestLanguage = encodeText(iisContext.Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"]);
+                requestHttpAccept = encodeText(iisContext.Request.ServerVariables["HTTP_ACCEPT"]);
+                requestHttpAcceptCharset = encodeText(iisContext.Request.ServerVariables["HTTP_ACCEPT_CHARSET"]);
+                requestHttpProfile = encodeText(iisContext.Request.ServerVariables["HTTP_PROFILE"]);
                 //
                 // -- http QueryString
                 if (iisContext.Request.QueryString.Count > 0) {
@@ -268,7 +268,7 @@ namespace Contensive.Core.Controllers {
                             prop.tempfilename = instanceId + "-" + filePtr.ToString() + ".bin";
                             file.SaveAs(cpCore.tempFiles.joinPath(cpCore.tempFiles.rootLocalPath, prop.tempfilename));
                             cpCore.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
-                            prop.FileSize = Convert.ToInt32(file.ContentLength);
+                            prop.FileSize = EncodeInteger(file.ContentLength);
                             cpCore.docProperties.setProperty(formName, prop);
                             filePtr += 1;
                         }
@@ -496,7 +496,7 @@ namespace Contensive.Core.Controllers {
                         if (!string.IsNullOrEmpty(forwardDomain)) {
                             int pos = requestUrlSource.IndexOf( requestDomain ,0,1,StringComparison.CurrentCultureIgnoreCase);
                             if (pos > 0) {
-                                cpCore.domainLegacyCache.domainDetails.forwardUrl = requestUrlSource.ToString().Substring(0, pos - 1) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length) - 1);
+                                cpCore.domainLegacyCache.domainDetails.forwardUrl = requestUrlSource.ToString().Left( pos - 1) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length) - 1);
                                 redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" + cpCore.domainLegacyCache.domainDetails.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
                                 return cpCore.doc.continueProcessing;
                             }
@@ -517,13 +517,13 @@ namespace Contensive.Core.Controllers {
                     requestVirtualFilePath = "/" + cpCore.serverConfig.appConfig.name;
                     //
                     requestContentWatchPrefix = requestProtocol + requestDomain + requestAppRootPath;
-                    requestContentWatchPrefix = requestContentWatchPrefix.Substring(0, requestContentWatchPrefix.Length - 1);
+                    requestContentWatchPrefix = requestContentWatchPrefix.Left( requestContentWatchPrefix.Length - 1);
                     //
                     requestPath = "/";
                     requestPage = cpCore.siteProperties.serverPageDefault;
                     int TextStartPointer = requestPathPage.ToString().LastIndexOf("/") + 1;
                     if (TextStartPointer != 0) {
-                        requestPath = requestPathPage.ToString().Substring(0, TextStartPointer);
+                        requestPath = requestPathPage.ToString().Left( TextStartPointer);
                         requestPage = requestPathPage.ToString().Substring(TextStartPointer);
                     }
                     requestSecureURLRoot = "https://" + requestDomain + requestAppRootPath;
@@ -598,18 +598,9 @@ namespace Contensive.Core.Controllers {
         // Write a cookie to the stream
         //========================================================================
         //
-        public void addResponseCookie(string CookieName, string CookieValue, DateTime DateExpires = default(DateTime), string domain = "", string Path = "", bool Secure = false) {
+        public void addResponseCookie(string cookieName, string iCookieValue, DateTime DateExpires = default(DateTime), string domain = "", string Path = "", bool Secure = false) {
             try {
-                string iCookieName = null;
-                string iCookieValue = null;
-                string MethodName = null;
                 string s = null;
-                string usedDomainList = "";
-                //
-                iCookieName = genericController.encodeText(CookieName);
-                iCookieValue = genericController.encodeText(CookieValue);
-                //
-                MethodName = "main_addResponseCookie";
                 //
                 if (cpCore.doc.continueProcessing) {
                     //If cpCore.doc.continueProcessing And cpCore.doc.outputBufferEnabled Then
@@ -712,16 +703,16 @@ namespace Contensive.Core.Controllers {
                             //
                             // Pass cookie to asp (compatibility)
                             //
-                            iisContext.Response.Cookies[iCookieName].Value = iCookieValue;
+                            iisContext.Response.Cookies[cookieName].Value = iCookieValue;
                             if (!isMinDate(DateExpires)) {
-                                iisContext.Response.Cookies[iCookieName].Expires = DateExpires;
+                                iisContext.Response.Cookies[cookieName].Expires = DateExpires;
                             }
                             //main_ASPResponse.Cookies[iCookieName].domain = domainSet
                             if (!isMissing(Path)) {
-                                iisContext.Response.Cookies[iCookieName].Path = genericController.encodeText(Path);
+                                iisContext.Response.Cookies[cookieName].Path = genericController.encodeText(Path);
                             }
                             if (!isMissing(Secure)) {
-                                iisContext.Response.Cookies[iCookieName].Secure = Secure;
+                                iisContext.Response.Cookies[cookieName].Secure = Secure;
                             }
                         } else {
                             //
@@ -731,7 +722,7 @@ namespace Contensive.Core.Controllers {
                             if (bufferCookies != "") {
                                 bufferCookies = bufferCookies + "\r\n";
                             }
-                            bufferCookies = bufferCookies + CookieName;
+                            bufferCookies = bufferCookies + cookieName;
                             bufferCookies = bufferCookies + "\r\n" + iCookieValue;
                             //
                             s = "";
@@ -753,7 +744,7 @@ namespace Contensive.Core.Controllers {
                             bufferCookies = bufferCookies + "\r\n" + s;
                             //
                             s = "false";
-                            if (genericController.EncodeBoolean(Secure)) {
+                            if (genericController.encodeBoolean(Secure)) {
                                 s = "true";
                             }
                             bufferCookies = bufferCookies + "\r\n" + s;
@@ -775,7 +766,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         public void setResponseContentType(object ContentType) {
-            bufferContentType = Convert.ToString(ContentType);
+            bufferContentType = encodeText(ContentType);
         }
         //
         //
@@ -824,13 +815,13 @@ namespace Contensive.Core.Controllers {
                     redirectCycles = cpCore.docProperties.getInteger(rnRedirectCycleFlag);
                     //
                     // convert link to a long link on this domain
-                    if (NonEncodedLink.Substring(0, 4).ToLower() == "http") {
+                    if (NonEncodedLink.Left( 4).ToLower() == "http") {
                         FullLink = NonEncodedLink;
                     } else {
-                        if (NonEncodedLink.Substring(0, 1).ToLower() == "/") {
+                        if (NonEncodedLink.Left( 1).ToLower() == "/") {
                             //
                             // -- root relative - url starts with path, let it go
-                        } else if (NonEncodedLink.Substring(0, 1).ToLower() == "?") {
+                        } else if (NonEncodedLink.Left( 1).ToLower() == "?") {
                             //
                             // -- starts with qs, fix issue where iis consideres this on the physical page, not the link-alias vitrual route
                             NonEncodedLink = requestPathPage + NonEncodedLink;
@@ -955,7 +946,7 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <param name="poolName"></param>
-        private static void verifyAppPool(coreClass cpCore, string poolName) {
+        public static void verifyAppPool(coreClass cpCore, string poolName) {
             try {
                 using (ServerManager serverManager = new ServerManager()) {
                     bool poolFound = false;
@@ -1148,7 +1139,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
                 //
-                EncodedLink = Convert.ToString(cpcore.db.csGetText(CSPointer, iFieldName)).Trim(' ');
+                EncodedLink = encodeText(cpcore.db.csGetText(CSPointer, iFieldName)).Trim(' ');
                 if (string.IsNullOrEmpty(EncodedLink)) {
                     BlockRedirect = true;
                 } else {
@@ -1224,16 +1215,16 @@ namespace Contensive.Core.Controllers {
                 string AcceptLanguageString = genericController.encodeText(cpCore.webServer.requestLanguage) + ",";
                 int CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",");
                 while (CommaPosition != 0) {
-                    string AcceptLanguage = (AcceptLanguageString.Substring(0, CommaPosition - 1)).Trim(' ');
+                    string AcceptLanguage = (AcceptLanguageString.Left( CommaPosition - 1)).Trim(' ');
                     AcceptLanguageString = AcceptLanguageString.Substring(CommaPosition);
                     if (AcceptLanguage.Length > 0) {
                         int DashPosition = genericController.vbInstr(1, AcceptLanguage, "-");
                         if (DashPosition > 1) {
-                            AcceptLanguage = AcceptLanguage.Substring(0, DashPosition - 1);
+                            AcceptLanguage = AcceptLanguage.Left( DashPosition - 1);
                         }
                         DashPosition = genericController.vbInstr(1, AcceptLanguage, ";");
                         if (DashPosition > 1) {
-                            return AcceptLanguage.Substring(0, DashPosition - 1);
+                            return AcceptLanguage.Left( DashPosition - 1);
                         }
                     }
                     CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",");

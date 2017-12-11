@@ -94,7 +94,6 @@ namespace Contensive.Core.Controllers {
                     }
                 } catch (Exception ex) {
                     cpCore.handleException(ex);
-                    throw;
                     loadOK = false;
                 }
                 if (loadOK) {

@@ -7,6 +7,8 @@ Imports Contensive.Core.constants
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 Imports System.Xml
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
 
 Namespace Contensive.Core
     '
@@ -181,10 +183,10 @@ Namespace Contensive.Core
             '
             ' Housekeep each application
             '
-            For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cp.core.serverConfig.apps
-                Dim appConfig As Models.Entity.serverConfigModel.appConfigModel = kvp.Value
+            For Each kvp As KeyValuePair(Of String, serverConfigModel.appConfigModel) In cp.core.serverConfig.apps
+                Dim appConfig As serverConfigModel.appConfigModel = kvp.Value
                 If True Then
-                    If (appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK) And (appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
+                    If (appConfig.appStatus = serverConfigModel.appStatusEnum.OK) And (appConfig.appMode = serverConfigModel.appModeEnum.normal) Then
                         cp = New CPClass(appConfig.name)
                         If (cp IsNot Nothing) Then
                             If True Then

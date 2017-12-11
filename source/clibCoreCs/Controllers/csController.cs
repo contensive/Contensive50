@@ -25,6 +25,7 @@ namespace Contensive.Core {
         //
         public csController(coreClass cpCore) {
             this.cpCore = cpCore;
+            OpeningMemberID = cpCore.doc.authContext.user.id;
         }
         //
         //====================================================================================================

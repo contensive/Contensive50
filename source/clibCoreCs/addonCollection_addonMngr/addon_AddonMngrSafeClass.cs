@@ -23,25 +23,25 @@ namespace Contensive.Core {
         //
         // To interigate Add-on Collections to check for re-use
         //
-        private struct DeleteType {
-            public string Name;
-            public int ParentID;
-        }
-        private struct NavigatorType {
-            public string Name;
-            public string menuNameSpace;
-        }
-        private struct Collection2Type {
-            public int AddOnCnt;
-            public string[] AddonGuid;
-            public string[] AddonName;
-            public int MenuCnt;
-            public string[] Menus;
-            public int NavigatorCnt;
-            public NavigatorType[] Navigators;
-        }
-        private int CollectionCnt;
-        private Collection2Type[] Collections;
+        //private struct DeleteType {
+        //    public string Name;
+        //    public int ParentID;
+        //}
+        //private struct NavigatorType {
+        //    public string Name;
+        //    public string menuNameSpace;
+        //}
+        //private struct Collection2Type {
+        //    public int AddOnCnt;
+        //    public string[] AddonGuid;
+        //    public string[] AddonName;
+        //    public int MenuCnt;
+        //    public string[] Menus;
+        //    public int NavigatorCnt;
+        //    public NavigatorType[] Navigators;
+        //}
+        //private int CollectionCnt;
+        //private Collection2Type[] Collections;
         //
         //==================================================================================================================================
         /// <summary>
@@ -149,7 +149,7 @@ namespace Contensive.Core {
                     } else {
                         //
                         PreTableCopy = "Use this form to upload an add-on collection. If the GUID of the add-on matches one already installed on this server, it will be updated. If the GUID is new, it will be added.";
-                        InstallFolder = "temp\\CollectionUpload" + Convert.ToString(genericController.GetRandomInteger());
+                        InstallFolder = "temp\\CollectionUpload" + encodeText(genericController.GetRandomInteger());
                         privateFilesInstallPath = InstallFolder + "\\";
                         if (Button == constants.ButtonOK) {
                             //
@@ -678,7 +678,7 @@ namespace Contensive.Core {
                                                                 // Version
                                                                 //
                                                                 CollectionLastChangeDate = CollectionNode.InnerText;
-                                                                if (DateHelper.IsDate(CollectionLastChangeDate)) {
+                                                                if (dateController.IsDate(CollectionLastChangeDate)) {
                                                                     DateValue = DateTime.Parse(CollectionLastChangeDate);
                                                                     CollectionLastChangeDate = DateValue.ToShortDateString();
                                                                 }
@@ -716,7 +716,7 @@ namespace Contensive.Core {
                                                             Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
                                                             Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
                                                         } else {
-                                                            IsOnServer = genericController.EncodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
+                                                            IsOnServer = genericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
                                                             CS = cpCore.db.csOpen("Add-on Collections", GuidFieldName + "=" + cpCore.db.encodeSQLText(CollectionGuid));
                                                             IsOnSite = cpCore.db.csOk(CS);
                                                             cpCore.db.csClose(ref CS);
@@ -1030,7 +1030,7 @@ namespace Contensive.Core {
                         ParentNameSpace = "";
                     } else {
                         ParentName = menuNameSpace.Substring(Pos);
-                        ParentNameSpace = menuNameSpace.Substring(0, Pos - 1);
+                        ParentNameSpace = menuNameSpace.Left( Pos - 1);
                     }
                     if (string.IsNullOrEmpty(ParentNameSpace)) {
                         CS = cpCore.db.csOpen(ContentName, "(name=" + cpCore.db.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0, false, false, "ID");

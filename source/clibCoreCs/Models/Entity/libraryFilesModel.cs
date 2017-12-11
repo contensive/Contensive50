@@ -77,7 +77,7 @@ namespace Contensive.Core.Models.Entity {
         }
         //
         //====================================================================================================
-        public void save(coreClass cpCore) {
+        public new void save(coreClass cpCore) {
             base.save(cpCore);
         }
         //

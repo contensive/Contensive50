@@ -75,7 +75,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return genericController.EncodeBoolean(GetProperty(PropertyName, DefaultValue));
+            return genericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
         }
         //
         //====================================================================================================
@@ -144,7 +144,7 @@ namespace Contensive.Core {
         //
         public override bool TrapErrors {
             get {
-                return genericController.EncodeBoolean(GetProperty("TrapErrors", "1"));
+                return genericController.encodeBoolean(GetProperty("TrapErrors", "1"));
             }
         }
         //
@@ -317,7 +317,7 @@ namespace Contensive.Core {
         //
         public override int LandingPageId(string DomainName = "") //Inherits BaseClasses.CPSiteBaseClass.LandingPageId
         {
-            return Convert.ToInt32(GetProperty("LandingPageID", ""));
+            return EncodeInteger(GetProperty("LandingPageID", ""));
         }
         //
         //====================================================================================================

@@ -554,7 +554,7 @@ ErrorTrap:
                                         Case "ccmembers"
                                             '
                                             If ActivityLogOrganizationID < 0 Then
-                                                Dim person As Models.Entity.personModel = Models.Entity.personModel.create(cpCore, editRecord.id)
+                                                Dim person As personModel = personModel.create(cpCore, editRecord.id)
                                                 If (person IsNot Nothing) Then
                                                     ActivityLogOrganizationID = person.OrganizationID
                                                 End If

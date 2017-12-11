@@ -245,7 +245,7 @@ namespace Contensive.Core.Models.Context {
                                     //cpCore.webServer.requestBrowser = .visit.Browser
                                     resultAuthContext.visit.TimeToLastHit = 0;
                                     if (resultAuthContext.visit.StartTime > DateTime.MinValue) {
-                                        resultAuthContext.visit.TimeToLastHit = Convert.ToInt32((cpCore.doc.profileStartTime - resultAuthContext.visit.StartTime).TotalSeconds);
+                                        resultAuthContext.visit.TimeToLastHit = EncodeInteger((cpCore.doc.profileStartTime - resultAuthContext.visit.StartTime).TotalSeconds);
                                     }
                                     resultAuthContext.visit.CookieSupport = true;
                                     if (resultAuthContext.visit.VisitorID > 0) {
@@ -278,7 +278,7 @@ namespace Contensive.Core.Models.Context {
                                 }
                                 resultAuthContext.visit.PageVisits = 0;
                                 resultAuthContext.visit.StartTime = cpCore.doc.profileStartTime;
-                                resultAuthContext.visit.StartDateValue = Convert.ToInt32(cpCore.doc.profileStartTime.ToOADate());
+                                resultAuthContext.visit.StartDateValue = EncodeInteger(cpCore.doc.profileStartTime.ToOADate());
                                 //
                                 // -- setup referrer
                                 if (!string.IsNullOrEmpty(cpCore.webServer.requestReferrer)) {
@@ -293,7 +293,7 @@ namespace Contensive.Core.Models.Context {
                                         resultAuthContext.visit.HTTP_REFERER = WorkingReferer;
                                     } else {
                                         resultAuthContext.visit.RefererPathPage = WorkingReferer.Substring(SlashPosition - 1);
-                                        resultAuthContext.visit.HTTP_REFERER = WorkingReferer.Substring(0, SlashPosition - 1);
+                                        resultAuthContext.visit.HTTP_REFERER = WorkingReferer.Left( SlashPosition - 1);
                                     }
                                 }
                                 //
@@ -441,31 +441,42 @@ namespace Contensive.Core.Models.Context {
                                     botList.AddRange(botFileContent.Split(Convert.ToChar("\n")));
                                     resultAuthContext.visit.Bot = false;
                                     resultAuthContext.visit_isBadBot = false;
-                                    foreach (string Arg in botList) {
-                                        if (Arg.Substring(0, 2) != "//") {
-                                            string[] Args = genericController.customSplit(Arg, "\t");
-                                            if (Args.GetUpperBound(0) > 0) {
-                                                if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
-                                                    if (genericController.vbInstr(1, cpCore.webServer.requestBrowser, Args[1], 1) != 0) {
-                                                        resultAuthContext.visit.Name = Args[0];
-                                                        //visitNameFound = True
-                                                        break;
-                                                    }
-                                                }
-                                                if (Args.GetUpperBound(0) > 1) {
-                                                    if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
-                                                        if (genericController.vbInstr(1, cpCore.webServer.requestRemoteIP, Args[2], 1) != 0) {
+                                    foreach (string srcLine in botList) {
+                                        string line = srcLine.Trim();
+                                        if (!string.IsNullOrWhiteSpace(line)) {
+                                            // -- remove comment
+                                            int posComment = line.IndexOf("//");
+                                            if (posComment >= 0) {
+                                                line = line.Left( posComment);
+                                            }
+                                            if (!string.IsNullOrWhiteSpace(line)) {
+                                                // -- parse line on tab characters
+                                                string[] Args = genericController.customSplit(line, "\t");
+                                                if (Args.GetUpperBound(0) > 0) {
+                                                    // -- process argument 1
+                                                    if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
+                                                        if (genericController.vbInstr(1, cpCore.webServer.requestBrowser, Args[1], 1) != 0) {
                                                             resultAuthContext.visit.Name = Args[0];
                                                             //visitNameFound = True
                                                             break;
                                                         }
                                                     }
-                                                    if (Args.GetUpperBound(0) <= 2) {
-                                                        resultAuthContext.visit.Bot = true;
-                                                        resultAuthContext.visit_isBadBot = false;
-                                                    } else {
-                                                        resultAuthContext.visit_isBadBot = (Args[3].ToLower() == "b");
-                                                        resultAuthContext.visit.Bot = resultAuthContext.visit_isBadBot || (Args[3].ToLower() == "r");
+                                                    if (Args.GetUpperBound(0) > 1) {
+                                                        // -- process argument 2
+                                                        if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
+                                                            if (genericController.vbInstr(1, cpCore.webServer.requestRemoteIP, Args[2], 1) != 0) {
+                                                                resultAuthContext.visit.Name = Args[0];
+                                                                //visitNameFound = True
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (Args.GetUpperBound(0) <= 2) {
+                                                            resultAuthContext.visit.Bot = true;
+                                                            resultAuthContext.visit_isBadBot = false;
+                                                        } else {
+                                                            resultAuthContext.visit_isBadBot = (Args[3].ToLower() == "b");
+                                                            resultAuthContext.visit.Bot = resultAuthContext.visit_isBadBot || (Args[3].ToLower() == "r");
+                                                        }
                                                     }
                                                 }
                                             }
@@ -512,7 +523,7 @@ namespace Contensive.Core.Models.Context {
                             if (resultAuthContext.user.id < 1) {
                                 //
                                 // -- No user created
-                                if (resultAuthContext.visit.Name.Substring(0, 5).ToLower() != "visit") {
+                                if (resultAuthContext.visit.Name.Left(5).ToLower() != "visit") {
                                     DefaultMemberName = resultAuthContext.visit.Name;
                                 } else {
                                     DefaultMemberName = genericController.encodeText(Models.Complex.cdefModel.GetContentFieldProperty(cpCore, "people", "name", "default"));
@@ -610,7 +621,7 @@ namespace Contensive.Core.Models.Context {
                         //
                         // -- Write Visit Cookie
                         visitCookie = cpCore.security.encodeToken(resultAuthContext.visit.id, cpCore.doc.profileStartTime);
-                        cpCore.webServer.addResponseCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit, visitCookie, default(DateTime) , "", requestAppRootPath, false);
+                        cpCore.webServer.addResponseCookie(main_appNameCookiePrefix + constants.main_cookieNameVisit, visitCookie, default(DateTime), "", requestAppRootPath, false);
                     }
                 }
             } catch (Exception ex) {
@@ -826,7 +837,7 @@ namespace Contensive.Core.Models.Context {
                         // ----- loginFieldValue not found, stop here
                         //
                         errorController.error_AddUserError(cpCore, badLoginUserError);
-                    } else if ((!genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (cpCore.db.csGetRowCount(CS) > 1)) {
+                    } else if ((!genericController.encodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (cpCore.db.csGetRowCount(CS) > 1)) {
                         //
                         // ----- AllowDuplicates is false, and there are more then one record
                         //
@@ -1153,7 +1164,7 @@ namespace Contensive.Core.Models.Context {
         //   the current member to be non-authenticated, but recognized
         //========================================================================
         //
-        public bool recognizeById(coreClass cpCore, int userId, ref  authContextModel authContext) {
+        public bool recognizeById(coreClass cpCore, int userId, ref authContextModel authContext) {
             bool returnResult = false;
             try {
                 if (authContext.visitor.ID == 0) {
@@ -1555,7 +1566,7 @@ namespace Contensive.Core.Models.Context {
             //
             MethodName = "result";
             //
-            main_EditLockExpiresMinutes = Convert.ToInt32((main_EditLockExpires - cpcore.doc.profileStartTime).TotalMinutes);
+            main_EditLockExpiresMinutes = EncodeInteger((main_EditLockExpires - cpcore.doc.profileStartTime).TotalMinutes);
             //
             // ----- site does not support workflow authoring
             //

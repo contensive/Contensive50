@@ -112,13 +112,13 @@ namespace Contensive.Core {
                         NameValue = Line.Split('=');
                         if (NameValue.GetUpperBound(0) > 0) {
                             if (NameValue[0].ToLower().Trim(' ') == "lastcheck") {
-                                if (DateHelper.IsDate(NameValue[1])) {
+                                if (dateController.IsDate(NameValue[1])) {
                                     LastCheckDateTime = DateTime.Parse(NameValue[1]);
                                 }
                                 //Exit For
                             }
                             if (NameValue[0].ToLower().Trim(' ') == "serverhousekeeptime") {
-                                if (DateHelper.IsDate(NameValue[1])) {
+                                if (dateController.IsDate(NameValue[1])) {
                                     ServerHousekeepTime = rightNow.Date.Add(genericController.EncodeDate(NameValue[1]).TimeOfDay);
                                 }
                             }
@@ -220,7 +220,7 @@ namespace Contensive.Core {
                                 DomainNamePrimary = cp.core.serverConfig.appConfig.domainList[0];
                                 Pos = genericController.vbInstr(1, DomainNamePrimary, ",");
                                 if (Pos > 1) {
-                                    DomainNamePrimary = DomainNamePrimary.Substring(0, Pos - 1);
+                                    DomainNamePrimary = DomainNamePrimary.Left( Pos - 1);
                                 }
                                 //dataBuildVersion = cp.Core.app.getSiteProperty("BuildVersion", "0")
                                 DataSourceType = cp.core.db.getDataSourceType("default");
@@ -466,7 +466,7 @@ namespace Contensive.Core {
                                     //INSTANT C# TODO TASK: The step increment was not confirmed to be positive - confirm that the stopping condition is appropriate:
                                     //ORIGINAL LINE: For PeriodDatePtr = PeriodStartDate.ToOADate To OldestDateAdded.ToOADate Step PeriodStep
                                     for (PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
-                                        SQL = "select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + Convert.ToInt64(PeriodDatePtr) + " group by DateNumber";
+                                        SQL = "select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + EncodeInteger(PeriodDatePtr) + " group by DateNumber";
                                         //SQL = "select count(id) as HoursPerDay from ccVisitSummary group by DateNumber having DateNumber=" & CLng(PeriodDatePtr)
                                         CS = cp.core.db.csOpenSql_rev("default", SQL);
                                         HoursPerDay = 0;
@@ -510,19 +510,19 @@ namespace Contensive.Core {
                                         AlarmTimeString = "12:00:00 AM";
                                         cp.core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                                     }
-                                    if (!DateHelper.IsDate(AlarmTimeString)) {
+                                    if (!dateController.IsDate(AlarmTimeString)) {
                                         AlarmTimeString = "12:00:00 AM";
                                         cp.core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                                     }
                                     AlarmTimeMinutesSinceMidnight = genericController.EncodeDate(AlarmTimeString).TimeOfDay.TotalMinutes;
                                     minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes;
                                     LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes;
-                                    if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight >= LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
+                                    if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
                                         //
                                         // Same Day - Midnight is before last and after current
                                         //
                                         HouseKeep_App_Daily(VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, cp.core.siteProperties.dataBuildVersion);
-                                    } else if ((LastCheckMinutesFromMidnight > minutesSinceMidnight) && ((LastCheckMinutesFromMidnight < minutesSinceMidnight) || (LastCheckMinutesFromMidnight > LastCheckMinutesFromMidnight))) {
+                                    } else if ((LastCheckMinutesFromMidnight > minutesSinceMidnight) && ((LastCheckMinutesFromMidnight < minutesSinceMidnight))) {
                                         //
                                         // New Day - Midnight is between Last and Set
                                         //
@@ -616,7 +616,7 @@ namespace Contensive.Core {
                 MidnightTwoDaysAgo = rightNow.AddDays(-2).Date;
                 thirtyDaysAgo = rightNow.AddDays(-30).Date;
                 appName = cp.core.serverConfig.appConfig.name;
-                ArchiveDeleteNoCookie = genericController.EncodeBoolean(cp.core.siteProperties.getText("ArchiveDeleteNoCookie", "1"));
+                ArchiveDeleteNoCookie = genericController.encodeBoolean(cp.core.siteProperties.getText("ArchiveDeleteNoCookie", "1"));
                 DataSourceType = cp.core.db.getDataSourceType("default");
                 TimeoutSave = cp.core.db.sqlCommandTimeout;
                 cp.core.db.sqlCommandTimeout = 1800;
@@ -803,7 +803,7 @@ namespace Contensive.Core {
                     AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" + appName + ")", "No records were removed because Housekeep ArchiveRecordAgeDays is 0.");
                 } else {
                     ArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date;
-                    DaystoRemove = Convert.ToInt32(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
+                    DaystoRemove = EncodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
                     if (DaystoRemove > 30) {
                         ArchiveDate = OldestVisitDate.AddDays(30);
                     }
@@ -1393,7 +1393,7 @@ namespace Contensive.Core {
                 //
                 // Content TextFile types with no controlling record
                 //
-                if (genericController.EncodeBoolean(cp.core.siteProperties.getText("ArchiveAllowFileClean", "false"))) {
+                if (genericController.encodeBoolean(cp.core.siteProperties.getText("ArchiveAllowFileClean", "false"))) {
                     //
                     int DSType = cp.core.db.getDataSourceType("");
                     AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" + appName + ")", "Content TextFile types with no controlling record.");
@@ -1920,8 +1920,8 @@ namespace Contensive.Core {
                     PeriodDatePtr = PeriodStart;
                     while (PeriodDatePtr < EndTimeDate) {
                         //
-                        DateNumber = Convert.ToInt32(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
-                        TimeNumber = Convert.ToInt32(PeriodDatePtr.TimeOfDay.TotalHours);
+                        DateNumber = EncodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
+                        TimeNumber = EncodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
                         DateStart = PeriodDatePtr.Date;
                         DateEnd = PeriodDatePtr.AddHours(HourDuration).Date;
                         //
@@ -2081,7 +2081,7 @@ namespace Contensive.Core {
                             }
                             //
                             if ((MultiPageHitCnt > MultiPageVisitCnt) && (HitCnt > 0)) {
-                                AveReadTime = Convert.ToInt32(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt));
+                                AveReadTime = EncodeInteger(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt));
                                 TotalTimeOnSite = MultiPageTimetoLastHitSum + (AveReadTime * VisitCnt);
                                 AveTimeOnSite = TotalTimeOnSite / VisitCnt;
                             }
@@ -2386,8 +2386,8 @@ namespace Contensive.Core {
                     PeriodStep = (double)HourDuration / 24.0F;
                     while (PeriodDatePtr < EndTimeDate) {
                         //
-                        DateNumber = Convert.ToInt32(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
-                        TimeNumber = Convert.ToInt32(PeriodDatePtr.TimeOfDay.TotalHours);
+                        DateNumber = EncodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
+                        TimeNumber = EncodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
                         DateStart = PeriodDatePtr.Date;
                         DateEnd = PeriodDatePtr.AddHours(HourDuration).Date;
                         //
@@ -2689,7 +2689,7 @@ namespace Contensive.Core {
                                         AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "CollectionPath has no '\\', skipping");
                                         //
                                     } else {
-                                        CollectionRootPath = CollectionRootPath.Substring(0, Pos - 1);
+                                        CollectionRootPath = CollectionRootPath.Left( Pos - 1);
                                         Path = cp.core.addon.getPrivateFilesAddonPath() + "\\" + CollectionRootPath + "\\";
                                         FolderList = new DirectoryInfo[0];
                                         if (cp.core.privateFiles.pathExists(Path)) {
@@ -2750,7 +2750,7 @@ namespace Contensive.Core {
                                                     // only keep last two non-matching folders and the active folder
                                                     //
                                                     if (IsActiveFolder) {
-                                                        IsActiveFolder = IsActiveFolder;
+                                                        //IsActiveFolder = IsActiveFolder;
                                                     } else {
                                                         if (FolderPtr < (FolderList.Length - 3)) {
                                                             AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "....Deleting path because non-active and not one of the newest 2 [" + Path + dir.Name + "]");

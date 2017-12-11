@@ -4,6 +4,7 @@ Option Strict On
 '
 Imports System.Text.RegularExpressions
 Imports System.Runtime.Caching
+Imports Contensive.Core.Models.Entity
 '
 Namespace Contensive.Core.Controllers
     '
@@ -646,13 +647,13 @@ Namespace Contensive.Core.Controllers
             '
             invalidateContent(getCacheKey_Entity(tableName, recordId))
             Select Case tableName.ToLower
-                Case Models.Entity.linkAliasModel.contentTableName.ToLower
+                Case linkAliasModel.contentTableName.ToLower
                     '
                     Models.Complex.routeDictionaryModel.invalidateCache(cpcore)
-                Case Models.Entity.linkForwardModel.contentTableName.ToLower
+                Case linkForwardModel.contentTableName.ToLower
                     '
                     Models.Complex.routeDictionaryModel.invalidateCache(cpcore)
-                Case Models.Entity.addonModel.contentTableName.ToLower
+                Case addonModel.contentTableName.ToLower
                     '
                     Models.Complex.routeDictionaryModel.invalidateCache(cpcore)
             End Select

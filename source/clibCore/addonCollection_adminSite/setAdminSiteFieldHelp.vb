@@ -26,14 +26,14 @@ Namespace Contensive.Addons.AdminSite
                 Dim cpCore As coreClass = processor.core
                 If (cp.User.IsAdmin) Then
                     Dim fieldId As Integer = cp.Doc.GetInteger("fieldId")
-                    Dim help As Models.Entity.ContentFieldHelpModel = Models.Entity.ContentFieldHelpModel.createByFieldId(cpCore, fieldId)
+                    Dim help As ContentFieldHelpModel = ContentFieldHelpModel.createByFieldId(cpCore, fieldId)
                     If (help Is Nothing) Then
                         help = ContentFieldHelpModel.add(cpCore)
                         help.FieldID = fieldId
                     End If
                     help.HelpCustom = cp.Doc.GetText("helpcustom")
                     help.save(cpCore)
-                    Dim contentField As Models.Entity.contentFieldModel = Models.Entity.contentFieldModel.create(cpCore, fieldId)
+                    Dim contentField As contentFieldModel = contentFieldModel.create(cpCore, fieldId)
                     If (contentField IsNot Nothing) Then
                         Models.Complex.cdefModel.invalidateCache(cpCore, contentField.ContentID)
                     End If

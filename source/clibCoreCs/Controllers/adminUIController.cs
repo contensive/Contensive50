@@ -253,7 +253,7 @@ namespace Contensive.Core {
                         //INSTANT C# NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
                         //						Select Case Trim(Buttons[Ptr])
                         //ORIGINAL LINE: Case Trim(ButtonDelete)
-                        if (Buttons[Ptr].Trim(' ') == Convert.ToString(ButtonDelete).Trim(' ')) {
+                        if (Buttons[Ptr].Trim(' ') == encodeText(ButtonDelete).Trim(' ')) {
                             if (AllowDelete) {
                                 s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" VALUE=\"" + Buttons[Ptr] + "\" onClick=\"if(!DeleteCheck())return false;\">";
                             } else {
@@ -261,11 +261,11 @@ namespace Contensive.Core {
                             }
                         }
                         //ORIGINAL LINE: Case Trim(ButtonClose)
-                        else if (Buttons[Ptr].Trim(' ') == Convert.ToString(ButtonClose).Trim(' ')) {
+                        else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonClose).Trim(' ')) {
                             s = s + cpCore.html.html_GetFormButton(Buttons[Ptr], "", "", "window.close();");
                         }
                         //ORIGINAL LINE: Case Trim(ButtonAdd)
-                        else if (Buttons[Ptr].Trim(' ') == Convert.ToString(ButtonAdd).Trim(' ')) {
+                        else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonAdd).Trim(' ')) {
                             if (AllowAdd) {
                                 s = s + "<input TYPE=SUBMIT NAME=\"" + ButtonName + "\" VALUE=\"" + Buttons[Ptr] + "\" onClick=\"return processSubmit(this);\">";
                             } else {
@@ -869,9 +869,9 @@ namespace Contensive.Core {
                 // ----- Post Table copy
                 //
                 if ((DataRowCount / (double)ReportPageSize) != Math.Floor((DataRowCount / (double)ReportPageSize))) {
-                    PageCount = Convert.ToInt32((DataRowCount / (double)ReportPageSize) + 0.5);
+                    PageCount = EncodeInteger((DataRowCount / (double)ReportPageSize) + 0.5);
                 } else {
-                    PageCount = Convert.ToInt32(DataRowCount / (double)ReportPageSize);
+                    PageCount = EncodeInteger(DataRowCount / (double)ReportPageSize);
                 }
                 if (PageCount > 1) {
                     result = result + "<br>Page " + ReportPageNumber + " (Row " + (RowBAse) + " of " + DataRowCount + ")";

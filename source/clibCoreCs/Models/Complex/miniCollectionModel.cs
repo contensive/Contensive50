@@ -14,7 +14,7 @@ using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 //
-namespace Contensive.Core.Models.Entity {
+namespace Contensive.Core.Models.Complex {
     //
     //
     //====================================================================================================
@@ -26,20 +26,40 @@ namespace Contensive.Core.Models.Entity {
         // Content Definitions (some data in CDef, some in the CDef extension)
         //
         public string name;
-        public bool isBaseCollection; // true only for the one collection created from the base file. This property does not transfer during addSrcToDst
-        public Dictionary<string, Models.Complex.cdefModel> CDef = new Dictionary<string, Models.Complex.cdefModel>();
-        //public int SQLIndexCnt;
-        public List<SQLIndexType> SQLIndexes;
-        public struct SQLIndexType {
+        //
+        // true only for the one collection created from the base file. This property does not transfer during addSrcToDst
+        public bool isBaseCollection; 
+        //
+        //
+        public Dictionary<string, Models.Complex.cdefModel> CDef = new Dictionary<string, Models.Complex.cdefModel>() { };
+        //
+        //
+        public Dictionary<string, collectionAddOnModel> AddOns = new Dictionary<string, collectionAddOnModel>() { };
+        public class collectionAddOnModel {
+            public string Name;
+            public string Link;
+            public string ObjectProgramID;
+            public string ArgumentList;
+            public string SortOrder;
+            public string Copy;
+            public bool dataChanged;
+        }
+        //
+        //
+        public List<collectionSQLIndexModel> SQLIndexes = new List<collectionSQLIndexModel> { };
+        public class collectionSQLIndexModel {
             public string DataSourceName;
             public string TableName;
             public string IndexName;
             public string FieldNameList;
             public bool dataChanged;
         }
-        public int MenuCnt;
-        public MenusType[] Menus;
-        public struct MenusType {
+        //
+        //
+        public Dictionary<string, collectionMenuModel> Menus = new Dictionary<string, collectionMenuModel> { };
+        //
+        //
+        public class collectionMenuModel {
             public string Name;
             public bool IsNavigator;
             public string menuNameSpace;
@@ -58,41 +78,46 @@ namespace Contensive.Core.Models.Entity {
             public string NavIconTitle;
             public string Key;
         }
-        public AddOnType[] AddOns;
-        public struct AddOnType {
-            public string Name;
-            public string Link;
-            public string ObjectProgramID;
-            public string ArgumentList;
-            public string SortOrder;
-            public string Copy;
-            public bool dataChanged;
-        }
-        public int AddOnCnt;
+        //
+        //
         public StyleType[] Styles;
+        //
+        //
         public struct StyleType {
             public string Name;
             public bool Overwrite;
             public string Copy;
             public bool dataChanged;
         }
+        //
+        //
         public int StyleCnt;
         public string StyleSheet;
-        public int ImportCnt;
-        public ImportCollectionType[] collectionImports;
+        //
+        //
+        public List<ImportCollectionType> collectionImports = new List<ImportCollectionType>() { };
+        //
+        //
         public struct ImportCollectionType {
             public string Name;
             public string Guid;
         }
+        //
+        //
         public int PageTemplateCnt;
+        //
+        //
         public PageTemplateType[] PageTemplates;
-        //   Page Template - started, but CDef2 and LoadDataToCDef are all that is done do far
+        //
+        // Page Template - started, but CDef2 and LoadDataToCDef are all that is done do far
         public struct PageTemplateType {
             public string Name;
             public string Copy;
             public string Guid;
             public string Style;
         }
+        //
+        //
         public object Clone() {
             return this.MemberwiseClone();
         }

@@ -1407,7 +1407,7 @@ ErrorTrap:
             Dim allowContentEdit As Boolean
             Dim allowContentAdd As Boolean
             Dim allowContentDelete As Boolean
-            Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
+            Dim datasource As dataSourceModel = dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
             '
             ' ----- Process Input
             '

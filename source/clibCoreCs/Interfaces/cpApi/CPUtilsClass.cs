@@ -149,7 +149,7 @@ namespace Contensive.Core {
                 if (Expression == null) {
                     tempEncodeNumber = 0;
                 } else if (genericController.vbIsNumeric(Expression)) {
-                    tempEncodeNumber = Convert.ToDouble(Expression);
+                    tempEncodeNumber = EncodeNumber(Expression);
                 } else if (Expression is bool) {
                     if ((bool)Expression) {
                         tempEncodeNumber = 1;
@@ -172,7 +172,7 @@ namespace Contensive.Core {
                 } else if ((System.DBNull)Expression == DBNull.Value) {
                     tempencodeText = "";
                 } else {
-                    tempencodeText = Convert.ToString(Expression);
+                    tempencodeText = encodeText(Expression);
                 }
             } catch( Exception ex ) {
                 tempencodeText = "";
@@ -192,7 +192,7 @@ namespace Contensive.Core {
                 } else if (Expression is bool) {
                     tempEncodeBoolean = (bool)Expression;
                 } else if (genericController.vbIsNumeric(Expression)) {
-                    tempEncodeBoolean = (Convert.ToString(Expression) != "0");
+                    tempEncodeBoolean = (encodeText(Expression) != "0");
                 } else if (Expression is string) {
                     switch (Expression.ToString().ToLower().Trim()) {
                         case "on":
@@ -215,7 +215,7 @@ namespace Contensive.Core {
             try {
                 if (Expression == null) {
                     result = DateTime.MinValue;
-                } else if (DateHelper.IsDate(Expression)) {
+                } else if (dateController.IsDate(Expression)) {
                     result = Convert.ToDateTime(Expression);
                 }
                 if (result < new DateTime(1900, 1, 1)) {

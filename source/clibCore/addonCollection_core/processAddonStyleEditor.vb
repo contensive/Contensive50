@@ -29,7 +29,7 @@ Namespace Contensive.Addons.Core
                     Dim addonId As Integer
                     addonId = cpCore.docProperties.getInteger("AddonID")
                     If (addonId > 0) Then
-                        Dim styleAddon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpCore, addonId)
+                        Dim styleAddon As addonModel = addonModel.create(cpCore, addonId)
                         If (styleAddon.StylesFilename.content <> cpCore.docProperties.getText("CustomStyles")) Then
                             styleAddon.StylesFilename.content = cpCore.docProperties.getText("CustomStyles")
                             styleAddon.save(cpCore)

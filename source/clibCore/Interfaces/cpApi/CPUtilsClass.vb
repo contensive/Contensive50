@@ -8,6 +8,7 @@ Imports System.Web.Security.FormsAuthentication
 Imports System.Guid
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
+Imports Contensive.Core.Models.Entity
 
 Namespace Contensive.Core
     '
@@ -236,13 +237,13 @@ Namespace Contensive.Core
             }
             If (IsNumeric(IdGuidOrName)) Then
                 executeConext.errorCaption = "id:" & IdGuidOrName
-                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext)
+                Return CP.core.addon.execute(addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext)
             ElseIf genericController.isGuid(IdGuidOrName) Then
                 executeConext.errorCaption = "guid:" & IdGuidOrName
-                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, IdGuidOrName), executeConext)
+                Return CP.core.addon.execute(addonModel.create(CP.core, IdGuidOrName), executeConext)
             Else
                 executeConext.errorCaption = IdGuidOrName
-                Return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext)
+                Return CP.core.addon.execute(addonModel.createByName(CP.core, IdGuidOrName), executeConext)
             End If
             'Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), 0)
         End Function
@@ -255,11 +256,11 @@ Namespace Contensive.Core
                     .wrapperID = WrapperId
             }
             If (IsNumeric(IdGuidOrName)) Then
-                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext)
+                Return CP.core.addon.execute(addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext)
             ElseIf genericController.isGuid(IdGuidOrName) Then
-                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, IdGuidOrName), executeConext)
+                Return CP.core.addon.execute(addonModel.create(CP.core, IdGuidOrName), executeConext)
             Else
-                Return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext)
+                Return CP.core.addon.execute(addonModel.createByName(CP.core, IdGuidOrName), executeConext)
             End If
             'Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), WrapperId)
         End Function
@@ -271,11 +272,11 @@ Namespace Contensive.Core
                     .addonType = context
             }
             If (IsNumeric(IdGuidOrName)) Then
-                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext)
+                Return CP.core.addon.execute(addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext)
             ElseIf genericController.isGuid(IdGuidOrName) Then
-                Return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, IdGuidOrName), executeConext)
+                Return CP.core.addon.execute(addonModel.create(CP.core, IdGuidOrName), executeConext)
             Else
-                Return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext)
+                Return CP.core.addon.execute(addonModel.createByName(CP.core, IdGuidOrName), executeConext)
             End If
             'Return CP.core.addon.execute_legacy4(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), context, Nothing)
         End Function

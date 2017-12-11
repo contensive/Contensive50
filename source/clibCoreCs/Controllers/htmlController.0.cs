@@ -60,7 +60,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // seems like these are the correct positions here.
                             //
-                            returnValue = layout.Substring(0, posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
+                            returnValue = layout.Left( posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
                         }
                     }
                 }
@@ -94,7 +94,7 @@ namespace Contensive.Core.Controllers {
                                 posStart = posStart + 1;
                                 posEnd = layout.LastIndexOf("<", posEnd - 2) + 1;
                                 if (posEnd != 0) {
-                                    returnValue = layout.Substring(0, posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
+                                    returnValue = layout.Left( posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
                                 }
                             }
                         }
@@ -189,7 +189,7 @@ namespace Contensive.Core.Controllers {
                         s = s.Substring(posStart - 1);
                         posEnd = getTagEndPos(ignore, s, 1);
                         if (posEnd > 0) {
-                            s = s.Substring(0, posEnd - 1);
+                            s = s.Left( posEnd - 1);
                             returnValue = s;
                         }
                     }
@@ -434,7 +434,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //   searchKey = the search pattern to start
                     //
-                    if (workingKey.Substring(0, 1) == ".") {
+                    if (workingKey.Left( 1) == ".") {
                         //
                         // search for a class
                         //
@@ -444,12 +444,12 @@ namespace Contensive.Core.Controllers {
                         Pos = genericController.vbInstr(1, searchClass, "#");
                         if (Pos != 0) {
                             searchId = searchClass.Substring(Pos - 1);
-                            searchClass = searchClass.Substring(0, Pos - 1);
+                            searchClass = searchClass.Left( Pos - 1);
                         }
                         //
                         //workingKey = Mid(workingKey, 2)
                         searchKey = "<";
-                    } else if (workingKey.Substring(0, 1) == "#") {
+                    } else if (workingKey.Left( 1) == "#") {
                         //
                         // search for an ID
                         //
@@ -459,7 +459,7 @@ namespace Contensive.Core.Controllers {
                         Pos = genericController.vbInstr(1, searchId, ".");
                         if (Pos != 0) {
                             searchClass = searchId.Substring(Pos - 1);
-                            searchId = searchId.Substring(0, Pos - 1);
+                            searchId = searchId.Left( Pos - 1);
                         }
                         //
                         //workingKey = Mid(workingKey, 2)
@@ -475,21 +475,21 @@ namespace Contensive.Core.Controllers {
                         Pos = genericController.vbInstr(1, searchTag, "#");
                         if (Pos != 0) {
                             searchId = searchTag.Substring(Pos);
-                            searchTag = searchTag.Substring(0, Pos - 1);
+                            searchTag = searchTag.Left( Pos - 1);
                             Pos = genericController.vbInstr(1, searchId, ".");
                             if (Pos != 0) {
                                 searchClass = searchId.Substring(Pos - 1);
-                                searchId = searchId.Substring(0, Pos - 1);
+                                searchId = searchId.Left( Pos - 1);
                             }
                         }
                         Pos = genericController.vbInstr(1, searchTag, ".");
                         if (Pos != 0) {
                             searchClass = searchTag.Substring(Pos);
-                            searchTag = searchTag.Substring(0, Pos - 1);
+                            searchTag = searchTag.Left( Pos - 1);
                             Pos = genericController.vbInstr(1, searchClass, "#");
                             if (Pos != 0) {
                                 searchId = searchClass.Substring(Pos - 1);
-                                searchClass = searchClass.Substring(0, Pos - 1);
+                                searchClass = searchClass.Left( Pos - 1);
                             }
                         }
                         //
@@ -1072,7 +1072,7 @@ namespace Contensive.Core.Controllers {
                                     }
                                     if (cpCore.siteProperties.selectFieldWidthLimit != 0) {
                                         if (Copy.Length > cpCore.siteProperties.selectFieldWidthLimit) {
-                                            Copy = Copy.Substring(0, cpCore.siteProperties.selectFieldWidthLimit) + "...+";
+                                            Copy = Copy.Left( cpCore.siteProperties.selectFieldWidthLimit) + "...+";
                                         }
                                     }
                                     FastString.Add(">" + encodeHTML(Copy) + "</option>");
@@ -1101,7 +1101,7 @@ namespace Contensive.Core.Controllers {
                                         SelectedFound = true;
                                         if (cpCore.siteProperties.selectFieldWidthLimit != 0) {
                                             if (Copy.Length > cpCore.siteProperties.selectFieldWidthLimit) {
-                                                Copy = Copy.Substring(0, cpCore.siteProperties.selectFieldWidthLimit) + "...+";
+                                                Copy = Copy.Left( cpCore.siteProperties.selectFieldWidthLimit) + "...+";
                                             }
                                         }
                                         FastString.Add(">" + encodeHTML(Copy) + "</option>");
@@ -1418,7 +1418,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                         if (cpCore.siteProperties.selectFieldWidthLimit != 0) {
                                             if (Copy.Length > cpCore.siteProperties.selectFieldWidthLimit) {
-                                                Copy = Copy.Substring(0, cpCore.siteProperties.selectFieldWidthLimit) + "...+";
+                                                Copy = Copy.Left( cpCore.siteProperties.selectFieldWidthLimit) + "...+";
                                             }
                                         }
                                         FastString.Add(">" + Copy + "</option>");
@@ -1503,7 +1503,7 @@ namespace Contensive.Core.Controllers {
                             //SelectedFound = True
                         }
                         if (Copy.Length > SelectFieldWidthLimit) {
-                            Copy = Copy.Substring(0, SelectFieldWidthLimit) + "...+";
+                            Copy = Copy.Left( SelectFieldWidthLimit) + "...+";
                         }
                         FastString.Add(">" + Copy + "</option>");
                     }
@@ -1545,7 +1545,7 @@ namespace Contensive.Core.Controllers {
                         result = result + "<a href=\"" + encodeHTML(Link) + "\" >";
                     }
                     IconFilename = cpCore.siteProperties.LoginIconFilename;
-                    if (genericController.vbLCase(IconFilename.Substring(0, 7)) != "/ccLib/") {
+                    if (genericController.vbLCase(IconFilename.Left( 7)) != "/ccLib/") {
                         IconFilename = genericController.getCdnFileLink(cpCore, IconFilename);
                     }
                     result = result + "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >";
@@ -1683,27 +1683,14 @@ namespace Contensive.Core.Controllers {
                     cpCore.doc.legacySiteStyles_Loaded = true;
                     //
                     // compatibility with old sites - if they do not main_Get the default style sheet, put it in here
-                    //
-                    if (false) {
-                        temphtml_GetLegacySiteStyles = ""
-                            + "\r<!-- compatibility with legacy framework --><style type=text/css>"
-                            + "\r .ccEditWrapper {border-top:1px solid #6a6;border-left:1px solid #6a6;border-bottom:1px solid #cec;border-right:1px solid #cec;}"
-                            + "\r .ccEditWrapperInner {border-top:1px solid #cec;border-left:1px solid #cec;border-bottom:1px solid #6a6;border-right:1px solid #6a6;}"
-                            + "\r .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #888;padding:4px;background-color:#40C040;color:black;}"
-                            + "\r .ccEditWrapperContent{padding:4px;}"
-                            + "\r .ccHintWrapper {border:1px dashed #888;margin-bottom:10px}"
-                            + "\r .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}"
-                            + "</style>";
-                    } else {
-                        temphtml_GetLegacySiteStyles = ""
-                            + "\r<!-- compatibility with legacy framework --><style type=text/css>"
-                            + "\r .ccEditWrapper {border:1px dashed #808080;}"
-                            + "\r .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}"
-                            + "\r .ccEditWrapperContent{padding:4px;}"
-                            + "\r .ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}"
-                            + "\r .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}"
-                            + "</style>";
-                    }
+                    temphtml_GetLegacySiteStyles = ""
+                        + "\r<!-- compatibility with legacy framework --><style type=text/css>"
+                        + "\r .ccEditWrapper {border:1px dashed #808080;}"
+                        + "\r .ccEditWrapperCaption {text-align:left;border-bottom:1px solid #808080;padding:4px;background-color:#40C040;color:black;}"
+                        + "\r .ccEditWrapperContent{padding:4px;}"
+                        + "\r .ccHintWrapper {border:1px dashed #808080;margin-bottom:10px}"
+                        + "\r .ccHintWrapperContent{padding:10px;background-color:#80E080;color:black;}"
+                        + "</style>";
                 }
                 //
                 return temphtml_GetLegacySiteStyles;
@@ -2081,7 +2068,7 @@ namespace Contensive.Core.Controllers {
                     addScriptCode_head("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup");
                 }
 
-                if (DateHelper.IsDate(iDefaultValue)) {
+                if (dateController.IsDate(iDefaultValue)) {
                     DateValue = genericController.EncodeDate(iDefaultValue);
                     if (DateValue.Month < 10) {
                         DateString = DateString + "0";
@@ -2174,7 +2161,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string html_GetFormInputCheckBox(string TagName, string DefaultValue = "", string htmlId = "") {
-            return html_GetFormInputCheckBox2(genericController.encodeText(TagName), genericController.EncodeBoolean(DefaultValue), genericController.encodeText(htmlId));
+            return html_GetFormInputCheckBox2(genericController.encodeText(TagName), genericController.encodeBoolean(DefaultValue), genericController.encodeText(htmlId));
         }
         //
         //========================================================================
@@ -2267,7 +2254,7 @@ namespace Contensive.Core.Controllers {
                     CanSeeHiddenFields = cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore);
                     while (cpCore.db.csOk(CS)) {
                         GroupName = cpCore.db.csGetText(CS, "GroupName");
-                        if ((GroupName.Substring(0, 1) != "_") || CanSeeHiddenFields) {
+                        if ((GroupName.Left( 1) != "_") || CanSeeHiddenFields) {
                             RecordID = cpCore.db.csGetInteger(CS, "ID");
                             GroupCaption = cpCore.db.csGetText(CS, "GroupCaption");
                             if (string.IsNullOrEmpty(GroupCaption)) {
@@ -2440,9 +2427,9 @@ namespace Contensive.Core.Controllers {
                                     break;
                                 case FieldTypeIdBoolean:
                                     if (FieldReadOnly) {
-                                        returnResult = genericController.encodeText(genericController.EncodeBoolean(FieldValueVariant));
+                                        returnResult = genericController.encodeText(genericController.encodeBoolean(FieldValueVariant));
                                     } else {
-                                        returnResult = html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValueVariant));
+                                        returnResult = html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -2763,7 +2750,7 @@ namespace Contensive.Core.Controllers {
                             //
                             //
                             //
-                            result = html_GetFormInputCheckBox2(InputName, genericController.EncodeBoolean(HtmlValue) == true, HtmlId, false, HtmlClass);
+                            result = html_GetFormInputCheckBox2(InputName, genericController.encodeBoolean(HtmlValue) == true, HtmlId, false, HtmlClass);
                             if (!string.IsNullOrEmpty(HtmlStyle)) {
                                 result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
                             }
@@ -3155,7 +3142,7 @@ namespace Contensive.Core.Controllers {
                         CSLists = cpCore.db.csOpen("Content Watch Lists","", "Name,ID", false, 0, false, false, "Name,ID", 20, 1);
                         if (cpCore.db.csOk(CSLists)) {
                             while (cpCore.db.csOk(CSLists)) {
-                                FieldName = Convert.ToString(cpCore.db.csGetText(CSLists, "name")).Trim(' ');
+                                FieldName = encodeText(cpCore.db.csGetText(CSLists, "name")).Trim(' ');
                                 if (!string.IsNullOrEmpty(FieldName)) {
                                     FieldCaption = "Watch List [" + FieldName + "]";
                                     IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
@@ -3219,9 +3206,9 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // Block activex addons from email
                                     //
-                                    ObjectProgramID2 = ObjectProgramID2;
+                                    //ObjectProgramID2 = ObjectProgramID2;
                                 } else {
-                                    AddonName = Convert.ToString(cpCore.db.csGet(CSAddons, "name")).Trim(' ');
+                                    AddonName = encodeText(cpCore.db.csGet(CSAddons, "name")).Trim(' ');
                                     if (!string.IsNullOrEmpty(AddonName) & (AddonName != LastAddonName)) {
                                         //
                                         // Icon (fieldtyperesourcelink)
@@ -3244,7 +3231,7 @@ namespace Contensive.Core.Controllers {
                                         if (UseAjaxDefaultAddonOptions) {
                                             DefaultAddonOption_String = "";
                                         } else {
-                                            ArgumentList = Convert.ToString(cpCore.db.csGet(CSAddons, "ArgumentList")).Trim(' ');
+                                            ArgumentList = encodeText(cpCore.db.csGet(CSAddons, "ArgumentList")).Trim(' ');
                                             DefaultAddonOption_String = addonController.main_GetDefaultAddonOption_String(cpCore, ArgumentList, AddonGuid, IsInline);
                                             DefaultAddonOption_String = main_encodeHTML(DefaultAddonOption_String);
                                         }
@@ -3531,7 +3518,7 @@ namespace Contensive.Core.Controllers {
                     PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
                     if (PosEnd > 0) {
                         AllowGroups = workingContent.Substring(PosStart + 21, PosEnd - PosStart - 23);
-                        workingContent = workingContent.Substring(0, PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text\" querystring=\"allowgroups=" + AllowGroups + "\">" + workingContent.Substring(PosEnd + 2);
+                        workingContent = workingContent.Left( PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text\" querystring=\"allowgroups=" + AllowGroups + "\">" + workingContent.Substring(PosEnd + 2);
                     }
                 }
                 //
@@ -3539,7 +3526,7 @@ namespace Contensive.Core.Controllers {
                 if (PosStart > 0) {
                     PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
                     if (PosEnd > 0) {
-                        workingContent = workingContent.Substring(0, PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text end\" >" + workingContent.Substring(PosEnd + 2);
+                        workingContent = workingContent.Left( PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text end\" >" + workingContent.Substring(PosEnd + 2);
                     }
                 }
                 //
@@ -3659,7 +3646,7 @@ namespace Contensive.Core.Controllers {
                                                             Link = Link.Substring(Pos + 2);
                                                             Pos = genericController.vbInstr(1, Link, "/");
                                                             if (Pos > 0) {
-                                                                Link = Link.Substring(0, Pos - 1);
+                                                                Link = Link.Left( Pos - 1);
                                                             }
                                                         }
                                                         if ((string.IsNullOrEmpty(Link)) || (("," + cpCore.serverConfig.appConfig.domainList[0] + ",").IndexOf("," + Link + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0)) {
@@ -4081,7 +4068,7 @@ namespace Contensive.Core.Controllers {
                                                                     SrcOptionName = SrcOptions[Ptr];
                                                                     int LoopPtr2 = 0;
 
-                                                                    while ((SrcOptionName.Length > 1) && (SrcOptionName.Substring(0, 1) == "\t") && (LoopPtr2 < 100)) {
+                                                                    while ((SrcOptionName.Length > 1) && (SrcOptionName.Left( 1) == "\t") && (LoopPtr2 < 100)) {
                                                                         SrcOptionName = SrcOptionName.Substring(1);
                                                                         LoopPtr2 = LoopPtr2 + 1;
                                                                     }
@@ -4090,7 +4077,7 @@ namespace Contensive.Core.Controllers {
                                                                     Pos = genericController.vbInstr(1, SrcOptionName, "=");
                                                                     if (Pos > 0) {
                                                                         SrcOptionValueSelector = SrcOptionName.Substring(Pos);
-                                                                        SrcOptionName = SrcOptionName.Substring(0, Pos - 1);
+                                                                        SrcOptionName = SrcOptionName.Left( Pos - 1);
                                                                         SrcOptionSelector = "";
                                                                         Pos = genericController.vbInstr(1, SrcOptionValueSelector, "[");
                                                                         if (Pos != 0) {
@@ -4538,7 +4525,7 @@ namespace Contensive.Core.Controllers {
                                                 ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src");
                                                 VirtualFilePathBad = cpCore.serverConfig.appConfig.name + "/files/";
                                                 serverFilePath = "/" + VirtualFilePathBad;
-                                                if (ImageSrcOriginal.ToLower().Substring(0, VirtualFilePathBad.Length) == genericController.vbLCase(VirtualFilePathBad)) {
+                                                if (ImageSrcOriginal.ToLower().Left( VirtualFilePathBad.Length) == genericController.vbLCase(VirtualFilePathBad)) {
                                                     //
                                                     // if the image is from the virtual file path, but the editor did not include the root path, add it
                                                     //
@@ -4564,7 +4551,7 @@ namespace Contensive.Core.Controllers {
                                                     if (ImageIDArrayCount > 5) {
                                                         for (Ptr = 5; Ptr < ImageIDArrayCount; Ptr++) {
                                                             ACGuid = ImageIDArray[Ptr];
-                                                            if ((ACGuid.Substring(0, 1) == "{") && (ACGuid.Substring(ACGuid.Length - 1) == "}")) {
+                                                            if ((ACGuid.Left( 1) == "{") && (ACGuid.Substring(ACGuid.Length - 1) == "}")) {
                                                                 //
                                                                 // this element is the guid, go with it
                                                                 //
@@ -4641,7 +4628,7 @@ namespace Contensive.Core.Controllers {
                                                                                 ImageStylePair = IMageStyleArray[ImageStyleArrayPointer].Trim(' ');
                                                                                 PositionColon = genericController.vbInstr(1, ImageStylePair, ":");
                                                                                 if (PositionColon > 1) {
-                                                                                    ImageStylePairName = (ImageStylePair.Substring(0, PositionColon - 1)).Trim(' ');
+                                                                                    ImageStylePairName = (ImageStylePair.Left( PositionColon - 1)).Trim(' ');
                                                                                     ImageStylePairValue = (ImageStylePair.Substring(PositionColon)).Trim(' ');
                                                                                     switch (genericController.vbUCase(ImageStylePairName)) {
                                                                                         case "WIDTH":
@@ -4712,7 +4699,7 @@ namespace Contensive.Core.Controllers {
                                                                         for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
                                                                             Pos = genericController.vbInstr(1, QSSplit[QSPtr], "[");
                                                                             if (Pos > 0) {
-                                                                                QSSplit[QSPtr] = QSSplit[QSPtr].Substring(0, Pos - 1);
+                                                                                QSSplit[QSPtr] = QSSplit[QSPtr].Left( Pos - 1);
                                                                             }
                                                                             QSSplit[QSPtr] = encodeHTML(QSSplit[QSPtr]);
                                                                         }
@@ -4815,7 +4802,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (Pos > 0) {
                                                                             string ImageFilenameAltSize = "";
                                                                             ImageFilenameExt = ImageFilename.Substring(Pos);
-                                                                            ImageFilenameNoExt = ImageFilename.Substring(0, Pos - 1);
+                                                                            ImageFilenameNoExt = ImageFilename.Left( Pos - 1);
                                                                             Pos = ImageFilenameNoExt.LastIndexOf("-") + 1;
                                                                             if (Pos > 0) {
                                                                                 //
@@ -4831,7 +4818,7 @@ namespace Contensive.Core.Controllers {
                                                                                     ImageFilenameAltSize = "";
                                                                                 } else {
                                                                                     if ((genericController.vbIsNumeric(SizeTest[0]) & genericController.vbIsNumeric(SizeTest[1]))) {
-                                                                                        ImageFilenameNoExt = ImageFilenameNoExt.Substring(0, Pos - 1);
+                                                                                        ImageFilenameNoExt = ImageFilenameNoExt.Left( Pos - 1);
                                                                                         //RecordVirtualFilenameNoExt = Mid(RecordVirtualFilename, 1, Pos - 1)
                                                                                     } else {
                                                                                         ImageFilenameAltSize = "";
@@ -4889,7 +4876,7 @@ namespace Contensive.Core.Controllers {
                                                                                     Pos = RecordFilenameNoExt.LastIndexOf(".") + 1;
                                                                                     if (Pos > 0) {
                                                                                         RecordFilenameExt = RecordFilenameNoExt.Substring(Pos);
-                                                                                        RecordFilenameNoExt = RecordFilenameNoExt.Substring(0, Pos - 1);
+                                                                                        RecordFilenameNoExt = RecordFilenameNoExt.Left( Pos - 1);
                                                                                     }
                                                                                     //
                                                                                     // if recordwidth or height are missing, get them from the file
@@ -4936,7 +4923,7 @@ namespace Contensive.Core.Controllers {
                                                                                             if ((ImageHeight == 0) && (ImageWidth == 0) && (!string.IsNullOrEmpty(ImageFilenameAltSize))) {
                                                                                                 Pos = genericController.vbInstr(1, ImageFilenameAltSize, "x");
                                                                                                 if (Pos != 0) {
-                                                                                                    ImageWidth = genericController.EncodeInteger(ImageFilenameAltSize.Substring(0, Pos - 1));
+                                                                                                    ImageWidth = genericController.EncodeInteger(ImageFilenameAltSize.Left( Pos - 1));
                                                                                                     ImageHeight = genericController.EncodeInteger(ImageFilenameAltSize.Substring(Pos));
                                                                                                 }
                                                                                             }
@@ -4960,7 +4947,7 @@ namespace Contensive.Core.Controllers {
                                                                                             // this is the raw image
                                                                                             // image matches record, and the sizes are the same
                                                                                             //
-                                                                                            RecordVirtualFilename = RecordVirtualFilename;
+                                                                                            //RecordVirtualFilename = RecordVirtualFilename;
                                                                                         } else if ((RecordVirtualFilename == ImageVirtualFilePath + ImageFilenameNoExt + "." + ImageFilenameExt) && (RecordAltSizeList.IndexOf(ImageAltSize, System.StringComparison.OrdinalIgnoreCase) + 1 != 0)) {
                                                                                             //
                                                                                             // OK
@@ -4985,7 +4972,7 @@ namespace Contensive.Core.Controllers {
                                                                                                 //
                                                                                                 // set back to Raw image untouched, use the record image filename
                                                                                                 //
-                                                                                                ElementText = ElementText;
+                                                                                                //ElementText = ElementText;
                                                                                                 //ElementText = genericController.vbReplace(ElementText, ImageVirtualFilename, RecordVirtualFilename)
                                                                                             } else {
                                                                                                 //
@@ -5279,7 +5266,7 @@ namespace Contensive.Core.Controllers {
                             FnArgList = (Choice.Substring((Pos + FnLen) - 1)).Trim(' ');
                             ContentName = "";
                             ContentCriteria = "";
-                            if ((FnArgList.Substring(0, 1) == "(") && (FnArgList.Substring(FnArgList.Length - 1) == ")")) {
+                            if ((FnArgList.Left( 1) == "(") && (FnArgList.Substring(FnArgList.Length - 1) == ")")) {
                                 //
                                 // set ContentName and ContentCriteria from argument list
                                 //
@@ -5288,17 +5275,17 @@ namespace Contensive.Core.Controllers {
                                 FnArgCnt = FnArgs.GetUpperBound(0) + 1;
                                 if (FnArgCnt > 0) {
                                     ContentName = FnArgs[0].Trim(' ');
-                                    if ((ContentName.Substring(0, 1) == "\"") && (ContentName.Substring(ContentName.Length - 1) == "\"")) {
+                                    if ((ContentName.Left( 1) == "\"") && (ContentName.Substring(ContentName.Length - 1) == "\"")) {
                                         ContentName = (ContentName.Substring(1, ContentName.Length - 2)).Trim(' ');
-                                    } else if ((ContentName.Substring(0, 1) == "'") && (ContentName.Substring(ContentName.Length - 1) == "'")) {
+                                    } else if ((ContentName.Left( 1) == "'") && (ContentName.Substring(ContentName.Length - 1) == "'")) {
                                         ContentName = (ContentName.Substring(1, ContentName.Length - 2)).Trim(' ');
                                     }
                                 }
                                 if (FnArgCnt > 1) {
                                     ContentCriteria = FnArgs[1].Trim(' ');
-                                    if ((ContentCriteria.Substring(0, 1) == "\"") && (ContentCriteria.Substring(ContentCriteria.Length - 1) == "\"")) {
+                                    if ((ContentCriteria.Left( 1) == "\"") && (ContentCriteria.Substring(ContentCriteria.Length - 1) == "\"")) {
                                         ContentCriteria = (ContentCriteria.Substring(1, ContentCriteria.Length - 2)).Trim(' ');
-                                    } else if ((ContentCriteria.Substring(0, 1) == "'") && (ContentCriteria.Substring(ContentCriteria.Length - 1) == "'")) {
+                                    } else if ((ContentCriteria.Left( 1) == "'") && (ContentCriteria.Substring(ContentCriteria.Length - 1) == "'")) {
                                         ContentCriteria = (ContentCriteria.Substring(1, ContentCriteria.Length - 2)).Trim(' ');
                                     }
                                 }
@@ -5334,7 +5321,7 @@ namespace Contensive.Core.Controllers {
                                     if (string.IsNullOrEmpty(RecordName)) {
                                         RecordName = "record " + RecordID;
                                     } else if (RecordName.Length > 50) {
-                                        RecordName = RecordName.Substring(0, 50) + "...";
+                                        RecordName = RecordName.Left( 50) + "...";
                                     }
                                     RecordName = genericController.encodeNvaArgument(RecordName);
                                     list = list + "|" + RecordName;
@@ -5610,7 +5597,7 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
                         AddonOptionConstructor = AddonOptionConstructor + "\r\n";
                     }
-                    if (genericController.EncodeBoolean(addon.IsInline)) {
+                    if (genericController.encodeBoolean(addon.IsInline)) {
                         AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
                     } else {
                         AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Block;
@@ -5748,7 +5735,7 @@ namespace Contensive.Core.Controllers {
                                         if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
                                             AddonOptionConstructor = AddonOptionConstructor + "\r\n";
                                         }
-                                        if (genericController.EncodeBoolean(embeddedAddon.IsInline)) {
+                                        if (genericController.encodeBoolean(embeddedAddon.IsInline)) {
                                             AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
                                         } else {
                                             AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Block;
@@ -5812,7 +5799,7 @@ namespace Contensive.Core.Controllers {
                                     PosIDEnd = genericController.vbInstr(PosIDStart, Copy, "\"");
                                     if (PosIDEnd != 0) {
                                         ParseOK = true;
-                                        Copy = Copy.Substring(0, PosIDStart - 1) + encodeHTML(addonOption_String) + Copy.Substring(PosIDEnd - 1);
+                                        Copy = Copy.Left( PosIDStart - 1) + encodeHTML(addonOption_String) + Copy.Substring(PosIDEnd - 1);
                                         cpCore.db.csSet(CS, FieldName, Copy);
                                         needToClearCache = true;
                                     }
@@ -6114,7 +6101,7 @@ namespace Contensive.Core.Controllers {
                                 DivName = TagName + ".All";
                                 while (cpCore.db.csOk(CS)) {
                                     OptionName = cpCore.db.csGetText(CS, "OptionName");
-                                    if ((OptionName.Substring(0, 1) != "_") || CanSeeHiddenFields) {
+                                    if ((OptionName.Left( 1) != "_") || CanSeeHiddenFields) {
                                         //
                                         // Current checkbox is visible
                                         //
@@ -6236,7 +6223,7 @@ namespace Contensive.Core.Controllers {
                 //
                 iContentName = genericController.encodeText(ContentName);
                 iRecordID = genericController.EncodeInteger(RecordID);
-                iAllowCut = genericController.EncodeBoolean(AllowCut);
+                iAllowCut = genericController.encodeBoolean(AllowCut);
                 ContentCaption = genericController.encodeHTML(iContentName);
                 if (genericController.vbLCase(ContentCaption) == "aggregate functions") {
                     ContentCaption = "Add-on";
@@ -6445,7 +6432,7 @@ namespace Contensive.Core.Controllers {
                     iContentName = genericController.encodeText(ContentName);
                     iPresetNameValueList = genericController.encodeText(PresetNameValueList);
                     iPresetNameValueList = genericController.vbReplace(iPresetNameValueList, "&", ",");
-                    iAllowPaste = genericController.EncodeBoolean(AllowPaste);
+                    iAllowPaste = genericController.encodeBoolean(AllowPaste);
 
                     if (string.IsNullOrEmpty(iContentName)) {
                         throw (new ApplicationException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
@@ -7283,10 +7270,10 @@ namespace Contensive.Core.Controllers {
                         }
                         DebugPanel = DebugPanel + getDebugPanelRow("Render Time &gt;= ", ((cpCore.doc.appStopWatch.ElapsedMilliseconds) / 1000).ToString("0.000") + " sec");
                         if (true) {
-                            VisitHrs = Convert.ToInt32(cpCore.doc.authContext.visit.TimeToLastHit / 3600);
-                            VisitMin = Convert.ToInt32(cpCore.doc.authContext.visit.TimeToLastHit / 60) - (60 * VisitHrs);
+                            VisitHrs = EncodeInteger(cpCore.doc.authContext.visit.TimeToLastHit / 3600);
+                            VisitMin = EncodeInteger(cpCore.doc.authContext.visit.TimeToLastHit / 60) - (60 * VisitHrs);
                             VisitSec = cpCore.doc.authContext.visit.TimeToLastHit % 60;
-                            DebugPanel = DebugPanel + getDebugPanelRow("Visit Length", Convert.ToString(cpCore.doc.authContext.visit.TimeToLastHit) + " sec, (" + VisitHrs + " hrs " + VisitMin + " mins " + VisitSec + " secs)");
+                            DebugPanel = DebugPanel + getDebugPanelRow("Visit Length", encodeText(cpCore.doc.authContext.visit.TimeToLastHit) + " sec, (" + VisitHrs + " hrs " + VisitMin + " mins " + VisitSec + " secs)");
                             //DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(main_VisitTimeToLastHit) & " sec, (" & Int(main_VisitTimeToLastHit / 60) & " min " & (main_VisitTimeToLastHit Mod 60) & " sec)")
                         }
                         DebugPanel = DebugPanel + getDebugPanelRow("Addon Profile", "<hr><ul class=\"ccPanel\"><li>tbd</li>\r</ul>");
@@ -7332,9 +7319,9 @@ namespace Contensive.Core.Controllers {
             string result = genericController.getSimpleNameValue(OptionName, addonOptionString, "", "&");
             int Pos = genericController.vbInstr(1, result, "[");
             if (Pos > 0) {
-                result = result.Substring(0, Pos - 1);
+                result = result.Left( Pos - 1);
             }
-            return Convert.ToString(genericController.decodeNvaArgument(result)).Trim(' ');
+            return encodeText(genericController.decodeNvaArgument(result)).Trim(' ');
         }
         //
         //====================================================================================================
@@ -7951,7 +7938,7 @@ namespace Contensive.Core.Controllers {
                                                 //hint = hint & ",330"
                                                 ListName = addonController.getAddonOption("LISTNAME", addonOptionString);
                                                 SortField = addonController.getAddonOption("SORTFIELD", addonOptionString);
-                                                SortReverse = genericController.EncodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString));
+                                                SortReverse = genericController.encodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString));
                                                 result = result + cpCore.doc.main_GetWatchList(cpCore, ListName, SortField, SortReverse);
                                                 break;
                                             default:
@@ -8045,7 +8032,7 @@ namespace Contensive.Core.Controllers {
                                     }
                                 }
                             }
-                            result = result.Substring(0, LineStart - 1) + Copy + result.Substring(LineEnd + 3);
+                            result = result.Left( LineStart - 1) + Copy + result.Substring(LineEnd + 3);
                         }
                     }
                     //
@@ -8065,13 +8052,13 @@ namespace Contensive.Core.Controllers {
                                 LineEnd = genericController.vbInstr(LineStart, result, BlockTextEndMarker, 1);
                                 if (LineEnd <= 0) {
                                     DoAnotherPass = false;
-                                    result = result.Substring(0, LineStart - 1);
+                                    result = result.Left( LineStart - 1);
                                 } else {
                                     LineEnd = genericController.vbInstr(LineEnd, result, " -->");
                                     if (LineEnd <= 0) {
                                         DoAnotherPass = false;
                                     } else {
-                                        result = result.Substring(0, LineStart - 1) + result.Substring(LineEnd + 3);
+                                        result = result.Left( LineStart - 1) + result.Substring(LineEnd + 3);
                                         //returnValue = Mid(returnValue, 1, LineStart - 1) & Copy & Mid(returnValue, LineEnd + 4)
                                     }
                                 }
@@ -8153,7 +8140,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 //
-                result = result;
+                //result = result;
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
@@ -8307,14 +8294,14 @@ namespace Contensive.Core.Controllers {
                                                 Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
                                                 RecordFilename = "";
                                                 if (Pos > 0) {
-                                                    RecordVirtualPath = RecordVirtualFilename.Substring(0, Pos);
+                                                    RecordVirtualPath = RecordVirtualFilename.Left( Pos);
                                                     RecordFilename = RecordVirtualFilename.Substring(Pos);
                                                 }
                                                 Pos = RecordFilename.LastIndexOf(".") + 1;
                                                 RecordFilenameNoExt = "";
                                                 if (Pos > 0) {
                                                     RecordFilenameExt = genericController.vbLCase(RecordFilename.Substring(Pos));
-                                                    RecordFilenameNoExt = genericController.vbLCase(RecordFilename.Substring(0, Pos - 1));
+                                                    RecordFilenameNoExt = genericController.vbLCase(RecordFilename.Left( Pos - 1));
                                                 }
                                                 FilePrefixSegment = LinkSplit[LinkPtr - 1];
                                                 if (FilePrefixSegment.Length > 1) {
@@ -8413,12 +8400,12 @@ namespace Contensive.Core.Controllers {
 
                                                                 //'hint = hint & ",120"
                                                                 SegmentAfterImage = FilenameSegment.Substring(EndPos - 1);
-                                                                ImageFilename = genericController.DecodeResponseVariable(FilenameSegment.Substring(0, EndPos - 1));
+                                                                ImageFilename = genericController.DecodeResponseVariable(FilenameSegment.Left( EndPos - 1));
                                                                 ImageFilenameNoExt = ImageFilename;
                                                                 ImageFilenameExt = "";
                                                                 Pos = ImageFilename.LastIndexOf(".") + 1;
                                                                 if (Pos > 0) {
-                                                                    ImageFilenameNoExt = genericController.vbLCase(ImageFilename.Substring(0, Pos - 1));
+                                                                    ImageFilenameNoExt = genericController.vbLCase(ImageFilename.Left( Pos - 1));
                                                                     ImageFilenameExt = genericController.vbLCase(ImageFilename.Substring(Pos));
                                                                 }
                                                                 //
@@ -8439,7 +8426,7 @@ namespace Contensive.Core.Controllers {
                                                                     // the recordfilename is the first part of the imagefilename - Get ImageAltSize
                                                                     //
                                                                     ImageAltSize = ImageFilenameNoExt.Substring(RecordFilenameNoExt.Length);
-                                                                    if (ImageAltSize.Substring(0, 1) != "-") {
+                                                                    if (ImageAltSize.Left( 1) != "-") {
                                                                         ImageAltSize = "";
                                                                     } else {
                                                                         ImageAltSize = ImageAltSize.Substring(1);
@@ -8591,7 +8578,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // should use the ccNav object, no the ccCommon module for this code
                 //
-                cpCore.menuTab.AddEntry(genericController.encodeText(Caption), genericController.encodeText(Link), genericController.EncodeBoolean(IsHit), genericController.encodeText(StylePrefix));
+                cpCore.menuTab.AddEntry(genericController.encodeText(Caption), genericController.encodeText(Link), genericController.encodeBoolean(IsHit), genericController.encodeText(StylePrefix));
 
                 //Call ccAddTabEntry(genericController.encodeText(Caption), genericController.encodeText(Link), genericController.EncodeBoolean(IsHit), genericController.encodeText(StylePrefix), genericController.encodeText(LiveBody))
                 //
@@ -9013,7 +9000,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string main_GetRecordEditLink(string ContentName, int RecordID, bool AllowCut = false) {
-            return main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), "", cpCore.doc.authContext.isEditing(ContentName));
+            return main_GetRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), "", cpCore.doc.authContext.isEditing(ContentName));
         }
     }
 }

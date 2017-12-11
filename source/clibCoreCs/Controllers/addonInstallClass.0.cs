@@ -12,6 +12,7 @@ using static Contensive.Core.constants;
 using System.IO;
 using System.Data;
 using System.Threading;
+using Contensive.Core.Models.Complex;
 //
 //
 namespace Contensive.Core {
@@ -184,7 +185,7 @@ namespace Contensive.Core {
                             okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstCollectionCdef.ContentTableName, srcCollectionCdef.ContentTableName);
                             //
                             if (DebugDstFound) {
-                                DebugDstFound = DebugDstFound;
+                                //DebugDstFound = DebugDstFound;
                             }
                             if (!okToUpdateDstFromSrc) {
                                 n = "DefaultSortMethod";
@@ -206,7 +207,7 @@ namespace Contensive.Core {
                             }
                             okToUpdateDstFromSrc = okToUpdateDstFromSrc || (dstCollectionCdef.IgnoreContentControl != srcCollectionCdef.IgnoreContentControl);
                             if (okToUpdateDstFromSrc) {
-                                okToUpdateDstFromSrc = okToUpdateDstFromSrc;
+                                //okToUpdateDstFromSrc = okToUpdateDstFromSrc;
                             }
                             //
                             if (!okToUpdateDstFromSrc) {
@@ -263,7 +264,7 @@ namespace Contensive.Core {
                             }
                             okToUpdateDstFromSrc = okToUpdateDstFromSrc || (dstCollectionCdef.IsBaseContent != srcCollectionCdef.IsBaseContent);
                             if (okToUpdateDstFromSrc) {
-                                okToUpdateDstFromSrc = okToUpdateDstFromSrc;
+                                //okToUpdateDstFromSrc = okToUpdateDstFromSrc;
                             }
                             if (okToUpdateDstFromSrc) {
                                 if (dstCollectionCdef.IsBaseContent & !srcCollectionCdef.IsBaseContent) {
@@ -521,7 +522,7 @@ namespace Contensive.Core {
                                     }
                                     okToUpdateDstFromSrc = okToUpdateDstFromSrc || (srcCollectionCdefField.UniqueName != dstCollectionCdefField.UniqueName);
                                     if (okToUpdateDstFromSrc) {
-                                        okToUpdateDstFromSrc = okToUpdateDstFromSrc;
+                                        //okToUpdateDstFromSrc = okToUpdateDstFromSrc;
                                     }
                                     //
                                     if (!okToUpdateDstFromSrc) {
@@ -642,15 +643,15 @@ namespace Contensive.Core {
                 // Check SQL Indexes
                 // -------------------------------------------------------------------------------------------------
                 //
-                foreach (miniCollectionModel.SQLIndexType srcSqlIndex in srcCollection.SQLIndexes) {
+                foreach (miniCollectionModel.collectionSQLIndexModel srcSqlIndex in srcCollection.SQLIndexes) {
                     srcName = (srcSqlIndex.DataSourceName + "-" + srcSqlIndex.TableName + "-" + srcSqlIndex.IndexName).ToLower();
                     okToUpdateDstFromSrc = false;
                     //
                     // Search for this name in the Dst
                     bool indexFound = false;
                     bool indexChanged = false;
-                    miniCollectionModel.SQLIndexType indexToUpdate;
-                    foreach (miniCollectionModel.SQLIndexType dstSqlIndex in dstCollection.SQLIndexes) {
+                    miniCollectionModel.collectionSQLIndexModel indexToUpdate = new miniCollectionModel.collectionSQLIndexModel() { };
+                    foreach (miniCollectionModel.collectionSQLIndexModel dstSqlIndex in dstCollection.SQLIndexes) {
                         dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLower();
                         if (TextMatch(cpCore, dstName, srcName)) {
                             //
@@ -665,9 +666,10 @@ namespace Contensive.Core {
                         //
                         // add src to dst
                         dstCollection.SQLIndexes.Add(srcSqlIndex);
-                    } else if (indexChanged) {
+                    } else if (indexChanged && (indexToUpdate != null )) {
                         //
                         // update dst to src
+
                         indexToUpdate.dataChanged = true;
                         indexToUpdate.DataSourceName = srcSqlIndex.DataSourceName;
                         indexToUpdate.FieldNameList = srcSqlIndex.FieldNameList;
@@ -680,130 +682,76 @@ namespace Contensive.Core {
                 // Check menus
                 //-------------------------------------------------------------------------------------------------
                 //
-                int DstMenuPtr = 0;
-                string SrcNameSpace = null;
-                string SrcParentName = null;
                 DataBuildVersion = cpCore.siteProperties.dataBuildVersion;
-                for (var SrcMenuPtr = 0; SrcMenuPtr < srcCollection.MenuCnt; SrcMenuPtr++) {
-                    DstMenuPtr = 0;
-                    srcName = genericController.vbLCase(srcCollection.Menus[SrcMenuPtr].Name);
-                    SrcParentName = genericController.vbLCase(srcCollection.Menus[SrcMenuPtr].ParentName);
-                    SrcNameSpace = genericController.vbLCase(srcCollection.Menus[SrcMenuPtr].menuNameSpace);
-                    SrcIsNavigator = srcCollection.Menus[SrcMenuPtr].IsNavigator;
-                    if (SrcIsNavigator) {
-                        if (srcName == "manage add-ons") {
-                            //srcName = srcName;
-                        }
-                    }
+                foreach (var srcKvp in srcCollection.Menus) {
+                    string srcKey = srcKvp.Key.ToLower() ;
+                    miniCollectionModel.collectionMenuModel srcMenu = srcKvp.Value;
+                    srcName = srcMenu.Name.ToLower();
+                    string srcGuid = srcMenu.Guid;
+                    string SrcParentName = genericController.vbLCase(srcMenu.ParentName);
+                    string SrcNameSpace = genericController.vbLCase(srcMenu.menuNameSpace);
+                    SrcIsNavigator = srcMenu.IsNavigator;
                     okToUpdateDstFromSrc = false;
                     //
-                    SrcKey = genericController.vbLCase(srcCollection.Menus[SrcMenuPtr].Key);
-                    //
                     // Search for match using guid
-                    //
+                    miniCollectionModel.collectionMenuModel dstMenuMatch = new miniCollectionModel.collectionMenuModel() { } ;
                     IsMatch = false;
-                    for (DstMenuPtr = 0; DstMenuPtr < dstCollection.MenuCnt; DstMenuPtr++) {
-                        dstName = genericController.vbLCase(dstCollection.Menus[DstMenuPtr].Name);
-                        if (dstName == srcName) {
-                            //dstName = dstName;
-                            DstIsNavigator = dstCollection.Menus[DstMenuPtr].IsNavigator;
-                            DstKey = genericController.vbLCase(dstCollection.Menus[DstMenuPtr].Key);
-                            if (genericController.vbLCase(dstName) == "settings") {
-                                //dstName = dstName;
-                            }
+                    foreach (var dstKvp in dstCollection.Menus) {
+                        string dstKey = dstKvp.Key.ToLower();
+                        miniCollectionModel.collectionMenuModel dstMenu = dstKvp.Value;
+                        string dstGuid = dstMenu.Guid;
+                        if (dstGuid == srcGuid) {
+                            DstIsNavigator = dstMenu.IsNavigator;
+                            DstKey = genericController.vbLCase(dstMenu.Key);
                             IsMatch = (DstKey == SrcKey) && (SrcIsNavigator == DstIsNavigator);
                             if (IsMatch) {
+                                dstMenuMatch = dstMenu;
                                 break;
                             }
+
                         }
                     }
                     if (!IsMatch) {
                         //
                         // no match found on guid, try name and ( either namespace or parentname )
-                        //
-                        for (DstMenuPtr = 0; DstMenuPtr < dstCollection.MenuCnt; DstMenuPtr++) {
-                            dstName = genericController.vbLCase(dstCollection.Menus[DstMenuPtr].Name);
-                            if (genericController.vbLCase(dstName) == "settings") {
-                                //dstName = dstName;
-                            }
+                        foreach (var dstKvp in dstCollection.Menus) {
+                            string dstKey = dstKvp.Key.ToLower();
+                            miniCollectionModel.collectionMenuModel dstMenu = dstKvp.Value;
+                            dstName = genericController.vbLCase(dstMenu.Name);
                             if ((srcName == dstName) && (SrcIsNavigator == DstIsNavigator)) {
                                 if (SrcIsNavigator) {
                                     //
                                     // Navigator - check namespace if Dst.guid is blank (builder to new version of menu)
-                                    //
-                                    IsMatch = (SrcNameSpace == genericController.vbLCase(dstCollection.Menus[DstMenuPtr].menuNameSpace)) && (dstCollection.Menus[DstMenuPtr].Guid == "");
+                                    IsMatch = (SrcNameSpace == genericController.vbLCase(dstMenu.menuNameSpace)) && (dstMenu.Guid == "");
                                 } else {
                                     //
                                     // AdminMenu - check parentname
-                                    //
-                                    IsMatch = (SrcParentName == genericController.vbLCase(dstCollection.Menus[DstMenuPtr].ParentName));
+                                    IsMatch = (SrcParentName == genericController.vbLCase(dstMenu.ParentName));
                                 }
                                 if (IsMatch) {
+                                    dstMenuMatch = dstMenu;
                                     break;
                                 }
                             }
                         }
                     }
-                    if (!IsMatch) {
-                        //If DstPtr = CollectionDst.MenuCnt Then
-                        //
-                        // menu was not found, add it
-                        //
-                        Array.Resize(ref dstCollection.Menus, dstCollection.MenuCnt);
-                        //Array.Resize( ref asdf,asdf) // redim preserve  dstCollection.Menus(dstCollection.MenuCnt);
-                        dstCollection.MenuCnt = dstCollection.MenuCnt + 1;
-                        okToUpdateDstFromSrc = true;
-                    } else {
-                        //If IsMatch Then
-                        //
-                        // found a match between Src and Dst
-                        //
-                        if (SrcIsUserCDef || SrcIsNavigator) {
-                            //
-                            // Special case -- Navigators update from all upgrade sources so Base migrates changes
-                            // test for cdef attribute changes
-                            //
-                            var tempVar4 = dstCollection.Menus[DstMenuPtr];
-                            //With dstCollection.Menus(dstCollection.MenuCnt)
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || (tempVar4.Active != srcCollection.Menus[SrcMenuPtr].Active);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || (tempVar4.AdminOnly != srcCollection.Menus[SrcMenuPtr].AdminOnly);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, tempVar4.ContentName, srcCollection.Menus[SrcMenuPtr].ContentName);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || (tempVar4.DeveloperOnly != srcCollection.Menus[SrcMenuPtr].DeveloperOnly);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, tempVar4.LinkPage, srcCollection.Menus[SrcMenuPtr].LinkPage);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, tempVar4.Name, srcCollection.Menus[SrcMenuPtr].Name);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || (tempVar4.NewWindow != srcCollection.Menus[SrcMenuPtr].NewWindow);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, tempVar4.SortOrder, srcCollection.Menus[SrcMenuPtr].SortOrder);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, tempVar4.AddonName, srcCollection.Menus[SrcMenuPtr].AddonName);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, tempVar4.NavIconType, srcCollection.Menus[SrcMenuPtr].NavIconType);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, tempVar4.NavIconTitle, srcCollection.Menus[SrcMenuPtr].NavIconTitle);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, tempVar4.menuNameSpace, srcCollection.Menus[SrcMenuPtr].menuNameSpace);
-                            okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, tempVar4.Guid, srcCollection.Menus[SrcMenuPtr].Guid);
-                            //okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(cpcore,.ParentName, CollectionSrc.Menus[SrcPtr].ParentName)
-                        }
-                        //Exit For
+                    if(IsMatch) {
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || (dstMenuMatch.Active != srcMenu.Active);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || (dstMenuMatch.AdminOnly != srcMenu.AdminOnly);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstMenuMatch.ContentName, srcMenu.ContentName);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || (dstMenuMatch.DeveloperOnly != srcMenu.DeveloperOnly);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstMenuMatch.LinkPage, srcMenu.LinkPage);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstMenuMatch.Name, srcMenu.Name);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || (dstMenuMatch.NewWindow != srcMenu.NewWindow);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstMenuMatch.SortOrder, srcMenu.SortOrder);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstMenuMatch.AddonName, srcMenu.AddonName);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstMenuMatch.NavIconType, srcMenu.NavIconType);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstMenuMatch.NavIconTitle, srcMenu.NavIconTitle);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstMenuMatch.menuNameSpace, srcMenu.menuNameSpace);
+                        okToUpdateDstFromSrc = okToUpdateDstFromSrc || !TextMatch(cpCore, dstMenuMatch.Guid, srcMenu.Guid);
+                        dstCollection.Menus.Remove(DstKey);
                     }
-                    if (okToUpdateDstFromSrc) {
-                        var tempVar5 = dstCollection.Menus[DstMenuPtr];
-                        //
-                        // It okToUpdateDstFromSrc, update the Dst with the Src
-                        //
-                        tempVar5.dataChanged = true;
-                        tempVar5.Guid = srcCollection.Menus[SrcMenuPtr].Guid;
-                        tempVar5.Name = srcCollection.Menus[SrcMenuPtr].Name;
-                        tempVar5.IsNavigator = srcCollection.Menus[SrcMenuPtr].IsNavigator;
-                        tempVar5.Active = srcCollection.Menus[SrcMenuPtr].Active;
-                        tempVar5.AdminOnly = srcCollection.Menus[SrcMenuPtr].AdminOnly;
-                        tempVar5.ContentName = srcCollection.Menus[SrcMenuPtr].ContentName;
-                        tempVar5.DeveloperOnly = srcCollection.Menus[SrcMenuPtr].DeveloperOnly;
-                        tempVar5.LinkPage = srcCollection.Menus[SrcMenuPtr].LinkPage;
-                        tempVar5.NewWindow = srcCollection.Menus[SrcMenuPtr].NewWindow;
-                        tempVar5.ParentName = srcCollection.Menus[SrcMenuPtr].ParentName;
-                        tempVar5.menuNameSpace = srcCollection.Menus[SrcMenuPtr].menuNameSpace;
-                        tempVar5.SortOrder = srcCollection.Menus[SrcMenuPtr].SortOrder;
-                        tempVar5.AddonName = srcCollection.Menus[SrcMenuPtr].AddonName;
-                        tempVar5.NavIconType = srcCollection.Menus[SrcMenuPtr].NavIconType;
-                        tempVar5.NavIconTitle = srcCollection.Menus[SrcMenuPtr].NavIconTitle;
-                    }
+                    dstCollection.Menus.Add(srcKey, srcMenu);
                 }
                 //'
                 //'-------------------------------------------------------------------------------------------------
@@ -919,13 +867,8 @@ namespace Contensive.Core {
                 // Add Collections
                 //-------------------------------------------------------------------------------------------------
                 //
-                int dstPtr = 0;
-                for (var SrcPtr = 0; SrcPtr < srcCollection.ImportCnt; SrcPtr++) {
-                    dstPtr = dstCollection.ImportCnt;
-                    //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                    Array.Resize(ref dstCollection.collectionImports, dstPtr); // redim preserve  [dstPtr];
-                    dstCollection.collectionImports[dstPtr] = srcCollection.collectionImports[SrcPtr];
-                    dstCollection.ImportCnt = dstPtr + 1;
+                foreach( var import in srcCollection.collectionImports) {
+                    dstCollection.collectionImports.Add(import);
                 }
                 //
                 //-------------------------------------------------------------------------------------------------
@@ -986,7 +929,7 @@ namespace Contensive.Core {
                     //
                     // if this is not an empty database, get the application collection, else return empty
                     //
-                    ExportFilename = "cdef_export_" + Convert.ToString(genericController.GetRandomInteger()) + ".xml";
+                    ExportFilename = "cdef_export_" + encodeText(genericController.GetRandomInteger()) + ".xml";
                     ExportPathPage = "tmp\\" + ExportFilename;
                     exportApplicationCDefXml(cpCore, ExportPathPage, true);
                     CollectionData = cpCore.privateFiles.readFile(ExportPathPage);
@@ -1050,7 +993,7 @@ namespace Contensive.Core {
         //========================================================================
         //
         private static bool GetXMLAttributeBoolean(coreClass cpCore, bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
-            return genericController.EncodeBoolean(GetXMLAttribute(cpCore, Found, Node, Name, Convert.ToString(DefaultIfNotFound)));
+            return genericController.encodeBoolean(GetXMLAttribute(cpCore, Found, Node, Name, encodeText(DefaultIfNotFound)));
         }
         //
         //========================================================================
@@ -1066,12 +1009,16 @@ namespace Contensive.Core {
         //==================================================================================================================
         //
         private static bool TextMatch(coreClass cpCore, string Source1, string Source2) {
-            return (Source1.ToLower() == genericController.vbLCase(Source2));
+            if ( (Source1 == null) || (Source2 == null )) {
+                return false;
+            }else {
+                return (Source1.ToLower() == Source2.ToLower());
+            }
         }
         //
         //
         //
-        private static string GetMenuNameSpace(coreClass cpCore, miniCollectionModel Collection, int MenuPtr, bool IsNavigator, string UsedIDList) {
+        private static string GetMenuNameSpace(coreClass cpCore, Dictionary<string,miniCollectionModel.collectionMenuModel> menus, miniCollectionModel.collectionMenuModel menu, string UsedIDList) {
             string returnAttr = "";
             try {
                 string ParentName = null;
@@ -1080,13 +1027,14 @@ namespace Contensive.Core {
                 string LCaseParentName = null;
 
                 //
-                ParentName = Collection.Menus[MenuPtr].ParentName;
+                ParentName = menu.ParentName;
                 if (!string.IsNullOrEmpty(ParentName)) {
                     LCaseParentName = genericController.vbLCase(ParentName);
-                    for (Ptr = 0; Ptr < Collection.MenuCnt; Ptr++) {
+                    foreach ( var kvp in menus) {
+                        miniCollectionModel.collectionMenuModel testMenu = kvp.Value;
                         if (genericController.vbInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
-                            if (LCaseParentName == genericController.vbLCase(Collection.Menus[Ptr].Name) && (IsNavigator == Collection.Menus[Ptr].IsNavigator)) {
-                                Prefix = GetMenuNameSpace(cpCore, Collection, Ptr, IsNavigator, UsedIDList + "," + MenuPtr);
+                            if (LCaseParentName == genericController.vbLCase(testMenu.Name) && (menu.IsNavigator == testMenu.IsNavigator)) {
+                                Prefix = GetMenuNameSpace(cpCore, menus, testMenu, UsedIDList + "," + menu.Guid);
                                 if (string.IsNullOrEmpty(Prefix)) {
                                     returnAttr = ParentName;
                                 } else {
@@ -1095,6 +1043,7 @@ namespace Contensive.Core {
                                 break;
                             }
                         }
+
                     }
                 }
             } catch (Exception ex) {
@@ -1641,7 +1590,7 @@ namespace Contensive.Core {
                 //
                 if (CollectionGuid.Length < 38) {
                     if (CollectionGuid.Length == 32) {
-                        CollectionGuid = CollectionGuid.Substring(0, 8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
+                        CollectionGuid = CollectionGuid.Left( 8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
                     }
                     if (CollectionGuid.Length == 36) {
                         CollectionGuid = "{" + CollectionGuid + "}";
@@ -1660,11 +1609,11 @@ namespace Contensive.Core {
                     //
                     UpgradeOK = DownloadCollectionFiles(cpCore, workingPath, CollectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage);
                     if (!UpgradeOK) {
-                        UpgradeOK = UpgradeOK;
+                        //UpgradeOK = UpgradeOK;
                     } else {
                         UpgradeOK = BuildLocalCollectionReposFromFolder(cpCore, workingPath, CollectionLastChangeDate, ref collectionGuidList, ref return_ErrorMessage, false);
                         if (!UpgradeOK) {
-                            UpgradeOK = UpgradeOK;
+                            //UpgradeOK = UpgradeOK;
                         }
                     }
                     //
@@ -1676,7 +1625,7 @@ namespace Contensive.Core {
                 if (UpgradeOK) {
                     UpgradeOK = installCollectionFromLocalRepo(cpCore, CollectionGuid, cpCore.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, ref nonCriticalErrorList);
                     if (!UpgradeOK) {
-                        UpgradeOK = UpgradeOK;
+                        //UpgradeOK = UpgradeOK;
                     }
                 }
             } catch (Exception ex) {
@@ -1881,7 +1830,7 @@ namespace Contensive.Core {
                                                                         }
                                                                     }
                                                                     if (!string.IsNullOrEmpty(LocalGuid)) {
-                                                                        if (!DateHelper.IsDate(LocalLastChangeDateStr)) {
+                                                                        if (!dateController.IsDate(LocalLastChangeDateStr)) {
                                                                             LocalLastChangeDate = DateTime.MinValue;
                                                                         } else {
                                                                             LocalLastChangeDate = genericController.EncodeDate(LocalLastChangeDateStr);
@@ -1910,7 +1859,7 @@ namespace Contensive.Core {
                                                                                             break;
                                                                                         case "system":
                                                                                             //
-                                                                                            LibSystem = genericController.EncodeBoolean(CollectionNode.InnerText);
+                                                                                            LibSystem = genericController.encodeBoolean(CollectionNode.InnerText);
                                                                                             break;
                                                                                         case "guid":
                                                                                             //
@@ -1922,7 +1871,7 @@ namespace Contensive.Core {
                                                                                         case "lastchangedate":
                                                                                             //
                                                                                             LibLastChangeDateStr = CollectionNode.InnerText;
-                                                                                            LibLastChangeDateStr = LibLastChangeDateStr;
+                                                                                            //LibLastChangeDateStr = LibLastChangeDateStr;
                                                                                             break;
                                                                                         case "contensiveversion":
                                                                                             //
@@ -1932,7 +1881,7 @@ namespace Contensive.Core {
                                                                                 }
                                                                                 if (!string.IsNullOrEmpty(LibGUID)) {
                                                                                     if (genericController.vbInstr(1, LibGUID, "58c9", 1) != 0) {
-                                                                                        LibGUID = LibGUID;
+                                                                                        //LibGUID = LibGUID;
                                                                                     }
                                                                                     if ((!string.IsNullOrEmpty(LibGUID)) & (LibGUID == LocalGuid) & ((string.IsNullOrEmpty(LibContensiveVersion)) || (string.CompareOrdinal(LibContensiveVersion, cpCore.codeVersion()) <= 0))) {
                                                                                         //
@@ -1942,9 +1891,9 @@ namespace Contensive.Core {
                                                                                             logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Library collection node found that matches");
                                                                                         }
                                                                                         if (genericController.vbInstr(1, LibGUID, "58c9", 1) != 0) {
-                                                                                            LibGUID = LibGUID;
+                                                                                            //LibGUID = LibGUID;
                                                                                         }
-                                                                                        if (!DateHelper.IsDate(LibLastChangeDateStr)) {
+                                                                                        if (!dateController.IsDate(LibLastChangeDateStr)) {
                                                                                             LibLastChangeDate = DateTime.MinValue;
                                                                                         } else {
                                                                                             LibLastChangeDate = genericController.EncodeDate(LibLastChangeDateStr);
@@ -2216,7 +2165,7 @@ namespace Contensive.Core {
                                                 UpdatingCollection = true;
                                                 Pos = genericController.vbInstr(1, CollectionVersionFolderName, "\\");
                                                 if (Pos > 0) {
-                                                    CollectionFolderName = CollectionVersionFolderName.Substring(0, Pos - 1);
+                                                    CollectionFolderName = CollectionVersionFolderName.Left( Pos - 1);
                                                 }
                                             } else {
                                                 //
@@ -2556,10 +2505,10 @@ namespace Contensive.Core {
                                             bool CollectionSystem_fileValueOK = false;
                                             bool CollectionUpdatable_fileValueOK = false;
                                             //												Dim CollectionblockNavigatorNode_fileValueOK As Boolean
-                                            bool CollectionSystem = genericController.EncodeBoolean(GetXMLAttribute(cpCore, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
+                                            bool CollectionSystem = genericController.encodeBoolean(GetXMLAttribute(cpCore, CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
                                             int Parent_NavID = appBuilderController.verifyNavigatorEntry(cpCore, addonGuidManageAddon, "", "Manage Add-ons", "", "", "", false, false, false, true, "", "", "", 0);
-                                            bool CollectionUpdatable = genericController.EncodeBoolean(GetXMLAttribute(cpCore, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
-                                            bool CollectionblockNavigatorNode = genericController.EncodeBoolean(GetXMLAttribute(cpCore, CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
+                                            bool CollectionUpdatable = genericController.encodeBoolean(GetXMLAttribute(cpCore, CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
+                                            bool CollectionblockNavigatorNode = genericController.encodeBoolean(GetXMLAttribute(cpCore, CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
                                             string FileGuid = GetXMLAttribute(cpCore, IsFound, Doc.DocumentElement, "guid", Collectionname);
                                             if (string.IsNullOrEmpty(FileGuid)) {
                                                 FileGuid = Collectionname;
@@ -2612,7 +2561,7 @@ namespace Contensive.Core {
                                                                 //
                                                                 // Source path is in filename
                                                                 //
-                                                                SrcPath = filename.Substring(0, Pos - 1);
+                                                                SrcPath = filename.Left( Pos - 1);
                                                                 filename = filename.Substring(Pos);
                                                                 if (string.IsNullOrEmpty(resourcePath)) {
                                                                     //
@@ -2632,7 +2581,7 @@ namespace Contensive.Core {
                                                                 DstFilePath = "";
                                                             }
                                                             if (!string.IsNullOrEmpty(DstFilePath)) {
-                                                                if (DstFilePath.Substring(0, 1) == "\\") {
+                                                                if (DstFilePath.Left( 1) == "\\") {
                                                                     DstFilePath = DstFilePath.Substring(1);
                                                                 }
                                                                 if (DstFilePath.Substring(DstFilePath.Length - 1) != "\\") {
@@ -3051,7 +3000,7 @@ namespace Contensive.Core {
                                                                                                             if (FieldLookupContentID != 0) {
                                                                                                                 string FieldLookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, FieldLookupContentID);
                                                                                                                 if (!string.IsNullOrEmpty(FieldLookupContentName)) {
-                                                                                                                    if ((FieldValue.Substring(0, 1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && Models.Complex.cdefModel.isContentFieldSupported(cpCore, FieldLookupContentName, "ccguid")) {
+                                                                                                                    if ((FieldValue.Left( 1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && Models.Complex.cdefModel.isContentFieldSupported(cpCore, FieldLookupContentName, "ccguid")) {
                                                                                                                         //
                                                                                                                         // Lookup by guid
                                                                                                                         //
@@ -3288,7 +3237,7 @@ namespace Contensive.Core {
                                                                 //
                                                                 InstallCollectionFromLocalRepo_addonNode_Phase1(cpCore, CDefSection, "ccguid", cpCore.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                 if (!result) {
-                                                                    result = result;
+                                                                    //result = result;
                                                                 }
                                                                 break;
                                                             case "interfaces":
@@ -3298,7 +3247,7 @@ namespace Contensive.Core {
                                                                 foreach (XmlNode CDefInterfaces in CDefSection.ChildNodes) {
                                                                     InstallCollectionFromLocalRepo_addonNode_Phase1(cpCore, CDefInterfaces, "ccguid", cpCore.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                     if (!result) {
-                                                                        result = result;
+                                                                        //result = result;
                                                                     }
                                                                 }
                                                                 //Case "otherxml", "importcollection", "sqlindex", "style", "styles", "stylesheet", "adminmenu", "menuentry", "navigatorentry"
@@ -3337,7 +3286,7 @@ namespace Contensive.Core {
                                                                 //
                                                                 InstallCollectionFromLocalRepo_addonNode_Phase2(cpCore, CDefSection, "ccguid", cpCore.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                 if (!result) {
-                                                                    result = result;
+                                                                    //result = result;
                                                                 }
                                                                 break;
                                                             case "interfaces":
@@ -3347,7 +3296,7 @@ namespace Contensive.Core {
                                                                 foreach (XmlNode CDefInterfaces in CDefSection.ChildNodes) {
                                                                     InstallCollectionFromLocalRepo_addonNode_Phase2(cpCore, CDefInterfaces, "ccguid", cpCore.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                     if (!result) {
-                                                                        result = result;
+                                                                        //result = result;
                                                                     }
                                                                 }
                                                                 break;
@@ -3409,19 +3358,19 @@ namespace Contensive.Core {
                             Pos = genericController.vbInstr(1, FolderName, "\t");
                             if (Pos > 1) {
                                 //hint = hint & ",800"
-                                FolderName = FolderName.Substring(0, Pos - 1);
+                                FolderName = FolderName.Left( Pos - 1);
                                 if (FolderName.Length > 34) {
-                                    if (genericController.vbLCase(FolderName.Substring(0, 4)) != "temp") {
+                                    if (genericController.vbLCase(FolderName.Left( 4)) != "temp") {
                                         CollectionGuid = FolderName.Substring(FolderName.Length - 32);
-                                        Collectionname = FolderName.Substring(0, FolderName.Length - CollectionGuid.Length - 1);
-                                        CollectionGuid = CollectionGuid.Substring(0, 8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
+                                        Collectionname = FolderName.Left( FolderName.Length - CollectionGuid.Length - 1);
+                                        CollectionGuid = CollectionGuid.Left( 8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
                                         CollectionGuid = "{" + CollectionGuid + "}";
                                         SubFolderList = cpCore.privateFiles.getFolderList(cpCore.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
                                         if (SubFolderList.Length > 0) {
                                             SubFolder = SubFolderList[SubFolderList.Length - 1];
                                             FolderName = FolderName + "\\" + SubFolder.Name;
-                                            LastChangeDate = SubFolder.Name.Substring(4, 2) + "/" + SubFolder.Name.Substring(6, 2) + "/" + SubFolder.Name.Substring(0, 4);
-                                            if (!DateHelper.IsDate(LastChangeDate)) {
+                                            LastChangeDate = SubFolder.Name.Substring(4, 2) + "/" + SubFolder.Name.Substring(6, 2) + "/" + SubFolder.Name.Left( 4);
+                                            if (!dateController.IsDate(LastChangeDate)) {
                                                 LastChangeDate = "";
                                             }
                                         }
@@ -3760,12 +3709,12 @@ namespace Contensive.Core {
                 //
                 SrcFolder = SrcPath;
                 if (SrcFolder.Substring(SrcFolder.Length - 1) == "\\") {
-                    SrcFolder = SrcFolder.Substring(0, SrcFolder.Length - 1);
+                    SrcFolder = SrcFolder.Left( SrcFolder.Length - 1);
                 }
                 //
                 DstFolder = DstPath;
                 if (DstFolder.Substring(DstFolder.Length - 1) == "\\") {
-                    DstFolder = DstFolder.Substring(0, DstFolder.Length - 1);
+                    DstFolder = DstFolder.Left( DstFolder.Length - 1);
                 }
                 //
                 if (cpCore.privateFiles.pathExists(SrcFolder)) {
@@ -3815,7 +3764,7 @@ namespace Contensive.Core {
                 //
                 SrcFolder = SrcPath + SubFolder;
                 if (SrcFolder.Substring(SrcFolder.Length - 1) == "\\") {
-                    SrcFolder = SrcFolder.Substring(0, SrcFolder.Length - 1);
+                    SrcFolder = SrcFolder.Left( SrcFolder.Length - 1);
                 }
                 //
                 if (cpCore.privateFiles.pathExists(SrcFolder)) {
@@ -4143,7 +4092,7 @@ namespace Contensive.Core {
                                         //
                                         // multiple argumentlist elements are concatinated with crlf
                                         //
-                                        NewValue = Convert.ToString(PageInterfaceWithinLoop.InnerText).Trim(' ');
+                                        NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
                                         if (!string.IsNullOrEmpty(NewValue)) {
                                             if (string.IsNullOrEmpty(ArgumentList)) {
                                                 ArgumentList = NewValue;
@@ -4157,8 +4106,8 @@ namespace Contensive.Core {
                                         // import exclusive style
                                         //
                                         NodeName = GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "name", "");
-                                        NewValue = Convert.ToString(PageInterfaceWithinLoop.InnerText).Trim(' ');
-                                        if (NewValue.Substring(0, 1) != "{") {
+                                        NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
+                                        if (NewValue.Left( 1) != "{") {
                                             NewValue = "{" + NewValue;
                                         }
                                         if (NewValue.Substring(NewValue.Length - 1) != "}") {
@@ -4234,7 +4183,7 @@ namespace Contensive.Core {
                                             //
                                         } else {
                                             cpCore.db.csSet(CS, FieldName, FieldValue);
-                                            if (genericController.EncodeBoolean(PageInterfaceWithinLoop.InnerText)) {
+                                            if (genericController.encodeBoolean(PageInterfaceWithinLoop.InnerText)) {
                                                 //
                                                 // if template, admin or content - let non-developers have navigator entry
                                                 //
@@ -4257,13 +4206,13 @@ namespace Contensive.Core {
                                                 // the link is an absolute URL, leave it link this
                                                 //
                                             } else {
-                                                if (FieldValue.Substring(0, 1) != "/") {
+                                                if (FieldValue.Left( 1) != "/") {
                                                     //
                                                     // make sure it starts with a slash to be consistance
                                                     //
                                                     FieldValue = "/" + FieldValue;
                                                 }
-                                                if (FieldValue.Substring(0, 17) == "/contensivefiles/") {
+                                                if (FieldValue.Left( 17) == "/contensivefiles/") {
                                                     //
                                                     // in content files, start link without the slash
                                                     //
@@ -5232,7 +5181,7 @@ namespace Contensive.Core {
                 bool Found = false;
                 string menuNameSpace = null;
                 string MenuGuid = null;
-                string MenuKey = null;
+               
                 XmlNode CDef_Node = null;
                 //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode CDefChildNode = null;
@@ -5342,7 +5291,7 @@ namespace Contensive.Core {
                                             if (string.IsNullOrEmpty(ActiveText)) {
                                                 ActiveText = "1";
                                             }
-                                            tempVar.Active = genericController.EncodeBoolean(ActiveText);
+                                            tempVar.Active = genericController.encodeBoolean(ActiveText);
                                             tempVar.ActiveOnly = true;
                                             //.adminColumns = ?
                                             tempVar.AdminOnly = GetXMLAttributeBoolean(cpCore, Found, CDef_NodeWithinLoop, "AdminOnly", DefaultCDef.AdminOnly);
@@ -5395,7 +5344,7 @@ namespace Contensive.Core {
                                                 if (TextMatch(cpCore, CDefChildNode.Name, "field")) {
                                                     FieldName = GetXMLAttribute(cpCore, Found, CDefChildNode, "Name", "");
                                                     if (FieldName.ToLower() == "middlename") {
-                                                        FieldName = FieldName;
+                                                        //FieldName = FieldName;
                                                     }
                                                     //
                                                     // try to find field in the defaultcdef
@@ -5419,7 +5368,7 @@ namespace Contensive.Core {
                                                     if (string.IsNullOrEmpty(ActiveText)) {
                                                         ActiveText = "1";
                                                     }
-                                                    tempVar2.active = genericController.EncodeBoolean(ActiveText);
+                                                    tempVar2.active = genericController.encodeBoolean(ActiveText);
                                                     //
                                                     // Convert Field Descriptor (text) to field type (integer)
                                                     //
@@ -5499,14 +5448,14 @@ namespace Contensive.Core {
                                     // SQL Indexes
                                     //
                                     IndexName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "indexname", "");
-                                    TableName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "TableName", "");
+                                    TableName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "tableName", "");
                                     DataSourceName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "DataSourceName", "");
                                     if (string.IsNullOrEmpty(DataSourceName)) {
                                         DataSourceName = "default";
                                     }
                                     bool removeDup = false;
-                                    miniCollectionModel.SQLIndexType dupToRemove = new miniCollectionModel.SQLIndexType();
-                                    foreach (miniCollectionModel.SQLIndexType index in result.SQLIndexes) {
+                                    miniCollectionModel.collectionSQLIndexModel dupToRemove = new miniCollectionModel.collectionSQLIndexModel();
+                                    foreach (miniCollectionModel.collectionSQLIndexModel index in result.SQLIndexes) {
                                         if (TextMatch(cpCore, index.IndexName, IndexName) & TextMatch(cpCore, index.TableName, TableName) & TextMatch(cpCore, index.DataSourceName, DataSourceName)) {
                                             dupToRemove = index;
                                             removeDup = true;
@@ -5516,7 +5465,7 @@ namespace Contensive.Core {
                                     if (removeDup) {
                                         result.SQLIndexes.Remove(dupToRemove);
                                     }
-                                    miniCollectionModel.SQLIndexType newIndex = new miniCollectionModel.SQLIndexType();
+                                    miniCollectionModel.collectionSQLIndexModel newIndex = new miniCollectionModel.collectionSQLIndexModel();
                                     newIndex.IndexName = IndexName;
                                     newIndex.TableName = TableName;
                                     newIndex.DataSourceName = DataSourceName;
@@ -5526,72 +5475,43 @@ namespace Contensive.Core {
                                 case "adminmenu":
                                 case "menuentry":
                                 case "navigatorentry":
-
                                     //
                                     // Admin Menus / Navigator Entries
-                                    //
                                     MenuName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "Name", "");
                                     menuNameSpace = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "NameSpace", "");
                                     MenuGuid = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "guid", "");
                                     IsNavigator = (NodeName == "navigatorentry");
-                                    //
-                                    // Set MenuKey to what we will expect to find in the .guid
-                                    //
-                                    // make a local out of getdatabuildversion
-                                    //
+                                    string MenuKey = null;
                                     if (!IsNavigator) {
                                         MenuKey = genericController.vbLCase(MenuName);
-                                    } else if (false) {
-                                        MenuKey = genericController.vbLCase("nav." + menuNameSpace + "." + MenuName);
                                     } else {
                                         MenuKey = MenuGuid;
                                     }
-                                    //
-                                    // Go through all current menus and check for duplicates
-                                    //
-                                    if (result.MenuCnt > 0) {
-                                        for (Ptr = 0; Ptr < result.MenuCnt; Ptr++) {
-                                            // 1/16/2009 - JK - empty keys should not be allowed
-                                            if (result.Menus[Ptr].Key != "") {
-                                                if (TextMatch(cpCore, result.Menus[Ptr].Key, MenuKey)) {
-                                                    break;
-                                                }
-                                            }
+                                    if ( !result.Menus.ContainsKey(MenuKey)) {
+                                        ActiveText = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "Active", "1");
+                                        if (string.IsNullOrEmpty(ActiveText)) {
+                                            ActiveText = "1";
                                         }
+                                        result.Menus.Add(MenuKey, new miniCollectionModel.collectionMenuModel() {
+                                            dataChanged = setAllDataChanged,
+                                            Name = MenuName,
+                                            Guid = MenuGuid,
+                                            Key = MenuKey,
+                                            Active = genericController.encodeBoolean(ActiveText),
+                                            menuNameSpace = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "NameSpace", ""),
+                                            ParentName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "ParentName", ""),
+                                            ContentName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "ContentName", ""),
+                                            LinkPage = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "LinkPage", ""),
+                                            SortOrder = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "SortOrder", ""),
+                                            AdminOnly = GetXMLAttributeBoolean(cpCore, Found, CDef_NodeWithinLoop, "AdminOnly", false),
+                                            DeveloperOnly = GetXMLAttributeBoolean(cpCore, Found, CDef_NodeWithinLoop, "DeveloperOnly", false),
+                                            NewWindow = GetXMLAttributeBoolean(cpCore, Found, CDef_NodeWithinLoop, "NewWindow", false),
+                                            AddonName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "AddonName", ""),
+                                            NavIconType = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "NavIconType", ""),
+                                            NavIconTitle = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "NavIconTitle", ""),
+                                            IsNavigator = IsNavigator
+                                        });
                                     }
-                                    if (Ptr >= result.MenuCnt) {
-                                        //
-                                        // Add new entry
-                                        //
-                                        Ptr = result.MenuCnt;
-                                        result.MenuCnt = result.MenuCnt + 1;
-                                        Array.Resize(ref result.Menus, Ptr);
-                                    }
-                                    var tempVar3 = result.Menus[Ptr];
-                                    ActiveText = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "Active", "1");
-                                    if (string.IsNullOrEmpty(ActiveText)) {
-                                        ActiveText = "1";
-                                    }
-                                    //
-                                    // Update Entry
-                                    //
-                                    tempVar3.dataChanged = setAllDataChanged;
-                                    tempVar3.Name = MenuName;
-                                    tempVar3.Guid = MenuGuid;
-                                    tempVar3.Key = MenuKey;
-                                    tempVar3.Active = genericController.EncodeBoolean(ActiveText);
-                                    tempVar3.menuNameSpace = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "NameSpace", "");
-                                    tempVar3.ParentName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "ParentName", "");
-                                    tempVar3.ContentName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "ContentName", "");
-                                    tempVar3.LinkPage = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "LinkPage", "");
-                                    tempVar3.SortOrder = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "SortOrder", "");
-                                    tempVar3.AdminOnly = GetXMLAttributeBoolean(cpCore, Found, CDef_NodeWithinLoop, "AdminOnly", false);
-                                    tempVar3.DeveloperOnly = GetXMLAttributeBoolean(cpCore, Found, CDef_NodeWithinLoop, "DeveloperOnly", false);
-                                    tempVar3.NewWindow = GetXMLAttributeBoolean(cpCore, Found, CDef_NodeWithinLoop, "NewWindow", false);
-                                    tempVar3.AddonName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "AddonName", "");
-                                    tempVar3.NavIconType = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "NavIconType", "");
-                                    tempVar3.NavIconTitle = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "NavIconTitle", "");
-                                    tempVar3.IsNavigator = IsNavigator;
                                     break;
                                 case "aggregatefunction":
                                 case "addon":
@@ -5599,28 +5519,19 @@ namespace Contensive.Core {
                                     // Aggregate Objects (just make them -- there are not too many
                                     //
                                     Name = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "Name", "");
-                                    if (result.AddOnCnt > 0) {
-                                        for (Ptr = 0; Ptr < result.AddOnCnt; Ptr++) {
-                                            if (TextMatch(cpCore, result.AddOns[Ptr].Name, Name)) {
-                                                break;
-                                            }
-                                        }
+                                    miniCollectionModel.collectionAddOnModel addon;
+                                    if (result.AddOns.ContainsKey(Name.ToLower())) {
+                                        addon = result.AddOns[Name.ToLower()];
+                                    } else {
+                                        addon = new miniCollectionModel.collectionAddOnModel();
+                                        result.AddOns.Add(Name.ToLower(), addon);
                                     }
-                                    if (Ptr >= result.AddOnCnt) {
-                                        Ptr = result.AddOnCnt;
-                                        result.AddOnCnt = result.AddOnCnt + 1;
-                                        Array.Resize(ref result.AddOns, Ptr);
-                                        //INSTANT C# TODO TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                                        result.AddOns[Ptr].Name = Name;
-                                    }
-                                    var tempVar4 = result.AddOns[Ptr];
-                                    tempVar4.dataChanged = setAllDataChanged;
-                                    tempVar4.Link = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "Link", "");
-                                    tempVar4.ObjectProgramID = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "ObjectProgramID", "");
-                                    tempVar4.ArgumentList = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "ArgumentList", "");
-                                    tempVar4.SortOrder = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "SortOrder", "");
-                                    tempVar4.Copy = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "copy", "");
-                                    result.AddOns[Ptr].Copy = CDef_NodeWithinLoop.InnerText;
+                                    addon.dataChanged = setAllDataChanged;
+                                    addon.Link = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "Link", "");
+                                    addon.ObjectProgramID = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "ObjectProgramID", "");
+                                    addon.ArgumentList = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "ArgumentList", "");
+                                    addon.SortOrder = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "SortOrder", "");
+                                    addon.Copy = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "copy", "");
                                     break;
                                 case "style":
                                     //
@@ -5667,10 +5578,10 @@ namespace Contensive.Core {
                                             status = "The collection you selected [" + Collectionname + "] can not be downloaded because it does not include a valid GUID.";
                                             //cpCore.AppendLog("builderClass.UpgradeCDef_LoadDataToCollection, UserError [" & status & "], The error was [" & Doc.ParseError.reason & "]")
                                         } else {
-                                            Array.Resize(ref result.collectionImports, result.ImportCnt);
-                                            result.collectionImports[result.ImportCnt].Guid = CollectionGuid;
-                                            result.collectionImports[result.ImportCnt].Name = Collectionname;
-                                            result.ImportCnt = result.ImportCnt + 1;
+                                            result.collectionImports.Add(new miniCollectionModel.ImportCollectionType() {
+                                                Name = Collectionname,
+                                                Guid = CollectionGuid
+                                            });
                                         }
                                     }
                                     break;
@@ -5732,13 +5643,10 @@ namespace Contensive.Core {
                         //
                         // Convert Menus.ParentName to Menu.menuNameSpace
                         //
-                        if (result.MenuCnt > 0) {
-                            for (Ptr = 0; Ptr < result.MenuCnt; Ptr++) {
-                                if (result.Menus[Ptr].ParentName != "") {
-                                    result.Menus[Ptr].menuNameSpace = GetMenuNameSpace(cpCore, result, Ptr, result.Menus[Ptr].IsNavigator, "");
-                                    //.Menus[Ptr].ParentName = ""
-                                    Ptr = Ptr;
-                                }
+                        foreach ( var kvp in result.Menus) {
+                            miniCollectionModel.collectionMenuModel menu = kvp.Value;
+                            if ( !string.IsNullOrEmpty( menu.ParentName )) {
+                                menu.menuNameSpace = GetMenuNameSpace(cpCore, result.Menus, menu, "");
                             }
                         }
                     }
@@ -5784,8 +5692,6 @@ namespace Contensive.Core {
                 string TableName = null;
                 bool RequireReload = false;
                 bool Found = false;
-                // Dim builder As New coreBuilderClass(cpCore)
-                string InstallCollectionList = ""; //Collections to Install when upgrade is complete
                                                    //
                 logController.appendInstallLog(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
                 //
@@ -5809,7 +5715,7 @@ namespace Contensive.Core {
                             if (genericController.vbLCase(workingCdef.ContentDataSourceName) == "default" || workingCdef.ContentDataSourceName == "") {
                                 TableName = workingCdef.ContentTableName;
                                 if (genericController.vbInstr(1, "," + UsedTables + ",", "," + TableName + ",", 1) != 0) {
-                                    TableName = TableName;
+                                    //TableName = TableName;
                                 } else {
                                     UsedTables = UsedTables + "," + TableName;
                                     cpCore.db.createSQLTable(workingCdef.ContentDataSourceName, TableName);
@@ -5927,7 +5833,7 @@ namespace Contensive.Core {
                                     if (string.IsNullOrEmpty(Copy)) {
                                         Copy = tempVar.HelpDefault;
                                         if (!string.IsNullOrEmpty(Copy)) {
-                                            Copy = Copy;
+                                            //Copy = Copy;
                                         }
                                     }
                                     SQL = "update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCID + ",fieldid=" + fieldId + ",helpdefault=" + cpCore.db.encodeSQLText(Copy) + " where id=" + FieldHelpID;
@@ -5944,7 +5850,7 @@ namespace Contensive.Core {
                 logController.appendInstallLog(cpCore, "CDef Load, stage 7: create SQL indexes");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                foreach (miniCollectionModel.SQLIndexType index in Collection.SQLIndexes) {
+                foreach (miniCollectionModel.collectionSQLIndexModel index in Collection.SQLIndexes) {
                     if (index.dataChanged) {
                         logController.appendInstallLog(cpCore, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
                         cpCore.db.createSQLIndex(index.DataSourceName, index.TableName, index.IndexName, index.FieldNameList);
@@ -5957,21 +5863,11 @@ namespace Contensive.Core {
                 logController.appendInstallLog(cpCore, "CDef Load, stage 8a: Verify All Menu Names, then all Menus");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                for (var Ptr = 0; Ptr < Collection.MenuCnt; Ptr++) {
-                    var tempVar3 = Collection.Menus[Ptr];
-                    if (tempVar3.dataChanged) {
-                        logController.appendInstallLog(cpCore, "creating navigator entry [" + tempVar3.Name + "], namespace [" + tempVar3.menuNameSpace + "], guid [" + tempVar3.Guid + "]");
-                        appBuilderController.verifyNavigatorEntry(cpCore, tempVar3.Guid, tempVar3.menuNameSpace, tempVar3.Name, tempVar3.ContentName, tempVar3.LinkPage, tempVar3.SortOrder, tempVar3.AdminOnly, tempVar3.DeveloperOnly, tempVar3.NewWindow, tempVar3.Active, tempVar3.AddonName, tempVar3.NavIconType, tempVar3.NavIconTitle, 0);
-                    }
-                }
-                //
-                //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 8d: Verify Import Collections");
-                //----------------------------------------------------------------------------------------------------------------------
-                //
-                if (Collection.ImportCnt > 0) {
-                    for (var Ptr = 0; Ptr < Collection.ImportCnt; Ptr++) {
-                        InstallCollectionList = InstallCollectionList + "," + Collection.collectionImports[Ptr].Guid;
+                foreach (var kvp in Collection.Menus) {
+                    var menu = kvp.Value;
+                    if (menu.dataChanged) {
+                        logController.appendInstallLog(cpCore, "creating navigator entry [" + menu.Name + "], namespace [" + menu.menuNameSpace + "], guid [" + menu.Guid + "]");
+                        appBuilderController.verifyNavigatorEntry(cpCore, menu.Guid, menu.menuNameSpace, menu.Name, menu.ContentName, menu.LinkPage, menu.SortOrder, menu.AdminOnly, menu.DeveloperOnly, menu.NewWindow, menu.Active, menu.AddonName, menu.NavIconType, menu.NavIconTitle, 0);
                     }
                 }
                 //
@@ -5980,39 +5876,28 @@ namespace Contensive.Core {
                 //---------------------------------------------------------------------
                 //
                 string errorMessage = "";
-                string[] Guids = null;
                 string Guid = null;
                 string CollectionPath = "";
                 DateTime lastChangeDate = new DateTime();
-                bool ignoreRefactor = false;
                 logController.appendInstallLog(cpCore, "Installing Add-on Collections gathered during upgrade");
-                if (string.IsNullOrEmpty(InstallCollectionList)) {
-                    logController.appendInstallLog(cpCore, "No Add-on collections added during upgrade");
-                } else {
+                foreach( var import in Collection.collectionImports) {
                     errorMessage = "";
-                    Guids = InstallCollectionList.Split(',');
-                    for (var Ptr = 0; Ptr <= Guids.GetUpperBound(0); Ptr++) {
-                        errorMessage = "";
-                        Guid = Guids[Ptr];
-                        if (!string.IsNullOrEmpty(Guid)) {
-                            String emptyString = "";
-                            GetCollectionConfig(cpCore, Guid, ref CollectionPath, ref lastChangeDate, ref emptyString);
-                            if (!string.IsNullOrEmpty(CollectionPath)) {
-                                //
-                                // This collection is installed locally, install from local collections
-                                //
-                                installCollectionFromLocalRepo(cpCore, Guid, cpCore.codeVersion(), ref errorMessage, "", isNewBuild, ref nonCriticalErrorList);
-                            } else {
-                                //
-                                // This is a new collection, install to the server and force it on this site
-                                //
-                                bool addonInstallOk = installCollectionFromRemoteRepo(cpCore, Guid, ref errorMessage, "", isNewBuild, ref nonCriticalErrorList);
-                                if (!addonInstallOk) {
-                                    throw (new ApplicationException("Failure to install addon collection from remote repository. Collection [" + Guid + "] was referenced in collection [" + Collection.name + "]")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
-                                }
-
-                            }
+                    String emptyString = "";
+                    GetCollectionConfig(cpCore, import.Guid , ref CollectionPath, ref lastChangeDate, ref emptyString);
+                    if (!string.IsNullOrEmpty(CollectionPath)) {
+                        //
+                        // This collection is installed locally, install from local collections
+                        //
+                        installCollectionFromLocalRepo(cpCore, Guid, cpCore.codeVersion(), ref errorMessage, "", isNewBuild, ref nonCriticalErrorList);
+                    } else {
+                        //
+                        // This is a new collection, install to the server and force it on this site
+                        //
+                        bool addonInstallOk = installCollectionFromRemoteRepo(cpCore, Guid, ref errorMessage, "", isNewBuild, ref nonCriticalErrorList);
+                        if (!addonInstallOk) {
+                            throw (new ApplicationException("Failure to install addon collection from remote repository. Collection [" + Guid + "] was referenced in collection [" + Collection.name + "]")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                         }
+
                     }
                 }
                 //
@@ -6156,7 +6041,7 @@ namespace Contensive.Core {
                         if (rs.Rows.Count > 0) {
                             //EditorGroupID = cpcore.app.getDataRowColumnName(RS.rows(0), "ID")
                             ContentID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                            ContentIsBaseContent = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows[0], "IsBaseContent"));
+                            ContentIsBaseContent = genericController.encodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows[0], "IsBaseContent"));
                         }
                     }
                     rs.Dispose();

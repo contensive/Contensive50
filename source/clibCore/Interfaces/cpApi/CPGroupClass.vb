@@ -3,6 +3,7 @@ Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
+Imports Contensive.Core.Models.Entity
 
 Namespace Contensive.Core
     '
@@ -81,7 +82,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Delete(ByVal GroupNameIdOrGuid As String)
             Try
-                Models.Entity.groupModel.delete(cpCore, GroupNameIdOrGuid)
+                groupModel.delete(cpCore, GroupNameIdOrGuid)
             Catch ex As Exception
                 cpCore.handleException(ex)
             End Try

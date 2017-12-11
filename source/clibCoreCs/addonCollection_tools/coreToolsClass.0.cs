@@ -690,7 +690,7 @@ namespace Contensive.Core {
                     while ((LineCounter < 10) && (!string.IsNullOrEmpty(SQLArchive))) {
                         SQLLine = getLine( ref SQLArchive);
                         if (SQLLine.Length > SelectFieldWidthLimit) {
-                            SQLName = SQLLine.Substring(0, SelectFieldWidthLimit) + "...";
+                            SQLName = SQLLine.Left( SelectFieldWidthLimit) + "...";
                         } else {
                             SQLName = SQLLine;
                         }
@@ -1284,7 +1284,7 @@ namespace Contensive.Core {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
-                                ColumnWidth = Convert.ToInt32(100 * (kvp.Value.Width / (double)ColumnWidthTotal));
+                                ColumnWidth = EncodeInteger(100 * (kvp.Value.Width / (double)ColumnWidthTotal));
                                 FieldName = kvp.Value.Name;
                                 var tempVar = CDef.fields[FieldName.ToLower()];
                                 fieldId = tempVar.id;
@@ -1770,7 +1770,7 @@ namespace Contensive.Core {
                                                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
                                                                 DiagActions[0].Command = "";
                                                                 DiagActions[1].Name = "Convert the field to an Integer so no lookup is provided.";
-                                                                DiagActions[1].Command = DiagActionSetFieldType.ToString() + "," + ContentName + "," + FieldName + "," + Convert.ToString(FieldTypeIdInteger);
+                                                                DiagActions[1].Command = DiagActionSetFieldType.ToString() + "," + ContentName + "," + FieldName + "," + encodeText(FieldTypeIdInteger);
                                                                 Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                                             }
                                                         }
@@ -1935,7 +1935,7 @@ namespace Contensive.Core {
                         cpCore.db.cs_goFirst(CSPointer);
                         while (cpCore.db.csOk(CSPointer)) {
                             ColumnWidth = cpCore.db.csGetInteger(CSPointer, "IndexWidth");
-                            ColumnWidth = Convert.ToInt32((ColumnWidth * 100) / (double)ColumnWidthTotal);
+                            ColumnWidth = EncodeInteger((ColumnWidth * 100) / (double)ColumnWidthTotal);
                             cpCore.db.csSet(CSPointer, "IndexWidth", ColumnWidth);
                             cpCore.db.csGoNext(CSPointer);
                         }
@@ -2696,16 +2696,7 @@ namespace Contensive.Core {
                     Stream.Add(DateTime.Now + " Opening Column Schema<br>");
                     //
                     RSSchema = cpCore.db.getColumnSchemaData(TableName);
-                    if (true) {
-                        Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
-                    } else {
-                        //
-                        // ----- error
-                        //
-                        Stream.Add(DateTime.Now + " SQL execution returned the following error<br>");
-                        Stream.Add("Error Number " + ErrorNumber + "<br>");
-                        Stream.Add("Error Descrition " + ErrorDescription + "<br>");
-                    }
+                    Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
                     if (isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
@@ -2895,7 +2886,7 @@ namespace Contensive.Core {
                                                 //
                                                 // Was a field, make it inherit from it's parent
                                                 //
-                                                CSTarget = CSTarget;
+                                                //CSTarget = CSTarget;
                                                 cpCore.db.deleteContentRecord("Content Fields", formFieldId);
                                                 ReloadCDef = true;
                                             } else if ((!cdefFieldKvp.Value.inherited) && (!formFieldInherited)) {
@@ -3664,7 +3655,7 @@ namespace Contensive.Core {
                 CurrentPath = cpCore.docProperties.getText("SetPath");
                 if (string.IsNullOrEmpty(CurrentPath)) {
                     CurrentPath = "\\";
-                } else if (CurrentPath.Substring(0, 1) != "\\") {
+                } else if (CurrentPath.Left( 1) != "\\") {
                     CurrentPath = "\\" + CurrentPath;
                 }
                 //
@@ -3674,7 +3665,7 @@ namespace Contensive.Core {
                 if (Position == 1) {
                     ParentPath = "\\";
                 } else {
-                    ParentPath = CurrentPath.Substring(0, Position - 1);
+                    ParentPath = CurrentPath.Left( Position - 1);
                 }
                 //
                 //
@@ -3734,7 +3725,7 @@ namespace Contensive.Core {
                                 FileDate = LineSplit[3];
                                 FileURL = StartPath + CurrentPath + "\\" + Filename;
                                 QueryString = cpCore.doc.refreshQueryString;
-                                QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, Convert.ToString(AdminFormTool), true);
+                                QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, encodeText(AdminFormTool), true);
                                 QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, true);
                                 QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, true);
                                 CellCopy = "<A href=\"" + cpCore.webServer.requestPath + "?" + QueryString + "\" target=\"_blank\">" + Filename + "</A>";
@@ -3760,7 +3751,7 @@ namespace Contensive.Core {
             //
             string ClassString = null;
             //
-            if (genericController.EncodeBoolean(RowEven)) {
+            if (genericController.encodeBoolean(RowEven)) {
                 RowEven = false;
                 ClassString = " class=\"ccPanelRowEven\" ";
             } else {

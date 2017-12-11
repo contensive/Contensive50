@@ -7,6 +7,8 @@ Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 Imports System.Web.Routing
 Imports System.IO
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
 
 Public Class configurationClass
     '
@@ -30,11 +32,11 @@ Public Class configurationClass
     ''' Site settings come from the contensive json configuration file in c:\ProgramData\Contensive, unless overridden by aspx app settings
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function getServerConfig() As Contensive.Core.Models.Entity.serverConfigModel
-        Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel = Nothing
+    Public Shared Function getServerConfig() As serverConfigModel
+        Dim serverConfig As serverConfigModel = Nothing
         Try
-            serverConfig = New Contensive.Core.Models.Entity.serverConfigModel
-            serverConfig.appConfig = New Contensive.Core.Models.Entity.serverConfigModel.appConfigModel
+            serverConfig = New serverConfigModel
+            serverConfig.appConfig = New serverConfigModel.appConfigModel
             '
             serverConfig.allowTaskRunnerService = False
             serverConfig.allowTaskSchedulerService = False
@@ -53,8 +55,8 @@ Public Class configurationClass
             serverConfig.defaultDataSourcePassword = ConfigurationManager.AppSettings("ContensiveDefaultDataSourcePassword")
             'serverConfig.defaultDataSourceType = genericController.EncodeInteger(ConfigurationManager.AppSettings("ContensiveDefaultDataSourceType"))
             serverConfig.defaultDataSourceUsername = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceUsername")
-            serverConfig.enableLocalMemoryCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
-            serverConfig.isLocalFileSystem = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
+            serverConfig.enableLocalMemoryCache = genericController.encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
+            serverConfig.isLocalFileSystem = genericController.encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
             serverConfig.localDataDriveLetter = ConfigurationManager.AppSettings("ContensiveLocalDataDriveLetter")
             serverConfig.name = ConfigurationManager.AppSettings("ContensiveServerGroupName")
             serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")

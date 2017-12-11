@@ -121,7 +121,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override bool getBoolean(string key) {
-            return genericController.EncodeBoolean(getObject(key));
+            return genericController.encodeBoolean(getObject(key));
         }
         //
         //====================================================================================================

@@ -6,8 +6,9 @@ Imports System
 Imports System.Collections.Generic
 Imports System.Text
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Models.Entity
 
-Namespace Contensive.Core.Models.Entity
+Namespace Contensive.Core.Models.Context
     '
     '====================================================================================================
     ' cached entity model pattern
@@ -40,7 +41,7 @@ Namespace Contensive.Core.Models.Entity
         Public awsElastiCacheConfigurationEndpoint As String = ""
         '
         ' -- datasource for the cluster (only sql support for now)
-        Public defaultDataSourceType As Models.Entity.dataSourceModel.dataSourceTypeEnum
+        Public defaultDataSourceType As dataSourceModel.dataSourceTypeEnum
         Public defaultDataSourceAddress As String = ""
         Public defaultDataSourceUsername As String = ""
         Public defaultDataSourcePassword As String = ""
@@ -136,8 +137,8 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>
-        Public Shared Function getObject(cpCore As coreClass) As Models.Entity.serverConfigModel
-            Dim returnModel As Models.Entity.serverConfigModel = Nothing
+        Public Shared Function getObject(cpCore As coreClass) As serverConfigModel
+            Dim returnModel As serverConfigModel = Nothing
             Try
                 Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
                 Dim JSONTemp As String
@@ -149,7 +150,7 @@ Namespace Contensive.Core.Models.Entity
                     '
                     ' for now it fails, maybe later let it autobuild a local cluster
                     '
-                    returnModel = New Models.Entity.serverConfigModel
+                    returnModel = New serverConfigModel
                     returnModel.allowTaskRunnerService = False
                     returnModel.allowTaskSchedulerService = False
                     cpCore.programDataFiles.saveFile("config.json", json_serializer.Serialize(returnModel))
@@ -171,8 +172,8 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>
-        Public Shared Function getObject(cpCore As coreClass, appName As String) As Models.Entity.serverConfigModel
-            Dim returnModel As Models.Entity.serverConfigModel = Nothing
+        Public Shared Function getObject(cpCore As coreClass, appName As String) As serverConfigModel
+            Dim returnModel As serverConfigModel = Nothing
             Try
                 returnModel = getObject(cpCore)
                 If (Not String.IsNullOrEmpty(appName)) Then

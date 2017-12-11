@@ -221,7 +221,7 @@ Namespace Contensive.Core.Controllers
                     If loginAddonID <> 0 Then
                         '
                         ' -- Custom Login
-                        Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, loginAddonID)
+                        Dim addon As addonModel = addonModel.create(cpcore, loginAddonID)
                         Dim executeContext As New CPUtilsBaseClass.addonExecuteContext() With {
                             .addonType = CPUtilsBaseClass.addonContext.ContextPage
                         }

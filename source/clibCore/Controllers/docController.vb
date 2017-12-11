@@ -34,16 +34,16 @@ Namespace Contensive.Core.Controllers
         Public Property htmlMetaContent_KeyWordList As New List(Of htmlMetaClass)
         '
         ' -- current domain
-        Public Property domain As Models.Entity.domainModel
+        Public Property domain As domainModel
         '
         ' -- current page
-        Public Property page As Models.Entity.pageContentModel
+        Public Property page As pageContentModel
         '
         ' -- current page to it's root
-        Public Property pageToRootList As List(Of Models.Entity.pageContentModel)
+        Public Property pageToRootList As List(Of pageContentModel)
         '
         ' -- current template
-        Public Property template As Models.Entity.pageTemplateModel
+        Public Property template As pageTemplateModel
         Public Property templateReason As String = ""
         '
         ' -- Anything that needs to be written to the Page during main_GetClosePage
@@ -171,7 +171,7 @@ Namespace Contensive.Core.Controllers
         Public Sub New(cpCore As coreClass)
             Me.cpcore = cpCore
             '
-            domain = New Models.Entity.domainModel()
+            domain = New domainModel()
             page = New pageContentModel()
             pageToRootList = New List(Of pageContentModel)
             template = New pageTemplateModel()
@@ -390,8 +390,8 @@ Namespace Contensive.Core.Controllers
         Friend Function getQuickEditing(rootPageId As Integer, OrderByClause As String, AllowPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, contactMemberID As Integer, childListSortMethodId As Integer, main_AllowChildListComposite As Boolean, ArchivePage As Boolean) As String
             Dim result As String = String.Empty
             Try
-                Dim RootPageContentName As String = Models.Entity.pageContentModel.contentName
-                Dim LiveRecordContentName As String = Models.Entity.pageContentModel.contentName
+                Dim RootPageContentName As String = pageContentModel.contentName
+                Dim LiveRecordContentName As String = pageContentModel.contentName
                 Dim Link As String
                 Dim page_ParentID As Integer
                 Dim PageList As String
@@ -435,7 +435,7 @@ Namespace Contensive.Core.Controllers
                 Dim IsRootPage As Boolean = False
                 Call getAuthoringStatus(LiveRecordContentName, page.id, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
                 Call getAuthoringPermissions(LiveRecordContentName, page.id, AllowInsert, AllowCancel, allowSave, AllowDelete, False, False, False, False, readOnlyField)
-                AllowMarkReviewed = Models.Complex.cdefModel.isContentFieldSupported(cpcore, Models.Entity.pageContentModel.contentName, "DateReviewed")
+                AllowMarkReviewed = Models.Complex.cdefModel.isContentFieldSupported(cpcore, pageContentModel.contentName, "DateReviewed")
                 OptionsPanelAuthoringStatus = cpcore.doc.authContext.main_GetAuthoringStatusMessage(cpcore, False, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
                 '
                 ' Set Editing Authoring Control
@@ -520,11 +520,11 @@ Namespace Contensive.Core.Controllers
                 '
                 ' ----- Child pages
                 '
-                Dim addon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, cpcore.siteProperties.childListAddonID)
+                Dim addon As addonModel = addonModel.create(cpcore, cpcore.siteProperties.childListAddonID)
                 Dim executeContext As New CPUtilsBaseClass.addonExecuteContext With {
                     .addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     .hostRecord = New CPUtilsBaseClass.addonExecuteHostRecordContext() With {
-                        .contentName = Models.Entity.pageContentModel.contentName,
+                        .contentName = pageContentModel.contentName,
                         .fieldName = "",
                         .recordId = page.id
                     },
@@ -532,7 +532,7 @@ Namespace Contensive.Core.Controllers
                         .instanceGuid = PageChildListInstanceID
                     }
                 PageList = cpcore.addon.execute(addon, executeContext)
-                'PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+                'PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
                 If genericController.vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
                     PageList = "(there are no child pages)"
                 End If
@@ -1442,7 +1442,7 @@ ErrorTrap:
         Friend Function getPageSectionId(ByVal PageID As Integer, ByRef UsedIDList As List(Of Integer), siteSectionRootPageIndex As Dictionary(Of Integer, Integer)) As Integer
             Dim sectionId As Integer = 0
             Try
-                Dim page As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpcore, PageID, New List(Of String))
+                Dim page As pageContentModel = pageContentModel.create(cpcore, PageID, New List(Of String))
                 If (page IsNot Nothing) Then
                     If (page.ParentID = 0) And (Not UsedIDList.Contains(page.ParentID)) Then
                         UsedIDList.Add(page.ParentID)
@@ -1671,7 +1671,7 @@ ErrorTrap:
         '
         Public Shared Function getLinkAlias(cpcore As coreClass, PageID As Integer, QueryStringSuffix As String, DefaultLink As String) As String
             Dim linkAlias As String = DefaultLink
-            Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpcore, PageID, QueryStringSuffix)
+            Dim linkAliasList As List(Of linkAliasModel) = linkAliasModel.createList(cpcore, PageID, QueryStringSuffix)
             If linkAliasList.Count > 0 Then
                 linkAlias = linkAliasList.First.name
                 If Mid(linkAlias, 1, 1) <> "/" Then

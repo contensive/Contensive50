@@ -734,7 +734,7 @@ Namespace Contensive.Core
         Public Shared Function BuildLocalCollectionRepoFromFile(cpCore As coreClass, ByVal collectionPathFilename As String, ByVal CollectionLastChangeDate As Date, ByRef return_CollectionGUID As String, ByRef return_ErrorMessage As String, ByVal allowLogging As Boolean) As Boolean
             Dim result As Boolean = True
             Try
-                Dim ResourceType As String
+                'Dim ResourceType As String
                 Dim CollectionVersionFolderName As String = String.Empty
                 Dim ChildCollectionLastChangeDate As Date
                 Dim ChildWorkingPath As String
@@ -1358,7 +1358,7 @@ Namespace Contensive.Core
                                                     '
                                                     Dim OKToInstall As Boolean = False
                                                     Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], pass 1 done, create collection record.")
-                                                    Dim collection As Models.Entity.AddonCollectionModel = Models.Entity.AddonCollectionModel.create(cpCore, CollectionGuid)
+                                                    Dim collection As AddonCollectionModel = AddonCollectionModel.create(cpCore, CollectionGuid)
                                                     If (collection IsNot Nothing) Then
                                                         '
                                                         ' Upgrade addon
@@ -1377,7 +1377,7 @@ Namespace Contensive.Core
                                                         '
                                                         ' Install new on this application
                                                         '
-                                                        collection = Models.Entity.AddonCollectionModel.add(cpCore)
+                                                        collection = AddonCollectionModel.add(cpCore)
                                                         Call logController.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App does not have this collection so it will be installed.")
                                                         OKToInstall = True
                                                     End If
@@ -4735,7 +4735,7 @@ Namespace Contensive.Core
                         ContentName = .Name
                         ContentIsBaseContent = False
                         FieldHelpCID = Models.Complex.cdefModel.getContentId(cpCore, "Content Field Help")
-                        Dim datasource As Contensive.Core.Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.createByName(cpCore, .ContentDataSourceName, New List(Of String))
+                        Dim datasource As dataSourceModel = dataSourceModel.createByName(cpCore, .ContentDataSourceName, New List(Of String))
                         '
                         ' get contentid and protect content with IsBaseContent true
                         '

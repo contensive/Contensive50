@@ -563,7 +563,7 @@
     <Compile Include="Controllers\menuTabController.vb" />
     <Compile Include="Controllers\menuTreeController.vb" />
     <Compile Include="Controllers\appBuilderController.vb" />
-    <Compile Include="Models\Entity\serverConfigModel.vb" />
+    <Compile Include="Models\Context\serverConfigModel.vb" />
     <Compile Include="Models\Entity\xdataSourceModel.vb" />
     <Compile Include="Models\Entity\visitorModel.vb" />
     <Compile Include="Models\Entity\visitModel.vb" />

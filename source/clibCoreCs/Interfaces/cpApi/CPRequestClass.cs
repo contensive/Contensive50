@@ -57,61 +57,37 @@ namespace Contensive.Core {
 
         public override string Browser {
             get {
-                if (true) {
-                    return cpCore.webServer.requestBrowser;
-                } else {
-                    return "";
-                }
+                return cpCore.webServer.requestBrowser;
             }
         }
 
         public override bool BrowserIsIE {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit_browserIsIE;
-                } else {
-                    return false;
-                }
+                return cpCore.doc.authContext.visit_browserIsIE;
             }
         }
 
         public override bool BrowserIsMac {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit_browserIsMac;
-                } else {
-                    return false;
-                }
+                return cpCore.doc.authContext.visit_browserIsMac;
             }
         }
 
         public override bool BrowserIsMobile {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit.Mobile;
-                } else {
-                    return false;
-                }
+                return cpCore.doc.authContext.visit.Mobile;
             }
         }
 
         public override bool BrowserIsWindows {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit_browserIsWindows;
-                } else {
-                    return false;
-                }
+                return cpCore.doc.authContext.visit_browserIsWindows;
             }
         }
 
         public override string BrowserVersion {
             get {
-                if (true) {
-                    return cpCore.doc.authContext.visit_browserVersion;
-                } else {
-                    return "";
-                }
+                return cpCore.doc.authContext.visit_browserVersion;
             }
         }
 

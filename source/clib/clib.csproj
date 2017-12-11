@@ -187,16 +187,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\clibCore\clibCore.vbproj">
-      <Project>{9814c7bd-200c-4c57-859d-5d81899a3421}</Project>
-      <Name>clibCore</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\cpBaseCs\CPBaseCs.csproj">
-      <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
-      <Name>CPBaseCs</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.1">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.5.1 %28x86 and x64%29</ProductName>
@@ -217,6 +207,16 @@
       <ProductName>Windows Installer 4.5</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\clibCoreCs\clibCoreCs.csproj">
+      <Project>{46657d07-74bc-4ddc-8fdd-9078eb1a1cd2}</Project>
+      <Name>clibCoreCs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\cpBaseCs\CPBaseCs.csproj">
+      <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
+      <Name>CPBaseCs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

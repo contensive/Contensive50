@@ -2305,7 +2305,7 @@ ErrorTrap:
                         , "Content [" & adminContent.Name & "] has no field records."
                         ))
                 Else
-                    Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
+                    Dim datasource As dataSourceModel = dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
                     '
                     ' get access rights
                     '

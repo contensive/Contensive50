@@ -110,7 +110,7 @@ namespace Contensive.Core.Controllers {
             this.cpCore = cpCore;
             EntryIndexName = new keyPtrController();
             Microsoft.VisualBasic.VBMath.Randomize();
-            MenuFlyoutNamePrefix = "id" + Convert.ToString(Convert.ToInt32(Math.Floor(Convert.ToDouble(9999 * Microsoft.VisualBasic.VBMath.Rnd()))));
+            MenuFlyoutNamePrefix = "id" + encodeText(EncodeInteger(Math.Floor(EncodeNumber(9999 * Microsoft.VisualBasic.VBMath.Rnd()))));
         }
         //
         //===============================================================================

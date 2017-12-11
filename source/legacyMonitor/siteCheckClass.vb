@@ -9,6 +9,8 @@ Imports Contensive.Core.Controllers.genericController
 Imports System.Reflection
 Imports System.Timers
 Imports System.Threading
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
 
 Namespace Contensive.Core
     Public Class siteCheckClass
@@ -282,7 +284,7 @@ ErrorTrap:
         '
         '
         '
-        public Sub StartMonitoring()
+        Public Sub StartMonitoring()
             On Error GoTo ErrorTrap
             '
             ' convert to cluster-level object, then do applicaiton work by enumerating applications and using cp for each app
@@ -336,7 +338,7 @@ ErrorTrap:
         '       2 - if busy and it shuts down correctly, complete is at end of GetDoc
         '       3 - if busy and TopTimeoutTimer goes off, abort GetDoc
         '
-        public Sub StopMonitoring()
+        Public Sub StopMonitoring()
             On Error GoTo ErrorTrap
             '
             Dim Timeout As Integer
@@ -504,7 +506,7 @@ ErrorTrap:
                                 '    ' Paused
                                 '    '
                                 '    Call appendMonitorLog(AppName & " paused")
-                            ElseIf AppStatus = Models.Entity.serverConfigModel.appStatusEnum.OK Then
+                            ElseIf AppStatus = serverConfigModel.appStatusEnum.OK Then
                                 '
                                 ' Running
                                 '
@@ -766,7 +768,7 @@ ErrorTrap:
 
         Public Sub New(cpCore As coreClass)
             MyBase.New()
-            Me.cpcore = cpCore
+            Me.cpCore = cpCore
             version = Assembly.GetEntryAssembly().GetName().Version.ToString()
             AddHandler processTimer.Elapsed, AddressOf ProcessTimerTick
         End Sub

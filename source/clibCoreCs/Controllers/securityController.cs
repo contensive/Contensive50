@@ -350,7 +350,7 @@ namespace Contensive.Core.Controllers {
                 }
 
                 // Convert size of hash from bits to bytes.
-                hashSizeInBytes = Convert.ToInt32(hashSizeInBits / 8.0);
+                hashSizeInBytes = EncodeInteger(hashSizeInBits / 8.0);
 
                 // Make sure that the specified hash value is long enough.
                 if (hashWithSaltBytes.Length < hashSizeInBytes) {

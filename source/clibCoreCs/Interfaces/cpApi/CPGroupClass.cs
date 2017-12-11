@@ -100,25 +100,24 @@ namespace Contensive.Core {
             try {
                 returnInteger = cpCore.db.getRecordID("groups", GroupNameIdOrGuid);
             } catch (Exception ex) {
-
+                cpCore.handleException(ex);
             }
             return returnInteger;
         }
         //
         // Get Group Name
         //
-        public override string GetName(string GroupNameIdOrGuid) {
+        public override string GetName(string GroupIdOrGuid) {
             string returnText = "";
             try {
-                if (genericController.vbIsNumeric(GroupNameIdOrGuid)) {
-                    returnText = cpCore.db.getRecordName("groups", genericController.EncodeInteger(GroupNameIdOrGuid));
+                if (genericController.vbIsNumeric(GroupIdOrGuid)) {
+                    //
+                    // -- record Id
+                    returnText = cpCore.db.getRecordName("groups", genericController.EncodeInteger(GroupIdOrGuid));
                 } else {
-                    string sqlCriteria = cpCore.db.getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid);
-                    CPCSClass cs = cp.CSNew();
-                    if (cs.Open("groups", sqlCriteria, "", false, "name")) {
-                        returnText = cs.GetText("name");
-                    }
-                    cs.Close();
+                    //
+                    // -- record guid
+                    returnText = cpCore.db.getRecordName("groups", GroupIdOrGuid);
                 }
             } catch (Exception ex) {
 

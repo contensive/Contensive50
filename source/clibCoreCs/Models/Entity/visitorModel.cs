@@ -366,7 +366,7 @@ namespace Contensive.Core.Models.Entity {
                 } else if (CDef.Id <= 0) {
                     throw new ApplicationException("content [" + primaryContentName + "] could Not be found.");
                 } else {
-                    instance.Active = genericController.EncodeBoolean(CDef.fields["Active"].defaultValue);
+                    instance.Active = genericController.encodeBoolean(CDef.fields["Active"].defaultValue);
                     instance.ccGuid = genericController.encodeText(CDef.fields["ccGuid"].defaultValue);
                     instance.ContentControlID = genericController.EncodeInteger(CDef.fields["ContentControlID"].defaultValue);
                     instance.CreatedBy = genericController.EncodeInteger(CDef.fields["CreatedBy"].defaultValue);

@@ -52,6 +52,9 @@
       <HintPath>..\packages\Amazon.ElastiCacheCluster.1.0.0.4\lib\net35\Amazon.ElastiCacheCluster.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ClearScript">
+      <HintPath>..\..\..\..\h\ClearScript-master\bin\Debug\ClearScript.dll</HintPath>
+    </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
       <HintPath>..\packages\EnyimMemcached.2.16.0\lib\net35\Enyim.Caching.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
@@ -668,9 +671,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\clibCore\clibCore.vbproj">
-      <Project>{9814c7bd-200c-4c57-859d-5d81899a3421}</Project>
-      <Name>clibCore</Name>
+    <ProjectReference Include="..\clibCoreCs\clibCoreCs.csproj">
+      <Project>{46657d07-74bc-4ddc-8fdd-9078eb1a1cd2}</Project>
+      <Name>clibCoreCs</Name>
     </ProjectReference>
     <ProjectReference Include="..\cpBaseCs\CPBaseCs.csproj">
       <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>

@@ -119,7 +119,7 @@ namespace Contensive.Core.Controllers {
                                     nvpValue = nvp[1];
                                 }
                                 if (nvpValue.IndexOf("[") >= 0) {
-                                    nvpValue = nvpValue.Substring(0, nvpValue.IndexOf("["));
+                                    nvpValue = nvpValue.Left( nvpValue.IndexOf("["));
                                 }
                                 cpCore.docProperties.setProperty(nvp[0], nvpValue);
                             }
@@ -135,7 +135,7 @@ namespace Contensive.Core.Controllers {
                                 executeContext.wrapperID = genericController.EncodeInteger(kvp.Value);
                                 break;
                             case "as ajax":
-                                addon.AsAjax = genericController.EncodeBoolean(kvp.Value);
+                                addon.AsAjax = genericController.encodeBoolean(kvp.Value);
                                 break;
                             case "css container id":
                                 ContainerCssID = kvp.Value;
@@ -406,7 +406,7 @@ namespace Contensive.Core.Controllers {
                             if (RemoteAssetLink.IndexOf("://") < 0) {
                                 //
                                 // use request object to build link
-                                if (RemoteAssetLink.Substring(0, 1) == "/") {
+                                if (RemoteAssetLink.Left( 1) == "/") {
                                     RemoteAssetLink = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + RemoteAssetLink;
                                 } else {
                                     RemoteAssetLink = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + cpCore.webServer.requestVirtualFilePath + RemoteAssetLink;
@@ -706,7 +706,7 @@ namespace Contensive.Core.Controllers {
                                                                 case "boolean":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = genericController.EncodeBoolean(FieldValue).ToString();
+                                                                        FieldValue = genericController.encodeBoolean(FieldValue).ToString();
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -787,10 +787,10 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             // A Copy Content block
                                                             //
-                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                             if (!FieldReadOnly) {
                                                                 FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                                FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"));
+                                                                FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"));
                                                                 if (FieldHTML) {
                                                                     //
                                                                     // treat html as active content for now.
@@ -828,7 +828,7 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             // A File Content block
                                                             //
-                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                             if (!FieldReadOnly) {
                                                                 FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                                 fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
@@ -872,7 +872,7 @@ namespace Contensive.Core.Controllers {
                                             TabDescription = xml_GetAttribute(IsFound, SettingNode, "description", "");
                                             TabHeading = xml_GetAttribute(IsFound, SettingNode, "heading", "");
                                             if (TabHeading == "Debug and Trace Settings") {
-                                                TabHeading = TabHeading;
+                                                //TabHeading = TabHeading;
                                             }
                                             TabCell = new stringBuilderLegacyController();
                                             foreach (XmlNode TabNode in SettingNode.ChildNodes) {
@@ -894,8 +894,8 @@ namespace Contensive.Core.Controllers {
                                                             if (string.IsNullOrEmpty(FieldCaption)) {
                                                                 FieldCaption = FieldName;
                                                             }
-                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-                                                            FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
                                                             FieldSelector = xml_GetAttribute(IsFound, TabNode, "selector", "");
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
@@ -936,11 +936,11 @@ namespace Contensive.Core.Controllers {
                                                                         break;
                                                                     case "boolean":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue));
+                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
                                                                             Copy += cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue));
+                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValue));
                                                                         }
                                                                         break;
                                                                     case "float":
@@ -1056,9 +1056,9 @@ namespace Contensive.Core.Controllers {
                                                             if (string.IsNullOrEmpty(FieldCaption)) {
                                                                 FieldCaption = FieldName;
                                                             }
-                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                            FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                            FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
                                                             CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
                                                             if (!cpCore.db.csOk(CS)) {
@@ -1102,7 +1102,7 @@ namespace Contensive.Core.Controllers {
                                                         FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                         FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
                                                         fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
-                                                        FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                        FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                         FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                         FieldDefaultValue = TabNode.InnerText;
                                                         Copy = "";
@@ -1311,7 +1311,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // List of Options, might be select, radio or checkbox
                     //
-                    LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Substring(0, Pos - 1));
+                    LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left( Pos - 1));
                     int PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=");
 
                     if (PosEqual > 0) {
@@ -1325,7 +1325,7 @@ namespace Contensive.Core.Controllers {
                         if (Pos < ExpandedSelector.Length) {
                             OptionSuffix = genericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
                         }
-                        ExpandedSelector = ExpandedSelector.Substring(0, Pos - 1);
+                        ExpandedSelector = ExpandedSelector.Left( Pos - 1);
                     }
                     OptionValues = ExpandedSelector.Split('|');
                     result = "";
@@ -1338,7 +1338,7 @@ namespace Contensive.Core.Controllers {
                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
                                 OptionCaption = OptionValue;
                             } else {
-                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(0, Pos - 1));
+                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left( Pos - 1));
                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
                             }
                             switch (OptionSuffix) {
@@ -1442,8 +1442,8 @@ namespace Contensive.Core.Controllers {
                 //}
                 //if (Pos > 1) {
                 //    EntryPointArgs = EntryPointName.Substring(Pos - 1).Trim(' ');
-                //    EntryPointName = (EntryPointName.Substring(0, Pos - 1)).Trim(' ');
-                //    if ((EntryPointArgs.Substring(0, 1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
+                //    EntryPointName = (EntryPointName.Left( Pos - 1)).Trim(' ');
+                //    if ((EntryPointArgs.Left( 1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
                 //        EntryPointArgs = EntryPointArgs.Substring(1, EntryPointArgs.Length - 2);
                 //    }
                 //    Args = SplitDelimited(EntryPointArgs, ",");
@@ -1871,7 +1871,7 @@ namespace Contensive.Core.Controllers {
                     logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
                     //
                     string cmdQueryString = ""
-                        + "appname=" + encodeNvaArgument(EncodeRequestVariable(cpCore.serverConfig.appConfig.name)) + "&AddonID=" + Convert.ToString(addon.id) + "&OptionString=" + encodeNvaArgument(EncodeRequestVariable(OptionString));
+                        + "appname=" + encodeNvaArgument(EncodeRequestVariable(cpCore.serverConfig.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(EncodeRequestVariable(OptionString));
                     cmdDetailClass cmdDetail = new cmdDetailClass();
                     cmdDetail.addonId = addon.id;
                     cmdDetail.addonName = addon.name;
@@ -1975,7 +1975,7 @@ namespace Contensive.Core.Controllers {
                                     if (Pos < OptionName.Length) {
                                         OptionSelector = (OptionName.Substring(Pos)).Trim(' ');
                                     }
-                                    OptionName = (OptionName.Substring(0, Pos - 1)).Trim(' ');
+                                    OptionName = (OptionName.Left( Pos - 1)).Trim(' ');
                                 }
                                 OptionName = genericController.decodeNvaArgument(OptionName);
                                 Pos = genericController.vbInstr(1, OptionSelector, "[");
@@ -1983,7 +1983,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // List of Options, might be select, radio, checkbox, resourcelink
                                     //
-                                    OptionDefault = OptionSelector.Substring(0, Pos - 1);
+                                    OptionDefault = OptionSelector.Left( Pos - 1);
                                     OptionDefault = genericController.decodeNvaArgument(OptionDefault);
                                     LCaseOptionDefault = genericController.vbLCase(OptionDefault);
                                     //LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault)
@@ -1994,7 +1994,7 @@ namespace Contensive.Core.Controllers {
                                         if (Pos < OptionSelector.Length) {
                                             OptionSuffix = genericController.vbLCase((OptionSelector.Substring(Pos)).Trim(' '));
                                         }
-                                        OptionSelector = OptionSelector.Substring(0, Pos - 1);
+                                        OptionSelector = OptionSelector.Left( Pos - 1);
                                     }
                                     OptionValues = OptionSelector.Split('|');
                                     FormInput = "";
@@ -2007,7 +2007,7 @@ namespace Contensive.Core.Controllers {
                                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
                                                 OptionCaption = OptionValue;
                                             } else {
-                                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(0, Pos - 1));
+                                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left( Pos - 1));
                                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
                                             }
                                             switch (OptionSuffix) {
@@ -2517,7 +2517,7 @@ namespace Contensive.Core.Controllers {
                                                                 case "boolean":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = genericController.EncodeBoolean(FieldValue).ToString();
+                                                                        FieldValue = genericController.encodeBoolean(FieldValue).ToString();
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -2598,10 +2598,10 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             // A Copy Content block
                                                             //
-                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                             if (!FieldReadOnly) {
                                                                 FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                                FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"));
+                                                                FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"));
                                                                 if (FieldHTML) {
                                                                     //
                                                                     // treat html as active content for now.
@@ -2639,7 +2639,7 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             // A File Content block
                                                             //
-                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                             if (!FieldReadOnly) {
                                                                 FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                                 fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
@@ -2702,8 +2702,8 @@ namespace Contensive.Core.Controllers {
                                                             if (string.IsNullOrEmpty(FieldCaption)) {
                                                                 FieldCaption = FieldName;
                                                             }
-                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-                                                            FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
                                                             FieldSelector = xml_GetAttribute(IsFound, TabNode, "selector", "");
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
@@ -2749,11 +2749,11 @@ namespace Contensive.Core.Controllers {
                                                                         break;
                                                                     case "boolean":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue));
+                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
                                                                             Copy += cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue));
+                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValue));
                                                                         }
                                                                         break;
                                                                     case "float":
@@ -2868,9 +2868,9 @@ namespace Contensive.Core.Controllers {
                                                             if (string.IsNullOrEmpty(FieldCaption)) {
                                                                 FieldCaption = FieldName;
                                                             }
-                                                            FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                            FieldHTML = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                            FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
                                                             CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID",true,0,false,false, "Copy");
                                                             if (!cpCore.db.csOk(CS)) {
@@ -2914,7 +2914,7 @@ namespace Contensive.Core.Controllers {
                                                         FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                         FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
                                                         fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
-                                                        FieldReadOnly = genericController.EncodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                        FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                         FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                         FieldDefaultValue = TabNode.InnerText;
                                                         Copy = "";
@@ -3136,7 +3136,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // List of Options, might be select, radio or checkbox
                     //
-                    LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Substring(0, Pos - 1));
+                    LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left( Pos - 1));
                     int PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=");
 
                     if (PosEqual > 0) {
@@ -3150,7 +3150,7 @@ namespace Contensive.Core.Controllers {
                         if (Pos < ExpandedSelector.Length) {
                             OptionSuffix = genericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
                         }
-                        ExpandedSelector = ExpandedSelector.Substring(0, Pos - 1);
+                        ExpandedSelector = ExpandedSelector.Left( Pos - 1);
                     }
                     OptionValues = ExpandedSelector.Split('|');
                     tempgetFormContent_decodeSelector = "";
@@ -3163,7 +3163,7 @@ namespace Contensive.Core.Controllers {
                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
                                 OptionCaption = OptionValue;
                             } else {
-                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(0, Pos - 1));
+                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left( Pos - 1));
                                 OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
                             }
                             switch (OptionSuffix) {
@@ -3295,11 +3295,11 @@ namespace Contensive.Core.Controllers {
                         Pos = genericController.vbInstr(1, ConstructorName, "=");
                         if (Pos > 1) {
                             ConstructorValue = ConstructorName.Substring(Pos);
-                            ConstructorName = (ConstructorName.Substring(0, Pos - 1)).Trim(' ');
+                            ConstructorName = (ConstructorName.Left( Pos - 1)).Trim(' ');
                             Pos = genericController.vbInstr(1, ConstructorValue, "[");
                             if (Pos > 0) {
                                 ConstructorSelector = ConstructorValue.Substring(Pos - 1);
-                                ConstructorValue = ConstructorValue.Substring(0, Pos - 1);
+                                ConstructorValue = ConstructorValue.Left( Pos - 1);
                             }
                         }
                         if (!string.IsNullOrEmpty(ConstructorName)) {
@@ -3452,7 +3452,7 @@ namespace Contensive.Core.Controllers {
                     Copy = cpCore.db.csGetText(CS, "stylesfilename");
                     if (!string.IsNullOrEmpty(Copy)) {
                         if (genericController.vbInstr(1, Copy, "://") != 0) {
-                        } else if (Copy.Substring(0, 1) == "/") {
+                        } else if (Copy.Left( 1) == "/") {
                         } else {
                             Copy = cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, Copy);
                         }
@@ -3568,7 +3568,7 @@ namespace Contensive.Core.Controllers {
                         if (Pos == 0) {
                             OptionName = NameValue;
                         } else {
-                            OptionName = NameValue.Substring(0, Pos - 1);
+                            OptionName = NameValue.Left( Pos - 1);
                             OptionValue = NameValue.Substring(Pos);
                         }
                         OptionName = genericController.vbReplace(OptionName, "\r\n", "\\=");
@@ -3580,7 +3580,7 @@ namespace Contensive.Core.Controllers {
                         Pos = genericController.vbInstr(1, OptionValue, "[");
                         if (Pos != 0) {
                             OptionSelector = OptionValue.Substring(Pos - 1);
-                            OptionValue = OptionValue.Substring(0, Pos - 1);
+                            OptionValue = OptionValue.Left( Pos - 1);
                         }
                         OptionValue = genericController.vbReplace(OptionValue, "\r\n", "\\[");
                         OptionSelector = genericController.vbReplace(OptionSelector, "\r\n", "\\[");
@@ -3645,12 +3645,12 @@ namespace Contensive.Core.Controllers {
                 for (Ptr = 0; Ptr <= Options.GetUpperBound(0); Ptr++) {
                     Pos = genericController.vbInstr(1, Options[Ptr], "=");
                     if (Pos > 0) {
-                        TestName = genericController.vbLCase((Options[Ptr].Substring(0, Pos - 1)).Trim(' '));
-                        while ((!string.IsNullOrEmpty(TestName)) && (TestName.Substring(0, 1) == "\t")) {
+                        TestName = genericController.vbLCase((Options[Ptr].Left( Pos - 1)).Trim(' '));
+                        while ((!string.IsNullOrEmpty(TestName)) && (TestName.Left( 1) == "\t")) {
                             TestName = TestName.Substring(1).Trim(' ');
                         }
                         while ((!string.IsNullOrEmpty(TestName)) && (TestName.Substring(TestName.Length - 1) == "\t")) {
-                            TestName = (TestName.Substring(0, TestName.Length - 1)).Trim(' ');
+                            TestName = (TestName.Left( TestName.Length - 1)).Trim(' ');
                         }
                         if (TestName == TargetName) {
                             result = genericController.decodeNvaArgument((Options[Ptr].Substring(Pos)).Trim(' '));

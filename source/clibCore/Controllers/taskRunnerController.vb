@@ -4,6 +4,9 @@ Option Strict On
 '
 Imports Contensive.Core
 Imports Contensive.Core.Controllers
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
+Imports Contensive.Core.Models.Entity
 '
 Namespace Contensive.Core.Controllers
 #Const includeTracing = False
@@ -151,7 +154,7 @@ Namespace Contensive.Core.Controllers
                 '
                 Console.WriteLine("taskRunnerService.runTasks")
                 '
-                For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cpClusterCore.serverConfig.apps
+                For Each kvp As KeyValuePair(Of String, serverConfigModel.appConfigModel) In cpClusterCore.serverConfig.apps
                     AppName = kvp.Value.name
                     '
                     Console.WriteLine("taskRunnerService.runTasks, appname=[" & AppName & "]")
@@ -159,7 +162,7 @@ Namespace Contensive.Core.Controllers
                     ' query tasks that need to be run
                     '
                     Using cpSite As New CPClass(AppName)
-                        If (cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK) And (cpSite.core.serverConfig.appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
+                        If (cpSite.core.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK) And (cpSite.core.serverConfig.appConfig.appMode = serverConfigModel.appModeEnum.normal) Then
                             Try
                                 Do
                                     '
@@ -189,7 +192,7 @@ Namespace Contensive.Core.Controllers
                                         Select Case command.ToLower()
                                             Case taskQueueCommandEnumModule.runAddon
                                                 Call cpSite.core.addon.execute(
-                                                    Models.Entity.addonModel.create(
+                                                    addonModel.create(
                                                         cpSite.core, cmdDetail.addonId),
                                                         New BaseClasses.CPUtilsBaseClass.addonExecuteContext With {
                                                             .addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,

@@ -94,7 +94,7 @@ namespace Contensive.Core.Controllers {
                 path = Filename.Replace("/", "\\");
                 ptr = path.LastIndexOf("\\");
                 if (ptr > 0) {
-                    path = Filename.Substring(0, ptr);
+                    path = Filename.Left( ptr);
                     Directory.CreateDirectory(path);
                 }
                 File.Delete(privateResponseFilename);
@@ -137,7 +137,7 @@ namespace Contensive.Core.Controllers {
                     //    privateResponseStatusDescription = response.StatusDescription
                     //    privateResponseHeaders = response.Headers
                     //    privateResponseLength = 0
-                } catch (Exception ex) {
+                } catch {
                     //
                     //
                     //
@@ -221,13 +221,13 @@ namespace Contensive.Core.Controllers {
                     //        privateResponseHeaders = response.Headers
                     //        privateResponseLength = CInt(response.ContentLength)
                     //    End If
-                } catch (Exception ex) {
+                } catch {
                     //
                     //
                     //
                     throw;
                 }
-            } catch( Exception ex ) {
+            } catch {
                 //
                 // general catch for the routine
                 //
@@ -248,7 +248,7 @@ namespace Contensive.Core.Controllers {
                 string returnString = "";
                 try {
                     returnString = http.UserAgent;
-                } catch (Exception ex) {
+                } catch  {
                     throw new ApplicationException("Error in UserAgent Property, get Method");
                 }
                 return returnString;
@@ -256,7 +256,7 @@ namespace Contensive.Core.Controllers {
             set {
                 try {
                     http.UserAgent = value;
-                } catch (Exception ex) {
+                } catch {
                     throw new ApplicationException("Error in UserAgent Property, set Method");
                 }
             }
@@ -270,8 +270,8 @@ namespace Contensive.Core.Controllers {
             get {
                 int returnTimeout = 0;
                 try {
-                    returnTimeout = Convert.ToInt32(http.Timeout / 1000);
-                } catch (Exception ex) {
+                    returnTimeout = EncodeInteger(http.Timeout / 1000);
+                } catch {
                     throw new ApplicationException("Error in Timeout Property, get Method");
                 }
                 return returnTimeout;
@@ -282,7 +282,7 @@ namespace Contensive.Core.Controllers {
                         value = 65535;
                     }
                     http.Timeout = value * 1000;
-                } catch (Exception ex) {
+                } catch {
                     throw new ApplicationException("Error in Timeout Property, set Method");
                 }
             }
@@ -303,7 +303,7 @@ namespace Contensive.Core.Controllers {
                             returnString += privateRequestHeaders[ptr];
                         }
                     }
-                } catch (Exception ex) {
+                } catch {
                     throw new ApplicationException("Error in requestHeader Property, get Method");
                 }
                 return returnString;
@@ -328,7 +328,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                     }
-                } catch (Exception ex) {
+                } catch {
                     throw;
                     //Throw New ApplicationException("Error in responseHeader Property, get Method")
                 }
@@ -347,7 +347,7 @@ namespace Contensive.Core.Controllers {
                 //
                 try {
                     returnString = privateSocketResponse;
-                } catch (Exception ex) {
+                } catch {
                     throw new ApplicationException("Error in SocketResponse Property, get Method");
                 }
                 return returnString;
@@ -383,7 +383,7 @@ namespace Contensive.Core.Controllers {
                 //
                 try {
                     returnString = privateResponseStatusDescription;
-                } catch (Exception ex) {
+                } catch {
                     throw;
                 }
                 return returnString;
@@ -401,7 +401,7 @@ namespace Contensive.Core.Controllers {
                 //
                 try {
                     returnCode = privateResponseStatusCode;
-                } catch (Exception ex) {
+                } catch  {
                     throw;
                 }
                 return returnCode;
@@ -414,7 +414,7 @@ namespace Contensive.Core.Controllers {
             set {
                 try {
                     privateRequestCookie = value;
-                } catch (Exception ex) {
+                } catch  {
                     throw;
                 }
             }
@@ -426,7 +426,7 @@ namespace Contensive.Core.Controllers {
             set {
                 try {
                     privateRequestUsername = value;
-                } catch (Exception ex) {
+                } catch  {
                     throw;
                 }
             }
@@ -438,7 +438,7 @@ namespace Contensive.Core.Controllers {
             set {
                 try {
                     privateRequestPassword = value;
-                } catch (Exception ex) {
+                } catch {
                     throw;
                 }
             }

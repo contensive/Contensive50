@@ -6,7 +6,8 @@ Imports Contensive
 Imports Contensive.Core
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
-
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
 
 Namespace Contensive.Core
     Public Class processEmailClass
@@ -82,7 +83,7 @@ Namespace Contensive.Core
             '
             Exit Sub
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3("unknown", "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3("unknown", "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -94,9 +95,9 @@ ErrorTrap:
             Dim EmailServiceLastCheck As Date
             Dim IsNewHour As Boolean
             Dim IsNewDay As Boolean
-            Dim appConfig As Core.Models.Entity.serverConfigModel.appConfigModel = cpCore.serverConfig.appConfig
+            Dim appConfig As serverConfigModel.appConfigModel = cpCore.serverConfig.appConfig
             '
-            If (appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK) And (appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
+            If (appConfig.appStatus = serverConfigModel.appStatusEnum.OK) And (appConfig.appMode = serverConfigModel.appModeEnum.normal) Then
                 Using cp As New CPClass(appConfig.name)
                     cpCore.db.sqlCommandTimeout = 120
                     EmailServiceLastCheck = (cpCore.siteProperties.getDate("EmailServiceLastCheck"))
@@ -177,9 +178,9 @@ ErrorTrap:
             CSEmail = cpCore.db.csOpen("Email", Criteria, , , , , , FieldList)
             If cpCore.db.csOk(CSEmail) Then
                 '
-                SQLTablePeople = models.complex.cdefmodel.getContentTablename(  cpcore,"People")
-                SQLTableMemberRules = models.complex.cdefmodel.getContentTablename(  cpcore,"Member Rules")
-                SQLTableGroups = models.complex.cdefmodel.getContentTablename(  cpcore,"Groups")
+                SQLTablePeople = Models.Complex.cdefModel.getContentTablename(cpCore, "People")
+                SQLTableMemberRules = Models.Complex.cdefModel.getContentTablename(cpCore, "Member Rules")
+                SQLTableGroups = Models.Complex.cdefModel.getContentTablename(cpCore, "Groups")
                 BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
                 'siteStyles = cpCore.html.html_getStyleSheet2(0, 0)
                 '
@@ -312,7 +313,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -367,9 +368,9 @@ ErrorTrap:
             Dim sqlDateTest As String
             '
             dataSourceType = cpCore.db.getDataSourceType("default")
-            SQLTablePeople = models.complex.cdefmodel.getContentTablename(  cpcore,"People")
-            SQLTableMemberRules = models.complex.cdefmodel.getContentTablename(  cpcore,"Member Rules")
-            SQLTableGroups = models.complex.cdefmodel.getContentTablename(  cpcore,"Groups")
+            SQLTablePeople = Models.Complex.cdefModel.getContentTablename(cpCore, "People")
+            SQLTableMemberRules = Models.Complex.cdefModel.getContentTablename(cpCore, "Member Rules")
+            SQLTableGroups = Models.Complex.cdefModel.getContentTablename(cpCore, "Groups")
             BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
             ' siteStyles = cpCore.html.html_getStyleSheet2(0, 0)
             '
@@ -568,7 +569,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '

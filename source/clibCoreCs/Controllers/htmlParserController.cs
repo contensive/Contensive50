@@ -129,7 +129,7 @@ namespace Contensive.Core.Controllers {
                     // get a unique signature
                     //
                     do {
-                        BlobSN = "/blob" + Convert.ToString(genericController.GetRandomInteger()) + ":";
+                        BlobSN = "/blob" + encodeText(genericController.GetRandomInteger()) + ":";
                         Ptr = Ptr + 1;
                     } while ((WorkingSrc.IndexOf(BlobSN, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) && (Ptr < 10));
                     //
@@ -145,7 +145,7 @@ namespace Contensive.Core.Controllers {
                                 if (PosEndScript > 0) {
                                     Array.Resize(ref Blobs, BlobCnt + 1);
                                     Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
-                                    splittest[Ptr] = splittest[Ptr].Substring(0, PosScriptEnd) + BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosEndScript - 1);
+                                    splittest[Ptr] = splittest[Ptr].Left( PosScriptEnd) + BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosEndScript - 1);
                                     BlobCnt = BlobCnt + 1;
                                 }
                             }
@@ -165,7 +165,7 @@ namespace Contensive.Core.Controllers {
                                 if (PosEndScript > 0) {
                                     Array.Resize(ref Blobs, BlobCnt + 1);
                                     Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
-                                    splittest[Ptr] = splittest[Ptr].Substring(0, PosScriptEnd) + BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosEndScript - 1);
+                                    splittest[Ptr] = splittest[Ptr].Left( PosScriptEnd) + BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosEndScript - 1);
                                     BlobCnt = BlobCnt + 1;
                                 }
                             }
@@ -182,7 +182,7 @@ namespace Contensive.Core.Controllers {
                             PosScriptEnd = genericController.vbInstr(1, splittest[Ptr], "-->");
                             if (PosScriptEnd > 0) {
                                 Array.Resize(ref Blobs, BlobCnt + 1);
-                                Blobs[BlobCnt] = splittest[Ptr].Substring(0, PosScriptEnd - 1);
+                                Blobs[BlobCnt] = splittest[Ptr].Left( PosScriptEnd - 1);
                                 splittest[Ptr] = BlobSN + BlobCnt + "/" + splittest[Ptr].Substring(PosScriptEnd - 1);
                                 BlobCnt = BlobCnt + 1;
                             }
@@ -210,7 +210,7 @@ namespace Contensive.Core.Controllers {
                         TagStart = genericController.vbInstr(1, WorkingSrc, TagStartString);
                         while (TagStart != 0) {
                             if ((LocalElementCount / 1000.0) == Math.Floor(LocalElementCount / 1000.0)) {
-                                LocalElementCount = LocalElementCount;
+                                //LocalElementCount = LocalElementCount;
                             }
                             TagStartString = "<";
                             //
@@ -549,7 +549,7 @@ namespace Contensive.Core.Controllers {
                 //
                 TagString = LocalElements[ElementPointer].Text.Substring(1, LocalElements[ElementPointer].Text.Length - 2);
                 if (TagString.Substring(TagString.Length - 1) == "/") {
-                    TagString = TagString.Substring(0, TagString.Length - 1);
+                    TagString = TagString.Left( TagString.Length - 1);
                 }
                 //TagString = genericController.vbReplace(TagString, ">", " ") & " "
                 TagString = genericController.vbReplace(TagString, "\r", " ");
@@ -600,11 +600,11 @@ namespace Contensive.Core.Controllers {
                                             AttrValue = AttrName.Substring(EqualPosition);
                                             AttrValueLen = AttrValue.Length;
                                             if (AttrValueLen > 1) {
-                                                if ((AttrValue.Substring(0, 1) == "\"") && (AttrValue.Substring(AttrValueLen - 1, 1) == "\"")) {
+                                                if ((AttrValue.Left( 1) == "\"") && (AttrValue.Substring(AttrValueLen - 1, 1) == "\"")) {
                                                     AttrValue = AttrValue.Substring(1, AttrValueLen - 2);
                                                 }
                                             }
-                                            AttrName = AttrName.Substring(0, EqualPosition - 1);
+                                            AttrName = AttrName.Left( EqualPosition - 1);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Name = AttrName;
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = genericController.vbUCase(AttrName);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Value = AttrValue;
@@ -926,7 +926,7 @@ namespace Contensive.Core.Controllers {
             //
             if (NewWay) {
                 if (!(LocalElements[ElementPtr].Loaded)) {
-                    SplitPtr = Convert.ToInt32(ElementPtr / 2.0);
+                    SplitPtr = EncodeInteger(ElementPtr / 2.0);
                     ElementBasePtr = SplitPtr * 2;
                     SplitSrc = SplitStore[SplitPtr];
                     Ptr = genericController.vbInstr(1, SplitSrc, ">");
@@ -937,7 +937,7 @@ namespace Contensive.Core.Controllers {
                         SrcTag = "";
                         SrcBody = ReplaceBlob(SplitSrc);
                     } else {
-                        SrcTag = ReplaceBlob(SplitSrc.Substring(0, Ptr));
+                        SrcTag = ReplaceBlob(SplitSrc.Left( Ptr));
                         SrcBody = ReplaceBlob(SplitSrc.Substring(Ptr));
                     }
                     if (Ptr == 0) {
@@ -1015,7 +1015,7 @@ namespace Contensive.Core.Controllers {
                             if (Ptr < BlobCnt) {
                                 Blob = Blobs[Ptr];
                             }
-                            tempReplaceBlob = Src.Substring(0, Pos - 1) + Blob + Src.Substring(PosEnd);
+                            tempReplaceBlob = Src.Left( Pos - 1) + Blob + Src.Substring(PosEnd);
                         }
                     }
                 }

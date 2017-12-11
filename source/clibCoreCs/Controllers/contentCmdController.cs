@@ -333,14 +333,14 @@ namespace Contensive.Core.Controllers {
                     trimming = false;
                     trimLen = cmdSrc.Length;
                     if (trimLen > 0) {
-                        leftChr = cmdSrc.Substring(0, 1);
+                        leftChr = cmdSrc.Left( 1);
                         rightChr = cmdSrc.Substring(cmdSrc.Length - 1);
                         if (genericController.vbInstr(1, whiteChrs, leftChr) != 0) {
                             cmdSrc = cmdSrc.Substring(1);
                             trimming = true;
                         }
                         if (genericController.vbInstr(1, whiteChrs, rightChr) != 0) {
-                            cmdSrc = cmdSrc.Substring(0, cmdSrc.Length - 1);
+                            cmdSrc = cmdSrc.Left( cmdSrc.Length - 1);
                             trimming = true;
                         }
                     }
@@ -368,7 +368,7 @@ namespace Contensive.Core.Controllers {
                     Dictionary<string, object> cmdObject = null;
                     //
                     cmdCollection = new Collection<object>();
-                    if ((cmdSrc.Substring(0, 1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
+                    if ((cmdSrc.Left( 1) == "{") && (cmdSrc.Substring(cmdSrc.Length - 1) == "}")) {
                         //
                         // JSON is a single command in the form of an object, like:
                         //   { "import": "test.html" }
@@ -394,7 +394,7 @@ namespace Contensive.Core.Controllers {
                                 cmdCollection.Add(cmdObject);
                             }
                         }
-                    } else if ((cmdSrc.Substring(0, 1) == "[") && (cmdSrc.Substring(cmdSrc.Length - 1) == "]")) {
+                    } else if ((cmdSrc.Left( 1) == "[") && (cmdSrc.Substring(cmdSrc.Length - 1) == "]")) {
                         //
                         // JSON is a command list in the form of an array, like:
                         //   [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
@@ -422,7 +422,7 @@ namespace Contensive.Core.Controllers {
                         //
                         cmdText = cmdSrc.Trim(' ');
                         cmdArg = "";
-                        if (cmdText.Substring(0, 1) == "\"") {
+                        if (cmdText.Left( 1) == "\"") {
                             //
                             //cmd is quoted
                             //   "open"
@@ -459,10 +459,10 @@ namespace Contensive.Core.Controllers {
                             Pos = genericController.vbInstr(1, cmdText, " ");
                             if (Pos > 0) {
                                 cmdArg = cmdSrc.Substring(Pos);
-                                cmdText = (cmdSrc.Substring(0, Pos - 1)).Trim(' ');
+                                cmdText = (cmdSrc.Left( Pos - 1)).Trim(' ');
                             }
                         }
-                        if (cmdArg.Substring(0, 1) == "\"") {
+                        if (cmdArg.Left( 1) == "\"") {
                             //
                             //cmdarg is quoted
                             //
@@ -473,7 +473,7 @@ namespace Contensive.Core.Controllers {
                                 cmdArg = cmdArg.Substring(1, Pos - 2);
                             }
                         }
-                        if ((cmdArg.Substring(0, 1) == "{") && (cmdArg.Substring(cmdArg.Length - 1) == "}")) {
+                        if ((cmdArg.Left( 1) == "{") && (cmdArg.Substring(cmdArg.Length - 1) == "}")) {
                             //
                             // argument is in the form of an object, like:
                             //   { "text name": "my text" }
@@ -871,7 +871,7 @@ namespace Contensive.Core.Controllers {
                                     //ArgGuid = ""
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (Convert.ToInt32(kvp.Key.ToLower())) {
+                                        switch (EncodeInteger(kvp.Key.ToLower())) {
                                             //Case "instanceid"
                                             //    ArgInstanceId = kvp.Value.ToString()
                                             //Case "guid"

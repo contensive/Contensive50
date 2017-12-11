@@ -5,6 +5,9 @@ Option Strict On
 Imports Microsoft.Web.Administration
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Models.Entity
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
 
 Namespace Contensive.Core.Controllers
     ''' <summary>
@@ -275,7 +278,7 @@ Namespace Contensive.Core.Controllers
                 '
                 '--------------------------------------------------------------------------
                 '
-                If (cpCore.serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.appStatusEnum.OK) Then
+                If (cpCore.serverConfig.appConfig.appStatus <> serverConfigModel.appStatusEnum.OK) Then
                     '
                     ' did not initialize correctly
                     '
@@ -352,14 +355,14 @@ Namespace Contensive.Core.Controllers
                     cpCore.domainLegacyCache.domainDetails.forwardUrl = ""
                     '
                     ' REFACTOR -- move to cpcore.domains class 
-                    cpCore.domainLegacyCache.domainDetailsList = cpCore.cache.getObject(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))("domainContentList")
+                    cpCore.domainLegacyCache.domainDetailsList = cpCore.cache.getObject(Of Dictionary(Of String, domainLegacyModel.domainDetailsClass))("domainContentList")
                     If (cpCore.domainLegacyCache.domainDetailsList Is Nothing) Then
                         '
                         '  no cache found, build domainContentList from database
-                        cpCore.domainLegacyCache.domainDetailsList = New Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass)
-                        Dim domainList As List(Of Models.Entity.domainModel) = Models.Entity.domainModel.createList(cpCore, "(active<>0)and(name is not null)")
+                        cpCore.domainLegacyCache.domainDetailsList = New Dictionary(Of String, domainLegacyModel.domainDetailsClass)
+                        Dim domainList As List(Of domainModel) = domainModel.createList(cpCore, "(active<>0)and(name is not null)")
                         For Each domain In domainList
-                            Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
+                            Dim domainDetailsNew As New domainLegacyModel.domainDetailsClass
                             domainDetailsNew.name = domain.name
                             domainDetailsNew.rootPageId = domain.RootPageID
                             domainDetailsNew.noFollow = domain.NoFollow
@@ -385,7 +388,7 @@ Namespace Contensive.Core.Controllers
                     '
                     For Each domain As String In cpCore.serverConfig.appConfig.domainList
                         If Not cpCore.domainLegacyCache.domainDetailsList.ContainsKey(domain.ToLower()) Then
-                            Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
+                            Dim domainDetailsNew As New domainLegacyModel.domainDetailsClass
                             domainDetailsNew.name = domain
                             domainDetailsNew.rootPageId = 0
                             domainDetailsNew.noFollow = False
@@ -409,7 +412,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' -- domain not found
                         ' -- current host not in domainContent, add it and re-save the cache
-                        Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
+                        Dim domainDetailsNew As New domainLegacyModel.domainDetailsClass
                         domainDetailsNew.name = requestDomain
                         domainDetailsNew.rootPageId = 0
                         domainDetailsNew.noFollow = False
@@ -423,7 +426,7 @@ Namespace Contensive.Core.Controllers
                         cpCore.domainLegacyCache.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
                         '
                         ' -- update database
-                        Dim domain As Models.Entity.domainModel = Models.Entity.domainModel.add(cpCore, New List(Of String))
+                        Dim domain As domainModel = domainModel.add(cpCore, New List(Of String))
                         cpCore.domainLegacyCache.domainDetails.id = domain.id
                         domain.name = requestDomain
                         domain.TypeID = 1
@@ -439,7 +442,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' this is a default domain or a new domain -- add to the domain table
                         '
-                        Dim domain As New Models.Entity.domainModel() With {
+                        Dim domain As New domainModel() With {
                                 .name = requestDomain,
                                 .TypeID = 1,
                                 .RootPageID = cpCore.domainLegacyCache.domainDetails.rootPageId,
@@ -1165,7 +1168,7 @@ ErrorTrap:
                             '
                             LinkPrefix = cpcore.webServer.requestContentWatchPrefix
                             ContentID = (cpcore.db.csGetInteger(CSPointer, "ContentID"))
-                            HostContentName = models.complex.cdefmodel.getContentNameByID(cpcore,ContentID)
+                            HostContentName = Models.Complex.cdefModel.getContentNameByID(cpcore, ContentID)
                             If (HostContentName = "") Then
                                 '
                                 ' ----- Content Watch with a bad ContentID, mark inactive
@@ -1196,7 +1199,7 @@ ErrorTrap:
                                 '
                                 ' ----- if a content watch record is blocked, delete the content tracking
                                 '
-                                Call cpcore.db.deleteContentRules(models.complex.cdefmodel.getcontentid(cpcore,HostContentName), HostRecordID)
+                                Call cpcore.db.deleteContentRules(Models.Complex.cdefModel.getContentId(cpcore, HostContentName), HostRecordID)
                             End If
                     End Select
                 End If

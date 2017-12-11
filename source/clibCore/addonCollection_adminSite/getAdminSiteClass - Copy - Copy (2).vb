@@ -68,7 +68,7 @@ Namespace Contensive.Addons.AdminSite
                     ' --- must be authenticated to continue. Force a local login
                     '
                     returnHtml = cpCore.addon.execute(
-                        Models.Entity.addonModel.create(cpCore, addonGuidLoginPage),
+                        addonModel.create(cpCore, addonGuidLoginPage),
                         New BaseClasses.CPUtilsBaseClass.addonExecuteContext() With {
                             .errorCaption = "Login Page",
                             .addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage

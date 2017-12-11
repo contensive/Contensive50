@@ -326,7 +326,7 @@ namespace Contensive.Core {
                 throw;
                 result = string.Empty;
             }
-            return Convert.ToString(result);
+            return encodeText(result);
         }
         //
         //====================================================================================================
@@ -364,7 +364,7 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return string.Empty;
+            //return string.Empty;
         }
         //
         //====================================================================================================
@@ -388,7 +388,7 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return Convert.ToInt32(string.Empty);
+            return EncodeInteger(string.Empty);
         }
         //
         //====================================================================================================
@@ -400,7 +400,7 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return Convert.ToDouble(string.Empty);
+            return EncodeNumber(string.Empty);
         }
         //
         //====================================================================================================
@@ -412,7 +412,7 @@ namespace Contensive.Core {
                 cpCore.handleException(ex);
                 throw;
             }
-            return Convert.ToInt32(string.Empty);
+            return EncodeInteger(string.Empty);
         }
         //
         //====================================================================================================

@@ -399,7 +399,7 @@ namespace Contensive.Core.Controllers {
                                 Copy += " or by phone at " + ContactPhone;
                             }
                         }
-                        Copy = Copy;
+                        //Copy = Copy;
                     } else {
                         if (string.IsNullOrEmpty(ContactEmail)) {
                             if (!string.IsNullOrEmpty(ContactPhone)) {
@@ -410,7 +410,7 @@ namespace Contensive.Core.Controllers {
                             if (!string.IsNullOrEmpty(ContactPhone)) {
                                 Copy += ", or call " + ContactPhone;
                             }
-                            Copy = Copy;
+                            //Copy = Copy;
                         }
                     }
                 }
@@ -466,7 +466,7 @@ namespace Contensive.Core.Controllers {
                         // -- use the Landing Page
                         requestedPage = getLandingPage(cpcore, domain);
                     }
-                    cpcore.doc.addRefreshQueryString(rnPageId, Convert.ToString(requestedPage.id));
+                    cpcore.doc.addRefreshQueryString(rnPageId, encodeText(requestedPage.id));
                     //
                     // -- build parentpageList (first = current page, last = root)
                     // -- add a 0, then repeat until another 0 is found, or there is a repeat
@@ -647,7 +647,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // no protocol, convert to short link
                     //
-                    if (tempverifyTemplateLink.Substring(0, 1) != "/") {
+                    if (tempverifyTemplateLink.Left( 1) != "/") {
                         //
                         // page entered without path, assume it is in root path
                         //
@@ -710,15 +710,15 @@ namespace Contensive.Core.Controllers {
                     if (cpcore.webServer.requestReferer != "") {
                         Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningPageID=", 1);
                         if (Pos != 0) {
-                            cpcore.webServer.requestReferrer = cpcore.webServer.requestReferrer.Substring(0, Pos - 2);
+                            cpcore.webServer.requestReferrer = cpcore.webServer.requestReferrer.Left( Pos - 2);
                         }
                         Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "main_AdminWarningMsg=", 1);
                         if (Pos != 0) {
-                            cpcore.webServer.requestReferrer = cpcore.webServer.requestReferrer.Substring(0, Pos - 2);
+                            cpcore.webServer.requestReferrer = cpcore.webServer.requestReferrer.Left( Pos - 2);
                         }
                         Pos = genericController.vbInstr(1, cpcore.webServer.requestReferrer, "blockcontenttracking=", 1);
                         if (Pos != 0) {
-                            cpcore.webServer.requestReferrer = cpcore.webServer.requestReferrer.Substring(0, Pos - 2);
+                            cpcore.webServer.requestReferrer = cpcore.webServer.requestReferrer.Left( Pos - 2);
                         }
                         adminMessage = adminMessage + " The referring page was " + cpcore.webServer.requestReferrer + ".";
                     }
@@ -764,9 +764,9 @@ namespace Contensive.Core.Controllers {
                     } else {
                         int Pos = genericController.vbInstr(1, linkPathPage, "?");
                         if (Pos != 0) {
-                            linkPathPage = linkPathPage.Substring(0, Pos - 1);
+                            linkPathPage = linkPathPage.Left( Pos - 1);
                         }
-                        if (linkPathPage.Substring(0, 1) != "/") {
+                        if (linkPathPage.Left( 1) != "/") {
                             linkPathPage = "/" + linkPathPage;
                         }
                     }
@@ -1192,17 +1192,17 @@ namespace Contensive.Core.Controllers {
                                                             FieldCount = Fields.GetUpperBound(0) + 1;
                                                             for (var FieldPointer = 0; FieldPointer < FieldCount; FieldPointer++) {
                                                                 string Pair = Fields[FieldPointer];
-                                                                if (Pair.Substring(0, 1) == "(" && Pair.Substring(Pair.Length - 1, 1) == ")") {
+                                                                if (Pair.Left( 1) == "(" && Pair.Substring(Pair.Length - 1, 1) == ")") {
                                                                     Pair = Pair.Substring(1, Pair.Length - 2);
                                                                 }
                                                                 NameValues = Pair.Split('=');
                                                                 if (NameValues.GetUpperBound(0) == 0) {
                                                                     errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data Field List is not configured correctly.");
                                                                 } else {
-                                                                    if (!cpCore.db.cs_isFieldSupported(CSClip, Convert.ToString(NameValues[0]))) {
-                                                                        errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data Field [" + Convert.ToString(NameValues[0]) + "] is not supported by the location data.");
+                                                                    if (!cpCore.db.cs_isFieldSupported(CSClip, encodeText(NameValues[0]))) {
+                                                                        errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data Field [" + encodeText(NameValues[0]) + "] is not supported by the location data.");
                                                                     } else {
-                                                                        cpCore.db.csSet(CSClip, Convert.ToString(NameValues[0]), Convert.ToString(NameValues[1]));
+                                                                        cpCore.db.csSet(CSClip, encodeText(NameValues[0]), encodeText(NameValues[1]));
                                                                     }
                                                                 }
                                                             }
@@ -1271,12 +1271,12 @@ namespace Contensive.Core.Controllers {
                     //
                     LinkAliasCriteria = "";
                     linkAliasTest1 = cpCore.webServer.requestPathPage;
-                    if (linkAliasTest1.Substring(0, 1) == "/") {
+                    if (linkAliasTest1.Left( 1) == "/") {
                         linkAliasTest1 = linkAliasTest1.Substring(1);
                     }
                     if (linkAliasTest1.Length > 0) {
                         if (linkAliasTest1.Substring(linkAliasTest1.Length - 1, 1) == "/") {
-                            linkAliasTest1 = linkAliasTest1.Substring(0, linkAliasTest1.Length - 1);
+                            linkAliasTest1 = linkAliasTest1.Left( linkAliasTest1.Length - 1);
                         }
                     }
 
@@ -1291,7 +1291,7 @@ namespace Contensive.Core.Controllers {
                             LinkNoProtocol = cpCore.webServer.requestPathPage.Substring(Pos + 2);
                             Pos = genericController.vbInstr(Pos + 3, cpCore.webServer.requestPathPage, "/", Microsoft.VisualBasic.Constants.vbBinaryCompare);
                             if (Pos != 0) {
-                                linkDomain = cpCore.webServer.requestPathPage.Substring(0, Pos - 1);
+                                linkDomain = cpCore.webServer.requestPathPage.Left( Pos - 1);
                                 LinkFullPath = cpCore.webServer.requestPathPage.Substring(Pos - 1);
                                 //
                                 // strip off leading or trailing slashes, and return only the string between the leading and secton slash
@@ -1449,7 +1449,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     bool SecureLink_Required = SecureLink_Template_Required || SecureLink_Page_Required;
-                    bool SecureLink_CurrentURL = (cpCore.webServer.requestUrl.ToLower().Substring(0, 8) == "https://");
+                    bool SecureLink_CurrentURL = (cpCore.webServer.requestUrl.ToLower().Left( 8) == "https://");
                     if (SecureLink_CurrentURL && (!SecureLink_Required)) {
                         //
                         // -- redirect to non-secure
@@ -1548,7 +1548,7 @@ namespace Contensive.Core.Controllers {
                         Position = genericController.vbInstr(1, main_ServerReferrerURL, "?");
                         if (Position != 0) {
                             main_ServerReferrerQs = main_ServerReferrerURL.Substring(Position);
-                            main_ServerReferrerURL = main_ServerReferrerURL.Substring(0, Position - 1);
+                            main_ServerReferrerURL = main_ServerReferrerURL.Left( Position - 1);
                         }
                         if (main_ServerReferrerURL.Substring(main_ServerReferrerURL.Length - 1) == "/") {
                             //
@@ -1677,7 +1677,7 @@ namespace Contensive.Core.Controllers {
                                 // People Record
                                 //
                                 FormValue = cpcore.docProperties.getText(tempVar.PeopleField);
-                                if ((!string.IsNullOrEmpty(FormValue)) & genericController.EncodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "people", tempVar.PeopleField, "uniquename"))) {
+                                if ((!string.IsNullOrEmpty(FormValue)) & genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "people", tempVar.PeopleField, "uniquename"))) {
                                     SQL = "select count(*) from ccMembers where " + tempVar.PeopleField + "=" + cpcore.db.encodeSQLText(FormValue);
                                     CS = cpcore.db.csOpenSql(SQL);
                                     if (cpcore.db.csOk(CS)) {
@@ -1688,7 +1688,7 @@ namespace Contensive.Core.Controllers {
                                         errorController.error_AddUserError(cpcore, "The field [" + tempVar.Caption + "] must be unique, and the value [" + genericController.encodeHTML(FormValue) + "] has already been used.");
                                     }
                                 }
-                                if ((tempVar.REquired | genericController.EncodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
+                                if ((tempVar.REquired | genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
                                     errorController.error_AddUserError(cpcore, "The field [" + genericController.encodeHTML(tempVar.Caption) + "] is required.");
                                 } else {
@@ -1774,7 +1774,7 @@ namespace Contensive.Core.Controllers {
                         // Join Groups requested by pageform
                         //
                         if (f.AddGroupNameList != "") {
-                            Groups = (Convert.ToString(f.AddGroupNameList).Trim(' ')).Split(',');
+                            Groups = (encodeText(f.AddGroupNameList).Trim(' ')).Split(',');
                             for (Ptr = 0; Ptr <= Groups.GetUpperBound(0); Ptr++) {
                                 GroupName = Groups[Ptr].Trim(' ');
                                 if (!string.IsNullOrEmpty(GroupName)) {
@@ -1828,7 +1828,7 @@ namespace Contensive.Core.Controllers {
                     if (PtrFront > 0) {
                         PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}");
                         if (PtrBack > 0) {
-                            result.PreRepeat = Formhtml.Substring(0, PtrFront - 1);
+                            result.PreRepeat = Formhtml.Left( PtrFront - 1);
                             PtrFront = genericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", 1);
                             if (PtrFront > 0) {
                                 result.RepeatCell = Formhtml.Substring(PtrBack + 1, PtrFront - PtrBack - 2);
@@ -1845,7 +1845,7 @@ namespace Contensive.Core.Controllers {
                                             // decode Version 1 arguments, then start instructions line at line 1
                                             //
                                             result.AddGroupNameList = genericController.encodeText(i[1]);
-                                            result.AuthenticateOnFormProcess = genericController.EncodeBoolean(i[2]);
+                                            result.AuthenticateOnFormProcess = genericController.encodeBoolean(i[2]);
                                             IStart = 3;
                                         }
                                         //
@@ -1860,7 +1860,7 @@ namespace Contensive.Core.Controllers {
                                             if (IArgs.GetUpperBound(0) >= main_IPosMax) {
                                                 tempVar.Caption = IArgs[main_IPosCaption];
                                                 tempVar.Type = genericController.EncodeInteger(IArgs[main_IPosType]);
-                                                tempVar.REquired = genericController.EncodeBoolean(IArgs[main_IPosRequired]);
+                                                tempVar.REquired = genericController.encodeBoolean(IArgs[main_IPosRequired]);
                                                 switch (tempVar.Type) {
                                                     case 1:
                                                         //
@@ -1956,7 +1956,7 @@ namespace Contensive.Core.Controllers {
                                 CSPeople = cpcore.db.csOpenRecord("people", cpcore.doc.authContext.user.id);
                             }
                             Caption = tempVar.Caption;
-                            if (tempVar.REquired | genericController.EncodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "People", tempVar.PeopleField, "Required"))) {
+                            if (tempVar.REquired | genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "People", tempVar.PeopleField, "Required"))) {
                                 Caption = "*" + Caption;
                             }
                             if (cpcore.db.csOk(CSPeople)) {
@@ -2300,13 +2300,13 @@ namespace Contensive.Core.Controllers {
                                 Body = Body + getTableRow("Link", cpCore.webServer.requestUrl, false);
                                 Body = Body + getTableRow("Page Name", PageName, true);
                                 Body = Body + getTableRow("Member Name", cpCore.doc.authContext.user.name, false);
-                                Body = Body + getTableRow("Member #", Convert.ToString(cpCore.doc.authContext.user.id), true);
-                                Body = Body + getTableRow("Visit Start Time", Convert.ToString(cpCore.doc.authContext.visit.StartTime), false);
-                                Body = Body + getTableRow("Visit #", Convert.ToString(cpCore.doc.authContext.visit.id), true);
+                                Body = Body + getTableRow("Member #", encodeText(cpCore.doc.authContext.user.id), true);
+                                Body = Body + getTableRow("Visit Start Time", encodeText(cpCore.doc.authContext.visit.StartTime), false);
+                                Body = Body + getTableRow("Visit #", encodeText(cpCore.doc.authContext.visit.id), true);
                                 Body = Body + getTableRow("Visit IP", cpCore.webServer.requestRemoteIP, false);
                                 Body = Body + getTableRow("Browser ", cpCore.webServer.requestBrowser, true);
-                                Body = Body + getTableRow("Visitor #", Convert.ToString(cpCore.doc.authContext.visitor.ID), false);
-                                Body = Body + getTableRow("Visit Authenticated", Convert.ToString(cpCore.doc.authContext.visit.VisitAuthenticated), true);
+                                Body = Body + getTableRow("Visitor #", encodeText(cpCore.doc.authContext.visitor.ID), false);
+                                Body = Body + getTableRow("Visit Authenticated", encodeText(cpCore.doc.authContext.visit.VisitAuthenticated), true);
                                 Body = Body + getTableRow("Visit Referrer", cpCore.doc.authContext.visit.HTTP_REFERER, false);
                                 Body = Body + kmaEndTable;
                                 cpCore.email.sendPerson(cpCore.doc.page.ContactMemberID, cpCore.siteProperties.getText("EmailFromAddress", "info@" + cpCore.webServer.requestDomain), "Page Hit Notification", Body, false, true, 0, "", false);

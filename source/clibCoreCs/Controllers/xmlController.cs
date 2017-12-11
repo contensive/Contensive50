@@ -275,7 +275,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- <cdef>
                         //
-                        IsBaseContent = genericController.EncodeBoolean(dr["isBaseContent"]);
+                        IsBaseContent = genericController.encodeBoolean(dr["isBaseContent"]);
                         iContentName = GetRSXMLAttribute(appName, dr, "Name");
                         ContentID = genericController.EncodeInteger(dr["ID"]);
                         sb.Append("\r\n\t<CDef");
@@ -472,16 +472,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string GetXMLContentDefinition(string ContentName = "") {
-            //
-            string appName;
-            //
-            appName = cpCore.serverConfig.appConfig.name;
             return GetXMLContentDefinition3(ContentName, false);
-            //
-            // ----- Error Trap
-            //
-            //ErrorTrap:
-            HandleClassErrorAndBubble(appName, "GetXMLContentDefinition");
         }
         //'
         //'========================================================================
@@ -602,7 +593,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         private bool GetXMLAttributeBoolean(bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
-            return genericController.EncodeBoolean(GetXMLAttribute(Found, Node, Name, Convert.ToString(DefaultIfNotFound)));
+            return genericController.encodeBoolean(GetXMLAttribute(Found, Node, Name, encodeText(DefaultIfNotFound)));
         }
         //
         //========================================================================
@@ -1036,7 +1027,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         private string xaB(object Source) {
-            return Convert.ToString(genericController.EncodeBoolean(genericController.encodeText(Source)));
+            return encodeText(genericController.encodeBoolean(genericController.encodeText(Source)));
         }
         //
         //===========================================================================

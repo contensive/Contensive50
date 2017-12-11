@@ -163,26 +163,26 @@ namespace Contensive.Core.Models.Complex {
                         //
                         string contentName = null;
                         DataRow row = dt.Rows[0];
-                        contentName = Convert.ToString(genericController.encodeText(row[1])).Trim(' ');
+                        contentName = encodeText(genericController.encodeText(row[1])).Trim(' ');
                         string contentTablename = genericController.encodeText(row[10]);
                         result.Name = contentName;
                         result.Id = contentId;
-                        result.AllowAdd = genericController.EncodeBoolean(row[3]);
-                        result.DeveloperOnly = genericController.EncodeBoolean(row[4]);
-                        result.AdminOnly = genericController.EncodeBoolean(row[5]);
-                        result.AllowDelete = genericController.EncodeBoolean(row[6]);
+                        result.AllowAdd = genericController.encodeBoolean(row[3]);
+                        result.DeveloperOnly = genericController.encodeBoolean(row[4]);
+                        result.AdminOnly = genericController.encodeBoolean(row[5]);
+                        result.AllowDelete = genericController.encodeBoolean(row[6]);
                         result.parentID = genericController.EncodeInteger(row[7]);
                         result.DropDownFieldList = genericController.vbUCase(genericController.encodeText(row[9]));
                         result.ContentTableName = genericController.encodeText(contentTablename);
                         result.ContentDataSourceName = "default";
-                        result.AllowCalendarEvents = genericController.EncodeBoolean(row[15]);
+                        result.AllowCalendarEvents = genericController.encodeBoolean(row[15]);
                         result.DefaultSortMethod = genericController.encodeText(row[17]);
                         if (string.IsNullOrEmpty(result.DefaultSortMethod)) {
                             result.DefaultSortMethod = "name";
                         }
                         result.EditorGroupName = genericController.encodeText(row[18]);
-                        result.AllowContentTracking = genericController.EncodeBoolean(row[19]);
-                        result.AllowTopicRules = genericController.EncodeBoolean(row[20]);
+                        result.AllowContentTracking = genericController.encodeBoolean(row[19]);
+                        result.AllowTopicRules = genericController.encodeBoolean(row[20]);
                         // .AllowMetaContent = genericController.EncodeBoolean(row[21])
                         //
                         result.ActiveOnly = true;
@@ -325,7 +325,7 @@ namespace Contensive.Core.Models.Complex {
                                     // translate htmlContent to fieldtypehtml
                                     //   this is also converted in upgrade, daily housekeep, addon install
                                     //
-                                    bool fieldHtmlContent = genericController.EncodeBoolean(rowWithinLoop[25]);
+                                    bool fieldHtmlContent = genericController.encodeBoolean(rowWithinLoop[25]);
                                     if (fieldHtmlContent) {
                                         if (fieldTypeId == FieldTypeIdLongText) {
                                             fieldTypeId = FieldTypeIdHTML;
@@ -333,16 +333,16 @@ namespace Contensive.Core.Models.Complex {
                                             fieldTypeId = FieldTypeIdFileHTML;
                                         }
                                     }
-                                    field.active = genericController.EncodeBoolean(rowWithinLoop[24]);
-                                    field.adminOnly = genericController.EncodeBoolean(rowWithinLoop[8]);
-                                    field.authorable = genericController.EncodeBoolean(rowWithinLoop[27]);
-                                    field.blockAccess = genericController.EncodeBoolean(rowWithinLoop[38]);
+                                    field.active = genericController.encodeBoolean(rowWithinLoop[24]);
+                                    field.adminOnly = genericController.encodeBoolean(rowWithinLoop[8]);
+                                    field.authorable = genericController.encodeBoolean(rowWithinLoop[27]);
+                                    field.blockAccess = genericController.encodeBoolean(rowWithinLoop[38]);
                                     field.caption = genericController.encodeText(rowWithinLoop[16]);
                                     field.dataChanged = false;
                                     //.Changed
                                     field.contentId = contentId;
                                     field.defaultValue = genericController.encodeText(rowWithinLoop[22]);
-                                    field.developerOnly = genericController.EncodeBoolean(rowWithinLoop[0]);
+                                    field.developerOnly = genericController.encodeBoolean(rowWithinLoop[0]);
                                     field.editSortPriority = genericController.EncodeInteger(rowWithinLoop[10]);
                                     field.editTabName = genericController.encodeText(rowWithinLoop[34]);
                                     field.fieldTypeId = fieldTypeId;
@@ -354,7 +354,7 @@ namespace Contensive.Core.Models.Complex {
                                     field.indexWidth = genericController.encodeText(genericController.EncodeInteger(genericController.encodeText(rowWithinLoop[5]).Replace("%", "")));
                                     field.inherited = false;
                                     field.installedByCollectionGuid = genericController.encodeText(rowWithinLoop[39]);
-                                    field.isBaseField = genericController.EncodeBoolean(rowWithinLoop[38]);
+                                    field.isBaseField = genericController.encodeBoolean(rowWithinLoop[38]);
                                     field.isModifiedSinceInstalled = false;
                                     field.lookupContentID = genericController.EncodeInteger(rowWithinLoop[18]);
                                     //.lookupContentName = ""
@@ -368,19 +368,19 @@ namespace Contensive.Core.Models.Complex {
                                     field.MemberSelectGroupID = genericController.EncodeInteger(rowWithinLoop[36]);
                                     //.MemberSelectGroupName(cpCore) = ""
                                     field.nameLc = fieldNameLower;
-                                    field.NotEditable = genericController.EncodeBoolean(rowWithinLoop[26]);
-                                    field.Password = genericController.EncodeBoolean(rowWithinLoop[3]);
-                                    field.ReadOnly = genericController.EncodeBoolean(rowWithinLoop[17]);
+                                    field.NotEditable = genericController.encodeBoolean(rowWithinLoop[26]);
+                                    field.Password = genericController.encodeBoolean(rowWithinLoop[3]);
+                                    field.ReadOnly = genericController.encodeBoolean(rowWithinLoop[17]);
                                     field.RedirectContentID = genericController.EncodeInteger(rowWithinLoop[19]);
                                     //.RedirectContentName(cpCore) = ""
                                     field.RedirectID = genericController.encodeText(rowWithinLoop[21]);
                                     field.RedirectPath = genericController.encodeText(rowWithinLoop[20]);
-                                    field.Required = genericController.EncodeBoolean(rowWithinLoop[14]);
-                                    field.RSSTitleField = genericController.EncodeBoolean(rowWithinLoop[32]);
-                                    field.RSSDescriptionField = genericController.EncodeBoolean(rowWithinLoop[33]);
-                                    field.Scramble = genericController.EncodeBoolean(rowWithinLoop[35]);
-                                    field.TextBuffered = genericController.EncodeBoolean(rowWithinLoop[2]);
-                                    field.UniqueName = genericController.EncodeBoolean(rowWithinLoop[1]);
+                                    field.Required = genericController.encodeBoolean(rowWithinLoop[14]);
+                                    field.RSSTitleField = genericController.encodeBoolean(rowWithinLoop[32]);
+                                    field.RSSDescriptionField = genericController.encodeBoolean(rowWithinLoop[33]);
+                                    field.Scramble = genericController.encodeBoolean(rowWithinLoop[35]);
+                                    field.TextBuffered = genericController.encodeBoolean(rowWithinLoop[2]);
+                                    field.UniqueName = genericController.encodeBoolean(rowWithinLoop[1]);
                                     //.ValueVariant
                                     //
                                     field.HelpCustom = genericController.encodeText(rowWithinLoop[41]);
@@ -470,7 +470,7 @@ namespace Contensive.Core.Models.Complex {
                         //
                         foreach (var keyvaluepair in cdef.adminColumns) {
                             adminColumn = keyvaluepair.Value;
-                            adminColumn.Width = Convert.ToInt32(100 * ((double)adminColumn.Width / (double)FieldWidthTotal));
+                            adminColumn.Width = EncodeInteger(100 * ((double)adminColumn.Width / (double)FieldWidthTotal));
                         }
                     }
                 }
@@ -921,7 +921,7 @@ namespace Contensive.Core.Models.Complex {
                         if (dt.Rows.Count > 0) {
                             returnContentId = genericController.EncodeInteger(dt.Rows[0]["ID"]);
                             LcContentGuid = genericController.vbLCase(genericController.encodeText(dt.Rows[0]["ccguid"]));
-                            ContentIsBaseContent = genericController.EncodeBoolean(dt.Rows[0]["IsBaseContent"]);
+                            ContentIsBaseContent = genericController.encodeBoolean(dt.Rows[0]["IsBaseContent"]);
                         }
                         dt.Dispose();
                         //
@@ -1345,7 +1345,7 @@ namespace Contensive.Core.Models.Complex {
                 if (isDataTableOk(rs)) {
                     isNewFieldRecord = false;
                     RecordID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                    RecordIsBaseField = genericController.EncodeBoolean(cpcore.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
+                    RecordIsBaseField = genericController.encodeBoolean(cpcore.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
                 }
                 //
                 // check if this is a non-base field updating a base field

@@ -6,6 +6,8 @@ Imports System.Xml
 Imports Microsoft.Web.Administration
 Imports Contensive.Core.Controllers.genericController
 Imports Contensive.Core.Models.Entity
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
 '
 Namespace Contensive.Core.Controllers
     '
@@ -408,9 +410,9 @@ Namespace Contensive.Core.Controllers
                     cpcore.siteProperties.getText("TrapEmail", "")
                     cpcore.siteProperties.getText("TrapErrors", "0")
                     Dim defaultRouteAddonId As Integer = cpcore.siteProperties.getinteger(spDefaultRouteAddonId, 0)
-                    Dim defaultRouteAddon As Models.Entity.addonModel = Models.Entity.addonModel.create(cpcore, defaultRouteAddonId)
+                    Dim defaultRouteAddon As addonModel = addonModel.create(cpcore, defaultRouteAddonId)
                     If (defaultRouteAddon Is Nothing) Then
-                        defaultRouteAddon = Models.Entity.addonModel.create(cpcore, addonGuidPageManager)
+                        defaultRouteAddon = addonModel.create(cpcore, addonGuidPageManager)
                         If (defaultRouteAddon IsNot Nothing) Then
                             cpcore.siteProperties.setProperty(spDefaultRouteAddonId, defaultRouteAddon.id)
                         End If
@@ -441,21 +443,21 @@ Namespace Contensive.Core.Controllers
                             End If
                             '
                             ' -- primary domain
-                            Dim domain As Models.Entity.domainModel = Models.Entity.domainModel.createByName(cpcore, primaryDomain, New List(Of String))
+                            Dim domain As domainModel = domainModel.createByName(cpcore, primaryDomain, New List(Of String))
                             If (domain Is Nothing) Then
-                                domain = Models.Entity.domainModel.add(cpcore, New List(Of String))
+                                domain = domainModel.add(cpcore, New List(Of String))
                                 domain.name = primaryDomain
                             End If
                             '
                             ' -- Landing Page
-                            Dim landingPage As Models.Entity.pageContentModel = pageContentModel.create(cpcore, DefaultLandingPageGuid, New List(Of String))
+                            Dim landingPage As pageContentModel = pageContentModel.create(cpcore, DefaultLandingPageGuid, New List(Of String))
                             If (landingPage Is Nothing) Then
                                 landingPage = pageContentModel.add(cpcore, New List(Of String))
                                 landingPage.ccguid = DefaultLandingPageGuid
                             End If
                             '
                             ' -- default template
-                            Dim defaultTemplate As Models.Entity.pageTemplateModel = pageTemplateModel.createByName(cpcore, "Default", New List(Of String))
+                            Dim defaultTemplate As pageTemplateModel = pageTemplateModel.createByName(cpcore, "Default", New List(Of String))
                             If (defaultTemplate Is Nothing) Then
                                 defaultTemplate = pageTemplateModel.add(cpcore, New List(Of String))
                                 defaultTemplate.Name = "Default"
@@ -2369,10 +2371,10 @@ Namespace Contensive.Core.Controllers
                     Dim parentId As Integer = verifyNavigatorEntry_getParentIdFromNameSpace(cpCore, menuNameSpace)
                     Dim contentId As Integer = Models.Complex.cdefModel.getContentId(cpCore, ContentName)
                     Dim listCriteria As String = "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(Parentid=" & parentId & ")"
-                    Dim entryList As List(Of Models.Entity.NavigatorEntryModel) = Models.Entity.NavigatorEntryModel.createList(cpCore, listCriteria, "id")
-                    Dim entry As Models.Entity.NavigatorEntryModel
+                    Dim entryList As List(Of NavigatorEntryModel) = NavigatorEntryModel.createList(cpCore, listCriteria, "id")
+                    Dim entry As NavigatorEntryModel
                     If (entryList.Count = 0) Then
-                        entry = Models.Entity.NavigatorEntryModel.add(cpCore)
+                        entry = NavigatorEntryModel.add(cpCore)
                         entry.name = EntryName.Trim
                         entry.ParentID = parentId
                     Else

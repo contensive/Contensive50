@@ -216,7 +216,7 @@ namespace Contensive.Core.Controllers {
                 string MethodName = null;
                 int CS = 0;
                 //
-                iSortFieldList = Convert.ToString(encodeEmptyText(SortFieldList, "")).Trim(' ');
+                iSortFieldList = encodeText(encodeEmptyText(SortFieldList, "")).Trim(' ');
                 //iSortFieldList = encodeMissingText(SortFieldList, "DateAdded")
                 if (string.IsNullOrEmpty(iSortFieldList)) {
                     iSortFieldList = "DateAdded";
@@ -868,7 +868,7 @@ namespace Contensive.Core.Controllers {
                     //
                     string link = PageLink;
                     if (ArchivePages) {
-                        link = genericController.modifyLinkQuery(archiveLink, rnPageId, Convert.ToString(childPage.id), true);
+                        link = genericController.modifyLinkQuery(archiveLink, rnPageId, encodeText(childPage.id), true);
                     }
                     bool blockContentComposite = false;
                     if (childPage.BlockContent | childPage.BlockPage) {
@@ -962,7 +962,7 @@ namespace Contensive.Core.Controllers {
                         // if AllowBrief is false, BriefFilename is not loaded
                         //
                         if ((childPage.BriefFilename != "") & (childPage.AllowBrief)) {
-                            string Brief = Convert.ToString(cpCore.cdnFiles.readFile(childPage.BriefFilename)).Trim(' ');
+                            string Brief = encodeText(cpCore.cdnFiles.readFile(childPage.BriefFilename)).Trim(' ');
                             if (!string.IsNullOrEmpty(Brief)) {
                                 activeList = activeList + "<div class=\"ccListCopy\">" + Brief + "</div>";
                             }
@@ -1117,26 +1117,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public void getAuthoringStatus(string ContentName, int RecordID, ref bool IsSubmitted, ref bool IsApproved, ref string SubmittedName, ref string ApprovedName, ref bool IsInserted, ref bool IsDeleted, ref bool IsModified, ref string ModifiedName, ref DateTime ModifiedDate, ref DateTime SubmittedDate, ref DateTime ApprovedDate) {
-            try {
-                //
-                //If Not (true) Then Exit Sub
-                //
-                string MethodName;
-                //
-                MethodName = "main_GetAuthoringStatus";
-                //
-                cpCore.workflow.getAuthoringStatus(ContentName, RecordID, ref IsSubmitted, ref IsApproved, ref SubmittedName, ref ApprovedName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
-                //
-                return;
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-            //ErrorTrap:
-            ////throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
-                                                                    //
+            cpCore.workflow.getAuthoringStatus(ContentName, RecordID, ref IsSubmitted, ref IsApproved, ref SubmittedName, ref ApprovedName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
         }
         //
         //========================================================================
@@ -1422,7 +1403,7 @@ namespace Contensive.Core.Controllers {
                 CSPointer = cpCore.db.csOpen("Content Watch", "ContentRecordKey=" + cpCore.db.encodeSQLText(ContentRecordKey), "", false, 0, false, false, "Link,Clicks");
                 if (cpCore.db.csOk(CSPointer)) {
                     tempgetContentWatchLinkByKey = cpCore.db.csGetText(CSPointer, "Link");
-                    if (genericController.EncodeBoolean(IncrementClicks)) {
+                    if (genericController.encodeBoolean(IncrementClicks)) {
                         cpCore.db.csSet(CSPointer, "Clicks", cpCore.db.csGetInteger(CSPointer, "clicks") + 1);
                     }
                 } else {
@@ -1527,7 +1508,7 @@ namespace Contensive.Core.Controllers {
             // Convert default page to default link
             //
             DefaultLink = cpCore.siteProperties.serverPageDefault;
-            if (DefaultLink.Substring(0, 1) != "/") {
+            if (DefaultLink.Left( 1) != "/") {
                 DefaultLink = "/" + cpCore.siteProperties.serverPageDefault;
             }
             //
@@ -1689,7 +1670,7 @@ namespace Contensive.Core.Controllers {
             List<Models.Entity.linkAliasModel> linkAliasList = linkAliasModel.createList(cpcore, PageID, QueryStringSuffix);
             if (linkAliasList.Count > 0) {
                 linkAlias = linkAliasList.First().name;
-                if (linkAlias.Substring(0, 1) != "/") {
+                if (linkAlias.Left( 1) != "/") {
                     linkAlias = "/" + linkAlias;
                 }
             }
@@ -1778,9 +1759,9 @@ namespace Contensive.Core.Controllers {
                         Ptr = Ptr + 1;
                     }
                     if (WorkingLinkAlias.Substring(WorkingLinkAlias.Length - 1) == "\t") {
-                        WorkingLinkAlias = WorkingLinkAlias.Substring(0, WorkingLinkAlias.Length - 1);
+                        WorkingLinkAlias = WorkingLinkAlias.Left( WorkingLinkAlias.Length - 1);
                     }
-                    if (WorkingLinkAlias.Substring(0, 1) == "\t") {
+                    if (WorkingLinkAlias.Left( 1) == "\t") {
                         WorkingLinkAlias = WorkingLinkAlias.Substring(1);
                     }
                     WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, "\t", "-");
@@ -1788,7 +1769,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Make sure there is not a folder or page in the wwwroot that matches this Alias
                         //
-                        if (WorkingLinkAlias.Substring(0, 1) != "/") {
+                        if (WorkingLinkAlias.Left( 1) != "/") {
                             WorkingLinkAlias = "/" + WorkingLinkAlias;
                         }
                         //
@@ -2148,14 +2129,14 @@ namespace Contensive.Core.Controllers {
                                 Filename = cpCore.db.csGet(CS, "filename");
                                 Pos = Filename.LastIndexOf("/") + 1;
                                 if (Pos > 0) {
-                                    FilePath = Filename.Substring(0, Pos);
+                                    FilePath = Filename.Left( Pos);
                                     Filename = Filename.Substring(Pos);
                                 }
                                 cpCore.db.csSet(CS, "filesize", cpCore.appRootFiles.main_GetFileSize(FilePath + Filename));
                                 Pos = Filename.LastIndexOf(".") + 1;
                                 if (Pos > 0) {
                                     FilenameExt = Filename.Substring(Pos);
-                                    FilenameNoExt = Filename.Substring(0, Pos - 1);
+                                    FilenameNoExt = Filename.Left( Pos - 1);
                                     if (genericController.vbInstr(1, "jpg,gif,png", FilenameExt, 1) != 0) {
                                         sf = new imageEditController();
                                         if (sf.load(cpCore.appRootFiles.rootLocalPath + FilePath + Filename)) {
@@ -2172,7 +2153,7 @@ namespace Contensive.Core.Controllers {
                                                 // Attempt to make 640x
                                                 //
                                                 if (sf.width >= 640) {
-                                                    sf.height = Convert.ToInt32(sf.height * (640 / sf.width));
+                                                    sf.height = EncodeInteger(sf.height * (640 / sf.width));
                                                     sf.width = 640;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + "\r\n640x" + sf.height;
@@ -2181,7 +2162,7 @@ namespace Contensive.Core.Controllers {
                                                 // Attempt to make 320x
                                                 //
                                                 if (sf.width >= 320) {
-                                                    sf.height = Convert.ToInt32(sf.height * (320 / sf.width));
+                                                    sf.height = EncodeInteger(sf.height * (320 / sf.width));
                                                     sf.width = 320;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt);
 
@@ -2191,7 +2172,7 @@ namespace Contensive.Core.Controllers {
                                                 // Attempt to make 160x
                                                 //
                                                 if (sf.width >= 160) {
-                                                    sf.height = Convert.ToInt32(sf.height * (160 / sf.width));
+                                                    sf.height = EncodeInteger(sf.height * (160 / sf.width));
                                                     sf.width = 160;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + "\r\n160x" + sf.height;
@@ -2200,7 +2181,7 @@ namespace Contensive.Core.Controllers {
                                                 // Attempt to make 80x
                                                 //
                                                 if (sf.width >= 80) {
-                                                    sf.height = Convert.ToInt32(sf.height * (80 / sf.width));
+                                                    sf.height = EncodeInteger(sf.height * (80 / sf.width));
                                                     sf.width = 80;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + "\r\n80x" + sf.height;
@@ -2379,7 +2360,7 @@ namespace Contensive.Core.Controllers {
                     cpCore.db.csGoNext(CS);
                 }
                 if (!string.IsNullOrEmpty(KeywordList)) {
-                    if (KeywordList.Substring(0, 1) == ",") {
+                    if (KeywordList.Left( 1) == ",") {
                         KeywordList = KeywordList.Substring(1);
                     }
                     //KeyWordList = Mid(KeyWordList, 2)

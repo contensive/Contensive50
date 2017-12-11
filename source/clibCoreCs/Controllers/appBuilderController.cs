@@ -23,11 +23,11 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private struct fieldTypePrivate {
-            public string Name;
-            //INSTANT C# NOTE: This member was renamed since members cannot have the same name as their enclosing type in C#:
-            public int fieldTypePrivate_Renamed;
-        }
+        //private struct fieldTypePrivate {
+        //    public string Name;
+        //    //INSTANT C# NOTE: This member was renamed since members cannot have the same name as their enclosing type in C#:
+        //    public int fieldTypePrivate_Renamed;
+        //}
         //        '
         //        '=======================================================================================
         //        '   Register a dotnet assembly (only with interop perhaps)
@@ -1419,7 +1419,7 @@ namespace Contensive.Core.Controllers {
                         Active = true;
                         DataSourceName = "Default";
                     } else {
-                        Active = genericController.EncodeBoolean(dt.Rows[ptr]["DataSourceActive"]);
+                        Active = genericController.encodeBoolean(dt.Rows[ptr]["DataSourceActive"]);
                         DataSourceName = genericController.encodeText(dt.Rows[ptr]["DataSourcename"]);
                     }
                     if (Active) {

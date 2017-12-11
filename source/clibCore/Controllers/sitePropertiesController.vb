@@ -4,6 +4,8 @@ Option Strict On
 
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
 
 Namespace Contensive.Core.Controllers
     '
@@ -29,7 +31,7 @@ Namespace Contensive.Core.Controllers
         '
         Private ReadOnly Property dbNotReady() As Boolean
             Get
-                Return (cpCore.serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.appStatusEnum.OK)
+                Return (cpCore.serverConfig.appConfig.appStatus <> serverConfigModel.appStatusEnum.OK)
             End Get
         End Property
         '
@@ -327,7 +329,7 @@ Namespace Contensive.Core.Controllers
                             If (recordsAffected = 0) Then
                                 SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" _
                             & SQLTrue _
-                            & "," & cpCore.db.encodeSQLNumber(models.complex.cdefmodel.getcontentid(cpcore,"site properties")) _
+                            & "," & cpCore.db.encodeSQLNumber(Models.Complex.cdefModel.getContentId(cpCore, "site properties")) _
                             & "," & cpCore.db.encodeSQLText(UCase(propertyName)) _
                             & "," & cpCore.db.encodeSQLText(Value) _
                             & "," & SQLNow _

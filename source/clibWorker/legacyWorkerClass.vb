@@ -15,6 +15,8 @@ Imports System.Text
 Imports System.Threading
 Imports System.Web
 Imports Microsoft.VisualBasic
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Context
 
 Namespace Contensive
 #Const includeTracing = False
@@ -148,7 +150,7 @@ Namespace Contensive
                     '
                     ' call .dispose for managed objects
                     '
-                    cpCore.dispose()
+                    cpCore.Dispose()
                 End If
                 '
                 ' cp  creates and destroys cmc
@@ -795,13 +797,13 @@ Namespace Contensive
                     '
                     ' Bad username and password
                     '
-                    logController.appendLog(cpcore,"serverClass.executeServerCmd", "bad username/password.")
+                    logController.appendLog(cpCore, "serverClass.executeServerCmd", "bad username/password.")
                     returnString = "ERROR " & ignoreString
                 Else
                     '
                     ' authenticated
                     '
-                    logController.appendLog(cpcore,"serverClass.executeServerCmd, switch on method=[" & Method & "]")
+                    logController.appendLog(cpCore, "serverClass.executeServerCmd, switch on method=[" & Method & "]")
                     Select Case genericController.vbUCase(Method)
                         Case "CONNECT"
                             '
@@ -1028,7 +1030,7 @@ Namespace Contensive
                             '
                             ' ccCmd parse the command line with a "&". Quotes in the values need to be doubled
                             '
-                            logController.appendLog(cpcore,"serverClass.executeServerCmd, ccCMD method case")
+                            logController.appendLog(cpCore, "serverClass.executeServerCmd, ccCMD method case")
                             '
                             Cmd = Method
                             QSPairs = Split(queryString, "&")
@@ -1068,7 +1070,7 @@ Namespace Contensive
                                 Method = Method
                             End If
                             '
-                            logController.appendLog(cpcore,"serverClass.executeServerCmd, adding command to Queue [" & Cmd & "]")
+                            logController.appendLog(cpCore, "serverClass.executeServerCmd, adding command to Queue [" & Cmd & "]")
                             '
                             If Not addAsyncCmd(cpCore, Cmd, False) Then
                                 returnString = "Command was blocked because there are too many commands waiting, or this is a duplicate command."
@@ -1081,7 +1083,7 @@ Namespace Contensive
                         Case Else
                             returnString = "ERROR " & ignoreString & vbCrLf & "unknown command [" & Method & "]"
                             '
-                            logController.appendLog(cpcore,"serverClass.executeServerCmd, unknown cmd=[" & Cmd & "]")
+                            logController.appendLog(cpCore, "serverClass.executeServerCmd, unknown cmd=[" & Cmd & "]")
                             '
                     End Select
                 End If
@@ -1236,13 +1238,13 @@ Namespace Contensive
                 '
                 RightNow = DateTime.Now
                 SQLNow = cpCore.db.encodeSQLDate(RightNow)
-                For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cpCore.serverConfig.apps
+                For Each kvp As KeyValuePair(Of String, serverConfigModel.appConfigModel) In cpCore.serverConfig.apps
                     AppName = kvp.Value.name
                     '
                     ' permissions issue -- this is a root process - maybe the token will be saved in a configuration file
                     '
                     cpSite = New CPClass(AppName)
-                    If cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK Then
+                    If cpSite.core.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK Then
                         hint &= ",app [" & AppName & "] is running, setup cp and cmc"
                         '
                         ' Execute Processes
@@ -1326,7 +1328,7 @@ Namespace Contensive
                 Dim Ptr As Integer
                 Dim LcaseCommand As String
                 '
-                logController.appendLog(cpcore,"serverClass.addAsyncCmd, command=[" & Command & "], BlockDuplicates=[" & BlockDuplicates & "]")
+                logController.appendLog(cpCore, "serverClass.addAsyncCmd, command=[" & Command & "], BlockDuplicates=[" & BlockDuplicates & "]")
                 '
                 returnBoolean = True
                 LcaseCommand = genericController.vbLCase(Command)
@@ -1335,7 +1337,7 @@ Namespace Contensive
                     ' Server Queue is too large, block the add
                     '
                     returnBoolean = False
-                    logController.appendLog(cpcore,"addAsyncCmd, Server Cmd was blocked because Server Queue is too long [" & asyncCmdQueueCnt & "], command was [" & Command & "]")
+                    logController.appendLog(cpCore, "addAsyncCmd, Server Cmd was blocked because Server Queue is too long [" & asyncCmdQueueCnt & "], command was [" & Command & "]")
                 ElseIf BlockDuplicates Then
                     '
                     ' Search for a duplicate
@@ -1343,7 +1345,7 @@ Namespace Contensive
                     For Ptr = 0 To asyncCmdQueueCnt - 1
                         If genericController.vbLCase(asyncCmdQueue(Ptr)) = LcaseCommand Then
                             returnBoolean = False
-                            logController.appendLog(cpcore,"addAsyncCmd, Server Cmd was blocked because there is a duplicate in the queue already, [" & Command & "]")
+                            logController.appendLog(cpCore, "addAsyncCmd, Server Cmd was blocked because there is a duplicate in the queue already, [" & Command & "]")
                             Exit For
                         End If
                     Next
@@ -1359,12 +1361,12 @@ Namespace Contensive
                     asyncCmdQueue(asyncCmdQueueCnt) = Command
                     asyncCmdQueueCnt = asyncCmdQueueCnt + 1
                     '
-                    logController.appendLog(cpcore,"serverClass.addAsyncCmd, command added to ServerCmds, index=[" & asyncCmdQueueCnt & "], call runProcess...")
+                    logController.appendLog(cpCore, "serverClass.addAsyncCmd, command added to ServerCmds, index=[" & asyncCmdQueueCnt & "], call runProcess...")
                     '
                     Call runProcess(cpCore, cpCore.serverConfig.programFilesPath & "\ccCmd.exe", "port=" & serverListenerPort & " max=" & maxCmdInstances)
                 End If
                 '
-                logController.appendLog(cpcore,"serverClass.addAsyncCmd, exit")
+                logController.appendLog(cpCore, "serverClass.addAsyncCmd, exit")
                 '
             Catch ex As Exception
                 Call handleExceptionResume(ex, "addAsyncCmd", "ErrorTrap")
@@ -1439,7 +1441,7 @@ Namespace Contensive
         '======================================================================================
         '
         Public Sub handleExceptionResume(ByVal ex As Exception, ByVal MethodName As String, ByVal LogCopy As String)
-            logController.appendLogWithLegacyRow( cpcore,"(server)", LogCopy, "server", "serverClass", MethodName, -1, ex.Source, ex.ToString, True, True, "", "", "")
+            logController.appendLogWithLegacyRow(cpCore, "(server)", LogCopy, "server", "serverClass", MethodName, -1, ex.Source, ex.ToString, True, True, "", "", "")
         End Sub
         ''
         ''======================================================================================

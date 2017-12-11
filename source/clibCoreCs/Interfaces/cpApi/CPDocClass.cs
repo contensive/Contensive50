@@ -327,7 +327,7 @@ namespace Contensive.Core {
         //=======================================================================================================
         //
         public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return genericController.EncodeBoolean(GetProperty(PropertyName, DefaultValue));
+            return genericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
         }
         //
         //=======================================================================================================

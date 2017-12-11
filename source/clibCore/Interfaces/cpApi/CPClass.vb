@@ -6,7 +6,9 @@ Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 Imports System.Runtime.InteropServices
 Imports Contensive.BaseClasses
-
+Imports Contensive.Core.Models.Complex
+Imports Contensive.Core.Models.Entity
+Imports Contensive.Core.Models.Context
 
 Namespace Contensive.Core
     '
@@ -51,7 +53,7 @@ Namespace Contensive.Core
         ''' constructor for non-Internet app use. Configuration provided manually
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub New(serverConfig As Models.Entity.serverConfigModel)
+        Public Sub New(serverConfig As serverConfigModel)
             MyBase.New()
             core = New coreClass(Me, serverConfig)
         End Sub
@@ -62,7 +64,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="httpContext"></param>
         ''' <remarks></remarks>
-        Public Sub New(serverConfig As Models.Entity.serverConfigModel, httpContext As System.Web.HttpContext)
+        Public Sub New(serverConfig As serverConfigModel, httpContext As System.Web.HttpContext)
             MyBase.New()
             core = New coreClass(Me, serverConfig, httpContext)
         End Sub
@@ -80,7 +82,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         '
-        Public ReadOnly Property status As Models.Entity.serverConfigModel.appStatusEnum
+        Public ReadOnly Property status As serverConfigModel.appStatusEnum
             Get
                 Return core.serverConfig.appConfig.appStatus
             End Get
@@ -120,7 +122,7 @@ Namespace Contensive.Core
                 If (core Is Nothing) Then
                     Return False
                 Else
-                    Return (core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.OK)
+                    Return (core.serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.OK)
                 End If
             End Get
         End Property
@@ -152,9 +154,9 @@ Namespace Contensive.Core
             Dim result As String = ""
             Try
                 If genericController.isGuid(addonNameOrGuid) Then
-                    core.addon.execute(Models.Entity.addonModel.create(core, addonNameOrGuid), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = addonNameOrGuid})
+                    core.addon.execute(addonModel.create(core, addonNameOrGuid), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = addonNameOrGuid})
                 Else
-                    core.addon.execute(Models.Entity.addonModel.createByName(core, addonNameOrGuid), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = addonNameOrGuid})
+                    core.addon.execute(addonModel.createByName(core, addonNameOrGuid), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = addonNameOrGuid})
                 End If
                 'result = core.addon.execute_legacy4(addonNameOrGuid, core.docProperties.getLegacyOptionStringFromVar(), addonContext, Nothing)
             Catch ex As Exception
@@ -173,7 +175,7 @@ Namespace Contensive.Core
         Public Function executeAddon(addonId As Integer, Optional addonContext As Contensive.BaseClasses.CPUtilsBaseClass.addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) As String
             Dim result As String = ""
             Try
-                core.addon.execute(Models.Entity.addonModel.create(core, addonId), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = "id:" & addonId.ToString()})
+                core.addon.execute(addonModel.create(core, addonId), New CPUtilsBaseClass.addonExecuteContext With {.addonType = addonContext, .errorCaption = "id:" & addonId.ToString()})
                 'If Response.isOpen Then
                 '    result = core.addon.execute_legacy6(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.doc.authContext.user.id, core.doc.authContext.visit.VisitAuthenticated)
                 'End If

@@ -179,7 +179,7 @@ namespace Contensive.Core.Controllers {
                     if (true) {
                         CSLog = cpcore.db.csInsertRecord("Email Log", 0);
                         if (cpcore.db.csOk(CSLog)) {
-                            cpcore.db.csSet(CSLog, "Name", "System Email Send " + Convert.ToString(DateTime.Now));
+                            cpcore.db.csSet(CSLog, "Name", "System Email Send " + encodeText(DateTime.Now));
                             cpcore.db.csSet(CSLog, "LogType", EmailLogTypeImmediateSend);
                             cpcore.db.csSet(CSLog, "SendStatus", returnStatus);
                             cpcore.db.csSet(CSLog, "toaddress", ToAddress);
@@ -248,7 +248,7 @@ namespace Contensive.Core.Controllers {
                 //
                 CS = cpcore.db.cs_openContentRecord("People", personId, 0, false, false, "email");
                 if (cpcore.db.csOk(CS)) {
-                    ToAddress = Convert.ToString(cpcore.db.csGetText(CS, "email")).Trim(' ');
+                    ToAddress = encodeText(cpcore.db.csGetText(CS, "email")).Trim(' ');
                     if (string.IsNullOrEmpty(ToAddress)) {
                         returnStatus = "The email was not sent because the to-address was blank.";
                     } else if ((ToAddress.IndexOf("@") + 1 == 0) || (ToAddress.IndexOf(".") + 1 == 0)) {
@@ -571,7 +571,7 @@ namespace Contensive.Core.Controllers {
         public string send_Legacy(string ToAddress, string FromAddress, string SubjectMessage, string BodyMessage, int optionalEmailIdForLog = 0, bool Immediate = true, bool HTML = false) {
             string returnStatus = "";
             try {
-                returnStatus = send(genericController.encodeText(ToAddress), genericController.encodeText(FromAddress), genericController.encodeText(SubjectMessage), genericController.encodeText(BodyMessage), "", "", "", Immediate, genericController.EncodeBoolean(HTML), genericController.EncodeInteger(optionalEmailIdForLog));
+                returnStatus = send(genericController.encodeText(ToAddress), genericController.encodeText(FromAddress), genericController.encodeText(SubjectMessage), genericController.encodeText(BodyMessage), "", "", "", Immediate, genericController.encodeBoolean(HTML), genericController.EncodeInteger(optionalEmailIdForLog));
             } catch (Exception ex) {
                 cpcore.handleException(ex);
                 throw;
@@ -798,11 +798,7 @@ namespace Contensive.Core.Controllers {
         //
         public void sendGroup(string GroupList, string FromAddress, string subject, string Body, bool Immediate, bool HTML) {
             try {
-                //
-                //If Not (true) Then Exit Sub
-                //
                 string rootUrl = null;
-                string MethodName = null;
                 string[] Groups = { };
                 int GroupCount = 0;
                 int GroupPointer = 0;
@@ -820,14 +816,12 @@ namespace Contensive.Core.Controllers {
                 int CSPointer = 0;
                 int ToMemberID = 0;
                 //
-                MethodName = "main_SendGroupEmail";
-                //
                 iGroupList = genericController.encodeText(GroupList);
                 iFromAddress = genericController.encodeText(FromAddress);
                 iSubjectSource = genericController.encodeText(subject);
                 iBodySource = genericController.encodeText(Body);
-                iImmediate = genericController.EncodeBoolean(Immediate);
-                iHTML = genericController.EncodeBoolean(HTML);
+                iImmediate = genericController.encodeBoolean(Immediate);
+                iHTML = genericController.encodeBoolean(HTML);
                 //
                 // Fix links for HTML send - must do it now before encodehtml so eid links will attach
                 //
@@ -845,7 +839,7 @@ namespace Contensive.Core.Controllers {
                             Groups[GroupCount] = iiGroupList;
                             iiGroupList = "";
                         } else {
-                            Groups[GroupCount] = iiGroupList.Substring(0, ParsePosition - 1);
+                            Groups[GroupCount] = iiGroupList.Left( ParsePosition - 1);
                             iiGroupList = iiGroupList.Substring(ParsePosition);
                         }
                         GroupCount = GroupCount + 1;
@@ -967,7 +961,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // valid login account for this email not found
                             //
-                            if (Convert.ToString(vbMid(workingEmail, atPtr + 1)).ToLower() == "contensive.com") {
+                            if (encodeText(vbMid(workingEmail, atPtr + 1)).ToLower() == "contensive.com") {
                                 //
                                 // look for expired account to renew
                                 //
@@ -1038,7 +1032,7 @@ namespace Contensive.Core.Controllers {
                                         Ptr = 0;
                                         while (!usernameOK && (Ptr < 100)) {
                                             //hint = "240"
-                                            Username = EMailName + Convert.ToInt32(Math.Floor(Convert.ToDouble(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
+                                            Username = EMailName + EncodeInteger(Math.Floor(EncodeNumber(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
                                             usernameOK = !cpcore.doc.authContext.isLoginOK(cpcore, Username, "test");
                                             Ptr = Ptr + 1;
                                         }
@@ -1067,7 +1061,7 @@ namespace Contensive.Core.Controllers {
                                         //hint = "310"
                                         for (Ptr = 0; Ptr <= 8; Ptr++) {
                                             //hint = "320"
-                                            Index = Convert.ToInt32(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
+                                            Index = EncodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
                                             Password = Password + vbMid(passwordChrs, Index, 1);
                                         }
                                         //hint = "330"

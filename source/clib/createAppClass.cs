@@ -9,6 +9,7 @@ using System.Security.Permissions;
 using System.Security;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using Contensive.Core.Models.Context;
 
 namespace  Contensive.CLI {
     class createAppClass {
@@ -38,7 +39,7 @@ namespace  Contensive.CLI {
                     //
                     // -- create app
                     Console.Write("\n\nCreate application within the server group [" + cp.core.serverConfig.name + "].");
-                    Core.Models.Entity.serverConfigModel.appConfigModel appConfig = new Core.Models.Entity.serverConfigModel.appConfigModel();
+                    serverConfigModel.appConfigModel appConfig = new serverConfigModel.appConfigModel();
                     //
                     // app name
                     bool appNameOk = false;
@@ -190,10 +191,10 @@ namespace  Contensive.CLI {
 
                     //
                     // -- save the app configuration and reload the server using this app
-                    appConfig.appStatus = Core.Models.Entity.serverConfigModel.appStatusEnum.building;
+                    appConfig.appStatus = serverConfigModel.appStatusEnum.building;
                     cp.core.serverConfig.apps.Add(appName, appConfig);
                     cp.core.serverConfig.saveObject(cp.core);
-                    cp.core.serverConfig = Contensive.Core.Models.Entity.serverConfigModel.getObject(cp.core, appName);
+                    cp.core.serverConfig = serverConfigModel.getObject(cp.core, appName);
                     // 
                     // update local host file
                     //
@@ -233,7 +234,7 @@ namespace  Contensive.CLI {
                     Core.Controllers.appBuilderController.upgrade(cp.core,true);
                     //
                     // -- set the application back to normal mode
-                    cp.core.serverConfig.apps[appName].appMode = Core.Models.Entity.serverConfigModel.appModeEnum.normal;
+                    cp.core.serverConfig.apps[appName].appMode = serverConfigModel.appModeEnum.normal;
                     cp.core.serverConfig.saveObject(cp.core);
                     cp.core.siteProperties.setProperty(constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 }
