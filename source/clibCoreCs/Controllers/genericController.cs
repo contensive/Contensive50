@@ -3333,7 +3333,9 @@ namespace Contensive.Core.Controllers {
         public static bool encodeBoolean(object Expression) {
             bool tempEncodeBoolean = false;
             tempEncodeBoolean = false;
-            if (Expression is bool) {
+            if (Expression == null) {
+                tempEncodeBoolean = false;
+            } else if (Expression is bool) {
                 tempEncodeBoolean = (bool)Expression;
             } else if (vbIsNumeric(Expression)) {
                 tempEncodeBoolean = (encodeText(Expression) != "0");
@@ -4183,19 +4185,19 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// replacement for visual basic isNumeric
         /// </summary>
-        /// <param name="Expression"></param>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        public static bool vbIsNumeric(object Expression) {
+        public static bool vbIsNumeric(object expression) {
             try {
-                if (Expression is DateTime) {
+                if (expression == null) {
                     return false;
-                } else if (Expression == null) {
+                } else if (expression is DateTime) {
                     return false;
-                } else if ((Expression is int) || (Expression is Int16) || (Expression is Int32) || (Expression is Int64) || (Expression is decimal) || (Expression is float) || (Expression is double) || (Expression is bool)) {
+                } else if ((expression is int) || (expression is Int16) || (expression is Int32) || (expression is Int64) || (expression is decimal) || (expression is float) || (expression is double) || (expression is bool)) {
                     return true;
-                } else if (Expression is string) {
+                } else if (expression is string) {
                     double output = 0;
-                    return double.TryParse((string)Expression, out output);
+                    return double.TryParse((string)expression, out output);
                 } else {
                     return false;
                 }

@@ -1430,25 +1430,56 @@ namespace Contensive.Core.Controllers {
             string returnText = "";
             try {
                 var engine = new Microsoft.ClearScript.Windows.VBScriptEngine();
-                string[] Lines = null;
+                //string[] Lines = null;
                 string[] Args = { };
                 string EntryPointArgs = string.Empty;
-                //
-                string WorkingEntryPoint = EntryPoint;
                 string WorkingCode = Code;
-                string EntryPointName = WorkingEntryPoint;
-                int Pos = genericController.vbInstr(1, EntryPointName, "(");
-                if (Pos == 0) {
-                    Pos = genericController.vbInstr(1, EntryPointName, " ");
-                }
-                if (Pos > 1) {
-                    EntryPointArgs = EntryPointName.Substring(Pos - 1).Trim(' ');
-                    EntryPointName = (EntryPointName.Left(Pos - 1)).Trim(' ');
-                    if ((EntryPointArgs.Left(1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
-                        EntryPointArgs = EntryPointArgs.Substring(1, EntryPointArgs.Length - 2);
+                //
+                if (string.IsNullOrEmpty(EntryPoint)) {
+                    //
+                    // -- compatibility mode, if no entry point given, if the code starts with "function myFuncton()" and add "call myFunction()"
+                    int pos = WorkingCode.IndexOf("function");
+                    if (pos >= 0) {
+                        string EntryPointName = WorkingCode.Substring(pos + 8);
+                        pos = EntryPointName.IndexOf("\r");
+                        if (pos > 0) {
+                            EntryPointName = EntryPointName.Substring(0, pos);
+                        }
+                        pos = EntryPointName.IndexOf("\n");
+                        if (pos > 0) {
+                            EntryPointName = EntryPointName.Substring(0, pos);
+                        }
+                        pos = EntryPointName.IndexOf("(");
+                        if (pos > 0) {
+                            EntryPointName = EntryPointName.Substring(0, pos);
+                        }
+                        string entryCode = "\r\ncall " + EntryPointName;
+                        logController.appendLog(cpCore, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + entryCode + "].");
+                        WorkingCode += entryCode;
                     }
-                    Args = SplitDelimited(EntryPointArgs, ",");
+                } else {
+                    //
+                    // -- etnry point provided, remove "()" if included and add to code
+                    string EntryPointName = EntryPoint;
+                    int pos = EntryPointName.IndexOf("(");
+                    if (pos > 0) {
+                        EntryPointName = EntryPointName.Substring(0, pos);
+                    }
+                    string entryCode = "\r\ncall " + EntryPointName;
+                    WorkingCode += entryCode;
                 }
+                //int Pos = genericController.vbInstr(1, EntryPointName, "(");
+                //if (Pos == 0) {
+                //    Pos = genericController.vbInstr(1, EntryPointName, " ");
+                //}
+                //if (Pos > 1) {
+                //    EntryPointArgs = EntryPointName.Substring(Pos - 1).Trim(' ');
+                //    EntryPointName = (EntryPointName.Left(Pos - 1)).Trim(' ');
+                //    if ((EntryPointArgs.Left(1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
+                //        EntryPointArgs = EntryPointArgs.Substring(1, EntryPointArgs.Length - 2);
+                //    }
+                //    Args = SplitDelimited(EntryPointArgs, ",");
+                //}
                 //
                 //MSScriptControl.ScriptControl sc = new MSScriptControl.ScriptControl();
                 //try {
@@ -1532,6 +1563,11 @@ namespace Contensive.Core.Controllers {
                             //    }
                             //}
                             try {
+                                //if ( !string.IsNullOrEmpty(WorkingEntryPoint)) {
+                                //    //
+                                //    // -- if entry point specified, add it to the end
+                                //    WorkingCode += "\r\ncall " + WorkingEntryPoint;
+                                //};
                                 object returnObj = engine.ExecuteCommand(WorkingCode);
                                 if (returnObj != null) {
                                     if (returnObj.GetType() == typeof(String)) {

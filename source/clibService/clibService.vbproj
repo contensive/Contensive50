@@ -357,9 +357,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\clibCore\clibCore.vbproj">
+    <ProjectReference Include="..\clibCoreVb\clibCoreVb.vbproj">
       <Project>{9814C7BD-200C-4C57-859D-5D81899A3421}</Project>
-      <Name>clibCore</Name>
+      <Name>clibCoreVb</Name>
     </ProjectReference>
     <ProjectReference Include="..\clibWorker\legacyWorker.vbproj">
       <Project>{31EDC921-CD8E-4AE8-B74D-0E1B238192B6}</Project>

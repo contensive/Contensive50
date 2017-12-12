@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "clibCore", "clibCore\clibCore.vbproj", "{9814C7BD-200C-4C57-859D-5D81899A3421}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "clibCoreVb", "clibCoreVb\clibCoreVb.vbproj", "{9814C7BD-200C-4C57-859D-5D81899A3421}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webClientExt", "webClientExt\webClientExt.csproj", "{41DC21C3-5FA4-43DD-9EEB-DA8964E5CD66}"
 EndProject
@@ -40,7 +40,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPBaseCs", "cpBaseCs\CPBase
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clibCoreCs", "clibCoreCs\clibCoreCs.csproj", "{46657D07-74BC-4DDC-8FDD-9078EB1A1CD2}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CPBase", "cpBase\CPBase.vbproj", "{E873F18E-47EF-46A9-AEA1-5A8B0F8BEB01}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CPBaseVb", "cpBaseVb\CPBaseVb.vbproj", "{E873F18E-47EF-46A9-AEA1-5A8B0F8BEB01}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clibCore.unitTests", "clibCoreUnitTests\clibCore.unitTests.csproj", "{36E017D4-C4EB-4C0E-8E2B-1F97150B07D9}"
 EndProject

@@ -128,97 +128,28 @@ namespace Contensive.Core {
         }
         //
         //
-        //
         public override double EncodeNumber(object Expression) {
-            double tempEncodeNumber = 0;
-            tempEncodeNumber = 0;
-            try {
-                if (Expression == null) {
-                    tempEncodeNumber = 0;
-                } else if (genericController.vbIsNumeric(Expression)) {
-                    tempEncodeNumber = EncodeNumber(Expression);
-                } else if (Expression is bool) {
-                    if ((bool)Expression) {
-                        tempEncodeNumber = 1;
-                    }
-                }
-            } catch (Exception ex) {
-                tempEncodeNumber = 0;
-            }
-            return tempEncodeNumber;
+            return genericController.EncodeNumber(Expression);
         }
-        //
         //
         //
         public override string EncodeText(object Expression) {
-            string tempencodeText = null;
-            tempencodeText = "";
-            try {
-                if (Expression == null) {
-                    tempencodeText = "";
-                } else if ((System.DBNull)Expression == DBNull.Value) {
-                    tempencodeText = "";
-                } else {
-                    tempencodeText = encodeText(Expression);
-                }
-            } catch( Exception ex ) {
-                tempencodeText = "";
-            }
-
-            return tempencodeText;
+            return genericController.encodeText(Expression);
         }
-        //
         //
         //
         public override bool EncodeBoolean(object Expression) {
-            bool tempEncodeBoolean = false;
-            tempEncodeBoolean = false;
-            try {
-                if (Expression == null) {
-                    tempEncodeBoolean = false;
-                } else if (Expression is bool) {
-                    tempEncodeBoolean = (bool)Expression;
-                } else if (genericController.vbIsNumeric(Expression)) {
-                    tempEncodeBoolean = (encodeText(Expression) != "0");
-                } else if (Expression is string) {
-                    switch (Expression.ToString().ToLower().Trim()) {
-                        case "on":
-                        case "yes":
-                        case "true":
-                            tempEncodeBoolean = true;
-                            break;
-                    }
-                }
-            } catch (Exception ex) {
-                tempEncodeBoolean = false;
-            }
-            return tempEncodeBoolean;
+            return genericController.encodeBoolean(Expression);
         }
-        //
         //
         //
         public override DateTime EncodeDate(object Expression) {
-            DateTime result = DateTime.MinValue;
-            try {
-                if (Expression == null) {
-                    result = DateTime.MinValue;
-                } else if (dateController.IsDate(Expression)) {
-                    result = Convert.ToDateTime(Expression);
-                }
-                if (result < new DateTime(1900, 1, 1)) {
-                    result = DateTime.MinValue;
-                }
-            } catch (Exception ex) {
-                result = DateTime.MinValue;
-            }
-            return result;
+            return genericController.EncodeDate(Expression);
         }
         //
         //
-        //
-        public override string ExecuteAddon(string IdGuidOrName) {
-            addonExecuteContext executeConext = new addonExecuteContext() { addonType = addonContext.ContextPage };
-            if (NumericHelper.IsNumeric(IdGuidOrName)) {
+        private string ExecuteAddon(string IdGuidOrName, addonExecuteContext executeConext) {
+            if (genericController.vbIsNumeric(IdGuidOrName)) {
                 executeConext.errorCaption = "id:" + IdGuidOrName;
                 return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext);
             } else if (genericController.isGuid(IdGuidOrName)) {
@@ -228,39 +159,27 @@ namespace Contensive.Core {
                 executeConext.errorCaption = IdGuidOrName;
                 return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext);
             }
-            //Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), 0)
         }
-        //
-        //
-        //
-        public override string ExecuteAddon(string IdGuidOrName, int WrapperId) {
-            addonExecuteContext executeConext = new addonExecuteContext() {
+        public override string ExecuteAddon(string IdGuidOrName, int WrapperId) => ExecuteAddon(
+            IdGuidOrName,
+            new addonExecuteContext() {
                 addonType = addonContext.ContextPage,
                 wrapperID = WrapperId
-            };
-            if (NumericHelper.IsNumeric(IdGuidOrName)) {
-                return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext);
-            } else if (genericController.isGuid(IdGuidOrName)) {
-                return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, IdGuidOrName), executeConext);
-            } else {
-                return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext);
             }
-            //Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), WrapperId)
-        }
-        //
-        //
-        //
-        public override string ExecuteAddon(string IdGuidOrName, addonContext context) {
-            addonExecuteContext executeConext = new addonExecuteContext() { addonType = context };
-            if (NumericHelper.IsNumeric(IdGuidOrName)) {
-                return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext);
-            } else if (genericController.isGuid(IdGuidOrName)) {
-                return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, IdGuidOrName), executeConext);
-            } else {
-                return CP.core.addon.execute(Models.Entity.addonModel.createByName(CP.core, IdGuidOrName), executeConext);
+        );
+
+        public override string ExecuteAddon(string IdGuidOrName) => ExecuteAddon(
+            IdGuidOrName,
+            new addonExecuteContext() {
+                addonType = addonContext.ContextPage
             }
-            //Return CP.core.addon.execute_legacy4(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), context, Nothing)
-        }
+        );
+        public override string ExecuteAddon(string IdGuidOrName, addonContext context) => ExecuteAddon(
+            IdGuidOrName,
+            new addonExecuteContext() {
+                addonType = context
+            }
+        );
 
         public override string ExecuteAddonAsProcess(string IdGuidOrName) {
             return CP.core.addon.executeAddonAsProcess(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar());

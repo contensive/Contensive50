@@ -333,9 +333,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\clibCore\clibCore.vbproj">
+    <ProjectReference Include="..\clibCoreVb\clibCoreVb.vbproj">
       <Project>{9814C7BD-200C-4C57-859D-5D81899A3421}</Project>
-      <Name>clibCore</Name>
+      <Name>clibCoreVb</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
