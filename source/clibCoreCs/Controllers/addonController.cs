@@ -165,7 +165,7 @@ namespace Contensive.Core.Controllers {
                         //        & "&remotemethodaddon=" & EncodeURL(addon.id.ToString) _
                         //        & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                         //        & ""
-                        //FrameID = "frame" & GetRandomInteger()
+                        //FrameID = "frame" & GetRandomInteger(cpCore)
                         //returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
                         //        & cr & "<script language=javascript type=""text/javascript"">" _
                         //        & cr & "// Safari and Opera need a kick-start." _
@@ -184,7 +184,7 @@ namespace Contensive.Core.Controllers {
                         //'-----------------------------------------------------------------
                         //'
                         //If True Then
-                        //    AsAjaxID = "asajax" & GetRandomInteger()
+                        //    AsAjaxID = "asajax" & GetRandomInteger(cpCore)
                         //    QS = "" _
                         //& RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(addon.id.ToString()) _
                         //& "&HostContentName=" & EncodeRequestVariable(HostContentName) _
@@ -1429,36 +1429,37 @@ namespace Contensive.Core.Controllers {
         private string execute_Script(ref addonModel addon, string Language, string Code, string EntryPoint, int ScriptingTimeout, string ScriptName) {
             string returnText = "";
             try {
-                //string[] Lines = null;
-                //string[] Args = { };
-                //string EntryPointArgs = string.Empty;
-                ////
-                //string WorkingEntryPoint = EntryPoint;
-                //string WorkingCode = Code;
-                //string EntryPointName = WorkingEntryPoint;
-                //int Pos = genericController.vbInstr(1, EntryPointName, "(");
-                //if (Pos == 0) {
-                //    Pos = genericController.vbInstr(1, EntryPointName, " ");
-                //}
-                //if (Pos > 1) {
-                //    EntryPointArgs = EntryPointName.Substring(Pos - 1).Trim(' ');
-                //    EntryPointName = (EntryPointName.Left( Pos - 1)).Trim(' ');
-                //    if ((EntryPointArgs.Left( 1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
-                //        EntryPointArgs = EntryPointArgs.Substring(1, EntryPointArgs.Length - 2);
-                //    }
-                //    Args = SplitDelimited(EntryPointArgs, ",");
-                //}
-                ////
+                var engine = new Microsoft.ClearScript.Windows.VBScriptEngine();
+                string[] Lines = null;
+                string[] Args = { };
+                string EntryPointArgs = string.Empty;
+                //
+                string WorkingEntryPoint = EntryPoint;
+                string WorkingCode = Code;
+                string EntryPointName = WorkingEntryPoint;
+                int Pos = genericController.vbInstr(1, EntryPointName, "(");
+                if (Pos == 0) {
+                    Pos = genericController.vbInstr(1, EntryPointName, " ");
+                }
+                if (Pos > 1) {
+                    EntryPointArgs = EntryPointName.Substring(Pos - 1).Trim(' ');
+                    EntryPointName = (EntryPointName.Left(Pos - 1)).Trim(' ');
+                    if ((EntryPointArgs.Left(1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
+                        EntryPointArgs = EntryPointArgs.Substring(1, EntryPointArgs.Length - 2);
+                    }
+                    Args = SplitDelimited(EntryPointArgs, ",");
+                }
+                //
                 //MSScriptControl.ScriptControl sc = new MSScriptControl.ScriptControl();
                 //try {
-                //    sc.AllowUI = false;
-                //    sc.Timeout = ScriptingTimeout;
-                //    if (!string.IsNullOrEmpty(Language)) {
-                //        sc.Language = Language;
-                //    } else {
-                //        sc.Language = "VBScript";
-                //    }
-                //    sc.AddCode(WorkingCode);
+                //    //sc.AllowUI = false;
+                //    //sc.Timeout = ScriptingTimeout;
+                //    //if (!string.IsNullOrEmpty(Language)) {
+                //    //    sc.Language = Language;
+                //    //} else {
+                //    //    sc.Language = "VBScript";
+                //    //}
+                //    //sc.AddCode(WorkingCode);
                 //} catch (Exception ex) {
                 //    string errorMessage = "Error configuring scripting system";
                 //    if (sc.Error.Number != 0) {
@@ -1474,117 +1475,128 @@ namespace Contensive.Core.Controllers {
                 //    }
                 //    throw new ApplicationException(errorMessage, ex);
                 //}
-                //if (true) {
-                //    try {
-                //        mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(cpCore);
-                //        sc.AddObject("ccLib", mainCsv);
-                //    } catch (Exception ex) {
-                //        //
-                //        // Error adding cclib object
-                //        //
-                //        string errorMessage = "Error adding cclib compatibility object to script environment";
-                //        if (sc.Error.Number != 0) {
-                //            errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                //            if (sc.Error.Line != 0) {
-                //                Lines = genericController.customSplit(WorkingCode, "\r\n");
-                //                if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                //                    errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
-                //                }
-                //            }
-                //        } else {
-                //            errorMessage += ", no scripting error";
-                //        }
-                //        throw new ApplicationException(errorMessage, ex);
-                //    }
-                //    if (true) {
-                //        try {
-                //            sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly);
-                //        } catch (Exception ex) {
-                //            //
-                //            // Error adding cp object
-                //            //
-                //            string errorMessage = "Error adding cp object to script environment";
-                //            if (sc.Error.Number != 0) {
-                //                errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                //                if (sc.Error.Line != 0) {
-                //                    Lines = genericController.customSplit(WorkingCode, "\r\n");
-                //                    if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                //                        errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
-                //                    }
-                //                }
-                //            } else {
-                //                errorMessage += ", no scripting error";
-                //            }
-                //            string addonDescription = getAddonDescription(cpCore, addon);
-                //            errorMessage += ", " + addonDescription;
-                //            throw new ApplicationException(errorMessage, ex);
-                //        }
-                //        if (true) {
-                //            //
-                //            if (string.IsNullOrEmpty(EntryPointName)) {
-                //                if (sc.Procedures.Count > 0) {
-                //                    EntryPointName = sc.Procedures(1).Name;
-                //                }
-                //            }
-                //            try {
-                //                if (string.IsNullOrEmpty(EntryPointArgs)) {
-                //                    returnText = genericController.encodeText(sc.Run(EntryPointName));
+                if (true) {
+                    try {
+                        mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(cpCore);
+                        //sc.AddObject("ccLib", mainCsv);
+                        engine.AddHostObject("ccLib", mainCsv);
+                    } catch (Exception ex) {
+                        ////
+                        //// Error adding cclib object
+                        ////
+                        //string errorMessage = "Error adding cclib compatibility object to script environment";
+                        //if (sc.Error.Number != 0) {
+                        //    errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
+                        //    if (sc.Error.Line != 0) {
+                        //        Lines = genericController.customSplit(WorkingCode, "\r\n");
+                        //        if (Lines.GetUpperBound(0) >= sc.Error.Line) {
+                        //            errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
+                        //        }
+                        //    }
+                        //} else {
+                        //    errorMessage += ", no scripting error";
+                        //}
+                        //throw new ApplicationException(errorMessage, ex);
+                        throw;
+                    }
+                    if (true) {
+                        try {
+                            //sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly);
+                            engine.AddHostObject("cp", cpCore.cp_forAddonExecutionOnly);
+                        } catch (Exception ex) {
+                            ////
+                            //// Error adding cp object
+                            ////
+                            //string errorMessage = "Error adding cp object to script environment";
+                            //if (sc.Error.Number != 0) {
+                            //    errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
+                            //    if (sc.Error.Line != 0) {
+                            //        Lines = genericController.customSplit(WorkingCode, "\r\n");
+                            //        if (Lines.GetUpperBound(0) >= sc.Error.Line) {
+                            //            errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
+                            //        }
+                            //    }
+                            //} else {
+                            //    errorMessage += ", no scripting error";
+                            //}
+                            //string addonDescription = getAddonDescription(cpCore, addon);
+                            //errorMessage += ", " + addonDescription;
+                            //throw new ApplicationException(errorMessage, ex);
+                            throw;
+                        }
+                        if (true) {
+                            //
+                            //if (string.IsNullOrEmpty(EntryPointName)) {
+                            //    if (sc.Procedures.Count > 0) {
+                            //        EntryPointName = sc.Procedures(1).Name;
+                            //    }
+                            //}
+                            try {
+                                object returnObj = engine.ExecuteCommand(WorkingCode);
+                                if (returnObj != null) {
+                                    if (returnObj.GetType() == typeof(String)) {
+                                        returnText = (String)returnObj;
+                                    }
+                                }
+                                //if (string.IsNullOrEmpty(EntryPointArgs)) {
+                                //    returnText = genericController.encodeText(sc.Run(EntryPointName));
 
-                //                } else {
-                //                    switch (Args.GetUpperBound(0)) {
-                //                        case 0:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0]));
-                //                            break;
-                //                        case 1:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1]));
-                //                            break;
-                //                        case 2:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2]));
-                //                            break;
-                //                        case 3:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3]));
-                //                            break;
-                //                        case 4:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4]));
-                //                            break;
-                //                        case 5:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5]));
-                //                            break;
-                //                        case 6:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6]));
-                //                            break;
-                //                        case 7:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7]));
-                //                            break;
-                //                        case 8:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8]));
-                //                            break;
-                //                        case 9:
-                //                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8], Args[9]));
-                //                            break;
-                //                        default:
-                //                            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
-                //                    }
-                //                }
-                //            } catch (Exception ex) {
-                //                string addonDescription = getAddonDescription(cpCore, addon);
-                //                string errorMessage = "Error executing script [" + ScriptName + "], " + addonDescription;
-                //                if (sc.Error.Number != 0) {
-                //                    errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                //                    if (sc.Error.Line != 0) {
-                //                        Lines = genericController.customSplit(WorkingCode, "\r\n");
-                //                        if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                //                            errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
-                //                        }
-                //                    }
-                //                } else {
-                //                    errorMessage = errorMessage + ", " + GetErrString();
-                //                }
-                //                throw new ApplicationException(errorMessage, ex);
-                //            }
-                //        }
-                //    }
-                //}
+                                //} else {
+                                //    switch (Args.GetUpperBound(0)) {
+                                //        case 0:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0]));
+                                //            break;
+                                //        case 1:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1]));
+                                //            break;
+                                //        case 2:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2]));
+                                //            break;
+                                //        case 3:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3]));
+                                //            break;
+                                //        case 4:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4]));
+                                //            break;
+                                //        case 5:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5]));
+                                //            break;
+                                //        case 6:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6]));
+                                //            break;
+                                //        case 7:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7]));
+                                //            break;
+                                //        case 8:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8]));
+                                //            break;
+                                //        case 9:
+                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8], Args[9]));
+                                //            break;
+                                //        default:
+                                //            break;
+                                //            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
+                                //    }
+                                //}
+                            } catch (Exception ex) {
+                                string addonDescription = getAddonDescription(cpCore, addon);
+                                string errorMessage = "Error executing script [" + ScriptName + "], " + addonDescription;
+                                //if (sc.Error.Number != 0) {
+                                //    errorMessage = errorMessage + ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
+                                //    if (sc.Error.Line != 0) {
+                                //        Lines = genericController.customSplit(WorkingCode, "\r\n");
+                                //        if (Lines.GetUpperBound(0) >= sc.Error.Line) {
+                                //            errorMessage = errorMessage + ", code [" + Lines[sc.Error.Line - 1] + "]";
+                                //        }
+                                //    }
+                                //} else {
+                                //    errorMessage = errorMessage + ", " + GetErrString();
+                                //}
+                                throw new ApplicationException(errorMessage, ex);
+                            }
+                        }
+                    }
+                }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;

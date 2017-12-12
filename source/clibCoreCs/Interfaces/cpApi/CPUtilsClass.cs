@@ -104,27 +104,14 @@ namespace Contensive.Core {
 
         public override string EncodeUrl(string Source) {
             return genericController.EncodeURL(Source);
-            //If true Then
-            //    EncodeUrl = cmc.main_EncodeURL(Source)
-            //Else
-            //    EncodeUrl = ""
-            //End If
         }
 
         public override string GetPleaseWaitEnd() {
-            if (true) {
-                return CP.core.programFiles.readFile("resources\\WaitPageClose.htm");
-            } else {
-                return "";
-            }
+            return CP.core.programFiles.readFile("resources\\WaitPageClose.htm");
         }
 
         public override string GetPleaseWaitStart() {
-            if (true) {
                 return CP.core.programFiles.readFile("Resources\\WaitPageOpen.htm");
-            } else {
-                return "";
-            }
         }
 
 
@@ -355,7 +342,7 @@ namespace Contensive.Core {
         }
 
         public override int GetRandomInteger() {
-            return genericController.GetRandomInteger();
+            return genericController.GetRandomInteger(CP.core);
         }
 
         public override bool IsInDelimitedString(string DelimitedString, string TestString, string Delimiter) {

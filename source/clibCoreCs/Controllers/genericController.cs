@@ -2264,10 +2264,10 @@ namespace Contensive.Core.Controllers {
         //   Get a Random Long Value
         //=================================================================================
         //
-        public static int GetRandomInteger() {
-            int RandomBase = EncodeInteger((Math.Pow(2, 30)) - 1); ;
-            int RandomLimit = EncodeInteger((Math.Pow(2, 31)) - RandomBase - 1);
-            return (new Random()).Next(RandomBase, RandomLimit);
+        public static int GetRandomInteger(coreClass cpCore) {
+            int RandomBase = 1; ;
+            int RandomLimit = EncodeInteger( (Math.Pow(2, 31)) - RandomBase - 1);
+            return cpCore.random.Next(RandomBase, RandomLimit);
         }
         //
         //=================================================================================
@@ -2669,7 +2669,6 @@ namespace Contensive.Core.Controllers {
             //
             int Position = 0;
             string ESCString = null;
-            int ESCValue = 0;
             string Digit0 = null;
             string Digit1 = null;
             //Dim iURL As String
@@ -2685,9 +2684,13 @@ namespace Contensive.Core.Controllers {
                 Digit1 = vbUCase(ESCString.Substring(2, 1));
                 if (((string.CompareOrdinal(Digit0, "0") >= 0) && (string.CompareOrdinal(Digit0, "9") <= 0)) || ((string.CompareOrdinal(Digit0, "A") >= 0) && (string.CompareOrdinal(Digit0, "F") <= 0))) {
                     if (((string.CompareOrdinal(Digit1, "0") >= 0) && (string.CompareOrdinal(Digit1, "9") <= 0)) || ((string.CompareOrdinal(Digit1, "A") >= 0) && (string.CompareOrdinal(Digit1, "F") <= 0))) {
-                        ESCValue = int.Parse("&H" + ESCString.Substring(1));
-                        tempDecodeResponseVariable = tempDecodeResponseVariable.Left( Position - 1) + Convert.ToChar(ESCValue) + tempDecodeResponseVariable.Substring(Position + 2);
-                        //  & vbReplace(DecodeResponseVariable, ESCString, Chr(ESCValue), Position, 1)
+                        int ESCValue = 0;
+                        try {
+                            ESCValue = Convert.ToInt32(ESCString.Substring(1), 16);
+                        } catch  {
+                            // do nothing -- just put a 0 in as the escape code was not valid, a data problem not a code problem
+                        }
+                        tempDecodeResponseVariable = tempDecodeResponseVariable.Left(Position - 1) + Convert.ToChar(ESCValue) + tempDecodeResponseVariable.Substring(Position + 2);
                     }
                 }
                 Position = vbInstr(Position + 1, tempDecodeResponseVariable, "%");

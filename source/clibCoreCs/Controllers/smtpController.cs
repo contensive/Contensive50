@@ -172,7 +172,7 @@ namespace Contensive.Core.Controllers {
                 Copy += genericController.encodeText(SubjectMessage) + "\r\n";
                 Copy += genericController.encodeText(HTML) + "\r\n";
                 Copy += genericController.encodeText(BodyMessage);
-                Filename = "Out" + encodeText(genericController.GetRandomInteger()) + ".txt";
+                Filename = "Out" + encodeText(genericController.GetRandomInteger(cpCore)) + ".txt";
                 //
                 cpCore.appRootFiles.saveFile(iEmailOutPath + Filename, Copy);
             } catch( Exception ex ) {

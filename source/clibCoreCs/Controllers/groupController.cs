@@ -55,7 +55,7 @@ namespace Contensive.Core.Controllers {
                     returnGroupId = genericController.EncodeInteger(dt.Rows[0]["ID"]);
                 } else {
                     cid = Models.Complex.cdefModel.getContentId(cpCore, "groups");
-                    createkey = genericController.GetRandomInteger();
+                    createkey = genericController.GetRandomInteger(cpCore);
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" + cid + ",1," + createkey + "," + sqlGroupName + "," + sqlGroupName + ")";
                     cpCore.db.executeQuery(sql);
                     //

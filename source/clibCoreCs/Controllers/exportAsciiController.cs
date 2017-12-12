@@ -51,7 +51,7 @@ namespace Contensive.Core.Controllers {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string TestFilename;
                 //
-                TestFilename = "AsciiExport" + genericController.GetRandomInteger() + ".txt";
+                TestFilename = "AsciiExport" + genericController.GetRandomInteger(cpCore) + ".txt";
                 //
                 iContentName = genericController.encodeText(ContentName);
                 if (PageSize == 0) {

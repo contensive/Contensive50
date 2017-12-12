@@ -18,6 +18,7 @@ namespace Contensive.Core {
         //
         internal CPClass cp_forAddonExecutionOnly { get; set; }
         public Models.Context.serverConfigModel serverConfig { get; set; }
+        public Random random = new Random();
         //
         //===================================================================================================
         /// <summary>

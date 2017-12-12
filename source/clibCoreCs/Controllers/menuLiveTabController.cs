@@ -32,8 +32,8 @@ namespace Contensive.Core.Controllers {
             comboTab.AddEntry(Caption, "", "", LiveBody, false, "ccAdminTab");
         }
         //
-        public string GetTabs() {
-            return comboTab.GetTabs();
+        public string GetTabs(coreClass cpCore) {
+            return comboTab.GetTabs(cpCore);
         }
         //
         public string GetTabBlank() {

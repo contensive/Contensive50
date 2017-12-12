@@ -149,7 +149,7 @@ namespace Contensive.Core {
                     } else {
                         //
                         PreTableCopy = "Use this form to upload an add-on collection. If the GUID of the add-on matches one already installed on this server, it will be updated. If the GUID is new, it will be added.";
-                        InstallFolder = "temp\\CollectionUpload" + encodeText(genericController.GetRandomInteger());
+                        InstallFolder = "temp\\CollectionUpload" + encodeText(genericController.GetRandomInteger(cpCore));
                         privateFilesInstallPath = InstallFolder + "\\";
                         if (Button == constants.ButtonOK) {
                             //

@@ -318,7 +318,7 @@ namespace Contensive.Core.Controllers {
                         MouseClickCode = "";
                         MouseOverCode = "";
                         MouseOutCode = "";
-                        ImageID = "img" + encodeText(genericController.GetRandomInteger()) + "s";
+                        ImageID = "img" + encodeText(genericController.GetRandomInteger(cpCore)) + "s";
                         FlyoutStyle = LocalStyleSheetPrefix + "Button";
                         //
                         switch (MenuStyle) {

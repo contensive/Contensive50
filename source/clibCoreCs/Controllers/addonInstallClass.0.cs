@@ -929,7 +929,7 @@ namespace Contensive.Core {
                     //
                     // if this is not an empty database, get the application collection, else return empty
                     //
-                    ExportFilename = "cdef_export_" + encodeText(genericController.GetRandomInteger()) + ".xml";
+                    ExportFilename = "cdef_export_" + encodeText(genericController.GetRandomInteger(cpCore)) + ".xml";
                     ExportPathPage = "tmp\\" + ExportFilename;
                     exportApplicationCDefXml(cpCore, ExportPathPage, true);
                     CollectionData = cpCore.privateFiles.readFile(ExportPathPage);
@@ -1604,7 +1604,7 @@ namespace Contensive.Core {
                     //
                     // Download all files for this collection and build the collection folder(s)
                     //
-                    workingPath = cpCore.addon.getPrivateFilesAddonPath() + "temp_" + genericController.GetRandomInteger() + "\\";
+                    workingPath = cpCore.addon.getPrivateFilesAddonPath() + "temp_" + genericController.GetRandomInteger(cpCore) + "\\";
                     cpCore.privateFiles.createPath(workingPath);
                     //
                     UpgradeOK = DownloadCollectionFiles(cpCore, workingPath, CollectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage);
@@ -1903,7 +1903,7 @@ namespace Contensive.Core {
                                                                                             //
                                                                                             // LibLastChangeDate <>0, and it is > local lastchangedate
                                                                                             //
-                                                                                            workingPath = cpCore.addon.getPrivateFilesAddonPath() + "\\temp_" + genericController.GetRandomInteger() + "\\";
+                                                                                            workingPath = cpCore.addon.getPrivateFilesAddonPath() + "\\temp_" + genericController.GetRandomInteger(cpCore) + "\\";
                                                                                             if (allowLogging) {
                                                                                                 logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" + workingPath + "].");
                                                                                             }
@@ -5092,7 +5092,7 @@ namespace Contensive.Core {
                     //
                     // now treat as a regular collection and install - to pickup everything else 
                     //
-                    string tmpFolderPath = "tmp" + genericController.GetRandomInteger().ToString() + "\\";
+                    string tmpFolderPath = "tmp" + genericController.GetRandomInteger(cpCore).ToString() + "\\";
                     cpCore.privateFiles.createPath(tmpFolderPath);
                     cpCore.programFiles.copyFile("aoBase5.xml", tmpFolderPath + "aoBase5.xml", cpCore.privateFiles);
                     List<string> ignoreList = new List<string>();

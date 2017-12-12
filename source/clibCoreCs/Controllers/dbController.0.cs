@@ -477,7 +477,7 @@ namespace Contensive.Core.Controllers {
                 string CreateKeyString = null;
                 string DateAddedString = null;
                 //
-                CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger());
+                CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(cpCore));
                 DateAddedString = encodeSQLDate(DateTime.Now);
                 //
                 sqlList.add("createkey", CreateKeyString);
@@ -2438,7 +2438,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         //
-                        CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger());
+                        CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(cpCore));
                         DateAddedString = encodeSQLDate(DateTime.Now);
                         //
                         sqlList.add("CREATEKEY", CreateKeyString); // ArrayPointer)
@@ -4651,7 +4651,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //DataSourceID = cpCore.db.GetDataSourceID(DataSourceName)
                 DateAddedString = cpCore.db.encodeSQLDate(DateTime.Now);
-                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.GetRandomInteger());
+                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.GetRandomInteger(cpCore));
                 //
                 //----------------------------------------------------------------
                 // ----- Read in a record from the table to get fields
@@ -5326,10 +5326,12 @@ namespace Contensive.Core.Controllers {
                     // ----- Close all open csv_ContentSets, and make sure the RS is killed
                     //
                     if (contentSetStoreCount > 0) {
-                        int CSPointer = 0;
-                        for (CSPointer = 1; CSPointer <= contentSetStoreCount; CSPointer++) {
-                            if (contentSetStore[CSPointer].IsOpen) {
-                                csClose(ref CSPointer);
+                        for (int CSPointer = 1; CSPointer <= contentSetStoreCount; CSPointer++) {
+                            int tmpPtr = CSPointer;
+                            if (contentSetStore[tmpPtr] != null ) {
+                                if (contentSetStore[tmpPtr].IsOpen) {
+                                    csClose(ref tmpPtr);
+                                }
                             }
                         }
                     }

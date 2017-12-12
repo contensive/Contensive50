@@ -5100,31 +5100,42 @@ namespace Contensive.Addons.AdminSite {
         private void LoadEditRecord_Request( cdefModel adminContent, editRecordClass editRecord) {
             try {
                 int PageNotFoundPageID = 0;
-                string FormFieldListToBeLoaded = null;
-                string FormEmptyFieldList = null;
                 //
                 // List of fields that were created for the form, and should be verified (starts and ends with a comma)
-                //
-                FormFieldListToBeLoaded = cpCore.docProperties.getText("FormFieldList");
-                if (string.IsNullOrEmpty(FormFieldListToBeLoaded)) {
-                    FormFieldListToBeLoaded = ",";
-                } else {
-                    //FormFieldListToBeLoaded = "," & FormFieldListToBeLoaded & ","
+                var FormFieldLcListToBeLoaded = new List<string> { };
+                string formFieldList = cpCore.docProperties.getText("FormFieldList");
+                if (!string.IsNullOrWhiteSpace(formFieldList)) {
+                    FormFieldLcListToBeLoaded.AddRange(formFieldList.ToLower().Split(','));
+                    // -- remove possible front and end spaces
+                    if (FormFieldLcListToBeLoaded.Contains("")) {
+                        FormFieldLcListToBeLoaded.Remove("");
+                        if (FormFieldLcListToBeLoaded.Contains("")) {
+                            FormFieldLcListToBeLoaded.Remove("");
+                        }
+                    }
                 }
                 //
                 // List of fields coming from the form that are empty -- and should not be in stream (starts and ends with a comma)
+                var FormEmptyFieldLcList = new List<string> { };
+                string emptyFieldList = cpCore.docProperties.getText("FormEmptyFieldList");
+                if (!string.IsNullOrWhiteSpace(emptyFieldList)) {
+                    FormEmptyFieldLcList.AddRange(emptyFieldList.ToLower().Split(','));
+                    // -- remove possible front and end spaces
+                    if (FormEmptyFieldLcList.Contains("")) {
+                        FormEmptyFieldLcList.Remove("");
+                        if (FormEmptyFieldLcList.Contains("")) {
+                            FormEmptyFieldLcList.Remove("");
+                        }
+                    }
+                }
                 //
-                FormEmptyFieldList = cpCore.docProperties.getText("FormEmptyFieldList");
-                //
-                if (AllowAdminFieldCheck() && (FormFieldListToBeLoaded == ",")) {
+                if (AllowAdminFieldCheck() && (FormFieldLcListToBeLoaded.Count==0)) {
                     //
                     // The field list was not returned
-                    //
                     errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no field list].");
-                } else if (AllowAdminFieldCheck() && (string.IsNullOrEmpty(FormEmptyFieldList))) {
+                } else if (AllowAdminFieldCheck() && (FormEmptyFieldLcList.Count==0)) {
                     //
                     // The field list was not returned
-                    //
                     errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no empty field list].");
                 } else {
                     //
@@ -5135,13 +5146,13 @@ namespace Contensive.Addons.AdminSite {
                     //DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
                     foreach (var keyValuePair in adminContent.fields) {
                         CDefFieldModel field = keyValuePair.Value;
-                        LoadEditRecord_RequestField(adminContent, editRecord, field, datasource.Name, ref FormFieldListToBeLoaded, FormEmptyFieldList);
+                        LoadEditRecord_RequestField(adminContent, editRecord, field, datasource.Name, FormFieldLcListToBeLoaded, FormEmptyFieldLcList);
                     }
                     //
                     // If there are any form fields that were no loaded, flag the error now
                     //
-                    if (AllowAdminFieldCheck() & (FormFieldListToBeLoaded != ",")) {
-                        errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" + FormFieldListToBeLoaded.Substring(1, FormFieldListToBeLoaded.Length - 2) + "].");
+                    if (AllowAdminFieldCheck() & (FormFieldLcListToBeLoaded.Count > 0)) {
+                        errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
                         throw (new ApplicationException("Unexpected exception")); // cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
                     } else {
                         //
@@ -5220,22 +5231,16 @@ namespace Contensive.Addons.AdminSite {
         //   Read the Form into the fields array
         //========================================================================
         //
-        private void LoadEditRecord_RequestField( cdefModel adminContent, editRecordClass editRecord, CDefFieldModel field, string ignore, ref string FormFieldListToBeLoaded, string FormEmptyFieldList) {
+        private void LoadEditRecord_RequestField( cdefModel adminContent, editRecordClass editRecord, CDefFieldModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
             try {
                 const int LoopPtrMax = 100;
                 bool blockDuplicateUsername = false;
                 bool blockDuplicateEmail = false;
                 string lcaseCopy = null;
-                bool HasImg = false;
-                bool HasInput = false;
-                bool HasAC = false;
                 int EditorPixelHeight = 0;
                 int EditorRowHeight = 0;
-                htmlToTextControllers HTMLDecode = null;
-                string Copy = null;
-                string FieldName = null;
+                string fieldNameUc = "";
                 bool ResponseFieldValueIsOKToSave = false;
-
                 int CSPointer = 0;
                 bool ResponseFieldIsEmpty = false;
                 string ResponseFieldValueText = null;
@@ -5248,7 +5253,7 @@ namespace Contensive.Addons.AdminSite {
                 bool InLoadedFieldList = false;
                 bool InEmptyFieldList = false;
                 bool InResponse = false;
-                string responseName = null;
+                //string responseName = "";
                 //
                 //   Read in form values
                 //
@@ -5262,13 +5267,15 @@ namespace Contensive.Addons.AdminSite {
                     // Assume OK, mark not ok if there is a problem
                     //
                     ResponseFieldValueIsOKToSave = true;
-                    FieldName = genericController.vbUCase(field.nameLc);
-                    responseName = FieldName;
-                    InLoadedFieldList = (FormFieldListToBeLoaded.IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
-                    InEmptyFieldList = (FormEmptyFieldList.IndexOf("," + responseName + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
-                    InResponse = cpCore.docProperties.containsKey(responseName);
-                    FormFieldListToBeLoaded = FormFieldListToBeLoaded.Replace( "," + FieldName + "," , "," );
-                    ResponseFieldValueText = cpCore.docProperties.getText(responseName);
+                    fieldNameUc = field.nameLc.ToUpper();
+                    //responseName = fieldNameUc;
+                    InEmptyFieldList = FormEmptyFieldLcList.Contains(field.nameLc);
+                    InLoadedFieldList = FormFieldLcListToBeLoaded.Contains(field.nameLc);
+                    if (InLoadedFieldList) {
+                        FormFieldLcListToBeLoaded.Remove(field.nameLc);
+                    }
+                    InResponse = cpCore.docProperties.containsKey(fieldNameUc);
+                    ResponseFieldValueText = cpCore.docProperties.getText(fieldNameUc);
                     ResponseFieldIsEmpty = string.IsNullOrEmpty(ResponseFieldValueText);
                     if (field.editTabName != "") {
                         TabCopy = " In the " + field.editTabName + " tab";
@@ -5276,7 +5283,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // process reserved fields
                     //
-                    switch (FieldName) {
+                    switch (fieldNameUc) {
                         //
                         // ----- block control fields by name
                         //
@@ -5285,18 +5292,18 @@ namespace Contensive.Addons.AdminSite {
                             //
                             //
                             if (AllowAdminFieldCheck()) {
-                                if (!cpCore.docProperties.containsKey(FieldName)) {
+                                if (!cpCore.docProperties.containsKey(fieldNameUc)) {
                                     if (!(cpCore.doc.debug_iUserError != "")) {
                                         //
                                         // Add user error only for the first missing field
                                         //
-                                        errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + FieldName + " Not found]. There may have been others.");
+                                        errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" + fieldNameUc + " Not found]. There may have been others.");
                                     }
                                     throw (new ApplicationException("Unexpected exception")); // cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                 }
                             }
                             //
-                            ResponseFieldValueText = cpCore.docProperties.getText(FieldName);
+                            ResponseFieldValueText = cpCore.docProperties.getText(fieldNameUc);
                             //ResponseValueVariant = cpCore.main_ReadStreamText(FieldName)
                             //ResponseValueText = genericController.encodeText(ResponseValueVariant)
                             if (genericController.EncodeInteger(ResponseFieldValueText) == genericController.EncodeInteger(editRecord.fieldsLc[field.nameLc].value)) {
@@ -5315,17 +5322,16 @@ namespace Contensive.Addons.AdminSite {
                             //
                             //
                             //
-                            InEmptyFieldList = (FormEmptyFieldList.IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
-                            InResponse = cpCore.docProperties.containsKey(FieldName);
+                            InEmptyFieldList = FormEmptyFieldLcList.Contains( fieldNameUc  );
+                            InResponse = cpCore.docProperties.containsKey(fieldNameUc);
                             if (AllowAdminFieldCheck()) {
                                 if ((!InResponse) && (!InEmptyFieldList)) {
-                                    errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" + FieldName + " Not found].");
-                                    throw (new ApplicationException("Unexpected exception")); // cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" + fieldNameUc + " Not found].");
                                     return;
                                 }
                             }
                             //
-                            bool responseValue = cpCore.docProperties.getBoolean(FieldName);
+                            bool responseValue = cpCore.docProperties.getBoolean(fieldNameUc);
 
                             if (!responseValue.Equals(encodeBoolean(editRecord.fieldsLc[field.nameLc].value))) {
                                 //
@@ -5339,17 +5345,16 @@ namespace Contensive.Addons.AdminSite {
                             //
                             //
                             //
-                            InEmptyFieldList = (FormEmptyFieldList.IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
-                            InResponse = cpCore.docProperties.containsKey(FieldName);
+                            InEmptyFieldList = FormEmptyFieldLcList.Contains(fieldNameUc);
+                            InResponse = cpCore.docProperties.containsKey(fieldNameUc);
                             if (AllowAdminFieldCheck()) {
                                 if ((!InResponse) && (!InEmptyFieldList)) {
-                                    errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" + FieldName + " Not found].");
-                                    throw (new ApplicationException("Unexpected exception")); // cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" + fieldNameUc + " Not found].");
                                     return;
                                 }
                             }
                             //
-                            ResponseFieldValueText = cpCore.docProperties.getText(FieldName);
+                            ResponseFieldValueText = cpCore.docProperties.getText(fieldNameUc);
                             if (ResponseFieldValueText == editRecord.fieldsLc[field.nameLc].value.ToString()) {
                                 //
                                 // No change
@@ -5504,13 +5509,13 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // ----- Html fields
                                         //
-                                        EditorRowHeight = cpCore.docProperties.getInteger(FieldName + "Rows");
+                                        EditorRowHeight = cpCore.docProperties.getInteger(fieldNameUc + "Rows");
                                         if (EditorRowHeight != 0) {
-                                            cpCore.userProperty.setProperty(adminContent.Name + "." + FieldName + ".RowHeight", EditorRowHeight);
+                                            cpCore.userProperty.setProperty(adminContent.Name + "." + fieldNameUc + ".RowHeight", EditorRowHeight);
                                         }
-                                        EditorPixelHeight = cpCore.docProperties.getInteger(FieldName + "PixelHeight");
+                                        EditorPixelHeight = cpCore.docProperties.getInteger(fieldNameUc + "PixelHeight");
                                         if (EditorPixelHeight != 0) {
-                                            cpCore.userProperty.setProperty(adminContent.Name + "." + FieldName + ".PixelHeight", EditorPixelHeight);
+                                            cpCore.userProperty.setProperty(adminContent.Name + "." + fieldNameUc + ".PixelHeight", EditorPixelHeight);
                                         }
                                         //
                                         if (!field.htmlContent) {
@@ -5548,17 +5553,17 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // ----- text types
                                         //
-                                        EditorRowHeight = cpCore.docProperties.getInteger(FieldName + "Rows");
+                                        EditorRowHeight = cpCore.docProperties.getInteger(fieldNameUc + "Rows");
                                         if (EditorRowHeight != 0) {
-                                            cpCore.userProperty.setProperty(adminContent.Name + "." + FieldName + ".RowHeight", EditorRowHeight);
+                                            cpCore.userProperty.setProperty(adminContent.Name + "." + fieldNameUc + ".RowHeight", EditorRowHeight);
                                         }
-                                        EditorPixelHeight = cpCore.docProperties.getInteger(FieldName + "PixelHeight");
+                                        EditorPixelHeight = cpCore.docProperties.getInteger(fieldNameUc + "PixelHeight");
                                         if (EditorPixelHeight != 0) {
-                                            cpCore.userProperty.setProperty(adminContent.Name + "." + FieldName + ".PixelHeight", EditorPixelHeight);
+                                            cpCore.userProperty.setProperty(adminContent.Name + "." + fieldNameUc + ".PixelHeight", EditorPixelHeight);
                                         }
                                         break;
                                 }
-                                if (FieldName.ToLower() == "parentid") {
+                                if (fieldNameUc.ToLower() == "parentid") {
                                     //
                                     // check circular reference on all parentid fields
                                     //
@@ -5625,7 +5630,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // ----- Do the unique check for this field
                                     //
-                                    string SQLUnique = "select id from " + adminContent.ContentTableName + " where (" + FieldName + "=" + cpCore.db.EncodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + cdefModel.getContentControlCriteria(cpCore, adminContent.Name) + ")";
+                                    string SQLUnique = "select id from " + adminContent.ContentTableName + " where (" + fieldNameUc + "=" + cpCore.db.EncodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + cdefModel.getContentControlCriteria(cpCore, adminContent.Name) + ")";
                                     if (editRecord.id > 0) {
                                         //
                                         // --editing record
@@ -12750,10 +12755,10 @@ namespace Contensive.Addons.AdminSite {
                                                     cpCore.db.csSet(CSDst, "Name", cpCore.db.csGetText(CSSrc, "name"));
                                                     cpCore.db.csSet(CSDst, SQLFieldName, cpCore.db.csGetText(CSSrc, SQLFieldName));
                                                     if (genericController.vbLCase(cpCore.db.csGetText(CSSrc, "command")) == "xml") {
-                                                        cpCore.db.csSet(CSDst, "Filename", "DupDownload_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger()) + ".xml");
+                                                        cpCore.db.csSet(CSDst, "Filename", "DupDownload_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger(cpCore)) + ".xml");
                                                         cpCore.db.csSet(CSDst, "Command", "BUILDXML");
                                                     } else {
-                                                        cpCore.db.csSet(CSDst, "Filename", "DupDownload_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger()) + ".csv");
+                                                        cpCore.db.csSet(CSDst, "Filename", "DupDownload_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger(cpCore)) + ".csv");
                                                         cpCore.db.csSet(CSDst, "Command", "BUILDCSV");
                                                     }
                                                 }
@@ -12777,7 +12782,7 @@ namespace Contensive.Addons.AdminSite {
                                         TableName = cdefModel.getContentTablename(cpCore, ContentName);
                                         Criteria = cdefModel.getContentControlCriteria(cpCore, ContentName);
                                         Name = "CSV Download, " + ContentName;
-                                        Filename = genericController.vbReplace(ContentName, " ", "") + "_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger()) + ".csv";
+                                        Filename = genericController.vbReplace(ContentName, " ", "") + "_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger(cpCore)) + ".csv";
                                         cpCore.db.csSet(CS, "Name", Name);
                                         cpCore.db.csSet(CS, "Filename", Filename);
                                         cpCore.db.csSet(CS, "Command", "BUILDCSV");
@@ -12794,7 +12799,7 @@ namespace Contensive.Addons.AdminSite {
                                         TableName = cdefModel.getContentTablename(cpCore, ContentName);
                                         Criteria = cdefModel.getContentControlCriteria(cpCore, ContentName);
                                         Name = "XML Download, " + ContentName;
-                                        Filename = genericController.vbReplace(ContentName, " ", "") + "_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger()) + ".xml";
+                                        Filename = genericController.vbReplace(ContentName, " ", "") + "_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger(cpCore)) + ".xml";
                                         cpCore.db.csSet(CS, "Name", Name);
                                         cpCore.db.csSet(CS, "Filename", Filename);
                                         cpCore.db.csSet(CS, "Command", "BUILDXML");
@@ -13421,7 +13426,7 @@ namespace Contensive.Addons.AdminSite {
                                             CS = cpCore.db.csInsertRecord("Tasks");
                                             if (cpCore.db.csOk(CS)) {
                                                 RecordName = "CSV Download, Custom Report [" + Name + "]";
-                                                Filename = "CustomReport_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger()) + ".csv";
+                                                Filename = "CustomReport_" + encodeText(genericController.dateToSeconds(cpCore.doc.profileStartTime)) + encodeText(genericController.GetRandomInteger(cpCore)) + ".csv";
                                                 cpCore.db.csSet(CS, "Name", RecordName);
                                                 cpCore.db.csSet(CS, "Filename", Filename);
                                                 if (Format == "XML") {
@@ -14695,10 +14700,10 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 switch (ExportType) {
                                     case 1:
-                                        taskSchedulerController.main_RequestTask(cpCore, "BuildCSV", SQL, ExportName, "Export-" + encodeText(genericController.GetRandomInteger()) + ".csv");
+                                        taskSchedulerController.main_RequestTask(cpCore, "BuildCSV", SQL, ExportName, "Export-" + encodeText(genericController.GetRandomInteger(cpCore)) + ".csv");
                                         break;
                                     default:
-                                        taskSchedulerController.main_RequestTask(cpCore, "BuildXML", SQL, ExportName, "Export-" + encodeText(genericController.GetRandomInteger()) + ".xml");
+                                        taskSchedulerController.main_RequestTask(cpCore, "BuildXML", SQL, ExportName, "Export-" + encodeText(genericController.GetRandomInteger(cpCore)) + ".xml");
                                         break;
                                 }
                                 //

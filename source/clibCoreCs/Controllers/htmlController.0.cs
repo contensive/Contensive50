@@ -4679,7 +4679,7 @@ namespace Contensive.Core.Controllers {
                                                                     // ChildList, Language
                                                                     //
                                                                     if (ACInstanceName == "0") {
-                                                                        ACInstanceName = genericController.GetRandomInteger().ToString();
+                                                                        ACInstanceName = genericController.GetRandomInteger(cpCore).ToString();
                                                                     }
                                                                     ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\">";
                                                                     break;
@@ -6459,7 +6459,7 @@ namespace Contensive.Core.Controllers {
                                 + "></a>";
                         } else {
                             //
-                            MenuName = genericController.GetRandomInteger().ToString();
+                            MenuName = genericController.GetRandomInteger(cpCore).ToString();
                             cpCore.menuFlyout.menu_AddEntry(MenuName,"", "/ccLib/images/IconContentAdd.gif","","","", "stylesheet", "stylesheethover");
                             LowestRequiredMenuName = main_GetRecordAddLink_AddMenuEntry(iContentName, iPresetNameValueList, "", MenuName, MenuName);
                         }
@@ -8634,7 +8634,7 @@ namespace Contensive.Core.Controllers {
                 if (cpCore.doc.menuLiveTab == null) {
                     cpCore.doc.menuLiveTab = new menuLiveTabController();
                 }
-                result = cpCore.doc.menuLiveTab.GetTabs();
+                result = cpCore.doc.menuLiveTab.GetTabs(cpCore);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
@@ -8669,7 +8669,7 @@ namespace Contensive.Core.Controllers {
                 if (cpCore.doc.menuComboTab == null) {
                     cpCore.doc.menuComboTab = new menuComboTabController();
                 }
-                result = cpCore.doc.menuComboTab.GetTabs();
+                result = cpCore.doc.menuComboTab.GetTabs(cpCore);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }

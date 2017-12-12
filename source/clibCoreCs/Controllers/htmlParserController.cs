@@ -129,7 +129,7 @@ namespace Contensive.Core.Controllers {
                     // get a unique signature
                     //
                     do {
-                        BlobSN = "/blob" + encodeText(genericController.GetRandomInteger()) + ":";
+                        BlobSN = "/blob" + encodeText(genericController.GetRandomInteger(cpCore)) + ":";
                         Ptr = Ptr + 1;
                     } while ((WorkingSrc.IndexOf(BlobSN, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) && (Ptr < 10));
                     //

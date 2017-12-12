@@ -114,7 +114,7 @@ namespace Contensive.Core.Controllers {
                     TabEdgeStyle = "ccTabEdge";
                     result = result + "<table border=0 cellspacing=0 cellpadding=0><tr>";
                     for (TabPtr = 0; TabPtr < TabsCnt; TabPtr++) {
-                        TabID = "Tab" + encodeText(genericController.GetRandomInteger());
+                        TabID = "Tab" + encodeText(genericController.GetRandomInteger(cpCore));
                         TabStyle = Tabs[TabPtr].StylePrefix;
                         TabHitStyle = TabStyle + "Hit";
                         TabLinkStyle = TabStyle + "Link";

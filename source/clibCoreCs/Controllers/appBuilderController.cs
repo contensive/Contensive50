@@ -1253,7 +1253,7 @@ namespace Contensive.Core.Controllers {
         //            '
         //            Dim dt As DataTable
         //            Dim sql As String
-        //            Dim createkey As Integer = genericController.GetRandomInteger()
+        //            Dim createkey As Integer = genericController.GetRandomInteger(cpCore)
         //            Dim cid As Integer
         //            '
         //            core_group_add = 0

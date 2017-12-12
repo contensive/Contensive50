@@ -113,7 +113,7 @@ namespace Contensive.Core.Controllers {
                 string LogFilename = null;
                 string Copy = null;
                 //
-                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger()) + ".Log";
+                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger(cpCore)) + ".Log";
                 Cmd = "IISReset.exe";
                 arg = "/restart >> \"" + LogFilename + "\"";
                 runProcess(cpCore, Cmd, arg, true);
@@ -140,7 +140,7 @@ namespace Contensive.Core.Controllers {
                 string LogFilename = null;
                 string Copy = null;
                 //
-                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger()) + ".Log";
+                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger(cpCore)) + ".Log";
                 Cmd = "%comspec% /c IISReset /stop >> \"" + LogFilename + "\"";
                 runProcess(cpCore, Cmd, "", true);
                 Copy = cpCore.privateFiles.readFile(LogFilename);

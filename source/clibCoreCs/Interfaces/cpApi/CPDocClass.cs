@@ -369,37 +369,37 @@ namespace Contensive.Core {
         //=======================================================================================================
         //
         public override void Var(string Index, string Value) {
-            cpCore.docProperties.getText(Index);
+            SetProperty( Index, Value);
         }
         //
         //=======================================================================================================
         //
         public override string get_GlobalVar(string Index) {
-            throw new NotImplementedException();
+            return get_Var( Index );
         }
         //
         //=======================================================================================================
         //
         public override bool get_IsGlobalVar(string Index) {
-            throw new NotImplementedException();
+            return get_IsVar( Index );
         }
         //
         //=======================================================================================================
         //
         public override bool get_IsVar(string Index) {
-            throw new NotImplementedException();
+            return cpCore.docProperties.containsKey(Index);
         }
         //
         //=======================================================================================================
         //
         public override string get_Var(string Index) {
-            throw new NotImplementedException();
+            return cpCore.docProperties.getText(Index);
         }
         //
         //=======================================================================================================
         //
         public override void set_GlobalVar(string Index, string Value) {
-            throw new NotImplementedException();
+            //
         }
         //
         //=======================================================================================================

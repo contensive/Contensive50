@@ -85,7 +85,7 @@ namespace Contensive.Core.Controllers {
         public int checkListCnt { get; set; } = 0; // cnt of the main_GetFormInputCheckList calls - used for javascript
         public string includedAddonIDList { get; set; } = "";
         public int inputDateCnt { get; set; } = 0;
-        public List<main_InputSelectCacheType> inputSelectCache { get; set; }
+        public List<main_InputSelectCacheType> inputSelectCache = new List<main_InputSelectCacheType>() { };
         public int formInputTextCnt { get; set; } = 0;
         public string quickEditCopy { get; set; } = "";
         public string siteStructure { get; set; } = "";
@@ -100,7 +100,7 @@ namespace Contensive.Core.Controllers {
         //Public Property addonDepth As Integer = 0
         internal List<string> errList { get; set; } // exceptions collected during document construction
         public int errorCount { get; set; } = 0;
-        internal List<string> userErrorList { get; set; } // user messages
+        internal List<string> userErrorList = new List<string>() { };
         public string debug_iUserError { get; set; } = ""; // User Error String
         public string trapLogMessage { get; set; } = ""; // The content of the current traplog (keep for popups if no Csv)
         public string testPointMessage { get; set; } = "";
