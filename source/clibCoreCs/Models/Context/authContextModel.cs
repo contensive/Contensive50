@@ -1317,7 +1317,7 @@ namespace Contensive.Core.Models.Context {
                         }
                     }
                     if (!string.IsNullOrEmpty(WorkingIDList)) {
-                        if (vbRight(WorkingIDList, 1) == ",") {
+                        if (WorkingIDList.Right(1) == ",") {
                             if (vbLen(WorkingIDList) <= 1) {
                                 WorkingIDList = "";
                             } else {
@@ -1449,7 +1449,7 @@ namespace Contensive.Core.Models.Context {
                         if (true) {
                             if (cpCore.visitProperty.getBoolean("AllowEditing") | cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                 if (!string.IsNullOrEmpty(localContentNameOrId)) {
-                                    if (genericController.vbIsNumeric(localContentNameOrId)) {
+                                    if (localContentNameOrId.IsNumeric()) {
                                         localContentNameOrId = cdefModel.getContentNameByID(cpCore, EncodeInteger(localContentNameOrId));
                                     }
                                 }

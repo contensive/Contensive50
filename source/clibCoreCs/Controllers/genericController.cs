@@ -423,7 +423,7 @@ namespace Contensive.Core.Controllers {
                         posEnd = Pos + 6;
                     }
                     if (!string.IsNullOrEmpty(CharCodeString)) {
-                        if (vbIsNumeric(CharCodeString)) {
+                        if (CharCodeString.IsNumeric()) {
                             CharCode = EncodeInteger(CharCodeString);
                             s = s.Left( Pos - 1) + Convert.ToChar(CharCode) + s.Substring(posEnd - 1);
                         }
@@ -3292,7 +3292,7 @@ namespace Contensive.Core.Controllers {
             int tempEncodeInteger = 0;
             //
             tempEncodeInteger = 0;
-            if (vbIsNumeric(Expression)) {
+            if (Expression.IsNumeric()) {
                 tempEncodeInteger = Convert.ToInt32(Expression);
             } else if (Expression is bool) {
                 if ((bool)Expression) {
@@ -3307,7 +3307,7 @@ namespace Contensive.Core.Controllers {
         public static double EncodeNumber(object Expression) {
             double tempEncodeNumber = 0;
             tempEncodeNumber = 0;
-            if (vbIsNumeric(Expression)) {
+            if (Expression.IsNumeric()) {
                 tempEncodeNumber = Convert.ToDouble(Expression);
             } else if (Expression is bool) {
                 if ((bool)Expression) {
@@ -3337,7 +3337,7 @@ namespace Contensive.Core.Controllers {
                 tempEncodeBoolean = false;
             } else if (Expression is bool) {
                 tempEncodeBoolean = (bool)Expression;
-            } else if (vbIsNumeric(Expression)) {
+            } else if (Expression.IsNumeric()) {
                 tempEncodeBoolean = (encodeText(Expression) != "0");
             } else if (Expression is string) {
                 switch (Expression.ToString().ToLower().Trim()) {
@@ -4105,36 +4105,8 @@ namespace Contensive.Core.Controllers {
                 return source.ToLower();
             }
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// visual basic Left()
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="length"></param>
-        /// <returns></returns>
-        public static string vbLeft(string source, int length) {
-            if (string.IsNullOrEmpty(source)) {
-                return "";
-            } else {
-                return source.Substring(length);
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Visual Basic Right()
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="length"></param>
-        /// <returns></returns>
-        public static string vbRight(string source, int length) {
-            if (string.IsNullOrEmpty(source)) {
-                return "";
-            } else {
-                return source.Substring(source.Length - length);
-            }
-        }
+
+
         //
         //====================================================================================================
         /// <summary>
@@ -4180,31 +4152,7 @@ namespace Contensive.Core.Controllers {
                 return source.Substring(startIndex, length);
             }
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// replacement for visual basic isNumeric
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public static bool vbIsNumeric(object expression) {
-            try {
-                if (expression == null) {
-                    return false;
-                } else if (expression is DateTime) {
-                    return false;
-                } else if ((expression is int) || (expression is Int16) || (expression is Int32) || (expression is Int64) || (expression is decimal) || (expression is float) || (expression is double) || (expression is bool)) {
-                    return true;
-                } else if (expression is string) {
-                    double output = 0;
-                    return double.TryParse((string)expression, out output);
-                } else {
-                    return false;
-                }
-            } catch {
-                return false;
-            }
-        }
+
         //
         //====================================================================================================
         /// <summary>
@@ -4429,9 +4377,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public static string getCdnFileLink(coreClass cpcore, string virtualFile) {
-            string returnLink;
-            //
-            returnLink = virtualFile;
+            string returnLink = virtualFile;
             returnLink = genericController.vbReplace(returnLink, "\\", "/");
             if (genericController.vbInstr(1, returnLink, "://") != 0) {
                 //
@@ -4498,43 +4444,17 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// if date is invalid, set to minValue
-        /// </summary>
-        /// <param name="srcDate"></param>
-        /// <returns></returns>
-        public static DateTime encodeMinDate(DateTime srcDate) {
-            DateTime returnDate = srcDate;
-            if (srcDate < new DateTime(1900, 1, 1)) {
-                returnDate = DateTime.MinValue;
-            }
-            return returnDate;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// if valid date, return the short date, else return blank string 
         /// </summary>
         /// <param name="srcDate"></param>
         /// <returns></returns>
         public static string getShortDateString(DateTime srcDate) {
             string returnString = "";
-            DateTime workingDate = encodeMinDate(srcDate);
-            if (!isDateEmpty(srcDate)) {
+            DateTime workingDate = srcDate.MinValueIfOld();
+            if (!srcDate.isOld()) {
                 returnString = workingDate.ToShortDateString();
             }
             return returnString;
-        }
-        //
-        //====================================================================================================
-        //
-        public static bool isDateEmpty(DateTime srcDate) {
-            return (srcDate < new DateTime(1900, 1, 1));
-        }
-        //
-        //====================================================================================================
-        //
-        public static string urlEncodePath(string path) {
-            return Uri.EscapeUriString(convertToUnixSlash(path));
         }
         //
         //====================================================================================================
@@ -4682,7 +4602,6 @@ namespace Contensive.Core.Controllers {
             }
             return returnCopy;
         }
-
         //
         //=============================================================================
         //   Return just the copy from a content page

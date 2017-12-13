@@ -3773,7 +3773,7 @@ namespace Contensive.Core.Controllers {
                     + " from (ccAddonEvents e"
                     + " left join ccAddonEventCatchers c on c.eventId=e.id)"
                     + " where ";
-                if (genericController.vbIsNumeric(eventNameIdOrGuid)) {
+                if (eventNameIdOrGuid.IsNumeric()) {
                     sql += "e.id=" + cpCore.db.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
                 } else if ( genericController.isGuid(eventNameIdOrGuid)) {
                     sql += "e.ccGuid=" + cpCore.db.encodeSQLText(eventNameIdOrGuid);
@@ -3784,7 +3784,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // event not found
                     //
-                    if (genericController.vbIsNumeric(eventNameIdOrGuid)) {
+                    if (eventNameIdOrGuid.IsNumeric()) {
                         //
                         // can not create an id
                         //

@@ -1010,7 +1010,7 @@ namespace Contensive.Core.Controllers {
                     PosNum = genericController.vbInstr(Pos + 1, Src, ":");
                     if (PosNum > 0) {
                         PtrText = Src.Substring(PosNum, PosEnd - PosNum - 1);
-                        if (genericController.vbIsNumeric(PtrText)) {
+                        if (PtrText.IsNumeric()) {
                             Ptr = int.Parse(PtrText);
                             if (Ptr < BlobCnt) {
                                 Blob = Blobs[Ptr];

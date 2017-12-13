@@ -110,7 +110,7 @@ namespace Contensive.Core {
         public override string GetName(string GroupIdOrGuid) {
             string returnText = "";
             try {
-                if (genericController.vbIsNumeric(GroupIdOrGuid)) {
+                if (GroupIdOrGuid.IsNumeric()) {
                     //
                     // -- record Id
                     returnText = cpCore.db.getRecordName("groups", genericController.EncodeInteger(GroupIdOrGuid));

@@ -119,7 +119,7 @@ namespace Contensive.Core {
         public override void sendUser(string toUserId, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true) //Inherits BaseClasses.CPEmailBaseClass.SendUser
         {
             int userId = 0;
-            if (genericController.vbIsNumeric(toUserId)) {
+            if (toUserId.IsNumeric()) {
                 userId = int.Parse(toUserId);
                 cpCore.email.sendPerson(userId, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", false);
             }

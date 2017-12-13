@@ -1489,7 +1489,7 @@ namespace Contensive.Addons.AdminSite {
                             GroupName = IndexConfig.GroupList[Ptr];
                             if (!string.IsNullOrEmpty(GroupName)) {
                                 GroupID = cpCore.db.getRecordID("Groups", GroupName);
-                                if (GroupID == 0 && genericController.vbIsNumeric(GroupName)) {
+                                if (GroupID == 0 && GroupName.IsNumeric()) {
                                     GroupID = genericController.EncodeInteger(GroupName);
                                 }
                                 string groupTableAlias = "GroupFilter" + Ptr;
@@ -1602,7 +1602,7 @@ namespace Contensive.Addons.AdminSite {
                                     // found it, add it in the sql
                                     //
                                     return_SQLWhere += "AND(" + adminContent.ContentTableName + "." + WherePair[0, WCount] + "=";
-                                    if (genericController.vbIsNumeric(WherePair[1, WCount])) {
+                                    if (WherePair[1, WCount].IsNumeric()) {
                                         return_SQLWhere += WherePair[1, WCount] + ")";
                                     } else {
                                         return_SQLWhere += "'" + WherePair[1, WCount] + "')";
@@ -4770,7 +4770,7 @@ namespace Contensive.Addons.AdminSite {
 
                                 DefaultValueText = genericController.encodeText(field.defaultValue);
                                 if (!string.IsNullOrEmpty(DefaultValueText)) {
-                                    if (genericController.vbIsNumeric(DefaultValueText)) {
+                                    if (DefaultValueText.IsNumeric()) {
                                         editrecord.fieldsLc[field.nameLc].value = DefaultValueText;
                                     } else {
                                         if (field.lookupContentID != 0) {
@@ -5439,7 +5439,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                         if (!ResponseFieldIsEmpty) {
-                                            if (genericController.vbIsNumeric(ResponseFieldValueText)) {
+                                            if (ResponseFieldValueText.IsNumeric()) {
                                                 //ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
                                             } else {
                                                 errorController.error_AddUserError(cpCore, "The record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
@@ -5454,7 +5454,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                         if (!ResponseFieldIsEmpty) {
-                                            if (genericController.vbIsNumeric(ResponseFieldValueText)) {
+                                            if (ResponseFieldValueText.IsNumeric()) {
                                                 //ResponseValueVariant = EncodeNumber(ResponseValueVariant)
                                             } else {
                                                 errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a numeric value.");
@@ -5468,7 +5468,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                         if (!ResponseFieldIsEmpty) {
-                                            if (genericController.vbIsNumeric(ResponseFieldValueText)) {
+                                            if (ResponseFieldValueText.IsNumeric()) {
                                                 //ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
                                             } else {
                                                 errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " had an invalid selection.");
@@ -9933,7 +9933,7 @@ namespace Contensive.Addons.AdminSite {
                         // the desktop has been set to none - go with default desktop
                         //
                         addonId = 0;
-                    } else if (genericController.vbIsNumeric(AddonIDText)) {
+                    } else if (AddonIDText.IsNumeric()) {
                         //
                         // it has been set to a non-zero number
                         //
@@ -11259,7 +11259,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 IncludeWidth = false;
                 if (!string.IsNullOrEmpty(ButtonWidth)) {
-                    if (genericController.vbIsNumeric(ButtonWidth)) {
+                    if (ButtonWidth.IsNumeric()) {
                         IncludeWidth = true;
                     }
                 }

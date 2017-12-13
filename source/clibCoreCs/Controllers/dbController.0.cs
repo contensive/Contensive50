@@ -762,7 +762,7 @@ namespace Contensive.Core.Controllers {
                 } else {
                     if (!isSQLTableField(DataSourceName, TableName, FieldName)) {
                         string SQL = "ALTER TABLE " + TableName + " ADD " + FieldName + " ";
-                        if (!genericController.vbIsNumeric(fieldType)) {
+                        if (!fieldType.IsNumeric()) {
                             //
                             // ----- support old calls
                             //
@@ -1503,10 +1503,13 @@ namespace Contensive.Core.Controllers {
                         // non-workflow mode, delete the live record
                         //
                         deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName);
-                        if (workflowController.csv_AllowAutocsv_ClearContentTimeStamp) {
-                            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(ContentTableName, "id", LiveRecordID.ToString()));
-                            //Call cpCore.cache.invalidateObject(ContentName)
-                        }
+                        //
+                        // -- invalidate the special cache name used to detect a change in any record
+                        cpCore.cache.invalidateAllObjectsInContent(ContentName);
+                        //if (workflowController.csv_AllowAutocsv_ClearContentTimeStamp) {
+                        //    cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(ContentTableName, "id", LiveRecordID.ToString()));
+                        //    //Call cpCore.cache.invalidateObject(ContentName)
+                        //}
                         deleteContentRules(ContentID, LiveRecordID);
                     }
                 }
@@ -2452,9 +2455,10 @@ namespace Contensive.Core.Controllers {
                         //
                         Criteria = "((createkey=" + CreateKeyString + ")And(DateAdded=" + DateAddedString + "))";
                         returnCs = csOpen(ContentName, Criteria, "ID DESC", false, MemberID, false, true);
-                        //'
-                        //' ----- Clear Time Stamp because a record changed
-                        //'
+                        //
+                        // ----- Clear Time Stamp because a record changed
+                        // 20171213 added back for integration test (had not noted why it was commented out
+                        cpCore.cache.invalidateAllObjectsInContent(ContentName);
                         //If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
                         //    Call cpCore.cache.invalidateObject(ContentName)
                         //End If
@@ -2741,7 +2745,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //
                                             //
-                                            if (genericController.vbIsNumeric(FieldValueVariant)) {
+                                            if (FieldValueVariant.IsNumeric()) {
                                                 fieldLookupId = field.lookupContentID;
                                                 LookupContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, fieldLookupId);
                                                 LookupList = field.lookupList;
@@ -2770,7 +2774,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //
                                             //
-                                            if (genericController.vbIsNumeric(FieldValueVariant)) {
+                                            if (FieldValueVariant.IsNumeric()) {
                                                 fieldValue = getRecordName("people", genericController.EncodeInteger(FieldValueVariant));
                                             }
                                             break;
@@ -2778,7 +2782,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //
                                             //
-                                            if (genericController.vbIsNumeric(FieldValueVariant)) {
+                                            if (FieldValueVariant.IsNumeric()) {
                                                 fieldValue = FieldValueVariant.ToString();
                                             }
                                             break;
@@ -2977,7 +2981,7 @@ namespace Contensive.Core.Controllers {
                                                         fileNameNoExt = fileNameNoExt.Substring(Pos);
                                                         path = PathFilename.Left( Pos);
                                                         FilenameRev = 1;
-                                                        if (!genericController.vbIsNumeric(fileNameNoExt)) {
+                                                        if (!fileNameNoExt.IsNumeric()) {
                                                             Pos = genericController.vbInstr(1, fileNameNoExt, ".r", 1);
                                                             if (Pos > 0) {
                                                                 FilenameRev = genericController.EncodeInteger(fileNameNoExt.Substring(Pos + 1));
@@ -3389,6 +3393,9 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     tempVar.LastUsed = DateTime.Now;
+                    //
+                    // -- invalidate the special cache name used to detect a change in any record
+                    cpCore.cache.invalidateAllObjectsInContent(ContentName);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -4552,7 +4559,7 @@ namespace Contensive.Core.Controllers {
         public string getNameIdOrGuidSqlCriteria(string nameIdOrGuid) {
             string sqlCriteria = "";
             try {
-                if (genericController.vbIsNumeric(nameIdOrGuid)) {
+                if (nameIdOrGuid.IsNumeric()) {
                     sqlCriteria = "id=" + encodeSQLNumber(double.Parse(nameIdOrGuid));
                 } else if (genericController.common_isGuid(nameIdOrGuid)) {
                     sqlCriteria = "ccGuid=" + encodeSQLText(nameIdOrGuid);

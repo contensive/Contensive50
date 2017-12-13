@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Controllers\iisControllerUnitTests.cs" />
     <Compile Include="Controllers\genericControllerUnitTests.cs" />
+    <Compile Include="extensionMethodsUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +80,7 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

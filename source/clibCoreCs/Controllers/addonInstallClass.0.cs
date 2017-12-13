@@ -1575,63 +1575,60 @@ namespace Contensive.Core {
         //
         //=========================================================================================================================
         //
-        public static bool installCollectionFromRemoteRepo(coreClass cpCore, string CollectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionFromRemoteRepo(coreClass cpCore, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, ref List<string> nonCriticalErrorList) {
             bool UpgradeOK = true;
             try {
-                //
-                string CollectionVersionFolderName = null;
-                string workingPath = null;
-                DateTime CollectionLastChangeDate = default(DateTime);
-                List<string> collectionGuidList = new List<string>();
-                //Dim builder As New coreBuilderClass(cpCore)
-                //Dim isBaseCollection As Boolean = (CollectionGuid = baseCollectionGuid)
-                //
-                // normalize guid
-                //
-                if (CollectionGuid.Length < 38) {
-                    if (CollectionGuid.Length == 32) {
-                        CollectionGuid = CollectionGuid.Left( 8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
-                    }
-                    if (CollectionGuid.Length == 36) {
-                        CollectionGuid = "{" + CollectionGuid + "}";
-                    }
-                }
-                //
-                // Install it if it is not already here
-                //
-                CollectionVersionFolderName = GetCollectionPath(cpCore, CollectionGuid);
-                if (string.IsNullOrEmpty(CollectionVersionFolderName)) {
+                if (string.IsNullOrWhiteSpace(collectionGuid)) {
+                    logController.appendLog(cpCore, "collectionGuid is null", "debug");
+                } else {
                     //
-                    // Download all files for this collection and build the collection folder(s)
-                    //
-                    workingPath = cpCore.addon.getPrivateFilesAddonPath() + "temp_" + genericController.GetRandomInteger(cpCore) + "\\";
-                    cpCore.privateFiles.createPath(workingPath);
-                    //
-                    UpgradeOK = DownloadCollectionFiles(cpCore, workingPath, CollectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage);
-                    if (!UpgradeOK) {
-                        //UpgradeOK = UpgradeOK;
-                    } else {
-                        UpgradeOK = BuildLocalCollectionReposFromFolder(cpCore, workingPath, CollectionLastChangeDate, ref collectionGuidList, ref return_ErrorMessage, false);
-                        if (!UpgradeOK) {
-                            //UpgradeOK = UpgradeOK;
+                    // normalize guid
+                    if (collectionGuid.Length < 38) {
+                        if (collectionGuid.Length == 32) {
+                            collectionGuid = collectionGuid.Left(8) + "-" + collectionGuid.Substring(8, 4) + "-" + collectionGuid.Substring(12, 4) + "-" + collectionGuid.Substring(16, 4) + "-" + collectionGuid.Substring(20);
+                        }
+                        if (collectionGuid.Length == 36) {
+                            collectionGuid = "{" + collectionGuid + "}";
                         }
                     }
                     //
-                    cpCore.privateFiles.DeleteFileFolder(workingPath);
-                }
-                //
-                // Upgrade the server from the collection files
-                //
-                if (UpgradeOK) {
-                    UpgradeOK = installCollectionFromLocalRepo(cpCore, CollectionGuid, cpCore.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, ref nonCriticalErrorList);
-                    if (!UpgradeOK) {
-                        //UpgradeOK = UpgradeOK;
+                    // Install it if it is not already here
+                    //
+                    string CollectionVersionFolderName = GetCollectionPath(cpCore, collectionGuid);
+                    if (string.IsNullOrEmpty(CollectionVersionFolderName)) {
+                        //
+                        // Download all files for this collection and build the collection folder(s)
+                        //
+                        string workingPath = cpCore.addon.getPrivateFilesAddonPath() + "temp_" + genericController.GetRandomInteger(cpCore) + "\\";
+                        cpCore.privateFiles.createPath(workingPath);
+                        //
+                        DateTime CollectionLastChangeDate = default(DateTime);
+                        UpgradeOK = DownloadCollectionFiles(cpCore, workingPath, collectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage);
+                        if (!UpgradeOK) {
+                            //UpgradeOK = UpgradeOK;
+                        } else {
+                            List<string> collectionGuidList = new List<string>();
+                            UpgradeOK = BuildLocalCollectionReposFromFolder(cpCore, workingPath, CollectionLastChangeDate, ref collectionGuidList, ref return_ErrorMessage, false);
+                            if (!UpgradeOK) {
+                                //UpgradeOK = UpgradeOK;
+                            }
+                        }
+                        //
+                        cpCore.privateFiles.DeleteFileFolder(workingPath);
+                    }
+                    //
+                    // Upgrade the server from the collection files
+                    //
+                    if (UpgradeOK) {
+                        UpgradeOK = installCollectionFromLocalRepo(cpCore, collectionGuid, cpCore.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, ref nonCriticalErrorList);
+                        if (!UpgradeOK) {
+                            //UpgradeOK = UpgradeOK;
+                        }
                     }
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
-                throw ex;
             }
             return UpgradeOK;
         }
@@ -3024,7 +3021,7 @@ namespace Contensive.Core {
                                                                                                                         }
                                                                                                                     }
                                                                                                                 }
-                                                                                                            } else if (genericController.vbIsNumeric(FieldValue)) {
+                                                                                                            } else if (FieldValue.IsNumeric()) {
                                                                                                                 //
                                                                                                                 // must be lookup list
                                                                                                                 //

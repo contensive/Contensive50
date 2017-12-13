@@ -149,7 +149,7 @@ namespace Contensive.Core {
         //
         //
         private string ExecuteAddon(string IdGuidOrName, addonExecuteContext executeConext) {
-            if (genericController.vbIsNumeric(IdGuidOrName)) {
+            if (IdGuidOrName.IsNumeric()) {
                 executeConext.errorCaption = "id:" + IdGuidOrName;
                 return CP.core.addon.execute(Models.Entity.addonModel.create(CP.core, genericController.EncodeInteger(IdGuidOrName)), executeConext);
             } else if (genericController.isGuid(IdGuidOrName)) {

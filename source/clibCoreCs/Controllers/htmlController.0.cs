@@ -4817,7 +4817,7 @@ namespace Contensive.Core.Controllers {
                                                                                 if (SizeTest.GetUpperBound(0) != 1) {
                                                                                     ImageFilenameAltSize = "";
                                                                                 } else {
-                                                                                    if ((genericController.vbIsNumeric(SizeTest[0]) & genericController.vbIsNumeric(SizeTest[1]))) {
+                                                                                    if ((SizeTest[0].IsNumeric() & SizeTest[1].IsNumeric())) {
                                                                                         ImageFilenameNoExt = ImageFilenameNoExt.Left( Pos - 1);
                                                                                         //RecordVirtualFilenameNoExt = Mid(RecordVirtualFilename, 1, Pos - 1)
                                                                                     } else {
@@ -6754,7 +6754,7 @@ namespace Contensive.Core.Controllers {
             MyPadding = Padding.ToString();
             MyHeightMin = HeightMin.ToString();
             //
-            if (genericController.vbIsNumeric(MyWidth)) {
+            if (MyWidth.IsNumeric()) {
                 ContentPanelWidth = (int.Parse(MyWidth) - 2).ToString();
                 contentPanelWidthStyle = ContentPanelWidth + "px";
             } else {
@@ -6856,7 +6856,7 @@ namespace Contensive.Core.Controllers {
             MyPadding = genericController.encodeEmptyText(Padding, "5");
             MyHeightMin = genericController.encodeEmptyText(HeightMin, "1");
             MethodName = "main_GetPanelTop";
-            if (genericController.vbIsNumeric(MyWidth)) {
+            if (MyWidth.IsNumeric()) {
                 ContentPanelWidth = (int.Parse(MyWidth) - 2).ToString();
             } else {
                 ContentPanelWidth = "100%";
@@ -8434,7 +8434,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (SizeTest.GetUpperBound(0) != 1) {
                                                                             ImageAltSize = "";
                                                                         } else {
-                                                                            if (genericController.vbIsNumeric(SizeTest[0]) & genericController.vbIsNumeric(SizeTest[1])) {
+                                                                            if (SizeTest[0].IsNumeric() & SizeTest[1].IsNumeric()) {
                                                                                 ImageFilenameNoExt = RecordFilenameNoExt;
                                                                                 //ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
                                                                                 //RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)

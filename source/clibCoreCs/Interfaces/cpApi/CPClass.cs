@@ -113,11 +113,14 @@ namespace Contensive.Core {
         //
         public bool appOk {
             get {
-                if (core == null) {
-                    return false;
-                } else {
-                    return (core.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK);
+                if (core != null) {
+                    if (core.serverConfig != null) {
+                        if (core.serverConfig.appConfig != null) {
+                            return (core.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK);
+                        }
+                    }
                 }
+                return false;
             }
         }
         //

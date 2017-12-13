@@ -154,18 +154,18 @@ namespace Contensive.Core {
             try {
                 accum = "";
                 copyContentModel copy;
-                if (vbIsNumeric(copyRecordNameOrGuid)) {
+                if (copyRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
                     copy = copyContentModel.create(cpCore, genericController.EncodeInteger(copyRecordNameOrGuid));
                 } else if (genericController.isGuid(copyRecordNameOrGuid)) {
                     //
-                    // -- record name
-                    copy = copyContentModel.createByName(cpCore, copyRecordNameOrGuid);
-                } else {
-                    //
                     // -- record guid
                     copy = copyContentModel.create(cpCore, copyRecordNameOrGuid);
+                } else {
+                    //
+                    // -- record name
+                    copy = copyContentModel.createByName(cpCore, copyRecordNameOrGuid);
                 }
                 if (copy != null ) {
                     accum = copy.copy;
@@ -196,18 +196,18 @@ namespace Contensive.Core {
             try {
                 accum = "";
                 layoutModel copy;
-                if (vbIsNumeric(layoutRecordNameOrGuid)) {
+                if (layoutRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
                     copy = layoutModel.create(cpCore, genericController.EncodeInteger(layoutRecordNameOrGuid));
                 } else if (genericController.isGuid(layoutRecordNameOrGuid)) {
                     //
-                    // -- record name
-                    copy = layoutModel.createByName(cpCore, layoutRecordNameOrGuid);
-                } else {
-                    //
                     // -- record guid
                     copy = layoutModel.create(cpCore, layoutRecordNameOrGuid);
+                } else {
+                    //
+                    // -- record name
+                    copy = layoutModel.createByName(cpCore, layoutRecordNameOrGuid);
                 }
                 if (copy != null) {
                     accum = copy.Layout;

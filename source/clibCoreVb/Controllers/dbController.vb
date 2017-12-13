@@ -2280,9 +2280,10 @@ Namespace Contensive.Core.Controllers
                             '
                             Criteria = "((createkey=" & CreateKeyString & ")And(DateAdded=" & DateAddedString & "))"
                             returnCs = csOpen(ContentName, Criteria, "ID DESC", False, MemberID, False, True)
-                            ''
-                            '' ----- Clear Time Stamp because a record changed
-                            ''
+                            '
+                            ' ----- Clear Time Stamp because a record changed
+                            ' 20171213 added back for integration test (had not noted why it was commented out
+                            Call cpCore.cache.invalidateAllObjectsInContent(ContentName)
                             'If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
                             '    Call cpCore.cache.invalidateObject(ContentName)
                             'End If
