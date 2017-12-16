@@ -93,6 +93,7 @@ namespace integrationTests {
             string htmlText = "12345";
             string wysiwygText = "<b>abcde</b>";
             string addonGuid = cp.Utils.CreateGuid();
+           // string activeScript = "cp.doc.getText(\"echo\")";
             string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
             string echoText = "text added to document";
             //
@@ -108,8 +109,9 @@ namespace integrationTests {
             cs.Close();
             cp.Doc.SetProperty("echo", echoText);
             // act
+            string result = cp.executeRoute(addonName);
             // assert
-            Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeRoute(addonName));
+            Assert.AreEqual(htmlText + wysiwygText + echoText, result);
             //dispose
             cp.Content.Delete(Contensive.Core.constants.cnAddons, "id=" + recordId.ToString());
             cp.Dispose();

@@ -3864,7 +3864,6 @@ namespace Contensive.Core.Controllers {
                             deleteContentRecords("Library Folder Rules", "GroupID=" + RecordID);
                             deleteContentRecords("Member Rules", "GroupID=" + RecordID);
                             deleteContentRecords("Page Content Block Rules", "GroupID=" + RecordID);
-                            deleteContentRecords("Path Rules", "GroupID=" + RecordID);
                             break;
                         case "CCLIBRARYFOLDERS":
                             //

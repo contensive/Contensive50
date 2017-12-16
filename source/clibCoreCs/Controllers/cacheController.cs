@@ -81,11 +81,21 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         [Serializable()]
         public class cacheWrapperClass {
-            public string key; // if populated, all other properties are ignored and the primary tag b
-            public List<string> dependentKeyList = new List<string>(); // this object is invalidated if any of these objects are invalidated
-            public DateTime saveDate; // the date this object was last saved.
-            public DateTime invalidationDate; // the future date when this object self-invalidates
-            public object content; // the data storage
+            //
+            // if populated, all other properties are ignored and the primary tag b
+            public string keyPtr;
+            //
+            // this object is invalidated if any of these objects are invalidated
+            public List<string> dependentKeyList = new List<string>();
+            //
+            // the date this object was last saved.
+            public DateTime saveDate = DateTime.Now;
+            //
+            // the future date when this object self-invalidates
+            public DateTime invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault);
+            //
+            // the data storage
+            public object content;
         }
         //
         //====================================================================================================
@@ -110,15 +120,15 @@ namespace Contensive.Core.Controllers {
                 if (!_globalInvalidationDate.HasValue) {
                     setDefault = true;
                 } else {
-                    if ((Convert.ToDateTime(_globalInvalidationDate)).CompareTo(new DateTime(1990, 8, 7)) < 0) {
+                    if ((EncodeDate(_globalInvalidationDate)).CompareTo(new DateTime(1990, 8, 7)) < 0) {
                         setDefault = true;
                     }
                 }
                 if ( setDefault) {
                     _globalInvalidationDate = new DateTime(1990, 8, 7);
-                    setWrappedContent("globalInvalidationDate", new cacheWrapperClass { saveDate = Convert.ToDateTime(_globalInvalidationDate) });
+                    setWrappedContent("globalInvalidationDate", new cacheWrapperClass { saveDate = EncodeDate(_globalInvalidationDate) });
                 }
-                return Convert.ToDateTime(_globalInvalidationDate);
+                return EncodeDate(_globalInvalidationDate);
             }
         }
         private DateTime? _globalInvalidationDate;
@@ -211,7 +221,7 @@ namespace Contensive.Core.Controllers {
         public void setWrappedContent_MemoryCache(string wrapperKey, cacheWrapperClass wrappedContent) {
             ObjectCache cache = MemoryCache.Default;
             CacheItemPolicy policy = new CacheItemPolicy();
-            policy.AbsoluteExpiration = DateTime.Now.AddMinutes(100);
+            policy.AbsoluteExpiration = wrappedContent.invalidationDate; // DateTime.Now.AddMinutes(100);
             cache.Set(wrapperKey, wrappedContent, policy);
         }
         //
@@ -264,10 +274,10 @@ namespace Contensive.Core.Controllers {
                                 }
                             }
                             if (!cacheMiss) {
-                                if (!string.IsNullOrEmpty(wrappedContent.key)) {
+                                if (!string.IsNullOrEmpty(wrappedContent.keyPtr)) {
                                     //
                                     // -- this is a pointer key, load the primary
-                                    result = getObject<objectClass>(wrappedContent.key);
+                                    result = getObject<objectClass>(wrappedContent.keyPtr);
                                 } else if (wrappedContent.content is Newtonsoft.Json.Linq.JObject) {
                                     //
                                     // -- newtonsoft types
@@ -522,7 +532,7 @@ namespace Contensive.Core.Controllers {
                 cacheWrapperClass cacheWrapper = new cacheWrapperClass {
                     saveDate = DateTime.Now,
                     invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
-                    key = key
+                    keyPtr = key
                 };
                 setWrappedContent(pointerKey, cacheWrapper);
             } catch (Exception ex) {
@@ -572,11 +582,13 @@ namespace Contensive.Core.Controllers {
                 //
                 appendCacheLog("invalidateAllObjectsInContent(" + ContentName + ")");
                 //
-                // -- invalidate the cache key that represents any record in the content (legacy)
-                invalidateContent(ContentName.ToLower().Replace(" ", "_"));
+                // -- save the cache key that represents any record in the content, set as a dependent key for saves
+                setContent(ContentName, "");
+                //invalidateContent(ContentName.ToLower().Replace(" ", "_"));
                 //
                 // -- invalidate the cache key that represents any record in the table
-                invalidateAllObjectsInTable(Models.Complex.cdefModel.getContentTablename(cpCore, ContentName));
+                setContent(Models.Complex.cdefModel.getContentTablename(cpCore, ContentName), "");
+                //invalidateAllObjectsInTable(Models.Complex.cdefModel.getContentTablename(cpCore, ContentName));
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;

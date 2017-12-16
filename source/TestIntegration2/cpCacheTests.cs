@@ -142,6 +142,8 @@ namespace integrationTests {
                 // assert
                 Assert.AreEqual("testValue", cp.Cache.Read("keyA"));
                 // act
+                string tmp = cp.Cache.Read("keyA");
+                //
                 CPCSBaseClass cs = cp.CSNew();
                 if (cs.Insert(contentName)) {
                     cs.SetField("name", "test");
@@ -149,8 +151,9 @@ namespace integrationTests {
                     Assert.Fail();
                 }
                 cs.Close();
+                string clearedValue = cp.Cache.Read("keyA");
                 // assert
-                Assert.AreEqual("", cp.Cache.Read("keyA"));
+                Assert.AreEqual("", clearedValue);
             } catch (Exception ex) {
                 cp.Utils.AppendLog("cpCacheInvalidationOnEdit_integration, exception, [" + ex.Message + "]");
                 Assert.Fail("exception [" + ex.Message + "]");

@@ -10794,32 +10794,6 @@ namespace Contensive.Addons.AdminSite {
             }
             return tempGetForm_Edit_MemberReports;
         }
-        //        '
-        //        '========================================================================
-        //        '   Print the path Rules section of the path edit form
-        //        '========================================================================
-        //        '
-        //        Private Function GetForm_Edit_PathRules(adminContent As cdefModel, editRecord As editRecordClass) As String
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_PathRules")
-        //            '
-        //            Dim FastString As stringBuilderLegacyController
-        //            Dim Adminui As New adminUIController(cpCore)
-        //            '
-        //            FastString = New stringBuilderLegacyController
-        //            Call FastString.Add("<tr>")
-        //            Call FastString.Add("<td valign=""top"" align=""right"">" & SpanClassAdminSmall & "Groups</td>")
-        //            Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal & cpCore.html.getINputChecList2("PathRules", "Paths", editRecord.id, "Groups", "Path Rules", "PathID", "GroupID", , "Caption") & "</span></td>")
-        //            Call FastString.Add("</tr>")
-        //            'Call FastString.Add(adminui.EditTableClose)
-        //            GetForm_Edit_PathRules = Adminui.GetEditPanel((Not allowAdminTabs), "Path Permissions", "Groups that have access to this path", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
-        //            EditSectionPanelCount = EditSectionPanelCount + 1
-        //            FastString = Nothing
-        //            Exit Function
-        //            '
-        ////ErrorTrap:
-        //            FastString = Nothing
-        //            Call handleLegacyClassError3("GetForm_Edit_PathRules")
-        //        End Function
         //
         //========================================================================
         //   Print the path Rules section of the path edit form

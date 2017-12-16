@@ -151,15 +151,33 @@ namespace Contensive.Core {
             string result = "";
             try {
                 if (genericController.isGuid(addonNameOrGuid)) {
-                    core.addon.execute(Models.Entity.addonModel.create(core, addonNameOrGuid), new CPUtilsBaseClass.addonExecuteContext {
-                        addonType = addonContext,
-                        errorCaption = addonNameOrGuid
-                    });
+                    //
+                    // -- call by guid
+                    addonModel addon = Models.Entity.addonModel.create(core, addonNameOrGuid);
+                    if ( addon == null ) {
+                        throw new ApplicationException("Addon [" + addonNameOrGuid + "] could not be found.");
+                    } else {
+                        result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                            addonType = addonContext,
+                            errorCaption = addonNameOrGuid
+                        });
+                    }
                 } else {
-                    core.addon.execute(Models.Entity.addonModel.createByName(core, addonNameOrGuid), new CPUtilsBaseClass.addonExecuteContext {
-                        addonType = addonContext,
-                        errorCaption = addonNameOrGuid
-                    });
+                    addonModel addon = Models.Entity.addonModel.createByName(core, addonNameOrGuid);
+                    if ( addon != null ) {
+                        //
+                        // -- call by name
+                        result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                            addonType = addonContext,
+                            errorCaption = addonNameOrGuid
+                        });
+                    } else if (addonNameOrGuid.IsNumeric() ) {
+                        //
+                        // -- compatibility - call by id
+                        result = executeAddon(EncodeInteger(addonNameOrGuid), addonContext);
+                    } else {
+                        throw new ApplicationException("Addon [" + addonNameOrGuid + "] could not be found.");
+                    }
                 }
                 //result = core.addon.execute_legacy4(addonNameOrGuid, core.docProperties.getLegacyOptionStringFromVar(), addonContext, Nothing)
             } catch (Exception ex) {
@@ -178,14 +196,15 @@ namespace Contensive.Core {
         public string executeAddon(int addonId, Contensive.BaseClasses.CPUtilsBaseClass.addonContext addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) {
             string result = "";
             try {
-                core.addon.execute(Models.Entity.addonModel.create(core, addonId), new CPUtilsBaseClass.addonExecuteContext {
-                    addonType = addonContext,
-                    errorCaption = "id:" + addonId.ToString()
-                });
-                //If Response.isOpen Then
-                //    result = core.addon.execute_legacy6(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.doc.authContext.user.id, core.doc.authContext.visit.VisitAuthenticated)
-                //End If
-                //
+                addonModel addon = addonModel.create(core, addonId);
+                if ( addon == null) {
+                    throw new ApplicationException("Addon [#" + addonId.ToString() + "] could not be found.");
+                } else {
+                    result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                        addonType = addonContext,
+                        errorCaption = "id:" + addonId.ToString()
+                    });
+                }
             } catch (Exception ex) {
                 Site.ErrorReport(ex);
             }

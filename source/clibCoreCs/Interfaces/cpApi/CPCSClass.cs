@@ -515,9 +515,29 @@ namespace Contensive.Core {
         //
         public override void SetField(string FieldName, object FieldValue) {
             try {
-                cpCore.db.csSet(cs, FieldName, Convert.ToDateTime(FieldValue));
+                string fieldString = FieldValue as string;
+                if (fieldString != null) {
+                    cpCore.db.csSet(cs, FieldName, fieldString);
+                } else {
+                    int? fieldInt = FieldValue as int?;
+                    if (fieldInt != null) {
+                        cpCore.db.csSet(cs, FieldName, fieldInt.GetValueOrDefault());
+                    } else {
+                        bool? fieldBool = FieldValue as bool?;
+                        if (fieldBool != null) {
+                            cpCore.db.csSet(cs, FieldName, fieldBool.GetValueOrDefault());
+                        } else {
+                            DateTime? fieldDate = FieldValue as DateTime?;
+                            if (fieldDate != null) {
+                                cpCore.db.csSet(cs, FieldName, fieldDate.GetValueOrDefault());
+                            } else {
+                                cpCore.db.csSet(cs, FieldName, FieldValue.ToString());
+                            }
+                        }
+                    }
+                }
             } catch (Exception ex) {
-                cpCore.handleException(ex); // "Unexpected error in cs.SetField")
+                cpCore.handleException(ex);
                 throw;
             }
         }

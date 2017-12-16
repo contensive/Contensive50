@@ -1440,41 +1440,40 @@ namespace Contensive.Core.Controllers {
                     // -- compatibility mode, if no entry point given, if the code starts with "function myFuncton()" and add "call myFunction()"
                     int pos = WorkingCode.IndexOf("function");
                     if (pos >= 0) {
-                        string EntryPointName = WorkingCode.Substring(pos + 8);
-                        pos = EntryPointName.IndexOf("\r");
+                        EntryPoint = WorkingCode.Substring(pos + 8);
+                        pos = EntryPoint.IndexOf("\r");
                         if (pos > 0) {
-                            EntryPointName = EntryPointName.Substring(0, pos);
+                            EntryPoint = EntryPoint.Substring(0, pos);
                         }
-                        pos = EntryPointName.IndexOf("\n");
+                        pos = EntryPoint.IndexOf("\n");
                         if (pos > 0) {
-                            EntryPointName = EntryPointName.Substring(0, pos);
+                            EntryPoint = EntryPoint.Substring(0, pos);
                         }
-                        pos = EntryPointName.IndexOf("(");
+                        pos = EntryPoint.IndexOf("(");
                         if (pos > 0) {
-                            EntryPointName = EntryPointName.Substring(0, pos);
+                            EntryPoint = EntryPoint.Substring(0, pos);
                         }
-                        string entryCode = "\r\ncall " + EntryPointName;
-                        logController.appendLog(cpCore, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + entryCode + "].");
-                        WorkingCode += entryCode;
+                        logController.appendLog(cpCore, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
+                        //WorkingCode = EntryPoint + "\n" + WorkingCode;
                     }
                 } else {
                     //
                     // -- etnry point provided, remove "()" if included and add to code
-                    string EntryPointName = EntryPoint;
-                    int pos = EntryPointName.IndexOf("(");
+                    //string EntryPoint = EntryPoint;
+                    int pos = EntryPoint.IndexOf("(");
                     if (pos > 0) {
-                        EntryPointName = EntryPointName.Substring(0, pos);
+                        EntryPoint = EntryPoint.Substring(0, pos);
                     }
-                    string entryCode = "\r\ncall " + EntryPointName;
-                    WorkingCode += entryCode;
+                    //string entryCode = "\r\n" + EntryPoint;
+                    //WorkingCode += entryCode;
                 }
-                //int Pos = genericController.vbInstr(1, EntryPointName, "(");
+                //int Pos = genericController.vbInstr(1, EntryPoint, "(");
                 //if (Pos == 0) {
-                //    Pos = genericController.vbInstr(1, EntryPointName, " ");
+                //    Pos = genericController.vbInstr(1, EntryPoint, " ");
                 //}
                 //if (Pos > 1) {
-                //    EntryPointArgs = EntryPointName.Substring(Pos - 1).Trim(' ');
-                //    EntryPointName = (EntryPointName.Left(Pos - 1)).Trim(' ');
+                //    EntryPointArgs = EntryPoint.Substring(Pos - 1).Trim(' ');
+                //    EntryPoint = (EntryPoint.Left(Pos - 1)).Trim(' ');
                 //    if ((EntryPointArgs.Left(1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
                 //        EntryPointArgs = EntryPointArgs.Substring(1, EntryPointArgs.Length - 2);
                 //    }
@@ -1557,9 +1556,9 @@ namespace Contensive.Core.Controllers {
                         }
                         if (true) {
                             //
-                            //if (string.IsNullOrEmpty(EntryPointName)) {
+                            //if (string.IsNullOrEmpty(EntryPoint)) {
                             //    if (sc.Procedures.Count > 0) {
-                            //        EntryPointName = sc.Procedures(1).Name;
+                            //        EntryPoint = sc.Procedures(1).Name;
                             //    }
                             //}
                             try {
@@ -1568,46 +1567,48 @@ namespace Contensive.Core.Controllers {
                                 //    // -- if entry point specified, add it to the end
                                 //    WorkingCode += "\r\ncall " + WorkingEntryPoint;
                                 //};
-                                object returnObj = engine.ExecuteCommand(WorkingCode);
+                                engine.Execute(WorkingCode);
+                                object returnObj = engine.Evaluate(EntryPoint);
+                                //object returnObj = engine.ExecuteCommand(WorkingCode);
                                 if (returnObj != null) {
                                     if (returnObj.GetType() == typeof(String)) {
                                         returnText = (String)returnObj;
                                     }
                                 }
                                 //if (string.IsNullOrEmpty(EntryPointArgs)) {
-                                //    returnText = genericController.encodeText(sc.Run(EntryPointName));
+                                //    returnText = genericController.encodeText(sc.Run(EntryPoint));
 
                                 //} else {
                                 //    switch (Args.GetUpperBound(0)) {
                                 //        case 0:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0]));
                                 //            break;
                                 //        case 1:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1]));
                                 //            break;
                                 //        case 2:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2]));
                                 //            break;
                                 //        case 3:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3]));
                                 //            break;
                                 //        case 4:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4]));
                                 //            break;
                                 //        case 5:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5]));
                                 //            break;
                                 //        case 6:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6]));
                                 //            break;
                                 //        case 7:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7]));
                                 //            break;
                                 //        case 8:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8]));
                                 //            break;
                                 //        case 9:
-                                //            returnText = genericController.encodeText(sc.Run(EntryPointName, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8], Args[9]));
+                                //            returnText = genericController.encodeText(sc.Run(EntryPoint, Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6], Args[7], Args[8], Args[9]));
                                 //            break;
                                 //        default:
                                 //            break;

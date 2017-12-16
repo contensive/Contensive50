@@ -90,12 +90,10 @@ namespace Contensive.Core {
         public override void Save(string key, string Value, string invalidationTagCommaList, DateTime invalidationDate) {
             try {
                 List<string> invalidationTagList = new List<string>();
-                if (string.IsNullOrEmpty(invalidationTagCommaList.Trim())) {
-                    //
-                } else {
+                if (!string.IsNullOrEmpty(invalidationTagCommaList.Trim())) {
                     invalidationTagList.AddRange(invalidationTagCommaList.Split(','));
                 }
-                if (invalidationDate == Convert.ToDateTime("12:00:00 AM")) {
+                if (invalidationDate.isOld()) {
                     cpCore.cache.setContent(key, Value, invalidationTagList);
                 } else {
                     cpCore.cache.setContent(key, Value, invalidationDate, invalidationTagList);
