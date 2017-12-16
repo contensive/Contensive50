@@ -554,13 +554,13 @@ namespace Contensive.Core.Controllers {
                 throw;
             }
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' invalidates a tag
-        //''' </summary>
-        //''' <param name="tag"></param>
-        //''' <remarks></remarks>
+        //
+        //====================================================================================================
+        // <summary>
+        // invalidates a tag
+        // </summary>
+        // <param name="tag"></param>
+        // <remarks></remarks>
         public void invalidateContent(string key) {
             try {
                 if (!string.IsNullOrEmpty(key.Trim())) {

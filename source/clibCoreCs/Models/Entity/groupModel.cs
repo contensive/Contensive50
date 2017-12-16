@@ -162,15 +162,15 @@ namespace Contensive.Core.Models.Entity {
                     result.AllowBulkEmail = cs.getBoolean("AllowBulkEmail");
                     result.Caption = cs.getText("Caption");
                     result.ccGuid = cs.getText("ccGuid");
-                    //'
+                    //
                     result.ContentControlID = cs.getInteger("ContentControlID");
                     result.CopyFilename = cs.getText("CopyFilename");
                     result.CreatedBy = cs.getInteger("CreatedBy");
                     result.CreateKey = cs.getInteger("CreateKey");
                     result.DateAdded = cs.getDate("DateAdded");
-                    //'
-                    //'
-                    //'
+                    //
+                    //
+                    //
                     result.ModifiedBy = cs.getInteger("ModifiedBy");
                     result.ModifiedDate = cs.getDate("ModifiedDate");
                     result.Name = cs.getText("Name");
@@ -230,15 +230,15 @@ namespace Contensive.Core.Models.Entity {
                     cs.setField("AllowBulkEmail", AllowBulkEmail.ToString());
                     cs.setField("Caption", Caption);
                     cs.setField("ccGuid", ccGuid);
-                    //'
+                    //
                     cs.setField("ContentControlID", ContentControlID.ToString());
                     cs.setField("CopyFilename", CopyFilename);
                     cs.setField("CreatedBy", CreatedBy.ToString());
                     cs.setField("CreateKey", CreateKey.ToString());
                     cs.setField("DateAdded", DateAdded.ToString());
-                    //'
-                    //'
-                    //'
+                    //
+                    //
+                    //
                     cs.setField("ModifiedBy", ModifiedBy.ToString());
                     cs.setField("ModifiedDate", ModifiedDate.ToString());
                     cs.setField("Name", Name);
@@ -367,14 +367,14 @@ namespace Contensive.Core.Models.Entity {
             // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
             cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' produce a standard format cachename for this model
-        //''' </summary>
-        //''' <param name="fieldName"></param>
-        //''' <param name="fieldValue"></param>
-        //''' <returns></returns>
+        //
+        //====================================================================================================
+        // <summary>
+        // produce a standard format cachename for this model
+        // </summary>
+        // <param name="fieldName"></param>
+        // <param name="fieldValue"></param>
+        // <returns></returns>
         //Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,fieldName As String, fieldValue As String) As String
         //    Return (primaryContentTableName & "-" & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         //End Function

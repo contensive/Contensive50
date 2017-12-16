@@ -54,9 +54,9 @@ namespace Contensive.Core.Controllers {
             privateRequestUserAgent = "kmaHTTP/" + myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("00") + "." + myVersion.Build.ToString("00000000");
             http = new webClientExt();
         }
-        //'
-        //'============================================================================
-        //'
+        //
+        //============================================================================
+        //
         //Public Function common_getHttpRequest(url As String) As Stream
         //    Dim returnstream As Stream = Nothing
         //    Try

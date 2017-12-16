@@ -40,13 +40,13 @@ namespace Contensive.Core.Models.Entity {
         //Public id As Integer
         //Public name As String
         //Public guid As String
-        //'
+        //
         //Public memberID As Integer = 0              ' the last member account this visitor used (memberid=0 means untracked guest)
         //Public orderID As Integer = 0               ' the current shopping cart (non-complete order)
         //Public newVisitor As Boolean = False               ' stored in visit record - Is this the first visit for this visitor
         //Public forceBrowserMobile As Integer = 0           ' 0 = not set -- use Browser detect each time, 1 = Force Mobile, 2 = Force not Mobile
-        //'
-        //' -- publics not exposed to the UI (test/internal data)
+        //
+        // -- publics not exposed to the UI (test/internal data)
         //<JsonIgnore> Public createKey As Integer
         //
         //====================================================================================================
@@ -343,14 +343,14 @@ namespace Contensive.Core.Models.Entity {
             // -- always clear the cache with the content name
             //?? cpCore.cache.invalidateObject(primaryContentName)
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' produce a standard format cachename for this model
-        //''' </summary>
-        //''' <param name="fieldName"></param>
-        //''' <param name="fieldValue"></param>
-        //''' <returns></returns>
+        //
+        //====================================================================================================
+        // <summary>
+        // produce a standard format cachename for this model
+        // </summary>
+        // <param name="fieldName"></param>
+        // <param name="fieldValue"></param>
+        // <returns></returns>
         //Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,fieldName As String, fieldValue As String) As String
         //    Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         //End Function

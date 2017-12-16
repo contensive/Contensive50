@@ -32,7 +32,7 @@ namespace Contensive.Core.Controllers {
         //==========================================================================
         //
         public static void error_AddUserError(coreClass cpCore, string Message) {
-            if (cpCore.doc.debug_iUserError.IndexOf(Message, System.StringComparison.OrdinalIgnoreCase) + 1 == 0) {
+            if (cpCore.doc.debug_iUserError.IndexOf(Message, System.StringComparison.OrdinalIgnoreCase)  == -1) {
                 cpCore.doc.debug_iUserError = cpCore.doc.debug_iUserError + "\r<li class=\"ccError\">" + genericController.encodeText(Message) + "</LI>";
             }
         }

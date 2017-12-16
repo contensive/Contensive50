@@ -176,13 +176,13 @@ namespace Contensive.Core.Controllers {
                         // -- asajax execution, deliver div with ajax callback
                         //
                         result = "TBD - asajax";
-                        //'-----------------------------------------------------------------
-                        //' AsAjax and this is NOT the callback - setup the ajax callback
-                        //' js,styles and other features from the addon record are added to the host page
-                        //' during the remote method, these are blocked, but if any are added during
-                        //'   DLL processing, they have to be handled
-                        //'-----------------------------------------------------------------
-                        //'
+                        //-----------------------------------------------------------------
+                        // AsAjax and this is NOT the callback - setup the ajax callback
+                        // js,styles and other features from the addon record are added to the host page
+                        // during the remote method, these are blocked, but if any are added during
+                        //   DLL processing, they have to be handled
+                        //-----------------------------------------------------------------
+                        //
                         //If True Then
                         //    AsAjaxID = "asajax" & GetRandomInteger(cpCore)
                         //    QS = "" _
@@ -267,10 +267,10 @@ namespace Contensive.Core.Controllers {
                             //
                             // -- remotemethod called from asajax execution
                             result = "TBD - remotemethod ajax";
-                            //'
-                            //' Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
-                            //' restore form values
-                            //'
+                            //
+                            // Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
+                            // restore form values
+                            //
                             //If True Then
                             //    QS = cpCore.docProperties.getText("Hostform")
                             //    If QS <> "" Then
@@ -1878,9 +1878,9 @@ namespace Contensive.Core.Controllers {
             }
             return returnValue;
         }
-        //'
-        //' 
-        //'
+        //
+        // 
+        //
         //Public Function csv_ExecuteActiveX(ByVal ProgramID As String, ByVal AddonCaption As String, ByVal OptionString_ForObjectCall As String, ByVal OptionStringForDisplay As String, ByRef return_AddonErrorMessage As String) As String
         //    Dim exMsg As String = "activex addons [" & ProgramID & "] are no longer supported"
         //    handleException(New ApplicationException(exMsg))
@@ -3579,7 +3579,7 @@ namespace Contensive.Core.Controllers {
             ArgumentList = genericController.vbReplace(ArgumentList, "\r\n", "\r");
             ArgumentList = genericController.vbReplace(ArgumentList, "\n", "\r");
             ArgumentList = genericController.vbReplace(ArgumentList, "\r", "\r\n");
-            if (ArgumentList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) + 1 == 0) {
+            if (ArgumentList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase)  == -1) {
                 //
                 // Add in default constructors, like wrapper
                 //

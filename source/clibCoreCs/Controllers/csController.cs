@@ -325,13 +325,13 @@ namespace Contensive.Core {
         public string getHtml(string FieldName) {
             return getText(FieldName);
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' returns the text stored in a textfile type field instead of the filename.
-        //''' </summary>
-        //''' <param name="FieldName"></param>
-        //''' <returns></returns>
+        //
+        //====================================================================================================
+        // <summary>
+        // returns the text stored in a textfile type field instead of the filename.
+        // </summary>
+        // <param name="FieldName"></param>
+        // <returns></returns>
         //Public Function getTextFile(ByVal FieldName As String) As String
         //    Dim result As String = String.Empty
         //    Try

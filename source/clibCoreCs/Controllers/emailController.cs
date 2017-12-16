@@ -63,7 +63,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // bad email address
                 //
-            } else if ((EmailAddress.IndexOf("@") + 1 == 0) || (EmailAddress.IndexOf(".") + 1 == 0)) {
+            } else if ((EmailAddress.IndexOf("@")  == -1) || (EmailAddress.IndexOf(".")  == -1)) {
                 //
                 // bad email address
                 //
@@ -109,11 +109,11 @@ namespace Contensive.Core.Controllers {
                 //
                 if (string.IsNullOrEmpty(ToAddress)) {
                     // block
-                } else if ((ToAddress.IndexOf("@") + 1 == 0) || (ToAddress.IndexOf(".") + 1 == 0)) {
+                } else if ((ToAddress.IndexOf("@")  == -1) || (ToAddress.IndexOf(".")  == -1)) {
                     // block
                 } else if (string.IsNullOrEmpty(FromAddress)) {
                     // block
-                } else if ((FromAddress.IndexOf("@") + 1 == 0) || (FromAddress.IndexOf(".") + 1 == 0)) {
+                } else if ((FromAddress.IndexOf("@")  == -1) || (FromAddress.IndexOf(".")  == -1)) {
                     // block
                 } else if (0 != genericController.vbInstr(1, getBlockList(), "\r\n" + ToAddress + "\r\n", 1)) {
                     //
@@ -251,11 +251,11 @@ namespace Contensive.Core.Controllers {
                     ToAddress = encodeText(cpcore.db.csGetText(CS, "email")).Trim(' ');
                     if (string.IsNullOrEmpty(ToAddress)) {
                         returnStatus = "The email was not sent because the to-address was blank.";
-                    } else if ((ToAddress.IndexOf("@") + 1 == 0) || (ToAddress.IndexOf(".") + 1 == 0)) {
+                    } else if ((ToAddress.IndexOf("@")  == -1) || (ToAddress.IndexOf(".")  == -1)) {
                         returnStatus = "The email was not sent because the to-address [" + ToAddress + "] was not valid.";
                     } else if (string.IsNullOrEmpty(FromAddress)) {
                         returnStatus = "The email was not sent because the from-address was blank.";
-                    } else if ((FromAddress.IndexOf("@") + 1 == 0) || (FromAddress.IndexOf(".") + 1 == 0)) {
+                    } else if ((FromAddress.IndexOf("@")  == -1) || (FromAddress.IndexOf(".")  == -1)) {
                         returnStatus = "The email was not sent because the from-address [" + FromAddress + "] was not valid.";
                     } else {
                         //
@@ -278,7 +278,7 @@ namespace Contensive.Core.Controllers {
                             templateEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(templateEncoded, personId, "");
                             //templateEncoded = cpcore.html.convertActiveContent_internal(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                             //
-                            if (templateEncoded.IndexOf(fpoContentBox) + 1 != 0) {
+                            if (templateEncoded.IndexOf(fpoContentBox)  != -1) {
                                 bodyEncoded = genericController.vbReplace(templateEncoded, fpoContentBox, bodyEncoded);
                             } else {
                                 bodyEncoded = templateEncoded + bodyEncoded;
@@ -765,7 +765,7 @@ namespace Contensive.Core.Controllers {
                 iSendFrom = genericController.encodeText(SendFrom);
                 iSendSubject = genericController.encodeText(SendSubject);
                 //
-                if ((iSendTo.IndexOf("@") + 1 == 0)) {
+                if ((iSendTo.IndexOf("@")  == -1)) {
                     iSendTo = cpcore.siteProperties.getText("TrapEmail");
                     iSendSubject = "EmailForm with bad Sendto address";
                     Message = "Subject: " + iSendSubject;

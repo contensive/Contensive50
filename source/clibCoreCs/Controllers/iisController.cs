@@ -216,7 +216,7 @@ namespace Contensive.Core.Controllers {
                 iisContext.Response.CacheControl = "no-cache";
                 iisContext.Response.Expires = -1;
                 iisContext.Response.Buffer = true;
-                //'
+                //
                 //
                 // -- basic request environment
                 requestDomain = iisContext.Request.ServerVariables["SERVER_NAME"];
@@ -605,12 +605,12 @@ namespace Contensive.Core.Controllers {
                 if (cpCore.doc.continueProcessing) {
                     //If cpCore.doc.continueProcessing And cpCore.doc.outputBufferEnabled Then
                     if (false) {
-                        //'
-                        //' no domain provided, new mode
-                        //'   - write cookie for current domains
-                        //'   - write an iframe that called the cross-Site login
-                        //'   - http://127.0.0.1/ccLib/clientside/cross.html?v=1&vPath=%2F&vExpires=1%2F1%2F2012
-                        //'
+                        //
+                        // no domain provided, new mode
+                        //   - write cookie for current domains
+                        //   - write an iframe that called the cross-Site login
+                        //   - http://127.0.0.1/ccLib/clientside/cross.html?v=1&vPath=%2F&vExpires=1%2F1%2F2012
+                        //
                         //domainListSplit = Split(cpCore.main_ServerDomainCrossList, ",")
                         //For Ptr = 0 To UBound(domainListSplit)
                         //    domainSet = Trim(domainListSplit[Ptr])
@@ -913,9 +913,9 @@ namespace Contensive.Core.Controllers {
                 iisContext.Response.Flush();
             }
         }
-        //'
-        //'====================================================================================================
-        //'
+        //
+        //====================================================================================================
+        //
         //Private Structure fieldTypePrivate
         //    Dim Name As String
         //    Dim fieldTypePrivate As Integer

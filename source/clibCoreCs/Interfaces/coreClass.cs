@@ -1273,7 +1273,7 @@ namespace Contensive.Core {
                         //Call _json.Dispose()
                         _json = null;
                     }
-                    //'
+                    //
                     //If Not (_user Is Nothing) Then
                     //    ' no dispose
                     //    'Call _user.Dispose()

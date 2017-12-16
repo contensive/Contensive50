@@ -209,11 +209,11 @@ namespace Contensive.Core.Controllers {
         //        Call SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS)
         //        '
         //    End Sub
-        //'
-        //'==========================================================================================
-        //'   Format the current error object into a standard string
-        //'==========================================================================================
-        //'
+        //
+        //==========================================================================================
+        //   Format the current error object into a standard string
+        //==========================================================================================
+        //
         //Public shared Function GetErrString(Optional ErrorObject As Object) As String
         //    Dim Copy As String
         //    If ErrorObject Is Nothing Then
@@ -535,7 +535,7 @@ namespace Contensive.Core.Controllers {
             //End If
             //i = i + 1
 
-            //'Examine the first two bytes
+            //Examine the first two bytes
             //CopyMemory(iUnicode, Bytes(0), 2)
 
             //If iUnicode = Bytes(0) Then 'Unicode
@@ -1334,13 +1334,13 @@ namespace Contensive.Core.Controllers {
             //
             return tempGetGMTFromDate;
         }
-        //'    '
-        //'    '========================================================================
-        //'    '   EncodeSQL
-        //'    '       encode a variable to go in an sql expression
-        //'    '       NOT supported
-        //'    '========================================================================
-        //'    '
+        //    '
+        //    '========================================================================
+        //    '   EncodeSQL
+        //    '       encode a variable to go in an sql expression
+        //    '       NOT supported
+        //    '========================================================================
+        //    '
         //Public shared Function EncodeSQL(ByVal expression As Object, Optional ByVal fieldType As Integer = FieldTypeIdText) As String
         //    ' ##### removed to catch err<>0 problem //On Error //Resume Next
         //    '
@@ -1368,11 +1368,11 @@ namespace Contensive.Core.Controllers {
         //    End Select
         //    '
         //End Function
-        //'
-        //'=====================================================================================================
-        //'   a value in a name/value pair
-        //'=====================================================================================================
-        //'
+        //
+        //=====================================================================================================
+        //   a value in a name/value pair
+        //=====================================================================================================
+        //
         //Public shared sub SetNameValueArrays(ByVal InputName As String, ByVal InputValue As String, ByRef SQLName() As String, ByRef SQLValue() As String, ByRef Index As Integer)
         //    ' ##### removed to catch err<>0 problem //On Error //Resume Next
         //    '
@@ -1533,9 +1533,9 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public shared Function GetAddonRootPath() As String
         //    Dim testPath As String
         //    '
@@ -2102,13 +2102,13 @@ namespace Contensive.Core.Controllers {
             }
             return tempDecodeGMTDate;
         }
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public shared Function  EncodeGMTDate(ByVal MSDate As Date) As String
         //    EncodeGMTDate = ""
         //End Function
-        //'
+        //
         //=================================================================================
         // Get the value of a name in a string of name value pairs parsed with vrlf and =
         //   the legacy line delimiter was a '&' -> name1=value1&name2=value2"
@@ -2178,14 +2178,14 @@ namespace Contensive.Core.Controllers {
             //ErrorTrap:
             return tempGetArgument;
         }
-        //'
-        //'=================================================================================
-        //'   Return the value from a name value pair, parsed with =,&[|].
-        //'   For example:
-        //'       name=Jay[Jay|Josh|Dwayne]
-        //'       the answer is Jay. If a select box is displayed, it is a dropdown of all three
-        //'=================================================================================
-        //'
+        //
+        //=================================================================================
+        //   Return the value from a name value pair, parsed with =,&[|].
+        //   For example:
+        //       name=Jay[Jay|Josh|Dwayne]
+        //       the answer is Jay. If a select box is displayed, it is a dropdown of all three
+        //=================================================================================
+        //
         //Public shared Function  GetAggrOption(ByVal Name As String, ByVal SegmentCMDArgs As String) As String
         //    '
         //    Dim Pos As Integer
@@ -2207,19 +2207,19 @@ namespace Contensive.Core.Controllers {
         //    End If
         //    '
         //End Function
-        //'
-        //'=================================================================================
-        //'   Compatibility for GetArgument
-        //'=================================================================================
-        //'
+        //
+        //=================================================================================
+        //   Compatibility for GetArgument
+        //=================================================================================
+        //
         //Public shared Function  GetNameValue(ByVal Name As String, ByVal ArgumentString As String, Optional ByVal DefaultValue As String = "") As String
         //    getNameValue = GetArgument(Name, ArgumentString, DefaultValue)
         //End Function
-        //'
-        //'========================================================================
-        //'   Gets the next line from a string, and removes the line
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   Gets the next line from a string, and removes the line
+        //========================================================================
+        //
         //Public shared Function GetLine(ByVal Body As String) As String
         //    Dim EOL As String
         //    Dim NextCR As Integer
@@ -2287,14 +2287,14 @@ namespace Contensive.Core.Controllers {
             //dt.Clear()
             dt.Dispose();
         }
-        //'
-        //'=============================================================================
-        //' Create the part of the sql where clause that is modified by the user
-        //'   WorkingQuery is the original querystring to change
-        //'   QueryName is the name part of the name pair to change
-        //'   If the QueryName is not found in the string, ignore call
-        //'=============================================================================
-        //'
+        //
+        //=============================================================================
+        // Create the part of the sql where clause that is modified by the user
+        //   WorkingQuery is the original querystring to change
+        //   QueryName is the name part of the name pair to change
+        //   If the QueryName is not found in the string, ignore call
+        //=============================================================================
+        //
         //Public shared Function ModifyQueryString(ByVal WorkingQuery As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
         //    '
         //    If vbInstr(1, WorkingQuery, "?") Then
@@ -2393,17 +2393,17 @@ namespace Contensive.Core.Controllers {
             }
             return tempGetIntegerString;
         }
-        //'
-        //'==========================================================================================
-        //'   the current process to a high priority
-        //'       Should be called once from the objects parent when it is first created.
-        //'
-        //'   taken from an example labeled
-        //'       KPD-Team 2000
-        //'       URL: http://www.allapi.net/
-        //'       Email: KPDTeam@Allapi.net
-        //'==========================================================================================
-        //'
+        //
+        //==========================================================================================
+        //   the current process to a high priority
+        //       Should be called once from the objects parent when it is first created.
+        //
+        //   taken from an example labeled
+        //       KPD-Team 2000
+        //       URL: http://www.allapi.net/
+        //       Email: KPDTeam@Allapi.net
+        //==========================================================================================
+        //
         //Public shared sub SetProcessHighPriority()
         //    Dim hProcess As Integer
         //    '
@@ -2413,7 +2413,7 @@ namespace Contensive.Core.Controllers {
         //    Call SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS)
         //    '
         //End Sub
-        //'
+        //
         //==========================================================================================
         //   Format the current error object into a standard string
         //==========================================================================================
@@ -2476,12 +2476,12 @@ namespace Contensive.Core.Controllers {
         //
         public static string EncodeURL(string Source) {
             return WebUtility.UrlEncode(Source);
-            //' ##### removed to catch err<>0 problem //On Error //Resume Next
-            //'
+            // ##### removed to catch err<>0 problem //On Error //Resume Next
+            //
             //Dim URLSplit() As String
-            //'Dim LeftSide As String
-            //'Dim RightSide As String
-            //'
+            //Dim LeftSide As String
+            //Dim RightSide As String
+            //
             //EncodeURL = Source
             //If Source <> "" Then
             //    URLSplit = Split(Source, "?")
@@ -2558,12 +2558,12 @@ namespace Contensive.Core.Controllers {
             } else {
                 return System.Uri.EscapeDataString(Source);
             }
-            //' ##### removed to catch err<>0 problem //On Error //Resume Next
-            //'
+            // ##### removed to catch err<>0 problem //On Error //Resume Next
+            //
             //Dim SourcePointer As Integer
             //Dim Character As String
             //Dim LocalSource As String
-            //'
+            //
             //EncodeRequestVariable = ""
             //If Source <> "" Then
             //    LocalSource = Source
@@ -2586,13 +2586,13 @@ namespace Contensive.Core.Controllers {
             //End If
             //
         }
-        //'
-        //'========================================================================
-        //' DecodeHTML
-        //'
-        //'   Convert HTML equivalent characters to their equivalents
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        // DecodeHTML
+        //
+        //   Convert HTML equivalent characters to their equivalents
+        //========================================================================
+        //
         //Public shared Function DecodeHTML(ByVal Source As String) As String
         //    ' ##### removed to catch err<>0 problem //On Error //Resume Next
         //    '
@@ -2916,9 +2916,9 @@ namespace Contensive.Core.Controllers {
             }
             return tempGetYesNo;
         }
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public shared Function GetFilename(ByVal PathFilename As String) As String
         //    Dim Position As Integer
         //    '
@@ -3027,12 +3027,12 @@ namespace Contensive.Core.Controllers {
                 // ----- Protcol found, determine if is local
                 //
                 GoodString = Protocol + ServerHost;
-                if (WorkingLink.IndexOf(GoodString, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                if (WorkingLink.IndexOf(GoodString, System.StringComparison.OrdinalIgnoreCase)  != -1) {
                     //
                     // URL starts with Protocol ServerHost
                     //
                     GoodString = Protocol + ServerHost + ServerVirtualPath + "/files/";
-                    if (WorkingLink.IndexOf(GoodString, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                    if (WorkingLink.IndexOf(GoodString, System.StringComparison.OrdinalIgnoreCase)  != -1) {
                         //
                         // URL is in the virtual files directory
                         //
@@ -3069,12 +3069,12 @@ namespace Contensive.Core.Controllers {
             bool VirtualHosted = false;
             //
             tempEncodeAppRootPath = Link;
-            if ((tempEncodeAppRootPath.IndexOf(ServerHost, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) || (Link.IndexOf("/") + 1 == 1)) {
+            if ((tempEncodeAppRootPath.IndexOf(ServerHost, System.StringComparison.OrdinalIgnoreCase)  != -1) || (Link.IndexOf("/") + 1 == 1)) {
                 //If (InStr(1, EncodeAppRootPath, ServerHost, vbTextCompare) <> 0) And (InStr(1, Link, "/") <> 0) Then
                 //
                 // This link is onsite and has a path
                 //
-                VirtualHosted = (AppRootPath.IndexOf(VirtualPath, System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
+                VirtualHosted = (AppRootPath.IndexOf(VirtualPath, System.StringComparison.OrdinalIgnoreCase)  != -1);
                 if (VirtualHosted && (Link.IndexOf(AppRootPath, System.StringComparison.OrdinalIgnoreCase) + 1 == 1)) {
                     //
                     // quick - virtual hosted and link starts at AppRootPath
@@ -3444,7 +3444,7 @@ namespace Contensive.Core.Controllers {
             //
             return returnResult;
         }
-        //'
+        //
         //Public shared sub runProcess(cp.core,cmd As String, Optional ignore As Object = "", Optional waitforreturn As Boolean = False)
         //    Call runProcess(cp.core,cmd, waitforreturn)
         //    'Dim ShellObj As Object
@@ -3724,9 +3724,9 @@ namespace Contensive.Core.Controllers {
             }
             return ipAddressList;
         }
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public shared Function GetAddonRootPath() As String
         //    Dim testPath As String
         //    '
@@ -3748,9 +3748,9 @@ namespace Contensive.Core.Controllers {
         public static bool IsNull(object source) {
             return (source == null);
         }
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public shared Function isNothing(ByVal source As Object) As Boolean
         //    Return IsNothing(source)
         //    'Dim returnIsEmpty As Boolean = True
@@ -3815,7 +3815,7 @@ namespace Contensive.Core.Controllers {
         public static bool isMinDate(DateTime sourceDate) {
             return encodeDateMinValue(sourceDate) == DateTime.MinValue;
         }
-        //'
+        //
         //Public Shared Function getVirtualTableFieldPath(ByVal TableName As String, ByVal FieldName As String) As String
         //    Dim result As String = TableName & "/" & FieldName & "/"
         //    Return result.Replace(" ", "_").Replace(".", "_")
@@ -3823,14 +3823,14 @@ namespace Contensive.Core.Controllers {
         //Public Shared Function getVirtualTableFieldIdPath(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer) As String
         //    Return getVirtualTableFieldPath(TableName, FieldName) & RecordID.ToString().PadLeft(12, "0"c) & "/"
         //End Function
-        //'
-        //'========================================================================
-        //' ----- Create a filename for the Virtual Directory
-        //'   Do not allow spaces.
-        //'   If the content supports authoring, the filename returned will be for the
-        //'   current authoring record.
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        // ----- Create a filename for the Virtual Directory
+        //   Do not allow spaces.
+        //   If the content supports authoring, the filename returned will be for the
+        //   current authoring record.
+        //========================================================================
+        //
         //Public Shared Function getVirtualRecordPathFilename(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer, ByVal OriginalFilename As String, ByVal fieldType As Integer) As String
         //    Dim result As String = ""
         //    '
@@ -3971,7 +3971,7 @@ namespace Contensive.Core.Controllers {
                     // Good to go
                     //
                     returnValue = true;
-                } else if ((Source.Length == 36) && (Source.IndexOf(" ") + 1 == 0)) {
+                } else if ((Source.Length == 36) && (Source.IndexOf(" ")  == -1)) {
                     //
                     // might be valid with the brackets, add them
                     //

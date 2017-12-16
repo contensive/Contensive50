@@ -266,7 +266,7 @@ namespace Contensive.Core.Controllers {
                     // remove duplicate spaces
                     //
                     LoopCount = 0;
-                    while ((result.IndexOf("  ") + 1 != 0) && (LoopCount < 1000)) {
+                    while ((result.IndexOf("  ")  != -1) && (LoopCount < 1000)) {
                         result = genericController.vbReplace(result, "  ", " ");
                         LoopCount += 1;
                     }
@@ -274,7 +274,7 @@ namespace Contensive.Core.Controllers {
                     // Remove lines that are just spaces
                     //
                     LoopCount = 0;
-                    while ((result.IndexOf("\r\n ") + 1 != 0) && (LoopCount < 1000)) {
+                    while ((result.IndexOf("\r\n ")  != -1) && (LoopCount < 1000)) {
                         result = genericController.vbReplace(result, "\r\n ", "\r\n");
                         LoopCount += 1;
                     }
@@ -282,7 +282,7 @@ namespace Contensive.Core.Controllers {
                     // remove long sets of extra line feeds
                     //
                     LoopCount = 0;
-                    while ((result.IndexOf("\r\n\r\n\r\n") + 1 != 0) && (LoopCount < 1000)) {
+                    while ((result.IndexOf("\r\n\r\n\r\n")  != -1) && (LoopCount < 1000)) {
                         result = genericController.vbReplace(result, "\r\n\r\n\r\n", "\r\n\r\n");
                         LoopCount += 1;
                     }

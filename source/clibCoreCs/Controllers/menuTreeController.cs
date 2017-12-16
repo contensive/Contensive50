@@ -128,7 +128,7 @@ namespace Contensive.Core.Controllers {
                 iEntryName = genericController.vbReplace(encodeEmptyText(EntryName, ""), ",", " ");
                 UcaseEntryName = genericController.vbUCase(iEntryName);
                 //
-                if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",") + 1 == 0)) {
+                if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",")  == -1)) {
                     UsedEntries = UsedEntries + "," + UcaseEntryName;
                     if (iEntryCount >= iEntrySize) {
                         iEntrySize = iEntrySize + 10;
@@ -260,7 +260,7 @@ namespace Contensive.Core.Controllers {
                 SubMenuCount = 0;
                 for (EntryPointer = 0; EntryPointer < iEntryCount; EntryPointer++) {
                     if (iEntry[EntryPointer].ParentName == ParentName) {
-                        if ((iUsedEntries + ",").IndexOf("," + EntryPointer + ",") + 1 == 0) {
+                        if ((iUsedEntries + ",").IndexOf("," + EntryPointer + ",")  == -1) {
                             JSChildObject = JSObject + ".s[" + SubMenuCount + "]";
                             iUsedEntries = iUsedEntries + "," + EntryPointer;
                             result = result + JSChildObject + " = new so(0,'" + iEntry[EntryPointer].Caption + "','" + iEntry[EntryPointer].Link + "','_blank',''); \r\n" + GetMenuTreeBranch(iEntry[EntryPointer].Name, JSChildObject, iUsedEntries);

@@ -207,14 +207,14 @@ namespace Contensive.Core.Models.Entity
 					result.username = cs.getText("username");
 					result.password = cs.getText("password");
 					result.type = cs.getInteger("dbTypeId");
-					//'
+					//
 					result.ContentControlID = cs.getInteger("ContentControlID");
 					result.CreatedBy = cs.getInteger("CreatedBy");
 					result.CreateKey = cs.getInteger("CreateKey");
 					result.DateAdded = cs.getDate("DateAdded");
-					//'
-					//'
-					//'
+					//
+					//
+					//
 					result.ModifiedBy = cs.getInteger("ModifiedBy");
 					result.ModifiedDate = cs.getDate("ModifiedDate");
 					result.Name = normalizeDataSourceName(cs.getText("Name"));
@@ -288,14 +288,14 @@ namespace Contensive.Core.Models.Entity
 					cs.setField("username", username);
 					cs.setField("password", password);
 					cs.setField("dbTypeId", type);
-					//'
+					//
 					cs.setField("ContentControlID", ContentControlID.ToString());
 					cs.setField("CreatedBy", CreatedBy.ToString());
 					cs.setField("CreateKey", CreateKey.ToString());
 					cs.setField("DateAdded", DateAdded.ToString());
-					//'
-					//'
-					//'
+					//
+					//
+					//
 					cs.setField("ModifiedBy", ModifiedBy.ToString());
 					cs.setField("ModifiedDate", ModifiedDate.ToString());
 					cs.setField("Name", normalizeDataSourceName(Name));
@@ -454,18 +454,18 @@ namespace Contensive.Core.Models.Entity
 			// -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
 			cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
 		}
-		//'
-		//'====================================================================================================
-		//''' <summary>
-		//''' produce a standard format cachename for this model
-		//''' </summary>
-		//''' <param name="fieldName"></param>
-		//''' <param name="fieldValue"></param>
-		//''' <returns></returns>
+		//
+		//====================================================================================================
+		// <summary>
+		// produce a standard format cachename for this model
+		// </summary>
+		// <param name="fieldName"></param>
+		// <param name="fieldValue"></param>
+		// <returns></returns>
 		//Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,fieldName As String, fieldValue As String) As String
 		//    Return (primaryContentTableName & "-" & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
 		//End Function
-		//'
+		//
 		//Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
 		//    Return (primaryContentTableName & "-" & field1Name & "." & field1Value & "-" & field2Name & "." & field2Value).ToLower().Replace(" ", "_")
 		//End Function
@@ -623,8 +623,8 @@ namespace Contensive.Core.Models.Entity
 			}
 			return result;
 		}
-		//'
-		//'====================================================================================================
+		//
+		//====================================================================================================
 		//Public Shared Function getHtmlInputSelect(cpCore As coreClass, HtmlName As String, selectedId As Integer, callerCacheList As List(Of String)) As String
 		//    Dim result As String = ""
 		//    Try

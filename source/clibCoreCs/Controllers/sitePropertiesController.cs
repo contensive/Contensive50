@@ -452,8 +452,8 @@ namespace Contensive.Core.Controllers {
                                 if (false) {
                                     //Dim returnObj As Object = cpCore.cache.getObject(Of String)(cacheName)
                                     //If (returnObj IsNot Nothing) Then
-                                    //'
-                                    //' -- found in cache, save in simple cache and return
+                                    //
+                                    // -- found in cache, save in simple cache and return
                                     //returnString = encodeText(returnObj)
                                     //nameValueDict.Add(cacheName, returnString)
                                 } else {

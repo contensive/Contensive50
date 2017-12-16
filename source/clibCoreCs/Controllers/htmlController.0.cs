@@ -144,7 +144,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     do {
                                         posEnd = posEnd + 1;
-                                    } while ((posEnd < layout.Length) && (("\t\r\n\t ").IndexOf(layout.Substring(posEnd - 1, 1)) + 1 != 0));
+                                    } while ((posEnd < layout.Length) && (("\t\r\n\t ").IndexOf(layout.Substring(posEnd - 1, 1))  != -1));
                                     posEnd = posEnd - 1;
                                     returnValue = layout.Substring(posStart - 1, (posEnd - posStart));
                                 }
@@ -182,7 +182,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // now backtrack to include the leading whitespace
                         //
-                        while ((posStart > 0) && (("\t\r\n\t ").IndexOf(s.Substring(posStart - 1, 1)) + 1 != 0)) {
+                        while ((posStart > 0) && (("\t\r\n\t ").IndexOf(s.Substring(posStart - 1, 1))  != -1)) {
                             posStart = posStart - 1;
                         }
                         //posStart = posStart + 1
@@ -1557,19 +1557,19 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //'
-        //'========================================================================
-        //'   legacy
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   legacy
+        //========================================================================
+        //
         //Public Function main_GetClosePage(Optional ByVal AllowLogin As Boolean = True, Optional ByVal AllowTools As Boolean = True) As String
         //    main_GetClosePage = main_GetClosePage3(AllowLogin, AllowTools, False, False)
         //End Function
-        //'
-        //'========================================================================
-        //'   legacy
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   legacy
+        //========================================================================
+        //
         //Public Function main_GetClosePage2(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean) As String
         //    Try
         //        main_GetClosePage2 = main_GetClosePage3(AllowLogin, AllowTools, False, False)
@@ -1577,16 +1577,16 @@ namespace Contensive.Core.Controllers {
         //        cpCore.handleExceptionAndContinue(ex) : Throw
         //    End Try
         //End Function
-        //'
-        //'========================================================================
-        //'   main_GetClosePage3
-        //'       Public interface to end the page call
-        //'       Must be called last on every public page
-        //'       internally, you can NOT writeAltBuffer( main_GetClosePage3 ) because the stream is closed
-        //'       call main_GetEndOfBody - main_Gets toolspanel and all html,menuing,etc needed to finish page
-        //'       optionally calls main_dispose
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   main_GetClosePage3
+        //       Public interface to end the page call
+        //       Must be called last on every public page
+        //       internally, you can NOT writeAltBuffer( main_GetClosePage3 ) because the stream is closed
+        //       call main_GetEndOfBody - main_Gets toolspanel and all html,menuing,etc needed to finish page
+        //       optionally calls main_dispose
+        //========================================================================
+        //
         //Public Function main_GetClosePage3(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, doNotDisposeOnExit As Boolean) As String
         //    Try
         //        Return getBeforeEndOfBodyHtml(AllowLogin, AllowTools, BlockNonContentExtras, False)
@@ -1656,9 +1656,9 @@ namespace Contensive.Core.Controllers {
 
         //    End Get
         //End Property
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public Sub webServerIO_addRefreshQueryString(ByVal Name As String, Optional ByVal Value As String = "")
         //    Try
         //        Dim temp() As String
@@ -1915,7 +1915,7 @@ namespace Contensive.Core.Controllers {
                     //
                     if (PasswordField) {
                         temphtml_GetFormInputText2 = "<input TYPE=\"password\" NAME=\"" + htmlName + "\" SIZE=\"" + iWidth + "\" VALUE=\"" + iDefaultValue + "\"" + TagID + TagDisabled + ">";
-                    } else if ((iHeight == 1) && (iDefaultValue.IndexOf("\"") + 1 == 0)) {
+                    } else if ((iHeight == 1) && (iDefaultValue.IndexOf("\"")  == -1)) {
                         temphtml_GetFormInputText2 = "<input TYPE=\"Text\" NAME=\"" + htmlName + "\" SIZE=\"" + iWidth.ToString() + "\" VALUE=\"" + iDefaultValue + "\"" + TagID + TagDisabled + ">";
                     } else {
                         temphtml_GetFormInputText2 = "<textarea NAME=\"" + htmlName + "\" ROWS=\"" + iHeight.ToString() + "\" COLS=\"" + iWidth.ToString() + "\"" + TagID + TagDisabled + ">" + iDefaultValue + "</TEXTAREA>";
@@ -2989,9 +2989,9 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //'
-        //'   renamed to AllowDebugging
-        //'
+        //
+        //   renamed to AllowDebugging
+        //
         //Public ReadOnly Property visitProperty_AllowVerboseReporting() As Boolean
         //    Get
         //        Return visitProperty.getBoolean("AllowDebugging")
@@ -3013,9 +3013,9 @@ namespace Contensive.Core.Controllers {
         //            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
         //            '
         //        End Function
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public Function main_GetStyleSheet2(ByVal ContentType As csv_contentTypeEnum, Optional ByVal templateId As Integer = 0, Optional ByVal EmailID As Integer = 0) As String
         //    main_GetStyleSheet2 = html_getStyleSheet2(ContentType, templateId, EmailID)
         //End Function
@@ -3284,19 +3284,19 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //'
-        //'========================================================================
-        //'   deprecated - see csv_EncodeActiveContent_Internal
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   deprecated - see csv_EncodeActiveContent_Internal
+        //========================================================================
+        //
         //Public Function html_EncodeActiveContent4(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String) As String
         //    html_EncodeActiveContent4 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.doc.authContext.isAuthenticated)
         //End Function
-        //'
-        //'========================================================================
-        //'   see csv_EncodeActiveContent_Internal
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   see csv_EncodeActiveContent_Internal
+        //========================================================================
+        //
         //Public Function html_EncodeActiveContent5(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, ByVal Context As CPUtilsBaseClass.addonContext) As String
         //    html_EncodeActiveContent5 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.doc.authContext.isAuthenticated, Context)
         //End Function
@@ -3313,7 +3313,7 @@ namespace Contensive.Core.Controllers {
                 //
                 returnValue = Source;
                 LoopPtr = 0;
-                while ((LoopPtr < 10) && ((returnValue.IndexOf(contentReplaceEscapeStart) + 1 != 0))) {
+                while ((LoopPtr < 10) && ((returnValue.IndexOf(contentReplaceEscapeStart)  != -1))) {
                     returnValue = contentCmd.ExecuteCmd(returnValue, Context, personalizationPeopleId, personalizationIsAuthenticated);
                     LoopPtr = LoopPtr + 1;
                 }
@@ -3499,9 +3499,9 @@ namespace Contensive.Core.Controllers {
                 Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
                 if (Pos > 0) {
                     throw new ApplicationException("Structured xml data commands are no longer supported");
-                    //'
-                    //' convert content if provided
-                    //'
+                    //
+                    // convert content if provided
+                    //
                     //workingContent = Mid(workingContent, Pos)
                     //LayoutEngineOptionString = "data=" & encodeNvaArgument(workingContent)
                     //Dim structuredData As New core_primitivesStructuredDataClass(Me)
@@ -3539,9 +3539,9 @@ namespace Contensive.Core.Controllers {
                     IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0);
                     workingContent = genericController.vbReplace(workingContent, "{{content}}", IconImg, 1, 99, 1);
                     //WorkingContent = genericController.vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
-                    //'
-                    //' replace all other {{...}}
-                    //'
+                    //
+                    // replace all other {{...}}
+                    //
                     //LoopPtr = 0
                     //Pos = 1
                     //Do While Pos > 0 And LoopPtr < 100
@@ -3574,8 +3574,8 @@ namespace Contensive.Core.Controllers {
                 //
                 // Test early if this needs to run at all
                 //
-                ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || EncodeImages || EncodeEditIcons)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) + 1 != 0));
-                ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (workingContent.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
+                ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || EncodeImages || EncodeEditIcons)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase)  != -1));
+                ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (workingContent.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase)  != -1);
                 if ((!string.IsNullOrEmpty(workingContent)) & (ProcessAnchorTags || ProcessACTags)) {
                     //
                     // ----- Load the Active Elements
@@ -3609,7 +3609,7 @@ namespace Contensive.Core.Controllers {
                                             // 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
                                             // however, leave this one because it is needed to make current forms work.
                                             //
-                                            if ((Copy.IndexOf("contensiveuserform=1", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) | (Copy.IndexOf("contensiveuserform=\"1\"", System.StringComparison.OrdinalIgnoreCase) + 1 != 0)) {
+                                            if ((Copy.IndexOf("contensiveuserform=1", System.StringComparison.OrdinalIgnoreCase)  != -1) | (Copy.IndexOf("contensiveuserform=\"1\"", System.StringComparison.OrdinalIgnoreCase)  != -1)) {
                                                 //
                                                 // if it has "contensiveuserform=1" in the form tag, remove it from the form and add the hidden that makes it work
                                                 //
@@ -3649,7 +3649,7 @@ namespace Contensive.Core.Controllers {
                                                                 Link = Link.Left( Pos - 1);
                                                             }
                                                         }
-                                                        if ((string.IsNullOrEmpty(Link)) || (("," + cpCore.serverConfig.appConfig.domainList[0] + ",").IndexOf("," + Link + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0)) {
+                                                        if ((string.IsNullOrEmpty(Link)) || (("," + cpCore.serverConfig.appConfig.domainList[0] + ",").IndexOf("," + Link + ",", System.StringComparison.OrdinalIgnoreCase)  != -1)) {
                                                             //
                                                             // ----- link is for this site
                                                             //
@@ -4049,7 +4049,7 @@ namespace Contensive.Core.Controllers {
                                                             //
                                                             // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
                                                             //
-                                                            if (SrcOptionList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) + 1 == 0) {
+                                                            if (SrcOptionList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase)  == -1) {
                                                                 if (AddonIsInline) {
                                                                     SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Inline;
                                                                 } else {
@@ -4948,7 +4948,7 @@ namespace Contensive.Core.Controllers {
                                                                                             // image matches record, and the sizes are the same
                                                                                             //
                                                                                             //RecordVirtualFilename = RecordVirtualFilename;
-                                                                                        } else if ((RecordVirtualFilename == ImageVirtualFilePath + ImageFilenameNoExt + "." + ImageFilenameExt) && (RecordAltSizeList.IndexOf(ImageAltSize, System.StringComparison.OrdinalIgnoreCase) + 1 != 0)) {
+                                                                                        } else if ((RecordVirtualFilename == ImageVirtualFilePath + ImageFilenameNoExt + "." + ImageFilenameExt) && (RecordAltSizeList.IndexOf(ImageAltSize, System.StringComparison.OrdinalIgnoreCase)  != -1)) {
                                                                                             //
                                                                                             // OK
                                                                                             // resized image, and altsize is in the list - go with resized image name
@@ -6279,7 +6279,7 @@ namespace Contensive.Core.Controllers {
                                 + tempmain_GetRecordEditLink2 + helpLink;
                             //
                             tempmain_GetRecordEditLink2 = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + tempmain_GetRecordEditLink2 + "</span>";
-                            //'
+                            //
                             //main_GetRecordEditLink2 = "" _
                             //    & cr & "<div style=""position:absolute;"">" _
                             //    & genericController.kmaIndent(main_GetRecordEditLink2) _
@@ -7083,9 +7083,9 @@ namespace Contensive.Core.Controllers {
                             Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, iValueBoolean, TagID);
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + TagID + "\">" + Tag + "&nbsp;Debug</LABEL>" + helpLink + "\r</div>";
-                            //'
-                            //' Create Path Block Row
-                            //'
+                            //
+                            // Create Path Block Row
+                            //
                             //If cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) Then
                             //    TagID = "CreatePathBlock"
                             //    If cpCore.siteProperties.allowPathBlocking Then
@@ -7353,9 +7353,9 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //'
-        //' assemble all the html parts
-        //'
+        //
+        // assemble all the html parts
+        //
         //Public Function assembleHtmlDoc(ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
         //    Return "" _
         //        & cpCore.siteProperties.docTypeDeclarationAdmin _
@@ -7368,11 +7368,11 @@ namespace Contensive.Core.Controllers {
         //        & cr2 & "</body>" _
         //        & cr & "</html>"
         //End Function
-        //'
-        //'========================================================================
-        //' ----- Starts an HTML page (for an admin page -- not a public page)
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        // ----- Starts an HTML page (for an admin page -- not a public page)
+        //========================================================================
+        //
         //Public Function getHtmlDoc_beforeBodyHtml(Optional ByVal Title As String = "", Optional ByVal PageMargin As Integer = 0) As String
         //    If Title <> "" Then
         //        Call main_AddPagetitle(Title)
@@ -7845,7 +7845,7 @@ namespace Contensive.Core.Controllers {
                     // Process Active Content that must be run here to access webclass objects
                     //     parse as {{functionname?querystring}}
                     //
-                    if ((!EncodeActiveEditIcons) && (result.IndexOf("{{") + 1 != 0)) {
+                    if ((!EncodeActiveEditIcons) && (result.IndexOf("{{")  != -1)) {
                         ContentSplit = genericController.customSplit(result, "{{");
                         result = "";
                         ContentSplitCnt = ContentSplit.GetUpperBound(0) + 1;
@@ -7974,8 +7974,8 @@ namespace Contensive.Core.Controllers {
                     //    and all add-ons run as processes the same as they run on pages, or as remote methods
                     // (2/16/2010) - if <!-- AC --> has four arguments, the fourth is the addon guid
                     //
-                    if (result.IndexOf(StartFlag) + 1 != 0) {
-                        while (result.IndexOf(StartFlag) + 1 != 0) {
+                    if (result.IndexOf(StartFlag)  != -1) {
+                        while (result.IndexOf(StartFlag)  != -1) {
                             LineStart = genericController.vbInstr(1, result, StartFlag);
                             LineEnd = genericController.vbInstr(LineStart, result, EndFlag);
                             if (LineEnd == 0) {
@@ -8044,7 +8044,7 @@ namespace Contensive.Core.Controllers {
                     //
                     if ((!isEditingAnything) && (result != BlockTextStartMarker)) {
                         DoAnotherPass = true;
-                        while ((result.IndexOf(BlockTextStartMarker, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) && DoAnotherPass) {
+                        while ((result.IndexOf(BlockTextStartMarker, System.StringComparison.OrdinalIgnoreCase)  != -1) && DoAnotherPass) {
                             LineStart = genericController.vbInstr(1, result, BlockTextStartMarker, 1);
                             if (LineStart == 0) {
                                 DoAnotherPass = false;
@@ -8077,14 +8077,14 @@ namespace Contensive.Core.Controllers {
                         //
                         //hint = hint & ",500, Adding edit wrappers"
                         if (isEditingAnything) {
-                            if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                            if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase)  != -1) {
                                 //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
                                 Copy = getEditWrapper("Aggregate Script", "##MARKER##");
                                 Wrapper = genericController.customSplit(Copy, "##MARKER##");
                                 result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
                                 result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
                             }
-                            if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                            if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase)  != -1) {
                                 //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
                                 Copy = getEditWrapper("Aggregate Replacement", "##MARKER##");
                                 Wrapper = genericController.customSplit(Copy, "##MARKER##");
@@ -8099,17 +8099,17 @@ namespace Contensive.Core.Controllers {
                         if (genericController.vbInstr(1, result, FeedbackFormNotSupportedComment, 1) != 0) {
                             result = genericController.vbReplace(result, FeedbackFormNotSupportedComment, pageContentController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, 1);
                         }
-                        //'
-                        //' If any javascript or styles were added during encode, pick them up now
-                        //'
+                        //
+                        // If any javascript or styles were added during encode, pick them up now
+                        //
                         //Copy = cpCore.doc.getNextJavascriptBodyEnd()
                         //Do While Copy <> ""
                         //    Call addScriptCode_body(Copy, "embedded content")
                         //    Copy = cpCore.doc.getNextJavascriptBodyEnd()
                         //Loop
-                        //'
-                        //' current
-                        //'
+                        //
+                        // current
+                        //
                         //Copy = cpCore.doc.getNextJSFilename()
                         //Do While Copy <> ""
                         //    If genericController.vbInstr(1, Copy, "://") <> 0 Then
@@ -8120,7 +8120,7 @@ namespace Contensive.Core.Controllers {
                         //    Call addScriptLink_Head(Copy, "embedded content")
                         //    Copy = cpCore.doc.getNextJSFilename()
                         //Loop
-                        //'
+                        //
                         //Copy = cpCore.doc.getJavascriptOnLoad()
                         //Do While Copy <> ""
                         //    Call addOnLoadJs(Copy, "")
@@ -8189,7 +8189,7 @@ namespace Contensive.Core.Controllers {
                 ContentFilesLinkPrefix = "/" + cpCore.serverConfig.appConfig.name + "/files/";
                 ResourceLibraryLinkPrefix = ContentFilesLinkPrefix + "ccLibraryFiles/";
                 ImageAllowUpdate = cpCore.siteProperties.getBoolean("ImageAllowUpdate", true);
-                ImageAllowUpdate = ImageAllowUpdate && (Source.IndexOf(ResourceLibraryLinkPrefix, System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
+                ImageAllowUpdate = ImageAllowUpdate && (Source.IndexOf(ResourceLibraryLinkPrefix, System.StringComparison.OrdinalIgnoreCase)  != -1);
                 if (ImageAllowUpdate) {
                     //
                     // ----- Process Resource Library Images (swap in most current file)
@@ -8198,7 +8198,7 @@ namespace Contensive.Core.Controllers {
                     //   problem with replacing the images is the problem with parsing - too much work to find it
                     //   instead, use new replacement tags <ac type=image src="cclibraryfiles/filename/00001" width=0 height=0>
                     //
-                    //'hint = hint & ",010"
+                    //hint = hint & ",010"
                     ParseError = false;
                     LinkSplit = genericController.customSplit(Source, ContentFilesLinkPrefix);
                     LinkCnt = LinkSplit.GetUpperBound(0) + 1;
@@ -8208,7 +8208,7 @@ namespace Contensive.Core.Controllers {
                         // Next job is to determine if this sement is in a tag (<img src="...">) or in content (&quot...&quote)
                         // For now, skip the ones in content
                         //
-                        //'hint = hint & ",020"
+                        //hint = hint & ",020"
                         TagPosEnd = genericController.vbInstr(1, LinkSplit[LinkPtr], ">");
                         TagPosStart = genericController.vbInstr(1, LinkSplit[LinkPtr], "<");
                         if (TagPosEnd == 0 && TagPosStart == 0) {
@@ -8233,7 +8233,7 @@ namespace Contensive.Core.Controllers {
                             InTag = false;
                         }
                         if (InTag) {
-                            //'hint = hint & ",030"
+                            //hint = hint & ",030"
                             TableSplit = LinkSplit[LinkPtr].Split('/');
                             if (TableSplit.GetUpperBound(0) > 2) {
                                 TableName = TableSplit[0];
@@ -8243,7 +8243,7 @@ namespace Contensive.Core.Controllers {
                                 if ((TableName.ToLower() == "cclibraryfiles") && (FieldName.ToLower() == "filename") && (RecordID != 0)) {
                                     libraryFilesModel file = libraryFilesModel.create(cpCore, RecordID);
                                     if (file != null) {
-                                        //'hint = hint & ",060"
+                                        //hint = hint & ",060"
                                         FieldName = "filename";
                                         //SQL = "select filename,altsizelist from " & TableName & " where id=" & RecordID
                                         //CS = app.csv_OpenCSSQL("default", SQL)
@@ -8290,7 +8290,7 @@ namespace Contensive.Core.Controllers {
                                                 //   xRecordFilenameExt = "png"
                                                 //   xRecordFilenameNoExt = "test"
                                                 //
-                                                //'hint = hint & ",080"
+                                                //hint = hint & ",080"
                                                 Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
                                                 RecordFilename = "";
                                                 if (Pos > 0) {
@@ -8398,7 +8398,7 @@ namespace Contensive.Core.Controllers {
                                                                 string ImageFilenameExt = null;
                                                                 string ImageAltSize = null;
 
-                                                                //'hint = hint & ",120"
+                                                                //hint = hint & ",120"
                                                                 SegmentAfterImage = FilenameSegment.Substring(EndPos - 1);
                                                                 ImageFilename = genericController.DecodeResponseVariable(FilenameSegment.Left( EndPos - 1));
                                                                 ImageFilenameNoExt = ImageFilename;
@@ -8411,7 +8411,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // Get ImageAltSize
                                                                 //
-                                                                //'hint = hint & ",130"
+                                                                //hint = hint & ",130"
                                                                 ImageAltSize = "";
                                                                 if (ImageFilenameNoExt == RecordFilenameNoExt) {
                                                                     //
@@ -8447,7 +8447,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // problem - in the case where the recordfilename = img-100x200, the imagefilenamenoext is img
                                                                 //
-                                                                //'hint = hint & ",140"
+                                                                //hint = hint & ",140"
                                                                 if ((RecordFilenameNoExt != ImageFilenameNoExt) | (RecordFilenameExt != ImageFilenameExt)) {
                                                                     //
                                                                     // There has been a change
@@ -8483,12 +8483,12 @@ namespace Contensive.Core.Controllers {
                             break;
                         }
                     }
-                    //'hint = hint & ",910"
+                    //hint = hint & ",910"
                     if (SaveChanges && (!ParseError)) {
                         result = string.Join(ContentFilesLinkPrefix, LinkSplit);
                     }
                 }
-                //'hint = hint & ",920"
+                //hint = hint & ",920"
                 if (!ParseError) {
                     //
                     // Convert ACTypeDynamicForm to Add-on
@@ -8498,7 +8498,7 @@ namespace Contensive.Core.Controllers {
                         result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, 1);
                     }
                 }
-                //'hint = hint & ",930"
+                //hint = hint & ",930"
                 if (ParseError) {
                     result = ""
                     + "\r\n<!-- warning: parsing aborted on ccLibraryFile replacement -->"
@@ -8508,7 +8508,7 @@ namespace Contensive.Core.Controllers {
                 // {{content}} should be <ac type="templatecontent" etc>
                 // the merge is now handled in csv_EncodeActiveContent, but some sites have hand {{content}} tags entered
                 //
-                //'hint = hint & ",940"
+                //hint = hint & ",940"
                 if (genericController.vbInstr(1, result, "{{content}}", 1) != 0) {
                     result = genericController.vbReplace(result, "{{content}}", "<AC type=\"" + ACTypeTemplateContent + "\">", 1, 99, 1);
                 }
@@ -8675,29 +8675,29 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-        //'
-        //'================================================================================================================
-        //'   main_Get SharedStyleFilelist
-        //'
-        //'   SharedStyleFilelist is a list of filenames (with conditional comments) that should be included on pages
-        //'   that call out the SharedFileIDList
-        //'
-        //'   Suffix and Prefix are for Conditional Comments around the style tag
-        //'
-        //'   SharedStyleFileList is
-        //'       crlf filename < Prefix< Suffix
-        //'       crlf filename < Prefix< Suffix
-        //'       ...
-        //'       Prefix and Suffix are htmlencoded
-        //'
-        //'   SharedStyleMap file
-        //'       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
-        //'       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
-        //'       ...
-        //'       StyleID is 0 if Always include is set
-        //'       The Prefix and Suffix have had crlf removed, and comma replaced with &#44;
-        //'================================================================================================================
-        //'
+        //
+        //================================================================================================================
+        //   main_Get SharedStyleFilelist
+        //
+        //   SharedStyleFilelist is a list of filenames (with conditional comments) that should be included on pages
+        //   that call out the SharedFileIDList
+        //
+        //   Suffix and Prefix are for Conditional Comments around the style tag
+        //
+        //   SharedStyleFileList is
+        //       crlf filename < Prefix< Suffix
+        //       crlf filename < Prefix< Suffix
+        //       ...
+        //       Prefix and Suffix are htmlencoded
+        //
+        //   SharedStyleMap file
+        //       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
+        //       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
+        //       ...
+        //       StyleID is 0 if Always include is set
+        //       The Prefix and Suffix have had crlf removed, and comma replaced with &#44;
+        //================================================================================================================
+        //
         //Friend Shared Function main_GetSharedStyleFileList(cpCore As coreClass, SharedStyleIDList As String, main_IsAdminSite As Boolean) As String
         //    Dim result As String = ""
         //    '
@@ -8981,11 +8981,11 @@ namespace Contensive.Core.Controllers {
             }
         }
 
-        //'
-        //'========================================================================
-        //' ----- Ends an HTML page
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        // ----- Ends an HTML page
+        //========================================================================
+        //
         //Public Function getHtmlDoc_afterBodyHtml() As String
         //    Return "" _
         //        & cr & "</body>" _

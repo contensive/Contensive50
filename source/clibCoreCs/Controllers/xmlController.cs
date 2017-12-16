@@ -371,7 +371,7 @@ namespace Contensive.Core.Controllers {
                             if (FieldContentID > ContentID) {
                                 break;
                             } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
-                                if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) + 1 == 0)) {
+                                if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
                                     sb.Append("\r\n\t\t<Field");
                                     fieldType = cpCore.db.getFieldTypeNameFromFieldTypeId(EncodeInteger(CFields[f_Type, CFieldPtr]));
                                     sb.Append(" Name=\"" + xaT(FieldName) + "\"");
@@ -474,11 +474,11 @@ namespace Contensive.Core.Controllers {
         public string GetXMLContentDefinition(string ContentName = "") {
             return GetXMLContentDefinition3(ContentName, false);
         }
-        //'
-        //'========================================================================
-        //' ----- Save all content to an XML Stream
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        // ----- Save all content to an XML Stream
+        //========================================================================
+        //
         //Private Function GetXMLContent(cmc as appServicesClass, ContentName As String) As String
         //    On Error GoTo ErrorTrap
         //    '
@@ -603,11 +603,11 @@ namespace Contensive.Core.Controllers {
         private int GetXMLAttributeInteger(bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
             return genericController.EncodeInteger(GetXMLAttribute(Found, Node, Name, DefaultIfNotFound.ToString()));
         }
-        //'
-        //'========================================================================
-        //' ----- Get an XML nodes attribute based on its name
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        // ----- Get an XML nodes attribute based on its name
+        //========================================================================
+        //
         //Private Function GetXMLAttribute(NodeName As XmlNode, Name As String) As String
         //    On Error GoTo ErrorTrap
         //    '
@@ -629,9 +629,9 @@ namespace Contensive.Core.Controllers {
         ////ErrorTrap:
         //    Call HandleClassErrorAndBubble(appname,"GetXMLAttribute")
         //End Function
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Private Function GetContentNameByID(cmc As appServicesClass, ContentID as integer) As String
         //    On Error GoTo ErrorTrap
         //    '

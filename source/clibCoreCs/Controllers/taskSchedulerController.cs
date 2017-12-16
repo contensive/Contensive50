@@ -38,13 +38,13 @@ namespace Contensive.Core.Controllers {
         public bool StartServiceInProgress;
         //
         protected bool disposed = false;
-        //'
-        //'========================================================================================================
-        //''' <summary>
-        //''' constructor
-        //''' </summary>
-        //''' <param name="cpCore"></param>
-        //''' <remarks></remarks>
+        //
+        //========================================================================================================
+        // <summary>
+        // constructor
+        // </summary>
+        // <param name="cpCore"></param>
+        // <remarks></remarks>
         //Public Sub New()
         //    MyBase.New
         //End Sub
@@ -306,7 +306,7 @@ namespace Contensive.Core.Controllers {
             }
             return returnTaskAdded;
         }
-        //'
+        //
         //Private Sub appendLog(cpCore As coreClass, ByVal logText As String, Optional isImportant As Boolean = False)
         //    If (isImportant Or allowVerboseLogging) Then
         //        logController.appendLog(cpCore, logText, "", "trace")

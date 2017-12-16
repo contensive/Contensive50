@@ -395,14 +395,14 @@ namespace Contensive.Core.Models.Entity {
             // -- always clear the cache with the content name
             //?? cpCore.cache.invalidateObject(primaryContentName)
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' produce a standard format cachename for this model
-        //''' </summary>
-        //''' <param name="fieldName"></param>
-        //''' <param name="fieldValue"></param>
-        //''' <returns></returns>
+        //
+        //====================================================================================================
+        // <summary>
+        // produce a standard format cachename for this model
+        // </summary>
+        // <param name="fieldName"></param>
+        // <param name="fieldValue"></param>
+        // <returns></returns>
         //Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,fieldName As String, fieldValue As String) As String
         //    Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         //End Function

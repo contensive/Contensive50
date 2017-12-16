@@ -109,12 +109,12 @@ namespace Contensive.Core.Controllers {
         ////ErrorTrap:
         //            Call handleLegacyClassError1("unknown", "RegisterDotnet")
         //        End Sub
-        //'
-        //'=============================================================================================================
-        //'   Main
-        //'       Returns nothing if all OK, else returns an error message
-        //'=============================================================================================================
-        //'
+        //
+        //=============================================================================================================
+        //   Main
+        //       Returns nothing if all OK, else returns an error message
+        //=============================================================================================================
+        //
 
         //Public Function createApp(ByVal appName As String, ByVal domainName As String) As Boolean
         //    Dim returnOk As Boolean = False
@@ -157,12 +157,12 @@ namespace Contensive.Core.Controllers {
         //    End Try
         //    Return returnOk
         //End Function
-        //'
-        //'=============================================================================================================
-        //'   Main
-        //'       Returns nothing if all OK, else returns an error message
-        //'=============================================================================================================
-        //'
+        //
+        //=============================================================================================================
+        //   Main
+        //       Returns nothing if all OK, else returns an error message
+        //=============================================================================================================
+        //
         //Public Function importApp(cpCore As coreClass, ByVal siteName As String, ByVal IPAddress As String, ByVal DomainName As String, ByVal ODBCConnectionString As String, ByVal ContentFilesPath As String, ByVal WWWRootPath As String, ByVal defaultDoc As String, ByVal SMTPServer As String, ByVal AdminEmail As String) As String
         //    Dim returnMessage As String = ""
         //    Try
@@ -230,11 +230,11 @@ namespace Contensive.Core.Controllers {
         //    Return returnMessage
         //End Function
 
-        //'
-        //'========================================================================
-        //'   Init()
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   Init()
+        //========================================================================
+        //
         //Public shared Sub Init(appservicesObj As cpCoreClass)
         //    appservices = appservicesObj
         //    On Error GoTo ErrorTrap
@@ -251,11 +251,11 @@ namespace Contensive.Core.Controllers {
         ////ErrorTrap:
         //    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "Init", True, False)
         //End Sub
-        //'
-        //'=========================================================================
-        //'
-        //'=========================================================================
-        //'
+        //
+        //=========================================================================
+        //
+        //=========================================================================
+        //
         //Public shared Sub Upgrade()
         //    '
         //    ' deprecated call
@@ -512,11 +512,11 @@ namespace Contensive.Core.Controllers {
                             } else if (!UpgradeOK) {
                                 throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             }
-                            //'
-                            //'---------------------------------------------------------------------
-                            //' ----- Upgrade collections added during upgrade process
-                            //'---------------------------------------------------------------------
-                            //'
+                            //
+                            //---------------------------------------------------------------------
+                            // ----- Upgrade collections added during upgrade process
+                            //---------------------------------------------------------------------
+                            //
                             //Call appendUpgradeLog(cpcore, "Installing Add-on Collections gathered during upgrade")
                             //If InstallCollectionList = "" Then
                             //    Call appendUpgradeLog(cpCore.app.config.name, MethodName, "No Add-on collections added during upgrade")
@@ -1513,12 +1513,12 @@ namespace Contensive.Core.Controllers {
         //            '
         ////ErrorTrap:
         //            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyContentWatchLists", True, True)
-        //'        End Sub
-        //'
-        //'=============================================================================
-        //'
-        //'=============================================================================
-        //'
+        //        End Sub
+        //
+        //=============================================================================
+        //
+        //=============================================================================
+        //
         //Private shared Function VerifySurveyQuestionTypes() As Integer
         //    Dim returnType As Integer = 0
         //    Try
@@ -1920,11 +1920,11 @@ namespace Contensive.Core.Controllers {
                 throw;
             }
         }
-        //'
-        //'=========================================================================================
-        //'
-        //'=========================================================================================
-        //'
+        //
+        //=========================================================================================
+        //
+        //=========================================================================================
+        //
         //Public shared Sub ImportCDefFolder()
         //    Try
         //        '
@@ -1955,9 +1955,9 @@ namespace Contensive.Core.Controllers {
         //        cpCore.handleException(ex);
         //    End Try
         //End Sub
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public shared Sub SetNavigatorEntry(EntryName As String, ParentName As String, AddonID As Integer)
         //    On Error GoTo ErrorTrap
         //    '
@@ -1990,9 +1990,9 @@ namespace Contensive.Core.Controllers {
         ////ErrorTrap:
         //    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "SetNavigatorEntry", True, False)
         //End Sub
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public shared Sub SetNavigatorEntry2(EntryName As String, ParentGuid As String, AddonID As Integer, NavIconTypeID As Integer, NavIconTitle As String, DataBuildVersion As String)
         //    On Error GoTo ErrorTrap
         //    '
@@ -2028,11 +2028,11 @@ namespace Contensive.Core.Controllers {
         ////ErrorTrap:
         //    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "SetNavigatorEntry", True, False)
         //End Sub
-        //'
-        //'======================================================================================================
-        //'   Installs Addons in the content folder install subfolder
-        //'======================================================================================================
-        //' REFACTOR - \INSTALL FOLDER IS NOT THE CURRENT PATTERN
+        //
+        //======================================================================================================
+        //   Installs Addons in the content folder install subfolder
+        //======================================================================================================
+        // REFACTOR - \INSTALL FOLDER IS NOT THE CURRENT PATTERN
         //Public Function InstallAddons(IsNewBuild As Boolean, buildVersion As String) As Boolean
         //    Dim returnOk As Boolean = True
         //    Try
@@ -2059,8 +2059,8 @@ namespace Contensive.Core.Controllers {
         //    End Try
         //    Return returnOk
         //End Function
-        //'
-        //'
+        //
+        //
         ///
         //Public Shared Sub ReplaceAddonWithCollection(ByVal AddonProgramID As String, ByVal CollectionGuid As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String)
         //    Dim ex As New Exception("todo") : Call handleClassException(cpCore, ex, cpCore.serverConfig.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
@@ -2236,11 +2236,11 @@ namespace Contensive.Core.Controllers {
             Index = Index + 1;
             //
         }
-        //'
-        //'=============================================================================
-        //'
-        //'=============================================================================
-        //'
+        //
+        //=============================================================================
+        //
+        //=============================================================================
+        //
         //Public shared Sub csv_VerifyAggregateFunction(ByVal Name As String, ByVal Link As String, ByVal ObjectProgramID As String, ByVal ArgumentList As String, ByVal SortOrder As String)
         //    Try
         //        '
@@ -2348,12 +2348,12 @@ namespace Contensive.Core.Controllers {
         //        cpCore.handleExceptionAndContinue(ex) : Throw
         //    End Try
         //End Sub
-        //'
-        //'=============================================================================
-        //'   Verify an Admin Menu Entry
-        //'       Entries are unique by their name
-        //'=============================================================================
-        //'
+        //
+        //=============================================================================
+        //   Verify an Admin Menu Entry
+        //       Entries are unique by their name
+        //=============================================================================
+        //
         //Public Shared Sub admin_VerifyAdminMenu(cpCore As coreClass, ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False, Optional ByVal Active As Boolean = True)
 
         //    'Call admin_VerifyMenuEntry(cpCore, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, cnNavigatorEntries, "")

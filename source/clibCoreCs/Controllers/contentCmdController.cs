@@ -27,8 +27,8 @@ namespace Contensive.Core.Controllers {
         public contentCmdController(coreClass cpCore) {
             this.cpCore = cpCore;
         }
-        //'
-        //'=================================================================================
+        //
+        //=================================================================================
         //Public Function execute(CsvObject As Object, mainObject As Object, optionString As String, filterInput As String) As String
         //    Dim returnValue As String = ""
         //    Try
@@ -675,14 +675,14 @@ namespace Contensive.Core.Controllers {
                                 }
                             case "site": {
                                     throw new NotImplementedException("site contentCmd");
-                                    //'
-                                    //' returns a site property
-                                    //'
-                                    //' arguments
-                                    //'   name: the site property name
-                                    //' default argument
-                                    //'   name
-                                    //'
+                                    //
+                                    // returns a site property
+                                    //
+                                    // arguments
+                                    //   name: the site property name
+                                    // default argument
+                                    //   name
+                                    //
                                     //CmdAccumulator = ""
                                     //ArgName = ""
                                     //For Ptr = 0 To cmdArgDef.Count - 1
@@ -697,16 +697,16 @@ namespace Contensive.Core.Controllers {
                                 }
                             case "set": {
                                     throw new NotImplementedException("set contentCmd");
-                                    //'
-                                    //' does a find and replace
-                                    //'
-                                    //' arguments
-                                    //'   find: what to search for in teh accumulator
-                                    //'   replace: what to replace it with
-                                    //' default argument
-                                    //'   find
-                                    //'
-                                    //'CmdAccumulator = ""
+                                    //
+                                    // does a find and replace
+                                    //
+                                    // arguments
+                                    //   find: what to search for in teh accumulator
+                                    //   replace: what to replace it with
+                                    // default argument
+                                    //   find
+                                    //
+                                    //CmdAccumulator = ""
                                     //ArgName = ""
                                     //For Ptr = 0 To cmdArgDef.Count - 1
                                     //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
@@ -722,15 +722,15 @@ namespace Contensive.Core.Controllers {
                                 }
                             case "setinner": {
                                     throw new NotImplementedException("setInner contentCmd");
-                                    //'
-                                    //' does a find and replace on the inner HTML of an element identified by its class selector
-                                    //'
-                                    //' arguments
-                                    //'   find: what to search for in teh accumulator
-                                    //'   replace: what to replace it with
-                                    //' default argument
-                                    //'   find
-                                    //'
+                                    //
+                                    // does a find and replace on the inner HTML of an element identified by its class selector
+                                    //
+                                    // arguments
+                                    //   find: what to search for in teh accumulator
+                                    //   replace: what to replace it with
+                                    // default argument
+                                    //   find
+                                    //
                                     //ArgName = ""
                                     //For Ptr = 0 To cmdArgDef.Count - 1
                                     //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
@@ -746,14 +746,14 @@ namespace Contensive.Core.Controllers {
                                 }
                             case "getinner": {
                                     throw new NotImplementedException("getInner contentCmd");
-                                    //'
-                                    //' returns the inner HTML of an element identified by its class selector
-                                    //'
-                                    //' arguments
-                                    //'   find: what to search for in teh accumulator
-                                    //' default argument
-                                    //'   find
-                                    //'
+                                    //
+                                    // returns the inner HTML of an element identified by its class selector
+                                    //
+                                    // arguments
+                                    //   find: what to search for in teh accumulator
+                                    // default argument
+                                    //   find
+                                    //
                                     //ArgName = ""
                                     //For Ptr = 0 To cmdArgDef.Count - 1
                                     //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
@@ -769,15 +769,15 @@ namespace Contensive.Core.Controllers {
                                 }
                             case "setouter": {
                                     throw new NotImplementedException("setOuter contentCmd");
-                                    //'
-                                    //' does a find and replace on the outer HTML of an element identified by its class selector
-                                    //'
-                                    //' arguments
-                                    //'   find: what to search for in teh accumulator
-                                    //'   replace: what to replace it with
-                                    //' default argument
-                                    //'   find
-                                    //'
+                                    //
+                                    // does a find and replace on the outer HTML of an element identified by its class selector
+                                    //
+                                    // arguments
+                                    //   find: what to search for in teh accumulator
+                                    //   replace: what to replace it with
+                                    // default argument
+                                    //   find
+                                    //
                                     //ArgName = ""
                                     //For Ptr = 0 To cmdArgDef.Count - 1
                                     //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
@@ -793,14 +793,14 @@ namespace Contensive.Core.Controllers {
                                 }
                             case "getouter": {
                                     throw new NotImplementedException("getouter contentCmd");
-                                    //'
-                                    //' returns the outer HTML of an element identified by its class selector
-                                    //'
-                                    //' arguments
-                                    //'   find: what to search for in teh accumulator
-                                    //' default argument
-                                    //'   find
-                                    //'
+                                    //
+                                    // returns the outer HTML of an element identified by its class selector
+                                    //
+                                    // arguments
+                                    //   find: what to search for in teh accumulator
+                                    // default argument
+                                    //   find
+                                    //
                                     //ArgName = ""
                                     //For Ptr = 0 To cmdArgDef.Count - 1
                                     //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
@@ -900,9 +900,9 @@ namespace Contensive.Core.Controllers {
                                     CmdAccumulator = cpCore.addon.execute(addon, executeContext);
 
 
-                                    //'
-                                    //' attempts to execute an add-on with the command name
-                                    //'
+                                    //
+                                    // attempts to execute an add-on with the command name
+                                    //
                                     //addonName = cmdText
                                     //ArgInstanceId = ""
                                     //ArgGuid = ""
@@ -933,8 +933,8 @@ namespace Contensive.Core.Controllers {
                                     //}
                                     //Dim addon As addonModel = addonModel.createByName(cpCore, addonName)
                                     //CmdAccumulator = cpCore.addon.execute(addon, executeContext)
-                                    //'CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
-                                    //'CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
+                                    //CmdAccumulator = cpCore.addon.execute_legacy6(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                    //CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
                                     break;
                                 }
                         }

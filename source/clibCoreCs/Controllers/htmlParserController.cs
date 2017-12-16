@@ -131,7 +131,7 @@ namespace Contensive.Core.Controllers {
                     do {
                         BlobSN = "/blob" + encodeText(genericController.GetRandomInteger(cpCore)) + ":";
                         Ptr = Ptr + 1;
-                    } while ((WorkingSrc.IndexOf(BlobSN, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) && (Ptr < 10));
+                    } while ((WorkingSrc.IndexOf(BlobSN, System.StringComparison.OrdinalIgnoreCase)  != -1) && (Ptr < 10));
                     //
                     // remove all scripting
                     //
@@ -673,11 +673,11 @@ namespace Contensive.Core.Controllers {
             //ErrorTrap:
             cpCore.handleException(new Exception("unexpected exception"));
         }
-        //'
-        //'   CursorPosition points to the first character of an attribute name
-        //'   ElementValue has no spaces before and after '=', and no double spaces anywhere
-        //'   ElementValue whiteSpace has been converted to " "
-        //'
+        //
+        //   CursorPosition points to the first character of an attribute name
+        //   ElementValue has no spaces before and after '=', and no double spaces anywhere
+        //   ElementValue whiteSpace has been converted to " "
+        //
         //Private Function GetAttributeDelimiterPosition(CursorPosition as integer, ElementValue As String) as integer
         //    '
         //    Dim SpacePosition as integer

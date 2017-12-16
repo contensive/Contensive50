@@ -95,8 +95,8 @@ namespace Contensive.Core.Controllers {
         public string redirectLink { get; set; } = "";
         public string redirectReason { get; set; } = "";
         public bool redirectBecausePageNotFound { get; set; } = false;
-        //'
-        //' -- addon call depth. When an addon is called, it saves the value interanlly and increments. When level0 exits and htmlDocument is true, the output is wrapped with an html doc
+        //
+        // -- addon call depth. When an addon is called, it saves the value interanlly and increments. When level0 exits and htmlDocument is true, the output is wrapped with an html doc
         //Public Property addonDepth As Integer = 0
         internal List<string> errList { get; set; } // exceptions collected during document construction
         public int errorCount { get; set; } = 0;
@@ -1041,12 +1041,12 @@ namespace Contensive.Core.Controllers {
             ////throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError13("IsContentBlocked")
             return tempbypassContentBlock;
         }
-        //'
-        //'====================================================================================================
-        //'   main_GetTemplateLink
-        //'       Added to externals (aoDynamicMenu) can main_Get hard template links
-        //'====================================================================================================
-        //'
+        //
+        //====================================================================================================
+        //   main_GetTemplateLink
+        //       Added to externals (aoDynamicMenu) can main_Get hard template links
+        //====================================================================================================
+        //
         //Public Function getTemplateLink(templateId As Integer) As String
         //    Dim template As pageTemplateModel = pageTemplateModel.create(cpcore, templateId, New List(Of String))
         //    If template IsNot Nothing Then
@@ -1691,11 +1691,11 @@ namespace Contensive.Core.Controllers {
         //       When you make the menus, look up the most recent Link Alias entry with the pageID, and a blank QueryStringSuffix
         //
         //   The Link Alias table no longer needs the Link field.
-        //'
-        //'=================================================================================================================================================
-        //'
-        //' +++++ 9/8/2011 4.1.482, added csv_addLinkAlias to csv and changed main to call
-        //'
+        //
+        //=================================================================================================================================================
+        //
+        // +++++ 9/8/2011 4.1.482, added csv_addLinkAlias to csv and changed main to call
+        //
         //Public Shared Sub app_addLinkAlias(cpcore As coreClass, linkAlias As String, PageID As Integer, QueryStringSuffix As String)
         //    Dim return_ignoreError As String = ""
         //    Call app_addLinkAlias2(cpcore, linkAlias, PageID, QueryStringSuffix, True, False, return_ignoreError)
@@ -1900,9 +1900,9 @@ namespace Contensive.Core.Controllers {
                 }
             }
         }
-        //'
-        //'   Returns the next entry in the array, empty when there are no more
-        //'
+        //
+        //   Returns the next entry in the array, empty when there are no more
+        //
         //Public Function getNextStyleFilenames() As String
         //    Dim result As String = ""
         //    Dim Ptr As Integer
@@ -1917,9 +1917,9 @@ namespace Contensive.Core.Controllers {
         //    End If
         //    Return result
         //End Function
-        //'
-        //'   Returns the next entry in the array, empty when there are no more
-        //'
+        //
+        //   Returns the next entry in the array, empty when there are no more
+        //
         //Public Function getJavascriptOnLoad() As String
         //    Dim result As String = ""
         //    Dim Ptr As Integer
@@ -1934,9 +1934,9 @@ namespace Contensive.Core.Controllers {
         //    End If
         //    Return result
         //End Function
-        //'
-        //'   Returns the next entry in the array, empty when there are no more
-        //'
+        //
+        //   Returns the next entry in the array, empty when there are no more
+        //
         //Public Function getNextJavascriptBodyEnd() As String
         //    Dim result As String = ""
         //    Dim Ptr As Integer
@@ -1951,9 +1951,9 @@ namespace Contensive.Core.Controllers {
         //    End If
         //    Return result
         //End Function
-        //'
-        //'   Returns the next entry in the array, empty when there are no more
-        //'
+        //
+        //   Returns the next entry in the array, empty when there are no more
+        //
         //Public Function getNextJSFilename() As String
         //    Dim result As String = ""
         //    Dim Ptr As Integer

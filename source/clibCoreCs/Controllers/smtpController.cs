@@ -302,9 +302,9 @@ namespace Contensive.Core.Controllers {
             }
             return line;
         }
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public sub ErrorExit(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean)
         //    cpCore.handleLegacyError3("", "unknown", "ccEmail4", "SMTPHandler", MethodName, ErrNumber, ErrSource, ErrDescription, ErrorTrap, ResumeNext, "")
         //End Function

@@ -376,7 +376,7 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        //''' <summary>
+        // <summary>
         /// The main entry point for the application.
         /// </summary>
         private void sampleUse() {

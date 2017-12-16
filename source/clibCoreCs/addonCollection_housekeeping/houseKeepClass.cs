@@ -158,22 +158,22 @@ namespace Contensive.Core {
                 }
                 //FolderName = "Logs\Email"
                 //Call HousekeepLogFolder("server", FolderName)
-                //'
+                //
                 //FolderName = "Logs\Performance"
                 //Call HousekeepLogFolder("server", FolderName)
-                //'
+                //
                 //FolderName = "Logs\HouseKeep"
                 //Call HousekeepLogFolder("server", FolderName)
-                //'
+                //
                 //FolderName = "Logs\AddonInstall"
                 //Call HousekeepLogFolder("server", FolderName)
-                //'
+                //
                 //FolderName = "Logs\Monitor"
                 //Call HousekeepLogFolder("server", FolderName)
-                //'
+                //
                 //FolderName = "Logs\Admin"
                 //Call HousekeepLogFolder("server", FolderName)LogCheckDateLast = now.date
-                //'
+                //
                 //FolderName = "Logs\Process"
                 //Call HousekeepLogFolder("server", FolderName)
                 //
@@ -378,9 +378,9 @@ namespace Contensive.Core {
                                     //
                                     if (true) // 4.1.187" Then
                                     {
-                                        //'
-                                        //' Delete duplicates
-                                        //'
+                                        //
+                                        // Delete duplicates
+                                        //
                                         //SQL = "delete from ccviewingsummary" _
                                         //    & " where id in (" _
                                         //    & " select d.id from ccviewingsummary d,ccviewingsummary f" _
@@ -578,7 +578,7 @@ namespace Contensive.Core {
                 //
                 //Dim Controller As controlClass
                 int VisitArchiveDeleteSize = 0;
-                //'Dim AppService As appServicesClass
+                //Dim AppService As appServicesClass
                 //Dim KernelService As KernelServicesClass
                 //    Dim CSConnection As appEnvironmentStruc
                 string SQL = null;
@@ -1234,10 +1234,10 @@ namespace Contensive.Core {
                         cp.core.db.executeQuery(SQL);
                         break;
                 }
-                //'
-                //' TopicRules with bad ContentID
-                //' delete manually to prevent cdef reload
-                //'
+                //
+                // TopicRules with bad ContentID
+                // delete manually to prevent cdef reload
+                //
                 //Call AppendClassLog(AppName, "HouseKeep_App_Daily(" & AppName & ")", "Deleting Topic Rules with bad ContentID.")
                 //SQL = "Select ccTopicRules.ID" _
                 //    & " From ccTopicRules LEFT JOIN ccContent on ccContent.ID=ccTopicRules.ContentID" _
@@ -1248,9 +1248,9 @@ namespace Contensive.Core {
                 //    Call cp.Core.app.csv_NextCSRecord(CS)
                 //    Loop
                 //Call cp.Core.app.csv_CloseCS(CS)
-                //'
-                //' TopicRules with bad TopicID
-                //'
+                //
+                // TopicRules with bad TopicID
+                //
                 //Call AppendClassLog(AppName, "HouseKeep_App_Daily(" & AppName & ")", "Deleting Topic Rules with bad TopicID.")
                 //Select Case DataSourceType
                 //    Case DataSourceTypeODBCAccess
@@ -1375,9 +1375,9 @@ namespace Contensive.Core {
                 AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" + appName + ")", "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
                 SQL = "update ccfields set type=" + FieldTypeIdHTML + " where type=" + FieldTypeIdLongText + " and ( htmlcontent<>0 )";
                 cp.core.db.executeQuery(SQL);
-                //'
-                //' convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile
-                //'
+                //
+                // convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile
+                //
                 //Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile.")
                 //SQL = "update ccfields set type=" & FieldTypeIdFileHTMLPrivate & " where type=" & FieldTypeIdFileTextPrivate & " and ( htmlcontent<>0 )"
                 //Call cp.core.app.executeSql(SQL)
@@ -1551,7 +1551,7 @@ namespace Contensive.Core {
                 //Dim Controller As controlClass
                 int VisitArchiveAgeDays = 0;
                 int VisitArchiveDeleteSize = 0;
-                //'Dim AppService As appServicesClass
+                //Dim AppService As appServicesClass
                 //Dim KernelService As KernelServicesClass
                 //      Dim CSConnection As appEnvironmentStruc
                 string SQL = null;
@@ -1668,7 +1668,7 @@ namespace Contensive.Core {
                 //Dim Controller As controlClass
                 int VisitArchiveAgeDays = 0;
                 int VisitArchiveDeleteSize = 0;
-                //'Dim AppService As appServicesClass
+                //Dim AppService As appServicesClass
                 //Dim KernelService As KernelServicesClass
                 //   Dim CSConnection As appEnvironmentStruc
                 string SQL = null;
@@ -1871,7 +1871,7 @@ namespace Contensive.Core {
                 XmlDocument LibraryCollections = new XmlDocument();
                 XmlDocument LocalCollections = new XmlDocument();
                 XmlDocument Doc = new XmlDocument();
-                //'Dim AppService As appServicesClass
+                //Dim AppService As appServicesClass
                 //Dim KernelService As KernelServicesClass
                 string SetTimeCheckString = null;
                 double SetTimeCheck = 0;
@@ -2159,15 +2159,15 @@ namespace Contensive.Core {
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception");
         }
-        //'
+        //
         //Private Sub HandleClassTrapError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal Cause As String, ByVal ResumeNext As Boolean)
         //    '
         //    //throw new ApplicationException("Unexpected exception")
         //    '
         //End Sub
-        //'
-        //' ----- temp solution to convert error reporting without spending the time right now
-        //'
+        //
+        // ----- temp solution to convert error reporting without spending the time right now
+        //
         //Private Sub HandleClassInternalError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal Cause As String)
         //    '
         //    //throw new ApplicationException("Unexpected exception")
@@ -2331,7 +2331,7 @@ namespace Contensive.Core {
                 XmlDocument LibraryCollections = new XmlDocument();
                 XmlDocument LocalCollections = new XmlDocument();
                 XmlDocument Doc = new XmlDocument();
-                //'Dim AppService As appServicesClass
+                //Dim AppService As appServicesClass
                 //Dim KernelService As KernelServicesClass
                 string SetTimeCheckString = null;
                 double SetTimeCheck = 0;
@@ -2780,9 +2780,9 @@ namespace Contensive.Core {
                                 NodeCnt = NodeCnt + 1;
                             }
                             // 20161005 - no longer need to register activeX
-                            //'
-                            //' register files found in the active folder last
-                            //'
+                            //
+                            // register files found in the active folder last
+                            //
                             //If RegisterPathList <> "" Then
                             //    RegisterPaths = Split(RegisterPathList, vbCrLf)
                             //    For Ptr = 0 To UBound(RegisterPaths)

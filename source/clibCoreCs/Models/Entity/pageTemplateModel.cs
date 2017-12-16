@@ -212,14 +212,14 @@ namespace Contensive.Core.Models.Entity {
                     result.BodyHTML = cs.getText("BodyHTML");
                     // .BodyTag = cs.getText("BodyTag")
                     result.ccGuid = cs.getText("ccGuid");
-                    //'
+                    //
                     result.ContentControlID = cs.getInteger("ContentControlID");
                     result.CreatedBy = cs.getInteger("CreatedBy");
                     result.CreateKey = cs.getInteger("CreateKey");
                     result.DateAdded = cs.getDate("DateAdded");
-                    //'
-                    //'
-                    //'
+                    //
+                    //
+                    //
                     result.IsSecure = cs.getBoolean("IsSecure");
                     // .JSEndBody = cs.getText("JSEndBody")
                     // .JSFilename = cs.getText("JSFilename")
@@ -294,9 +294,9 @@ namespace Contensive.Core.Models.Entity {
                     cs.setField("CreatedBy", CreatedBy.ToString());
                     cs.setField("CreateKey", CreateKey.ToString());
                     cs.setField("DateAdded", DateAdded.ToString());
-                    //'''
-                    //'
-                    //'
+                    //
+                    //
+                    //
                     cs.setField("IsSecure", IsSecure.ToString());
                     // cs.setField("JSEndBody", JSEndBody)
                     // cs.setField("JSFilename", JSFilename)
@@ -442,18 +442,18 @@ namespace Contensive.Core.Models.Entity {
             // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
             cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' produce a standard format cachename for this model
-        //''' </summary>
-        //''' <param name="fieldName"></param>
-        //''' <param name="fieldValue"></param>
-        //''' <returns></returns>
+        //
+        //====================================================================================================
+        // <summary>
+        // produce a standard format cachename for this model
+        // </summary>
+        // <param name="fieldName"></param>
+        // <param name="fieldValue"></param>
+        // <returns></returns>
         //Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,fieldName As String, fieldValue As String) As String
         //    Return (primaryContentTableName & "-" & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         //End Function
-        //'
+        //
         //Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
         //    Return (primaryContentTableName & "-" & field1Name & "." & field1Value & "-" & field2Name & "." & field2Value).ToLower().Replace(" ", "_")
         //End Function

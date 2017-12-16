@@ -203,11 +203,11 @@ namespace Contensive.Addons.AdminSite {
                     GetForm_LoadControl(ref AdminContent, editRecord);
                     addonId = cpCore.docProperties.getInteger("addonid");
                     AddonGuid = cpCore.docProperties.getText("addonguid");
-                    //'
-                    //'-------------------------------------------------------------------------------
-                    //'
-                    //'-------------------------------------------------------------------------------
-                    //'
+                    //
+                    //-------------------------------------------------------------------------------
+                    //
+                    //-------------------------------------------------------------------------------
+                    //
                     //If AdminContent.fields.Count > 0 Then
                     //    ReDim EditRecordValuesObject(AdminContent.fields.Count)
                     //    ReDim EditRecordDbValues(AdminContent.fields.Count)
@@ -558,9 +558,9 @@ namespace Contensive.Addons.AdminSite {
                     if (cpCore.doc.debug_iUserError != "") {
                         ContentCell = "<div class=\"ccAdminMsg\">" + errorController.error_GetUserError(cpCore) + "</div>" + ContentCell;
                     }
-                    //'
-                    //' If blank, must be an addon with a setting form that returned blank, do the dashboard again
-                    //'
+                    //
+                    // If blank, must be an addon with a setting form that returned blank, do the dashboard again
+                    //
                     //If ContentCell = "" Then
                     //    '
                     //    ' must use the root as a default - bc forms and add-ons may return blank, meaning return to root
@@ -585,11 +585,11 @@ namespace Contensive.Addons.AdminSite {
             }
             return result;
         }
-        //'
-        //'========================================================================
-        //'   Display field in the admin/edit
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   Display field in the admin/edit
+        //========================================================================
+        //
         //Private Function GetForm_Edit_RSSFeeds(ContentName As String, ContentID as integer, RecordID as integer, PageLink As String) As String
         //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_Edit_RSSFeeds")
         //    '
@@ -799,11 +799,11 @@ namespace Contensive.Addons.AdminSite {
         //    s = Nothing
         //    Call HandleClassTrapErrorBubble("GetForm_Edit_RSSFeeds")
         //End Function
-        //'
-        //'========================================================================
-        //'   Load and Save RSS Feeds Tab
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   Load and Save RSS Feeds Tab
+        //========================================================================
+        //
         //Private Sub LoadAndSaveRSSFeeds(ContentName As String, ContentID as integer, RecordID as integer, ItemLink As String)
         //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.LoadAndSaveRSSFeeds")
         //    '
@@ -1373,7 +1373,7 @@ namespace Contensive.Addons.AdminSite {
                 int FieldPtr = 0;
                 bool IncludedInColumns = false;
                 string LookupContentName = null;
-                //'Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
+                //Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
                 //
                 Return_AllowAccess = true;
                 //
@@ -2103,13 +2103,13 @@ namespace Contensive.Addons.AdminSite {
         //Private EditRecord.SetPageNotFoundPageID As Boolean
         //Private EditRecord.SetLandingPageID As Boolean
 
-        //'
+        //
         //Private EditRecord.Loaded As Boolean            ' true/false - set true when the field array values are loaded
         //Private EditRecord.Saved As Boolean              ' true if edit record was saved during this page
         //Private editrecord.read_only As Boolean           ' set if this record can not be edited, for various reasons
-        //'
-        //' From cpCore.main_GetAuthoringStatus
-        //'
+        //
+        // From cpCore.main_GetAuthoringStatus
+        //
         //Private EditRecord.IsDeleted As Boolean          ' true means the edit record has been deleted
         //Private EditRecord.IsInserted As Boolean         ' set if Workflow authoring insert
         //Private EditRecord.IsModified As Boolean         ' record has been modified since last published
@@ -2121,9 +2121,9 @@ namespace Contensive.Addons.AdminSite {
         //Private EditRecord.ApproveLock As Boolean        ' set if an approve Lock
         //Private EditRecord.ApprovedName As String        ' member who approved the record
         //Private EditRecordApprovedDate As Date          ' Date when record was approved
-        //'
-        //' From cpCore.main_GetAuthoringPermissions
-        //'
+        //
+        // From cpCore.main_GetAuthoringPermissions
+        //
         //Private EditRecord.AllowInsert As Boolean
         //Private EditRecord.AllowCancel As Boolean
         //Private EditRecord.AllowSave As Boolean
@@ -2132,14 +2132,14 @@ namespace Contensive.Addons.AdminSite {
         //Private EditRecord.AllowAbort As Boolean
         //Private EditRecord.AllowSubmit As Boolean
         //Private EditRecord.AllowApprove As Boolean
-        //'
-        //' From cpCore.main_GetEditLock
-        //'
+        //
+        // From cpCore.main_GetEditLock
+        //
         //Private EditRecord.EditLock As Boolean           ' set if an edit Lock by anyone else besides the current user
         //Private EditRecord.EditLockMemberID As Integer      ' Member who edit locked the record
         //Private EditRecord.EditLockMemberName As String  ' Member who edit locked the record
         //Private EditRecord.EditLockExpires As Date       ' Time when the edit lock expires
-        //'
+        //
         //
         //=============================================================================
         // ----- Control Response
@@ -2204,11 +2204,11 @@ namespace Contensive.Addons.AdminSite {
         private int[] ContentWatchListID; // list of all ContentWatchLists for this Content, read from response, then later saved to Rules
         private int ContentWatchListIDSize; // size of ContentWatchListID() array
         private int ContentWatchListIDCount; // number of valid entries in ContentWatchListID()
-                                             //'
-                                             //'=============================================================================
-                                             //'   Calendar Event Editing
-                                             //'=============================================================================
-                                             //'
+                                             //
+                                             //=============================================================================
+                                             //   Calendar Event Editing
+                                             //=============================================================================
+                                             //
                                              //Private CalendarEventName As String
                                              //Private CalendarEventStartDate As Date
                                              //Private CalendarEventEndDate As Date
@@ -2265,9 +2265,9 @@ namespace Contensive.Addons.AdminSite {
         private const string RequestNameTitleExtension = "tx";
         //
         //
-        //'
-        //'Private AdminContentCellBackgroundColor As String
-        //'
+        //
+        //Private AdminContentCellBackgroundColor As String
+        //
         public enum NodeTypeEnum {
             NodeTypeEntry = 0,
             NodeTypeCollection = 1,
@@ -3045,9 +3045,9 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 DataTable_DataRows += DataTable_HdrRow;
                             }
-                            //'
-                            //' ----- DataTable_FindRow
-                            //'
+                            //
+                            // ----- DataTable_FindRow
+                            //
                             //ReDim Findstring(IndexConfig.Columns.Count)
                             //For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
                             //    FieldName = IndexConfig.Columns(ColumnPointer).Name
@@ -4565,7 +4565,7 @@ namespace Contensive.Addons.AdminSite {
                 // converted array to dictionary - Dim FieldPointer As Integer
                 DateTime ApprovedDate = default(DateTime);
                 int CS = 0;
-                //'Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
+                //Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
                 //
                 if (string.IsNullOrEmpty(adminContent.Name)) {
                     //
@@ -4722,7 +4722,7 @@ namespace Contensive.Addons.AdminSite {
                 string UCaseDefaultValueText = null;
                 string[] lookups = null;
                 int Ptr = 0;
-                //' converted array to dictionary - Dim FieldPointer As Integer
+                // converted array to dictionary - Dim FieldPointer As Integer
                 //Dim FieldCount As Integer
                 string defaultValue = null;
                 string MethodName = null;
@@ -5186,11 +5186,11 @@ namespace Contensive.Addons.AdminSite {
                 cpCore.handleException(ex);
             }
         }
-        //'
-        //'========================================================================
-        //'   Read in a Response value by name
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   Read in a Response value by name
+        //========================================================================
+        //
         //Private Sub LoadEditResponseByName(FieldName As String)
         //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.LoadEditResponseByName")
         //    '
@@ -5571,7 +5571,7 @@ namespace Contensive.Addons.AdminSite {
                                     ParentID = genericController.EncodeInteger(ResponseFieldValueText);
                                     LoopPtr = 0;
                                     UsedIDs = editRecord.id.ToString();
-                                    while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",") + 1 == 0)) {
+                                    while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",")  == -1)) {
                                         UsedIDs = UsedIDs + "," + ParentID.ToString();
                                         CS = cpCore.db.csOpen(adminContent.Name, "ID=" + ParentID,"",true,0,false,false, "ParentID");
                                         if (!cpCore.db.csOk(CS)) {
@@ -6336,7 +6336,7 @@ namespace Contensive.Addons.AdminSite {
             try {
                 //
                 tempGetJustTableName = SQL.ToUpper().Trim(' ');
-                while ((!string.IsNullOrEmpty(tempGetJustTableName)) & (tempGetJustTableName.IndexOf(" ") + 1 != 0)) {
+                while ((!string.IsNullOrEmpty(tempGetJustTableName)) & (tempGetJustTableName.IndexOf(" ")  != -1)) {
                     tempGetJustTableName = tempGetJustTableName.Substring(genericController.vbInstr(tempGetJustTableName, " "));
                 }
             } catch (Exception ex) {
@@ -6680,7 +6680,7 @@ namespace Contensive.Addons.AdminSite {
                         // if referer includes AdminWarningMsg (admin hint message), remove it -- this edit may fix the problem
                         //
                         Pos = EditReferer.IndexOf( "AdminWarningMsg=" );
-                        if (Pos != 0) {
+                        if (Pos >= 0) {
                             EditReferer = EditReferer.Left( Pos - 2);
                         }
                     }
@@ -6746,9 +6746,9 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 if ((!IsLandingPage) && (IsPageContentTable || IsSectionTable)) {
-                    //'
-                    //' ----- special case, Is this page a LandingPageParent (Parent of the landing page), or is this section the landing page section
-                    //'
+                    //
+                    // ----- special case, Is this page a LandingPageParent (Parent of the landing page), or is this section the landing page section
+                    //
                     //TestPageID = cpCore.siteProperties.landingPageID
                     //Do While LoopPtr < 20 And (TestPageID <> 0)
                     //    IsLandingPageParent = IsPageContentTable And (editRecord.id = TestPageID)
@@ -6880,7 +6880,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                     //
                     HeaderDescription = HeaderDescription + "</td></tr>";
-                    //'
+                    //
                     //If Not False Then
                     //    HeaderDescription = HeaderDescription & "<tr><td colspan=2>Authoring Mode: Immediate</td></tr>"
                     //Else
@@ -6903,7 +6903,7 @@ namespace Contensive.Addons.AdminSite {
                     //        HeaderDescription = HeaderDescription & "<td>&nbsp;</td></tr>"
                     //    End If
                     //End If
-                    //'
+                    //
                     HeaderDescription = HeaderDescription + "</table>";
                 }
                 //
@@ -7380,11 +7380,11 @@ namespace Contensive.Addons.AdminSite {
             }
             return returnHtml;
         }
-        //'
-        //'========================================================================
-        //' Print the DHTMLEdit form
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        // Print the DHTMLEdit form
+        //========================================================================
+        //
         //Private Function GetForm_EditHTML() As String
         //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_EditHTML")
         //    '
@@ -7730,7 +7730,7 @@ namespace Contensive.Addons.AdminSite {
                         + " Where (ccAuthoringControls.ControlType > 1)"
                         + " GROUP BY ccAuthoringControls.ContentID, ccContent.Name, ccAuthoringControls.RecordID, ccContentWatch.Link, ccContent.AllowWorkflowAuthoring"
                         + " order by min(ccAuthoringControls.ID) desc";
-                    //'PageNumber = 1 + (RecordTop / RecordsPerPage)
+                    //PageNumber = 1 + (RecordTop / RecordsPerPage)
                     //SQL = "SELECT DISTINCT ccContent.ID AS ContentID, ccContent.Name AS ContentName, ccAuthoringControls.RecordID, ccContentWatch.Link AS Link, ccContent.AllowWorkflowAuthoring AS ContentAllowWorkflowAuthoring,max(ccAuthoringControls.DateAdded) as DateAdded" _
                     //    & " FROM (ccAuthoringControls LEFT JOIN ccContent ON ccAuthoringControls.ContentID = ccContent.ID) LEFT JOIN ccContentWatch ON ccAuthoringControls.ContentRecordKey = ccContentWatch.ContentRecordKey" _
                     //    & " GROUP BY ccAuthoringControls.ID,ccContent.ID, ccContent.Name, ccAuthoringControls.RecordID, ccContentWatch.Link, ccContent.AllowWorkflowAuthoring, ccAuthoringControls.ControlType" _
@@ -8241,9 +8241,9 @@ namespace Contensive.Addons.AdminSite {
                                 cpCore.docProperties.setProperty("editorAddonList", editorAddonListJSON);
                                 cpCore.docProperties.setProperty("editorStyles", styleList);
                                 cpCore.docProperties.setProperty("editorStyleOptions", styleOptionList);
-                                //'                            ac = New innovaEditorAddonClassFPO
-                                //'                            Call ac.Init()
-                                //'                            editorAddonListJSON = ac.GetEditorAddonListJSON(IsTemplateTable, EditorContext)
+                                //                            ac = New innovaEditorAddonClassFPO
+                                //                            Call ac.Init()
+                                //                            editorAddonListJSON = ac.GetEditorAddonListJSON(IsTemplateTable, EditorContext)
 
                                 //addonOptionString = addonOptionString _
                                 //    & "&editorAllowActiveContent=1" _
@@ -8573,7 +8573,7 @@ namespace Contensive.Addons.AdminSite {
                                             //
                                             // not HTML capable, textarea with resizing
                                             //
-                                            if ((fieldTypeId == FieldTypeIdText) && (FieldValueText.IndexOf("\n") + 1 == 0) && (FieldValueText.Length < 40)) {
+                                            if ((fieldTypeId == FieldTypeIdText) && (FieldValueText.IndexOf("\n") == -1) && (FieldValueText.Length < 40)) {
                                                 //
                                                 // text field shorter then 40 characters without a CR
                                                 //
@@ -8801,7 +8801,7 @@ namespace Contensive.Addons.AdminSite {
                                             //
                                             // non-password
                                             //
-                                            if ((FieldValueText.IndexOf("\n") + 1 == 0) && (FieldValueText.Length < 40)) {
+                                            if ((FieldValueText.IndexOf("\n") == -1) && (FieldValueText.Length < 40)) {
                                                 //
                                                 // text field shorter then 40 characters without a CR
                                                 //
@@ -8914,7 +8914,7 @@ namespace Contensive.Addons.AdminSite {
                                             //
                                             // not HTML capable, textarea with resizing
                                             //
-                                            if ((fieldTypeId == FieldTypeIdText) && (FieldValueText.IndexOf("\n") + 1 == 0) && (FieldValueText.Length < 40)) {
+                                            if ((fieldTypeId == FieldTypeIdText) && (FieldValueText.IndexOf("\n")  == -1) && (FieldValueText.Length < 40)) {
                                                 //
                                                 // text field shorter then 40 characters without a CR
                                                 //
@@ -9371,14 +9371,14 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 bool Checked = false;
-                //'
-                //' ----- Authoring status
-                //'
+                //
+                // ----- Authoring status
+                //
                 //FieldHelp = "In immediate authoring mode, the live site is changed when each record is saved. In Workflow authoring mode, there are several steps to publishing a change. This field displays the current stage of this record."
                 //FieldRequired = False
                 //AuthoringStatusMessage = cpCore.doc.authContext.main_GetAuthoringStatusMessage(cpCore, false, editRecord.EditLock, editRecord.EditLockMemberName, editRecord.EditLockExpires, editRecord.ApproveLock, editRecord.ApprovedName, editRecord.SubmitLock, editRecord.SubmittedName, editRecord.IsDeleted, editRecord.IsInserted, editRecord.IsModified, editRecord.LockModifiedName)
                 //Call FastString.Add(Adminui.GetEditRow(AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
-                //'Call FastString.Add(AdminUI.GetEditRow( AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
+                //Call FastString.Add(AdminUI.GetEditRow( AuthoringStatusMessage, "Authoring Status", FieldHelp, FieldRequired, False, ""))
                 //
                 // ----- RecordID
                 //
@@ -9462,7 +9462,7 @@ namespace Contensive.Addons.AdminSite {
                         FieldHelp = "If you wish to use this add-on as a widget, cut and paste the 'Widget Code' into the website content. If any code appears in the 'Widget Head', this will need to be pasted into the head section of the website.";
                         HTMLFieldString = ""
                             + "<SCRIPT type=text/javascript>"
-                            + "\r\nvar ccProto=(('https:'==document.location.protocol) ? 'https://' : 'http://');"
+                            + "\r\nvar ccProto=(('https:'==document.location.protocol) ? 'https:// : 'http://);"
                             + "\r\ndocument.write(unescape(\"%3Cscript src='\" + ccProto + \"" + cpCore.webServer.requestDomain + "/ccLib/ClientSide/Core.js' type='text/javascript'%3E%3C/script%3E\"));"
                             + "\r\ndocument.write(unescape(\"%3Cscript src='\" + ccProto + \"" + cpCore.webServer.requestDomain + "/" + genericController.EncodeURL(editRecord.nameLc) + "?requestjsform=1' type='text/javascript'%3E%3C/script%3E\"));"
                             + "\r\n</SCRIPT>";
@@ -10152,11 +10152,11 @@ namespace Contensive.Addons.AdminSite {
             //
             return tempGetForm_QuickStats;
         }
-        //'
-        //'========================================================================
-        //'   Print the Topic Rules section of any edit form
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   Print the Topic Rules section of any edit form
+        //========================================================================
+        //
         //Private Function GetForm_Edit_TopicRules() As String
         //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_Edit_TopicRules")
         //    '
@@ -11257,12 +11257,12 @@ namespace Contensive.Addons.AdminSite {
             }
             return tempMakeButtonFlat;
         }
-        //'
-        //'========================================================================
-        //' GetMenuLeftMode()
-        //'   Prints the menu section of the admin page
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        // GetMenuLeftMode()
+        //   Prints the menu section of the admin page
+        //========================================================================
+        //
         //Private Function deprecate_menu_getLeftMode() As String
         //    Dim returnString As String = ""
         //    Try
@@ -11672,11 +11672,11 @@ namespace Contensive.Addons.AdminSite {
             }
             return result;
         }
-        //'
-        //'========================================================================
-        //'   Preload an image, returns object
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   Preload an image, returns object
+        //========================================================================
+        //
         //Private Function PreloadImage(Image As String) As String
         //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.PreloadImage")
         //    '
@@ -12033,19 +12033,19 @@ namespace Contensive.Addons.AdminSite {
                                     } else {
                                         // mark to rebuild next fetch
                                         cpCore.siteProperties.setProperty("StylesheetSerialNumber", "-1");
-                                        //'
-                                        //' Linked Styles
-                                        //' Bump the Style Serial Number so next fetch is not cached
-                                        //'
+                                        //
+                                        // Linked Styles
+                                        // Bump the Style Serial Number so next fetch is not cached
+                                        //
                                         //StyleSN = genericController.EncodeInteger(cpCore.main_GetSiteProperty2("StylesheetSerialNumber", "0"))
                                         //StyleSN = StyleSN + 1
                                         //Call cpCore.app.setSiteProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN))
-                                        //'
-                                        //' Save new public stylesheet
-                                        //'
-                                        //' 11/24/3009 - style sheet processing deprecated
+                                        //
+                                        // Save new public stylesheet
+                                        //
+                                        // 11/24/3009 - style sheet processing deprecated
                                         //Call cpCore.app.virtualFiles.SaveFile("templates\Public" & StyleSN & ".css", cpCore.main_GetStyleSheet)
-                                        //'Call cpCore.app.virtualFiles.SaveFile("templates\Public" & StyleSN & ".css", cpCore.main_GetStyleSheetProcessed)
+                                        //Call cpCore.app.virtualFiles.SaveFile("templates\Public" & StyleSN & ".css", cpCore.main_GetStyleSheetProcessed)
                                         //Call cpCore.app.virtualFiles.SaveFile("templates\Admin" & StyleSN & ".css", cpCore.main_GetStyleSheetDefault)
                                     }
                                     //
@@ -12412,11 +12412,11 @@ namespace Contensive.Addons.AdminSite {
         }
         //
         //
-        //'
-        //'========================================================================
-        //'
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //
+        //========================================================================
+        //
         //Private Function GetForm_EmailControl() As String
         //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_EmailControl")
         //    '
@@ -12791,7 +12791,7 @@ namespace Contensive.Addons.AdminSite {
                     // Build Tab0
                     //
                     //Tab0.Add( "<p>The following is a list of available downloads</p>")
-                    //'
+                    //
                     RQS = cpCore.doc.refreshQueryString;
                     PageSize = cpCore.docProperties.getInteger(RequestNamePageSize);
                     if (PageSize == 0) {
@@ -13461,7 +13461,7 @@ namespace Contensive.Addons.AdminSite {
                     ColAlign[ColumnPtr] = "left";
                     ColWidth[ColumnPtr] = "150";
                     ColumnPtr = ColumnPtr + 1;
-                    //'
+                    //
                     //ColCaption(ColumnPtr) = "?<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=100 height=1>"
                     //ColAlign(ColumnPtr) = "Left"
                     //ColWidth(ColumnPtr) = "100"
@@ -14166,11 +14166,11 @@ namespace Contensive.Addons.AdminSite {
             }
             return returnOptions;
         }
-        //'
-        //'=============================================================================
-        //' Create a child content
-        //'=============================================================================
-        //'
+        //
+        //=============================================================================
+        // Create a child content
+        //=============================================================================
+        //
         //Private Function GetForm_PageContentMap_OpenNodeList(Criteria As String) As String
         //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetForm_PageContentMap_OpenNodeList")
         //    '
@@ -14367,9 +14367,9 @@ namespace Contensive.Addons.AdminSite {
             }
             return tempGetForm_HouseKeepingControl;
         }
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Private Function GetPropertyControl(Name As String, FieldType as integer, ProcessRequest As Boolean, DefaultValue As String) As String
         //    On Error GoTo //ErrorTrap: 'Dim th as integer: th = profileLogAdminMethodEnter("AdminClass.GetPropertyControl")
         //    '
@@ -14839,7 +14839,7 @@ namespace Contensive.Addons.AdminSite {
                 int ColumnWidthBalance = 0;
                 int ToolsAction = 0;
                 indexConfigClass IndexConfig = null;
-                //'Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
+                //Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
                 int FieldPointerTemp = 0;
                 string NameTemp = null;
                 int WidthTemp = 0;
@@ -15321,10 +15321,10 @@ namespace Contensive.Addons.AdminSite {
                 //--------------------------------------------------------------------------------
                 //
                 //FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its index form<br >"
-                //'FormPanel = FormPanel & cpCore.main_GetFormInputHidden("af", AdminFormToolConfigureIndex)
+                //FormPanel = FormPanel & cpCore.main_GetFormInputHidden("af", AdminFormToolConfigureIndex)
                 //FormPanel = FormPanel & cpCore.htmldoc.main_GetFormInputSelect2("ContentID", ContentID, "Content")
                 //Call Stream.Add(cpcore.htmldoc.main_GetPanel(FormPanel))
-                //'
+                //
                 cpCore.siteProperties.setProperty("AllowContentAutoLoad", genericController.encodeText(AllowContentAutoLoad));
                 //Stream.Add( cpCore.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
 
@@ -15336,13 +15336,13 @@ namespace Contensive.Addons.AdminSite {
                 //    ButtonBar = AdminUI.GetButtonsFromList( ButtonList, True, True, "button")
                 //    ButtonBar = AdminUI.GetButtonBar(ButtonBar, "")
                 //    Stream = New FastStringClass
-                //'
-                //'    GetForm_Index_SetColumns = "" _
-                //'        & ButtonBar _
-                //'        & AdminUI.EditTableOpen _
-                //'        & Stream.Text _
-                //'        & AdminUI.EditTableClose _
-                //'        & ButtonBar _
+                //
+                //    GetForm_Index_SetColumns = "" _
+                //        & ButtonBar _
+                //        & AdminUI.EditTableOpen _
+                //        & Stream.Text _
+                //        & AdminUI.EditTableClose _
+                //        & ButtonBar _
                 //    '
                 //    '
                 //    ' Assemble LiveWindowTable
@@ -15975,7 +15975,7 @@ namespace Contensive.Addons.AdminSite {
                 int ColumnCnt = 0;
                 int ColumnPtr = 0;
                 string Button = null;
-                //'Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
+                //Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
                 //
                 //arrayOfFields = adminContent.fields
                 if (!IndexConfig.Loaded) {
@@ -16758,24 +16758,24 @@ namespace Contensive.Addons.AdminSite {
                     //                    Next
                     //                End If
                     //            End With
-                    //'            If CriteriaCount > 0 Then
-                    //'                For CriteriaPointer = 0 To CriteriaCount - 1
-                    //'                    FieldMatchOptions(FieldPtr) = 0
-                    //'                    If genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "=", vbTextCompare) = 1 Then
-                    //'                        NameValues = Split(CriteriaValues(CriteriaPointer), "=")
-                    //'                        FieldValue(FieldPtr) = NameValues(1)
-                    //'                        FieldMatchOptions(FieldPtr) = 1
-                    //'                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & ">", vbTextCompare) = 1 Then
-                    //'                        NameValues = Split(CriteriaValues(CriteriaPointer), ">")
-                    //'                        FieldValue(FieldPtr) = NameValues(1)
-                    //'                        FieldMatchOptions(FieldPtr) = 2
-                    //'                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "<", vbTextCompare) = 1 Then
-                    //'                        NameValues = Split(CriteriaValues(CriteriaPointer), "<")
-                    //'                        FieldValue(FieldPtr) = NameValues(1)
-                    //'                        FieldMatchOptions(FieldPtr) = 3
-                    //'                    End If
-                    //'                Next
-                    //'            End If
+                    //            If CriteriaCount > 0 Then
+                    //                For CriteriaPointer = 0 To CriteriaCount - 1
+                    //                    FieldMatchOptions(FieldPtr) = 0
+                    //                    If genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "=", vbTextCompare) = 1 Then
+                    //                        NameValues = Split(CriteriaValues(CriteriaPointer), "=")
+                    //                        FieldValue(FieldPtr) = NameValues(1)
+                    //                        FieldMatchOptions(FieldPtr) = 1
+                    //                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & ">", vbTextCompare) = 1 Then
+                    //                        NameValues = Split(CriteriaValues(CriteriaPointer), ">")
+                    //                        FieldValue(FieldPtr) = NameValues(1)
+                    //                        FieldMatchOptions(FieldPtr) = 2
+                    //                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "<", vbTextCompare) = 1 Then
+                    //                        NameValues = Split(CriteriaValues(CriteriaPointer), "<")
+                    //                        FieldValue(FieldPtr) = NameValues(1)
+                    //                        FieldMatchOptions(FieldPtr) = 3
+                    //                    End If
+                    //                Next
+                    //            End If
                     //            FieldPtr = FieldPtr + 1
                     //            Call cpCore.app.nextCSRecord(CS)
                     //        Loop

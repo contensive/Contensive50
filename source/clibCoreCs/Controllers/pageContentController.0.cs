@@ -86,7 +86,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // If Content was not found, add it to the end
                     //
-                    if (returnBody.IndexOf(fpoContentBox) + 1 != 0) {
+                    if (returnBody.IndexOf(fpoContentBox)  != -1) {
                         returnBody = genericController.vbReplace(returnBody, fpoContentBox, PageContent);
                     } else {
                         returnBody = returnBody + PageContent;
@@ -186,9 +186,9 @@ namespace Contensive.Core.Controllers {
                 //End If
                 //Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(rnPageId, CStr(PageID))
                 //templateReason = "The reason this template was selected could not be determined."
-                //'
-                //' -- build parentpageList (first = current page, last = root)
-                //' -- add a 0, then repeat until another 0 is found, or there is a repeat
+                //
+                // -- build parentpageList (first = current page, last = root)
+                // -- add a 0, then repeat until another 0 is found, or there is a repeat
                 //pageToRootList = New List(Of pageContentModel)()
                 //Dim usedPageIdList As New List(Of Integer)()
                 //Dim targetPageId = PageID
@@ -210,8 +210,8 @@ namespace Contensive.Core.Controllers {
                 //    Return "<div style=""width:300px; margin: 100px auto auto auto;text-align:center;"">This page is not valid.</div>"
                 //End If
                 //page = pageToRootList.First
-                //'
-                //' -- get template from pages
+                //
+                // -- get template from pages
                 //Dim template As pageTemplateModel = Nothing
                 //For Each page As pageContentModel In pageToRootList
                 //    If page.TemplateID > 0 Then
@@ -226,7 +226,7 @@ namespace Contensive.Core.Controllers {
                 //        End If
                 //    End If
                 //Next
-                //'
+                //
                 //If (template Is Nothing) Then
                 //    '
                 //    ' -- get template from domain
@@ -247,7 +247,7 @@ namespace Contensive.Core.Controllers {
                 string Editor = null;
                 string styleOptionList = string.Empty;
                 string addonListJSON = null;
-                if (cpCore.doc.redirectLink == "" && (returnHtml.IndexOf(html_quickEdit_fpo) + 1 != 0)) {
+                if (cpCore.doc.redirectLink == "" && (returnHtml.IndexOf(html_quickEdit_fpo)  != -1)) {
                     FieldRows = genericController.EncodeInteger(cpCore.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"));
                     if (FieldRows < 50) {
                         FieldRows = 50;
@@ -1207,9 +1207,9 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                             }
                                                         }
-                                                        //'
-                                                        //' Fixup Content Watch
-                                                        //'
+                                                        //
+                                                        // Fixup Content Watch
+                                                        //
                                                         //ShortLink = main_ServerPathPage
                                                         //ShortLink = ConvertLinkToShortLink(ShortLink, main_ServerHost, main_ServerVirtualPath)
                                                         //ShortLink = genericController.modifyLinkQuery(ShortLink, rnPageId, CStr(ClipChildRecordID), True)
@@ -1400,9 +1400,9 @@ namespace Contensive.Core.Controllers {
                                     }
                                     cpCore.db.csClose(ref CSPointer);
                                 }
-                                //'
-                                //' real 404
-                                //'
+                                //
+                                // real 404
+                                //
                                 //IsPageNotFound = True
                                 //PageNotFoundSource = cpCore.webServer.requestPathPage
                                 //PageNotFoundReason = "The page could Not be displayed because the URL Is Not a valid page, Link Forward, Link Alias Or RemoteMethod."
@@ -2279,7 +2279,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Page Hit Notification
                         //
-                        if ((!cpCore.doc.authContext.visit.ExcludeFromAnalytics) & (cpCore.doc.page.ContactMemberID != 0) && (cpCore.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase) + 1 == 0)) {
+                        if ((!cpCore.doc.authContext.visit.ExcludeFromAnalytics) & (cpCore.doc.page.ContactMemberID != 0) && (cpCore.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
                             if (cpCore.doc.page.AllowHitNotification) {
                                 PageName = cpCore.doc.page.name;
                                 if (string.IsNullOrEmpty(PageName)) {

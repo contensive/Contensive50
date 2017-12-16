@@ -580,13 +580,13 @@ namespace Contensive.Core.Controllers {
                 saveTransactionLog_InProcess = false;
             }
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' Finds the where clause (first WHERE not in single quotes). returns 0 if not found, otherwise returns locaion of word where
-        //''' </summary>
-        //''' <param name="SQL"></param>
-        //''' <returns></returns>
+        //
+        //====================================================================================================
+        // <summary>
+        // Finds the where clause (first WHERE not in single quotes). returns 0 if not found, otherwise returns locaion of word where
+        // </summary>
+        // <param name="SQL"></param>
+        // <returns></returns>
         //Private Function getSQLWherePosition(ByVal SQL As String) As Integer
         //    Dim returnPos As Integer = 0
         //    Try
@@ -1349,7 +1349,7 @@ namespace Contensive.Core.Controllers {
                         while (genericController.vbInstr(1, iSelectFieldList, ", ") != 0) {
                             iSelectFieldList = genericController.vbReplace(iSelectFieldList, ", ", ",");
                         }
-                        if ((!string.IsNullOrEmpty(iSelectFieldList)) && (iSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) + 1 == 0)) {
+                        if ((!string.IsNullOrEmpty(iSelectFieldList)) && (iSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
                             TestUcaseFieldList = genericController.vbUCase("," + iSelectFieldList + ",");
                             if (genericController.vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", 1) == 0) {
                                 iSelectFieldList = iSelectFieldList + ",ContentControlID";
@@ -3342,10 +3342,10 @@ namespace Contensive.Core.Controllers {
                             SQLLiveUpdate = SQLLiveUpdate + ",MODIFIEDDATE=" + encodeSQLDate(sqlModifiedDate) + ",MODIFIEDBY=" + encodeSQLNumber(sqlModifiedBy);
                         }
                     }
-                    //'
-                    //' not sure why, but this section was commented out.
-                    //' Modified was not being set, so I un-commented it
-                    //'
+                    //
+                    // not sure why, but this section was commented out.
+                    // Modified was not being set, so I un-commented it
+                    //
                     //If (SQLEditUpdate <> "") And (AuthorableFieldUpdate) Then
                     //    '
                     //    ' ----- set the csv_ContentSet Modified
@@ -3819,15 +3819,15 @@ namespace Contensive.Core.Controllers {
                     Criteria = "(ContentRecordKey=" + encodeSQLText(ContentRecordKey) + ")";
                     ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID);
                     TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
-                    //'
-                    //' ----- Delete CalendarEventRules and CalendarEvents
-                    //'
+                    //
+                    // ----- Delete CalendarEventRules and CalendarEvents
+                    //
                     //If Models.Complex.cdefModel.isContentFieldSupported(cpcore,"calendar events", "ID") Then
                     //    Call deleteContentRecords("Calendar Events", Criteria)
                     //End If
-                    //'
-                    //' ----- Delete ContentWatch
-                    //'
+                    //
+                    // ----- Delete ContentWatch
+                    //
                     //CS = cs_open("Content Watch", Criteria)
                     //Do While cs_ok(CS)
                     //    Call cs_deleteRecord(CS)
@@ -4162,15 +4162,15 @@ namespace Contensive.Core.Controllers {
             }
             return returnFieldTypeName;
         }
-        //'
-        //'========================================================================
-        //''' <summary>
-        //''' Returns a csv_ContentSet with records from the Definition that joins the  current Definition at the field specified.
-        //''' </summary>
-        //''' <param name="CSPointer"></param>
-        //''' <param name="FieldName"></param>
-        //''' <returns></returns>
-        //'
+        //
+        //========================================================================
+        // <summary>
+        // Returns a csv_ContentSet with records from the Definition that joins the  current Definition at the field specified.
+        // </summary>
+        // <param name="CSPointer"></param>
+        // <param name="FieldName"></param>
+        // <returns></returns>
+        //
         //Public Function OpenCSJoin(ByVal CSPointer As Integer, ByVal FieldName As String) As Integer
         //    Dim returnResult As Integer = -1
         //    Try
@@ -4506,12 +4506,12 @@ namespace Contensive.Core.Controllers {
             }
             return returnDt;
         }
-        //'
-        //'==========
-        //''' <summary>
-        //''' determine the application status code for the health of this application
-        //''' </summary>
-        //''' <returns></returns>
+        //
+        //==========
+        // <summary>
+        // determine the application status code for the health of this application
+        // </summary>
+        // <returns></returns>
         //Public Function checkHealth() As applicationStatusEnum
         //    Dim returnStatus As applicationStatusEnum = Models.Context.serverConfigModel.applicationStatusEnum.ApplicationStatusLoading
         //    Try
@@ -4592,13 +4592,13 @@ namespace Contensive.Core.Controllers {
             }
             return returnContentId;
         }
-        //'
-        //'========================================================================
-        //''' <summary>
-        //''' get dataSource Name from dataSource Id. Return "default" for Id=0. Name is as it appears in the name field of the dataSources table. To use a key in the dataSource cache, normaize with normalizeDataSourceKey()
-        //''' </summary>
-        //''' <param name="DataSourceID"></param>
-        //''' <returns></returns>
+        //
+        //========================================================================
+        // <summary>
+        // get dataSource Name from dataSource Id. Return "default" for Id=0. Name is as it appears in the name field of the dataSources table. To use a key in the dataSource cache, normaize with normalizeDataSourceKey()
+        // </summary>
+        // <param name="DataSourceID"></param>
+        // <returns></returns>
         //Public Function getDataSourceNameByID(DataSourceID As Integer) As String
         //    Dim returndataSourceName As String = "default"
         //    Try

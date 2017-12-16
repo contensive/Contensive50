@@ -195,7 +195,7 @@ namespace Contensive.Core.Controllers {
                 iEntryName = genericController.vbReplace(encodeEmptyText(EntryName, ""), ",", " ");
                 UcaseEntryName = genericController.vbUCase(iEntryName);
                 //
-                if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",") + 1 == 0)) {
+                if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",")  == -1)) {
                     UsedEntries = UsedEntries + "," + UcaseEntryName;
                     if (iEntryCount >= iEntrySize) {
                         iEntrySize = iEntrySize + 10;

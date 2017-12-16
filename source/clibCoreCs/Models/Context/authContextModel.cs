@@ -1400,12 +1400,12 @@ namespace Contensive.Core.Models.Context {
         public bool isRecognized(coreClass cpCore) {
             return !visit.MemberNew;
         }
-        //'
-        //'========================================================================
-        //''' <summary>
-        //''' authenticated
-        //''' </summary>
-        //''' <returns></returns>
+        //
+        //========================================================================
+        // <summary>
+        // authenticated
+        // </summary>
+        // <returns></returns>
         //Public Function isAuthenticated() As Boolean
         //    Return visit.VisitAuthenticated
         //End Function

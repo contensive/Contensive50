@@ -263,28 +263,28 @@ namespace Contensive.Core {
             string ignoreFilename = "";
             cpCore.cdnFiles.upload(HtmlName, VirtualFilePath, ref ignoreFilename);
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' process an html file element to a specified file system (cp.files.cdnFiles for example). The return path is returned.
-        //''' </summary>
-        //''' <param name="HtmlName"></param>
-        //''' <param name="fileSystem"></param>
-        //''' <param name="returnPathFilename"></param>
-        //''' <returns></returns>
+        //
+        //====================================================================================================
+        // <summary>
+        // process an html file element to a specified file system (cp.files.cdnFiles for example). The return path is returned.
+        // </summary>
+        // <param name="HtmlName"></param>
+        // <param name="fileSystem"></param>
+        // <param name="returnPathFilename"></param>
+        // <returns></returns>
         //Public Overrides Function ProcessInputFile(HtmlName As String, fileSystem As CPFileSystemBaseClass, ByRef returnPathFilename As String) As Boolean
         //    Throw New NotImplementedException()
         //End Function
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' process an html file element to a specified file system and a specified path. The filename uploaded to that path is returned
-        //''' </summary>
-        //''' <param name="HtmlName"></param>
-        //''' <param name="fileSystem"></param>
-        //''' <param name="uploadFilePath"></param>
-        //''' <param name="returnFilename"></param>
-        //''' <returns></returns>
+        //
+        //====================================================================================================
+        // <summary>
+        // process an html file element to a specified file system and a specified path. The filename uploaded to that path is returned
+        // </summary>
+        // <param name="HtmlName"></param>
+        // <param name="fileSystem"></param>
+        // <param name="uploadFilePath"></param>
+        // <param name="returnFilename"></param>
+        // <returns></returns>
         //Public Overrides Function ProcessInputFile(HtmlName As String, fileSystem As CPFileSystemBaseClass, uploadFilePath As String, ByRef returnFilename As String) As Boolean
         //    Return cpCore.web_processFormInputFile(HtmlName, fileSystem, uploadFilePath, returnFilename)
         //End Function
@@ -335,9 +335,9 @@ namespace Contensive.Core {
             }
             return returnValue;
         }
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Public Overrides Function InputField(ByVal ContentName As String, ByVal FieldName As String, Optional ByVal HtmlName As String = "", Optional ByVal HtmlValue As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "", Optional ByVal HtmlStyle As String = "", Optional ByVal ManyToManySourceRecordID As Integer = 0) As String
         //    If True Then
         //        Return cmc.main_GetFormInputField(ContentName, FieldName, HtmlName, HtmlValue, HtmlClass, HtmlId, HtmlClass, ManyToManySourceRecordID)

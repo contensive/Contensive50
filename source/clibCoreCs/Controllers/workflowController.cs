@@ -182,49 +182,49 @@ namespace Contensive.Core.Controllers {
         public void ClearEditLock(string ContentName, int RecordID) {
             clearEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id);
         }
-        //'
-        //'========================================================================
-        //'   Aborts any edits for this record
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   Aborts any edits for this record
+        //========================================================================
+        //
         //Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
         //    Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
         //End Sub
         //
-        //'========================================================================
-        //'   Approves any edits for this record
-        //'========================================================================
-        //'
+        //========================================================================
+        //   Approves any edits for this record
+        //========================================================================
+        //
         //Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
         //    Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
         //End Sub
-        //'
-        //'========================================================================
-        //'   Submits any edits for this record
-        //'========================================================================
-        //'
+        //
+        //========================================================================
+        //   Submits any edits for this record
+        //========================================================================
+        //
         //Public Sub main_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
         //    Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id)
         //End Sub
-        //'
-        //'=========================================================================================
-        //'   Determine if this Content Definition is run on a table that supports
-        //'   Workflow authoring. Only the ContentTable is checked, it is assumed that the
-        //'   AuthoringTable is a copy of the ContentTable
-        //'=========================================================================================
-        //'
+        //
+        //=========================================================================================
+        //   Determine if this Content Definition is run on a table that supports
+        //   Workflow authoring. Only the ContentTable is checked, it is assumed that the
+        //   AuthoringTable is a copy of the ContentTable
+        //=========================================================================================
+        //
         //Public Function isWorkflowAuthoringCompatible(ByVal ContentName As String) As Boolean
         //    isWorkflowAuthoringCompatible = genericController.EncodeBoolean(cpCore.metaData.GetContentProperty(genericController.encodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
         //End Function
-        //'
-        //'==========================================================================================
-        //'==========================================================================================
-        //'
-        //'
-        //'=================================================================================
-        //'
-        //'=================================================================================
-        //'
+        //
+        //==========================================================================================
+        //==========================================================================================
+        //
+        //
+        //=================================================================================
+        //
+        //=================================================================================
+        //
         //Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
         //    Try
         //        '
@@ -544,11 +544,11 @@ namespace Contensive.Core.Controllers {
         //        cpCore.handleException(ex); : Throw
         //    End Try
         //End Sub
-        //'
-        //'=================================================================================
-        //'
-        //'=================================================================================
-        //'
+        //
+        //=================================================================================
+        //
+        //=================================================================================
+        //
         //Public Sub abortEdit2(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
         //    Try
         //        '
@@ -687,11 +687,11 @@ namespace Contensive.Core.Controllers {
         //        cpCore.handleException(ex); : Throw
         //    End Try
         //End Sub
-        //'
-        //'=================================================================================
-        //'
-        //'=================================================================================
-        //'
+        //
+        //=================================================================================
+        //
+        //=================================================================================
+        //
         //Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
         //    Try
         //        '
@@ -707,11 +707,11 @@ namespace Contensive.Core.Controllers {
         //        cpCore.handleException(ex); : Throw
         //    End Try
         //End Sub
-        //'
-        //'=================================================================================
-        //'
-        //'=================================================================================
-        //'
+        //
+        //=================================================================================
+        //
+        //=================================================================================
+        //
         //Public Sub submitEdit2(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
         //    Try
         //        '

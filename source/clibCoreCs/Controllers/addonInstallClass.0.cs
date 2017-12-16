@@ -753,11 +753,11 @@ namespace Contensive.Core {
                     }
                     dstCollection.Menus.Add(srcKey, srcMenu);
                 }
-                //'
-                //'-------------------------------------------------------------------------------------------------
-                //' Check addons -- yes, this should be done.
-                //'-------------------------------------------------------------------------------------------------
-                //'
+                //
+                //-------------------------------------------------------------------------------------------------
+                // Check addons -- yes, this should be done.
+                //-------------------------------------------------------------------------------------------------
+                //
                 //If False Then
                 //    '
                 //    ' remove this for now -- later add ImportCollections to track the collections (not addons)
@@ -902,11 +902,11 @@ namespace Contensive.Core {
             }
             return returnOk;
         }
-        //'
-        //'===========================================================================
-        //'   Error handler
-        //'===========================================================================
-        //'
+        //
+        //===========================================================================
+        //   Error handler
+        //===========================================================================
+        //
         //Private Sub HandleClassTrapError(ByVal ApplicationName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, Optional ByVal ResumeNext As Boolean = False)
         //    '
         //    'Call App.LogEvent("addonInstallClass.HandleClassTrapError called from " & MethodName)
@@ -1543,7 +1543,7 @@ namespace Contensive.Core {
                 //
                 // no - register anything that downloaded correctly - if this collection contains an import, and one of the imports has a problem, all the rest need to continue
                 //
-                //'
+                //
                 //If Not DownloadCollectionFiles Then
                 //    '
                 //    ' Must clear these out, if there is an error, a reset will keep the error message from making it to the page
@@ -2230,10 +2230,10 @@ namespace Contensive.Core {
                                             foreach (XmlNode CDefSection in CollectionFile.DocumentElement.ChildNodes) {
                                                 switch (genericController.vbLCase(CDefSection.Name)) {
                                                     case "resource":
-                                                        //'
-                                                        //' resource node, if executable node, save to RegisterList
-                                                        //'
-                                                        //'hint = hint & ",510"
+                                                        //
+                                                        // resource node, if executable node, save to RegisterList
+                                                        //
+                                                        //hint = hint & ",510"
                                                         //ResourceType = genericController.vbLCase(GetXMLAttribute(cpCore, IsFound, CDefSection, "type", ""))
                                                         //Dim resourceFilename As String = Trim(GetXMLAttribute(cpCore, IsFound, CDefSection, "name", ""))
                                                         //Dim resourcePathFilename As String = CollectionVersionPath & resourceFilename
@@ -2274,10 +2274,10 @@ namespace Contensive.Core {
                                                         //End If
                                                         break;
                                                     case "interfaces":
-                                                        //'
-                                                        //' Compatibility only - this is deprecated - Install ActiveX found in Add-ons
-                                                        //'
-                                                        //'hint = hint & ",530"
+                                                        //
+                                                        // Compatibility only - this is deprecated - Install ActiveX found in Add-ons
+                                                        //
+                                                        //hint = hint & ",530"
                                                         //For Each CDefInterfaces In CDefSection.ChildNodes
                                                         //    AOName = GetXMLAttribute(cpCore, IsFound, CDefInterfaces, "name", "No Name")
                                                         //    If AOName = "" Then
@@ -2627,7 +2627,7 @@ namespace Contensive.Core {
                                                             if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                 ChildCollectionGUID = CDefSection.InnerText;
                                                             }
-                                                            if ((ImportFromCollectionsGuidList + "," + CollectionGuid).IndexOf(ChildCollectionGUID, System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                                                            if ((ImportFromCollectionsGuidList + "," + CollectionGuid).IndexOf(ChildCollectionGUID, System.StringComparison.OrdinalIgnoreCase)  != -1) {
                                                                 //
                                                                 // circular import detected, this collection is already imported
                                                                 //
@@ -3722,7 +3722,7 @@ namespace Contensive.Core {
                             // can not copy dll or exe
                             //
                             //Filename = Filename
-                        } else if (("," + BlockFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                        } else if (("," + BlockFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase)  != -1) {
                             //
                             // can not copy the current collection file
                             //
@@ -3739,7 +3739,7 @@ namespace Contensive.Core {
                     //
                     FolderInfoArray = cpCore.privateFiles.getFolderList(SrcFolder);
                     foreach (DirectoryInfo folder in FolderInfoArray) {
-                        if (("," + BlockFolderList + ",").IndexOf("," + folder.Name + ",", System.StringComparison.OrdinalIgnoreCase) + 1 == 0) {
+                        if (("," + BlockFolderList + ",").IndexOf("," + folder.Name + ",", System.StringComparison.OrdinalIgnoreCase)  == -1) {
                             CopyInstallToDst(cpCore, SrcPath + folder.Name + "\\", DstPath + folder.Name + "\\", BlockFileList, "");
                         }
                     }
@@ -3767,7 +3767,7 @@ namespace Contensive.Core {
                 if (cpCore.privateFiles.pathExists(SrcFolder)) {
                     FileInfoArray = cpCore.privateFiles.getFileList(SrcFolder);
                     foreach (FileInfo file in FileInfoArray) {
-                        if (("," + ExcludeFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase) + 1 != 0) {
+                        if (("," + ExcludeFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase)  != -1) {
                             //
                             // can not copy the current collection file
                             //
@@ -4298,13 +4298,13 @@ namespace Contensive.Core {
                     //
                     // -- if this is needed, the installation xml files are available in the addon install folder. - I do not believe this is important
                     //       as if a collection is missing a dependancy, there is an error and you would expect to have to reinstall.
-                    //'
-                    //' Addon is now fully installed
-                    //' Go through all collection files on this site and see if there are
-                    //' any Dependencies on this add-on that need to be attached
-                    //' src args are those for the addon that includes the current addon
-                    //'   - if this addon is the target of another add-on's  "includeaddon" node
-                    //'
+                    //
+                    // Addon is now fully installed
+                    // Go through all collection files on this site and see if there are
+                    // any Dependencies on this add-on that need to be attached
+                    // src args are those for the addon that includes the current addon
+                    //   - if this addon is the target of another add-on's  "includeaddon" node
+                    //
                     //Doc = New XmlDocument
                     //CS = cpCore.db.cs_open("Add-on Collections")
                     //Do While cpCore.db.cs_ok(CS)
@@ -4530,8 +4530,8 @@ namespace Contensive.Core {
             return result;
             //
         }
-        //'
-        //'====================================================================================================
+        //
+        //====================================================================================================
         //Public Sub housekeepAddonFolder()
         //    Try
         //        Dim RegisterPathList As String
@@ -5025,20 +5025,20 @@ namespace Contensive.Core {
         ////ErrorTrap:
         //            Call HandleClassTrapError(cpCore.app.config.name, Err.Number, Err.Source, Err.Description, "unknownMethodNameLegacyCall", True)
         //        End Function
-        //'
-        //'=========================================================================================================
-        //'   Use AppendClassLogFile
-        //'=========================================================================================================
-        //'
+        //
+        //=========================================================================================================
+        //   Use AppendClassLogFile
+        //=========================================================================================================
+        //
         //private Sub AppendAddonFile(ByVal ApplicationName As String, ByVal Method As String, ByVal Cause As String)
         //    logController.appendLogWithLegacyRow( cpcore,ApplicationName, Cause, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "AddonInstall", "")
 
         //End Sub
-        //'
-        //'===========================================================================
-        //'   Append Log File
-        //'===========================================================================
-        //'
+        //
+        //===========================================================================
+        //   Append Log File
+        //===========================================================================
+        //
         //Private Shared Sub logcontroller.appendInstallLog(cpCore As coreClass, ByVal ignore As String, ByVal Method As String, ByVal LogMessage As String)
         //    Try
         //        Console.WriteLine("install, " & LogMessage)
@@ -5222,10 +5222,10 @@ namespace Contensive.Core {
                             //Call AppendClassLogFile(cpcore.app.config.name,"UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & cpcore.app.appEnvironment.name & ", Collection: " & Collectionname)
                         }
                         result.name = Collectionname;
-                        //'
-                        //' Load possible DefaultSortMethods
-                        //'
-                        //'hint = "preload sort methods"
+                        //
+                        // Load possible DefaultSortMethods
+                        //
+                        //hint = "preload sort methods"
                         //SortMethodList = vbTab & "By Name" & vbTab & "By Alpha Sort Order Field" & vbTab & "By Date" & vbTab & "By Date Reverse"
                         //If cpCore.app.csv_IsContentFieldSupported("Sort Methods", "ID") Then
                         //    CS = cpCore.app.OpenCSContent("Sort Methods", , , , , , , "Name")
@@ -6124,9 +6124,9 @@ namespace Contensive.Core {
                                 }
                             }
                         }
-                        //'
-                        //' started doing something here -- research it.!!!!!
-                        //'
+                        //
+                        // started doing something here -- research it.!!!!!
+                        //
                         //For FieldPtr = 0 To .fields.Count - 1
                         //    fieldId = 0
                         //    With .fields(FieldPtr)

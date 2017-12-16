@@ -138,13 +138,13 @@ namespace Contensive.Core.Models.Entity {
             }
             return result;
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' template for open an existing object with multiple keys (like a rule)
-        //''' </summary>
-        //''' <param name="cp"></param>
-        //''' <param name="foreignKey1Id"></param>
+        //
+        //====================================================================================================
+        // <summary>
+        // template for open an existing object with multiple keys (like a rule)
+        // </summary>
+        // <param name="cp"></param>
+        // <param name="foreignKey1Id"></param>
         //Public Shared Function create(cpCore As coreClass, foreignKey1Id As Integer, foreignKey2Id As Integer, ByRef callersCacheNameList As List(Of String)) As baseModel
         //    Dim result As baseModel = Nothing
         //    Try
@@ -378,14 +378,14 @@ namespace Contensive.Core.Models.Entity {
                 throw;
             }
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' pattern to delete an existing object based on multiple criteria (like a rule record)
-        //''' </summary>
-        //''' <param name="cp"></param>
-        //''' <param name="foreignKey1Id"></param>
-        //''' <param name="foreignKey2Id"></param>
+        //
+        //====================================================================================================
+        // <summary>
+        // pattern to delete an existing object based on multiple criteria (like a rule record)
+        // </summary>
+        // <param name="cp"></param>
+        // <param name="foreignKey1Id"></param>
+        // <param name="foreignKey2Id"></param>
         //Public Shared Sub delete(cpCore As coreClass, foreignKey1Id As Integer, foreignKey2Id As Integer)
         //    Try
         //        If (foreignKey2Id > 0) And (foreignKey1Id > 0) Then
@@ -443,18 +443,18 @@ namespace Contensive.Core.Models.Entity {
             // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
             cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' produce a standard format cachename for this model
-        //''' </summary>
-        //''' <param name="fieldName"></param>
-        //''' <param name="fieldValue"></param>
-        //''' <returns></returns>
+        //
+        //====================================================================================================
+        // <summary>
+        // produce a standard format cachename for this model
+        // </summary>
+        // <param name="fieldName"></param>
+        // <param name="fieldValue"></param>
+        // <returns></returns>
         //Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,fieldName As String, fieldValue As String) As String
         //    Return (primaryContentTableName & "-" & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         //End Function
-        //'
+        //
         //Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
         //    Return (primaryContentTableName & "-" & field1Name & "." & field1Value & "-" & field2Name & "." & field2Value).ToLower().Replace(" ", "_")
         //End Function

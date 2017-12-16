@@ -585,9 +585,9 @@ namespace Contensive.Core.Controllers {
                         if (true) {
                             if (string.IsNullOrEmpty(DestinationFilename)) {
                                 throw new ApplicationException("Invalid destination file []");
-                            } else if (DestinationFilename.IndexOf("\\") + 1 != 0) {
+                            } else if (DestinationFilename.IndexOf("\\")  != -1) {
                                 throw new ApplicationException("Invalid '\\' character in destination filename [" + DestinationFilename + "]");
-                            } else if (DestinationFilename.IndexOf("/") + 1 != 0) {
+                            } else if (DestinationFilename.IndexOf("/")  != -1) {
                                 throw new ApplicationException("Invalid '/' character in destination filename [" + DestinationFilename + "]");
                             } else if (!fileExists(SourcePathFilename)) {
                                 //
@@ -886,15 +886,15 @@ namespace Contensive.Core.Controllers {
         //
         // save uploaded file (used to be in html_ classes)
         //
-        //'
-        //'========================================================================
-        //''' <summary>
-        //''' process the request for an input file, storing the file system provided, in an optional filePath. Return the pathFilename uploaded. The filename is returned as a byref argument.
-        //''' </summary>
-        //''' <param name="TagName"></param>
-        //''' <param name="files"></param>
-        //''' <param name="filePath"></param>
-        //''' <returns></returns>
+        //
+        //========================================================================
+        // <summary>
+        // process the request for an input file, storing the file system provided, in an optional filePath. Return the pathFilename uploaded. The filename is returned as a byref argument.
+        // </summary>
+        // <param name="TagName"></param>
+        // <param name="files"></param>
+        // <param name="filePath"></param>
+        // <returns></returns>
         //Public Function saveUpload(ByVal TagName As String, ByVal filePath As String) As String
         //    Dim returnFilename As String = ""
         //    Return web_processFormInputFile(TagName, files, filePath, returnFilename)

@@ -408,7 +408,7 @@ namespace Contensive.Core {
             get {
                 bool returnIsAdmin = false;
                 try {
-                    returnIsAdmin = (cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase) + 1 != 0);
+                    returnIsAdmin = (cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase)  != -1);
                 } catch (Exception ex) {
                     cpCore.handleException(ex); 
                     throw;

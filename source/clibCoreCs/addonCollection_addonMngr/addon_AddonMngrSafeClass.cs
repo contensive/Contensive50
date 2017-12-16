@@ -800,7 +800,7 @@ namespace Contensive.Core {
                                 ColAlign[0] = "center";
                                 ColWidth[0] = "50";
                                 ColSortable[0] = false;
-                                //'
+                                //
                                 //ColCaption(1) = "Edit"
                                 //ColAlign(1) = "center"
                                 //ColWidth(1) = "50"

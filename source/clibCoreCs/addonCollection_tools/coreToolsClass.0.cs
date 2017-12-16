@@ -2064,7 +2064,7 @@ namespace Contensive.Core {
                 Stream.Add(cpCore.html.html_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry));
                 Stream.Add("<br><br>");
                 //
-                //'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
+                //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
                 Stream.Add("</SPAN>");
                 //
                 result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
@@ -2769,7 +2769,7 @@ namespace Contensive.Core {
                 Stream.Add("Data Source<br>");
                 Stream.Add(cpCore.html.main_GetFormInputSelect("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
                 //
-                //'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
+                //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
                 Stream.Add("</SPAN>");
                 //
                 result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
@@ -2894,7 +2894,7 @@ namespace Contensive.Core {
                                                 // not inherited, save the field values and mark for a reload
                                                 //
                                                 if (true) {
-                                                    if (formFieldName.IndexOf(" ") + 1 != 0) {
+                                                    if (formFieldName.IndexOf(" ")  != -1) {
                                                         //
                                                         // remoave spaces from new name
                                                         //
@@ -2969,9 +2969,9 @@ namespace Contensive.Core {
                             }
                             cpCore.db.csClose(ref CSPointer);
                         }
-                        //'
-                        //' ----- Button Reload CDef
-                        //'
+                        //
+                        // ----- Button Reload CDef
+                        //
                         if (ToolButton == ButtonSaveandInvalidateCache) {
                             cpCore.cache.invalidateAll();
                             cpCore.doc.clearMetaData();
@@ -3882,9 +3882,9 @@ namespace Contensive.Core {
         //        CloseFormTable = "</td></tr></TABLE></form>"
         //    End If
         //End Function
-        //'
-        //'
-        //'
+        //
+        //
+        //
         //Function genericLegacyView.OpenFormTable(cpcore,ByVal ButtonList As String) As String
         //    Dim result As String = ""
         //    Try
@@ -3952,13 +3952,13 @@ namespace Contensive.Core {
             }
             return result;
         }
-        //'
-        //'=============================================================================
-        //'   Import the htm and html files in the FileRootPath and below into Page Templates
-        //'       FileRootPath is the path to the root of the site
-        //'       AppPath is the path to the folder currently
-        //'=============================================================================
-        //'
+        //
+        //=============================================================================
+        //   Import the htm and html files in the FileRootPath and below into Page Templates
+        //       FileRootPath is the path to the root of the site
+        //       AppPath is the path to the folder currently
+        //=============================================================================
+        //
         //Private Function ImportTemplates(ByVal FileRootPath As String, ByVal AppPath As String, ByVal AllowBodyHTML As Boolean, ByVal AllowScriptLink As Boolean, ByVal AllowImageImport As Boolean, ByVal AllowStyleImport As Boolean) As String
         //    Dim result As String = ""
         //    Try
@@ -4451,25 +4451,25 @@ namespace Contensive.Core {
             }
             return result;
         }
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' 'handle legacy errors in this class, v1
-        //''' </summary>
-        //''' <param name="MethodName"></param>
-        //''' <param name="ignore0"></param>
-        //''' <remarks></remarks>
+        //
+        //====================================================================================================
+        // <summary>
+        // 'handle legacy errors in this class, v1
+        // </summary>
+        // <param name="MethodName"></param>
+        // <param name="ignore0"></param>
+        // <remarks></remarks>
         //Private Sub handleLegacyClassErrors1(ByVal MethodName As String, Optional ByVal ignore0 As String = "")
         //   throw (New ApplicationException("Unexpected exception"))'cpCore.handleLegacyError("Tools", MethodName, Err.Number, Err.Source, Err.Description, True, False)
         //End Sub
-        //'
-        //'====================================================================================================
-        //''' <summary>
-        //''' handle legacy errors in this class, v2
-        //''' </summary>
-        //''' <param name="MethodName"></param>
-        //''' <param name="ErrDescription"></param>
-        //''' <remarks></remarks>
+        //
+        //====================================================================================================
+        // <summary>
+        // handle legacy errors in this class, v2
+        // </summary>
+        // <param name="MethodName"></param>
+        // <param name="ErrDescription"></param>
+        // <remarks></remarks>
         //Private Sub handleLegacyClassErrors2(ByVal MethodName As String, ByVal ErrDescription As String)
         //    fixme-- cpCore.handleException(New ApplicationException("")) ' -----ignoreInteger, "App.EXEName", ErrDescription)
         //End Sub

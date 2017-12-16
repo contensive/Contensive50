@@ -140,9 +140,9 @@ namespace Contensive.Core {
         //Public Const KmaccErrorServiceStopped = KmaObjectError + 2
         //
         public const string UserErrorHeadline = "<p class=\"ccError\">There was a problem with this page.</p>";
-        //'
-        //' ----- Errors connecting to server
-        //'
+        //
+        // ----- Errors connecting to server
+        //
         //Public Const ccError_InvalidAppName = 100
         //Public Const ccError_ErrorAddingApp = 101
         //Public Const ccError_ErrorDeletingApp = 102
@@ -150,7 +150,7 @@ namespace Contensive.Core {
         //Public Const ignoreString = 104
         //Public Const ignoreString = 105
         //Public Const ccError_NotConnected = 106             ' Attempt to execute a command without a connection
-        //'
+        //
         //
         //
         //Public Const ccStatusCode_Base = ignoreInteger
@@ -1121,7 +1121,7 @@ namespace Contensive.Core {
             private int ColumnCount;
             private ColumnDataType[] Column;
         }
-        //'
+        //
         // PrivateStorage to hold the DebugTimer
         //
         public class TimerStackType {
@@ -1210,9 +1210,9 @@ namespace Contensive.Core {
         //
         public const int NavigatorNodeCollectionList = -1;
         public const int NavigatorNodeAddonList = -1;
-        //'
-        //' Pointers into index of PCC (Page Content Cache) array
-        //'
+        //
+        // Pointers into index of PCC (Page Content Cache) array
+        //
         //Public Const PCC_ID = 0
         //Public Const PCC_Active = 1
         //Public Const PCC_ParentID = 2
@@ -1287,7 +1287,7 @@ namespace Contensive.Core {
         //Public Const TC_BodyHTML = 3
         //Public Const TC_JSOnLoad = 4
         //Public Const TC_JSInHeadLegacy = 5
-        //'Public Const TC_JSHead = 5
+        //Public Const TC_JSHead = 5
         //Public Const TC_JSEndBody = 6
         //Public Const TC_StylesFilename = 7
         //Public Const TC_SharedStylesIDList = 8
@@ -1296,11 +1296,11 @@ namespace Contensive.Core {
         //Public Const TC_OtherHeadTags = 11
         //Public Const TC_BodyTag = 12
         //Public Const TC_JSInHeadFilename = 13
-        //'Public Const TC_JSFilename = 13
+        //Public Const TC_JSFilename = 13
         //Public Const TC_IsSecure = 14
         //Public Const TC_DomainIdList = 15
-        //' for now, Mobile templates do not have shared styles
-        //'Public Const TC_MobileSharedStylesIDList = 11
+        // for now, Mobile templates do not have shared styles
+        //Public Const TC_MobileSharedStylesIDList = 11
         //Public Const TC_cnt = 16
         //
         // DTD
@@ -1312,9 +1312,9 @@ namespace Contensive.Core {
         public const string InnovaEditorFeaturefilename = "innova\\EditorConfig.txt";
         public const string InnovaEditorFeatureList = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Image,Flash,Media,CustomObject,CustomTag,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor";
         public const string InnovaEditorPublicFeatureList = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor";
-        //'
-        //' Content Type
-        //'
+        //
+        // Content Type
+        //
         //Enum contentTypeEnum
         //    contentTypeWeb = 1
         //    ContentTypeEmail = 2
@@ -1327,7 +1327,7 @@ namespace Contensive.Core {
         //    contentTypeEmail = 2
         //End Enum
         //Public EditorContext As EditorContextEnum
-        //'
+        //
         //Public Const EditorAddonMenuEmailTemplateFilename As String = "templates/EditorAddonMenuTemplateEmail.js"
         //Public Const EditorAddonMenuEmailContentFilename As String = "templates/EditorAddonMenuContentEmail.js"
         //Public Const EditorAddonMenuWebTemplateFilename As String = "templates/EditorAddonMenuTemplateWeb.js"
@@ -1430,7 +1430,7 @@ namespace Contensive.Core {
         //    warning = 2
         //    ErrorStatus = 3
         //End Enum
-        //'
+        //
         //Private Structure GoogleVisualizationType
         //    Dim version As String
         //    Dim reqid As String
@@ -1597,10 +1597,10 @@ namespace Contensive.Core {
         //   ByVal pszEscaped As String, _
         //   ByVal pcchEscaped As Integer, _
         //   ByVal dwFlags As Integer) As Integer
-        //'
-        //'Converts escape sequences back into
-        //'ordinary characters.
-        //'
+        //
+        //Converts escape sequences back into
+        //ordinary characters.
+        //
         //Declare Function UrlUnescape Lib "shlwapi" _
         //   Alias "UrlUnescapeA" _
         //  (ByVal pszURL As String, _
@@ -1639,17 +1639,17 @@ namespace Contensive.Core {
         // old - If an error is raised and the soure is not he current "dll", it is logged and translated
         //
         //Public Const ignoreInteger = vbObjectError                 ' Base on which Internal errors should start
-        //'
-        //'Public Const KmaError_UnderlyingObject = vbObjectError + 1     ' An error occurec in an underlying object
-        //'Public Const KmaccErrorServiceStopped = vbObjectError + 2       ' The service is not running
-        //'Public Const KmaError_BadObject = vbObjectError + 3            ' The Server Pointer is not valid
-        //'Public Const KmaError_UpgradeInProgress = vbObjectError + 4    ' page is blocked because an upgrade is in progress
-        //'Public Const KmaError_InvalidArgument = vbObjectError + 5      ' and input argument is not valid. Put details at end of description
-        //'
+        //
+        //Public Const KmaError_UnderlyingObject = vbObjectError + 1     ' An error occurec in an underlying object
+        //Public Const KmaccErrorServiceStopped = vbObjectError + 2       ' The service is not running
+        //Public Const KmaError_BadObject = vbObjectError + 3            ' The Server Pointer is not valid
+        //Public Const KmaError_UpgradeInProgress = vbObjectError + 4    ' page is blocked because an upgrade is in progress
+        //Public Const KmaError_InvalidArgument = vbObjectError + 5      ' and input argument is not valid. Put details at end of description
+        //
         //Public Const ignoreInteger = ignoreInteger + 16                   ' Generic Error code that passes the description back to the user
         //Public Const ignoreInteger = ignoreInteger + 17               ' Internal error which the user should not see
         //Public Const KmaErrorPage = ignoreInteger + 18                   ' Error from the page which called Contensive
-        //'
+        //
         //Public Const KmaObjectError = ignoreInteger + 256                ' Internal error which the user should not see
         //
         public const string SQLTrue = "1";
@@ -1668,11 +1668,11 @@ namespace Contensive.Core {
             contentTypeWebTemplate = 3,
             contentTypeEmailTemplate = 4
         }
-        //'
-        //' ---------------------------------------------------------------------------------------------------
-        //' ----- CDefAdminColumnType
-        //' ---------------------------------------------------------------------------------------------------
-        //'
+        //
+        // ---------------------------------------------------------------------------------------------------
+        // ----- CDefAdminColumnType
+        // ---------------------------------------------------------------------------------------------------
+        //
         //Public Structure cdefServices.CDefAdminColumnType
         //    Public Name As String
         //    Public FieldPointer As Integer
@@ -1680,12 +1680,12 @@ namespace Contensive.Core {
         //    Public SortPriority As Integer
         //    Public SortDirection As Integer
         //End Structure
-        //'
-        //' ---------------------------------------------------------------------------------------------------
-        //' ----- CDefFieldType
-        //'       class not structure because it has to marshall to vb6
-        //' ---------------------------------------------------------------------------------------------------
-        //'
+        //
+        // ---------------------------------------------------------------------------------------------------
+        // ----- CDefFieldType
+        //       class not structure because it has to marshall to vb6
+        // ---------------------------------------------------------------------------------------------------
+        //
         //Public Structure cdefServices.CDefFieldType
         //    Public Name As String                      ' The name of the field
         //    Public ValueVariant As Object             ' The value carried to and from the database
@@ -1734,12 +1734,12 @@ namespace Contensive.Core {
         //    Public MemberSelectGroupID As Integer         ' If the Type is TypeMemberSelect, this is the group that the member will be selected from
         //    Public LookupList As String                ' If TYPELOOKUP, and LookupContentID is null, this is a comma separated list of choices
         //End Structure
-        //'
-        //' ---------------------------------------------------------------------------------------------------
-        //' ----- CDefType
-        //'       class not structure because it has to marshall to vb6
-        //' ---------------------------------------------------------------------------------------------------
-        //'
+        //
+        // ---------------------------------------------------------------------------------------------------
+        // ----- CDefType
+        //       class not structure because it has to marshall to vb6
+        // ---------------------------------------------------------------------------------------------------
+        //
         //Public Structure cdefServices.CDefType
         //    Public Name As String                       ' Name of Content
         //    Public Id As Integer                           ' index in content table
