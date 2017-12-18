@@ -16,7 +16,7 @@ using System.Data;
 namespace Contensive.Core.Controllers {
     public class contentCmdController {
         //
-        private coreClass cpCore;
+        //private coreClass cpCore;
         //
         //====================================================================================================
         /// <summary>
@@ -24,9 +24,9 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <param name="cpCore"></param>
         /// <remarks></remarks>
-        public contentCmdController(coreClass cpCore) {
-            this.cpCore = cpCore;
-        }
+        //public contentCmdController(coreClass cpCore) {
+        //    this.cpCore = cpCore;
+        //}
         //
         //=================================================================================
         //Public Function execute(CsvObject As Object, mainObject As Object, optionString As String, filterInput As String) As String
@@ -147,7 +147,7 @@ namespace Contensive.Core.Controllers {
         //           user firstname
         //           site propertyname
         //
-        public string ExecuteCmd(string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        public static string ExecuteCmd(coreClass cpCore,  string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 bool badCmd = false;
@@ -268,7 +268,7 @@ namespace Contensive.Core.Controllers {
                         // cmd found, process it and add the results to the dst
                         //
                         Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        cmdResult = ExecuteAllCmdLists_Execute(Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                        cmdResult = ExecuteAllCmdLists_Execute( cpCore,  Cmd, badCmd, Context, personalizationPeopleId, personalizationIsAuthenticated);
                         if (badCmd) {
                             //
                             // the command was bad, put it back in place (?) in case it was not a command
@@ -294,47 +294,25 @@ namespace Contensive.Core.Controllers {
         // refactor -- go through all the parsing sections and setup specific exceptions to help users get the syntax correct
         //=================================================================================================================
         //
-        private string ExecuteAllCmdLists_Execute(string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        private static string ExecuteAllCmdLists_Execute(coreClass cpCore, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 //
                 // accumulator gets the result of each cmd, then is passed to the next command to filter
-                //
-                string CmdAccumulator = null;
-                Controllers.htmlController htmlDoc = null;
-                string importHead = null;
-                string ArgName = null;
-                string ArgInstanceId = null;
-                string ArgGuid = null;
-                string ArgOptionString = "";
-                string cmdText = "";
-                string cmdArg = null;
-                int Pos = 0;
-                string addonName = null;
-                bool CSPeopleSet = false;
-                //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				object cmd = null;
-                object cmdDictionaryOrCollection = null;
-                Dictionary<string, object> cmdDictionary = new Dictionary<string, object>();
                 Collection<object> cmdCollection = null;
                 Dictionary<string, object> cmdDef = null;
                 Dictionary<string, object> cmdArgDef = new Dictionary<string, object>();
-                string leftChr = null;
-                string rightChr = null;
-                int trimLen = 0;
-                string whiteChrs = null;
-                bool trimming = false;
                 //
-                htmlDoc = new Controllers.htmlController(cpCore);
-                //
+                //htmlDoc = new Controllers.htmlController(cpCore);
                 cmdSrc = cmdSrc.Trim(' ');
-                whiteChrs = "\r\n\t ";
+                string whiteChrs = "\r\n\t ";
+                bool trimming;
                 do {
                     trimming = false;
-                    trimLen = cmdSrc.Length;
+                    int trimLen = cmdSrc.Length;
                     if (trimLen > 0) {
-                        leftChr = cmdSrc.Left( 1);
-                        rightChr = cmdSrc.Substring(cmdSrc.Length - 1);
+                        string leftChr = cmdSrc.Left( 1);
+                        string rightChr = cmdSrc.Substring(cmdSrc.Length - 1);
                         if (genericController.vbInstr(1, whiteChrs, leftChr) != 0) {
                             cmdSrc = cmdSrc.Substring(1);
                             trimming = true;
@@ -345,7 +323,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 } while (trimming);
-                CmdAccumulator = "";
+                string CmdAccumulator =  "";
                 if (!string.IsNullOrEmpty(cmdSrc)) {
                     //
                     // convert cmdSrc to cmdCollection
@@ -373,10 +351,12 @@ namespace Contensive.Core.Controllers {
                         // JSON is a single command in the form of an object, like:
                         //   { "import": "test.html" }
                         //
+                        Dictionary<string, object> cmdDictionary = new Dictionary<string, object>();
                         try {
                             cmdDictionary = cpCore.json.Deserialize<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
                             cpCore.handleException(ex, "Error parsing JSON command list [" + GetErrString() + "]");
+                            throw;
                         }
                         //
                         dictionaryKeys = cmdDictionary.Keys;
@@ -420,8 +400,8 @@ namespace Contensive.Core.Controllers {
                         //   "content box"
                         //   all other posibilities are syntax errors
                         //
-                        cmdText = cmdSrc.Trim(' ');
-                        cmdArg = "";
+                        string cmdText = cmdSrc.Trim(' ');
+                        string cmdArg = "";
                         if (cmdText.Left( 1) == "\"") {
                             //
                             //cmd is quoted
@@ -429,7 +409,7 @@ namespace Contensive.Core.Controllers {
                             //   "Open" file
                             //   "Open" "file"
                             //
-                            Pos = genericController.vbInstr(2, cmdText, "\"");
+                            int Pos = genericController.vbInstr(2, cmdText, "\"");
                             if (Pos <= 1) {
                                 throw new ApplicationException("Error parsing content command [" + cmdSrc + "], expected a close quote around position " + Pos);
                             } else {
@@ -456,7 +436,7 @@ namespace Contensive.Core.Controllers {
                             //   open
                             //   open file
                             //
-                            Pos = genericController.vbInstr(1, cmdText, " ");
+                            int Pos = genericController.vbInstr(1, cmdText, " ");
                             if (Pos > 0) {
                                 cmdArg = cmdSrc.Substring(Pos);
                                 cmdText = (cmdSrc.Left( Pos - 1)).Trim(' ');
@@ -466,7 +446,7 @@ namespace Contensive.Core.Controllers {
                             //
                             //cmdarg is quoted
                             //
-                            Pos = genericController.vbInstr(2, cmdArg, "\"");
+                            int Pos = genericController.vbInstr(2, cmdArg, "\"");
                             if (Pos <= 1) {
                                 throw new ApplicationException("Error parsing JSON command list, expected a quoted command argument, command list [" + cmdSrc + "]");
                             } else {
@@ -478,9 +458,9 @@ namespace Contensive.Core.Controllers {
                             // argument is in the form of an object, like:
                             //   { "text name": "my text" }
                             //
-                            cmdDictionaryOrCollection = cpCore.json.Deserialize<object>(cmdArg);
+                            object cmdDictionaryOrCollection = cpCore.json.Deserialize<object>(cmdArg);
                             string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLower();
-                            if ((cmdDictionaryOrCollectionTypeName != "dictionary") & (cmdDictionaryOrCollectionTypeName != "dictionary(of string,object)")) {
+                            if (cmdDictionaryOrCollectionTypeName.Left(37) != "system.collections.generic.dictionary") {
                                 throw new ApplicationException("Error parsing JSON command argument list, expected a single command, command list [" + cmdSrc + "]");
                             } else {
                                 //
@@ -519,13 +499,14 @@ namespace Contensive.Core.Controllers {
                         //   E - { "command" : { "name" : "The Name" , "secondArgument" : "secondValue" } }
                         //
                         string cmdTypeName = cmd.GetType().FullName.ToLower();
-                        if (cmdTypeName == "string") {
+                        string cmdText = string.Empty;
+                        if (cmdTypeName == "system.string") {
                             //
                             // case A & B, the cmdDef is a string
                             //
                             cmdText = (string)cmd;
                             cmdArgDef = new Dictionary<string, object>();
-                        } else if ((cmdTypeName == "dictionary") || (cmdTypeName == "dictionary(of string,object)")) {
+                        } else if (cmdTypeName.Left(37)== "system.collections.generic.dictionary") {
                             //
                             // cases C-E, (0).key=cmd, (0).value = argument (might be string or object)
                             //
@@ -541,13 +522,13 @@ namespace Contensive.Core.Controllers {
                                 // command is the key for these cases
                                 //
                                 cmdText = cmdDefKey;
-                                if (cmdDefValueTypeName == "string") {
+                                if (cmdDefValueTypeName == "system.string") {
                                     //
                                     // command definition with default argument
                                     //
                                     cmdArgDef = new Dictionary<string, object>();
                                     cmdArgDef.Add("default", cmdDef[cmdDefKey]);
-                                } else if ((cmdDefValueTypeName == "dictionary") || (cmdDefValueTypeName == "dictionary(of string,object)")) {
+                                } else if ((cmdDefValueTypeName == "dictionary") || (cmdDefValueTypeName == "dictionary(of string,object)") || (cmdTypeName.Left(37) == "system.collections.generic.dictionary")) {
                                     cmdArgDef = (Dictionary<string, object>)cmdDef[cmdDefKey];
                                 } else {
                                     //
@@ -576,7 +557,7 @@ namespace Contensive.Core.Controllers {
                                     //   name
                                     //
                                     CmdAccumulator = "";
-                                    ArgName = "";
+                                    string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
                                         switch (kvp.Key.ToLower()) {
                                             case "name":
@@ -600,7 +581,7 @@ namespace Contensive.Core.Controllers {
                                     //   name
                                     //
                                     CmdAccumulator = "";
-                                    ArgName = "";
+                                    string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
                                         switch (kvp.Key.ToLower()) {
                                             case "name":
@@ -624,7 +605,7 @@ namespace Contensive.Core.Controllers {
                                     //   name
                                     //
                                     CmdAccumulator = "";
-                                    ArgName = "";
+                                    string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
                                         switch (kvp.Key.ToLower()) {
                                             case "name":
@@ -653,7 +634,7 @@ namespace Contensive.Core.Controllers {
                                     //   name
                                     //
                                     CmdAccumulator = "";
-                                    ArgName = "";
+                                    string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
                                         switch (kvp.Key.ToLower()) {
                                             case "name":
@@ -820,7 +801,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // execute an add-on
                                     //
-                                    addonName = "";
+                                    string addonName = "";
                                     //ArgInstanceId = ""
                                     //ArgGuid = ""
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
@@ -866,7 +847,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // execute an add-on
                                     //
-                                    addonName = cmdText;
+                                    string addonName = cmdText;
                                     //ArgInstanceId = ""
                                     //ArgGuid = ""
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();

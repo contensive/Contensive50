@@ -288,10 +288,11 @@ namespace Contensive.Core.Controllers {
                                     // -- newtonsoft types
                                     Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)wrappedContent.content;
                                     result = data.ToObject<objectClass>();
-                                //} else if ((wrappedContent.content is string) && (!( typeof (objectClass) is  string))) {
-                                //    //
-                                //    // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
-                                //    result = default(objectClass);
+                                } else if (wrappedContent.content==null) {
+                                    //} else if ((wrappedContent.content is string) && (!(typeof(objectClass) is string))) {
+                                    //
+                                    // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
+                                    result = default(objectClass);
                                 } else {
                                     //
                                     // -- all worked

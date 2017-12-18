@@ -3309,12 +3309,12 @@ namespace Contensive.Core.Controllers {
             string returnValue = "";
             try {
                 int LoopPtr = 0;
-                contentCmdController contentCmd = new contentCmdController(cpCore);
+                //contentCmdController contentCmd = new contentCmdController(cpCore);
                 //
                 returnValue = Source;
                 LoopPtr = 0;
                 while ((LoopPtr < 10) && ((returnValue.IndexOf(contentReplaceEscapeStart)  != -1))) {
-                    returnValue = contentCmd.ExecuteCmd(returnValue, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                    returnValue = contentCmdController.ExecuteCmd( cpCore, returnValue, Context, personalizationPeopleId, personalizationIsAuthenticated);
                     LoopPtr = LoopPtr + 1;
                 }
             } catch (Exception ex) {

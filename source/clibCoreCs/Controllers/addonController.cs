@@ -39,7 +39,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Execute an addon because it is a dependency of another addon/page/template
+        /// Execute an addon because it is a dependency of another addon/page/template. A dependancy is only run once in a page.
         /// </summary>
         /// <param name="addonId"></param>
         /// <param name="context"></param>
@@ -110,18 +110,20 @@ namespace Contensive.Core.Controllers {
                     bool allowAdvanceEditor = cpCore.visitProperty.getBoolean("AllowAdvancedEditor");
                     //
                     // -- add addon record arguments to doc properties
-                    foreach (var addon_argument in addon.ArgumentList.Replace("\r\n", "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
-                        if (!string.IsNullOrEmpty(addon_argument)) {
-                            string[] nvp = addon_argument.Split('=');
-                            if (!string.IsNullOrEmpty(nvp[0])) {
-                                string nvpValue = "";
-                                if (nvp.Length > 1) {
-                                    nvpValue = nvp[1];
+                    if (!string.IsNullOrWhiteSpace(addon.ArgumentList)) {
+                        foreach (var addon_argument in addon.ArgumentList.Replace("\r\n", "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
+                            if (!string.IsNullOrEmpty(addon_argument)) {
+                                string[] nvp = addon_argument.Split('=');
+                                if (!string.IsNullOrEmpty(nvp[0])) {
+                                    string nvpValue = "";
+                                    if (nvp.Length > 1) {
+                                        nvpValue = nvp[1];
+                                    }
+                                    if (nvpValue.IndexOf("[") >= 0) {
+                                        nvpValue = nvpValue.Left(nvpValue.IndexOf("["));
+                                    }
+                                    cpCore.docProperties.setProperty(nvp[0], nvpValue);
                                 }
-                                if (nvpValue.IndexOf("[") >= 0) {
-                                    nvpValue = nvpValue.Left( nvpValue.IndexOf("["));
-                                }
-                                cpCore.docProperties.setProperty(nvp[0], nvpValue);
                             }
                         }
                     }

@@ -60,6 +60,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Controllers\contentCmdControllerTests.cs" />
     <Compile Include="Controllers\iisControllerUnitTests.cs" />
     <Compile Include="Controllers\genericControllerUnitTests.cs" />
     <Compile Include="extensionMethodsUnitTests.cs" />
