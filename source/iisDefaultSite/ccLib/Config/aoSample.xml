@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Collection name="Collection Name" guid="{00000000-0000-0000-0000-000000000000}" Version="1">
+  <Interfaces>
+    <Page name="Addon Name" guid="{00000000-0000-0000-0000-000000000000}">
+      <Description>Add-on description</Description>
+      <Help />
+      <HelpLink />
+      <Argument>Feed=[SelectContentName("RSS Feeds")]</Argument>
+      <ActiveXDLL></ActiveXDLL>
+      <ActiveXProgramID></ActiveXProgramID>
+      <IconLink />
+      <Template>1</Template>
+      <Content>1</Content>
+      <Admin />
+      <WebService />
+      <OnPageEnd />
+      <JavaScriptOnLoad />
+      <JavaScriptInHead />
+      <JavaScriptBodyEnd />
+      <PageTitle />
+      <MetaDescription />
+      <MetaKeywordList />
+      <OtherHeadTags />
+      <Copy />
+      <CopyText />
+      <StyleSheet><![CDATA[
+            use CDATA to enclose non-XML data
+            ]]></StyleSheet>
+    </Page>
+  </Interfaces>
+  <Collection name="Collection Name" guid="{00000000-0000-0000-0000-000000000000}" Version="1">
+    /* collections can contain collections - effects navigator menus and removal */
+  </Collection>
+  <ContensiveCDef>
+    /* any CDef node. This section is treated just like a CDef import */
+  </ContensiveCDef>
+</Collection>

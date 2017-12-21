@@ -1,0 +1,95 @@
+<Collection name="Child Page Sorting" guid="{BDD2CFBD-CB53-40B7-A246-ED0D234F17EA}" system="Yes">
+	<Help></Help>
+	<Addon name="Child Page Sorting" guid="{281CABBC-3FCA-4B6F-A0F2-4A792500D152}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead><![CDATA[function saveSortable(listId){
+		var e,c,s;
+		s=listId;
+		e=document.getElementById(listId);
+		for (i=0;i<e.childNodes.length;i++){
+			c=e.childNodes[i];
+			if(c.id) {s+=','+c.id }
+		}
+		cj.ajax.addon('ChildListResort','sortlist='+s)
+}]]></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Admin>No</Admin>
+		<OnPageEndEvent>Yes</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="5000">
+		<Code><![CDATA[Function AddSortable()
+	if cp.user.isediting("Page Content") then
+		AddSortable = "<script language=""javascript"">" _
+			& "jQuery(function() {jQuery("".ccChildList"").sortable({stop: function(event, ui) { saveSortable(jQuery(this).attr('id')); }});});" _
+			& "cj.addHeadStyle('.ccChildList li {min-height:30px;vertical-align:middle;border:1px dashed #262;padding-right:40px !important;background:white url(/childPageSort/arrowUpDown.png) no-repeat right;}');" _
+			& "</script>"
+	end if
+End Function]]></Code>
+		</Scripting>
+	</Addon>
+	<Addon name="ChildListResort" guid="{8429641A-03C9-4CD1-9369-5B9F2FA509E9}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID><![CDATA[aoChildPageSorting.ResortClass]]></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>Yes</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<ImportCollection name="JQuery UI">{1D3B0D90-5C61-449F-B1AF-47688C5E97D1}</ImportCollection>
+	<Resource name="arrowUpDown.png" type="www" path="/ChildPageSort" />
+	<Resource name="aochildpagesorting.dll" type="executable" path="" />
+</Collection>
