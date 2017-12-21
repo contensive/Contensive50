@@ -2042,14 +2042,14 @@ ErrorTrap:
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
                                 AStart = "<a href=""?" & cpCore.doc.refreshQueryString & "&FieldName=" & genericController.encodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
-                                Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br >")
+                                Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br>")
                                 Call Stream.Add("<img src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"" >")
-                                Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><img src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
-                                Call Stream.Add(AStart & "&dta=" & ToolsActionMoveFieldRight & """><img src=""/ccLib/images/LibButtonMoveRightUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
-                                Call Stream.Add(AStart & "&dta=" & ToolsActionMoveFieldLeft & """><img src=""/ccLib/images/LibButtonMoveLeftUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
-                                'Call Stream.Add(AStart & "&dta=" & ToolsActionSetAZ & """><img src=""/ccLib/images/LibButtonSortazUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
-                                'Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
-                                Call Stream.Add(AStart & "&dta=" & ToolsActionExpand & """><img src=""/ccLib/images/LibButtonOpenUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
+                                Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><img src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
+                                Call Stream.Add(AStart & "&dta=" & ToolsActionMoveFieldRight & """><img src=""/ccLib/images/LibButtonMoveRightUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
+                                Call Stream.Add(AStart & "&dta=" & ToolsActionMoveFieldLeft & """><img src=""/ccLib/images/LibButtonMoveLeftUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
+                                'Call Stream.Add(AStart & "&dta=" & ToolsActionSetAZ & """><img src=""/ccLib/images/LibButtonSortazUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
+                                'Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
+                                Call Stream.Add(AStart & "&dta=" & ToolsActionExpand & """><img src=""/ccLib/images/LibButtonOpenUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionContract & """><img src=""/ccLib/images/LibButtonCloseUp.gif"" width=""50"" height=""15"" border=""0"" ></A>")
                                 Call Stream.Add("</span></td>")
                             End With
@@ -2156,7 +2156,7 @@ ErrorTrap:
             ' print the content tables that have index forms to Configure
             '--------------------------------------------------------------------------------
             '
-            'FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its index form<br >"
+            'FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its index form<br>"
             ''FormPanel = FormPanel & cpCore.main_GetFormInputHidden("af", AdminFormToolConfigureIndex)
             'FormPanel = FormPanel & cpCore.htmldoc.main_GetFormInputSelect2("ContentID", ContentID, "Content")
             'Call Stream.Add(cpcore.htmldoc.main_GetPanel(FormPanel))

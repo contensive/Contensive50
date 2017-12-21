@@ -1158,18 +1158,18 @@ ErrorTrap:
                     End If
                     If False Then
                         If editRecord.IsInserted Then
-                            HeaderDescription = HeaderDescription & "<BR >Last Published: not published"
+                            HeaderDescription = HeaderDescription & "<br>Last Published: not published"
                         Else
-                            HeaderDescription = HeaderDescription & "<BR >Last Published:" & ModifiedCopy
+                            HeaderDescription = HeaderDescription & "<br>Last Published:" & ModifiedCopy
                         End If
                     Else
-                        HeaderDescription = HeaderDescription & "<BR >Last Modified:" & ModifiedCopy
+                        HeaderDescription = HeaderDescription & "<br>Last Modified:" & ModifiedCopy
                     End If
                     '
                     ' Add Edit Locking to right panel
                     '
                     If editRecord.EditLock Then
-                        HeaderDescription = HeaderDescription & "<BR ><b>Record is locked by " & editRecord.EditLockMemberName & " until " & editRecord.EditLockExpires & "</b>"
+                        HeaderDescription = HeaderDescription & "<br><b>Record is locked by " & editRecord.EditLockMemberName & " until " & editRecord.EditLockExpires & "</b>"
                     End If
                     '
                     HeaderDescription = HeaderDescription & "</td></tr>"

@@ -31,8 +31,8 @@ Namespace Contensive.Core.Controllers
                 ElapsedTime = CSng(cpcore.doc.appStopWatch.ElapsedMilliseconds) / 1000
                 iMessage = genericController.encodeText(Message)
                 iMessage = Format((ElapsedTime), "00.000") & " - " & iMessage
-                cpcore.doc.testPointMessage = cpcore.doc.testPointMessage & "<nobr>" & iMessage & "</nobr><br >"
-                'writeAltBuffer ("<nobr>" & iMessage & "</nobr><br >")
+                cpcore.doc.testPointMessage = cpcore.doc.testPointMessage & "<nobr>" & iMessage & "</nobr><br>"
+                'writeAltBuffer ("<nobr>" & iMessage & "</nobr><br>")
             End If
             If cpcore.siteProperties.allowTestPointLogging Then
                 '

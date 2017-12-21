@@ -2258,7 +2258,7 @@ ErrorTrap:
                         End If
                         If GroupCount <> 0 Then
                             ' leave this between checkboxes - it is searched in the admin page
-                            Result = Result & "<br >" & vbCrLf
+                            Result = Result & "<br>" & vbCrLf
                         End If
                         If genericController.IsInDelimitedString(CheckedIDList, CStr(RecordID), ",") Then
                             Found = True
@@ -2447,7 +2447,7 @@ ErrorTrap:
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = FieldValueText & "<BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
+                                        returnResult = FieldValueText & "<br>change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
@@ -2457,7 +2457,7 @@ ErrorTrap:
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = "<img src=""" & genericController.getCdnFileLink(cpCore, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
+                                        returnResult = "<img src=""" & genericController.getCdnFileLink(cpCore, FieldValueText) & """><br>change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
@@ -4994,7 +4994,7 @@ ErrorTrap:
             If (iSource <> "") Then
                 convertCRLFToHtmlBreak = iSource
                 convertCRLFToHtmlBreak = genericController.vbReplace(convertCRLFToHtmlBreak, vbCr, "")
-                convertCRLFToHtmlBreak = genericController.vbReplace(convertCRLFToHtmlBreak, vbLf, "<br >")
+                convertCRLFToHtmlBreak = genericController.vbReplace(convertCRLFToHtmlBreak, vbLf, "<br>")
             End If
             Exit Function
             '
@@ -5008,7 +5008,7 @@ ErrorTrap:
         '   Encodes characters to be compatibile with HTML
         '   i.e. it converts the equation 5 > 6 to th sequence "5 &gt; 6"
         '
-        '   convert carriage returns ( 0x10 ) to <br >
+        '   convert carriage returns ( 0x10 ) to <br>
         '   remove linefeeds ( 0x13 )
         '========================================================================
         '
@@ -6012,7 +6012,7 @@ ErrorTrap:
                                         End If
                                         If DivCheckBoxCnt <> 0 Then
                                             ' leave this between checkboxes - it is searched in the admin page
-                                            returnHtml &= "<br >" & vbCrLf
+                                            returnHtml &= "<br>" & vbCrLf
                                         End If
                                         RuleCopy = ""
                                         If False Then

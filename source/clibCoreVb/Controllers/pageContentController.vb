@@ -1871,7 +1871,7 @@ ErrorTrap:
                                 result = result & "<a href=""" & genericController.encodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.csGetText(CS, "Name")) & "</A>"
                                 Copy = (cpcore.db.csGetText(CS, "Brief"))
                                 If Copy <> "" Then
-                                    result = result & "<br >" & genericController.AddSpan(Copy, "ccListCopy")
+                                    result = result & "<br>" & genericController.AddSpan(Copy, "ccListCopy")
                                 End If
                                 SeeAlsoCount = SeeAlsoCount + 1
                                 result = result & "</li>"

@@ -83,7 +83,7 @@ Namespace Contensive.Addons.AdminSite
                 '
                 ' ----- Page Body
                 '
-                BR = "<BR >"
+                BR = "<br>"
                 Body &= cr & "<table border=""0"" cellpadding=""2"" cellspacing=""2"" width=""100%"">"
                 Body &= cr & "<tr>"
                 Body &= cr & "<td width=""50"" class=""ccPanel"" align=""center"" class=""ccAdminSmall"">Pub" & BR & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""42"" height=""1"" ></td>"

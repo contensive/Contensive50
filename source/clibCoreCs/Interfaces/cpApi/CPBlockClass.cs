@@ -132,7 +132,7 @@ namespace Contensive.Core {
                     if (!string.IsNullOrEmpty(accum)) {
                         headTags = Controllers.htmlController.getTagInnerHTML(accum, "head", false);
                         if (!string.IsNullOrEmpty(headTags)) {
-                            foreach (string asset in headTags.Split("\r\n"[0])) {
+                            foreach (string asset in headTags.Split( new[] { "\r\n" }, StringSplitOptions.None )) {
                                 cpCore.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
                                     addedByMessage = "block.importFile",
                                     content = asset

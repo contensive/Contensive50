@@ -648,7 +648,7 @@ namespace Contensive.Core.Controllers {
         //=======================================================================
         private void appendCacheLog(string line) {
             try {
-                logController.appendLog(cpCore, line, "cache");
+                //logController.appendLog(cpCore, line, "cache");
             } catch (Exception ex) {
                 cpCore.handleException(new ApplicationException("appendCacheLog exception", ex));
             }

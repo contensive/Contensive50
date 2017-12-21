@@ -2703,7 +2703,7 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                 }
                                 if (!string.IsNullOrEmpty(GroupList)) {
-                                    Groups = GroupList.Split("\t".ToCharArray() );
+                                    Groups = GroupList.Split('\t');
                                     if (Groups.GetUpperBound(0) == 0) {
                                         SubTitle = SubTitle + ", in group '" + Groups[0] + "'";
                                     } else if (Groups.GetUpperBound(0) == 1) {
@@ -3079,7 +3079,7 @@ namespace Contensive.Addons.AdminSite {
                                 + "\r\n  }"
                                 + "\r\n} "
                                 + "\r\n</script>";
-                            DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br >" + cpCore.html.html_GetFormButton(ButtonFind,"", "FindButton") + "</td>";
+                            DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br>" + cpCore.html.html_GetFormButton(ButtonFind,"", "FindButton") + "</td>";
                             ColumnPointer = 0;
                             foreach (var kvp in IndexConfig.Columns) {
                                 indexConfigColumnClass column = kvp.Value;
@@ -3780,7 +3780,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // remove current preferences for this field
                                         //
-                                        Parts = ("," + editorpreferences).Split( ("," + fieldEditorFieldId.ToString() + ":").ToCharArray());
+                                        Parts = ("," + editorpreferences).Split(new[] { "," + fieldEditorFieldId.ToString() + ":" }, StringSplitOptions.None);
                                         Cnt = Parts.GetUpperBound(0) + 1;
                                         if (Cnt > 0) {
                                             for (Ptr = 1; Ptr < Cnt; Ptr++) {
@@ -6865,18 +6865,18 @@ namespace Contensive.Addons.AdminSite {
                     }
                     if (false) {
                         if (editRecord.IsInserted) {
-                            HeaderDescription = HeaderDescription + "<BR >Last Published: not published";
+                            HeaderDescription = HeaderDescription + "<br>Last Published: not published";
                         } else {
-                            HeaderDescription = HeaderDescription + "<BR >Last Published:" + ModifiedCopy;
+                            HeaderDescription = HeaderDescription + "<br>Last Published:" + ModifiedCopy;
                         }
                     } else {
-                        HeaderDescription = HeaderDescription + "<BR >Last Modified:" + ModifiedCopy;
+                        HeaderDescription = HeaderDescription + "<br>Last Modified:" + ModifiedCopy;
                     }
                     //
                     // Add Edit Locking to right panel
                     //
                     if (editRecord.EditLock) {
-                        HeaderDescription = HeaderDescription + "<BR ><b>Record is locked by " + editRecord.EditLockMemberName + " until " + editRecord.EditLockExpires + "</b>";
+                        HeaderDescription = HeaderDescription + "<br><b>Record is locked by " + editRecord.EditLockMemberName + " until " + editRecord.EditLockExpires + "</b>";
                     }
                     //
                     HeaderDescription = HeaderDescription + "</td></tr>";
@@ -7707,7 +7707,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- Page Body
                     //
-                    BR = "<BR >";
+                    BR = "<br>";
                     Body += "\r<table border=\"0\" cellpadding=\"2\" cellspacing=\"2\" width=\"100%\">";
                     Body += "\r<tr>";
                     Body += "\r<td width=\"50\" class=\"ccPanel\" align=\"center\" class=\"ccAdminSmall\">Pub" + BR + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"42\" height=\"1\" ></td>";
@@ -10814,7 +10814,7 @@ namespace Contensive.Addons.AdminSite {
                 adminUIController Adminui = new adminUIController(cpCore);
                 //
                 GroupList = cpCore.html.getCheckList2("PageContentBlockRules", adminContent.Name, editRecord.id, "Groups", "Page Content Block Rules", "RecordID", "GroupID","", "Caption", false);
-                GroupSplit = GroupList.Split("<br >".ToCharArray());
+                GroupSplit = GroupList.Split(new[] { "<br>" }, StringSplitOptions.None);
                 for (Ptr = 0; Ptr <= GroupSplit.GetUpperBound(0); Ptr++) {
                     GroupID = 0;
                     IDPtr = GroupSplit[Ptr].IndexOf("value=");
@@ -10859,7 +10859,7 @@ namespace Contensive.Addons.AdminSite {
                 adminUIController Adminui = new adminUIController(cpCore);
                 //
                 GroupList = cpCore.html.getCheckList2("LibraryFolderRules", adminContent.Name, editRecord.id, "Groups", "Library Folder Rules", "FolderID", "GroupID","", "Caption");
-                GroupSplit = GroupList.Split( "<br >".ToCharArray() );
+                GroupSplit = GroupList.Split( new[] { "<br>" },StringSplitOptions.None);
                 for (Ptr = 0; Ptr <= GroupSplit.GetUpperBound(0); Ptr++) {
                     GroupID = 0;
                     IDPtr = GroupSplit[Ptr].IndexOf(  "value="  );
@@ -11250,7 +11250,7 @@ namespace Contensive.Addons.AdminSite {
                 tempMakeButtonFlat = tempMakeButtonFlat + ">";
                 tempMakeButtonFlat = tempMakeButtonFlat + ButtonLabel + "</A>";
                 if (IncludeWidth) {
-                    tempMakeButtonFlat = tempMakeButtonFlat + "<br ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + ButtonWidth + "\" height=\"1\" >";
+                    tempMakeButtonFlat = tempMakeButtonFlat + "<br><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + ButtonWidth + "\" height=\"1\" >";
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -15209,14 +15209,14 @@ namespace Contensive.Addons.AdminSite {
                                     InheritedFieldCount = InheritedFieldCount + 1;
                                 }
                                 AStart = "<a href=\"?" + cpCore.doc.refreshQueryString + "&FieldName=" + genericController.encodeHTML(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
-                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br >");
+                                Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
                                 Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
-                                Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><img src=\"/ccLib/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><BR >");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><img src=\"/ccLib/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><BR >");
-                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><img src=\"/ccLib/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><BR >");
-                                //Call Stream.Add(AStart & "&dta=" & ToolsActionSetAZ & """><img src=""/ccLib/images/LibButtonSortazUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
-                                //Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
-                                Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><img src=\"/ccLib/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><BR >");
+                                Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><img src=\"/ccLib/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
+                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><img src=\"/ccLib/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
+                                Stream.Add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><img src=\"/ccLib/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
+                                //Call Stream.Add(AStart & "&dta=" & ToolsActionSetAZ & """><img src=""/ccLib/images/LibButtonSortazUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
+                                //Call Stream.Add(AStart & "&dta=" & ToolsActionSetZA & """><img src=""/ccLib/images/LibButtonSortzaUp.gif"" width=""50"" height=""15"" border=""0"" ></A><br>")
+                                Stream.Add(AStart + "&dta=" + ToolsActionExpand + "\"><img src=\"/ccLib/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A><br>");
                                 Stream.Add(AStart + "&dta=" + ToolsActionContract + "\"><img src=\"/ccLib/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\" ></A>");
                                 Stream.Add("</span></td>");
                             }
@@ -15320,7 +15320,7 @@ namespace Contensive.Addons.AdminSite {
                 // print the content tables that have index forms to Configure
                 //--------------------------------------------------------------------------------
                 //
-                //FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its index form<br >"
+                //FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its index form<br>"
                 //FormPanel = FormPanel & cpCore.main_GetFormInputHidden("af", AdminFormToolConfigureIndex)
                 //FormPanel = FormPanel & cpCore.htmldoc.main_GetFormInputSelect2("ContentID", ContentID, "Content")
                 //Call Stream.Add(cpcore.htmldoc.main_GetPanel(FormPanel))
@@ -15546,7 +15546,7 @@ namespace Contensive.Addons.AdminSite {
                                 FeatureList = "admin:" + InnovaEditorFeatureList + "\r\ncontentmanager:" + InnovaEditorFeatureList + "\r\npublic:" + InnovaEditorPublicFeatureList;
                             }
                             if (!string.IsNullOrEmpty(FeatureList)) {
-                                Features = FeatureList.Split( "\r\n".ToCharArray()  );
+                                Features = FeatureList.Split( new[] { "\r\n" }, StringSplitOptions.None );
                                 AdminList = Features[0].Replace( "admin:", "" );
                                 if (Features.GetUpperBound(0) > 0) {
                                     CMList = Features[1].Replace( "contentmanager:", "");
@@ -15739,7 +15739,7 @@ namespace Contensive.Addons.AdminSite {
                                     Ptr = Ptr + 1;
                                     while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
                                         Line = ConfigListLines[Ptr];
-                                        LineSplit = Line.Split( "\t".ToCharArray()  );
+                                        LineSplit = Line.Split( '\t');
                                         if (LineSplit.GetUpperBound(0) > 0) {
                                             indexConfigColumnClass column = new indexConfigColumnClass();
                                             column.Name = LineSplit[0].Trim();
@@ -15754,7 +15754,7 @@ namespace Contensive.Addons.AdminSite {
                                     while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
                                         //ReDim Preserve .Sorts(.SortCnt)
                                         Line = ConfigListLines[Ptr];
-                                        LineSplit = Line.Split( "\t".ToCharArray() );
+                                        LineSplit = Line.Split( '\t');
                                         if (LineSplit.GetUpperBound(0) == 1) {
                                             returnIndexConfig.Sorts.Add(LineSplit[0].ToLower(), new indexConfigSortClass {
                                                 fieldName = LineSplit[0],
@@ -15796,7 +15796,7 @@ namespace Contensive.Addons.AdminSite {
                                     while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
                                         //ReDim Preserve .FindWords(.FindWords.Count)
                                         Line = ConfigListLines[Ptr];
-                                        LineSplit = Line.Split( "\t".ToCharArray() );
+                                        LineSplit = Line.Split( '\t');
                                         if (LineSplit.GetUpperBound(0) > 1) {
                                             indexConfigFindWordClass findWord = new indexConfigFindWordClass();
                                             findWord.Name = LineSplit[0];

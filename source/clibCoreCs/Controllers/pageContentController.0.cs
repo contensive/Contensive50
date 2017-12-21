@@ -2755,7 +2755,7 @@ namespace Contensive.Core.Controllers {
                                 result = result + "<a href=\"" + genericController.encodeHTML(SeeAlsoLink) + "\" target=\"_blank\">" + (cpcore.db.csGetText(CS, "Name")) + "</A>";
                                 Copy = (cpcore.db.csGetText(CS, "Brief"));
                                 if (!string.IsNullOrEmpty(Copy)) {
-                                    result = result + "<br >" + genericController.AddSpan(Copy, "ccListCopy");
+                                    result = result + "<br>" + genericController.AddSpan(Copy, "ccListCopy");
                                 }
                                 SeeAlsoCount = SeeAlsoCount + 1;
                                 result = result + "</li>";

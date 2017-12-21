@@ -1564,14 +1564,14 @@ namespace Contensive.Core.Controllers {
             string[] tempSplitCRLF = null;
             //
             if (vbInstr(1, Expression, "\r\n") != 0) {
-                tempSplitCRLF = Expression.Split("\r\n".ToCharArray());
+                tempSplitCRLF = Expression.Split(new[] { "\r\n" }, StringSplitOptions.None);
             } else if (vbInstr(1, Expression, "\r") != 0) {
-                tempSplitCRLF = Expression.Split("\r".ToCharArray());
+                tempSplitCRLF = Expression.Split('\r');
             } else if (vbInstr(1, Expression, "\n") != 0) {
-                tempSplitCRLF = Expression.Split("\n".ToCharArray());
+                tempSplitCRLF = Expression.Split('\n');
             } else {
                 tempSplitCRLF = new string[1];
-                tempSplitCRLF = Expression.Split("\r\n".ToCharArray());
+                tempSplitCRLF = Expression.Split(new[] { "\r\n" }, StringSplitOptions.None);
             }
             return tempSplitCRLF;
         }
@@ -2854,7 +2854,7 @@ namespace Contensive.Core.Controllers {
             Out = new string[1];
             OutSize = 1;
             if (!string.IsNullOrEmpty(WordList)) {
-                QuoteSplit = WordList.Split("\"".ToCharArray());
+                QuoteSplit = WordList.Split( new[] { @"\" }, StringSplitOptions.None );
                 QuoteSplitCount = QuoteSplit.GetUpperBound(0) + 1;
                 InQuote = (string.IsNullOrEmpty(WordList.Left( 1)));
                 for (QuoteSplitPointer = 0; QuoteSplitPointer < QuoteSplitCount; QuoteSplitPointer++) {

@@ -2265,7 +2265,7 @@ namespace Contensive.Core.Controllers {
                             }
                             if (GroupCount != 0) {
                                 // leave this between checkboxes - it is searched in the admin page
-                                Result = Result + "<br >\r\n";
+                                Result = Result + "<br>\r\n";
                             }
                             if (genericController.IsInDelimitedString(CheckedIDList, RecordID.ToString(), ",")) {
                                 Found = true;
@@ -2459,7 +2459,7 @@ namespace Contensive.Core.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
                                     } else {
-                                        returnResult = FieldValueText + "<BR >change: " + html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant));
+                                        returnResult = FieldValueText + "<br>change: " + html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -2470,7 +2470,7 @@ namespace Contensive.Core.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
                                     } else {
-                                        returnResult = "<img src=\"" + genericController.getCdnFileLink(cpCore, FieldValueText) + "\"><BR >change: " + html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant));
+                                        returnResult = "<img src=\"" + genericController.getCdnFileLink(cpCore, FieldValueText) + "\"><br>change: " + html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -5100,7 +5100,7 @@ namespace Contensive.Core.Controllers {
                 if (!string.IsNullOrEmpty(iSource)) {
                     tempconvertCRLFToHtmlBreak = iSource;
                     tempconvertCRLFToHtmlBreak = genericController.vbReplace(tempconvertCRLFToHtmlBreak, "\r", "");
-                    tempconvertCRLFToHtmlBreak = genericController.vbReplace(tempconvertCRLFToHtmlBreak, "\n", "<br >");
+                    tempconvertCRLFToHtmlBreak = genericController.vbReplace(tempconvertCRLFToHtmlBreak, "\n", "<br>");
                 }
                 return tempconvertCRLFToHtmlBreak;
                 //
@@ -5118,7 +5118,7 @@ namespace Contensive.Core.Controllers {
         //   Encodes characters to be compatibile with HTML
         //   i.e. it converts the equation 5 > 6 to th sequence "5 &gt; 6"
         //
-        //   convert carriage returns ( 0x10 ) to <br >
+        //   convert carriage returns ( 0x10 ) to <br>
         //   remove linefeeds ( 0x13 )
         //========================================================================
         //
@@ -6119,7 +6119,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                         if (DivCheckBoxCnt != 0) {
                                             // leave this between checkboxes - it is searched in the admin page
-                                            returnHtml += "<br >\r\n";
+                                            returnHtml += "<br>\r\n";
                                         }
                                         RuleCopy = "";
                                         if (false) {

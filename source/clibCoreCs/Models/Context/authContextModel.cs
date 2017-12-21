@@ -1575,10 +1575,10 @@ namespace Contensive.Core.Models.Context {
                 Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString());
                 Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes));
                 result += Delimiter + Copy;
-                Delimiter = "<BR >";
+                Delimiter = "<br>";
             }
             result += Delimiter + Msg_WorkflowDisabled;
-            Delimiter = "<BR >";
+            Delimiter = "<br>";
             return result;
         }
         //

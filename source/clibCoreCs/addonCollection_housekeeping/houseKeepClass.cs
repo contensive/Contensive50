@@ -104,7 +104,7 @@ namespace Contensive.Core {
                 Config = cp.core.privateFiles.readFile("" + ConfigFilename);
             }
             if (!string.IsNullOrEmpty(Config)) {
-                ConfigLines = Config.Split("\r\n".ToCharArray());
+                ConfigLines = Config.Split(new[] { "\r\n" },StringSplitOptions.None );
                 LineCnt = ConfigLines.GetUpperBound(0) + 1;
                 for (LinePtr = 0; LinePtr < LineCnt; LinePtr++) {
                     Line = ConfigLines[LinePtr].Trim(' ');

@@ -135,7 +135,8 @@ namespace Contensive.Core.Controllers {
                     //
                     // remove all scripting
                     //
-                    splittest = WorkingSrc.Split("<script".ToCharArray() );
+                    splittest = WorkingSrc.Split(new[] { "<script" }, StringSplitOptions.None); 
+                    //  Regex.Split( WorkingSrc, "<script");
                     Cnt = splittest.GetUpperBound(0) + 1;
                     if (Cnt > 1) {
                         for (Ptr = 1; Ptr < Cnt; Ptr++) {

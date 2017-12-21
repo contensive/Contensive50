@@ -628,7 +628,7 @@ ErrorTrap:
             GetForm_Edit_EmailRules = s
             Exit Function
             'GroupList = cpCore.htmldoc.main_GetFormInputCheckList("EmailGroups", "Group Email", EditRecord.ID, "Groups", "Email Groups", "EmailID", "GroupID", , "Caption", readOnlyField)
-            GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
+            GroupSplit = Split(GroupList, "<br>", , vbTextCompare)
             Cnt = UBound(GroupSplit) + 1
             If Cnt = 0 Then
                 f.Add("<tr>")
@@ -710,7 +710,7 @@ ErrorTrap:
             Exit Function
 
             'GroupList = cpCore.htmldoc.main_GetFormInputCheckList("EmailTopics", "Group Email", EditRecord.ID, "Topics", "Email Topics", "EmailID", "TopicID", , "Name", readOnlyField)
-            'GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
+            'GroupSplit = Split(GroupList, "<br>", , vbTextCompare)
             'Cnt = UBound(GroupSplit) + 1
             'If Cnt = 0 Then
             '    f.Add("<tr>")
@@ -1057,7 +1057,7 @@ ErrorTrap:
             Dim Adminui As New adminUIController(cpCore)
             '
             GroupList = cpCore.html.getCheckList2("PageContentBlockRules", adminContent.Name, editRecord.id, "Groups", "Page Content Block Rules", "RecordID", "GroupID", , "Caption", False)
-            GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
+            GroupSplit = Split(GroupList, "<br>", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
                 IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
@@ -1105,7 +1105,7 @@ ErrorTrap:
             Dim Adminui As New adminUIController(cpCore)
             '
             GroupList = cpCore.html.getCheckList2("LibraryFolderRules", adminContent.Name, editRecord.id, "Groups", "Library Folder Rules", "FolderID", "GroupID", , "Caption")
-            GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
+            GroupSplit = Split(GroupList, "<br>", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
                 IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
@@ -1508,7 +1508,7 @@ ErrorTrap:
             MakeButtonFlat = MakeButtonFlat & ">"
             MakeButtonFlat = MakeButtonFlat & ButtonLabel & "</A>"
             If IncludeWidth Then
-                MakeButtonFlat = MakeButtonFlat & "<br ><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & ButtonWidth & """ height=""1"" >"
+                MakeButtonFlat = MakeButtonFlat & "<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & ButtonWidth & """ height=""1"" >"
             End If
             '
             ' --- close table

@@ -2890,7 +2890,7 @@ ErrorTrap:
                                 & vbCrLf & "  }" _
                                 & vbCrLf & "} " _
                                 & vbCrLf & "</script>"
-                            DataTable_FindRow = DataTable_FindRow & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""60"" height=""1"" ><br >" & cpCore.html.html_GetFormButton(ButtonFind, , "FindButton") & "</td>"
+                            DataTable_FindRow = DataTable_FindRow & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""60"" height=""1"" ><br>" & cpCore.html.html_GetFormButton(ButtonFind, , "FindButton") & "</td>"
                             ColumnPointer = 0
                             For Each kvp In IndexConfig.Columns
                                 Dim column As indexConfigColumnClass = kvp.Value

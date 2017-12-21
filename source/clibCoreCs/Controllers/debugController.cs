@@ -39,8 +39,8 @@ namespace Contensive.Core.Controllers {
                 ElapsedTime = Convert.ToSingle(cpcore.doc.appStopWatch.ElapsedMilliseconds) / 1000;
                 iMessage = genericController.encodeText(Message);
                 iMessage = (ElapsedTime).ToString("00.000") + " - " + iMessage;
-                cpcore.doc.testPointMessage = cpcore.doc.testPointMessage + "<nobr>" + iMessage + "</nobr><br >";
-                //writeAltBuffer ("<nobr>" & iMessage & "</nobr><br >")
+                cpcore.doc.testPointMessage = cpcore.doc.testPointMessage + "<nobr>" + iMessage + "</nobr><br>";
+                //writeAltBuffer ("<nobr>" & iMessage & "</nobr><br>")
             }
             if (cpcore.siteProperties.allowTestPointLogging) {
                 //
