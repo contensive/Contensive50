@@ -451,7 +451,7 @@ namespace Contensive.Core.Models.Context {
                                             }
                                             if (!string.IsNullOrWhiteSpace(line)) {
                                                 // -- parse line on tab characters
-                                                string[] Args = genericController.customSplit(line, "\t");
+                                                string[] Args = genericController.stringSplit(line, "\t");
                                                 if (Args.GetUpperBound(0) > 0) {
                                                     // -- process argument 1
                                                     if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {

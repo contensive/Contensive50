@@ -39,13 +39,13 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetCopy(string CopyName, string DefaultContent = "") {
-            return cpCore.html.html_GetContentCopy(CopyName, DefaultContent, cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated);
+            return cpCore.html.getContentCopy(CopyName, DefaultContent, cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated);
         }
         //
         //====================================================================================================
         //
         public override string GetCopy(string CopyName, string DefaultContent, int personalizationPeopleId) {
-            return cpCore.html.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, true, cpCore.doc.authContext.isAuthenticated);
+            return cpCore.html.getContentCopy(CopyName, DefaultContent, personalizationPeopleId, true, cpCore.doc.authContext.isAuthenticated);
         }
         //
         //====================================================================================================
@@ -57,7 +57,7 @@ namespace Contensive.Core {
         //====================================================================================================
         //
         public override string GetAddLink(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
-            return cpCore.html.main_GetRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing);
+            return cpCore.html.getRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing);
         }
         //
         //====================================================================================================
@@ -94,7 +94,7 @@ namespace Contensive.Core {
         //
         public override string GetEditLink(string ContentName, string RecordID, bool AllowCut, string RecordName, bool IsEditing) {
             if (true) {
-                return cpCore.html.main_GetRecordEditLink2(ContentName, genericController.EncodeInteger(RecordID), AllowCut, RecordName, IsEditing);
+                return cpCore.html.getRecordEditLink2(ContentName, genericController.EncodeInteger(RecordID), AllowCut, RecordName, IsEditing);
             } else {
                 return "";
             }

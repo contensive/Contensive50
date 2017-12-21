@@ -46,7 +46,7 @@ namespace Contensive.Core {
                     int i14, 
                     string s15, 
                     int i16) {
-            return cpCore.html.convertActiveContentToHtmlForWysiwygEditor(Controllers.genericController.encodeText(Source));
+            return activeContentController.convertActiveContentToHtmlForWysiwygEditor(cpCore, Controllers.genericController.encodeText(Source));
         }
     }
 }

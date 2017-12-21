@@ -347,10 +347,10 @@ namespace Contensive.Core.Controllers {
                             }
                             switch (executeContext.addonType) {
                                 case CPUtilsBaseClass.addonContext.ContextEditor:
-                                    result = cpCore.html.convertActiveContentToHtmlForWysiwygEditor(result);
+                                    result = activeContentController.convertActiveContentToHtmlForWysiwygEditor(cpCore, result);
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextEmail:
-                                    result = cpCore.html.convertActiveContentToHtmlForEmailSend(result, executeContext.personalizationPeopleId, "");
+                                    result = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, result, executeContext.personalizationPeopleId, "");
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextFilter:
                                 case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
@@ -362,17 +362,17 @@ namespace Contensive.Core.Controllers {
                                 case CPUtilsBaseClass.addonContext.ContextTemplate:
                                 case CPUtilsBaseClass.addonContext.ContextAdmin:
                                 case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
-                                    result = cpCore.html.convertActiveContentToHtmlForWebRender(result, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                    result = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, result, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextOnContentChange:
                                 case CPUtilsBaseClass.addonContext.ContextSimple:
-                                    result = cpCore.html.convertActiveContentToHtmlForWebRender(result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                    result = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                     break;
                                 case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
-                                    result = cpCore.html.convertActiveContentToJsonForRemoteMethod(result, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
+                                    result = activeContentController.convertActiveContentToJsonForRemoteMethod(cpCore, result, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
                                     break;
                                 default:
-                                    result = cpCore.html.convertActiveContentToHtmlForWebRender(result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                    result = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                     break;
                             }
                             //result = cpCore.html.convertActiveContent_internal(result, executeContext.personalizationPeopleId, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, 0, False, False, True, True, False, True, "", "", (executeContext.addonType = CPUtilsBaseClass.addonContext.ContextEmail), executeContext.wrapperID, "", executeContext.addonType, executeContext.personalizationAuthenticated, Nothing, False)
@@ -399,7 +399,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- DotNet
                         if (addon.DotNetClass != "") {
-                            result += execute_Assembly(addon, AddonCollectionModel.create(cpCore, addon.CollectionID));
+                            result += execute_assembly(addon, AddonCollectionModel.create(cpCore, addon.CollectionID));
                         }
                         //
                         // -- RemoteAssetLink
@@ -434,7 +434,7 @@ namespace Contensive.Core.Controllers {
                         // --  FormXML
                         if (addon.FormXML != "") {
                             bool ExitAddonWithBlankResponse = false;
-                            result += execute_FormContent(null, addon.FormXML, ref ExitAddonWithBlankResponse);
+                            result += execute_formContent(null, addon.FormXML, ref ExitAddonWithBlankResponse);
                             if (ExitAddonWithBlankResponse) {
                                 return string.Empty;
                             }
@@ -595,7 +595,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="FormXML"></param>
         /// <param name="return_ExitAddonBlankWithResponse"></param>
         /// <returns></returns>
-        private string execute_FormContent(object nothingObject, string FormXML, ref bool return_ExitAddonBlankWithResponse) {
+        private string execute_formContent(object nothingObject, string FormXML, ref bool return_ExitAddonBlankWithResponse) {
             string result = "";
             try {
                 //
@@ -922,7 +922,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // Use Selector
                                                                 //
-                                                                Copy = getFormContent_decodeSelector(nothingObject, FieldName, FieldValue, FieldSelector);
+                                                                Copy = execute_formContent_decodeSelector(nothingObject, FieldName, FieldValue, FieldSelector);
                                                             } else {
                                                                 //
                                                                 // Use default editor for each field type
@@ -1245,7 +1245,7 @@ namespace Contensive.Core.Controllers {
                                             }
                                             Copy = Adminui.GetEditPanel(true, TabHeading, TabDescription, Adminui.EditTableOpen + TabCell.Text + Adminui.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
-                                                cpCore.html.main_AddLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                                cpCore.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
                                             //Content.Add( GetForm_Edit_AddTab(TabName, Copy, True))
                                             TabCell = null;
@@ -1266,7 +1266,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 //
                                 if (TabCnt > 0) {
-                                    Content.Add(cpCore.html.main_GetLiveTabs());
+                                    Content.Add(cpCore.html.getLiveTabs());
                                 }
                             }
                         }
@@ -1282,11 +1282,10 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
+        //====================================================================================================
         //   Display field in the admin/edit
-        //========================================================================
         //
-        private string getFormContent_decodeSelector(object nothingObject, string SitePropertyName, string SitePropertyValue, string selector) {
+        private string execute_formContent_decodeSelector(object nothingObject, string SitePropertyName, string SitePropertyValue, string selector) {
             string result = "";
             try {
                 string ExpandedSelector = "";
@@ -1411,9 +1410,8 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
-
         //
-        // ================================================================================================================
+        //====================================================================================================
         /// <summary>
         /// execute the script section of addons. Must be 32-bit. 
         /// </summary>
@@ -1643,9 +1641,9 @@ namespace Contensive.Core.Controllers {
             return returnText;
         }
         //
+        //====================================================================================================
         //
-        //
-        private string execute_Assembly(Models.Entity.addonModel addon, AddonCollectionModel addonCollection) {
+        private string execute_assembly(Models.Entity.addonModel addon, AddonCollectionModel addonCollection) {
             string result = "";
             try {
                 bool AddonFound = false;
@@ -1660,14 +1658,14 @@ namespace Contensive.Core.Controllers {
                 if (!Directory.Exists(commonAssemblyPath)) {
                     Directory.CreateDirectory(commonAssemblyPath);
                 } else {
-                    result = executeAssembly_byFilePath(addon.id, addon.name, commonAssemblyPath, addon.DotNetClass, true, ref AddonFound);
+                    result = execute_assembly_byFilePath(addon.id, addon.name, commonAssemblyPath, addon.DotNetClass, true, ref AddonFound);
                 }
                 if (!AddonFound) {
                     //
                     // -- try app /bin folder
                     // -- purpose is to allow add-ons to be included in the website's (wwwRoot) assembly. So a website's custom addons are within the wwwRoot build, not separate
                     string addonAppRootPath = cpCore.privateFiles.joinPath(cpCore.appRootFiles.rootLocalPath, "bin\\");
-                    result = executeAssembly_byFilePath(addon.id, addon.name, addonAppRootPath, addon.DotNetClass, true, ref AddonFound);
+                    result = execute_assembly_byFilePath(addon.id, addon.name, addonAppRootPath, addon.DotNetClass, true, ref AddonFound);
                     if (!AddonFound) {
                         //
                         // -- try addon folder
@@ -1684,7 +1682,7 @@ namespace Contensive.Core.Controllers {
                             } else {
                                 string AddonPath = cpCore.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
                                 string appAddonPath = cpCore.privateFiles.joinPath(cpCore.privateFiles.rootLocalPath, AddonPath);
-                                result = executeAssembly_byFilePath(addon.id, addon.name, appAddonPath, addon.DotNetClass, false, ref AddonFound);
+                                result = execute_assembly_byFilePath(addon.id, addon.name, appAddonPath, addon.DotNetClass, false, ref AddonFound);
                                 if (!AddonFound) {
                                     //
                                     // assembly not found in addon path and in development path, if core collection, try in local /bin nm 
@@ -1709,13 +1707,12 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //==================================================================================================
+        //====================================================================================================
         //   This is the call from the COM csv code that executes a dot net addon from com.
         //   This is not in the CP BaseClass, because it is used by addons to call back into CP for
         //   services, and they should never call this.
-        //==================================================================================================
         //
-        private string executeAssembly_byFilePath(int AddonID, string AddonDisplayName, string fullPath, string typeFullName, bool IsDevAssembliesFolder, ref bool AddonFound) {
+        private string execute_assembly_byFilePath(int AddonID, string AddonDisplayName, string fullPath, string typeFullName, bool IsDevAssembliesFolder, ref bool AddonFound) {
             string returnValue = "";
             try {
                 AddonFound = false;
@@ -1881,14 +1878,6 @@ namespace Contensive.Core.Controllers {
             return returnValue;
         }
         //
-        // 
-        //
-        //Public Function csv_ExecuteActiveX(ByVal ProgramID As String, ByVal AddonCaption As String, ByVal OptionString_ForObjectCall As String, ByVal OptionStringForDisplay As String, ByRef return_AddonErrorMessage As String) As String
-        //    Dim exMsg As String = "activex addons [" & ProgramID & "] are no longer supported"
-        //    handleException(New ApplicationException(exMsg))
-        //    Return exMsg
-        //End Function
-        //
         //====================================================================================================================
         //   Execte an Addon as a process
         //
@@ -1904,7 +1893,7 @@ namespace Contensive.Core.Controllers {
         //       if false, the server is called remotely, which starts a cccmd process, gets the command and calls this routine with true
         //====================================================================================================================
         //
-        public string executeAddonAsProcess(string AddonIDGuidOrName, string OptionString = "") {
+        public string executeAsync(string AddonIDGuidOrName, string OptionString = "") {
             string result = "";
             try {
                 addonModel addon = null;
@@ -1918,7 +1907,6 @@ namespace Contensive.Core.Controllers {
                 if (addon != null) {
                     //
                     // -- addon found
-                    //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                     logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
                     //
                     string cmdQueryString = ""
@@ -1929,7 +1917,6 @@ namespace Contensive.Core.Controllers {
                     cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, cmdQueryString);
                     taskSchedulerController.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
-                    //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
                     logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", 0, "", "", false, true, "", "process", "");
                 }
             } catch (Exception ex) {
@@ -1943,7 +1930,6 @@ namespace Contensive.Core.Controllers {
         //       ACInstanceID required
         //       ACInstanceID = -1 means this Add-on does not support instance options (like end-of-page scope, etc)
         // REFACTOR - unify interface, remove cpcore.main_ and csv_ class references
-        //===============================================================================================================================================
         //
         public string getInstanceBubble(string AddonName, string Option_String, string ContentName, int RecordID, string FieldName, string ACInstanceID, CPUtilsBaseClass.addonContext Context, ref string return_DialogList) {
             string tempgetInstanceBubble = null;
@@ -2011,7 +1997,7 @@ namespace Contensive.Core.Controllers {
                             //
                             CopyContent = CopyContent + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                                 + "";
-                            OptionSplit = genericController.customSplit(Option_String, "\r\n");
+                            OptionSplit = genericController.stringSplit(Option_String, "\r\n");
                             for (Ptr = 0; Ptr <= OptionSplit.GetUpperBound(0); Ptr++) {
                                 //
                                 // Process each option row
@@ -2202,7 +2188,6 @@ namespace Contensive.Core.Controllers {
         //
         //===============================================================================================================================================
         //   cpcore.main_Get Addon Styles Bubble Editor
-        //===============================================================================================================================================
         //
         public string getAddonStylesBubble(int addonId, ref string return_DialogList) {
             string result = string.Empty;
@@ -2274,9 +2259,7 @@ namespace Contensive.Core.Controllers {
         //
         //===============================================================================================================================================
         //   cpcore.main_Get inner HTML viewer Bubble
-        //===============================================================================================================================================
         //
-
         public string getHelpBubble(int addonId, string helpCopy, int CollectionID, ref string return_DialogList) {
             string result = "";
             string QueryString = null;
@@ -2354,7 +2337,6 @@ namespace Contensive.Core.Controllers {
         //
         //===============================================================================================================================================
         //   cpcore.main_Get inner HTML viewer Bubble
-        //===============================================================================================================================================
         //
         public string getHTMLViewerBubble(int addonId, string HTMLSourceID, ref string return_DialogList) {
             string tempgetHTMLViewerBubble = null;
@@ -2442,7 +2424,7 @@ namespace Contensive.Core.Controllers {
             return tempgetHTMLViewerBubble;
         }
         //
-        //
+        //====================================================================================================
         //
         private string getFormContent(string FormXML, ref bool return_ExitRequest) {
             string tempgetFormContent = null;
@@ -3098,7 +3080,7 @@ namespace Contensive.Core.Controllers {
                                             }
                                             Copy = Adminui.GetEditPanel(true, TabHeading, TabDescription, Adminui.EditTableOpen + TabCell.Text + Adminui.EditTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
-                                                cpCore.html.main_AddLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                                cpCore.html.addLiveTabEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
                                             //Content.Add( cpcore.main_GetForm_Edit_AddTab(TabName, Copy, True))
                                             TabCell = null;
@@ -3115,7 +3097,7 @@ namespace Contensive.Core.Controllers {
                                 // Close Tables
                                 //
                                 if (TabCnt > 0) {
-                                    Content.Add(cpCore.html.main_GetLiveTabs());
+                                    Content.Add(cpCore.html.getLiveTabs());
                                 }
                             }
                         }
@@ -3132,7 +3114,6 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //   Display field in the admin/edit
-        //========================================================================
         //
         private string getFormContent_decodeSelector(string SitePropertyName, string SitePropertyValue, string selector) {
             string tempgetFormContent_decodeSelector = null;
@@ -3331,7 +3312,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Initially Build Constructor from AddonOptions
                     //
-                    ConstructorNameValues = genericController.customSplit(addonArgumentListFromRecord, "\r\n");
+                    ConstructorNameValues = genericController.stringSplit(addonArgumentListFromRecord, "\r\n");
                     ConstructorCnt = ConstructorNameValues.GetUpperBound(0) + 1;
                     ConstructorNames = new string[ConstructorCnt + 1];
                     ConstructorSelectors = new string[ConstructorCnt + 1];
@@ -3455,15 +3436,14 @@ namespace Contensive.Core.Controllers {
             buildAddonOptionLists2(ref addonInstanceProperties, ref addonArgumentListPassToBubbleEditor, addonArgumentListFromRecord, InstanceOptionList, InstanceID, IncludeEditWrapper);
         }
         //
-        //
+        //====================================================================================================
         //
         public string getPrivateFilesAddonPath() {
             return "addons\\";
         }
         //
-        //========================================================================
+        //====================================================================================================
         //   Apply a wrapper to content
-        //========================================================================
         //
         private string addWrapperToResult(string Content, int WrapperID, string WrapperSourceForComment = "") {
             string s = string.Empty;
@@ -3528,9 +3508,8 @@ namespace Contensive.Core.Controllers {
             return s;
         }
         //
-        //========================================================================
-        // ----- main_Get an XML nodes attribute based on its name
-        //========================================================================
+        //====================================================================================================
+        // main_Get an XML nodes attribute based on its name
         //
         public string xml_GetAttribute(bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             string result = string.Empty;
@@ -3565,6 +3544,7 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
+        //====================================================================================================
         //
         public static string main_GetDefaultAddonOption_String(coreClass cpCore, string ArgumentList, string AddonGuid, bool IsInline) {
             string result = "";
@@ -3665,7 +3645,7 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //=================================================================================================================
+        //====================================================================================================
         //   csv_GetAddonOption
         //
         //   returns the value matching a given name in an AddonOptionConstructor
@@ -3677,7 +3657,7 @@ namespace Contensive.Core.Controllers {
         //       AddonOptionConstructor
         //       AddonOptionNameValueList
         //       AddonOptionExpandedConstructor
-        //=================================================================================================================
+        //====================================================================================================
         //
         public static string getAddonOption(string OptionName, string OptionString) {
             string result = "";
@@ -3712,6 +3692,8 @@ namespace Contensive.Core.Controllers {
             }
             return result;
         }
+        //
+        //====================================================================================================
         //
         private string getAddonDescription(coreClass cpcore, addonModel addon) {
             string addonDescription = "[invalid addon]";
@@ -3757,7 +3739,6 @@ namespace Contensive.Core.Controllers {
             }
             return addonManager;
         }
-
         //
         //====================================================================================================
         /// <summary>

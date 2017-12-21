@@ -2763,7 +2763,7 @@ namespace Contensive.Core {
                                             // register files found in the active folder last
                                             //
                                             if (!string.IsNullOrEmpty(RegisterPathList)) {
-                                                RegisterPaths = genericController.customSplit(RegisterPathList, "\r\n");
+                                                RegisterPaths = genericController.stringSplit(RegisterPathList, "\r\n");
                                                 for (Ptr = 0; Ptr <= RegisterPaths.GetUpperBound(0); Ptr++) {
                                                     RegisterPath = RegisterPaths[Ptr].Trim(' ');
                                                     if (!string.IsNullOrEmpty(RegisterPath)) {

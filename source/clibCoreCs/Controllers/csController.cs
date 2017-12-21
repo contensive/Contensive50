@@ -218,7 +218,7 @@ namespace Contensive.Core {
         public string getAddLink(string PresetNameValueList = "", bool AllowPaste = false) {
             string result = "";
             try {
-                result = cpCore.html.main_cs_getRecordAddLink(csPtr, PresetNameValueList, AllowPaste);
+                result = cpCore.html.cs_getRecordAddLink(csPtr, PresetNameValueList, AllowPaste);
                 if (result == null) {
                     result = string.Empty;
                 }
@@ -478,8 +478,7 @@ namespace Contensive.Core {
                 ContentName = Models.Complex.cdefModel.getContentNameByID(cpcore, cpcore.db.csGetInteger(CSPointer, "contentcontrolId"));
             }
             string source = cpcore.db.csGet(CSPointer, FieldName);
-            return cpcore.html.convertActiveContentToHtmlForWebRender(source, ContentName, RecordID, cpcore.doc.authContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
-            //Return cpcore.html.convertActiveContent_internal(source, cpCore.doc.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.isAuthenticated, Nothing, cpCore.doc.authContext.isEditingAnything())
+            return activeContentController.convertActiveContentToHtmlForWebRender(cpcore, source, ContentName, RecordID, cpcore.doc.authContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
         }
         //
         //========================================================================

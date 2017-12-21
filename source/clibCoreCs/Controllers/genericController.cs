@@ -2169,96 +2169,8 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             }
-            //
-
-            return tempGetArgument;
-            //
-            // ----- ErrorTrap
-            //
-            //ErrorTrap:
             return tempGetArgument;
         }
-        //
-        //=================================================================================
-        //   Return the value from a name value pair, parsed with =,&[|].
-        //   For example:
-        //       name=Jay[Jay|Josh|Dwayne]
-        //       the answer is Jay. If a select box is displayed, it is a dropdown of all three
-        //=================================================================================
-        //
-        //Public shared Function  GetAggrOption(ByVal Name As String, ByVal SegmentCMDArgs As String) As String
-        //    '
-        //    Dim Pos As Integer
-        //    '
-        //    GetAggrOption = GetArgument(Name, SegmentCMDArgs)
-        //    '
-        //    ' remove the manual select list syntax "answer[choice1|choice2]"
-        //    '
-        //    Pos = vbInstr(1, GetAggrOption, "[")
-        //    If Pos <> 0 Then
-        //        GetAggrOption = Left(GetAggrOption, Pos - 1)
-        //    End If
-        //    '
-        //    ' remove any function syntax "answer{selectcontentname RSS Feeds}"
-        //    '
-        //    Pos = vbInstr(1, GetAggrOption, "{")
-        //    If Pos <> 0 Then
-        //        GetAggrOption = Left(GetAggrOption, Pos - 1)
-        //    End If
-        //    '
-        //End Function
-        //
-        //=================================================================================
-        //   Compatibility for GetArgument
-        //=================================================================================
-        //
-        //Public shared Function  GetNameValue(ByVal Name As String, ByVal ArgumentString As String, Optional ByVal DefaultValue As String = "") As String
-        //    getNameValue = GetArgument(Name, ArgumentString, DefaultValue)
-        //End Function
-        //
-        //========================================================================
-        //   Gets the next line from a string, and removes the line
-        //========================================================================
-        //
-        //Public shared Function GetLine(ByVal Body As String) As String
-        //    Dim EOL As String
-        //    Dim NextCR As Integer
-        //    Dim NextLF As Integer
-        //    Dim BOL As Integer
-        //    '
-        //    NextCR = vbInstr(1, Body, vbCr)
-        //    NextLF = vbInstr(1, Body, vbLf)
-
-        //    If NextCR <> 0 Or NextLF <> 0 Then
-        //        If NextCR <> 0 Then
-        //            If NextLF <> 0 Then
-        //                If NextCR < NextLF Then
-        //                    EOL = NextCR - 1
-        //                    If NextLF = NextCR + 1 Then
-        //                        BOL = NextLF + 1
-        //                    Else
-        //                        BOL = NextCR + 1
-        //                    End If
-
-        //                Else
-        //                    EOL = NextLF - 1
-        //                    BOL = NextLF + 1
-        //                End If
-        //            Else
-        //                EOL = NextCR - 1
-        //                BOL = NextCR + 1
-        //            End If
-        //        Else
-        //            EOL = NextLF - 1
-        //            BOL = NextLF + 1
-        //        End If
-        //        GetLine = Mid(Body, 1, EOL)
-        //        Body = Mid(Body, BOL)
-        //    Else
-        //        GetLine = Body
-        //        Body = ""
-        //    End If
-        //End Function
         //
         //=================================================================================
         //   Get a Random Long Value
@@ -2854,7 +2766,7 @@ namespace Contensive.Core.Controllers {
             Out = new string[1];
             OutSize = 1;
             if (!string.IsNullOrEmpty(WordList)) {
-                QuoteSplit = WordList.Split( new[] { @"\" }, StringSplitOptions.None );
+                QuoteSplit = stringSplit( WordList, @"\" );
                 QuoteSplitCount = QuoteSplit.GetUpperBound(0) + 1;
                 InQuote = (string.IsNullOrEmpty(WordList.Left( 1)));
                 for (QuoteSplitPointer = 0; QuoteSplitPointer < QuoteSplitCount; QuoteSplitPointer++) {
@@ -4518,7 +4430,7 @@ namespace Contensive.Core.Controllers {
                 int Pos = 0;
                 //
                 if (!string.IsNullOrEmpty(SrcOptionList)) {
-                    SrcOptions = genericController.customSplit(SrcOptionList.Replace("\r\n", "\r").Replace("\n", "\r"), "\r");
+                    SrcOptions = genericController.stringSplit(SrcOptionList.Replace("\r\n", "\r").Replace("\n", "\r"), "\r");
                     for (var Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
                         key = SrcOptions[Ptr].Replace("\t", "");
                         if (!string.IsNullOrEmpty(key)) {
@@ -4674,8 +4586,8 @@ namespace Contensive.Core.Controllers {
         }
         //
         //
-        internal static string[] customSplit( string src, string delimiter ) {
-            return src.Split(  delimiter.ToCharArray());
+        internal static string[] stringSplit( string src, string delimiter ) {
+            return src.Split( new[] { delimiter }, StringSplitOptions.None );
         }
     }
 }

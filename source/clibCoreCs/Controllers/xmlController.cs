@@ -680,7 +680,7 @@ namespace Contensive.Core.Controllers {
                     string IndexList = cpCore.db.getSQLIndexList(DataSourceName, TableName);
                     //
                     if (!string.IsNullOrEmpty(IndexList)) {
-                        string[] ListRows = genericController.customSplit(IndexList, "\r\n");
+                        string[] ListRows = genericController.stringSplit(IndexList, "\r\n");
                         string IndexName = "";
                         //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of UBound(ListRows) + 1 for every iteration:
                         int tempVar = ListRows.GetUpperBound(0) + 1;

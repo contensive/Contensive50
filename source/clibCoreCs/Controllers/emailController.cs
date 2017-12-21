@@ -262,20 +262,20 @@ namespace Contensive.Core.Controllers {
                         // encode subject
                         //
                         subjectEncoded = cpcore.html.executeContentCommands(null, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, true, ref layoutError);
-                        subjectEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(subjectEncoded, personId, "");
+                        subjectEncoded = activeContentController.convertActiveContentToHtmlForEmailSend(cpcore, subjectEncoded, personId, "");
                         //subjectEncoded = cpcore.html.convertActiveContent_internal(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         //
                         // encode Body
                         //
                         bodyEncoded = cpcore.html.executeContentCommands(null, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, true, ref layoutError);
-                        bodyEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(bodyEncoded, personId, "");
+                        bodyEncoded = activeContentController.convertActiveContentToHtmlForEmailSend(cpcore, bodyEncoded, personId, "");
                         //bodyEncoded = cpcore.html.convertActiveContent_internal(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         //
                         // encode template
                         //
                         if (!string.IsNullOrEmpty(templateEncoded)) {
                             templateEncoded = cpcore.html.executeContentCommands(null, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, true, ref layoutError);
-                            templateEncoded = cpcore.html.convertActiveContentToHtmlForEmailSend(templateEncoded, personId, "");
+                            templateEncoded = activeContentController.convertActiveContentToHtmlForEmailSend(cpcore, templateEncoded, personId, "");
                             //templateEncoded = cpcore.html.convertActiveContent_internal(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                             //
                             if (templateEncoded.IndexOf(fpoContentBox)  != -1) {

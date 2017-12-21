@@ -414,7 +414,7 @@ namespace Contensive.Core {
                 if (!string.IsNullOrEmpty(ContentSummary)) {
                     CellContentSummary = ""
                     + "\r<div class=\"ccPanelBackground\" style=\"padding:10px;\">"
-                    + htmlIndent(cpCore.html.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) + "\r</div>";
+                    + htmlIndent(cpCore.html.getPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) + "\r</div>";
                 }
                 //
                 ContentCell = ""

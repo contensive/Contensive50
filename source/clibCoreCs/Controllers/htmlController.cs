@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.IO;
 using System.Reflection;
 using System.Xml;
 using System.Diagnostics;
@@ -8,15 +9,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+
+using Contensive.BaseClasses;
 using Contensive.Core;
 using Contensive.Core.Models.Entity;
 using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
-//
-
-using Contensive.BaseClasses;
-using System.IO;
 
 namespace Contensive.Core.Controllers {
     /// <summary>
@@ -37,731 +36,6 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// setOuter
-        /// </summary>
-        /// <param name="ignore"></param>
-        /// <param name="layout"></param>
-        /// <param name="Key"></param>
-        /// <param name="textToInsert"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public string insertOuterHTML(object ignore, string layout, string Key, string textToInsert) {
-            string returnValue = "";
-            try {
-                if (string.IsNullOrEmpty(Key)) {
-                    returnValue = textToInsert;
-                } else {
-                    returnValue = layout;
-                    int posStart = getTagStartPos2(ignore, layout, 1, Key);
-                    if (posStart != 0) {
-                        int posEnd = getTagEndPos(ignore, layout, posStart);
-                        if (posEnd > 0) {
-                            //
-                            // seems like these are the correct positions here.
-                            //
-                            returnValue = layout.Left( posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnValue;
-        }
-        //
-        //====================================================================================================
-        public string insertInnerHTML(object ignore, string layout, string Key, string textToInsert) {
-            string returnValue = "";
-            try {
-                int posStart = 0;
-                int posEnd = 0;
-                //
-                // short-cut for now, get the outerhtml, find the position, then remove the wrapping tags
-                //
-                if (string.IsNullOrEmpty(Key)) {
-                    returnValue = textToInsert;
-                } else {
-                    returnValue = layout;
-                    posStart = getTagStartPos2(ignore, layout, 1, Key);
-                    //outerHTML = getOuterHTML(ignore, layout, Key, PosStart)
-                    if (posStart != 0) {
-                        posEnd = getTagEndPos(ignore, layout, posStart);
-                        if (posEnd > 0) {
-                            posStart = genericController.vbInstr(posStart + 1, layout, ">");
-                            if (posStart != 0) {
-                                posStart = posStart + 1;
-                                posEnd = layout.LastIndexOf("<", posEnd - 2) + 1;
-                                if (posEnd != 0) {
-                                    returnValue = layout.Left( posStart - 1) + textToInsert + layout.Substring(posEnd - 1);
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnValue;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// getInnerHTML
-        /// </summary>
-        /// <param name="ignore"></param>
-        /// <param name="layout"></param>
-        /// <param name="Key"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public string getInnerHTML(object ignore, string layout, string Key) {
-            string returnValue = "";
-            try {
-                int posStart = 0;
-                int posEnd = 0;
-                //
-                // short-cut for now, get the outerhtml, find the position, then remove the wrapping tags
-                //
-                if (string.IsNullOrEmpty(Key)) {
-                    //
-                    // inner of nothing is nothing
-                    //
-                } else {
-                    returnValue = layout;
-                    posStart = getTagStartPos2(ignore, layout, 1, Key);
-                    if (posStart != 0) {
-                        posEnd = getTagEndPos(ignore, layout, posStart);
-                        if (posEnd > 0) {
-                            posStart = genericController.vbInstr(posStart + 1, layout, ">");
-                            if (posStart != 0) {
-                                posStart = posStart + 1;
-                                posEnd = layout.LastIndexOf("<", posEnd - 2) + 1;
-                                if (posEnd != 0) {
-                                    //
-                                    // now move the end forward to skip trailing whitespace
-                                    //
-                                    do {
-                                        posEnd = posEnd + 1;
-                                    } while ((posEnd < layout.Length) && (("\t\r\n\t ").IndexOf(layout.Substring(posEnd - 1, 1))  != -1));
-                                    posEnd = posEnd - 1;
-                                    returnValue = layout.Substring(posStart - 1, (posEnd - posStart));
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnValue;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// getOuterHTML
-        /// </summary>
-        /// <param name="ignore"></param>
-        /// <param name="layout"></param>
-        /// <param name="Key"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public string getOuterHTML(object ignore, string layout, string Key) {
-            string returnValue = "";
-            try {
-                int posStart = 0;
-                int posEnd = 0;
-                string s;
-                //
-                s = layout;
-                if (!string.IsNullOrEmpty(s)) {
-                    posStart = getTagStartPos2(ignore, s, 1, Key);
-                    if (posStart > 0) {
-                        //
-                        // now backtrack to include the leading whitespace
-                        //
-                        while ((posStart > 0) && (("\t\r\n\t ").IndexOf(s.Substring(posStart - 1, 1))  != -1)) {
-                            posStart = posStart - 1;
-                        }
-                        //posStart = posStart + 1
-                        s = s.Substring(posStart - 1);
-                        posEnd = getTagEndPos(ignore, s, 1);
-                        if (posEnd > 0) {
-                            s = s.Left( posEnd - 1);
-                            returnValue = s;
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnValue;
-        }
-        //
-        //====================================================================================================
-        private bool tagMatch(string layout, int posStartTag, string searchId, string searchClass) {
-            bool returnValue = false;
-            try {
-                const string attrAllowedChars = "abcdefghijklmnopqrstuvwzyz-_";
-                string Tag = null;
-                string tagLower = null;
-                int Pos = 0;
-                string Delimiter = null;
-                string testChar = null;
-                int tagLength = 0;
-                int posValueStart = 0;
-                string testValue = null;
-                string[] testValues = null;
-                int testCnt = 0;
-                int Ptr = 0;
-                //
-                returnValue = false;
-                Pos = genericController.vbInstr(posStartTag, layout, ">");
-                if (Pos > 0) {
-                    returnValue = true;
-                    Tag = layout.Substring(posStartTag - 1, Pos - posStartTag + 1);
-                    tagLower = genericController.vbLCase(Tag);
-                    tagLength = Tag.Length;
-                    //
-                    // check searchId
-                    //
-                    if (returnValue && (!string.IsNullOrEmpty(searchId))) {
-                        Pos = genericController.vbInstr(1, tagLower, " id=", 1);
-                        if (Pos <= 0) {
-                            //
-                            // id required but this tag has no id attr
-                            //
-                            returnValue = false;
-                        } else {
-                            //
-                            // test if the id attr value matches the searchClass
-                            //
-                            Pos = Pos + 4;
-                            Delimiter = tagLower.Substring(Pos - 1, 1);
-                            testValue = "";
-                            if ((Delimiter == "\"") || (Delimiter == "'")) {
-                                //
-                                // search for end of delimited attribute value
-                                //
-                                posValueStart = Pos + 1;
-                                do {
-                                    Pos = Pos + 1;
-                                    testChar = tagLower.Substring(Pos - 1, 1);
-                                } while ((Pos < tagLength) && (testChar != Delimiter));
-                                if (Pos >= tagLength) {
-                                    //
-                                    // delimiter not found, html error
-                                    //
-                                    returnValue = false;
-                                } else {
-                                    testValue = Tag.Substring(posValueStart - 1, Pos - posValueStart);
-                                }
-                            } else {
-                                //
-                                // search for end of non-delimited attribute value
-                                //
-                                posValueStart = Pos;
-                                while ((Pos < tagLength) && (isInStr(1, attrAllowedChars, tagLower.Substring(Pos - 1, 1)))) {
-                                    Pos = Pos + 1;
-                                }
-                                if (Pos >= tagLength) {
-                                    //
-                                    // delimiter not found, html error
-                                    //
-                                    returnValue = false;
-                                } else {
-                                    testValue = Tag.Substring(posValueStart - 1, Pos - posValueStart);
-                                }
-                            }
-                            if (returnValue && (!string.IsNullOrEmpty(testValue))) {
-                                //
-                                //
-                                //
-                                if (searchId != testValue) {
-                                    //
-                                    // there can only be one id, and this does not match
-                                    //
-                                    returnValue = false;
-                                }
-                            }
-                        }
-                    }
-                    //
-                    // check searchClass
-                    //
-                    if (returnValue && (!string.IsNullOrEmpty(searchClass))) {
-                        Pos = genericController.vbInstr(1, tagLower, " class=", 1);
-                        if (Pos <= 0) {
-                            //
-                            // class required but this tag has no class attr
-                            //
-                            returnValue = false;
-                        } else {
-                            //
-                            // test if the class attr value matches the searchClass
-                            //
-                            Pos = Pos + 7;
-                            Delimiter = tagLower.Substring(Pos - 1, 1);
-                            testValue = "";
-                            if ((Delimiter == "\"") || (Delimiter == "'")) {
-                                //
-                                // search for end of delimited attribute value
-                                //
-                                posValueStart = Pos + 1;
-                                do {
-                                    Pos = Pos + 1;
-                                    testChar = tagLower.Substring(Pos - 1, 1);
-                                } while ((Pos < tagLength) && (testChar != Delimiter));
-                                if (Pos >= tagLength) {
-                                    //
-                                    // delimiter not found, html error
-                                    //
-                                    returnValue = false;
-                                } else {
-                                    testValue = Tag.Substring(posValueStart - 1, Pos - posValueStart);
-                                }
-                            } else {
-                                //
-                                // search for end of non-delimited attribute value
-                                //
-                                posValueStart = Pos;
-                                while ((Pos < tagLength) && (isInStr(1, attrAllowedChars, tagLower.Substring(Pos - 1, 1)))) {
-                                    Pos = Pos + 1;
-                                }
-                                if (Pos >= tagLength) {
-                                    //
-                                    // delimiter not found, html error
-                                    //
-                                    returnValue = false;
-                                } else {
-                                    testValue = Tag.Substring(posValueStart - 1, Pos - posValueStart);
-                                }
-                            }
-                            if (returnValue && (!string.IsNullOrEmpty(testValue))) {
-                                //
-                                //
-                                //
-                                testValues = testValue.Split(' ');
-                                testCnt = testValues.GetUpperBound(0) + 1;
-                                for (Ptr = 0; Ptr < testCnt; Ptr++) {
-                                    if (searchClass == testValues[Ptr]) {
-                                        break;
-                                    }
-                                }
-                                if (Ptr >= testCnt) {
-                                    returnValue = false;
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnValue;
-        }
-        //
-        //====================================================================================================
-        public int getTagStartPos2(object ignore, string layout, int layoutStartPos, string Key) {
-            int returnValue = 0;
-            try {
-                int returnPos = 0;
-                int SegmentStart = 0;
-                int Pos = 0;
-                int LoopPtr = 0;
-                string searchKey = null;
-                int lenSearchKey = 0;
-                int Ptr = 0;
-                string workingKey = null;
-                string[] workingKeys = null;
-                string searchClass = null;
-                string searchId = null;
-                string searchTag = null;
-                int posStartTag = 0;
-                //
-                returnPos = 0;
-                workingKey = Key;
-                if (genericController.vbInstr(1, workingKey, ">") != 0) {
-                    //
-                    // does not support > yet.
-                    //
-                    workingKey = genericController.vbReplace(workingKey, ">", " ");
-                }
-                //
-                // eliminate whitespace
-                //
-                while (genericController.vbInstr(1, workingKey, "\t") != 0) {
-                    workingKey = genericController.vbReplace(workingKey, "\t", " ");
-                }
-                //
-                while (genericController.vbInstr(1, workingKey, "\r") != 0) {
-                    workingKey = genericController.vbReplace(workingKey, "\r", " ");
-                }
-                //
-                while (genericController.vbInstr(1, workingKey, "\n") != 0) {
-                    workingKey = genericController.vbReplace(workingKey, "\n", " ");
-                }
-                //
-                while (genericController.vbInstr(1, workingKey, "  ") != 0) {
-                    workingKey = genericController.vbReplace(workingKey, "  ", " ");
-                }
-                //
-                workingKey = workingKey.Trim(' ');
-                //
-                if (genericController.vbInstr(1, workingKey, " ") != 0) {
-                    //
-                    // if there are spaces, do them sequentially
-                    //
-                    workingKeys = workingKey.Split(' ');
-                    SegmentStart = 1;
-                    while ((!string.IsNullOrEmpty(layout)) & (SegmentStart != 0) && (Ptr <= workingKeys.GetUpperBound(0))) {
-                        SegmentStart = getTagStartPos2(null, layout, SegmentStart, workingKeys[Ptr]);
-                        Ptr = Ptr + 1;
-                    }
-                    returnPos = SegmentStart;
-                } else {
-                    //
-                    // find this single key and get the outerHTML
-                    //   at this point, the key can be
-                    //       a class = .xxxx
-                    //       an id = #xxxx
-                    //       a tag = xxxx
-                    //       a compound in either form, xxxx.xxxx or xxxx#xxxx
-                    //
-                    //   searchKey = the search pattern to start
-                    //
-                    if (workingKey.Left( 1) == ".") {
-                        //
-                        // search for a class
-                        //
-                        searchClass = workingKey.Substring(1);
-                        searchTag = "";
-                        searchId = "";
-                        Pos = genericController.vbInstr(1, searchClass, "#");
-                        if (Pos != 0) {
-                            searchId = searchClass.Substring(Pos - 1);
-                            searchClass = searchClass.Left( Pos - 1);
-                        }
-                        //
-                        //workingKey = Mid(workingKey, 2)
-                        searchKey = "<";
-                    } else if (workingKey.Left( 1) == "#") {
-                        //
-                        // search for an ID
-                        //
-                        searchClass = "";
-                        searchTag = "";
-                        searchId = workingKey.Substring(1);
-                        Pos = genericController.vbInstr(1, searchId, ".");
-                        if (Pos != 0) {
-                            searchClass = searchId.Substring(Pos - 1);
-                            searchId = searchId.Left( Pos - 1);
-                        }
-                        //
-                        //workingKey = Mid(workingKey, 2)
-                        searchKey = "<";
-                    } else {
-                        //
-                        // search for a tagname
-                        //
-                        searchClass = "";
-                        searchTag = workingKey;
-                        searchId = "";
-                        //
-                        Pos = genericController.vbInstr(1, searchTag, "#");
-                        if (Pos != 0) {
-                            searchId = searchTag.Substring(Pos);
-                            searchTag = searchTag.Left( Pos - 1);
-                            Pos = genericController.vbInstr(1, searchId, ".");
-                            if (Pos != 0) {
-                                searchClass = searchId.Substring(Pos - 1);
-                                searchId = searchId.Left( Pos - 1);
-                            }
-                        }
-                        Pos = genericController.vbInstr(1, searchTag, ".");
-                        if (Pos != 0) {
-                            searchClass = searchTag.Substring(Pos);
-                            searchTag = searchTag.Left( Pos - 1);
-                            Pos = genericController.vbInstr(1, searchClass, "#");
-                            if (Pos != 0) {
-                                searchId = searchClass.Substring(Pos - 1);
-                                searchClass = searchClass.Left( Pos - 1);
-                            }
-                        }
-                        //
-                        searchKey = "<" + searchTag;
-                    }
-                    lenSearchKey = searchKey.Length;
-                    Pos = layoutStartPos;
-                    //posMatch = genericController.vbInstr(layoutStartPos, layout, searchKey)
-                    //pos = posMatch
-                    //searchIsOver = False
-                    do {
-                        Pos = genericController.vbInstr(Pos, layout, searchKey);
-                        if (Pos == 0) {
-                            //
-                            // not found, return empty
-                            //
-                            //s = ""
-                            break;
-                        } else {
-                            //
-                            // string found - go to the start of the tag
-                            //
-                            posStartTag = layout.LastIndexOf("<", Pos) + 1;
-                            if (posStartTag <= 0) {
-                                //
-                                // bad html, no start tag found
-                                //
-                                Pos = 0;
-                                returnPos = 0;
-                            } else if (layout.Substring(posStartTag - 1, 2) == "</") {
-                                //
-                                // this is an end tag, skip it
-                                //
-                                Pos = Pos + 1;
-                            } else if (tagMatch(layout, posStartTag, searchId, searchClass)) {
-                                //
-                                // match, return with this position
-                                //
-                                returnPos = Pos;
-                                break;
-                            } else {
-                                //
-                                // no match, skip this and go to the next
-                                //
-                                Pos = Pos + 1;
-                            }
-                        }
-                        LoopPtr = LoopPtr + 1;
-                    } while (LoopPtr < 1000);
-                    //
-                    //
-                    //
-                    if (LoopPtr >= 10000) {
-                        cpCore.handleException(new ApplicationException("Tag limit of 10000 tags per block reached."));
-                    }
-                }
-                //
-                returnValue = returnPos;
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnValue;
-        }
-        //
-        //====================================================================================================
-        public int getTagStartPos(object ignore, string layout, int layoutStartPos, string Key) {
-            int returnValue = 0;
-            try {
-                returnValue = getTagStartPos2(ignore, layout, layoutStartPos, Key);
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnValue;
-        }
-        //
-        //=================================================================================================
-        //   return the position following the tag which closes the tag that starts the string
-        //       starting postion<div><div><p>this and that</p><!-- </div> --></div></div>And a whole lot more
-        //       returns the position of the "A" following the last /div
-        //       string 123<img>456 returns pointing to "4"
-        //       string 123456 returns pointing to "6"
-        //       returns 0 if the end was not found
-        //=================================================================================================
-        //
-        public int getTagEndPos(object ignore, string Source, int startPos) {
-            int returnValue = 0;
-            try {
-                int Pos = 0;
-                string TagName = null;
-                string endTag = null;
-                string startTag = null;
-                int posNest = 0;
-                int posEnd = 0;
-                int posComment = 0;
-                string c = null;
-                //
-                Pos = genericController.vbInstr(startPos, Source, "<");
-                TagName = "";
-                returnValue = 0;
-                if (Pos != 0) {
-                    Pos = Pos + 1;
-                    while (Pos < Source.Length) {
-                        c = genericController.vbLCase(Source.Substring(Pos - 1, 1));
-                        if ((string.CompareOrdinal(c, "a") >= 0) && (string.CompareOrdinal(c, "z") <= 0)) {
-                            TagName = TagName + c;
-                        } else {
-                            break;
-                        }
-                        Pos = Pos + 1;
-                    }
-                    if (!string.IsNullOrEmpty(TagName)) {
-                        endTag = "</" + TagName;
-                        startTag = "<" + TagName;
-                        while (Pos != 0) {
-                            posEnd = genericController.vbInstr(Pos + 1, Source, endTag, 1);
-                            if (posEnd == 0) {
-                                //
-                                // no end was found, return the tag or rest of the string
-                                //
-                                returnValue = genericController.vbInstr(Pos + 1, Source, ">") + 1;
-                                if (posEnd == 1) {
-                                    returnValue = Source.Length;
-                                }
-                                break;
-                            } else {
-                                posNest = genericController.vbInstr(Pos + 1, Source, startTag, 1);
-                                if (posNest == 0) {
-                                    //
-                                    // no nest found, set to end
-                                    //
-                                    posNest = Source.Length;
-                                }
-                                posComment = genericController.vbInstr(Pos + 1, Source, "<!--");
-                                if (posComment == 0) {
-                                    //
-                                    // no comment found, set to end
-                                    //
-                                    posComment = Source.Length;
-                                }
-                                if ((posNest < posEnd) && (posNest < posComment)) {
-                                    //
-                                    // ----- the tag is nested, find the end of the nest
-                                    //
-                                    Pos = getTagEndPos(ignore, Source, posNest);
-                                    // 8/28/2012, if there is a nested tag right before the correct end tag, it skips the end:
-                                    // <div class=a>a<div class=b>b</div></div>
-                                    // the second /div is missed because returnValue returns one past the >, then the
-                                    // next search starts +1 that position
-                                    if (Pos > 0) {
-                                        Pos = Pos - 1;
-                                    }
-                                } else if (posComment < posEnd) {
-                                    //
-                                    // ----- there is a comment between the tag and the first tagend, skip it
-                                    //
-                                    Pos = genericController.vbInstr(posComment, Source, "-->");
-                                    if (Pos == 0) {
-                                        //
-                                        // start comment with no end, exit now
-                                        //
-                                        returnValue = Source.Length;
-                                        break;
-                                    }
-                                } else {
-                                    //
-                                    // ----- end position is here, go to the end of it and exit
-                                    //
-                                    Pos = genericController.vbInstr(posEnd, Source, ">");
-                                    if (Pos == 0) {
-                                        //
-                                        // no end was found, just exit
-                                        //
-                                        returnValue = Source.Length;
-                                        break;
-                                    } else {
-                                        //
-                                        // ----- end was found
-                                        //
-                                        returnValue = Pos + 1;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return returnValue;
-        }
-        //
-        //========================================================================================================
-        //
-        // Finds all tags matching the input, and concatinates them into the output
-        // does NOT account for nested tags, use for body, script, style
-        //
-        // ReturnAll - if true, it returns all the occurances, back-to-back
-        //
-        //========================================================================================================
-        //
-        public static string getTagInnerHTML(string PageSource, string Tag, bool ReturnAll) {
-            string tempgetTagInnerHTML = null;
-            try {
-                //
-                int TagStart = 0;
-                int TagEnd = 0;
-                int LoopCnt = 0;
-                string WB = null;
-                int Pos = 0;
-                int PosEnd = 0;
-                int CommentPos = 0;
-                int ScriptPos = 0;
-                //
-                tempgetTagInnerHTML = "";
-                Pos = 1;
-                while ((Pos > 0) && (LoopCnt < 100)) {
-                    TagStart = genericController.vbInstr(Pos, PageSource, "<" + Tag, 1);
-                    if (TagStart == 0) {
-                        Pos = 0;
-                    } else {
-                        //
-                        // tag found, skip any comments that start between current position and the tag
-                        //
-                        CommentPos = genericController.vbInstr(Pos, PageSource, "<!--");
-                        if ((CommentPos != 0) && (CommentPos < TagStart)) {
-                            //
-                            // skip comment and start again
-                            //
-                            Pos = genericController.vbInstr(CommentPos, PageSource, "-->");
-                        } else {
-                            ScriptPos = genericController.vbInstr(Pos, PageSource, "<script");
-                            if ((ScriptPos != 0) && (ScriptPos < TagStart)) {
-                                //
-                                // skip comment and start again
-                                //
-                                Pos = genericController.vbInstr(ScriptPos, PageSource, "</script");
-                            } else {
-                                //
-                                // Get the tags innerHTML
-                                //
-                                TagStart = genericController.vbInstr(TagStart, PageSource, ">", 1);
-                                Pos = TagStart;
-                                if (TagStart != 0) {
-                                    TagStart = TagStart + 1;
-                                    TagEnd = genericController.vbInstr(TagStart, PageSource, "</" + Tag, 1);
-                                    if (TagEnd != 0) {
-                                        tempgetTagInnerHTML += PageSource.Substring(TagStart - 1, TagEnd - TagStart);
-                                    }
-                                }
-                            }
-                        }
-                        LoopCnt = LoopCnt + 1;
-                        if (ReturnAll) {
-                            TagStart = genericController.vbInstr(TagEnd, PageSource, "<" + Tag, 1);
-                        } else {
-                            TagStart = 0;
-                        }
-                    }
-                }
-                //
-                return tempgetTagInnerHTML;
-                //
-            } catch   {
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
         //
         public string getHtmlDoc_beforeEndOfBodyHtml(bool AllowLogin, bool AllowTools) {
             List<string> result = new List<string>();
@@ -771,7 +45,7 @@ namespace Contensive.Core.Controllers {
                 // -- content extras like tool panel
                 if (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore) & (cpCore.doc.authContext.user.AllowToolsPanel)) {
                     if (AllowTools) {
-                        result.Add(cpCore.html.main_GetToolsPanel());
+                        result.Add(cpCore.html.getToolsPanel());
                     }
                 } else {
                     if (AllowLogin) {
@@ -817,16 +91,15 @@ namespace Contensive.Core.Controllers {
             return string.Join("\r", result);
         }
         //
-        //========================================================================
+        //====================================================================================================
         // main_Get a string with a Drop Down Select Box, see PrintFormInputSelect
-        //========================================================================
         //
         public string main_GetFormInputSelect(string MenuName, int CurrentValue, string ContentName, string Criteria = "", string NoneCaption = "", string htmlId = "") {
             bool tempVar = false;
             return main_GetFormInputSelect2(MenuName, CurrentValue, ContentName, Criteria, NoneCaption, htmlId, ref tempVar, "");
         }
         //
-        //
+        //====================================================================================================
         //
         public string main_GetFormInputSelect2(string MenuName, int CurrentValue, string ContentName, string Criteria, string NoneCaption, string htmlId, ref bool return_IsEmptyList, string HtmlClass = "") {
             string result = string.Empty;
@@ -1075,7 +348,7 @@ namespace Contensive.Core.Controllers {
                                             Copy = Copy.Left( cpCore.siteProperties.selectFieldWidthLimit) + "...+";
                                         }
                                     }
-                                    FastString.Add(">" + encodeHTML(Copy) + "</option>");
+                                    FastString.Add(">" + genericController.encodeHTML(Copy) + "</option>");
                                 }
                                 if (!SelectedFound && (CurrentValue != 0)) {
                                     cpCore.db.csClose(ref CSPointer);
@@ -1104,7 +377,7 @@ namespace Contensive.Core.Controllers {
                                                 Copy = Copy.Left( cpCore.siteProperties.selectFieldWidthLimit) + "...+";
                                             }
                                         }
-                                        FastString.Add(">" + encodeHTML(Copy) + "</option>");
+                                        FastString.Add(">" + genericController.encodeHTML(Copy) + "</option>");
                                     }
                                 }
                             }
@@ -1138,13 +411,13 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        //
-        //========================================================================
+        //====================================================================================================
         //
         public string getInputMemberSelect(string MenuName, int CurrentValue, int GroupID, string ignore = "", string NoneCaption = "", string htmlId = "") {
             return html_GetFormInputMemberSelect2(MenuName, CurrentValue, GroupID, "", NoneCaption, htmlId);
         }
+        //
+        //====================================================================================================
         //
         public string html_GetFormInputMemberSelect2(string MenuName, int CurrentValue, int GroupID, string ignore = "", string NoneCaption = "", string HtmlId = "", string HtmlClass = "") {
             string result = string.Empty;
@@ -1451,19 +724,14 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        //   Legacy
-        //========================================================================
+        //====================================================================================================
         //
         public string getInputSelectList(string MenuName, string CurrentValue, string SelectList, string NoneCaption = "", string htmlId = "") {
             return getInputSelectList2(genericController.encodeText(MenuName), genericController.EncodeInteger(CurrentValue), genericController.encodeText(SelectList), genericController.encodeText(NoneCaption), genericController.encodeText(htmlId));
         }
         //
-        //========================================================================
-        //   Create a select list from a comma separated list
-        //       returns an index into the list list, starting at 1
-        //       if an element is blank (,) no option is created
-        //========================================================================
+        //====================================================================================================
+        //   Create a select list from a comma separated list, returns an index into the list list, starting at 1, if an element is blank (,) no option is created
         //
         public string getInputSelectList2(string MenuName, int CurrentValue, string SelectList, string NoneCaption, string htmlId, string HtmlClass = "") {
             string result = string.Empty;
@@ -1520,9 +788,8 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
+        //====================================================================================================
         //   Display an icon with a link to the login form/cclib.net/admin area
-        //========================================================================
         //
         public string main_GetLoginLink() {
             string result = string.Empty;
@@ -1537,12 +804,12 @@ namespace Contensive.Core.Controllers {
                     result = result + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">";
                     result = result + "<tr><td align=\"right\">";
                     if (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore)) {
-                        result = result + "<a href=\"" + encodeHTML("/" + cpCore.serverConfig.appConfig.adminRoute) + "\" target=\"_blank\">";
+                        result = result + "<a href=\"" + genericController.encodeHTML("/" + cpCore.serverConfig.appConfig.adminRoute) + "\" target=\"_blank\">";
                     } else {
                         Link = cpCore.webServer.requestPage + "?" + cpCore.doc.refreshQueryString;
                         Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, true);
                         //Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
-                        result = result + "<a href=\"" + encodeHTML(Link) + "\" >";
+                        result = result + "<a href=\"" + genericController.encodeHTML(Link) + "\" >";
                     }
                     IconFilename = cpCore.siteProperties.LoginIconFilename;
                     if (genericController.vbLCase(IconFilename.Left( 7)) != "/ccLib/") {
@@ -1558,122 +825,7 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        //   legacy
-        //========================================================================
-        //
-        //Public Function main_GetClosePage(Optional ByVal AllowLogin As Boolean = True, Optional ByVal AllowTools As Boolean = True) As String
-        //    main_GetClosePage = main_GetClosePage3(AllowLogin, AllowTools, False, False)
-        //End Function
-        //
-        //========================================================================
-        //   legacy
-        //========================================================================
-        //
-        //Public Function main_GetClosePage2(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean) As String
-        //    Try
-        //        main_GetClosePage2 = main_GetClosePage3(AllowLogin, AllowTools, False, False)
-        //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
-        //    End Try
-        //End Function
-        //
-        //========================================================================
-        //   main_GetClosePage3
-        //       Public interface to end the page call
-        //       Must be called last on every public page
-        //       internally, you can NOT writeAltBuffer( main_GetClosePage3 ) because the stream is closed
-        //       call main_GetEndOfBody - main_Gets toolspanel and all html,menuing,etc needed to finish page
-        //       optionally calls main_dispose
-        //========================================================================
-        //
-        //Public Function main_GetClosePage3(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, doNotDisposeOnExit As Boolean) As String
-        //    Try
-        //        Return getBeforeEndOfBodyHtml(AllowLogin, AllowTools, BlockNonContentExtras, False)
-        //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
-        //    End Try
-        //End Function
-        //        '
-        //        '========================================================================
-        //        '   Write to the HTML stream
-        //        '========================================================================
-        //        ' refactor -- if this conversion goes correctly, all writeStream will mvoe to teh executeRoute which returns the string 
-        //        Public Sub writeAltBuffer(ByVal Message As Object)
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("WriteStream")
-        //            '
-        //            If cpCore.doc.continueProcessing Then
-        //                Select Case cpCore.webServer.outStreamDevice
-        //                    Case htmlDoc_OutStreamJavaScript
-        //                        Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
-        //                    Case Else
-
-        //                        If (cpCore.webServer.iisContext IsNot Nothing) Then
-        //                            cpCore.doc.isStreamWritten = True
-        //                            Call cpCore.webServer.iisContext.Response.Write(genericController.encodeText(Message))
-        //                        Else
-        //                            cpCore.doc.docBuffer = cpCore.doc.docBuffer & genericController.encodeText(Message)
-        //                        End If
-        //                End Select
-        //            End If
-        //            '
-        //            Exit Sub
-        ////ErrorTrap:
-        //            //throw new ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("writeAltBuffer")
-        //        End Sub
-
-        //        '
-        //        '
-        //        Private Sub webServerIO_JavaStream_Add(ByVal NewString As String)
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00375")
-        //            '
-        //            If cpCore.doc.javascriptStreamCount >= cpCore.doc.javascriptStreamSize Then
-        //                cpCore.doc.javascriptStreamSize = cpCore.doc.javascriptStreamSize + htmlDoc_JavaStreamChunk
-        //                ReDim Preserve cpCore.doc.javascriptStreamHolder(cpCore.doc.javascriptStreamSize)
-        //            End If
-        //            cpCore.doc.javascriptStreamHolder(cpCore.doc.javascriptStreamCount) = NewString
-        //            cpCore.doc.javascriptStreamCount = cpCore.doc.javascriptStreamCount + 1
-        //            Exit Sub
-        //            '
-        ////ErrorTrap:
-        //            //throw new ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_JavaStream_Add")
-        //        End Sub
-
-
-
-        //Public ReadOnly Property webServerIO_JavaStream_Text() As String
-        //    Get
-        //        Dim MsgLabel As String
-
-        //        MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-
-        //        webServerIO_JavaStream_Text = Join(cpCore.doc.javascriptStreamHolder, "")
-        //        webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, "'", "'+""'""+'")
-        //        webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCrLf, "\n")
-        //        webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCr, "\n")
-        //        webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbLf, "\n")
-        //        webServerIO_JavaStream_Text = "var " & MsgLabel & " = '" & webServerIO_JavaStream_Text & "'; document.write( " & MsgLabel & " ); " & vbCrLf
-
-        //    End Get
-        //End Property
-        //
-        //
-        //
-        //Public Sub webServerIO_addRefreshQueryString(ByVal Name As String, Optional ByVal Value As String = "")
-        //    Try
-        //        Dim temp() As String
-        //        '
-        //        If (InStr(1, Name, "=") > 0) Then
-        //            temp = Split(Name, "=")
-        //            cpCore.doc.refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, temp(0), temp(1), True)
-        //        Else
-        //            cpCore.doc.refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, Name, Value, True)
-        //        End If
-        //    Catch ex As Exception
-        //        cpCore.handleExceptionAndContinue(ex) : Throw
-        //    End Try
-        //
-        //  End Sub
+        //====================================================================================================
         //
         public string html_GetLegacySiteStyles() {
             string temphtml_GetLegacySiteStyles = null;
@@ -1702,9 +854,8 @@ namespace Contensive.Core.Controllers {
             return temphtml_GetLegacySiteStyles;
         }
         //
-        //===================================================================================================
+        //====================================================================================================
         //   Wrap the content in a common wrapper if authoring is enabled
-        //===================================================================================================
         //
         public string html_GetAdminHintWrapper(string Content) {
             string temphtml_GetAdminHintWrapper = null;
@@ -1732,7 +883,7 @@ namespace Contensive.Core.Controllers {
             return temphtml_GetAdminHintWrapper;
         }
         //
-        //
+        //====================================================================================================
         //
         public void enableOutputBuffer(bool BufferOn) {
             try {
@@ -1752,12 +903,9 @@ namespace Contensive.Core.Controllers {
                 throw;
             }
         }
-
         //
-        //========================================================================
-        // ----- Starts an HTML form for uploads
-        //       Should be closed with main_GetUploadFormEnd
-        //========================================================================
+        //====================================================================================================
+        // Starts an HTML form for uploads, Should be closed with main_GetUploadFormEnd
         //
         public string html_GetUploadFormStart(string ActionQueryString = null) {
             string result = string.Empty;
@@ -1773,18 +921,15 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        // ----- Closes an HTML form for uploads
-        //========================================================================
+        //====================================================================================================
+        // Closes an HTML form for uploads
         //
         public string html_GetUploadFormEnd() {
             return html_GetFormEnd();
         }
         //
-        //========================================================================
-        // ----- Starts an HTML form
-        //       Should be closed with PrintFormEnd
-        //========================================================================
+        //====================================================================================================
+        // Starts an HTML form, Should be closed with PrintFormEnd
         //
         public string html_GetFormStart(string ActionQueryString = null, string htmlName = "", string htmlId = "", string htmlMethod = "") {
             string temphtml_GetFormStart = null;
@@ -1836,7 +981,7 @@ namespace Contensive.Core.Controllers {
                             } else {
                                 QSName = genericController.DecodeResponseVariable(QSNameValues[0]);
                                 QSValue = genericController.DecodeResponseVariable(QSNameValues[1]);
-                                RefreshHiddens = RefreshHiddens + "\r<input type=\"hidden\" name=\"" + encodeHTML(QSName) + "\" value=\"" + encodeHTML(QSValue) + "\">";
+                                RefreshHiddens = RefreshHiddens + "\r<input type=\"hidden\" name=\"" + genericController.encodeHTML(QSName) + "\" value=\"" + genericController.encodeHTML(QSValue) + "\">";
                             }
                         }
                     }
@@ -1859,9 +1004,8 @@ namespace Contensive.Core.Controllers {
             return temphtml_GetFormStart;
         }
         //
-        //========================================================================
-        // ----- Ends an HTML form
-        //========================================================================
+        //====================================================================================================
+        // Ends an HTML form
         //
         public string html_GetFormEnd() {
             //
@@ -1869,13 +1013,13 @@ namespace Contensive.Core.Controllers {
             //
         }
         //
-        //
+        //====================================================================================================
         //
         public string html_GetFormInputText(string TagName, string DefaultValue = "", string Height = "", string Width = "", string Id = "", bool PasswordField = false) {
             return html_GetFormInputText2(genericController.encodeText(TagName), genericController.encodeText(DefaultValue), genericController.EncodeInteger(Height), genericController.EncodeInteger(Width), genericController.encodeText(Id), PasswordField, false);
         }
         //
-        //
+        //====================================================================================================
         //
         public string html_GetFormInputText2(string htmlName, string DefaultValue = "", int Height = -1, int Width = -1, string HtmlId = "", bool PasswordField = false, bool Disabled = false, string HtmlClass = "") {
             string temphtml_GetFormInputText2 = null;
@@ -1890,7 +1034,7 @@ namespace Contensive.Core.Controllers {
                 if (true) {
                     TagID = "";
                     //
-                    iDefaultValue = encodeHTML(DefaultValue);
+                    iDefaultValue = genericController.encodeHTML(DefaultValue);
                     if (!string.IsNullOrEmpty(HtmlId)) {
                         TagID = TagID + " id=\"" + genericController.encodeEmptyText(HtmlId, "") + "\"";
                     }
@@ -1932,9 +1076,8 @@ namespace Contensive.Core.Controllers {
             return temphtml_GetFormInputText2;
         }
         //
-        //========================================================================
-        // ----- main_Get an HTML Form text input (or text area)
-        //========================================================================
+        //====================================================================================================
+        // main_Get an HTML Form text input (or text area)
         //
         public string html_GetFormInputTextExpandable(string TagName, string Value = "", int Rows = 0, string styleWidth = "100%", string Id = "", bool PasswordField = false) {
             if (Rows == 0) {
@@ -1943,10 +1086,8 @@ namespace Contensive.Core.Controllers {
             return html_GetFormInputTextExpandable2(TagName, Value, Rows, styleWidth, Id, PasswordField, false, "");
         }
         //
-        //========================================================================
-        // ----- main_Get an HTML Form text input (or text area)
-        //   added disabled case
-        //========================================================================
+        //====================================================================================================
+        // main_Get an HTML Form text input (or text area), added disabled case
         //
         public string html_GetFormInputTextExpandable2(string TagName, string Value = "", int Rows = 0, string styleWidth = "100%", string Id = "", bool PasswordField = false, bool Disabled = false, string HtmlClass = "") {
             string temphtml_GetFormInputTextExpandable2 = null;
@@ -1963,7 +1104,7 @@ namespace Contensive.Core.Controllers {
                 string EditorClosed = null;
                 string EditorOpened = null;
                 //
-                Value_Local = encodeHTML(Value);
+                Value_Local = genericController.encodeHTML(Value);
                 IDRoot = Id;
                 if (string.IsNullOrEmpty(IDRoot)) {
                     IDRoot = "TextArea" + cpCore.doc.formInputTextCnt;
@@ -2020,7 +1161,7 @@ namespace Contensive.Core.Controllers {
             return temphtml_GetFormInputTextExpandable2;
         }
         //
-        //
+        //====================================================================================================
         //
         public string html_GetFormInputDate(string TagName, string DefaultValue = "", string Width = "", string Id = "") {
             string result = string.Empty;
@@ -2043,7 +1184,7 @@ namespace Contensive.Core.Controllers {
                 if ((iDefaultValue == "0") || (iDefaultValue == "12:00:00 AM")) {
                     iDefaultValue = "";
                 } else {
-                    iDefaultValue = encodeHTML(iDefaultValue);
+                    iDefaultValue = genericController.encodeHTML(iDefaultValue);
                 }
                 if (genericController.encodeEmptyText(Id, "") != "") {
                     TagID = " ID=\"" + genericController.encodeEmptyText(Id, "") + "\"";
@@ -2092,9 +1233,8 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        // ----- main_Get an HTML Form file upload input
-        //========================================================================
+        //====================================================================================================
+        // main_Get an HTML Form file upload input
         //
         public string html_GetFormInputFile2(string TagName, string htmlId = "", string HtmlClass = "") {
             //
@@ -2102,7 +1242,8 @@ namespace Contensive.Core.Controllers {
             //
         }
         //
-        // ----- main_Get an HTML Form file upload input
+        //====================================================================================================
+        // main_Get an HTML Form file upload input
         //
         public string html_GetFormInputFile(string TagName, string htmlId = "") {
             //
@@ -2110,9 +1251,8 @@ namespace Contensive.Core.Controllers {
             //
         }
         //
-        //========================================================================
-        // ----- main_Get an HTML Form input
-        //========================================================================
+        //====================================================================================================
+        // main_Get an HTML Form input
         //
         public string html_GetFormInputRadioBox(string TagName, string TagValue, string CurrentValue, string htmlId = "") {
             string temphtml_GetFormInputRadioBox = null;
@@ -2156,17 +1296,13 @@ namespace Contensive.Core.Controllers {
             return temphtml_GetFormInputRadioBox;
         }
         //
-        //========================================================================
-        //   Legacy
-        //========================================================================
+        //====================================================================================================
         //
         public string html_GetFormInputCheckBox(string TagName, string DefaultValue = "", string htmlId = "") {
             return html_GetFormInputCheckBox2(genericController.encodeText(TagName), genericController.encodeBoolean(DefaultValue), genericController.encodeText(htmlId));
         }
         //
-        //========================================================================
-        //
-        //========================================================================
+        //====================================================================================================
         //
         public string html_GetFormInputCheckBox2(string TagName, bool DefaultValue = false, string HtmlId = "", bool Disabled = false, string HtmlClass = "") {
             string temphtml_GetFormInputCheckBox2 = null;
@@ -2196,10 +1332,9 @@ namespace Contensive.Core.Controllers {
             return temphtml_GetFormInputCheckBox2;
         }
         //
-        //========================================================================
+        //====================================================================================================
         //   Create a List of Checkboxes based on a contentname and a list of IDs that should be checked
-        //
-        //   For instance, list out a checklist of all public groups, with the ones checked that this member belongs to
+        //      For instance, list out a checklist of all public groups, with the ones checked that this member belongs to
         //       PrimaryContentName = "People"
         //       PrimaryRecordID = MemberID
         //       SecondaryContentName = "Groups"
@@ -2298,7 +1433,7 @@ namespace Contensive.Core.Controllers {
             return Result;
         }
         //
-        // -----
+        //====================================================================================================
         //
         public string html_GetFormInputCS(int CSPointer, string ContentName, string FieldName, int Height = 1, int Width = 40, string htmlId = "") {
             string returnResult = string.Empty;
@@ -2538,17 +1673,15 @@ namespace Contensive.Core.Controllers {
             return returnResult;
         }
         //
-        //========================================================================
-        // ----- Print an HTML Form Button element named BUTTON
-        //========================================================================
+        //====================================================================================================
+        // Print an HTML Form Button element named BUTTON
         //
         public string html_GetFormButton(string ButtonLabel, string Name = "", string htmlId = "", string OnClick = "") {
             return html_GetFormButton2(ButtonLabel, Name, htmlId, OnClick, false);
         }
         //
-        //========================================================================
-        // ----- Print an HTML Form Button element named BUTTON
-        //========================================================================
+        //====================================================================================================
+        // Print an HTML Form Button element named BUTTON
         //
         public string html_GetFormButton2(string ButtonLabel, string Name = "button", string htmlId = "", string OnClick = "", bool Disabled = false) {
             string s = null;
@@ -2567,24 +1700,22 @@ namespace Contensive.Core.Controllers {
             return s + ">";
         }
         //
-        //========================================================================
-        // main_Gets a value in a hidden form field
-        //   Handles name and value encoding
-        //========================================================================
+        //====================================================================================================
+        // main_Gets a value in a hidden form field, Handles name and value encoding
         //
         public string html_GetFormInputHidden(string TagName, string TagValue, string htmlId = "") {
             string result = string.Empty;
             try {
-                result = "\r<input type=\"hidden\" NAME=\"" + encodeHTML(genericController.encodeText(TagName)) + "\"";
+                result = "\r<input type=\"hidden\" NAME=\"" + genericController.encodeHTML(genericController.encodeText(TagName)) + "\"";
                 //
-                string iTagValue = encodeHTML(genericController.encodeText(TagValue));
+                string iTagValue = genericController.encodeHTML(genericController.encodeText(TagValue));
                 if (!string.IsNullOrEmpty(iTagValue)) {
                     result = result + " VALUE=\"" + iTagValue + "\"";
                 }
                 //
                 string ihtmlId = genericController.encodeText(htmlId);
                 if (!string.IsNullOrEmpty(ihtmlId)) {
-                    result = result + " ID=\"" + encodeHTML(ihtmlId) + "\"";
+                    result = result + " ID=\"" + genericController.encodeHTML(ihtmlId) + "\"";
                 }
                 //
                 result = result + ">";
@@ -2594,14 +1725,19 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
+        //====================================================================================================
+        //
         public string html_GetFormInputHidden(string TagName, bool TagValue, string htmlId = "") {
             return html_GetFormInputHidden(TagName, TagValue.ToString(), htmlId);
         }
+        //
+        //====================================================================================================
         //
         public string html_GetFormInputHidden(string TagName, int TagValue, string htmlId = "") {
             return html_GetFormInputHidden(TagName, TagValue.ToString(), htmlId);
         }
         //
+        //====================================================================================================
         // Popup a separate window with the contents of a file
         //
         public string html_GetWindowOpenJScript(string URI, string WindowWidth = "", string WindowHeight = "", string WindowScrollBars = "", bool WindowResizable = true, string WindowName = "_blank") {
@@ -2658,6 +1794,7 @@ namespace Contensive.Core.Controllers {
             return temphtml_GetWindowOpenJScript;
         }
         //
+        //====================================================================================================
         // Popup a separate window with the contents of a file
         //
         public string html_GetWindowDialogJScript(string URI, string WindowWidth = "", string WindowHeight = "", bool WindowScrollBars = false, bool WindowResizable = false, string WindowName = "") {
@@ -2708,9 +1845,7 @@ namespace Contensive.Core.Controllers {
             return temphtml_GetWindowDialogJScript;
         }
         //
-        //=========================================================================================
-        //
-        //=========================================================================================
+        //====================================================================================================
         //
         public void html_AddEvent(string HtmlId, string DOMEvent, string Javascript) {
             string JSCodeAsString = Javascript;
@@ -2722,7 +1857,7 @@ namespace Contensive.Core.Controllers {
             addScriptCode_onLoad("cj.addListener(document.getElementById('" + HtmlId + "'),'" + DOMEvent + "',function(){eval(" + JSCodeAsString + ")})", "");
         }
         //
-        //
+        //====================================================================================================
         //
         public string html_GetFormInputField(string ContentName, string FieldName, string htmlName = "", string HtmlValue = "", string HtmlClass = "", string HtmlId = "", string HtmlStyle = "", int ManyToManySourceRecordID = 0) {
             string result = string.Empty;
@@ -2990,40 +2125,7 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //   renamed to AllowDebugging
-        //
-        //Public ReadOnly Property visitProperty_AllowVerboseReporting() As Boolean
-        //    Get
-        //        Return visitProperty.getBoolean("AllowDebugging")
-        //    End Get
-        //End Property
-        //        '
-        //        '
-        //        '
-        //        Public Function main_parseJSON(ByVal Source As String) As Object
-        //            On Error GoTo ErrorTrap 'Const Tn = "parseJSON" : ''Dim th as integer : th = profileLogMethodEnter(Tn)    '
-        //            '
-        //            main_parseJSON = common_jsonDeserialize(Source)
-        //            '
-        //            Exit Function
-        //            '
-        //            ' ----- Error Trap
-        //            '
-        ////ErrorTrap:
-        //            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
-        //            '
-        //        End Function
-        //
-        //
-        //
-        //Public Function main_GetStyleSheet2(ByVal ContentType As csv_contentTypeEnum, Optional ByVal templateId As Integer = 0, Optional ByVal EmailID As Integer = 0) As String
-        //    main_GetStyleSheet2 = html_getStyleSheet2(ContentType, templateId, EmailID)
-        //End Function
-        //
-
-
-
-        //
+        //====================================================================================================
         //
         public string main_GetEditorAddonListJSON(csv_contentTypeEnum ContentType) {
             string result = string.Empty;
@@ -3233,7 +2335,7 @@ namespace Contensive.Core.Controllers {
                                         } else {
                                             ArgumentList = encodeText(cpCore.db.csGet(CSAddons, "ArgumentList")).Trim(' ');
                                             DefaultAddonOption_String = addonController.main_GetDefaultAddonOption_String(cpCore, ArgumentList, AddonGuid, IsInline);
-                                            DefaultAddonOption_String = main_encodeHTML(DefaultAddonOption_String);
+                                            DefaultAddonOption_String = encodeHTML(DefaultAddonOption_String);
                                         }
                                         //
                                         // Changes necessary to support commas in AddonName and OptionString
@@ -3285,25 +2387,8 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //========================================================================
-        //   deprecated - see csv_EncodeActiveContent_Internal
-        //========================================================================
-        //
-        //Public Function html_EncodeActiveContent4(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String) As String
-        //    html_EncodeActiveContent4 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.doc.authContext.isAuthenticated)
-        //End Function
-        //
-        //========================================================================
-        //   see csv_EncodeActiveContent_Internal
-        //========================================================================
-        //
-        //Public Function html_EncodeActiveContent5(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, ByVal Context As CPUtilsBaseClass.addonContext) As String
-        //    html_EncodeActiveContent5 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.doc.authContext.isAuthenticated, Context)
-        //End Function
-        //
-        //========================================================================
+        //====================================================================================================
         //   encode (execute) all {% -- %} commands
-        //========================================================================
         //
         public string executeContentCommands(object nothingObject, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated, ref string Return_ErrorMessage) {
             string returnValue = "";
@@ -3324,1770 +2409,11 @@ namespace Contensive.Core.Controllers {
             return returnValue;
         }
         //
-        //========================================================================
-        // csv_EncodeActiveContent_Internal
-        //       ...
-        //       AllowLinkEID    Boolean, if yes, the EID=000... string is added to all links in the content
-        //                       Use this for email so links will include the members longin.
-        //
-        //       Some Active elements can not be replaced here because they incorporate content from  the wbeclient.
-        //       For instance the Aggregate Function Objects. These elements create
-        //       <!-- FPO1 --> placeholders in the content, and commented instructions, one per line, at the top of the content
-        //       Replacement instructions
-        //       <!-- Replace FPO1,AFObject,ObjectName,OptionString -->
-        //           Aggregate Function Object, ProgramID=ObjectName, Optionstring=Optionstring
-        //       <!-- Replace FPO1,AFObject,ObjectName,OptionString -->
-        //           Aggregate Function Object, ProgramID=ObjectName, Optionstring=Optionstring
-        //
-        // Tag descriptions:
-        //
-        //   primary methods
-        //
-        //   <Ac Type="Date">
-        //   <Ac Type="Member" Field="Name">
-        //   <Ac Type="Organization" Field="Name">
-        //   <Ac Type="Visitor" Field="Name">
-        //   <Ac Type="Visit" Field="Name">
-        //   <Ac Type="Contact" Member="PeopleID">
-        //       displays a For More info block of copy
-        //   <Ac Type="Feedback" Member="PeopleID">
-        //       displays a feedback note block
-        //   <Ac Type="ChildList" Name="ChildListName">
-        //       displays a list of child blocks that reference this CHildList Element
-        //   <Ac Type="Language" Name="All|English|Spanish|etc.">
-        //       blocks content to next language tag to eveyone without this PeopleLanguage
-        //   <Ac Type="Image" Record="" Width="" Height="" Alt="" Align="">
-        //   <AC Type="Download" Record="" Alt="">
-        //       renders as an anchored download icon, with the alt tag
-        //       the rendered anchor points back to the root/index, which increments the resource's download count
-        //
-        //   During Editing, AC tags are converted (Encoded) to EditIcons
-        //       these are image tags with AC information stored in the ID attribute
-        //       except AC-Image, which are converted into the actual image for editing
-        //       during the edit save, the EditIcons are converted (Decoded) back
-        //
-        //   Remarks
-        //
-        //   First <Member.FieldName> encountered opens the Members Table, etc.
-        //       ( does <OpenTable name="Member" Tablename="ccMembers" ID=(current PeopleID)> )
-        //   The copy is divided into Blocks, starting at every tag and running to the next tag.
-        //   BlockTag()  The tag without the braces found
-        //   BlockCopy() The copy following the tag up to the next tag
-        //   BlockLabel()    the string identifier for the block
-        //   BlockCount  the total blocks in the message
-        //   BlockPointer    the current block being examined
-        //========================================================================
-        //
-        private string convertActiveContent_Internal_activeParts(string Source, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool AddLinkEID, bool EncodeCachableTags, bool EncodeImages, bool EncodeEditIcons, bool EncodeNonCachableTags, string AddAnchorQuery, string ProtocolHostLink, bool IsEmailContent, string AdminURL, bool personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
-            string result = "";
-            try {
-                string ACGuid = null;
-                bool AddonFound = false;
-                string ACNameCaption = null;
-                string GroupIDList = null;
-                string IDControlString = null;
-                string IconIDControlString = null;
-                string Criteria = null;
-                string AddonContentName = null;
-                string SelectList = "";
-                int IconWidth = 0;
-                int IconHeight = 0;
-                int IconSprites = 0;
-                bool AddonIsInline = false;
-                string IconAlt = "";
-                string IconTitle = "";
-                string IconImg = null;
-                string TextName = null;
-                string ListName = null;
-                string SrcOptionSelector = null;
-                string ResultOptionSelector = null;
-                string SrcOptionList = null;
-                int Pos = 0;
-                string REsultOptionValue = null;
-                string SrcOptionValueSelector = null;
-                string InstanceOptionValue = null;
-                string ResultOptionListHTMLEncoded = null;
-                string UCaseACName = null;
-                string IconFilename = null;
-                string FieldName = null;
-                int Ptr = 0;
-                int ElementPointer = 0;
-                int ListCount = 0;
-                int CSVisitor = 0;
-                int CSVisit = 0;
-                bool CSVisitorSet = false;
-                bool CSVisitSet = false;
-                string ElementTag = null;
-                string ACType = null;
-                string ACField = null;
-                string ACName = "";
-                string Copy = null;
-                htmlParserController KmaHTML = null;
-                int AttributeCount = 0;
-                int AttributePointer = 0;
-                string Name = null;
-                string Value = null;
-                int CS = 0;
-                int ACAttrRecordID = 0;
-                int ACAttrWidth = 0;
-                int ACAttrHeight = 0;
-                string ACAttrAlt = null;
-                int ACAttrBorder = 0;
-                int ACAttrLoop = 0;
-                int ACAttrVSpace = 0;
-                int ACAttrHSpace = 0;
-                string Filename = "";
-                string ACAttrAlign = null;
-                bool ProcessAnchorTags = false;
-                bool ProcessACTags = false;
-                string ACLanguageName = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                string AnchorQuery = "";
-                int CSOrganization = 0;
-                bool CSOrganizationSet = false;
-                int CSPeople = 0;
-                bool CSPeopleSet = false;
-                int CSlanguage = 0;
-                bool PeopleLanguageSet = false;
-                string PeopleLanguage = "";
-                string UcasePeopleLanguage = null;
-                string serverFilePath = "";
-                string ReplaceInstructions = string.Empty;
-                string Link = null;
-                int NotUsedID = 0;
-                string addonOptionString = null;
-                string AddonOptionStringHTMLEncoded = null;
-                string[] SrcOptions = null;
-                string SrcOptionName = null;
-                int FormCount = 0;
-                int FormInputCount = 0;
-                string ACInstanceID = null;
-                int PosStart = 0;
-                int PosEnd = 0;
-                string AllowGroups = null;
-                string workingContent = null;
-                string NewName = null;
-                //
-                workingContent = Source;
-                //
-                // Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
-                //
-                if (AddLinkEID && (personalizationPeopleId != 0)) {
-                    AnchorQuery = AnchorQuery + "&EID=" + cpCore.security.encodeToken(genericController.EncodeInteger(personalizationPeopleId), DateTime.Now);
-                }
-                //
-                if (!string.IsNullOrEmpty(AddAnchorQuery)) {
-                    AnchorQuery = AnchorQuery + "&" + AddAnchorQuery;
-                }
-                //
-                if (!string.IsNullOrEmpty(AnchorQuery)) {
-                    AnchorQuery = AnchorQuery.Substring(1);
-                }
-                //
-                // ----- xml contensive process instruction
-                //
-                //TemplateBodyContent
-                //Pos = genericController.vbInstr(1, TemplateBodyContent, "<?contensive", vbTextCompare)
-                //If Pos > 0 Then
-                //    '
-                //    ' convert template body if provided - this is the content that replaces the content box addon
-                //    '
-                //    TemplateBodyContent = Mid(TemplateBodyContent, Pos)
-                //    LayoutEngineOptionString = "data=" & encodeNvaArgument(TemplateBodyContent)
-                //    TemplateBodyContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", nothing, LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
-                //End If
-                Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
-                if (Pos > 0) {
-                    throw new ApplicationException("Structured xml data commands are no longer supported");
-                    //
-                    // convert content if provided
-                    //
-                    //workingContent = Mid(workingContent, Pos)
-                    //LayoutEngineOptionString = "data=" & encodeNvaArgument(workingContent)
-                    //Dim structuredData As New core_primitivesStructuredDataClass(Me)
-                    //workingContent = structuredData.execute()
-                    //workingContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
-                }
-                //
-                // Special Case
-                // Convert <!-- STARTGROUPACCESS 10,11,12 --> format to <AC type=GROUPACCESS AllowGroups="10,11,12">
-                // Convert <!-- ENDGROUPACCESS --> format to <AC type=GROUPACCESSEND>
-                //
-                PosStart = genericController.vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", 1);
-                if (PosStart > 0) {
-                    PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
-                    if (PosEnd > 0) {
-                        AllowGroups = workingContent.Substring(PosStart + 21, PosEnd - PosStart - 23);
-                        workingContent = workingContent.Left( PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text\" querystring=\"allowgroups=" + AllowGroups + "\">" + workingContent.Substring(PosEnd + 2);
-                    }
-                }
-                //
-                PosStart = genericController.vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", 1);
-                if (PosStart > 0) {
-                    PosEnd = genericController.vbInstr(PosStart, workingContent, "-->");
-                    if (PosEnd > 0) {
-                        workingContent = workingContent.Left( PosStart - 1) + "<AC type=\"" + ACTypeAggregateFunction + "\" name=\"block text end\" >" + workingContent.Substring(PosEnd + 2);
-                    }
-                }
-                //
-                // ----- Special case -- if any of these are in the source, this is legacy. Convert them to icons,
-                //       and they will be converted to AC tags when the icons are saved
-                //
-                if (EncodeEditIcons) {
-                    //
-                    IconIDControlString = "AC," + ACTypeTemplateContent + "," + NotUsedID + "," + ACName + ",";
-                    IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0);
-                    workingContent = genericController.vbReplace(workingContent, "{{content}}", IconImg, 1, 99, 1);
-                    //WorkingContent = genericController.vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
-                    //
-                    // replace all other {{...}}
-                    //
-                    //LoopPtr = 0
-                    //Pos = 1
-                    //Do While Pos > 0 And LoopPtr < 100
-                    //    Pos = genericController.vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
-                    //    If Pos > 0 Then
-                    //        addonOptionString = ""
-                    //        PosStart = Pos
-                    //        If PosStart <> 0 Then
-                    //            'PosStart = PosStart + 2 + Len(ACTypeDynamicMenu)
-                    //            PosEnd = genericController.vbInstr(PosStart, workingContent, "}}", vbTextCompare)
-                    //            If PosEnd <> 0 Then
-                    //                Cmd = Mid(workingContent, PosStart + 2, PosEnd - PosStart - 2)
-                    //                Pos = genericController.vbInstr(1, Cmd, "?")
-                    //                If Pos <> 0 Then
-                    //                    addonOptionString = genericController.decodeHtml(Mid(Cmd, Pos + 1))
-                    //                End If
-                    //                TextName = cpCore.csv_GetAddonOptionStringValue("menu", addonOptionString)
-                    //                '
-                    //                addonOptionString = "Menu=" & TextName & "[" & cpCore.csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                    //                AddonOptionStringHTMLEncoded = html_EncodeHTML("Menu=" & TextName & "[" & cpCore.csv_GetDynamicMenuACSelect() & "]&NewMenu=")
-                    //                '
-                    //                IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                    //                IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
-                    //                workingContent = Mid(workingContent, 1, PosStart - 1) & IconImg & Mid(workingContent, PosEnd + 2)
-                    //            End If
-                    //        End If
-                    //    End If
-                    //Loop
-                }
-                //
-                // Test early if this needs to run at all
-                //
-                ProcessACTags = (((EncodeCachableTags || EncodeNonCachableTags || EncodeImages || EncodeEditIcons)) & (workingContent.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase)  != -1));
-                ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (workingContent.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase)  != -1);
-                if ((!string.IsNullOrEmpty(workingContent)) & (ProcessAnchorTags || ProcessACTags)) {
-                    //
-                    // ----- Load the Active Elements
-                    //
-                    KmaHTML = new htmlParserController(cpCore);
-                    KmaHTML.Load(workingContent);
-                    //
-                    // ----- Execute and output elements
-                    //
-                    ElementPointer = 0;
-                    if (KmaHTML.ElementCount > 0) {
-                        ElementPointer = 0;
-                        workingContent = "";
-                        serverFilePath = ProtocolHostLink + "/" + cpCore.serverConfig.appConfig.name + "/files/";
-                        Stream = new stringBuilderLegacyController();
-                        while (ElementPointer < KmaHTML.ElementCount) {
-                            Copy = KmaHTML.Text(ElementPointer).ToString();
-                            if (KmaHTML.IsTag(ElementPointer)) {
-                                ElementTag = genericController.vbUCase(KmaHTML.TagName(ElementPointer));
-                                ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME");
-                                UCaseACName = genericController.vbUCase(ACName);
-                                switch (ElementTag) {
-                                    case "FORM":
-                                        //
-                                        // Form created in content
-                                        // EncodeEditIcons -> remove the
-                                        //
-                                        if (EncodeNonCachableTags) {
-                                            FormCount = FormCount + 1;
-                                            //
-                                            // 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
-                                            // however, leave this one because it is needed to make current forms work.
-                                            //
-                                            if ((Copy.IndexOf("contensiveuserform=1", System.StringComparison.OrdinalIgnoreCase)  != -1) | (Copy.IndexOf("contensiveuserform=\"1\"", System.StringComparison.OrdinalIgnoreCase)  != -1)) {
-                                                //
-                                                // if it has "contensiveuserform=1" in the form tag, remove it from the form and add the hidden that makes it work
-                                                //
-                                                Copy = genericController.vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, 1);
-                                                Copy = genericController.vbReplace(Copy, "ContensiveUserForm=\"1\"", "", 1, 99, 1);
-                                                if (!EncodeEditIcons) {
-                                                    Copy += "<input type=hidden name=ContensiveUserForm value=1>";
-                                                }
-                                            }
-                                        }
-                                        break;
-                                    case "INPUT":
-                                        if (EncodeNonCachableTags) {
-                                            FormInputCount = FormInputCount + 1;
-                                        }
-                                        break;
-                                    case "A":
-                                        if (!string.IsNullOrEmpty(AnchorQuery)) {
-                                            //
-                                            // ----- Add ?eid=0000 to all anchors back to the same site so emails
-                                            //       can be sent that will automatically log the person in when they
-                                            //       arrive.
-                                            //
-                                            AttributeCount = KmaHTML.ElementAttributeCount(ElementPointer);
-                                            if (AttributeCount > 0) {
-                                                Copy = "<A ";
-                                                for (AttributePointer = 0; AttributePointer < AttributeCount; AttributePointer++) {
-                                                    Name = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer);
-                                                    Value = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer);
-                                                    if (genericController.vbUCase(Name) == "HREF") {
-                                                        Link = Value;
-                                                        Pos = genericController.vbInstr(1, Link, "://");
-                                                        if (Pos > 0) {
-                                                            Link = Link.Substring(Pos + 2);
-                                                            Pos = genericController.vbInstr(1, Link, "/");
-                                                            if (Pos > 0) {
-                                                                Link = Link.Left( Pos - 1);
-                                                            }
-                                                        }
-                                                        if ((string.IsNullOrEmpty(Link)) || (("," + cpCore.serverConfig.appConfig.domainList[0] + ",").IndexOf("," + Link + ",", System.StringComparison.OrdinalIgnoreCase)  != -1)) {
-                                                            //
-                                                            // ----- link is for this site
-                                                            //
-                                                            if (Value.Substring(Value.Length - 1) == "?") {
-                                                                //
-                                                                // Ends in a questionmark, must be Dwayne (?)
-                                                                //
-                                                                Value = Value + AnchorQuery;
-                                                            } else if (genericController.vbInstr(1, Value, "mailto:", 1) != 0) {
-                                                                //
-                                                                // catch mailto
-                                                                //
-                                                                //Value = Value & AnchorQuery
-                                                            } else if (genericController.vbInstr(1, Value, "?") == 0) {
-                                                                //
-                                                                // No questionmark there, add it
-                                                                //
-                                                                Value = Value + "?" + AnchorQuery;
-                                                            } else {
-                                                                //
-                                                                // Questionmark somewhere, add new value with amp;
-                                                                //
-                                                                Value = Value + "&" + AnchorQuery;
-                                                            }
-                                                            //    End If
-                                                        }
-                                                    }
-                                                    Copy += " " + Name + "=\"" + Value + "\"";
-                                                }
-                                                Copy += ">";
-                                            }
-                                        }
-                                        break;
-                                    case "AC":
-                                        //
-                                        // ----- decode all AC tags
-                                        //
-                                        ListCount = 0;
-                                        ACType = KmaHTML.ElementAttribute(ElementPointer, "TYPE");
-                                        // if ACInstanceID=0, it can not create settings link in edit mode. ACInstanceID is added during edit save.
-                                        ACInstanceID = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
-                                        ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID");
-                                        switch (genericController.vbUCase(ACType)) {
-                                            case ACTypeEnd: {
-                                                    //
-                                                    // End Tag - Personalization
-                                                    //       This tag causes an end to the all tags, like Language
-                                                    //       It is removed by with EncodeEditIcons (on the way to the editor)
-                                                    //       It is added to the end of the content with Decode(activecontent)
-                                                    //
-                                                    if (EncodeEditIcons) {
-                                                        Copy = "";
-                                                    } else if (EncodeNonCachableTags) {
-                                                        Copy = "<!-- Language ANY -->";
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeDate: {
-                                                    //
-                                                    // Date Tag
-                                                    //
-                                                    if (EncodeEditIcons) {
-                                                        IconIDControlString = "AC," + ACTypeDate;
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0);
-                                                        Copy = IconImg;
-                                                        //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/ccLib/images/ACDate.GIF"">"
-                                                    } else if (EncodeNonCachableTags) {
-                                                        Copy = DateTime.Now.ToString();
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeMember:
-                                            case ACTypePersonalization: {
-                                                    //
-                                                    // Member Tag works regardless of authentication
-                                                    // cm must be sure not to reveal anything
-                                                    //
-                                                    ACField = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"));
-                                                    if (string.IsNullOrEmpty(ACField)) {
-                                                        // compatibility for old personalization type
-                                                        ACField = htmlController.getAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"));
-                                                    }
-                                                    FieldName = genericController.EncodeInitialCaps(ACField);
-                                                    if (string.IsNullOrEmpty(FieldName)) {
-                                                        FieldName = "Name";
-                                                    }
-                                                    if (EncodeEditIcons) {
-                                                        switch (genericController.vbUCase(FieldName)) {
-                                                            case "FIRSTNAME":
-                                                                //
-                                                                IconIDControlString = "AC," + ACType + "," + FieldName;
-                                                                IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0);
-                                                                Copy = IconImg;
-                                                                //
-                                                                break;
-                                                            case "LASTNAME":
-                                                                //
-                                                                IconIDControlString = "AC," + ACType + "," + FieldName;
-                                                                IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0);
-                                                                Copy = IconImg;
-                                                                //
-                                                                break;
-                                                            default:
-                                                                //
-                                                                IconIDControlString = "AC," + ACType + "," + FieldName;
-                                                                IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's " + FieldName, "Renders as [User's " + FieldName + "]", ACInstanceID, 0);
-                                                                Copy = IconImg;
-                                                                //
-                                                                break;
-                                                        }
-                                                    } else if (EncodeNonCachableTags) {
-                                                        if (personalizationPeopleId != 0) {
-                                                            if (genericController.vbUCase(FieldName) == "EID") {
-                                                                Copy = cpCore.security.encodeToken(personalizationPeopleId, DateTime.Now);
-                                                            } else {
-                                                                if (!CSPeopleSet) {
-                                                                    CSPeople = cpCore.db.cs_openContentRecord("People", personalizationPeopleId);
-                                                                    CSPeopleSet = true;
-                                                                }
-                                                                if ((cpCore.db.csOk(CSPeople) & cpCore.db.cs_isFieldSupported(CSPeople, FieldName))) {
-                                                                    Copy = cpCore.db.csGetLookup(CSPeople, FieldName);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeChildList: {
-                                                    //
-                                                    // Child List
-                                                    //
-                                                    ListName = genericController.encodeText((KmaHTML.ElementAttribute(ElementPointer, "name")));
-
-                                                    if (EncodeEditIcons) {
-                                                        IconIDControlString = "AC," + ACType + ",," + ACName;
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0);
-                                                        Copy = IconImg;
-                                                    } else if (EncodeCachableTags) {
-                                                        //
-                                                        // Handle in webclient
-                                                        //
-                                                        // removed sort method because all child pages are read in together in the order set by the parent - improve this later
-                                                        Copy = "{{" + ACTypeChildList + "?name=" + genericController.encodeNvaArgument(ListName) + "}}";
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeContact: {
-                                                    //
-                                                    // Formatting Tag
-                                                    //
-                                                    if (EncodeEditIcons) {
-                                                        //
-                                                        IconIDControlString = "AC," + ACType;
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0);
-                                                        Copy = IconImg;
-                                                        //
-                                                        //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
-                                                    } else if (EncodeCachableTags) {
-                                                        if (moreInfoPeopleId != 0) {
-                                                            Copy = pageContentController.getMoreInfoHtml(cpCore, moreInfoPeopleId);
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeFeedback: {
-                                                    //
-                                                    // Formatting tag - change from information to be included after submission
-                                                    //
-                                                    if (EncodeEditIcons) {
-                                                        //
-                                                        IconIDControlString = "AC," + ACType;
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, false, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0);
-                                                        Copy = IconImg;
-                                                        //
-                                                        //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ccLib/images/ACFeedBack.GIF"">"
-                                                    } else if (EncodeNonCachableTags) {
-                                                        if ((moreInfoPeopleId != 0) & (!string.IsNullOrEmpty(ContextContentName)) & (ContextRecordID != 0)) {
-                                                            Copy = FeedbackFormNotSupportedComment;
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeLanguage: {
-                                                    //
-                                                    // Personalization Tag - block languages not from the visitor
-                                                    //
-                                                    ACLanguageName = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"));
-                                                    if (EncodeEditIcons) {
-                                                        switch (genericController.vbUCase(ACLanguageName)) {
-                                                            case "ANY":
-                                                                //
-                                                                IconIDControlString = "AC," + ACType + ",," + ACLanguageName;
-                                                                IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "All copy following this point is rendered, regardless of the member's language setting", "Renders as [Begin Rendering All Languages]", ACInstanceID, 0);
-                                                                Copy = IconImg;
-                                                                //
-                                                                //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered, regardless of the member's language setting"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageAny.GIF"">"
-                                                                //Case "ENGLISH", "FRENCH", "GERMAN", "PORTUGEUESE", "ITALIAN", "SPANISH", "CHINESE", "HINDI"
-                                                                //   Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguage" & ACLanguageName & ".GIF"">"
-                                                                break;
-                                                            default:
-                                                                //
-                                                                IconIDControlString = "AC," + ACType + ",," + ACLanguageName;
-                                                                IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "All copy following this point is rendered if the member's language setting matchs [" + ACLanguageName + "]", "Begin Rendering for language [" + ACLanguageName + "]", ACInstanceID, 0);
-                                                                Copy = IconImg;
-                                                                //
-                                                                //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageOther.GIF"">"
-                                                                break;
-                                                        }
-                                                    } else if (EncodeNonCachableTags) {
-                                                        if (personalizationPeopleId == 0) {
-                                                            PeopleLanguage = "any";
-                                                        } else {
-                                                            if (!PeopleLanguageSet) {
-                                                                if (!CSPeopleSet) {
-                                                                    CSPeople = cpCore.db.cs_openContentRecord("people", personalizationPeopleId);
-                                                                    CSPeopleSet = true;
-                                                                }
-                                                                CSlanguage = cpCore.db.cs_openContentRecord("Languages", cpCore.db.csGetInteger(CSPeople, "LanguageID"),0, false, false, "Name");
-                                                                if (cpCore.db.csOk(CSlanguage)) {
-                                                                    PeopleLanguage = cpCore.db.csGetText(CSlanguage, "name");
-                                                                }
-                                                                cpCore.db.csClose(ref CSlanguage);
-                                                                PeopleLanguageSet = true;
-                                                            }
-                                                        }
-                                                        UcasePeopleLanguage = genericController.vbUCase(PeopleLanguage);
-                                                        if (UcasePeopleLanguage == "ANY") {
-                                                            //
-                                                            // This person wants all the languages, put in language marker and continue
-                                                            //
-                                                            Copy = "<!-- Language " + ACLanguageName + " -->";
-                                                        } else if ((ACLanguageName != UcasePeopleLanguage) & (ACLanguageName != "ANY")) {
-                                                            //
-                                                            // Wrong language, remove tag, skip to the end, or to the next language tag
-                                                            //
-                                                            Copy = "";
-                                                            ElementPointer = ElementPointer + 1;
-                                                            while (ElementPointer < KmaHTML.ElementCount) {
-                                                                ElementTag = genericController.vbUCase(KmaHTML.TagName(ElementPointer));
-                                                                if (ElementTag == "AC") {
-                                                                    ACType = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"));
-                                                                    if (ACType == ACTypeLanguage) {
-                                                                        ElementPointer = ElementPointer - 1;
-                                                                        break;
-                                                                    } else if (ACType == ACTypeEnd) {
-                                                                        break;
-                                                                    }
-                                                                }
-                                                                ElementPointer = ElementPointer + 1;
-                                                            }
-                                                        } else {
-                                                            //
-                                                            // Right Language, remove tag
-                                                            //
-                                                            Copy = "";
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeAggregateFunction: {
-                                                    //
-                                                    // ----- Add-on
-                                                    //
-                                                    NotUsedID = 0;
-                                                    AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
-                                                    if (IsEmailContent) {
-                                                        //
-                                                        // Addon - for email
-                                                        //
-                                                        if (EncodeNonCachableTags) {
-                                                            //
-                                                            // Only hardcoded Add-ons can run in Emails
-                                                            //
-                                                            switch (genericController.vbLCase(ACName)) {
-                                                                case "block text":
-                                                                    //
-                                                                    // Email is always considered authenticated bc they need their login credentials to get the email.
-                                                                    // Allowed to see the content that follows if you are authenticated, admin, or in the group list
-                                                                    // This must be done out on the page because the csv does not know about authenticated
-                                                                    //
-                                                                    Copy = "";
-                                                                    GroupIDList = htmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
-                                                                    if (!cpCore.doc.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, true, GroupIDList, true)) {
-                                                                        //
-                                                                        // Block content if not allowed
-                                                                        //
-                                                                        ElementPointer = ElementPointer + 1;
-                                                                        while (ElementPointer < KmaHTML.ElementCount) {
-                                                                            ElementTag = genericController.vbUCase(KmaHTML.TagName(ElementPointer));
-                                                                            if (ElementTag == "AC") {
-                                                                                ACType = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"));
-                                                                                if (ACType == ACTypeAggregateFunction) {
-                                                                                    if (genericController.vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) == "block text end") {
-                                                                                        break;
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            ElementPointer = ElementPointer + 1;
-                                                                        }
-                                                                    }
-                                                                    break;
-                                                                case "block text end":
-                                                                    //
-                                                                    // always remove end tags because the block text did not remove it
-                                                                    //
-                                                                    Copy = "";
-                                                                    break;
-                                                                default:
-                                                                    //
-                                                                    // all other add-ons, pass out to cpCoreClass to process
-                                                                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                                                        addonType = CPUtilsBaseClass.addonContext.ContextEmail,
-                                                                        cssContainerClass = "",
-                                                                        cssContainerId = "",
-                                                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                                                            contentName = ContextContentName,
-                                                                            fieldName = "",
-                                                                            recordId = ContextRecordID
-                                                                        },
-                                                                        personalizationAuthenticated = personalizationIsAuthenticated,
-                                                                        personalizationPeopleId = personalizationPeopleId,
-                                                                        instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, AddonOptionStringHTMLEncoded),
-                                                                        instanceGuid = ACInstanceID
-                                                                    };
-                                                                    addonModel addon = addonModel.createByName(cpCore, ACName);
-                                                                    Copy = cpCore.addon.execute(addon, executeContext);
-                                                                    //Copy = cpCore.addon.execute_legacy6(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
-                                                                    break;
-                                                            }
-                                                        }
-                                                    } else {
-                                                        //
-                                                        // Addon - for web
-                                                        //
-
-                                                        if (EncodeEditIcons) {
-                                                            //
-                                                            // Get IconFilename, update the optionstring, and execute optionstring replacement functions
-                                                            //
-                                                            AddonContentName = cnAddons;
-                                                            if (true) {
-                                                                SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid";
-                                                            }
-                                                            if (!string.IsNullOrEmpty(ACGuid)) {
-                                                                Criteria = "ccguid=" + cpCore.db.encodeSQLText(ACGuid);
-                                                            } else {
-                                                                Criteria = "name=" + cpCore.db.encodeSQLText(UCaseACName);
-                                                            }
-                                                            CS = cpCore.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
-                                                            if (cpCore.db.csOk(CS)) {
-                                                                AddonFound = true;
-                                                                // ArgumentList comes in already encoded
-                                                                IconFilename = cpCore.db.csGet(CS, "IconFilename");
-                                                                SrcOptionList = cpCore.db.csGet(CS, "ArgumentList");
-                                                                IconWidth = cpCore.db.csGetInteger(CS, "IconWidth");
-                                                                IconHeight = cpCore.db.csGetInteger(CS, "IconHeight");
-                                                                IconSprites = cpCore.db.csGetInteger(CS, "IconSprites");
-                                                                AddonIsInline = cpCore.db.csGetBoolean(CS, "IsInline");
-                                                                ACGuid = cpCore.db.csGetText(CS, "ccGuid");
-                                                                IconAlt = ACName;
-                                                                IconTitle = "Rendered as the Add-on [" + ACName + "]";
-                                                            } else {
-                                                                switch (genericController.vbLCase(ACName)) {
-                                                                    case "block text":
-                                                                        IconFilename = "";
-                                                                        SrcOptionList = AddonOptionConstructor_ForBlockText;
-                                                                        IconWidth = 0;
-                                                                        IconHeight = 0;
-                                                                        IconSprites = 0;
-                                                                        AddonIsInline = true;
-                                                                        ACGuid = "";
-                                                                        break;
-                                                                    case "block text end":
-                                                                        IconFilename = "";
-                                                                        SrcOptionList = "";
-                                                                        IconWidth = 0;
-                                                                        IconHeight = 0;
-                                                                        IconSprites = 0;
-                                                                        AddonIsInline = true;
-                                                                        ACGuid = "";
-                                                                        break;
-                                                                    default:
-                                                                        IconFilename = "";
-                                                                        SrcOptionList = "";
-                                                                        IconWidth = 0;
-                                                                        IconHeight = 0;
-                                                                        IconSprites = 0;
-                                                                        AddonIsInline = false;
-                                                                        IconAlt = "Unknown Add-on [" + ACName + "]";
-                                                                        IconTitle = "Unknown Add-on [" + ACName + "]";
-                                                                        ACGuid = "";
-                                                                        break;
-                                                                }
-                                                            }
-                                                            cpCore.db.csClose(ref CS);
-                                                            //
-                                                            // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
-                                                            //
-                                                            if (SrcOptionList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase)  == -1) {
-                                                                if (AddonIsInline) {
-                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Inline;
-                                                                } else {
-                                                                    SrcOptionList = SrcOptionList + "\r\n" + AddonOptionConstructor_Block;
-                                                                }
-                                                            }
-                                                            if (string.IsNullOrEmpty(SrcOptionList)) {
-                                                                ResultOptionListHTMLEncoded = "";
-                                                            } else {
-                                                                ResultOptionListHTMLEncoded = "";
-                                                                REsultOptionValue = "";
-                                                                SrcOptionList = genericController.vbReplace(SrcOptionList, "\r\n", "\r");
-                                                                SrcOptionList = genericController.vbReplace(SrcOptionList, "\n", "\r");
-                                                                SrcOptions = genericController.customSplit(SrcOptionList, "\r");
-                                                                for (Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
-                                                                    SrcOptionName = SrcOptions[Ptr];
-                                                                    int LoopPtr2 = 0;
-
-                                                                    while ((SrcOptionName.Length > 1) && (SrcOptionName.Left( 1) == "\t") && (LoopPtr2 < 100)) {
-                                                                        SrcOptionName = SrcOptionName.Substring(1);
-                                                                        LoopPtr2 = LoopPtr2 + 1;
-                                                                    }
-                                                                    SrcOptionValueSelector = "";
-                                                                    SrcOptionSelector = "";
-                                                                    Pos = genericController.vbInstr(1, SrcOptionName, "=");
-                                                                    if (Pos > 0) {
-                                                                        SrcOptionValueSelector = SrcOptionName.Substring(Pos);
-                                                                        SrcOptionName = SrcOptionName.Left( Pos - 1);
-                                                                        SrcOptionSelector = "";
-                                                                        Pos = genericController.vbInstr(1, SrcOptionValueSelector, "[");
-                                                                        if (Pos != 0) {
-                                                                            SrcOptionSelector = SrcOptionValueSelector.Substring(Pos - 1);
-                                                                        }
-                                                                    }
-                                                                    // all Src and Instance vars are already encoded correctly
-                                                                    if (!string.IsNullOrEmpty(SrcOptionName)) {
-                                                                        // since AddonOptionString is encoded, InstanceOptionValue will be also
-                                                                        InstanceOptionValue = htmlController.getAddonOptionStringValue(SrcOptionName, addonOptionString);
-                                                                        //InstanceOptionValue = cpcore.csv_GetAddonOption(SrcOptionName, AddonOptionString)
-                                                                        ResultOptionSelector = getAddonSelector(SrcOptionName, genericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector);
-                                                                        //ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
-                                                                        ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded + "&" + ResultOptionSelector;
-                                                                    }
-                                                                }
-                                                                if (!string.IsNullOrEmpty(ResultOptionListHTMLEncoded)) {
-                                                                    ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded.Substring(1);
-                                                                }
-                                                            }
-                                                            ACNameCaption = genericController.vbReplace(ACName, "\"", "");
-                                                            ACNameCaption = encodeHTML(ACNameCaption);
-                                                            IDControlString = "AC," + ACType + "," + NotUsedID + "," + genericController.encodeNvaArgument(ACName) + "," + ResultOptionListHTMLEncoded + "," + ACGuid;
-                                                            Copy = genericController.GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0);
-                                                        } else if (EncodeNonCachableTags) {
-                                                            //
-                                                            // Add-on Experiment - move all processing to the Webclient
-                                                            // just pass the name and arguments back in th FPO
-                                                            // HTML encode and quote the name and AddonOptionString
-                                                            //
-                                                            Copy = ""
-                                                            + ""
-                                                            + "<!-- ADDON "
-                                                            + "\"" + ACName + "\""
-                                                            + ",\"" + AddonOptionStringHTMLEncoded + "\""
-                                                            + ",\"" + ACInstanceID + "\""
-                                                            + ",\"" + ACGuid + "\""
-                                                            + " -->"
-                                                            + "";
-                                                        }
-                                                        //
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeImage: {
-                                                    //
-                                                    // ----- Image Tag, substitute image placeholder with the link from the REsource Library Record
-                                                    //
-                                                    if (EncodeImages) {
-                                                        Copy = "";
-                                                        ACAttrRecordID = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
-                                                        ACAttrWidth = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "WIDTH"));
-                                                        ACAttrHeight = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HEIGHT"));
-                                                        ACAttrAlt = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"));
-                                                        ACAttrBorder = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "BORDER"));
-                                                        ACAttrLoop = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "LOOP"));
-                                                        ACAttrVSpace = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "VSPACE"));
-                                                        ACAttrHSpace = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"));
-                                                        ACAttrAlign = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"));
-                                                        //
-                                                        libraryFilesModel file = libraryFilesModel.create(cpCore, ACAttrRecordID);
-                                                        if (file != null) {
-                                                            Filename = file.Filename;
-                                                            Filename = genericController.vbReplace(Filename, "\\", "/");
-                                                            Filename = genericController.EncodeURL(Filename);
-                                                            Copy += "<img ID=\"AC,IMAGE,," + ACAttrRecordID + "\" src=\"" + genericController.getCdnFileLink(cpCore, Filename) + "\"";
-                                                            //
-                                                            if (ACAttrWidth == 0) {
-                                                                ACAttrWidth = file.pxWidth;
-                                                            }
-                                                            if (ACAttrWidth != 0) {
-                                                                Copy += " width=\"" + ACAttrWidth + "\"";
-                                                            }
-                                                            //
-                                                            if (ACAttrHeight == 0) {
-                                                                ACAttrHeight = file.pxHeight;
-                                                            }
-                                                            if (ACAttrHeight != 0) {
-                                                                Copy += " height=\"" + ACAttrHeight + "\"";
-                                                            }
-                                                            //
-                                                            if (ACAttrVSpace != 0) {
-                                                                Copy += " vspace=\"" + ACAttrVSpace + "\"";
-                                                            }
-                                                            //
-                                                            if (ACAttrHSpace != 0) {
-                                                                Copy += " hspace=\"" + ACAttrHSpace + "\"";
-                                                            }
-                                                            //
-                                                            if (!string.IsNullOrEmpty(ACAttrAlt)) {
-                                                                Copy += " alt=\"" + ACAttrAlt + "\"";
-                                                            }
-                                                            //
-                                                            if (!string.IsNullOrEmpty(ACAttrAlign)) {
-                                                                Copy += " align=\"" + ACAttrAlign + "\"";
-                                                            }
-                                                            //
-                                                            // no, 0 is an important value
-                                                            //If ACAttrBorder <> 0 Then
-                                                            Copy += " border=\"" + ACAttrBorder + "\"";
-                                                            //    End If
-                                                            //
-                                                            if (ACAttrLoop != 0) {
-                                                                Copy += " loop=\"" + ACAttrLoop + "\"";
-                                                            }
-                                                            //
-                                                            string attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "STYLE"));
-                                                            if (!string.IsNullOrEmpty(attr)) {
-                                                                Copy += " style=\"" + attr + "\"";
-                                                            }
-                                                            //
-                                                            attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "CLASS"));
-                                                            if (!string.IsNullOrEmpty(attr)) {
-                                                                Copy += " class=\"" + attr + "\"";
-                                                            }
-                                                            //
-                                                            Copy += ">";
-                                                        }
-                                                    }
-                                                    //
-                                                    //
-                                                    break;
-                                                }
-                                            case ACTypeDownload: {
-                                                    //
-                                                    // ----- substitute and anchored download image for the AC-Download tag
-                                                    //
-                                                    ACAttrRecordID = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
-                                                    ACAttrAlt = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"));
-                                                    //
-                                                    if (EncodeEditIcons) {
-                                                        //
-                                                        // Encoding the edit icons for the active editor form
-                                                        //
-                                                        IconIDControlString = "AC," + ACTypeDownload + ",," + ACAttrRecordID;
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 16, 16, 0, true, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0);
-                                                        Copy = IconImg;
-                                                        //
-                                                        //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
-                                                    } else if (EncodeImages) {
-                                                        //
-                                                        libraryFilesModel file = libraryFilesModel.create(cpCore, ACAttrRecordID);
-                                                        if (file != null) {
-                                                            if (string.IsNullOrEmpty(ACAttrAlt)) {
-                                                                ACAttrAlt = genericController.encodeText(file.AltText);
-                                                            }
-                                                            Copy = "<a href=\"" + ProtocolHostLink + requestAppRootPath + cpCore.siteProperties.serverPageDefault + "?" + RequestNameDownloadID + "=" + ACAttrRecordID + "\" target=\"_blank\"><img src=\"" + ProtocolHostLink + "/ccLib/images/IconDownload3.gif\" width=\"16\" height=\"16\" border=\"0\" alt=\"" + ACAttrAlt + "\"></a>";
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeTemplateContent: {
-                                                    //
-                                                    // ----- Create Template Content
-                                                    //
-                                                    //ACName = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
-                                                    AddonOptionStringHTMLEncoded = "";
-                                                    addonOptionString = "";
-                                                    NotUsedID = 0;
-                                                    if (EncodeEditIcons) {
-                                                        //
-                                                        IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0);
-                                                        Copy = IconImg;
-                                                        //
-                                                        //Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>"
-                                                    } else if (EncodeNonCachableTags) {
-                                                        //
-                                                        // Add in the Content
-                                                        //
-                                                        Copy = fpoContentBox;
-                                                        //Copy = TemplateBodyContent
-                                                        //Copy = "{{" & ACTypeTemplateContent & "}}"
-                                                    }
-                                                    break;
-                                                }
-                                            case ACTypeTemplateText: {
-                                                    //
-                                                    // ----- Create Template Content
-                                                    //
-                                                    //ACName = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
-                                                    AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
-                                                    NotUsedID = 0;
-                                                    if (EncodeEditIcons) {
-                                                        //
-                                                        IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0);
-                                                        Copy = IconImg;
-                                                        //
-                                                        //Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
-                                                    } else if (EncodeNonCachableTags) {
-                                                        //
-                                                        // Add in the Content Page
-                                                        //
-                                                        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                        //test - encoding changed
-                                                        NewName = htmlController.getAddonOptionStringValue("new", addonOptionString);
-                                                        //NewName =  genericController.DecodeResponseVariable(getSimpleNameValue("new", AddonOptionString, "", "&"))
-                                                        TextName = htmlController.getAddonOptionStringValue("name", addonOptionString);
-                                                        //TextName = getSimpleNameValue("name", AddonOptionString)
-                                                        if (string.IsNullOrEmpty(TextName)) {
-                                                            TextName = "Default";
-                                                        }
-                                                        Copy = "{{" + ACTypeTemplateText + "?name=" + genericController.encodeNvaArgument(TextName) + "&new=" + genericController.encodeNvaArgument(NewName) + "}}";
-                                                        // ***** can not add it here, if a web hit, it must be encoded from the web client for aggr objects
-                                                        //Copy = csv_GetContentCopy(TextName, "Copy Content", "", personalizationpeopleId)
-                                                    }
-                                                    //Case ACTypeDynamicMenu
-                                                    //    '
-                                                    //    ' ----- Create Template Menu
-                                                    //    '
-                                                    //    'ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
-                                                    //    AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                                    //    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded)
-                                                    //    '
-                                                    //    ' test for illegal characters (temporary patch to get around not addonencoding during the addon replacement
-                                                    //    '
-                                                    //    Pos = genericController.vbInstr(1, addonOptionString, "menunew=", vbTextCompare)
-                                                    //    If Pos > 0 Then
-                                                    //        NewName = Mid(addonOptionString, Pos + 8)
-                                                    //        Dim IsOK As Boolean
-                                                    //        IsOK = (NewName = genericController.encodeNvaArgument(NewName))
-                                                    //        If Not IsOK Then
-                                                    //            addonOptionString = Left(addonOptionString, Pos - 1) & "MenuNew=" & genericController.encodeNvaArgument(NewName)
-                                                    //        End If
-                                                    //    End If
-                                                    //    NotUsedID = 0
-                                                    //    If EncodeEditIcons Then
-                                                    //        If genericController.vbInstr(1, AddonOptionStringHTMLEncoded, "menu=", vbTextCompare) <> 0 Then
-                                                    //            '
-                                                    //            ' Dynamic Menu
-                                                    //            '
-                                                    //            '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                    //            ' test - encoding changed
-                                                    //            TextName = cpCore.csv_GetAddonOptionStringValue("menu", addonOptionString)
-                                                    //            'TextName = cpcore.csv_GetAddonOption("Menu", AddonOptionString)
-                                                    //            '
-                                                    //            IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & cpCore.csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                                                    //            IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
-                                                    //            Copy = IconImg
-                                                    //            '
-                                                    //            'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect & "]&NewMenu="" src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
-                                                    //        Else
-                                                    //            '
-                                                    //            ' Old Dynamic Menu - values are stored in the icon
-                                                    //            '
-                                                    //            IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                    //            IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
-                                                    //            Copy = IconImg
-                                                    //            '
-                                                    //            'Copy = "<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
-                                                    //        End If
-                                                    //    ElseIf EncodeNonCachableTags Then
-                                                    //        '
-                                                    //        ' Add in the Content Pag
-                                                    //        '
-                                                    //        Copy = "{{" & ACTypeDynamicMenu & "?" & addonOptionString & "}}"
-                                                    //    End If
-                                                    break;
-                                                }
-                                            case ACTypeWatchList: {
-                                                    //
-                                                    // ----- Formatting Tag
-                                                    //
-                                                    //
-                                                    // Content Watch replacement
-                                                    //   served by the web client because the
-                                                    //
-                                                    //UCaseACName = genericController.vbUCase(Trim(KmaHTML.ElementAttribute(ElementPointer, "NAME")))
-                                                    //ACName = encodeInitialCaps(UCaseACName)
-                                                    AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING");
-                                                    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded);
-                                                    if (EncodeEditIcons) {
-                                                        //
-                                                        IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 109, 10, 0, true, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" + ACName + "]", ACInstanceID, 0);
-                                                        Copy = IconImg;
-                                                        //
-                                                        //Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Watch List [" & ACName & "]"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACWatchList.GIF"">"
-                                                    } else if (EncodeNonCachableTags) {
-                                                        //
-                                                        Copy = "{{" + ACTypeWatchList + "?" + addonOptionString + "}}";
-                                                    }
-                                                    break;
-                                                }
-                                        }
-                                        break;
-                                }
-                            }
-                            //
-                            // ----- Output the results
-                            //
-                            Stream.Add(Copy);
-                            ElementPointer = ElementPointer + 1;
-                        }
-                    }
-                    workingContent = Stream.Text;
-                    //
-                    // Add Contensive User Form if needed
-                    //
-                    if (FormCount == 0 && FormInputCount > 0) {
-                    }
-                    workingContent = ReplaceInstructions + workingContent;
-                    if (CSPeopleSet) {
-                        cpCore.db.csClose(ref CSPeople);
-                    }
-                    if (CSOrganizationSet) {
-                        cpCore.db.csClose(ref CSOrganization);
-                    }
-                    if (CSVisitorSet) {
-                        cpCore.db.csClose(ref CSVisitor);
-                    }
-                    if (CSVisitSet) {
-                        cpCore.db.csClose(ref CSVisit);
-                    }
-                    KmaHTML = null;
-                }
-                result = workingContent;
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return result;
-        }
-
-
-        //
-        //========================================================================
-        //   Decodes ActiveContent and EditIcons into <AC tags
-        //       Detect IMG tags
-        //           If IMG ID attribute is "AC,IMAGE,recordid", convert to AC Image tag
-        //           If IMG ID attribute is "AC,DOWNLOAD,recordid", convert to AC Download tag
-        //           If IMG ID attribute is "AC,ACType,ACFieldName,ACInstanceName,QueryStringArguments,AddonGuid", convert it to generic AC tag
-        //   ACInstanceID - used to identify an AC tag on a page. Each instance of an AC tag must havea unique ACinstanceID
-        //========================================================================
-        //
-        public string convertEditorResponseToActiveContent(string SourceCopy) {
-            string result = "";
-            try {
-                string imageNewLink = null;
-                string ACQueryString = "";
-                string ACGuid = null;
-                string ACIdentifier = null;
-                string RecordFilename = null;
-                string RecordFilenameNoExt = null;
-                string RecordFilenameExt = null;
-                int Ptr = 0;
-                string ACInstanceID = null;
-                string QSHTMLEncoded = null;
-                int Pos = 0;
-                string ImageSrcOriginal = null;
-                string VirtualFilePathBad = null;
-                string[] Paths = null;
-                string ImageVirtualFilename = null;
-                string ImageFilename = null;
-                string ImageFilenameExt = null;
-                string ImageFilenameNoExt = null;
-                string[] SizeTest = null;
-                string[] Styles = null;
-                string StyleName = null;
-                string StyleValue = null;
-                int StyleValueInt = 0;
-                string[] Style = null;
-                string ImageVirtualFilePath = null;
-                string RecordVirtualFilename = null;
-                int RecordWidth = 0;
-                int RecordHeight = 0;
-                string RecordAltSizeList = null;
-                string ImageAltSize = null;
-                string NewImageFilename = null;
-                htmlParserController DHTML = new htmlParserController(cpCore);
-                int ElementPointer = 0;
-                int ElementCount = 0;
-                int AttributeCount = 0;
-                string ACType = null;
-                string ACFieldName = null;
-                string ACInstanceName = null;
-                int RecordID = 0;
-                string ImageWidthText = null;
-                string ImageHeightText = null;
-                int ImageWidth = 0;
-                int ImageHeight = 0;
-                string ElementText = null;
-                string ImageID = null;
-                string ImageSrc = null;
-                string ImageAlt = null;
-                int ImageVSpace = 0;
-                int ImageHSpace = 0;
-                string ImageAlign = null;
-                string ImageBorder = null;
-                string ImageLoop = null;
-                string ImageStyle = null;
-                string[] IMageStyleArray = null;
-                int ImageStyleArrayCount = 0;
-                int ImageStyleArrayPointer = 0;
-                string ImageStylePair = null;
-                int PositionColon = 0;
-                string ImageStylePairName = null;
-                string ImageStylePairValue = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
-                string[] ImageIDArray = { };
-                int ImageIDArrayCount = 0;
-                string QueryString = null;
-                string[] QSSplit = null;
-                int QSPtr = 0;
-                string serverFilePath = null;
-                bool ImageAllowSFResize = false;
-                imageEditController sf = null;
-                //
-                result = SourceCopy;
-                if (!string.IsNullOrEmpty(result)) {
-                    //
-                    // leave this in to make sure old <acform tags are converted back
-                    // new editor deals with <form, so no more converting
-                    //
-                    result = genericController.vbReplace(result, "<ACFORM>", "<FORM>");
-                    result = genericController.vbReplace(result, "<ACFORM ", "<FORM ");
-                    result = genericController.vbReplace(result, "</ACFORM>", "</form>");
-                    result = genericController.vbReplace(result, "</ACFORM ", "</FORM ");
-                    if (DHTML.Load(result)) {
-                        result = "";
-                        ElementCount = DHTML.ElementCount;
-                        if (ElementCount > 0) {
-                            //
-                            // ----- Locate and replace IMG Edit icons with AC tags
-                            //
-                            Stream = new stringBuilderLegacyController();
-                            for (ElementPointer = 0; ElementPointer < ElementCount; ElementPointer++) {
-                                ElementText = DHTML.Text(ElementPointer).ToString();
-                                if (DHTML.IsTag(ElementPointer)) {
-                                    switch (genericController.vbUCase(DHTML.TagName(ElementPointer))) {
-                                        case "FORM":
-                                            //
-                                            // User created form - add the attribute "Contensive=1"
-                                            //
-                                            // 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
-                                            //ElementText = genericController.vbReplace(ElementText, "<FORM", "<FORM ContensiveUserForm=1 ", vbTextCompare)
-                                            break;
-                                        case "IMG":
-                                            AttributeCount = DHTML.ElementAttributeCount(ElementPointer);
-
-                                            if (AttributeCount > 0) {
-                                                ImageID = DHTML.ElementAttribute(ElementPointer, "id");
-                                                ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src");
-                                                VirtualFilePathBad = cpCore.serverConfig.appConfig.name + "/files/";
-                                                serverFilePath = "/" + VirtualFilePathBad;
-                                                if (ImageSrcOriginal.ToLower().Left( VirtualFilePathBad.Length) == genericController.vbLCase(VirtualFilePathBad)) {
-                                                    //
-                                                    // if the image is from the virtual file path, but the editor did not include the root path, add it
-                                                    //
-                                                    ElementText = genericController.vbReplace(ElementText, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
-                                                    ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" + VirtualFilePathBad, 1, 99, 1);
-                                                }
-                                                ImageSrc = genericController.decodeHtml(ImageSrcOriginal);
-                                                ImageSrc = DecodeURL(ImageSrc);
-                                                //
-                                                // problem with this case is if the addon icon image is from another site.
-                                                // not sure how it happened, but I do not think the src of an addon edit icon
-                                                // should be able to prevent the addon from executing.
-                                                //
-                                                ACIdentifier = "";
-                                                ACType = "";
-                                                ACFieldName = "";
-                                                ACInstanceName = "";
-                                                ACGuid = "";
-                                                ImageIDArrayCount = 0;
-                                                if (0 != genericController.vbInstr(1, ImageID, ",")) {
-                                                    ImageIDArray = ImageID.Split(',');
-                                                    ImageIDArrayCount = ImageIDArray.GetUpperBound(0) + 1;
-                                                    if (ImageIDArrayCount > 5) {
-                                                        for (Ptr = 5; Ptr < ImageIDArrayCount; Ptr++) {
-                                                            ACGuid = ImageIDArray[Ptr];
-                                                            if ((ACGuid.Left( 1) == "{") && (ACGuid.Substring(ACGuid.Length - 1) == "}")) {
-                                                                //
-                                                                // this element is the guid, go with it
-                                                                //
-                                                                break;
-                                                            } else if ((string.IsNullOrEmpty(ACGuid)) && (Ptr == (ImageIDArrayCount - 1))) {
-                                                                //
-                                                                // this is the last element, leave it as the guid
-                                                                //
-                                                                break;
-                                                            } else {
-                                                                //
-                                                                // not a valid guid, add it to element 4 and try the next
-                                                                //
-                                                                ImageIDArray[4] = ImageIDArray[4] + "," + ACGuid;
-                                                                ACGuid = "";
-                                                            }
-                                                        }
-                                                    }
-                                                    if (ImageIDArrayCount > 1) {
-                                                        ACIdentifier = genericController.vbUCase(ImageIDArray[0]);
-                                                        ACType = ImageIDArray[1];
-                                                        if (ImageIDArrayCount > 2) {
-                                                            ACFieldName = ImageIDArray[2];
-                                                            if (ImageIDArrayCount > 3) {
-                                                                ACInstanceName = ImageIDArray[3];
-                                                                if (ImageIDArrayCount > 4) {
-                                                                    ACQueryString = ImageIDArray[4];
-                                                                    //If ImageIDArrayCount > 5 Then
-                                                                    //    ACGuid = ImageIDArray(5)
-                                                                    //End If
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                if (ACIdentifier == "AC") {
-                                                    if (true) {
-                                                        if (true) {
-                                                            //
-                                                            // ----- Process AC Tag
-                                                            //
-                                                            ACInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID");
-                                                            if (string.IsNullOrEmpty(ACInstanceID)) {
-                                                                //GUIDGenerator = New guidClass
-                                                                ACInstanceID = Guid.NewGuid().ToString();
-                                                                //ACInstanceID = Guid.NewGuid.ToString()
-                                                            }
-                                                            ElementText = "";
-                                                            //----------------------------- change to ACType
-                                                            switch (genericController.vbUCase(ACType)) {
-                                                                case "IMAGE":
-                                                                    //
-                                                                    // ----- AC Image, Decode Active Images to Resource Library references
-                                                                    //
-                                                                    if (ImageIDArrayCount >= 4) {
-                                                                        RecordID = genericController.EncodeInteger(ACInstanceName);
-                                                                        ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH");
-                                                                        ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT");
-                                                                        ImageAlt = encodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"));
-                                                                        ImageVSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"));
-                                                                        ImageHSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"));
-                                                                        ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align");
-                                                                        ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER");
-                                                                        ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP");
-                                                                        ImageStyle = DHTML.ElementAttribute(ElementPointer, "STYLE");
-
-                                                                        if (!string.IsNullOrEmpty(ImageStyle)) {
-                                                                            //
-                                                                            // ----- Process styles, which override attributes
-                                                                            //
-                                                                            IMageStyleArray = ImageStyle.Split(';');
-                                                                            ImageStyleArrayCount = IMageStyleArray.GetUpperBound(0) + 1;
-                                                                            for (ImageStyleArrayPointer = 0; ImageStyleArrayPointer < ImageStyleArrayCount; ImageStyleArrayPointer++) {
-                                                                                ImageStylePair = IMageStyleArray[ImageStyleArrayPointer].Trim(' ');
-                                                                                PositionColon = genericController.vbInstr(1, ImageStylePair, ":");
-                                                                                if (PositionColon > 1) {
-                                                                                    ImageStylePairName = (ImageStylePair.Left( PositionColon - 1)).Trim(' ');
-                                                                                    ImageStylePairValue = (ImageStylePair.Substring(PositionColon)).Trim(' ');
-                                                                                    switch (genericController.vbUCase(ImageStylePairName)) {
-                                                                                        case "WIDTH":
-                                                                                            ImageStylePairValue = genericController.vbReplace(ImageStylePairValue, "px", "");
-                                                                                            ImageWidthText = ImageStylePairValue;
-                                                                                            break;
-                                                                                        case "HEIGHT":
-                                                                                            ImageStylePairValue = genericController.vbReplace(ImageStylePairValue, "px", "");
-                                                                                            ImageHeightText = ImageStylePairValue;
-                                                                                            break;
-                                                                                    }
-                                                                                    //If genericController.vbInstr(1, ImageStylePair, "WIDTH", vbTextCompare) = 1 Then
-                                                                                    //    End If
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        ElementText = "<AC type=\"IMAGE\" ACInstanceID=\"" + ACInstanceID + "\" RecordID=\"" + RecordID + "\" Style=\"" + ImageStyle + "\" Width=\"" + ImageWidthText + "\" Height=\"" + ImageHeightText + "\" VSpace=\"" + ImageVSpace + "\" HSpace=\"" + ImageHSpace + "\" Alt=\"" + ImageAlt + "\" Align=\"" + ImageAlign + "\" Border=\"" + ImageBorder + "\" Loop=\"" + ImageLoop + "\">";
-                                                                    }
-                                                                    break;
-                                                                case ACTypeDownload:
-                                                                    //
-                                                                    // AC Download
-                                                                    //
-                                                                    if (ImageIDArrayCount >= 4) {
-                                                                        RecordID = genericController.EncodeInteger(ACInstanceName);
-                                                                        ElementText = "<AC type=\"DOWNLOAD\" ACInstanceID=\"" + ACInstanceID + "\" RecordID=\"" + RecordID + "\">";
-                                                                    }
-                                                                    break;
-                                                                case ACTypeDate:
-                                                                    //
-                                                                    // Date
-                                                                    //
-                                                                    ElementText = "<AC type=\"" + ACTypeDate + "\">";
-                                                                    break;
-                                                                case ACTypeVisit:
-                                                                case ACTypeVisitor:
-                                                                case ACTypeMember:
-                                                                case ACTypeOrganization:
-                                                                case ACTypePersonalization:
-                                                                    //
-                                                                    // Visit, etc
-                                                                    //
-                                                                    ElementText = "<AC type=\"" + ACType + "\" ACInstanceID=\"" + ACInstanceID + "\" field=\"" + ACFieldName + "\">";
-                                                                    break;
-                                                                case ACTypeChildList:
-                                                                case ACTypeLanguage:
-                                                                    //
-                                                                    // ChildList, Language
-                                                                    //
-                                                                    if (ACInstanceName == "0") {
-                                                                        ACInstanceName = genericController.GetRandomInteger(cpCore).ToString();
-                                                                    }
-                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\">";
-                                                                    break;
-                                                                case ACTypeAggregateFunction:
-                                                                    //
-                                                                    // Function
-                                                                    //
-                                                                    QueryString = "";
-                                                                    if (!string.IsNullOrEmpty(ACQueryString)) {
-                                                                        // I added this because single stepping through it I found it split on the & in &amp;
-                                                                        // I had added an Add-on and was saving
-                                                                        // I find it VERY odd that this could be the case
-                                                                        //
-                                                                        QSHTMLEncoded = genericController.encodeText(ACQueryString);
-                                                                        QueryString = genericController.decodeHtml(QSHTMLEncoded);
-                                                                        QSSplit = QueryString.Split('&');
-                                                                        for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            Pos = genericController.vbInstr(1, QSSplit[QSPtr], "[");
-                                                                            if (Pos > 0) {
-                                                                                QSSplit[QSPtr] = QSSplit[QSPtr].Left( Pos - 1);
-                                                                            }
-                                                                            QSSplit[QSPtr] = encodeHTML(QSSplit[QSPtr]);
-                                                                        }
-                                                                        QueryString = string.Join("&", QSSplit);
-                                                                    }
-                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\" guid=\"" + ACGuid + "\">";
-                                                                    break;
-                                                                case ACTypeContact:
-                                                                case ACTypeFeedback:
-                                                                    //
-                                                                    // Contact and Feedback
-                                                                    //
-                                                                    ElementText = "<AC type=\"" + ACType + "\" ACInstanceID=\"" + ACInstanceID + "\">";
-                                                                    break;
-                                                                case ACTypeTemplateContent:
-                                                                case ACTypeTemplateText:
-                                                                    //
-                                                                    //
-                                                                    //
-                                                                    QueryString = "";
-                                                                    if (ImageIDArrayCount > 4) {
-                                                                        QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QSSplit = QueryString.Split('&');
-                                                                        for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = encodeHTML(QSSplit[QSPtr]);
-                                                                        }
-                                                                        QueryString = string.Join("&", QSSplit);
-
-                                                                    }
-                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\">";
-                                                                    break;
-                                                                case ACTypeWatchList:
-                                                                    //
-                                                                    // Watch List
-                                                                    //
-                                                                    QueryString = "";
-                                                                    if (ImageIDArrayCount > 4) {
-                                                                        QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QueryString = genericController.decodeHtml(QueryString);
-                                                                        QSSplit = QueryString.Split('&');
-                                                                        for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = encodeHTML(QSSplit[QSPtr]);
-                                                                        }
-                                                                        QueryString = string.Join("&", QSSplit);
-                                                                    }
-                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\">";
-                                                                    break;
-                                                                case ACTypeRSSLink:
-                                                                    //
-                                                                    // RSS Link
-                                                                    //
-                                                                    QueryString = "";
-                                                                    if (ImageIDArrayCount > 4) {
-                                                                        QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QueryString = genericController.decodeHtml(QueryString);
-                                                                        QSSplit = QueryString.Split('&');
-                                                                        for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = encodeHTML(QSSplit[QSPtr]);
-                                                                        }
-                                                                        QueryString = string.Join("&", QSSplit);
-                                                                    }
-                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" querystring=\"" + QueryString + "\">";
-                                                                    break;
-                                                                default:
-                                                                    //
-                                                                    // All others -- added querystring from element(4) to all others to cover the group access AC object
-                                                                    //
-                                                                    QueryString = "";
-                                                                    if (ImageIDArrayCount > 4) {
-                                                                        QueryString = genericController.encodeText(ImageIDArray[4]);
-                                                                        QueryString = genericController.decodeHtml(QueryString);
-                                                                        QSSplit = QueryString.Split('&');
-                                                                        for (QSPtr = 0; QSPtr <= QSSplit.GetUpperBound(0); QSPtr++) {
-                                                                            QSSplit[QSPtr] = encodeHTML(QSSplit[QSPtr]);
-                                                                        }
-                                                                        QueryString = string.Join("&", QSSplit);
-                                                                    }
-                                                                    ElementText = "<AC type=\"" + ACType + "\" name=\"" + ACInstanceName + "\" ACInstanceID=\"" + ACInstanceID + "\" field=\"" + ACFieldName + "\" querystring=\"" + QueryString + "\">";
-                                                                    break;
-                                                            }
-                                                        }
-                                                    }
-                                                } else if (genericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1) != 0) {
-                                                    ImageAllowSFResize = cpCore.siteProperties.getBoolean("ImageAllowSFResize", true);
-                                                    if (ImageAllowSFResize && true) {
-                                                        //
-                                                        // if it is a real image, check for resize
-                                                        //
-                                                        Pos = genericController.vbInstr(1, ImageSrc, "cclibraryfiles", 1);
-                                                        if (Pos != 0) {
-                                                            ImageVirtualFilename = ImageSrc.Substring(Pos - 1);
-                                                            Paths = ImageVirtualFilename.Split('/');
-                                                            if (Paths.GetUpperBound(0) > 2) {
-                                                                if (genericController.vbLCase(Paths[1]) == "filename") {
-                                                                    RecordID = genericController.EncodeInteger(Paths[2]);
-                                                                    if (RecordID != 0) {
-                                                                        ImageFilename = Paths[3];
-                                                                        ImageVirtualFilePath = genericController.vbReplace(ImageVirtualFilename, ImageFilename, "");
-                                                                        Pos = ImageFilename.LastIndexOf(".") + 1;
-                                                                        if (Pos > 0) {
-                                                                            string ImageFilenameAltSize = "";
-                                                                            ImageFilenameExt = ImageFilename.Substring(Pos);
-                                                                            ImageFilenameNoExt = ImageFilename.Left( Pos - 1);
-                                                                            Pos = ImageFilenameNoExt.LastIndexOf("-") + 1;
-                                                                            if (Pos > 0) {
-                                                                                //
-                                                                                // ImageAltSize should be set from the width and height of the img tag,
-                                                                                // NOT from the actual width and height of the image file
-                                                                                // NOT from the suffix of the image filename
-                                                                                // ImageFilenameAltSize is used when the image has been resized, then 'reset' was hit
-                                                                                //  on the properties dialog before the save. The width and height come from this suffix
-                                                                                //
-                                                                                ImageFilenameAltSize = ImageFilenameNoExt.Substring(Pos);
-                                                                                SizeTest = ImageFilenameAltSize.Split('x');
-                                                                                if (SizeTest.GetUpperBound(0) != 1) {
-                                                                                    ImageFilenameAltSize = "";
-                                                                                } else {
-                                                                                    if ((SizeTest[0].IsNumeric() & SizeTest[1].IsNumeric())) {
-                                                                                        ImageFilenameNoExt = ImageFilenameNoExt.Left( Pos - 1);
-                                                                                        //RecordVirtualFilenameNoExt = Mid(RecordVirtualFilename, 1, Pos - 1)
-                                                                                    } else {
-                                                                                        ImageFilenameAltSize = "";
-                                                                                    }
-                                                                                }
-                                                                                //ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
-                                                                            }
-                                                                            if (genericController.vbInstr(1, sfImageExtList, ImageFilenameExt, 1) != 0) {
-                                                                                //
-                                                                                // Determine ImageWidth and ImageHeight
-                                                                                //
-                                                                                ImageStyle = DHTML.ElementAttribute(ElementPointer, "style");
-                                                                                ImageWidth = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "width"));
-                                                                                ImageHeight = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "height"));
-                                                                                if (!string.IsNullOrEmpty(ImageStyle)) {
-                                                                                    Styles = ImageStyle.Split(';');
-                                                                                    for (Ptr = 0; Ptr <= Styles.GetUpperBound(0); Ptr++) {
-                                                                                        Style = Styles[Ptr].Split(':');
-                                                                                        if (Style.GetUpperBound(0) > 0) {
-                                                                                            StyleName = genericController.vbLCase(Style[0].Trim(' '));
-                                                                                            if (StyleName == "width") {
-                                                                                                StyleValue = genericController.vbLCase(Style[1].Trim(' '));
-                                                                                                StyleValue = genericController.vbReplace(StyleValue, "px", "");
-                                                                                                StyleValueInt = genericController.EncodeInteger(StyleValue);
-                                                                                                if (StyleValueInt > 0) {
-                                                                                                    ImageWidth = StyleValueInt;
-                                                                                                }
-                                                                                            } else if (StyleName == "height") {
-                                                                                                StyleValue = genericController.vbLCase(Style[1].Trim(' '));
-                                                                                                StyleValue = genericController.vbReplace(StyleValue, "px", "");
-                                                                                                StyleValueInt = genericController.EncodeInteger(StyleValue);
-                                                                                                if (StyleValueInt > 0) {
-                                                                                                    ImageHeight = StyleValueInt;
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                //
-                                                                                // Get the record values
-                                                                                //
-                                                                                libraryFilesModel file = libraryFilesModel.create(cpCore, RecordID);
-                                                                                if (file != null) {
-                                                                                    RecordVirtualFilename = file.Filename;
-                                                                                    RecordWidth = file.pxWidth;
-                                                                                    RecordHeight = file.pxHeight;
-                                                                                    RecordAltSizeList = file.AltSizeList;
-                                                                                    RecordFilename = RecordVirtualFilename;
-                                                                                    Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
-                                                                                    if (Pos > 0) {
-                                                                                        RecordFilename = RecordVirtualFilename.Substring(Pos);
-                                                                                    }
-                                                                                    RecordFilenameExt = "";
-                                                                                    RecordFilenameNoExt = RecordFilename;
-                                                                                    Pos = RecordFilenameNoExt.LastIndexOf(".") + 1;
-                                                                                    if (Pos > 0) {
-                                                                                        RecordFilenameExt = RecordFilenameNoExt.Substring(Pos);
-                                                                                        RecordFilenameNoExt = RecordFilenameNoExt.Left( Pos - 1);
-                                                                                    }
-                                                                                    //
-                                                                                    // if recordwidth or height are missing, get them from the file
-                                                                                    //
-                                                                                    if (RecordWidth == 0 || RecordHeight == 0) {
-                                                                                        sf = new imageEditController();
-                                                                                        if (sf.load(genericController.convertCdnUrlToCdnPathFilename(ImageVirtualFilename))) {
-                                                                                            file.pxWidth = sf.width;
-                                                                                            file.pxHeight = sf.height;
-                                                                                            file.save(cpCore);
-                                                                                        }
-                                                                                        sf.Dispose();
-                                                                                        sf = null;
-                                                                                    }
-                                                                                    //
-                                                                                    // continue only if we have record width and height
-                                                                                    //
-                                                                                    if (RecordWidth != 0 & RecordHeight != 0) {
-                                                                                        //
-                                                                                        // set ImageWidth and ImageHeight if one of them is missing
-                                                                                        //
-                                                                                        if ((ImageWidth == RecordWidth) && (ImageHeight == 0)) {
-                                                                                            //
-                                                                                            // Image only included width, set default height
-                                                                                            //
-                                                                                            ImageHeight = RecordHeight;
-                                                                                        } else if ((ImageHeight == RecordHeight) && (ImageWidth == 0)) {
-                                                                                            //
-                                                                                            // Image only included height, set default width
-                                                                                            //
-                                                                                            ImageWidth = RecordWidth;
-                                                                                        } else if ((ImageHeight == 0) && (ImageWidth == 0)) {
-                                                                                            //
-                                                                                            // Image has no width or height, default both
-                                                                                            // This happens when you hit 'reset' on the image properties dialog
-                                                                                            //
-                                                                                            sf = new imageEditController();
-                                                                                            if (sf.load(genericController.convertCdnUrlToCdnPathFilename(ImageVirtualFilename))) {
-                                                                                                ImageWidth = sf.width;
-                                                                                                ImageHeight = sf.height;
-                                                                                            }
-                                                                                            sf.Dispose();
-                                                                                            sf = null;
-                                                                                            if ((ImageHeight == 0) && (ImageWidth == 0) && (!string.IsNullOrEmpty(ImageFilenameAltSize))) {
-                                                                                                Pos = genericController.vbInstr(1, ImageFilenameAltSize, "x");
-                                                                                                if (Pos != 0) {
-                                                                                                    ImageWidth = genericController.EncodeInteger(ImageFilenameAltSize.Left( Pos - 1));
-                                                                                                    ImageHeight = genericController.EncodeInteger(ImageFilenameAltSize.Substring(Pos));
-                                                                                                }
-                                                                                            }
-                                                                                            if (ImageHeight == 0 && ImageWidth == 0) {
-                                                                                                ImageHeight = RecordHeight;
-                                                                                                ImageWidth = RecordWidth;
-                                                                                            }
-                                                                                        }
-                                                                                        //
-                                                                                        // Set the ImageAltSize to what was requested from the img tag
-                                                                                        // if the actual image is a few rounding-error pixels off does not matter
-                                                                                        // if either is 0, let altsize be 0, set real value for image height/width
-                                                                                        //
-                                                                                        ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
-                                                                                        //
-                                                                                        // determine if we are OK, or need to rebuild
-                                                                                        //
-                                                                                        if ((RecordVirtualFilename == (ImageVirtualFilePath + ImageFilename)) && ((RecordWidth == ImageWidth) || (RecordHeight == ImageHeight))) {
-                                                                                            //
-                                                                                            // OK
-                                                                                            // this is the raw image
-                                                                                            // image matches record, and the sizes are the same
-                                                                                            //
-                                                                                            //RecordVirtualFilename = RecordVirtualFilename;
-                                                                                        } else if ((RecordVirtualFilename == ImageVirtualFilePath + ImageFilenameNoExt + "." + ImageFilenameExt) && (RecordAltSizeList.IndexOf(ImageAltSize, System.StringComparison.OrdinalIgnoreCase)  != -1)) {
-                                                                                            //
-                                                                                            // OK
-                                                                                            // resized image, and altsize is in the list - go with resized image name
-                                                                                            //
-                                                                                            NewImageFilename = ImageFilenameNoExt + "-" + ImageAltSize + "." + ImageFilenameExt;
-                                                                                            // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            imageNewLink = genericController.EncodeURL(genericController.getCdnFileLink(cpCore, ImageVirtualFilePath) + NewImageFilename);
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, encodeHTML(imageNewLink));
-                                                                                        } else if ((RecordWidth < ImageWidth) || (RecordHeight < ImageHeight)) {
-                                                                                            //
-                                                                                            // OK
-                                                                                            // reize image larger then original - go with it as is
-                                                                                            //
-                                                                                            // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, encodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(cpCore, RecordVirtualFilename))));
-                                                                                        } else {
-                                                                                            //
-                                                                                            // resized image - create NewImageFilename (and add new alt size to the record)
-                                                                                            //
-                                                                                            if (RecordWidth == ImageWidth && RecordHeight == ImageHeight) {
-                                                                                                //
-                                                                                                // set back to Raw image untouched, use the record image filename
-                                                                                                //
-                                                                                                //ElementText = ElementText;
-                                                                                                //ElementText = genericController.vbReplace(ElementText, ImageVirtualFilename, RecordVirtualFilename)
-                                                                                            } else {
-                                                                                                //
-                                                                                                // Raw image filename in content, but it is resized, switch to an alternate size
-                                                                                                //
-                                                                                                NewImageFilename = RecordFilename;
-                                                                                                if ((ImageWidth == 0) || (ImageHeight == 0) )  {
-                                                                                                    //
-                                                                                                    // Alt image has not been built
-                                                                                                    //
-                                                                                                    sf = new imageEditController();
-                                                                                                    if (!sf.load(genericController.convertCdnUrlToCdnPathFilename(RecordVirtualFilename))) {
-                                                                                                        //
-                                                                                                        // image load failed, use raw filename
-                                                                                                        //
-                                                                                                        throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
-                                                                                                                                                                  //INSTANT C# TODO TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                                                        //Microsoft.VisualBasic.Information.Err().Clear();
-                                                                                                        NewImageFilename = ImageFilename;
-                                                                                                    } else {
-                                                                                                        //
-                                                                                                        //
-                                                                                                        //
-                                                                                                        RecordWidth = sf.width;
-                                                                                                        RecordHeight = sf.height;
-                                                                                                        if (ImageWidth == 0) {
-                                                                                                            //
-                                                                                                            //
-                                                                                                            //
-                                                                                                            sf.height = ImageHeight;
-                                                                                                        } else if (ImageHeight == 0) {
-                                                                                                            //
-                                                                                                            //
-                                                                                                            //
-                                                                                                            sf.width = ImageWidth;
-                                                                                                        } else if (RecordHeight == ImageHeight) {
-                                                                                                            //
-                                                                                                            // change the width
-                                                                                                            //
-                                                                                                            sf.width = ImageWidth;
-                                                                                                        } else {
-                                                                                                            //
-                                                                                                            // change the height
-                                                                                                            //
-                                                                                                            sf.height = ImageHeight;
-                                                                                                        }
-                                                                                                        //
-                                                                                                        // if resized only width or height, set the other
-                                                                                                        //
-                                                                                                        if (ImageWidth == 0) {
-                                                                                                            ImageWidth = sf.width;
-                                                                                                            ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
-                                                                                                        }
-                                                                                                        if (ImageHeight == 0) {
-                                                                                                            ImageHeight = sf.height;
-                                                                                                            ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
-                                                                                                        }
-                                                                                                        //
-                                                                                                        // set HTML attributes so image properties will display
-                                                                                                        //
-                                                                                                        if (genericController.vbInstr(1, ElementText, "height=", 1) == 0) {
-                                                                                                            ElementText = genericController.vbReplace(ElementText, ">", " height=\"" + ImageHeight + "\">");
-                                                                                                        }
-                                                                                                        if (genericController.vbInstr(1, ElementText, "width=", 1) == 0) {
-                                                                                                            ElementText = genericController.vbReplace(ElementText, ">", " width=\"" + ImageWidth + "\">");
-                                                                                                        }
-                                                                                                        //
-                                                                                                        // Save new file
-                                                                                                        //
-                                                                                                        NewImageFilename = RecordFilenameNoExt + "-" + ImageAltSize + "." + RecordFilenameExt;
-                                                                                                        sf.save(genericController.convertCdnUrlToCdnPathFilename(ImageVirtualFilePath + NewImageFilename));
-                                                                                                        //
-                                                                                                        // Update image record
-                                                                                                        //
-                                                                                                        RecordAltSizeList = RecordAltSizeList + "\r\n" + ImageAltSize;
-                                                                                                    }
-                                                                                                }
-                                                                                                //
-                                                                                                // Change the image src to the AltSize
-                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, encodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(cpCore, ImageVirtualFilePath) + NewImageFilename)));
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                file.save(cpCore);
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                    }
-                                }
-                                Stream.Add(ElementText);
-                            }
-                        }
-                        result = Stream.Text;
-                    }
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-            return result;
-            //
-        }
-        //
-        //========================================================================
+        //====================================================================================================
         // Modify a string to be printed through the HTML stream
         //   convert carriage returns ( 0x10 ) to <br>
         //   remove linefeeds ( 0x13 )
-        //========================================================================
+        //====================================================================================================
         //
         public string convertCRLFToHtmlBreak(object Source) {
             string tempconvertCRLFToHtmlBreak = null;
@@ -5114,16 +2440,16 @@ namespace Contensive.Core.Controllers {
             return tempconvertCRLFToHtmlBreak;
         }
         //
-        //========================================================================
+        //====================================================================================================
         //   Encodes characters to be compatibile with HTML
         //   i.e. it converts the equation 5 > 6 to th sequence "5 &gt; 6"
         //
         //   convert carriage returns ( 0x10 ) to <br>
         //   remove linefeeds ( 0x13 )
-        //========================================================================
+        //====================================================================================================
         //
-        public string main_encodeHTML(object Source) {
-            return encodeHTML(genericController.encodeText(Source));
+        public string encodeHTML(object Source) {
+            return genericController.encodeHTML(genericController.encodeText(Source));
         }
         //
         //========================================================================
@@ -5134,7 +2460,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string convertTextToHTML(string Source) {
-            return convertCRLFToHtmlBreak(encodeHTML(Source));
+            return convertCRLFToHtmlBreak(genericController.encodeHTML(Source));
         }
         //
         //===============================================================================================================================
@@ -5346,9 +2672,9 @@ namespace Contensive.Core.Controllers {
                 // Build output string
                 //
                 //csv_result = encodeNvaArgument(SrcOptionName)
-                result = encodeHTML(genericController.encodeNvaArgument(SrcOptionName)) + "=";
+                result = genericController.encodeHTML(genericController.encodeNvaArgument(SrcOptionName)) + "=";
                 if (!string.IsNullOrEmpty(InstanceOptionValue_AddonEncoded)) {
-                    result = result + encodeHTML(InstanceOptionValue_AddonEncoded);
+                    result = result + genericController.encodeHTML(InstanceOptionValue_AddonEncoded);
                 }
                 if (string.IsNullOrEmpty(SrcSelectorSuffix) && string.IsNullOrEmpty(list)) {
                     //
@@ -5541,7 +2867,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
 
-                        ConstructorSplit = genericController.customSplit(AddonOptionConstructor, "\r\n");
+                        ConstructorSplit = genericController.stringSplit(AddonOptionConstructor, "\r\n");
                         AddonOptionConstructor = "";
                         //
                         // main_Get all responses from current Argument List and build new addonOption_String
@@ -5617,7 +2943,7 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 if (FoundAddon) {
-                    ConstructorSplit = genericController.customSplit(AddonOptionConstructor, "\r\n");
+                    ConstructorSplit = genericController.stringSplit(AddonOptionConstructor, "\r\n");
                     addonOption_String = "";
                     //
                     // main_Get all responses from current Argument List
@@ -5710,7 +3036,7 @@ namespace Contensive.Core.Controllers {
                     if (PosACInstanceID == 0) {
                         cpCore.handleException(new Exception("AC Instance [" + ACInstanceID + "] not found in record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                     } else {
-                        Copy = upgradeActiveContent(Copy);
+                        Copy = activeContentController.upgradeActiveContent(cpCore, Copy);
                         ParseOK = false;
                         PosStart = Copy.LastIndexOf("<ac ", PosACInstanceID - 1, System.StringComparison.OrdinalIgnoreCase) + 1;
                         if (PosStart != 0) {
@@ -5753,7 +3079,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (FoundAddon) {
-                                        ConstructorSplit = genericController.customSplit(AddonOptionConstructor, "\r\n");
+                                        ConstructorSplit = genericController.stringSplit(AddonOptionConstructor, "\r\n");
                                         addonOption_String = "";
                                         //
                                         // main_Get all responses from current Argument List
@@ -5799,7 +3125,7 @@ namespace Contensive.Core.Controllers {
                                     PosIDEnd = genericController.vbInstr(PosIDStart, Copy, "\"");
                                     if (PosIDEnd != 0) {
                                         ParseOK = true;
-                                        Copy = Copy.Left( PosIDStart - 1) + encodeHTML(addonOption_String) + Copy.Substring(PosIDEnd - 1);
+                                        Copy = Copy.Left( PosIDStart - 1) + genericController.encodeHTML(addonOption_String) + Copy.Substring(PosIDEnd - 1);
                                         cpCore.db.csSet(CS, FieldName, Copy);
                                         needToClearCache = true;
                                     }
@@ -5859,37 +3185,6 @@ namespace Contensive.Core.Controllers {
                     }
                     break;
             }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Convert an active content field (html data stored with <ac></ac> html tags) to a wysiwyg editor request (html with edit icon <img> for <ac></ac>)
-        /// </summary>
-        /// <param name="editorValue"></param>
-        /// <returns></returns>
-        public string convertActiveContentToHtmlForWysiwygEditor(string editorValue) {
-            return cpCore.html.convertActiveContent_internal(editorValue, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
-        }
-        //
-        //====================================================================================================
-        //
-        public string convertActiveContentToJsonForRemoteMethod(string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
-            return convertActiveContent_internal(Source, cpCore.doc.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.doc.authContext.isAuthenticated, null, cpCore.doc.authContext.isEditingAnything());
-            //False, False, True, True, False, True, ""
-        }
-        //
-        //====================================================================================================
-        //
-        public string convertActiveContentToHtmlForWebRender(string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, CPUtilsBaseClass.addonContext addonContext) {
-            return convertActiveContent_internal(Source, cpCore.doc.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, cpCore.doc.authContext.isAuthenticated, null, cpCore.doc.authContext.isEditingAnything());
-            //False, False, True, True, False, True, ""
-        }
-        //
-        //====================================================================================================
-        //
-        public string convertActiveContentToHtmlForEmailSend(string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
-            return convertActiveContent_internal(Source, personalizationPeopleID, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
-            //False, False, True, True, False, True, ""
         }
 
         //
@@ -5997,7 +3292,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //
                     rulesTablename = Models.Complex.cdefModel.getContentTablename(cpCore, RulesContentName);
-                    SingularPrefixHtmlEncoded = encodeHTML(genericController.GetSingular(SecondaryContentName)) + "&nbsp;";
+                    SingularPrefixHtmlEncoded = genericController.encodeHTML(genericController.GetSingular(SecondaryContentName)) + "&nbsp;";
                     //
                     main_MemberShipCount = 0;
                     main_MemberShipSize = 0;
@@ -6115,7 +3410,7 @@ namespace Contensive.Core.Controllers {
                                         if (string.IsNullOrEmpty(OptionCaption)) {
                                             optionCaptionHtmlEncoded = SingularPrefixHtmlEncoded + RecordID;
                                         } else {
-                                            optionCaptionHtmlEncoded = encodeHTML(OptionCaption);
+                                            optionCaptionHtmlEncoded = genericController.encodeHTML(OptionCaption);
                                         }
                                         if (DivCheckBoxCnt != 0) {
                                             // leave this between checkboxes - it is searched in the admin page
@@ -6201,7 +3496,7 @@ namespace Contensive.Core.Controllers {
         //   IsEditing
         //========================================================================
         //
-        public string main_GetRecordEditLink2(string ContentName, int RecordID, bool AllowCut, string RecordName, bool IsEditing) {
+        public string getRecordEditLink2(string ContentName, int RecordID, bool AllowCut, string RecordName, bool IsEditing) {
             string tempmain_GetRecordEditLink2 = null;
             try {
                 //
@@ -6313,7 +3608,7 @@ namespace Contensive.Core.Controllers {
         //   PresetNameValueList is a name=value pair to force in the added record
         //========================================================================
         //
-        public string main_cs_getRecordAddLink(int CSPointer, string PresetNameValueList = "", bool AllowPaste = false) {
+        public string cs_getRecordAddLink(int CSPointer, string PresetNameValueList = "", bool AllowPaste = false) {
             string tempmain_cs_getRecordAddLink = null;
             try {
                 //
@@ -6339,7 +3634,7 @@ namespace Contensive.Core.Controllers {
                     if (string.IsNullOrEmpty(ContentName)) {
                         throw (new ApplicationException("main_cs_getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.")); // handleLegacyError14(MethodName, "")
                     } else {
-                        tempmain_cs_getRecordAddLink = main_GetRecordAddLink(ContentName, iPresetNameValueList, AllowPaste);
+                        tempmain_cs_getRecordAddLink = getRecordAddLink(ContentName, iPresetNameValueList, AllowPaste);
                     }
                 }
                 return tempmain_cs_getRecordAddLink;
@@ -6375,8 +3670,8 @@ namespace Contensive.Core.Controllers {
         //   main_GetMenu uses
         //========================================================================
         //
-        public string main_GetRecordAddLink(string ContentName, string PresetNameValueList, bool AllowPaste = false) {
-            return main_GetRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, cpCore.doc.authContext.isEditing(ContentName));
+        public string getRecordAddLink(string ContentName, string PresetNameValueList, bool AllowPaste = false) {
+            return getRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, cpCore.doc.authContext.isEditing(ContentName));
         }
         //
         //========================================================================
@@ -6399,7 +3694,7 @@ namespace Contensive.Core.Controllers {
         //   main_GetMenu uses
         //========================================================================
         //
-        public string main_GetRecordAddLink2(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
+        public string getRecordAddLink2(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
             string tempmain_GetRecordAddLink2 = null;
             try {
                 //
@@ -6461,7 +3756,7 @@ namespace Contensive.Core.Controllers {
                             //
                             MenuName = genericController.GetRandomInteger(cpCore).ToString();
                             cpCore.menuFlyout.menu_AddEntry(MenuName,"", "/ccLib/images/IconContentAdd.gif","","","", "stylesheet", "stylesheethover");
-                            LowestRequiredMenuName = main_GetRecordAddLink_AddMenuEntry(iContentName, iPresetNameValueList, "", MenuName, MenuName);
+                            LowestRequiredMenuName = getRecordAddLink_AddMenuEntry(iContentName, iPresetNameValueList, "", MenuName, MenuName);
                         }
                         //
                         // Add in the paste entry, if needed
@@ -6569,7 +3864,7 @@ namespace Contensive.Core.Controllers {
         //   IsMember(), main_IsAuthenticated() And Member_AllowLinkAuthoring must already be checked
         //========================================================================
         //
-        private string main_GetRecordAddLink_AddMenuEntry(string ContentName, string PresetNameValueList, string ContentNameList, string MenuName, string ParentMenuName) {
+        private string getRecordAddLink_AddMenuEntry(string ContentName, string PresetNameValueList, string ContentNameList, string MenuName, string ParentMenuName) {
             string result = "";
             string Copy = null;
             int CS = 0;
@@ -6706,7 +4001,7 @@ namespace Contensive.Core.Controllers {
                             //
                             while (cpCore.db.csOk(csChildContent)) {
                                 ChildContentName = cpCore.db.csGetText(csChildContent, "name");
-                                Copy = main_GetRecordAddLink_AddMenuEntry(ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ParentMenuName);
+                                Copy = getRecordAddLink_AddMenuEntry(ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ParentMenuName);
                                 if (!string.IsNullOrEmpty(Copy)) {
                                     ChildMenuButtonCount = ChildMenuButtonCount + 1;
                                 }
@@ -6728,7 +4023,7 @@ namespace Contensive.Core.Controllers {
         // Return a panel with the input as center
         //========================================================================
         //
-        public string main_GetPanel(string Panel, string StylePanel = "", string StyleHilite = "ccPanelHilite", string StyleShadow = "ccPanelShadow", string Width = "100%", int Padding = 5, int HeightMin = 1) {
+        public string getPanel(string Panel, string StylePanel = "", string StyleHilite = "ccPanelHilite", string StyleShadow = "ccPanelShadow", string Width = "100%", int Padding = 5, int HeightMin = 1) {
             string tempmain_GetPanel = null;
             string ContentPanelWidth = null;
             string MethodName = null;
@@ -6805,21 +4100,21 @@ namespace Contensive.Core.Controllers {
         // Return a panel with the input as center
         //========================================================================
         //
-        public string main_GetReversePanel(string Panel, string StylePanel = "", string StyleHilite = "ccPanelShadow", string StyleShadow = "ccPanelHilite", string Width = "", string Padding = "", string HeightMin = "") {
+        public string getReversePanel(string Panel, string StylePanel = "", string StyleHilite = "ccPanelShadow", string StyleShadow = "ccPanelHilite", string Width = "", string Padding = "", string HeightMin = "") {
             string MyStyleHilite = null;
             string MyStyleShadow = null;
             //
             MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelShadow");
             MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelHilite");
 
-            return main_GetPanelTop(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding, HeightMin) + genericController.encodeText(Panel) + main_GetPanelBottom(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding);
+            return getPanelTop(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding, HeightMin) + genericController.encodeText(Panel) + getPanelBottom(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding);
         }
         //
         //========================================================================
         // Return a panel header with the header message reversed out of the left
         //========================================================================
         //
-        public string main_GetPanelHeader(string HeaderMessage, string RightSideMessage = "") {
+        public string getPanelHeader(string HeaderMessage, string RightSideMessage = "") {
             string iHeaderMessage = null;
             string iRightSideMessage = null;
             adminUIController Adminui = new adminUIController(cpCore);
@@ -6837,7 +4132,7 @@ namespace Contensive.Core.Controllers {
         //   Must be closed with PrintPanelBottom
         //========================================================================
         //
-        public string main_GetPanelTop(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "", string HeightMin = "") {
+        public string getPanelTop(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "", string HeightMin = "") {
             string tempmain_GetPanelTop = null;
             string ContentPanelWidth = null;
             string MethodName = null;
@@ -6884,7 +4179,7 @@ namespace Contensive.Core.Controllers {
         // Return a panel with the input as center
         //========================================================================
         //
-        public string main_GetPanelBottom(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "") {
+        public string getPanelBottom(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "") {
             string result = string.Empty;
             try {
                 //Dim MyStylePanel As String
@@ -6919,28 +4214,22 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //
-        public string main_GetPanelButtons(string ButtonValueList, string ButtonName, string PanelWidth = "", string PanelHeightMin = "") {
+        public string getPanelButtons(string ButtonValueList, string ButtonName, string PanelWidth = "", string PanelHeightMin = "") {
             adminUIController Adminui = new adminUIController(cpCore);
             return Adminui.GetButtonBar(Adminui.GetButtonsFromList(ButtonValueList, true, true, ButtonName), "");
         }
         //
         //
         //
-        public string main_GetPanelRev(string PanelContent, string PanelWidth = "", string PanelHeightMin = "") {
-            return main_GetPanel(PanelContent, "ccPanel", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, genericController.EncodeInteger(PanelHeightMin));
-        }
-        //
-        //
-        //
-        public string main_GetPanelInput(string PanelContent, string PanelWidth = "", string PanelHeightMin = "1") {
-            return main_GetPanel(PanelContent, "ccPanelInput", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, genericController.EncodeInteger(PanelHeightMin));
+        public string getPanelInput(string PanelContent, string PanelWidth = "", string PanelHeightMin = "1") {
+            return getPanel(PanelContent, "ccPanelInput", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, genericController.EncodeInteger(PanelHeightMin));
         }
         //
         //========================================================================
         // Print the tools panel at the bottom of the page
         //========================================================================
         //
-        public string main_GetToolsPanel() {
+        public string getToolsPanel() {
             string result = string.Empty;
             try {
                 string copyNameValue = null;
@@ -7010,7 +4299,7 @@ namespace Contensive.Core.Controllers {
                         string helpLink = "";
                         //helpLink = main_GetHelpLink("2", "Contensive Tools Panel", BubbleCopy)
                         BubbleCopy = "Use the Tools Panel to enable features such as editing and debugging tools. It also includes links to the admin site, the support site and the My Profile page.";
-                        result = result + main_GetPanelHeader("Contensive Tools Panel" + helpLink);
+                        result = result + getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
                         ToolsPanel.Add(cpCore.html.html_GetFormStart(WorkingQueryString));
                         ToolsPanel.Add(cpCore.html.html_GetFormInputHidden("Type", FormTypeToolsPanel));
@@ -7196,11 +4485,11 @@ namespace Contensive.Core.Controllers {
                         Copy = ""
                         + "\r<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">"
                         + genericController.htmlIndent(Copy) + "\r</table>";
-                        ToolsPanel.Add(main_GetPanelInput(Copy));
+                        ToolsPanel.Add(getPanelInput(Copy));
                         ToolsPanel.Add(cpCore.html.html_GetFormEnd());
-                        result = result + main_GetPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                        result = result + getPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         //
-                        result = result + main_GetPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                        result = result + getPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         //
                         LinkPanel = null;
                         ToolsPanel = null;
@@ -7284,12 +4573,12 @@ namespace Contensive.Core.Controllers {
                             //
                             // Debug Panel as part of legacy tools panel
                             //
-                            result = result + main_GetPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                            result = result + getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         } else {
                             //
                             // Debug Panel without Legacy Tools panel
                             //
-                            result = result + main_GetPanelHeader("Debug Panel") + main_GetPanel(LinkPanel.Text) + main_GetPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
+                            result = result + getPanelHeader("Debug Panel") + getPanel(LinkPanel.Text) + getPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5);
                         }
                     }
                     result = "\r<div class=\"ccCon\">" + genericController.htmlIndent(result) + "\r</div>";
@@ -7354,45 +4643,6 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        // assemble all the html parts
-        //
-        //Public Function assembleHtmlDoc(ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
-        //    Return "" _
-        //        & cpCore.siteProperties.docTypeDeclarationAdmin _
-        //        & cr & "<html>" _
-        //        & cr2 & "<head>" _
-        //        & genericController.htmlIndent(head) _
-        //        & cr2 & "</head>" _
-        //        & cr2 & bodyTag _
-        //        & genericController.htmlIndent(Body) _
-        //        & cr2 & "</body>" _
-        //        & cr & "</html>"
-        //End Function
-        //
-        //========================================================================
-        // ----- Starts an HTML page (for an admin page -- not a public page)
-        //========================================================================
-        //
-        //Public Function getHtmlDoc_beforeBodyHtml(Optional ByVal Title As String = "", Optional ByVal PageMargin As Integer = 0) As String
-        //    If Title <> "" Then
-        //        Call main_AddPagetitle(Title)
-        //    End If
-        //    If main_MetaContent_Title = "" Then
-        //        Call main_AddPagetitle("Admin-" & cpCore.webServer.webServerIO_requestDomain)
-        //    End If
-        //    cpCore.webServer.webServerIO_response_NoFollow = True
-        //    Call main_SetMetaContent(0, 0)
-        //    '
-        //    Return "" _
-        //        & cpCore.siteProperties.docTypeDeclarationAdmin _
-        //        & vbCrLf & "<html>" _
-        //        & vbCrLf & "<head>" _
-        //        & getHTMLInternalHead(True) _
-        //        & vbCrLf & "</head>" _
-        //        & vbCrLf & "<body class=""ccBodyAdmin ccCon"">"
-        //End Function
-
-        //
         //====================================================================================================
         /// <summary>
         /// legacy compatibility
@@ -7403,7 +4653,7 @@ namespace Contensive.Core.Controllers {
         public static string legacy_closeFormTable(coreClass cpCore, string ButtonList) {
             string templegacy_closeFormTable = null;
             if (!string.IsNullOrEmpty(ButtonList)) {
-                templegacy_closeFormTable = "</td></tr></TABLE>" + cpCore.html.main_GetPanelButtons(ButtonList, "Button") + "</form>";
+                templegacy_closeFormTable = "</td></tr></TABLE>" + cpCore.html.getPanelButtons(ButtonList, "Button") + "</form>";
             } else {
                 templegacy_closeFormTable = "</td></tr></TABLE></form>";
             }
@@ -7422,7 +4672,7 @@ namespace Contensive.Core.Controllers {
             try {
                 result = cpCore.html.html_GetFormStart();
                 if (!string.IsNullOrEmpty(ButtonList)) {
-                    result = result + cpCore.html.main_GetPanelButtons(ButtonList, "Button");
+                    result = result + cpCore.html.getPanelButtons(ButtonList, "Button");
                 }
                 result = result + "<table border=\"0\" cellpadding=\"10\" cellspacing=\"0\" width=\"100%\"><tr><TD>";
             } catch (Exception ex) {
@@ -7446,29 +4696,29 @@ namespace Contensive.Core.Controllers {
                         }
                         content += " | " + asset.content;
                     }
-                    headList.Add("<title>" + encodeHTML(content.Substring(3)) + "</title>");
+                    headList.Add("<title>" + genericController.encodeHTML(content.Substring(3)) + "</title>");
                 }
                 if (cpCore.doc.htmlMetaContent_KeyWordList.Count > 0) {
                     string content = "";
                     foreach (var asset in cpCore.doc.htmlMetaContent_KeyWordList.FindAll((a) => (!string.IsNullOrEmpty(a.content)))) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- '" + encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
+                            headList.Add("<!-- '" + genericController.encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
                         }
                         content += "," + asset.content;
                     }
                     if (!string.IsNullOrEmpty(content)) {
-                        headList.Add("<meta name=\"keywords\" content=\"" + encodeHTML(content.Substring(1)) + "\" >");
+                        headList.Add("<meta name=\"keywords\" content=\"" + genericController.encodeHTML(content.Substring(1)) + "\" >");
                     }
                 }
                 if (cpCore.doc.htmlMetaContent_Description.Count > 0) {
                     string content = "";
                     foreach (var asset in cpCore.doc.htmlMetaContent_Description) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- '" + encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
+                            headList.Add("<!-- '" + genericController.encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
                         }
                         content += "," + asset.content;
                     }
-                    headList.Add("<meta name=\"description\" content=\"" + encodeHTML(content.Substring(1)) + "\" >");
+                    headList.Add("<meta name=\"description\" content=\"" + genericController.encodeHTML(content.Substring(1)) + "\" >");
                 }
                 //
                 // -- favicon
@@ -7518,7 +4768,7 @@ namespace Contensive.Core.Controllers {
                     foreach (var asset in cpCore.doc.htmlAssetList.FindAll((htmlAssetClass item) => (item.inHead))) {
                         if (cpCore.doc.allowDebugLog) {
                             if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                                headList.Add("<!-- '" + encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
+                                headList.Add("<!-- '" + genericController.encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
                             }
                         }
                         if (asset.assetType.Equals(htmlAssetTypeEnum.style)) {
@@ -7544,7 +4794,7 @@ namespace Contensive.Core.Controllers {
                 foreach (var asset in cpCore.doc.htmlMetaContent_OtherTags.FindAll((a) => (!string.IsNullOrEmpty(a.content)))) {
                     if (cpCore.doc.allowDebugLog) {
                         if ((cpCore.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
-                            headList.Add("<!-- '" + encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
+                            headList.Add("<!-- '" + genericController.encodeHTML(asset.content + "' added by " + asset.addedByMessage) + " -->");
                         }
                     }
                     headList.Add(asset.content);
@@ -7764,766 +5014,12 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //===================================================================================================
-        // To support the special case when the template calls this to encode itself, and the page content has already been rendered.
-        //
-        private string convertActiveContent_internal(string Source, int personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool PlainText, bool AddLinkEID, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
-            string result = Source;
-            try {
-                //
-                const string StartFlag = "<!-- ADDON";
-                const string EndFlag = " -->";
-                //
-                bool DoAnotherPass = false;
-                int ArgCnt = 0;
-                string AddonGuid = null;
-                string ACInstanceID = null;
-                string[] ArgSplit = null;
-                string AddonName = null;
-                string addonOptionString = null;
-                int LineStart = 0;
-                int LineEnd = 0;
-                string Copy = null;
-                string[] Wrapper = null;
-                string[] SegmentSplit = null;
-                string AcCmd = null;
-                string SegmentSuffix = null;
-                string[] AcCmdSplit = null;
-                string ACType = null;
-                string[] ContentSplit = null;
-                int ContentSplitCnt = 0;
-                string Segment = null;
-                int Ptr = 0;
-                string CopyName = null;
-                string ListName = null;
-                string SortField = null;
-                bool SortReverse = false;
-                string AdminURL = null;
-                //
-                htmlToTextControllers converthtmlToText = null;
-                //
-                int iPersonalizationPeopleId = personalizationPeopleId;
-                if (iPersonalizationPeopleId == 0) {
-                    iPersonalizationPeopleId = cpCore.doc.authContext.user.id;
-                }
-                //
-
-                //hint = "csv_EncodeContent9 enter"
-                if (!string.IsNullOrEmpty(result)) {
-                    AdminURL = "/" + cpCore.serverConfig.appConfig.adminRoute;
-                    //
-                    //--------
-                    // cut-paste from csv_EncodeContent8
-                    //--------
-                    //
-                    // ----- Do EncodeCRLF Conversion
-                    //
-                    //hint = hint & ",010"
-                    if (cpCore.siteProperties.getBoolean("ConvertContentCRLF2BR", false) && (!PlainText)) {
-                        result = genericController.vbReplace(result, "\r", "");
-                        result = genericController.vbReplace(result, "\n", "<br>");
-                    }
-                    //
-                    // ----- Do upgrade conversions (upgrade legacy objects and upgrade old images)
-                    //
-                    //hint = hint & ",020"
-                    result = upgradeActiveContent(result);
-                    //
-                    // ----- Do Active Content Conversion
-                    //
-                    //hint = hint & ",030"
-                    if (AddLinkEID || EncodeActiveFormatting || EncodeActiveImages || EncodeActiveEditIcons) {
-                        result = convertActiveContent_Internal_activeParts(result, iPersonalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostLink, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context);
-                    }
-                    //
-                    // ----- Do Plain Text Conversion
-                    //
-                    if (PlainText) {
-                        result = htmlToTextControllers.convert(cpCore,result);
-                    }
-                    //
-                    // Process Active Content that must be run here to access webclass objects
-                    //     parse as {{functionname?querystring}}
-                    //
-                    if ((!EncodeActiveEditIcons) && (result.IndexOf("{{")  != -1)) {
-                        ContentSplit = genericController.customSplit(result, "{{");
-                        result = "";
-                        ContentSplitCnt = ContentSplit.GetUpperBound(0) + 1;
-                        Ptr = 0;
-                        while (Ptr < ContentSplitCnt) {
-                            //hint = hint & ",200"
-                            Segment = ContentSplit[Ptr];
-                            if (Ptr == 0) {
-                                //
-                                // Add in the non-command text that is before the first command
-                                //
-                                result = result + Segment;
-                            } else if (!string.IsNullOrEmpty(Segment)) {
-                                if (genericController.vbInstr(1, Segment, "}}") == 0) {
-                                    //
-                                    // No command found, return the marker and deliver the Segment
-                                    //
-                                    //hint = hint & ",210"
-                                    result = result + "{{" + Segment;
-                                } else {
-                                    //
-                                    // isolate the command
-                                    //
-                                    //hint = hint & ",220"
-                                    SegmentSplit = genericController.customSplit(Segment, "}}");
-                                    AcCmd = SegmentSplit[0];
-                                    SegmentSplit[0] = "";
-                                    SegmentSuffix = string.Join("}}", SegmentSplit).Substring(2);
-                                    if (!string.IsNullOrEmpty(AcCmd.Trim(' '))) {
-                                        //
-                                        // isolate the arguments
-                                        //
-                                        //hint = hint & ",230"
-                                        AcCmdSplit = AcCmd.Split('?');
-                                        ACType = AcCmdSplit[0].Trim(' ');
-                                        if (AcCmdSplit.GetUpperBound(0) == 0) {
-                                            addonOptionString = "";
-                                        } else {
-                                            addonOptionString = AcCmdSplit[1];
-                                            addonOptionString = genericController.decodeHtml(addonOptionString);
-                                        }
-                                        //
-                                        // execute the command
-                                        //
-                                        switch (genericController.vbUCase(ACType)) {
-                                            case ACTypeDynamicForm:
-                                                //
-                                                // Dynamic Form - run the core addon replacement instead
-                                                CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                                    addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                                                    cssContainerClass = "",
-                                                    cssContainerId = "",
-                                                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                                        contentName = ContextContentName,
-                                                        fieldName = "",
-                                                        recordId = ContextRecordID
-                                                    },
-                                                    personalizationAuthenticated = personalizationIsAuthenticated,
-                                                    personalizationPeopleId = iPersonalizationPeopleId,
-                                                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
-                                                };
-                                                addonModel addon = addonModel.create(cpCore, addonGuidDynamicForm);
-                                                result += cpCore.addon.execute(addon, executeContext);
-                                                break;
-                                            case ACTypeChildList:
-                                                //
-                                                // Child Page List
-                                                //
-                                                //hint = hint & ",320"
-                                                ListName = addonController.getAddonOption("name", addonOptionString);
-                                                result = result + cpCore.doc.getChildPageList(ListName, ContextContentName, ContextRecordID, true);
-                                                break;
-                                            case ACTypeTemplateText:
-                                                //
-                                                // Text Box = copied here from gethtmlbody
-                                                //
-                                                CopyName = addonController.getAddonOption("new", addonOptionString);
-                                                if (string.IsNullOrEmpty(CopyName)) {
-                                                    CopyName = addonController.getAddonOption("name", addonOptionString);
-                                                    if (string.IsNullOrEmpty(CopyName)) {
-                                                        CopyName = "Default";
-                                                    }
-                                                }
-                                                result = result + html_GetContentCopy(CopyName, "", iPersonalizationPeopleId, false, personalizationIsAuthenticated);
-                                                break;
-                                            case ACTypeWatchList:
-                                                //
-                                                // Watch List
-                                                //
-                                                //hint = hint & ",330"
-                                                ListName = addonController.getAddonOption("LISTNAME", addonOptionString);
-                                                SortField = addonController.getAddonOption("SORTFIELD", addonOptionString);
-                                                SortReverse = genericController.encodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString));
-                                                result = result + cpCore.doc.main_GetWatchList(cpCore, ListName, SortField, SortReverse);
-                                                break;
-                                            default:
-                                                //
-                                                // Unrecognized command - put all the syntax back in
-                                                //
-                                                //hint = hint & ",340"
-                                                result = result + "{{" + AcCmd + "}}";
-                                                break;
-                                        }
-                                    }
-                                    //
-                                    // add the SegmentSuffix back on
-                                    //
-                                    result = result + SegmentSuffix;
-                                }
-                            }
-                            //
-                            // Encode into Javascript if required
-                            //
-                            Ptr = Ptr + 1;
-                        }
-                    }
-                    //
-                    // Process Addons
-                    //   parse as <!-- Addon "Addon Name","OptionString" -->
-                    //   They are handled here because Addons are written against cpCoreClass, not the Content Server class
-                    //   ...so Group Email can not process addons 8(
-                    //   Later, remove the csv routine that translates <ac to this, and process it directly right here
-                    //   Later, rewrite so addons call csv, not cpCoreClass, so email processing can include addons
-                    // (2/16/2010) - move csv_EncodeContent to csv, or wait and move it all to CP
-                    //    eventually, everything should migrate to csv and/or cp to eliminate the cpCoreClass dependancy
-                    //    and all add-ons run as processes the same as they run on pages, or as remote methods
-                    // (2/16/2010) - if <!-- AC --> has four arguments, the fourth is the addon guid
-                    //
-                    if (result.IndexOf(StartFlag)  != -1) {
-                        while (result.IndexOf(StartFlag)  != -1) {
-                            LineStart = genericController.vbInstr(1, result, StartFlag);
-                            LineEnd = genericController.vbInstr(LineStart, result, EndFlag);
-                            if (LineEnd == 0) {
-                                logController.appendLog(cpCore, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly");
-                                break;
-                            } else {
-                                AddonName = "";
-                                addonOptionString = "";
-                                ACInstanceID = "";
-                                AddonGuid = "";
-                                Copy = result.Substring(LineStart + 10, LineEnd - LineStart - 11);
-                                ArgSplit = genericController.SplitDelimited(Copy, ",");
-                                ArgCnt = ArgSplit.GetUpperBound(0) + 1;
-                                if (!string.IsNullOrEmpty(ArgSplit[0])) {
-                                    AddonName = ArgSplit[0].Substring(1, ArgSplit[0].Length - 2);
-                                    if (ArgCnt > 1) {
-                                        if (!string.IsNullOrEmpty(ArgSplit[1])) {
-                                            addonOptionString = ArgSplit[1].Substring(1, ArgSplit[1].Length - 2);
-                                            addonOptionString = genericController.decodeHtml(addonOptionString.Trim(' '));
-                                        }
-                                        if (ArgCnt > 2) {
-                                            if (!string.IsNullOrEmpty(ArgSplit[2])) {
-                                                ACInstanceID = ArgSplit[2].Substring(1, ArgSplit[2].Length - 2);
-                                            }
-                                            if (ArgCnt > 3) {
-                                                if (!string.IsNullOrEmpty(ArgSplit[3])) {
-                                                    AddonGuid = ArgSplit[3].Substring(1, ArgSplit[3].Length - 2);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    // dont have any way of getting fieldname yet
-
-                                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                        addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                                        cssContainerClass = "",
-                                        cssContainerId = "",
-                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                            contentName = ContextContentName,
-                                            fieldName = "",
-                                            recordId = ContextRecordID
-                                        },
-                                        personalizationAuthenticated = personalizationIsAuthenticated,
-                                        personalizationPeopleId = iPersonalizationPeopleId,
-                                        instanceGuid = ACInstanceID,
-                                        instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(cpCore, addonOptionString)
-                                    };
-                                    if (!string.IsNullOrEmpty(AddonGuid)) {
-                                        Copy = cpCore.addon.execute(Models.Entity.addonModel.create(cpCore, AddonGuid), executeContext);
-                                        //Copy = cpCore.addon.execute_legacy6(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
-                                    } else {
-                                        Copy = cpCore.addon.execute(Models.Entity.addonModel.createByName(cpCore, AddonName), executeContext);
-                                        //Copy = cpCore.addon.execute_legacy6(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, False, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
-                                    }
-                                }
-                            }
-                            result = result.Left( LineStart - 1) + Copy + result.Substring(LineEnd + 3);
-                        }
-                    }
-                    //
-                    // process out text block comments inserted by addons
-                    // remove all content between BlockTextStartMarker and the next BlockTextEndMarker, or end of copy
-                    // exception made for the content with just the startmarker because when the AC tag is replaced with
-                    // with the marker, encode content is called with the result, which is just the marker, and this
-                    // section will remove it
-                    //
-                    if ((!isEditingAnything) && (result != BlockTextStartMarker)) {
-                        DoAnotherPass = true;
-                        while ((result.IndexOf(BlockTextStartMarker, System.StringComparison.OrdinalIgnoreCase)  != -1) && DoAnotherPass) {
-                            LineStart = genericController.vbInstr(1, result, BlockTextStartMarker, 1);
-                            if (LineStart == 0) {
-                                DoAnotherPass = false;
-                            } else {
-                                LineEnd = genericController.vbInstr(LineStart, result, BlockTextEndMarker, 1);
-                                if (LineEnd <= 0) {
-                                    DoAnotherPass = false;
-                                    result = result.Left( LineStart - 1);
-                                } else {
-                                    LineEnd = genericController.vbInstr(LineEnd, result, " -->");
-                                    if (LineEnd <= 0) {
-                                        DoAnotherPass = false;
-                                    } else {
-                                        result = result.Left( LineStart - 1) + result.Substring(LineEnd + 3);
-                                        //returnValue = Mid(returnValue, 1, LineStart - 1) & Copy & Mid(returnValue, LineEnd + 4)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    //
-                    // only valid for a webpage
-                    //
-                    if (true) {
-                        //
-                        // Add in EditWrappers for Aggregate scripts and replacements
-                        //   This is also old -- used here because csv encode content can create replacements and links, but can not
-                        //   insert wrappers. This is all done in GetAddonContents() now. This routine is left only to
-                        //   handle old style calls in cache.
-                        //
-                        //hint = hint & ",500, Adding edit wrappers"
-                        if (isEditingAnything) {
-                            if (result.IndexOf("<!-- AFScript -->", System.StringComparison.OrdinalIgnoreCase)  != -1) {
-                                //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
-                                Copy = getEditWrapper("Aggregate Script", "##MARKER##");
-                                Wrapper = genericController.customSplit(Copy, "##MARKER##");
-                                result = genericController.vbReplace(result, "<!-- AFScript -->", Wrapper[0], 1, 99, 1);
-                                result = genericController.vbReplace(result, "<!-- /AFScript -->", Wrapper[1], 1, 99, 1);
-                            }
-                            if (result.IndexOf("<!-- AFReplacement -->", System.StringComparison.OrdinalIgnoreCase)  != -1) {
-                                //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
-                                Copy = getEditWrapper("Aggregate Replacement", "##MARKER##");
-                                Wrapper = genericController.customSplit(Copy, "##MARKER##");
-                                result = genericController.vbReplace(result, "<!-- AFReplacement -->", Wrapper[0], 1, 99, 1);
-                                result = genericController.vbReplace(result, "<!-- /AFReplacement -->", Wrapper[1], 1, 99, 1);
-                            }
-                        }
-                        //
-                        // Process Feedback form
-                        //
-                        //hint = hint & ",600, Handle webclient features"
-                        if (genericController.vbInstr(1, result, FeedbackFormNotSupportedComment, 1) != 0) {
-                            result = genericController.vbReplace(result, FeedbackFormNotSupportedComment, pageContentController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, 1);
-                        }
-                        //
-                        // If any javascript or styles were added during encode, pick them up now
-                        //
-                        //Copy = cpCore.doc.getNextJavascriptBodyEnd()
-                        //Do While Copy <> ""
-                        //    Call addScriptCode_body(Copy, "embedded content")
-                        //    Copy = cpCore.doc.getNextJavascriptBodyEnd()
-                        //Loop
-                        //
-                        // current
-                        //
-                        //Copy = cpCore.doc.getNextJSFilename()
-                        //Do While Copy <> ""
-                        //    If genericController.vbInstr(1, Copy, "://") <> 0 Then
-                        //    ElseIf Left(Copy, 1) = "/" Then
-                        //    Else
-                        //        Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
-                        //    End If
-                        //    Call addScriptLink_Head(Copy, "embedded content")
-                        //    Copy = cpCore.doc.getNextJSFilename()
-                        //Loop
-                        //
-                        //Copy = cpCore.doc.getJavascriptOnLoad()
-                        //Do While Copy <> ""
-                        //    Call addOnLoadJs(Copy, "")
-                        //    Copy = cpCore.doc.getJavascriptOnLoad()
-                        //Loop
-                        //
-                        //Copy = cpCore.doc.getNextStyleFilenames()
-                        //Do While Copy <> ""
-                        //    If genericController.vbInstr(1, Copy, "://") <> 0 Then
-                        //    ElseIf Left(Copy, 1) = "/" Then
-                        //    Else
-                        //        Copy = cpCore.webServer.requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
-                        //    End If
-                        //    Call addStyleLink(Copy, "")
-                        //    Copy = cpCore.doc.getNextStyleFilenames()
-                        //Loop
-                    }
-                }
-                //
-                //result = result;
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-            return result;
-        }
-        //
-        // ================================================================================================================
-        //   Upgrade old objects in content, and update changed resource library images
-        // ================================================================================================================
-        //
-        public string upgradeActiveContent(string Source) {
-            string result = Source;
-            try {
-                string RecordVirtualPath = string.Empty;
-                string RecordVirtualFilename = null;
-                string RecordFilename = null;
-                string RecordFilenameNoExt = null;
-                string RecordFilenameExt = string.Empty;
-                string[] SizeTest = null;
-                string RecordAltSizeList = null;
-                int TagPosEnd = 0;
-                int TagPosStart = 0;
-                bool InTag = false;
-                int Pos = 0;
-                string FilenameSegment = null;
-                int EndPos1 = 0;
-                int EndPos2 = 0;
-                string[] LinkSplit = null;
-                int LinkCnt = 0;
-                int LinkPtr = 0;
-                string[] TableSplit = null;
-                string TableName = null;
-                string FieldName = null;
-                int RecordID = 0;
-                bool SaveChanges = false;
-                int EndPos = 0;
-                int Ptr = 0;
-                string FilePrefixSegment = null;
-                bool ImageAllowUpdate = false;
-                string ContentFilesLinkPrefix = null;
-                string ResourceLibraryLinkPrefix = null;
-                string TestChr = null;
-                bool ParseError = false;
-                result = Source;
-                //
-                ContentFilesLinkPrefix = "/" + cpCore.serverConfig.appConfig.name + "/files/";
-                ResourceLibraryLinkPrefix = ContentFilesLinkPrefix + "ccLibraryFiles/";
-                ImageAllowUpdate = cpCore.siteProperties.getBoolean("ImageAllowUpdate", true);
-                ImageAllowUpdate = ImageAllowUpdate && (Source.IndexOf(ResourceLibraryLinkPrefix, System.StringComparison.OrdinalIgnoreCase)  != -1);
-                if (ImageAllowUpdate) {
-                    //
-                    // ----- Process Resource Library Images (swap in most current file)
-                    //
-                    //   There is a better way:
-                    //   problem with replacing the images is the problem with parsing - too much work to find it
-                    //   instead, use new replacement tags <ac type=image src="cclibraryfiles/filename/00001" width=0 height=0>
-                    //
-                    //hint = hint & ",010"
-                    ParseError = false;
-                    LinkSplit = genericController.customSplit(Source, ContentFilesLinkPrefix);
-                    LinkCnt = LinkSplit.GetUpperBound(0) + 1;
-                    for (LinkPtr = 1; LinkPtr < LinkCnt; LinkPtr++) {
-                        //
-                        // Each LinkSplit(1...) is a segment that would have started with '/appname/files/'
-                        // Next job is to determine if this sement is in a tag (<img src="...">) or in content (&quot...&quote)
-                        // For now, skip the ones in content
-                        //
-                        //hint = hint & ",020"
-                        TagPosEnd = genericController.vbInstr(1, LinkSplit[LinkPtr], ">");
-                        TagPosStart = genericController.vbInstr(1, LinkSplit[LinkPtr], "<");
-                        if (TagPosEnd == 0 && TagPosStart == 0) {
-                            //
-                            // no tags found, skip it
-                            //
-                            InTag = false;
-                        } else if (TagPosEnd == 0) {
-                            //
-                            // no end tag, but found a start tag -> in content
-                            //
-                            InTag = false;
-                        } else if (TagPosEnd < TagPosStart) {
-                            //
-                            // Found end before start - > in tag
-                            //
-                            InTag = true;
-                        } else {
-                            //
-                            // Found start before end -> in content
-                            //
-                            InTag = false;
-                        }
-                        if (InTag) {
-                            //hint = hint & ",030"
-                            TableSplit = LinkSplit[LinkPtr].Split('/');
-                            if (TableSplit.GetUpperBound(0) > 2) {
-                                TableName = TableSplit[0];
-                                FieldName = TableSplit[1];
-                                RecordID = genericController.EncodeInteger(TableSplit[2]);
-                                FilenameSegment = TableSplit[3];
-                                if ((TableName.ToLower() == "cclibraryfiles") && (FieldName.ToLower() == "filename") && (RecordID != 0)) {
-                                    libraryFilesModel file = libraryFilesModel.create(cpCore, RecordID);
-                                    if (file != null) {
-                                        //hint = hint & ",060"
-                                        FieldName = "filename";
-                                        //SQL = "select filename,altsizelist from " & TableName & " where id=" & RecordID
-                                        //CS = app.csv_OpenCSSQL("default", SQL)
-                                        //If app.csv_IsCSOK(CS) Then
-                                        if (true) {
-                                            //
-                                            // now figure out how the link is delimited by how it starts
-                                            //   go to the left and look for:
-                                            //   ' ' - ignore spaces, continue forward until we find one of these
-                                            //   '=' - means space delimited (src=/image.jpg), ends in ' ' or '>'
-                                            //   '"' - means quote delimited (src="/image.jpg"), ends in '"'
-                                            //   '>' - means this is not in an HTML tag - skip it (<B>image.jpg</b>)
-                                            //   '<' - means god knows what, but its wrong, skip it
-                                            //   '(' - means it is a URL(/image.jpg), go to ')'
-                                            //
-                                            // odd cases:
-                                            //   URL( /image.jpg) -
-                                            //
-                                            RecordVirtualFilename = file.Filename;
-                                            RecordAltSizeList = file.AltSizeList;
-                                            if (RecordVirtualFilename == genericController.EncodeJavascript(RecordVirtualFilename)) {
-                                                //
-                                                // The javascript version of the filename must match the filename, since we have no way
-                                                // of differentiating a ligitimate file, from a block of javascript. If the file
-                                                // contains an apostrophe, the original code could have encoded it, but we can not here
-                                                // so the best plan is to skip it
-                                                //
-                                                // example:
-                                                // RecordVirtualFilename = "jay/files/cclibraryfiles/filename/000005/test.png"
-                                                //
-                                                // RecordFilename = "test.png"
-                                                // RecordFilenameAltSize = "" (does not exist - the record has the raw filename in it)
-                                                // RecordFilenameExt = "png"
-                                                // RecordFilenameNoExt = "test"
-                                                //
-                                                // RecordVirtualFilename = "jay/files/cclibraryfiles/filename/000005/test-100x200.png"
-                                                // this is a specail case - most cases to not have the alt size format saved in the filename
-                                                // RecordFilename = "test-100x200.png"
-                                                // RecordFilenameAltSize (does not exist - the record has the raw filename in it)
-                                                // RecordFilenameExt = "png"
-                                                // RecordFilenameNoExt = "test-100x200"
-                                                // this is wrong
-                                                //   xRecordFilenameAltSize = "100x200"
-                                                //   xRecordFilenameExt = "png"
-                                                //   xRecordFilenameNoExt = "test"
-                                                //
-                                                //hint = hint & ",080"
-                                                Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
-                                                RecordFilename = "";
-                                                if (Pos > 0) {
-                                                    RecordVirtualPath = RecordVirtualFilename.Left( Pos);
-                                                    RecordFilename = RecordVirtualFilename.Substring(Pos);
-                                                }
-                                                Pos = RecordFilename.LastIndexOf(".") + 1;
-                                                RecordFilenameNoExt = "";
-                                                if (Pos > 0) {
-                                                    RecordFilenameExt = genericController.vbLCase(RecordFilename.Substring(Pos));
-                                                    RecordFilenameNoExt = genericController.vbLCase(RecordFilename.Left( Pos - 1));
-                                                }
-                                                FilePrefixSegment = LinkSplit[LinkPtr - 1];
-                                                if (FilePrefixSegment.Length > 1) {
-                                                    //
-                                                    // Look into FilePrefixSegment and see if we are in the querystring attribute of an <AC tag
-                                                    //   if so, the filename may be AddonEncoded and delimited with & (so skip it)
-                                                    Pos = FilePrefixSegment.LastIndexOf("<") + 1;
-                                                    if (Pos > 0) {
-                                                        if (genericController.vbLCase(FilePrefixSegment.Substring(Pos, 3)) != "ac ") {
-                                                            //
-                                                            // look back in the FilePrefixSegment to find the character before the link
-                                                            //
-                                                            EndPos = 0;
-                                                            for (Ptr = FilePrefixSegment.Length; Ptr >= 1; Ptr--) {
-                                                                TestChr = FilePrefixSegment.Substring(Ptr - 1, 1);
-                                                                switch (TestChr) {
-                                                                    case "=":
-                                                                        //
-                                                                        // Ends in ' ' or '>', find the first
-                                                                        //
-                                                                        EndPos1 = genericController.vbInstr(1, FilenameSegment, " ");
-                                                                        EndPos2 = genericController.vbInstr(1, FilenameSegment, ">");
-                                                                        if (EndPos1 != 0 & EndPos2 != 0) {
-                                                                            if (EndPos1 < EndPos2) {
-                                                                                EndPos = EndPos1;
-                                                                            } else {
-                                                                                EndPos = EndPos2;
-                                                                            }
-                                                                        } else if (EndPos1 != 0) {
-                                                                            EndPos = EndPos1;
-                                                                        } else if (EndPos2 != 0) {
-                                                                            EndPos = EndPos2;
-                                                                        } else {
-                                                                            EndPos = 0;
-                                                                        }
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
-                                                                    case "\"":
-                                                                        //
-                                                                        // Quoted, ends is '"'
-                                                                        //
-                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, "\"");
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
-                                                                    case "(":
-                                                                        //
-                                                                        // url() style, ends in ')' or a ' '
-                                                                        //
-                                                                        if (genericController.vbLCase(FilePrefixSegment.Substring(Ptr - 1, 7)) == "(&quot;") {
-                                                                            EndPos = genericController.vbInstr(1, FilenameSegment, "&quot;)");
-                                                                        } else if (genericController.vbLCase(FilePrefixSegment.Substring(Ptr - 1, 2)) == "('") {
-                                                                            EndPos = genericController.vbInstr(1, FilenameSegment, "')");
-                                                                        } else if (genericController.vbLCase(FilePrefixSegment.Substring(Ptr - 1, 2)) == "(\"") {
-                                                                            EndPos = genericController.vbInstr(1, FilenameSegment, "\")");
-                                                                        } else {
-                                                                            EndPos = genericController.vbInstr(1, FilenameSegment, ")");
-                                                                        }
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
-                                                                    case "'":
-                                                                        //
-                                                                        // Delimited within a javascript pair of apostophys
-                                                                        //
-                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, "'");
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
-                                                                    case ">":
-                                                                    case "<":
-                                                                        //
-                                                                        // Skip this link
-                                                                        //
-                                                                        ParseError = true;
-                                                                        //INSTANT C# WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
-                                                                }
-                                                            }
-                                                            ExitLabel1:
-                                                            //
-                                                            // check link
-                                                            //
-                                                            if (EndPos == 0) {
-                                                                ParseError = true;
-                                                                break;
-                                                            } else {
-                                                                string ImageFilename = null;
-                                                                string SegmentAfterImage = null;
-
-                                                                string ImageFilenameNoExt = null;
-                                                                string ImageFilenameExt = null;
-                                                                string ImageAltSize = null;
-
-                                                                //hint = hint & ",120"
-                                                                SegmentAfterImage = FilenameSegment.Substring(EndPos - 1);
-                                                                ImageFilename = genericController.DecodeResponseVariable(FilenameSegment.Left( EndPos - 1));
-                                                                ImageFilenameNoExt = ImageFilename;
-                                                                ImageFilenameExt = "";
-                                                                Pos = ImageFilename.LastIndexOf(".") + 1;
-                                                                if (Pos > 0) {
-                                                                    ImageFilenameNoExt = genericController.vbLCase(ImageFilename.Left( Pos - 1));
-                                                                    ImageFilenameExt = genericController.vbLCase(ImageFilename.Substring(Pos));
-                                                                }
-                                                                //
-                                                                // Get ImageAltSize
-                                                                //
-                                                                //hint = hint & ",130"
-                                                                ImageAltSize = "";
-                                                                if (ImageFilenameNoExt == RecordFilenameNoExt) {
-                                                                    //
-                                                                    // Exact match
-                                                                    //
-                                                                } else if (genericController.vbInstr(1, ImageFilenameNoExt, RecordFilenameNoExt, 1) != 1) {
-                                                                    //
-                                                                    // There was a change and the recordfilename is not part of the imagefilename
-                                                                    //
-                                                                } else {
-                                                                    //
-                                                                    // the recordfilename is the first part of the imagefilename - Get ImageAltSize
-                                                                    //
-                                                                    ImageAltSize = ImageFilenameNoExt.Substring(RecordFilenameNoExt.Length);
-                                                                    if (ImageAltSize.Left( 1) != "-") {
-                                                                        ImageAltSize = "";
-                                                                    } else {
-                                                                        ImageAltSize = ImageAltSize.Substring(1);
-                                                                        SizeTest = ImageAltSize.Split('x');
-                                                                        if (SizeTest.GetUpperBound(0) != 1) {
-                                                                            ImageAltSize = "";
-                                                                        } else {
-                                                                            if (SizeTest[0].IsNumeric() & SizeTest[1].IsNumeric()) {
-                                                                                ImageFilenameNoExt = RecordFilenameNoExt;
-                                                                                //ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
-                                                                                //RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)
-                                                                            } else {
-                                                                                ImageAltSize = "";
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                                //
-                                                                // problem - in the case where the recordfilename = img-100x200, the imagefilenamenoext is img
-                                                                //
-                                                                //hint = hint & ",140"
-                                                                if ((RecordFilenameNoExt != ImageFilenameNoExt) | (RecordFilenameExt != ImageFilenameExt)) {
-                                                                    //
-                                                                    // There has been a change
-                                                                    //
-                                                                    string NewRecordFilename = null;
-                                                                    int ImageHeight = 0;
-                                                                    int ImageWidth = 0;
-                                                                    NewRecordFilename = RecordVirtualPath + RecordFilenameNoExt + "." + RecordFilenameExt;
-                                                                    //
-                                                                    // realtime image updates replace without creating new size - that is for the edit interface
-                                                                    //
-                                                                    // put the New file back into the tablesplit in case there are more then 4 splits
-                                                                    //
-                                                                    TableSplit[0] = "";
-                                                                    TableSplit[1] = "";
-                                                                    TableSplit[2] = "";
-                                                                    TableSplit[3] = SegmentAfterImage;
-                                                                    NewRecordFilename = genericController.EncodeURL(NewRecordFilename) + ((string)(string.Join("/", TableSplit))).Substring(3);
-                                                                    LinkSplit[LinkPtr] = NewRecordFilename;
-                                                                    SaveChanges = true;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (ParseError) {
-                            break;
-                        }
-                    }
-                    //hint = hint & ",910"
-                    if (SaveChanges && (!ParseError)) {
-                        result = string.Join(ContentFilesLinkPrefix, LinkSplit);
-                    }
-                }
-                //hint = hint & ",920"
-                if (!ParseError) {
-                    //
-                    // Convert ACTypeDynamicForm to Add-on
-                    //
-                    if (genericController.vbInstr(1, result, "<ac type=\"" + ACTypeDynamicForm, 1) != 0) {
-                        result = genericController.vbReplace(result, "type=\"DYNAMICFORM\"", "TYPE=\"aggregatefunction\"", 1, 99, 1);
-                        result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, 1);
-                    }
-                }
-                //hint = hint & ",930"
-                if (ParseError) {
-                    result = ""
-                    + "\r\n<!-- warning: parsing aborted on ccLibraryFile replacement -->"
-                    + "\r\n" + result + "\r\n<!-- /warning: parsing aborted on ccLibraryFile replacement -->";
-                }
-                //
-                // {{content}} should be <ac type="templatecontent" etc>
-                // the merge is now handled in csv_EncodeActiveContent, but some sites have hand {{content}} tags entered
-                //
-                //hint = hint & ",940"
-                if (genericController.vbInstr(1, result, "{{content}}", 1) != 0) {
-                    result = genericController.vbReplace(result, "{{content}}", "<AC type=\"" + ACTypeTemplateContent + "\">", 1, 99, 1);
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-            return result;
-        }
-        //
         //============================================================================
         //   csv_GetContentCopy3
         //       To get them, cp.content.getCopy must call the cpCoreClass version, which calls this for the content
         //============================================================================
         //
-        public string html_GetContentCopy(string CopyName, string DefaultContent, int personalizationPeopleId, bool AllowEditWrapper, bool personalizationIsAuthenticated) {
+        public string getContentCopy(string CopyName, string DefaultContent, int personalizationPeopleId, bool AllowEditWrapper, bool personalizationIsAuthenticated) {
             string returnCopy = "";
             try {
                 //
@@ -8551,8 +5047,7 @@ namespace Contensive.Core.Controllers {
                     contactPeopleId = cpCore.db.csGetInteger(CS, "modifiedBy");
                     returnCopy = cpCore.db.csGet(CS, "Copy");
                     returnCopy = executeContentCommands(null, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
-                    returnCopy = convertActiveContentToHtmlForWebRender(returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
-                    //returnCopy = convertActiveContent_internal(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, False, Nothing, False)
+                    returnCopy = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                     //
                     if (true) {
                         if (cpCore.doc.authContext.isEditingAnything()) {
@@ -8573,7 +5068,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public void main_AddTabEntry(string Caption, string Link, bool IsHit, string StylePrefix = "", string LiveBody = "") {
+        public void addTabEntry(string Caption, string Link, bool IsHit, string StylePrefix = "", string LiveBody = "") {
             try {
                 //
                 // should use the ccNav object, no the ccCommon module for this code
@@ -8589,26 +5084,11 @@ namespace Contensive.Core.Controllers {
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18("main_AddTabEntry")
         }
-        //        '
-        //        '
-        //        '
-        //        Public Function main_GetTabs() As String
-        //            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetTabs")
-        //            '
-        //            ' should use the ccNav object, no the ccCommon module for this code
-        //            '
-        //            '
-        //            main_GetTabs = menuTab.GetTabs()
-        //            '    main_GetTabs = ccGetTabs()
-        //            '
-        //            Exit Function
-        ////ErrorTrap:
-        //            //throw new ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetTabs")
-        //        End Function
+        //
+        //====================================================================================================
         //
         //
-        //
-        public void main_AddLiveTabEntry(string Caption, string LiveBody, string StylePrefix = "") {
+        public void addLiveTabEntry(string Caption, string LiveBody, string StylePrefix = "") {
             try {
                 //
                 // should use the ccNav object, no the ccCommon module for this code
@@ -8628,7 +5108,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public string main_GetLiveTabs() {
+        public string getLiveTabs() {
             string result = string.Empty;
             try {
                 if (cpCore.doc.menuLiveTab == null) {
@@ -8643,7 +5123,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public void menu_AddComboTabEntry(string Caption, string Link, string AjaxLink, string LiveBody, bool IsHit, string ContainerClass) {
+        public void addComboTabEntry(string Caption, string Link, string AjaxLink, string LiveBody, bool IsHit, string ContainerClass) {
             try {
                 //
                 // should use the ccNav object, no the ccCommon module for this code
@@ -8663,7 +5143,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public string menu_GetComboTabs() {
+        public string getComboTabs() {
             string result = string.Empty;
             try {
                 if (cpCore.doc.menuComboTab == null) {
@@ -8676,153 +5156,9 @@ namespace Contensive.Core.Controllers {
             return result;
         }
         //
-        //================================================================================================================
-        //   main_Get SharedStyleFilelist
+        //====================================================================================================
         //
-        //   SharedStyleFilelist is a list of filenames (with conditional comments) that should be included on pages
-        //   that call out the SharedFileIDList
-        //
-        //   Suffix and Prefix are for Conditional Comments around the style tag
-        //
-        //   SharedStyleFileList is
-        //       crlf filename < Prefix< Suffix
-        //       crlf filename < Prefix< Suffix
-        //       ...
-        //       Prefix and Suffix are htmlencoded
-        //
-        //   SharedStyleMap file
-        //       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
-        //       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
-        //       ...
-        //       StyleID is 0 if Always include is set
-        //       The Prefix and Suffix have had crlf removed, and comma replaced with &#44;
-        //================================================================================================================
-        //
-        //Friend Shared Function main_GetSharedStyleFileList(cpCore As coreClass, SharedStyleIDList As String, main_IsAdminSite As Boolean) As String
-        //    Dim result As String = ""
-        //    '
-        //    Dim Prefix As String
-        //    Dim Suffix As String
-        //    Dim Files() As String
-        //    Dim Pos As Integer
-        //    Dim SrcID As Integer
-        //    Dim Srcs() As String
-        //    Dim SrcCnt As Integer
-        //    Dim IncludedStyleFilename As String
-        //    Dim styleId As Integer
-        //    Dim LastStyleID As Integer
-        //    Dim CS As Integer
-        //    Dim Ptr As Integer
-        //    Dim MapList As String
-        //    Dim Map() As String
-        //    Dim MapCnt As Integer
-        //    Dim MapRow As Integer
-        //    Dim Filename As String
-        //    Dim FileList As String
-        //    Dim SQL As String = String.Empty
-        //    Dim BakeName As String
-        //    '
-        //    If main_IsAdminSite Then
-        //        BakeName = "SharedStyleMap-Admin"
-        //    Else
-        //        BakeName = "SharedStyleMap-Public"
-        //    End If
-        //    MapList = genericController.encodeText(cpCore.cache.getObject(Of String)(BakeName))
-        //    If MapList = "" Then
-        //        '
-        //        ' BuildMap
-        //        '
-        //        MapList = ""
-        //        If True Then
-        //            '
-        //            ' add prefix and suffix conditional comments
-        //            '
-        //            SQL = "select s.ID,s.Stylefilename,s.Prefix,s.Suffix,i.StyleFilename as iStylefilename,s.AlwaysInclude,i.Prefix as iPrefix,i.Suffix as iSuffix" _
-        //                & " from ((ccSharedStyles s" _
-        //                & " left join ccSharedStylesIncludeRules r on r.StyleID=s.id)" _
-        //                & " left join ccSharedStyles i on i.id=r.IncludedStyleID)" _
-        //                & " where ( s.active<>0 )and((i.active is null)or(i.active<>0))"
-        //        End If
-        //        CS = cpCore.db.cs_openSql(SQL)
-        //        LastStyleID = 0
-        //        Do While cpCore.db.cs_ok(CS)
-        //            styleId = cpCore.db.cs_getInteger(CS, "ID")
-        //            If styleId <> LastStyleID Then
-        //                Filename = cpCore.db.cs_get(CS, "StyleFilename")
-        //                Prefix = genericController.vbReplace(cpCore.html.main_encodeHTML(cpCore.db.cs_get(CS, "Prefix")), ",", "&#44;")
-        //                Suffix = genericController.vbReplace(cpCore.html.main_encodeHTML(cpCore.db.cs_get(CS, "Suffix")), ",", "&#44;")
-        //                If (Not main_IsAdminSite) And cpCore.db.cs_getBoolean(CS, "alwaysinclude") Then
-        //                    MapList = MapList & vbCrLf & "0" & vbTab & Filename & "<" & Prefix & "<" & Suffix
-        //                Else
-        //                    MapList = MapList & vbCrLf & styleId & vbTab & Filename & "<" & Prefix & "<" & Suffix
-        //                End If
-        //            End If
-        //            IncludedStyleFilename = cpCore.db.cs_getText(CS, "iStylefilename")
-        //            Prefix = cpCore.html.main_encodeHTML(cpCore.db.cs_get(CS, "iPrefix"))
-        //            Suffix = cpCore.html.main_encodeHTML(cpCore.db.cs_get(CS, "iSuffix"))
-        //            If IncludedStyleFilename <> "" Then
-        //                MapList = MapList & "," & IncludedStyleFilename & "<" & Prefix & "<" & Suffix
-        //            End If
-        //            Call cpCore.db.cs_goNext(CS)
-        //        Loop
-        //        If MapList = "" Then
-        //            MapList = ","
-        //        End If
-        //        Call cpCore.cache.setObject(BakeName, MapList, "Shared Styles")
-        //    End If
-        //    If (MapList <> "") And (MapList <> ",") Then
-        //        Srcs = Split(SharedStyleIDList, ",")
-        //        SrcCnt = UBound(Srcs) + 1
-        //        Map = Split(MapList, vbCrLf)
-        //        MapCnt = UBound(Map) + 1
-        //        '
-        //        ' Add stylesheets with AlwaysInclude set (ID is saved as 0 in Map)
-        //        '
-        //        FileList = ""
-        //        For MapRow = 0 To MapCnt - 1
-        //            If genericController.vbInstr(1, Map(MapRow), "0" & vbTab) = 1 Then
-        //                Pos = genericController.vbInstr(1, Map(MapRow), vbTab)
-        //                If Pos > 0 Then
-        //                    FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
-        //                End If
-        //            End If
-        //        Next
-        //        '
-        //        ' create a filelist of everything that is needed, might be duplicates
-        //        '
-        //        For Ptr = 0 To SrcCnt - 1
-        //            SrcID = genericController.EncodeInteger(Srcs[Ptr])
-        //            If SrcID <> 0 Then
-        //                For MapRow = 0 To MapCnt - 1
-        //                    If genericController.vbInstr(1, Map(MapRow), SrcID & vbTab) <> 0 Then
-        //                        Pos = genericController.vbInstr(1, Map(MapRow), vbTab)
-        //                        If Pos > 0 Then
-        //                            FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
-        //                        End If
-        //                    End If
-        //                Next
-        //            End If
-        //        Next
-        //        '
-        //        ' dedup the filelist and convert it to crlf delimited
-        //        '
-        //        If FileList <> "" Then
-        //            Files = Split(FileList, ",")
-        //            For Ptr = 0 To UBound(Files)
-        //                Filename = Files[Ptr]
-        //                If genericController.vbInstr(1, result, Filename, vbTextCompare) = 0 Then
-        //                    result = result & vbCrLf & Filename
-        //                End If
-        //            Next
-        //        End If
-        //    End If
-        //    Return result
-        //End Function
-
-        //
-        //
-        //
-        public string main_GetResourceLibrary2(string RootFolderName, bool AllowSelectResource, string SelectResourceEditorName, string SelectLinkObjectName, bool AllowGroupAdd) {
+        public string getResourceLibrary2(string RootFolderName, bool AllowSelectResource, string SelectResourceEditorName, string SelectLinkObjectName, bool AllowGroupAdd) {
             string addonGuidResourceLibrary = "{564EF3F5-9673-4212-A692-0942DD51FF1A}";
             Dictionary<string, string> arguments = new Dictionary<string, string>();
             arguments.Add("RootFolderName", RootFolderName);
@@ -8851,7 +5187,7 @@ namespace Contensive.Core.Controllers {
         //   see main_GetFormInputCheckList for an explaination of the input
         //========================================================================
         //
-        public void main_ProcessCheckList(string TagName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName) {
+        public void processCheckList(string TagName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName) {
             //
             string rulesTablename = null;
             string SQL = null;
@@ -8980,27 +5316,16 @@ namespace Contensive.Core.Controllers {
                 cpCore.cache.invalidateAllObjectsInContent(RulesContentName);
             }
         }
-
         //
-        //========================================================================
-        // ----- Ends an HTML page
-        //========================================================================
-        //
-        //Public Function getHtmlDoc_afterBodyHtml() As String
-        //    Return "" _
-        //        & cr & "</body>" _
-        //        & vbCrLf & "</html>"
-        //End Function
-        //
-        //========================================================================
+        //====================================================================================================
         // main_GetRecordEditLink( iContentName, iRecordID )
         //
         //   iContentName The content for this link
         //   iRecordID    The ID of the record in the Table
         //========================================================================
         //
-        public string main_GetRecordEditLink(string ContentName, int RecordID, bool AllowCut = false) {
-            return main_GetRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), "", cpCore.doc.authContext.isEditing(ContentName));
+        public string getRecordEditLink(string ContentName, int RecordID, bool AllowCut = false) {
+            return getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), "", cpCore.doc.authContext.isEditing(ContentName));
         }
     }
 }

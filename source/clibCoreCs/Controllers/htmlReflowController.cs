@@ -22,21 +22,12 @@ namespace Contensive.Core.Controllers {
     /// </summary>
     public class htmlReflowController : IDisposable {
         //
-        // ----- constants
+        //====================================================================================================
         //
-        //Private Const invalidationDaysDefault As Double = 365
-        //
-        // ----- objects constructed that must be disposed
-        //
-        //Private cacheClient As Enyim.Caching.MemcachedClient
-        //
-        // ----- private instance storage
-        //
-        //Private remoteCacheDisabled As Boolean
         public static string reflow(coreClass cpCore, string source) {
+            // disabled, this is sample vb - re-introduce later as requirements cleared (pretty vs ugly reflow)
             return source;
             //Dim returnHtml As String = ""
-
             //If cpCore.siteProperties.getBoolean("AutoHTMLFormatting") Then
             //    Dim indentCnt As Integer = 0
             //    Dim Parse As htmlParserController = New htmlParserController(cpCore)

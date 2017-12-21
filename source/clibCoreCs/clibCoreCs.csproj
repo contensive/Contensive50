@@ -150,7 +150,9 @@
     <Compile Include="Controllers\fileController.cs" />
     <Compile Include="Controllers\genericController.cs" />
     <Compile Include="Controllers\groupController.cs" />
-    <Compile Include="Controllers\htmlController.0.cs" />
+    <Compile Include="Controllers\activeContentController.cs" />
+    <Compile Include="Controllers\htmlParseStaticController.cs" />
+    <Compile Include="Controllers\htmlController.cs" />
     <Compile Include="Controllers\htmlParserController.cs" />
     <Compile Include="Controllers\htmlReflowController.cs" />
     <Compile Include="Controllers\htmlToTextControllers.cs" />

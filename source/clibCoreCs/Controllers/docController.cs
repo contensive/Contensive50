@@ -359,7 +359,7 @@ namespace Contensive.Core.Controllers {
                         this.cpCore.db.csGoNext(CS);
                     }
                     if (!string.IsNullOrEmpty(result)) {
-                        result = this.cpCore.html.html_GetContentCopy("Watch List Caption: " + ListName, ListName, this.cpCore.doc.authContext.user.id, true, this.cpCore.doc.authContext.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
+                        result = this.cpCore.html.getContentCopy("Watch List Caption: " + ListName, ListName, this.cpCore.doc.authContext.user.id, true, this.cpCore.doc.authContext.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
                     }
                 }
                 this.cpCore.db.csClose(ref CS);
@@ -480,7 +480,7 @@ namespace Contensive.Core.Controllers {
                 }
                 if (!string.IsNullOrEmpty(ButtonList)) {
                     ButtonList = ButtonList.Substring(1);
-                    ButtonList = cpCore.html.main_GetPanelButtons(ButtonList, "Button");
+                    ButtonList = cpCore.html.getPanelButtons(ButtonList, "Button");
                 }
                 //If OptionsPanelAuthoringStatus <> "" Then
                 //    result = result & "" _
@@ -559,7 +559,7 @@ namespace Contensive.Core.Controllers {
                     + genericController.htmlIndent(result) + "\r</table>";
                 result = ""
                     + ButtonList + result + ButtonList;
-                result = cpCore.html.main_GetPanel(result);
+                result = cpCore.html.getPanel(result);
                 //
                 // Form Wrapper
                 //
@@ -698,7 +698,7 @@ namespace Contensive.Core.Controllers {
                     pageContentModel page = pageContentModel.create(cpCore, RecordID);
                     if (page != null) {
                         Copy = cpCore.docProperties.getText("copyFilename");
-                        Copy = cpCore.html.convertEditorResponseToActiveContent(Copy);
+                        Copy = activeContentController.convertEditorResponseToActiveContent(cpCore, Copy);
                         if (Copy != page.Copyfilename.content) {
                             page.Copyfilename.content = Copy;
                             SaveButNoChanges = false;
@@ -863,7 +863,7 @@ namespace Contensive.Core.Controllers {
                     }
                     string pageEditLink = "";
                     if (cpCore.doc.authContext.isEditing(ContentName)) {
-                        pageEditLink = cpCore.html.main_GetRecordEditLink2(ContentName, childPage.id, true, childPage.name, true);
+                        pageEditLink = cpCore.html.getRecordEditLink2(ContentName, childPage.id, true, childPage.name, true);
                     }
                     //
                     string link = PageLink;
@@ -976,7 +976,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Add Link
                 //
                 if (!ArchivePages) {
-                    string AddLink = cpCore.html.main_GetRecordAddLink(ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true);
+                    string AddLink = cpCore.html.getRecordAddLink(ContentName, "parentid=" + parentPageID + ",ParentListName=" + UcaseRequestedListName, true);
                     if (!string.IsNullOrEmpty(AddLink)) {
                         inactiveList = inactiveList + "\r<li class=\"ccListItem\">" + AddLink + "</LI>";
                     }
@@ -1616,7 +1616,7 @@ namespace Contensive.Core.Controllers {
                         + "\r\n<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">"
                         + "\r\n{{REPEATSTART}}<tr><td align=right style=\"height:22px;\">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}"
                         + "\r\n<tr><td align=right><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
-                        + "\r\n<tr><td colspan=2>&nbsp;<br>" + cpcore.html.main_GetPanelButtons(ButtonRegister, "Button") + "</td></tr>"
+                        + "\r\n<tr><td colspan=2>&nbsp;<br>" + cpcore.html.getPanelButtons(ButtonRegister, "Button") + "</td></tr>"
                         + "\r\n</table>";
                         cpcore.db.csSet(CS, "Body", Copy);
                         Copy = ""
@@ -2275,7 +2275,7 @@ namespace Contensive.Core.Controllers {
             while (cpCore.db.csOk(CS)) {
                 addonId = cpCore.db.csGetInteger(CS, "Addonid");
                 //hint = hint & ",210 addonid=[" & addonId & "]"
-                cpCore.addon.executeAddonAsProcess(addonId.ToString(), Option_String);
+                cpCore.addon.executeAsync(addonId.ToString(), Option_String);
                 cpCore.db.csGoNext(CS);
             }
             cpCore.db.csClose(ref CS);

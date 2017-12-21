@@ -97,7 +97,7 @@ namespace Contensive.Core {
             try {
                 string a = accum;
                 if (!string.IsNullOrEmpty(findSelector)) {
-                    s = htmlDoc.getInnerHTML(cpCore, a, findSelector);
+                    s = htmlParseStaticController.getInnerHTML(cpCore, a, findSelector);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -113,7 +113,7 @@ namespace Contensive.Core {
             try {
                 string a = accum;
                 if (!string.IsNullOrEmpty(findSelector)) {
-                    s = htmlDoc.getOuterHTML(cpCore, a, findSelector);
+                    s = htmlParseStaticController.getOuterHTML(cpCore, a, findSelector);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -130,16 +130,16 @@ namespace Contensive.Core {
                 if (!string.IsNullOrEmpty(wwwFileName)) {
                     accum = cp.wwwFiles.read(wwwFileName);
                     if (!string.IsNullOrEmpty(accum)) {
-                        headTags = Controllers.htmlController.getTagInnerHTML(accum, "head", false);
+                        headTags = htmlParseStaticController.getTagInnerHTML(accum, "head", false);
                         if (!string.IsNullOrEmpty(headTags)) {
-                            foreach (string asset in headTags.Split( new[] { "\r\n" }, StringSplitOptions.None )) {
+                            foreach (string asset in stringSplit( headTags, "\r\n" )) {
                                 cpCore.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
                                     addedByMessage = "block.importFile",
                                     content = asset
                                 });
                             }
                         }
-                        accum = Controllers.htmlController.getTagInnerHTML(accum, "body", false);
+                        accum = htmlParseStaticController.getTagInnerHTML(accum, "body", false);
                     }
                 }
             } catch (Exception ex) {
@@ -233,7 +233,7 @@ namespace Contensive.Core {
         //
         public override void SetInner(string findSelector, string htmlString) {
             try {
-                accum = htmlDoc.insertInnerHTML(cpCore, accum, findSelector, htmlString);
+                accum = htmlParseStaticController.insertInnerHTML(cpCore, accum, findSelector, htmlString);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -244,7 +244,7 @@ namespace Contensive.Core {
         //
         public override void SetOuter(string findSelector, string htmlString) {
             try {
-                accum = htmlDoc.insertOuterHTML(cpCore, accum, findSelector, htmlString);
+                accum = htmlParseStaticController.insertOuterHTML(cpCore, accum, findSelector, htmlString);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;

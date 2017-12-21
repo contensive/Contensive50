@@ -51,7 +51,7 @@ namespace Contensive.Addons.AdminSite {
                     gd.row[0].Cell.Add(cell);
                 }
                 result = remoteQueryController.main_FormatRemoteQueryOutput(cpCore, gd, RemoteFormatEnum.RemoteFormatJsonNameValue);
-                result = cpCore.html.main_encodeHTML(result);
+                result = cpCore.html.encodeHTML(result);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

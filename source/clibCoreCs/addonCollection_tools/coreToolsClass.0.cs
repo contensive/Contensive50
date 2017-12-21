@@ -1409,7 +1409,7 @@ namespace Contensive.Core {
                 FormPanel = FormPanel + SpanClassAdminNormal + "Select a Content Definition to Configure its Listing Page<br>";
                 //FormPanel = FormPanel & cpCore.main_GetFormInputHidden("af", AdminFormToolConfigureListing)
                 FormPanel = FormPanel + cpCore.html.main_GetFormInputSelect("ContentID", ContentID, "Content");
-                Stream.Add(cpCore.html.main_GetPanel(FormPanel));
+                Stream.Add(cpCore.html.getPanel(FormPanel));
                 //
                 cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
                 Stream.Add(cpCore.html.html_GetFormInputHidden("ReloadCDef", ReloadCDef));
@@ -2194,7 +2194,7 @@ namespace Contensive.Core {
                 }
                 Panel = Panel + "</TABLE>";
                 DiagActionCount = DiagActionCount + 1;
-                result =  cpCore.html.main_GetPanel(Panel);
+                result =  cpCore.html.getPanel(Panel);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }
@@ -2204,7 +2204,7 @@ namespace Contensive.Core {
         //
         //
         private string GetDiagHeader(string Copy) {
-            return cpCore.html.main_GetPanel("<B>" + SpanClassAdminNormal + Copy + "</SPAN><B>");
+            return cpCore.html.getPanel("<B>" + SpanClassAdminNormal + Copy + "</SPAN><B>");
         }
         //
         //
@@ -3025,7 +3025,7 @@ namespace Contensive.Core {
                     // print the Configure edit form
                     //--------------------------------------------------------------------------------
                     //
-                    Stream.Add(cpCore.html.main_GetPanelTop());
+                    Stream.Add(cpCore.html.getPanelTop());
                     ContentName = Local_GetContentNameByID(ContentID);
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd; // & "," & ButtonReloadCDef
                                                                                                      //
@@ -3296,7 +3296,7 @@ namespace Contensive.Core {
                     Stream.Add("</table>");
                     //Stream.Add( cpcore.htmldoc.main_GetPanelButtons(ButtonList, "Button"))
                     //
-                    Stream.Add(cpCore.html.main_GetPanelBottom());
+                    Stream.Add(cpCore.html.getPanelBottom());
                     //Call Stream.Add(cpCore.main_GetFormEnd())
                     if (NeedFootNote1) {
                         Stream.Add("<br>*Field Inheritance is not allowed because this Content Definition has no parent.");
@@ -3318,7 +3318,7 @@ namespace Contensive.Core {
                     FormPanel = FormPanel + "<br>";
                     FormPanel = FormPanel + cpCore.html.main_GetFormInputSelect(RequestNameToolContentID, ContentID, "Content");
                     FormPanel = FormPanel + "</SPAN>";
-                    Stream.Add(cpCore.html.main_GetPanel(FormPanel));
+                    Stream.Add(cpCore.html.getPanel(FormPanel));
                 }
                 //
                 Stream.Add(cpCore.html.html_GetFormInputHidden("ReloadCDef", ReloadCDef));

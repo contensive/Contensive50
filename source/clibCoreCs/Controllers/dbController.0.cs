@@ -1756,36 +1756,14 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- attempt read from readCache
                         //
-                        if (useCSReadCacheMultiRow) {
-                            if (!tempVar.dt.Columns.Contains(FieldName.ToLower())) {
-                                if (tempVar.Updateable) {
-                                    throw new ApplicationException("Field [" + fieldNameTrim + "] was Not found in [" + tempVar.ContentName + "] with selected fields [" + tempVar.SelectTableFieldList + "]");
-                                } else {
-                                    throw new ApplicationException("Field [" + fieldNameTrim + "] was Not found in sql [" + tempVar.Source + "]");
-                                }
+                        if (!tempVar.dt.Columns.Contains(FieldName.ToLower())) {
+                            if (tempVar.Updateable) {
+                                throw new ApplicationException("Field [" + fieldNameTrim + "] was Not found in [" + tempVar.ContentName + "] with selected fields [" + tempVar.SelectTableFieldList + "]");
                             } else {
-                                returnValue = genericController.encodeText(tempVar.dt.Rows[tempVar.readCacheRowPtr][FieldName.ToLower()]);
+                                throw new ApplicationException("Field [" + fieldNameTrim + "] was Not found in sql [" + tempVar.Source + "]");
                             }
                         } else {
-                            //
-                            // ----- read the value from the Recordset Result
-                            //
-                            if (tempVar.resultColumnCount > 0) {
-                                for (ColumnPointer = 0; ColumnPointer < tempVar.resultColumnCount; ColumnPointer++) {
-                                    if (tempVar.fieldNames[ColumnPointer] == fieldNameTrimUpper) {
-                                        returnValue = tempVar.readCache[ColumnPointer, 0];
-                                        if ((tempVar.Updateable & (tempVar.ContentName != "") & (!string.IsNullOrEmpty(FieldName)))) {
-                                            if (tempVar.CDef.fields[FieldName.ToLower()].Scramble) {
-                                                returnValue = genericController.TextDeScramble(cpCore, genericController.encodeText(returnValue));
-                                            }
-                                        }
-                                        break;
-                                    }
-                                }
-                                if (ColumnPointer == tempVar.resultColumnCount) {
-                                    throw new ApplicationException("Field [" + fieldNameTrim + "] was Not found In csv_ContentSet from source [" + tempVar.Source + "]");
-                                }
-                            }
+                            returnValue = genericController.encodeText(tempVar.dt.Rows[tempVar.readCacheRowPtr][FieldName.ToLower()]);
                         }
                     }
                     tempVar.LastUsed = DateTime.Now;
@@ -5305,7 +5283,7 @@ namespace Contensive.Core.Controllers {
                     ContentControlID = (cpCore.db.csGetInteger(iCSPointer, "contentcontrolid"));
                     ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        result = cpCore.html.main_GetRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, cpCore.doc.authContext.isEditing(ContentName));
+                        result = cpCore.html.getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, cpCore.doc.authContext.isEditing(ContentName));
                     }
                 }
             }

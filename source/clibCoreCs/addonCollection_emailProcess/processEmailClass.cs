@@ -647,12 +647,12 @@ namespace Contensive.Core {
                         // Encode body and subject
                         //
                         EmailBodyEncoded = cpCore.html.executeContentCommands(null, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
-                        EmailBodyEncoded = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailBodyEncoded, MemberID, ClickFlagQuery);
+                        EmailBodyEncoded = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, EmailBodyEncoded, MemberID, ClickFlagQuery);
                         //EmailBodyEncoded = cpCore.html.convertActiveContent_internal(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         //EmailBodyEncoded = cpCore.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         //
                         EmailSubjectEncoded = cpCore.html.executeContentCommands(null, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
-                        EmailSubjectEncoded = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailSubjectEncoded, MemberID, ClickFlagQuery);
+                        EmailSubjectEncoded = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, EmailSubjectEncoded, MemberID, ClickFlagQuery);
                         //EmailSubjectEncoded = cpCore.html.convertActiveContent_internal(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         //EmailSubjectEncoded = cpCore.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         //
@@ -668,7 +668,7 @@ namespace Contensive.Core {
                             // use provided template
                             //
                             EmailTemplateEncoded = cpCore.html.executeContentCommands(null, EmailTemplateEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, true, ref errorMessage);
-                            EmailTemplateEncoded = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailTemplate, MemberID, ClickFlagQuery);
+                            EmailTemplateEncoded = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, EmailTemplate, MemberID, ClickFlagQuery);
                             //EmailTemplateEncoded = cpCore.html.convertActiveContent_internal(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, protocolHostLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                             //EmailTemplateEncoded = cpCore.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                             //EmailTemplateEncoded = cpCore.csv_encodecontent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
@@ -815,12 +815,12 @@ namespace Contensive.Core {
                     ClickFlagQuery = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberID + "=" + ConfirmationMemberID;
                     //
                     EmailSubject = cpCore.html.executeContentCommands(null, EmailSubject, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, true, ref  errorMessage);
-                    EmailSubject = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailSubject, ConfirmationMemberID, ClickFlagQuery);
+                    EmailSubject = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, EmailSubject, ConfirmationMemberID, ClickFlagQuery);
                     //EmailSubject = cpCore.html.convertActiveContent_internal(EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                     //EmailSubject = cpCore.csv_EncodeContent8(Nothing, EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                     //
                     EmailBody = cpCore.html.executeContentCommands(null, EmailBody, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, true, ref errorMessage);
-                    EmailBody = cpCore.html.convertActiveContentToHtmlForEmailSend(EmailBody, ConfirmationMemberID, ClickFlagQuery);
+                    EmailBody = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, EmailBody, ConfirmationMemberID, ClickFlagQuery);
                     //EmailBody = cpCore.html.convertActiveContent_internal(EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                     //EmailBody = cpCore.csv_EncodeContent8(Nothing, EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                     //
@@ -834,7 +834,7 @@ namespace Contensive.Core {
                     } else {
                         WorkingTemplate = EmailTemplate;
                         WorkingTemplate = cpCore.html.executeContentCommands(null, WorkingTemplate, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, true, ref errorMessage);
-                        WorkingTemplate = cpCore.html.convertActiveContentToHtmlForEmailSend(WorkingTemplate, ConfirmationMemberID, ClickFlagQuery);
+                        WorkingTemplate = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, WorkingTemplate, ConfirmationMemberID, ClickFlagQuery);
                         //WorkingTemplate = cpCore.html.convertActiveContent_internal(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         //WorkingTemplate = cpCore.csv_encodecontent8(Nothing, EmailTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
                         if (genericController.vbInstr(1, WorkingTemplate, fpoContentBox) != 0) {

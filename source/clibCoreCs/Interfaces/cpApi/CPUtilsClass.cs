@@ -86,7 +86,7 @@ namespace Contensive.Core {
         }
 
         public override string EncodeContentForWeb(string Source, string ContextContentName = "", int ContextRecordID = 0, int WrapperID = 0) {
-            return CP.core.html.convertActiveContentToHtmlForWebRender(Source, ContextContentName, ContextRecordID, 0, "", WrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+            return activeContentController.convertActiveContentToHtmlForWebRender( CP.core, Source, ContextContentName, ContextRecordID, 0, "", WrapperID, CPUtilsBaseClass.addonContext.ContextPage);
         }
 
         public override string DecodeHTML(string Source) {
@@ -182,7 +182,7 @@ namespace Contensive.Core {
         );
 
         public override string ExecuteAddonAsProcess(string IdGuidOrName) {
-            return CP.core.addon.executeAddonAsProcess(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar());
+            return CP.core.addon.executeAsync(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar());
         }
         [Obsolete("Deprecated, use AppendLog")]
         public override void AppendLogFile(string Text) {
@@ -374,9 +374,7 @@ namespace Contensive.Core {
         /// <param name="Source"></param>
         /// <returns></returns>
         public override string EncodeHtmlForWysiwygEditor(string Source) {
-            return CP.core.html.convertActiveContentToHtmlForWysiwygEditor(Source);
-            //Return CP.core.html.convertActiveContent_internal(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
-            //Return CP.core.encodeContent9(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", 1)
+            return activeContentController.convertActiveContentToHtmlForWysiwygEditor(CP.core, Source);
         }
         //
         //====================================================================================================
@@ -386,8 +384,7 @@ namespace Contensive.Core {
         /// <param name="Source"></param>
         /// <returns></returns>
         public override string DecodeHtmlFromWysiwygEditor(string Source) {
-            return CP.core.html.convertEditorResponseToActiveContent(Source);
-            //Throw New NotImplementedException()
+            return activeContentController.convertEditorResponseToActiveContent(CP.core, Source);
         }
         //
         //

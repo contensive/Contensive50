@@ -121,10 +121,6 @@ namespace Contensive.Core.Controllers {
                     }
                 }
             }
-            //
-            return tempLoad;
-            //ErrorTrap:
-            throw (new Exception("unexpected exception"));
             return tempLoad;
         }
         //

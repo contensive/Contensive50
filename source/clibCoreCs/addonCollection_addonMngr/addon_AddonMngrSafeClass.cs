@@ -777,7 +777,7 @@ namespace Contensive.Core {
                                     + "";
                                     BodyHTML = Adminui.GetEditPanel(true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
                                     BodyHTML = BodyHTML + cpCore.html.html_GetFormInputHidden("AOCnt", RowPtr);
-                                    cpCore.html.main_AddLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
+                                    cpCore.html.addLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                                 }
                                 //
                                 // --------------------------------------------------------------------------------
@@ -853,7 +853,7 @@ namespace Contensive.Core {
                                 BodyHTML = "<div style=\"width:100%\">" + Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
                                 BodyHTML = Adminui.GetEditPanel(true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
                                 BodyHTML = BodyHTML + cpCore.html.html_GetFormInputHidden("accnt", RowPtr);
-                                cpCore.html.main_AddLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
+                                cpCore.html.addLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Get the Upload Add-ons tab
@@ -878,13 +878,13 @@ namespace Contensive.Core {
                                     Body.Add(Adminui.GetEditRow(FormInput, "&nbsp;", "", true, false, ""));
                                     Body.Add(Adminui.EditTableClose);
                                 }
-                                cpCore.html.main_AddLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
+                                cpCore.html.addLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Build Page from tabs
                                 // --------------------------------------------------------------------------------
                                 //
-                                Content.Add(cpCore.html.main_GetLiveTabs());
+                                Content.Add(cpCore.html.getLiveTabs());
                                 //
                                 ButtonList = ButtonCancel + "," + ButtonOK;
                                 Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));

@@ -43,7 +43,7 @@ namespace Contensive.Addons.Core {
                     cpCore.html.addScriptCode_onLoad("document.body.style.overflow='scroll';", "Site Explorer");
                     string htmlBodyTag = "<body class=\"ccBodyAdmin ccCon\" style=\"overflow:scroll\">";
                     string htmlBody = ""
-                        + genericController.htmlIndent(cpCore.html.main_GetPanelHeader("Contensive Site Explorer")) + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>"
+                        + genericController.htmlIndent(cpCore.html.getPanelHeader("Contensive Site Explorer")) + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>"
                         + genericController.htmlIndent(copy) + "\r</td></tr></table>"
                         + "";
                     result = cpCore.html.getHtmlDoc(htmlBody, htmlBodyTag, false, false);

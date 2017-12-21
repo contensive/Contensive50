@@ -1346,40 +1346,11 @@ namespace Contensive.Core.Controllers {
         //
         private static void Upgrade_Conversion(coreClass cpCore, string DataBuildVersion) {
             try {
-                int CID = 0;
                 //
-                //---------------------------------------------------------------------
-                //   moved from right after core table creation
-                //   If pre-3.0.300 core table changes only
-                //   required so the rest of the system will operate during upgrade
-                //   convert Setup to Site Properties, populate ccTables, populate ccFields.Authorable from .active, set .active true
-                //---------------------------------------------------------------------
-                //
-                if (false) {
-                    appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "Upgrade_Conversion", "4.2.414, convert all ccaggregateFunctions to add-ons");
-                    //
-                    // remove all non add-on contentdefs for ccaggregatefunctions
-                    //
-                    CID = Models.Complex.cdefModel.getContentId(cpCore, cnAddons);
-                    if (CID != 0) {
-                        cpCore.db.executeQuery("update ccaggregatefunctions set contentcontrolid=" + CID);
-                        cpCore.db.executeQuery("delete from cccontent where id in (select c.id from cccontent c left join cctables t on t.id=c.contenttableid where t.name='ccAggregateFunctions' and c.id<>" + CID + ")");
-                    }
-                }
-                //
-                // iis virtual path /appName/files/ becomes publicFileContentPathPrefix
-                //
-                //cpcore.app.config.contentFilePathPrefix = "/" & cpCore.app.config.name & "/files/"
-                //Call cpCore.app.siteProperty_getText("publicFileContentPathPrefix", cpcore.app.config.contentFilePathPrefix)
-                //
-                //---------------------------------------------------------------------
-                // ----- Roll the style sheet cache if it is setup
-                //---------------------------------------------------------------------
-                //
+                // -- Roll the style sheet cache if it is setup
                 cpCore.siteProperties.setProperty("StylesheetSerialNumber", (-1).ToString());
                 //
-                // ----- Reload CSv
-                //
+                // -- Reload
                 cpCore.cache.invalidateAll();
                 cpCore.doc.clearMetaData();
             } catch (Exception ex) {
@@ -1885,7 +1856,7 @@ namespace Contensive.Core.Controllers {
                 appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
                 string list = cpCore.appRootFiles.readFile("cclib\\config\\isoCountryList.txt");
-                string[] rows  = genericController.customSplit(list, "\r\n");
+                string[] rows  = genericController.stringSplit(list, "\r\n");
                 foreach( var row in rows) {
                     if (!string.IsNullOrEmpty(row)) {
                         string[] attrs = row.Split(';');

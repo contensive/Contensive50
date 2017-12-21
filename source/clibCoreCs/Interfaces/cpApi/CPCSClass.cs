@@ -317,7 +317,7 @@ namespace Contensive.Core {
             object result = null;
             //
             try {
-                result = cpCore.html.main_cs_getRecordAddLink(cs, PresetNameValueList, AllowPaste);
+                result = cpCore.html.cs_getRecordAddLink(cs, PresetNameValueList, AllowPaste);
                 if (result == null) {
                     result = string.Empty;
                 }

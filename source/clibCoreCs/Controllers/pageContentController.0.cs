@@ -82,7 +82,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Encode Template
                     //
                     LocalTemplateBody = cpCore.html.executeContentCommands(null, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
-                    returnBody = returnBody + cpCore.html.convertActiveContentToHtmlForWebRender(LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
+                    returnBody = returnBody + activeContentController.convertActiveContentToHtmlForWebRender(cpCore, LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
                     //
                     // If Content was not found, add it to the end
                     //
@@ -103,7 +103,7 @@ namespace Contensive.Core.Controllers {
                         // Add template editing
                         //
                         if (cpCore.visitProperty.getBoolean("AllowAdvancedEditor") & cpCore.doc.authContext.isEditing("Page Templates")) {
-                            returnBody = cpCore.html.getEditWrapper("Page Template [" + LocalTemplateName + "]", cpCore.html.main_GetRecordEditLink2("Page Templates", LocalTemplateID, false, LocalTemplateName, cpCore.doc.authContext.isEditing("Page Templates")) + returnBody);
+                            returnBody = cpCore.html.getEditWrapper("Page Template [" + LocalTemplateName + "]", cpCore.html.getRecordEditLink2("Page Templates", LocalTemplateID, false, LocalTemplateName, cpCore.doc.authContext.isEditing("Page Templates")) + returnBody);
                         }
                     }
                     //
@@ -265,7 +265,7 @@ namespace Contensive.Core.Controllers {
                     // Display Admin Warnings with Edits for record errors
                     //
                     if (cpCore.doc.adminWarningPageID != 0) {
-                        cpCore.doc.adminWarning = cpCore.doc.adminWarning + "</p>" + cpCore.html.main_GetRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, true, "Page " + cpCore.doc.adminWarningPageID, cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) + "&nbsp;Edit the page<p>";
+                        cpCore.doc.adminWarning = cpCore.doc.adminWarning + "</p>" + cpCore.html.getRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, true, "Page " + cpCore.doc.adminWarningPageID, cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) + "&nbsp;Edit the page<p>";
                         cpCore.doc.adminWarningPageID = 0;
                     }
                     //
@@ -1431,7 +1431,7 @@ namespace Contensive.Core.Controllers {
                                     cpCore.doc.continueProcessing = false;
                                     cpCore.doc.setMetaContent(0, 0);
                                     cpCore.html.addScriptCode_onLoad("document.body.style.overflow='scroll'", "Anonymous User Block");
-                                    return cpCore.html.getHtmlDoc('\r' + cpCore.html.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=\"width:250px;margin:100px auto auto auto;\">The site is currently not available for anonymous access.</p>", cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated), TemplateDefaultBodyTag, true, true);
+                                    return cpCore.html.getHtmlDoc('\r' + cpCore.html.getContentCopy("AnonymousUserResponseCopy", "<p style=\"width:250px;margin:100px auto auto auto;\">The site is currently not available for anonymous access.</p>", cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated), TemplateDefaultBodyTag, true, true);
                             }
                         }
                     }
@@ -2246,7 +2246,7 @@ namespace Contensive.Core.Controllers {
                     // Encode the copy
                     //
                     returnHtml = cpCore.html.executeContentCommands(null, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
-                    returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                    returnHtml = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (cpCore.doc.refreshQueryString != "") {
                         returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + cpCore.doc.refreshQueryString, 1, 99, 1);
                     }
@@ -2268,12 +2268,12 @@ namespace Contensive.Core.Controllers {
                             // Link authoring, workflow rendering -> do encoding, but no tracking
                             //
                             returnHtml = cpCore.html.executeContentCommands(null, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
-                            returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            returnHtml = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
                             returnHtml = cpCore.html.executeContentCommands(null, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
-                            returnHtml = cpCore.html.convertActiveContentToHtmlForWebRender(returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            returnHtml = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             cpCore.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + cpCore.doc.page.id);
                         }
                         //
@@ -2448,7 +2448,7 @@ namespace Contensive.Core.Controllers {
                 if (cpCore.doc.adminWarning != "") {
                     //
                     if (cpCore.doc.adminWarningPageID != 0) {
-                        cpCore.doc.adminWarning = cpCore.doc.adminWarning + "</p>" + cpCore.html.main_GetRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, true, "Page " + cpCore.doc.adminWarningPageID, cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) + "&nbsp;Edit the page<p>";
+                        cpCore.doc.adminWarning = cpCore.doc.adminWarning + "</p>" + cpCore.html.getRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, true, "Page " + cpCore.doc.adminWarningPageID, cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) + "&nbsp;Edit the page<p>";
                         cpCore.doc.adminWarningPageID = 0;
                     }
                     returnHtml = ""
@@ -2491,9 +2491,9 @@ namespace Contensive.Core.Controllers {
                         LiveBody = getContentBox_content_Body(cpcore, OrderByClause, AllowChildPageList, false, cpcore.doc.pageToRootList.Last().id, AllowReturnLink, pageContentModel.contentName, ArchivePages);
                         bool isRootPage = (cpcore.doc.pageToRootList.Count == 1);
                         if (cpcore.doc.authContext.isAdvancedEditing(cpcore, "")) {
-                            result = result + cpcore.html.main_GetRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (!isRootPage)) + LiveBody;
+                            result = result + cpcore.html.getRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (!isRootPage)) + LiveBody;
                         } else if (isEditing) {
-                            result = result + cpcore.html.getEditWrapper("", cpcore.html.main_GetRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (!isRootPage)) + LiveBody);
+                            result = result + cpcore.html.getEditWrapper("", cpcore.html.getRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (!isRootPage)) + LiveBody);
                         } else {
                             result = result + LiveBody;
                         }
@@ -2586,7 +2586,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Headline
                     //
                     if (cpcore.doc.page.Headline != "") {
-                        string headline = cpcore.html.main_encodeHTML(cpcore.doc.page.Headline);
+                        string headline = cpcore.html.encodeHTML(cpcore.doc.page.Headline);
                         Cell = Cell + "\r<h1>" + headline + "</h1>";
                         //
                         // Add AC end here to force the end of any left over AC tags (like language)
@@ -2750,7 +2750,7 @@ namespace Contensive.Core.Controllers {
                                     SeeAlsoLink = cpcore.webServer.requestProtocol + SeeAlsoLink;
                                 }
                                 if (IsEditingLocal) {
-                                    result = result + cpcore.html.main_GetRecordEditLink2("See Also", (cpcore.db.csGetInteger(CS, "ID")), false, "", cpcore.doc.authContext.isEditing("See Also"));
+                                    result = result + cpcore.html.getRecordEditLink2("See Also", (cpcore.db.csGetInteger(CS, "ID")), false, "", cpcore.doc.authContext.isEditing("See Also"));
                                 }
                                 result = result + "<a href=\"" + genericController.encodeHTML(SeeAlsoLink) + "\" target=\"_blank\">" + (cpcore.db.csGetText(CS, "Name")) + "</A>";
                                 Copy = (cpcore.db.csGetText(CS, "Brief"));
@@ -2766,7 +2766,7 @@ namespace Contensive.Core.Controllers {
                         //
                         if (IsEditingLocal) {
                             SeeAlsoCount = SeeAlsoCount + 1;
-                            result = result + "\r<li class=\"ccListItem\">" + cpcore.html.main_GetRecordAddLink("See Also", "RecordID=" + iRecordID + ",ContentID=" + ContentID) + "</LI>";
+                            result = result + "\r<li class=\"ccListItem\">" + cpcore.html.getRecordAddLink("See Also", "RecordID=" + iRecordID + ",ContentID=" + ContentID) + "</LI>";
                         }
                     }
                     //

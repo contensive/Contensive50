@@ -567,7 +567,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = cpCore.html.html_GetContentCopy(ArgName, "copy content", cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated);
+                                        CmdAccumulator = cpCore.html.getContentCopy(ArgName, "copy content", cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated);
                                     }
                                     break;
                                 }
@@ -591,7 +591,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = cpCore.html.html_GetContentCopy(ArgName, "copy content", cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated);
+                                        CmdAccumulator = cpCore.html.getContentCopy(ArgName, "copy content", cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated);
                                     }
                                     break;
                                 }

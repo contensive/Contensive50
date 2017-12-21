@@ -44,7 +44,7 @@ namespace Contensive.Addons.AdminSite {
                     cpCore.visitProperty.setProperty(PropertyName, PropertyValue);
                 }
                 result = remoteQueryController.main_FormatRemoteQueryOutput(cpCore, gd, RemoteFormatEnum.RemoteFormatJsonNameValue);
-                result = cpCore.html.main_encodeHTML(result);
+                result = cpCore.html.encodeHTML(result);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

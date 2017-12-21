@@ -55,7 +55,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- convert editor active edit icons
                     //
-                    ContentCopy = cpCore.html.convertEditorResponseToActiveContent(ContentCopy);
+                    ContentCopy = activeContentController.convertEditorResponseToActiveContent(cpCore,ContentCopy);
                     //
                     // ----- save the content
                     //
@@ -97,14 +97,14 @@ namespace Contensive.Core.Controllers {
             ContentID = Models.Complex.cdefModel.getContentId(cpcore, intContentName);
             if ((ContentID < 1) || (intRecordId < 1) || (string.IsNullOrEmpty(strFieldName))) {
                 PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
-                EditorPanel = EditorPanel + cpcore.html.main_GetPanel(PanelCopy);
+                EditorPanel = EditorPanel + cpcore.html.getPanel(PanelCopy);
             } else {
                 intContentName = Models.Complex.cdefModel.getContentNameByID(cpcore, ContentID);
                 if (!string.IsNullOrEmpty(intContentName)) {
                     CSPointer = cpcore.db.csOpen(intContentName, "ID=" + intRecordId);
                     if (!cpcore.db.csOk(CSPointer)) {
                         PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
-                        EditorPanel = EditorPanel + cpcore.html.main_GetPanel(PanelCopy);
+                        EditorPanel = EditorPanel + cpcore.html.getPanel(PanelCopy);
                     } else {
                         Copy = cpcore.db.csGet(CSPointer, strFieldName);
                         EditorPanel = EditorPanel + cpcore.html.html_GetFormInputHidden("Type", FormTypeActiveEditor);
@@ -114,14 +114,14 @@ namespace Contensive.Core.Controllers {
                         EditorPanel = EditorPanel + genericController.encodeText(FormElements);
                         EditorPanel = EditorPanel + cpcore.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
                         //EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
-                        ButtonPanel = cpcore.html.main_GetPanelButtons(ButtonCancel + "," + ButtonSave, "button");
+                        ButtonPanel = cpcore.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
                         EditorPanel = EditorPanel + ButtonPanel;
                     }
                     cpcore.db.csClose(ref CSPointer);
                 }
             }
-            Stream = Stream + cpcore.html.main_GetPanelHeader("Contensive Active Content Editor");
-            Stream = Stream + cpcore.html.main_GetPanel(EditorPanel);
+            Stream = Stream + cpcore.html.getPanelHeader("Contensive Active Content Editor");
+            Stream = Stream + cpcore.html.getPanel(EditorPanel);
             Stream = cpcore.html.html_GetFormStart() + Stream + cpcore.html.html_GetFormEnd();
             return Stream;
         }

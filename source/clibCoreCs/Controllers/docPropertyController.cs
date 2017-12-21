@@ -134,19 +134,17 @@ namespace Contensive.Core.Controllers {
                 cpCore.handleException(ex);
                 throw;
             }
-            return string.Empty;
         }
         //
         //=============================================================================================
         //
         public string getRenderedActiveContent(string RequestName) {
             try {
-                return cpCore.html.convertEditorResponseToActiveContent(genericController.encodeText(getProperty(RequestName).Value));
+                return activeContentController.convertEditorResponseToActiveContent(cpCore, genericController.encodeText(getProperty(RequestName).Value));
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
             }
-            return string.Empty;
         }
         //
         //=============================================================================================

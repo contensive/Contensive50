@@ -247,7 +247,7 @@ namespace Contensive.Core {
         public override void ProcessCheckList(string HtmlName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName) //Inherits BaseClasses.CPHtmlBaseClass.ProcessCheckList
         {
             if (true) {
-                cpCore.html.main_ProcessCheckList(HtmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName);
+                cpCore.html.processCheckList(HtmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName);
             }
         }
         //

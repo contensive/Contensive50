@@ -46,7 +46,7 @@ namespace Contensive.Core.Controllers {
                     + Body + "";
                 //
                 Body = ""
-                    + cpcore.html.main_GetPanel(Body, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) + "\r<p>&nbsp;</p>"
+                    + cpcore.html.getPanel(Body, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) + "\r<p>&nbsp;</p>"
                     + "\r<p>&nbsp;</p>"
                     + "\r<p style=\"text-align:center\"><a href=\"http://www.Contensive.com\" target=\"_blank\"><img src=\"/ccLib/images/ccLibLogin.GIF\" width=\"80\" height=\"33\" border=\"0\" alt=\"Contensive Content Control\" ></A></p>"
                     + "\r<p style=\"text-align:center\" class=\"ccAdminSmall\">The content on this web site is managed and delivered by the Contensive Site Management Server. If you do not have member access, please use your back button to return to the public area.</p>"
@@ -56,7 +56,7 @@ namespace Contensive.Core.Controllers {
                 //
                 Body = ""
                     + "\r<div class=\"ccCon\" style=\"width:400px;margin:100px auto 0 auto;\">"
-                    + htmlIndent(cpcore.html.main_GetPanelHeader("Login")) + htmlIndent(Body) + "</div>";
+                    + htmlIndent(cpcore.html.getPanelHeader("Login")) + htmlIndent(Body) + "</div>";
                 //
                 returnREsult = Body;
                 //Call cpcore.doc.setMetaContent(0, 0)
@@ -164,7 +164,7 @@ namespace Contensive.Core.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
                         + htmlIndent(loginForm) + "\r</table>"
                         + "";
-                    loginForm = loginForm + cpcore.html.html_GetFormInputHidden("Type", FormTypeLogin) + cpcore.html.html_GetFormInputHidden("email", cpcore.doc.authContext.user.Email) + cpcore.html.main_GetPanelButtons(ButtonLogin, "Button") + "";
+                    loginForm = loginForm + cpcore.html.html_GetFormInputHidden("Type", FormTypeLogin) + cpcore.html.html_GetFormInputHidden("email", cpcore.doc.authContext.user.Email) + cpcore.html.getPanelButtons(ButtonLogin, "Button") + "";
                     loginForm = ""
                         + cpcore.html.html_GetFormStart(QueryString) + htmlIndent(loginForm) + "\r</form>"
                         + "";
@@ -259,7 +259,7 @@ namespace Contensive.Core.Controllers {
                     + cr2 + "</tr>"
                     + cr2 + "<tr>"
                     + cr3 + "<td colspan=\"2\">"
-                    + htmlIndent(htmlIndent(cpcore.html.main_GetPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>"
+                    + htmlIndent(htmlIndent(cpcore.html.getPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>"
                     + cr2 + "</tr>"
                     + "\r</table>"
                     + "";
