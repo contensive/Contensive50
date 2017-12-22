@@ -315,17 +315,17 @@ namespace integrationTests {
             Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("d") + 1, vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"));
             Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E") + 1, vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"));
             Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", Microsoft.VisualBasic.CompareMethod.Binary));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9, System.StringComparison.OrdinalIgnoreCase) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", Microsoft.VisualBasic.CompareMethod.Text));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("c", 9) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", Microsoft.VisualBasic.CompareMethod.Binary));
-            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("c", 9, System.StringComparison.OrdinalIgnoreCase) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", Microsoft.VisualBasic.CompareMethod.Text));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", 2));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("E", 9, System.StringComparison.OrdinalIgnoreCase) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", 1));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("c", 9) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", 2));
+            Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("c", 9, System.StringComparison.OrdinalIgnoreCase) + 1, vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", 1));
             string haystack = "abcdefgabcdefgabcdefgabcdefg";
             string needle = "c";
             Assert.AreEqual("?".IndexOf("?") + 1, vbInstr(1, "?", "?"));
             //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of haystack.Length for every iteration:
             int tempVar = haystack.Length;
             for (int ptr = 1; ptr <= tempVar; ptr++) {
-                Assert.AreEqual(haystack.IndexOf(needle, ptr - 1) + 1, vbInstr(ptr, haystack, needle, Microsoft.VisualBasic.CompareMethod.Binary));
+                Assert.AreEqual(haystack.IndexOf(needle, ptr - 1) + 1, vbInstr(ptr, haystack, needle, 2));
             }
         }
         //

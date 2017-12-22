@@ -200,7 +200,7 @@ Namespace Contensive.Core
                 If UBound(ResponseLines) > 0 Then
                     ResponseStatus = ResponseLines(0)
                 End If
-                If genericController.vbInstr(1, ResponseStatus, "200 OK", vbTextCompare) = 0 Then
+                If genericController.vbInstr(1, ResponseStatus, "200 OK", 1) = 0 Then
                     '
                     ' Not a 200, this is an error
                     '
@@ -546,7 +546,7 @@ ErrorTrap:
                                     AppLog(AppLogPtr).ErrorCount = AppLog(AppLogPtr).ErrorCount + 1
                                     Call appendMonitorLog(AppName & " has no valid domain name")
                                 Else
-                                    If genericController.vbInstr(1, DomainName, "http://", CompareMethod.Text) = 0 Then
+                                    If genericController.vbInstr(1, DomainName, "http://", 1) = 0 Then
                                         DomainName = "http://" & DomainName
                                     End If
                                     DomainName = DomainName & AppRootPath & DefaultPageName
@@ -561,7 +561,7 @@ ErrorTrap:
                                     Response = GetDoc(DomainName, AppName, SiteTimeout, needsErrorRecovery)
                                     ResponseStatusLine = getLine(Response)
                                     AppLog(AppLogPtr).LastStatusResponse = ResponseStatusLine
-                                    If genericController.vbInstr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
+                                    If genericController.vbInstr(1, ResponseStatusLine, "Contensive OK", 1) = 1 Then
                                         '
                                         ' no error
                                         '
@@ -619,7 +619,7 @@ ErrorTrap:
                                             Response = GetDoc(DomainName, AppName, SiteTimeout, needsErrorRecovery)
                                             ResponseStatusLine = getLine(Response)
                                             AppLog(AppLogPtr).LastStatusResponse = "[" & AppLog(AppLogPtr).LastStatusResponse & "], after recovery [" & ResponseStatusLine & "]"
-                                            If genericController.vbInstr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
+                                            If genericController.vbInstr(1, ResponseStatusLine, "Contensive OK", 1) = 1 Then
                                                 '
                                                 ' recovered, continue without error
                                                 '

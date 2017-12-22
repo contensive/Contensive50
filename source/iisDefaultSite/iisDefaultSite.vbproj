@@ -671,13 +671,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\clibCoreCs\clibCoreCs.csproj">
+    <ProjectReference Include="..\core\core.csproj">
       <Project>{46657d07-74bc-4ddc-8fdd-9078eb1a1cd2}</Project>
-      <Name>clibCoreCs</Name>
+      <Name>core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\cpBaseCs\CPBaseCs.csproj">
+    <ProjectReference Include="..\CPBase50\CPBase50.csproj">
       <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
-      <Name>CPBaseCs</Name>
+      <Name>CPBase50</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
