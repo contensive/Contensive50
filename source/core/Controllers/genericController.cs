@@ -3202,12 +3202,22 @@ namespace Contensive.Core.Controllers {
         //
         public static int EncodeInteger(object expression) {
             int result = 0;
-            if ( expression == null ) {
+            if (expression == null) {
                 return 0;
-            } else if (Int32.TryParse(expression.ToString(), out result)) {
-                return result;
             } else {
-                return 0;
+                double number = 0;
+                string tmpString = expression.ToString();
+                if ( String.IsNullOrWhiteSpace( tmpString)) {
+                    return 0;
+                } else {
+                    if (Int32.TryParse(tmpString, out result)) {
+                        return result;
+                    } else if (Double.TryParse(tmpString, out number)) {
+                        return Convert.ToInt32(number);
+                    } else {
+                        return 0;
+                    }
+                }
             }
 
             //if (expression == null) {
@@ -3215,8 +3225,8 @@ namespace Contensive.Core.Controllers {
             //}
             //string result = expression.ToString();
 
-            
-            
+
+
             //else if ((expression is int) || (expression is Int16) || (expression is Int32)) {
             //    return Convert.ToInt32(expression);
             //} else if ((expression is decimal) || (expression is float) || (expression is double) || (expression is Int64)) {
