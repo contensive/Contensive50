@@ -11,13 +11,16 @@ using System.Diagnostics;
 using System.Linq;
 //
 namespace Contensive.Core {
+    // todo - this is not 'cpCore'. It is a 
     public class coreClass : IDisposable {
         //
         //======================================================================
         // -- provides object dependancy injection
         //
         internal CPClass cp_forAddonExecutionOnly { get; set; }
+        // todo - take appConfig out of serverConfig. saved server structure should not include it.
         public Models.Context.serverConfigModel serverConfig { get; set; }
+        // todo move persistent objects to .doc (keeping of document scope persistence)
         public Random random = new Random();
         //
         //===================================================================================================
@@ -390,15 +393,15 @@ namespace Contensive.Core {
         private dbController _db;
         //
         //===================================================================================================
-        public dbEngineController dbServer {
+        public dbServerController dbServer {
             get {
                 if (_dbEngine == null) {
-                    _dbEngine = new dbEngineController(this);
+                    _dbEngine = new dbServerController(this);
                 }
                 return _dbEngine;
             }
         }
-        private dbEngineController _dbEngine;
+        private dbServerController _dbEngine;
         //
         //====================================================================================================
         /// <summary>
@@ -598,19 +601,19 @@ namespace Contensive.Core {
                         //
                         // -- Process Email Open
                         doc.continueProcessing = false;
-                        return (new Addons.Core.openEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Primitives.openEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
                     }
                     if (docProperties.getInteger(rnEmailClickFlag) > 0) {
                         //
                         // -- Process Email click
                         doc.continueProcessing = false;
-                        return (new Addons.Core.clickEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Primitives.clickEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
                     }
                     if (docProperties.getInteger(rnEmailBlockRecipientEmail) > 0) {
                         //
                         // -- Process Email block
                         doc.continueProcessing = false;
-                        return (new Addons.Core.blockEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Primitives.blockEmailClass()).Execute(cp_forAddonExecutionOnly).ToString();
                     }
                     //
                     // -- legacy form process methods 
@@ -621,44 +624,44 @@ namespace Contensive.Core {
                         switch (formType) {
                             case FormTypeAddonStyleEditor:
                                 //
-                                result = (new Addons.Core.processAddonStyleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processAddonStyleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeAddonSettingsEditor:
                                 //
-                                result = (new Addons.Core.processAddonSettingsEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processAddonSettingsEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeSendPassword:
                                 //
-                                result = (new Addons.Core.processSendPasswordFormClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processSendPasswordFormClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeLogin:
                             case "l09H58a195":
                                 //
-                                result = (new Addons.Core.processFormLoginDefaultClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processFormLoginDefaultClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeToolsPanel:
                                 //
-                                result = (new Addons.Core.processFormToolsPanelClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processFormToolsPanelClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypePageAuthoring:
                                 //
-                                result = (new Addons.Core.processFormQuickEditingClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processFormQuickEditingClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeActiveEditor:
                                 //
-                                result = (new Addons.Core.processActiveEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processActiveEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeSiteStyleEditor:
                                 //
-                                result = (new Addons.Core.processSiteStyleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processSiteStyleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeHelpBubbleEditor:
                                 //
-                                result = (new Addons.Core.processHelpBubbleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processHelpBubbleEditorClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                             case FormTypeJoin:
                                 //
-                                result = (new Addons.Core.processJoinFormClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                result = (new Addons.Primitives.processJoinFormClass()).Execute(cp_forAddonExecutionOnly).ToString();
                                 break;
                         }
                     }
@@ -669,37 +672,37 @@ namespace Contensive.Core {
                         switch (genericController.vbLCase(HardCodedPage)) {
                             case HardCodedPageSendPassword:
                                 //
-                                return (new Addons.Core.processSendPasswordMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processSendPasswordMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageResourceLibrary:
                                 //
-                                return (new Addons.Core.processResourceLibraryMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processResourceLibraryMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLoginDefault:
                                 //
-                                return (new Addons.Core.processLoginDefaultMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processLoginDefaultMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLogin:
                                 //
-                                return (new Addons.Core.processLoginMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processLoginMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLogoutLogin:
                                 //
-                                return (new Addons.Core.processLogoutLoginMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processLogoutLoginMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageLogout:
                                 //
-                                return (new Addons.Core.processLogoutMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processLogoutMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageSiteExplorer:
                                 //
-                                return (new Addons.Core.processSiteExplorerMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processSiteExplorerMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageStatus:
                                 //
-                                return (new Addons.Core.processStatusMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processStatusMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageRedirect:
                                 //
-                                return (new Addons.Core.processRedirectMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processRedirectMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPageExportAscii:
                                 //
-                                return (new Addons.Core.processExportAsciiMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processExportAsciiMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case HardCodedPagePayPalConfirm:
                                 //
-                                return (new Addons.Core.processPayPalConformMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.Primitives.processPayPalConformMethodClass()).Execute(cp_forAddonExecutionOnly).ToString();
                         }
                     }
                     //
@@ -782,13 +785,13 @@ namespace Contensive.Core {
                         //
                         // -- Favicon.ico
                         doc.continueProcessing = false;
-                        return (new Addons.Core.faviconIcoClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Primitives.faviconIcoClass()).Execute(cp_forAddonExecutionOnly).ToString();
                     }
                     if (normalizedRoute.Equals("robots.txt")) {
                         //
                         // -- Favicon.ico
                         doc.continueProcessing = false;
-                        return (new Addons.Core.robotsTxtClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                        return (new Addons.Primitives.robotsTxtClass()).Execute(cp_forAddonExecutionOnly).ToString();
                     }
                     //
                     // -- default route

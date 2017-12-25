@@ -295,7 +295,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // -- verify base collection
                     logController.appendInstallLog(cpcore, "Install base collection");
-                    addonInstallClass.installBaseCollection(cpcore, isNewBuild,ref  nonCriticalErrorList);
+                    collectionController.installBaseCollection(cpcore, isNewBuild,ref  nonCriticalErrorList);
                     //
                     // -- Update server config file
                     logController.appendInstallLog(cpcore, "Update configuration file");
@@ -506,7 +506,7 @@ namespace Contensive.Core.Controllers {
                             //RegisterList = ""
                             logController.appendInstallLog(cpcore, "Upgrading All Local Collections to new server build.");
                             string tmpString = "";
-                            bool UpgradeOK = addonInstallClass.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, ref  nonCriticalErrorList);
+                            bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, ref  nonCriticalErrorList);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
                                 throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
@@ -565,7 +565,7 @@ namespace Contensive.Core.Controllers {
                             logController.appendInstallLog(cpcore, "...Open collectons.xml");
                             try {
                                 XmlDocument Doc = new XmlDocument();
-                                Doc.LoadXml(addonInstallClass.getCollectionListFile(cpcore));
+                                Doc.LoadXml(collectionController.getCollectionListFile(cpcore));
                                 if (true) {
                                     if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
                                         throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
@@ -637,7 +637,7 @@ namespace Contensive.Core.Controllers {
                                                         ErrorMessage = "";
                                                         if (!localCollectionFound) {
                                                             logController.appendInstallLog(cpcore, "...site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
-                                                            bool addonInstallOk = addonInstallClass.installCollectionFromRemoteRepo(cpcore, CollectionGuid, ref  ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
+                                                            bool addonInstallOk = collectionController.installCollectionFromRemoteRepo(cpcore, CollectionGuid, ref  ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
                                                             if (!addonInstallOk) {
                                                                 //
                                                                 // this may be OK so log, but do not call it an error
@@ -647,7 +647,7 @@ namespace Contensive.Core.Controllers {
                                                         } else {
                                                             if (upgradeCollection) {
                                                                 logController.appendInstallLog(cpcore, "...upgrading collection");
-                                                                addonInstallClass.installCollectionFromLocalRepo(cpcore, CollectionGuid, cpcore.codeVersion(), ref ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
+                                                                collectionController.installCollectionFromLocalRepo(cpcore, CollectionGuid, cpcore.codeVersion(), ref ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
                                                             }
                                                         }
                                                     }

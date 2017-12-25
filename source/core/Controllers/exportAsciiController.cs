@@ -41,7 +41,7 @@ namespace Contensive.Core.Controllers {
             string result = "";
             try {
                 string Delimiter = null;
-                string Copy = string.Empty;
+                string Copy = "";
                 string TableName = null;
                 int CSPointer = 0;
                 string FieldNameVariant = null;

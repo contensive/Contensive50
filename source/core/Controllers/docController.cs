@@ -399,7 +399,7 @@ namespace Contensive.Core.Controllers {
         //=============================================================================
         //
         internal string getQuickEditing(int rootPageId, string OrderByClause, bool AllowPageList, bool AllowReturnLink, bool ArchivePages, int contactMemberID, int childListSortMethodId, bool main_AllowChildListComposite, bool ArchivePage) {
-            string result = string.Empty;
+            string result = "";
             try {
                 string RootPageContentName = pageContentModel.contentName;
                 string LiveRecordContentName = pageContentModel.contentName;
@@ -416,7 +416,7 @@ namespace Contensive.Core.Controllers {
                 Models.Complex.cdefModel CDef = null;
                 bool readOnlyField = false;
                 bool IsEditLocked = false;
-                string main_EditLockMemberName = string.Empty;
+                string main_EditLockMemberName = "";
                 DateTime main_EditLockDateExpires = default(DateTime);
                 DateTime SubmittedDate = default(DateTime);
                 DateTime ApprovedDate = default(DateTime);
@@ -637,7 +637,7 @@ namespace Contensive.Core.Controllers {
             string Button = null;
             int RecordID = 0;
             bool RecordModified = false;
-            string RecordName = string.Empty;
+            string RecordName = "";
             //
             bool IsEditLocked = false;
             bool IsSubmitted = false;
@@ -1060,7 +1060,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string deleteChildRecords(string ContentName, int RecordID, bool ReturnListWithoutDelete = false) {
-            string result = string.Empty;
+            string result = "";
             try {
                 bool QuickEditing = false;
                 string[] IDs = null;
@@ -1146,9 +1146,9 @@ namespace Contensive.Core.Controllers {
                 bool IsModified = false;
                 string EditingName = null;
                 DateTime EditingExpires = default(DateTime);
-                string SubmittedName = string.Empty;
-                string ApprovedName = string.Empty;
-                string ModifiedName = string.Empty;
+                string SubmittedName = "";
+                string ApprovedName = "";
+                string ModifiedName = "";
                 Models.Complex.cdefModel CDef = null;
                 DateTime ModifiedDate = default(DateTime);
                 DateTime SubmittedDate = default(DateTime);
@@ -1502,7 +1502,7 @@ namespace Contensive.Core.Controllers {
             int SectionID = 0;
             bool IsRootPage = false;
             int templateId = 0;
-            string MenuLinkOverRide = string.Empty;
+            string MenuLinkOverRide = "";
             //
             //
             // Convert default page to default link
@@ -1999,7 +1999,7 @@ namespace Contensive.Core.Controllers {
             string Filename = null;
             string FilenameExt = null;
             string FilenameNoExt = null;
-            string FilePath = string.Empty;
+            string FilePath = "";
             int Pos = 0;
             string AltSizeList = null;
             imageEditController sf = null;
@@ -2308,7 +2308,7 @@ namespace Contensive.Core.Controllers {
         //=============================================================================
         //
         public void setMetaContent(int ContentID, int RecordID) {
-            string KeywordList = string.Empty;
+            string KeywordList = "";
             int CS = 0;
             string Criteria = null;
             string SQL = null;

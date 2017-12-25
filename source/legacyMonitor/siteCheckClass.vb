@@ -14,10 +14,6 @@ Imports Contensive.Core.Models.Context
 
 Namespace Contensive.Core
     Public Class siteCheckClass
-        '========================================================================
-        '
-        ' This page and its contents are copyright by Kidwell McGowan Associates.
-        '
         '==================================================================================================
         '
         '   Timer runs while the form is loaded

@@ -14,6 +14,11 @@ using Contensive.BaseClasses;
 //
 
 namespace Contensive.Core {
+    //
+    //==========================================================================================
+    /// <summary>
+    /// A recordset-like construct
+    /// </summary>
     public class csController : IDisposable {
         //
         private Contensive.Core.coreClass cpCore;
@@ -220,7 +225,7 @@ namespace Contensive.Core {
             try {
                 result = cpCore.html.cs_getRecordAddLink(csPtr, PresetNameValueList, AllowPaste);
                 if (result == null) {
-                    result = string.Empty;
+                    result = "";
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -241,11 +246,11 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         public string getEditLink(bool AllowCut = false) {
-            string result = string.Empty;
+            string result = "";
             try {
                 result = cpCore.db.csGetRecordEditLink(csPtr, AllowCut);
                 if (result == null) {
-                    result = string.Empty;
+                    result = "";
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -256,11 +261,11 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         public string getFilename(string FieldName, string OriginalFilename = "", string ContentName = "", int fieldTypeId = 0) {
-            string result = string.Empty;
+            string result = "";
             try {
                 result = cpCore.db.csGetFilename(csPtr, FieldName, OriginalFilename, ContentName, fieldTypeId);
                 if (result == null) {
-                    result = string.Empty;
+                    result = "";
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -286,11 +291,11 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         public string getSql() {
-            string result = string.Empty;
+            string result = "";
             try {
                 result = cpCore.db.csGetSource(csPtr);
                 if (result == null) {
-                    result = string.Empty;
+                    result = "";
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -307,11 +312,11 @@ namespace Contensive.Core {
         /// <param name="FieldName"></param>
         /// <returns></returns>
         public string getText(string FieldName) {
-            string result = string.Empty;
+            string result = "";
             try {
                 result = cpCore.db.csGet(csPtr, FieldName);
                 if (result == null) {
-                    result = string.Empty;
+                    result = "";
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -333,11 +338,11 @@ namespace Contensive.Core {
         // <param name="FieldName"></param>
         // <returns></returns>
         //Public Function getTextFile(ByVal FieldName As String) As String
-        //    Dim result As String = String.Empty
+        //    Dim result As String = ""
         //    Try
         //        result = cpCore.db.cs_getTextFile(csPtr, FieldName)
         //        If result Is Nothing Then
-        //            result = String.Empty
+        //            result = ""
         //        End If
         //    Catch ex As Exception
         //        Call cpCore.handleException(ex); : Throw
@@ -471,7 +476,7 @@ namespace Contensive.Core {
         //========================================================================
         //
         public static string getTextEncoded(coreClass cpcore, int CSPointer, string FieldName) {
-            string ContentName = string.Empty;
+            string ContentName = "";
             int RecordID = 0;
             if (cpcore.db.cs_isFieldSupported(CSPointer, "id") & cpcore.db.cs_isFieldSupported(CSPointer, "contentcontrolId")) {
                 RecordID = cpcore.db.csGetInteger(CSPointer, "id");
@@ -484,11 +489,11 @@ namespace Contensive.Core {
         //========================================================================
         //
         public string getValue(string FieldName) {
-            string result = string.Empty;
+            string result = "";
             try {
                 result = cpCore.db.cs_getValue(csPtr, FieldName);
                 if (result == null) {
-                    result = string.Empty;
+                    result = "";
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);

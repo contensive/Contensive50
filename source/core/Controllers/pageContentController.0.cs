@@ -34,7 +34,7 @@ namespace Contensive.Core.Controllers {
             string returnBody = "";
             try {
                 string AddonReturn = null;
-                string layoutError = string.Empty;
+                string layoutError = "";
                 stringBuilderLegacyController Result = new stringBuilderLegacyController();
                 string PageContent = null;
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
@@ -245,7 +245,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- if fpo_QuickEdit it there, replace it out
                 string Editor = null;
-                string styleOptionList = string.Empty;
+                string styleOptionList = "";
                 string addonListJSON = null;
                 if (cpCore.doc.redirectLink == "" && (returnHtml.IndexOf(html_quickEdit_fpo)  != -1)) {
                     FieldRows = genericController.EncodeInteger(cpCore.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"));
@@ -663,7 +663,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         internal static string main_ProcessPageNotFound_GetLink(coreClass cpcore, string adminMessage, string BackupPageNotFoundLink = "", string PageNotFoundLink = "", int EditPageID = 0, int EditSectionID = 0) {
-            string result = string.Empty;
+            string result = "";
             try {
                 int Pos = 0;
                 string DefaultLink = null;
@@ -1629,8 +1629,8 @@ namespace Contensive.Core.Controllers {
                 //
                 int CS = 0;
                 string SQL = null;
-                string Formhtml = string.Empty;
-                string FormInstructions = string.Empty;
+                string Formhtml = "";
+                string FormInstructions = "";
                 main_FormPagetype f ;
                 int Ptr = 0;
                 int CSPeople = 0;
@@ -1638,12 +1638,12 @@ namespace Contensive.Core.Controllers {
                 bool WasInGroup = false;
                 string FormValue = null;
                 bool Success = false;
-                string PeopleFirstName = string.Empty;
-                string PeopleLastName = string.Empty;
+                string PeopleFirstName = "";
+                string PeopleLastName = "";
                 string PeopleUsername = null;
                 string PeoplePassword = null;
-                string PeopleName = string.Empty;
-                string PeopleEmail = string.Empty;
+                string PeopleName = "";
+                string PeopleEmail = "";
                 string[] Groups = null;
                 string GroupName = null;
                 int GroupIDToJoinOnSuccess = 0;
@@ -1907,8 +1907,8 @@ namespace Contensive.Core.Controllers {
                 int CSPeople = 0;
                 string Body = null;
                 string Instruction = null;
-                string Formhtml = string.Empty;
-                string FormInstructions = string.Empty;
+                string Formhtml = "";
+                string FormInstructions = "";
                 int CS = 0;
                 bool HasRequiredFields = false;
                 string ArgCaption = null;
@@ -2813,7 +2813,7 @@ namespace Contensive.Core.Controllers {
                 string Panel = null;
                 string Copy = null;
                 string FeedbackButton = null;
-                string NoteCopy = string.Empty;
+                string NoteCopy = "";
                 string NoteFromEmail = null;
                 string NoteFromName = null;
                 int CS = 0;

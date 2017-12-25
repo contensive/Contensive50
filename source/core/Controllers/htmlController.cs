@@ -102,7 +102,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string main_GetFormInputSelect2(string MenuName, int CurrentValue, string ContentName, string Criteria, string NoneCaption, string htmlId, ref bool return_IsEmptyList, string HtmlClass = "") {
-            string result = string.Empty;
+            string result = "";
             try {
                 const string MenuNameFPO = "<MenuName>";
                 const string NoneCaptionFPO = "<NoneCaption>";
@@ -118,9 +118,9 @@ namespace Contensive.Core.Controllers {
                 string[] DropDownFieldName = { };
                 string[] DropDownDelimiter = { };
                 int DropDownFieldCount = 0;
-                string DropDownPreField = string.Empty;
+                string DropDownPreField = "";
                 int DropDownFieldListLength = 0;
-                string FieldName = string.Empty;
+                string FieldName = "";
                 string CharAllowed = null;
                 string CharTest = null;
                 int CharPointer = 0;
@@ -135,13 +135,13 @@ namespace Contensive.Core.Controllers {
                 int ColumnPointer = 0;
                 int[] DropDownFieldPointer = null;
                 string UcaseFieldName = null;
-                string SortFieldList = string.Empty;
+                string SortFieldList = "";
                 string SQL = null;
                 string TableName = null;
                 string DataSource = null;
                 string SelectFields = null;
                 int Ptr = 0;
-                string SelectRaw = string.Empty;
+                string SelectRaw = "";
                 int CachePtr = 0;
                 string TagID = null;
                 string CurrentValueText = null;
@@ -420,7 +420,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string html_GetFormInputMemberSelect2(string MenuName, int CurrentValue, int GroupID, string ignore = "", string NoneCaption = "", string HtmlId = "", string HtmlClass = "") {
-            string result = string.Empty;
+            string result = "";
             try {
                 int LastRecordID = 0;
                 string MemberRulesTableName = null;
@@ -437,9 +437,9 @@ namespace Contensive.Core.Controllers {
                 string[] DropDownDelimiter = { };
                 int DropDownFieldCount = 0;
                 // converted array to dictionary - Dim FieldPointer As Integer
-                string DropDownPreField = string.Empty;
+                string DropDownPreField = "";
                 int DropDownFieldListLength = 0;
-                string FieldName = string.Empty;
+                string FieldName = "";
                 string CharAllowed = null;
                 string CharTest = null;
                 int CharPointer = 0;
@@ -454,14 +454,14 @@ namespace Contensive.Core.Controllers {
                 int ColumnPointer = 0;
                 int[] DropDownFieldPointer = null;
                 string UcaseFieldName = null;
-                string SortFieldList = string.Empty;
+                string SortFieldList = "";
                 string SQL = null;
                 string PeopleTableName = null;
                 string PeopleDataSource = null;
-                string iCriteria = string.Empty;
+                string iCriteria = "";
                 string SelectFields = null;
                 int Ptr = 0;
-                string SelectRaw = string.Empty;
+                string SelectRaw = "";
                 int CachePtr = 0;
                 string TagID = null;
                 string TagClass = null;
@@ -734,7 +734,7 @@ namespace Contensive.Core.Controllers {
         //   Create a select list from a comma separated list, returns an index into the list list, starting at 1, if an element is blank (,) no option is created
         //
         public string getInputSelectList2(string MenuName, int CurrentValue, string SelectList, string NoneCaption, string htmlId, string HtmlClass = "") {
-            string result = string.Empty;
+            string result = "";
             try {
                 //
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
@@ -792,7 +792,7 @@ namespace Contensive.Core.Controllers {
         //   Display an icon with a link to the login form/cclib.net/admin area
         //
         public string main_GetLoginLink() {
-            string result = string.Empty;
+            string result = "";
             try {
                 //
                 //If Not (true) Then Exit Function
@@ -908,7 +908,7 @@ namespace Contensive.Core.Controllers {
         // Starts an HTML form for uploads, Should be closed with main_GetUploadFormEnd
         //
         public string html_GetUploadFormStart(string ActionQueryString = null) {
-            string result = string.Empty;
+            string result = "";
             try {
                 if (ActionQueryString == null) {
                     ActionQueryString = cpCore.doc.refreshQueryString;
@@ -1029,7 +1029,7 @@ namespace Contensive.Core.Controllers {
                 int iWidth = 0;
                 int iHeight = 0;
                 string TagID = null;
-                string TagDisabled = string.Empty;
+                string TagDisabled = "";
                 //
                 if (true) {
                     TagID = "";
@@ -1096,7 +1096,7 @@ namespace Contensive.Core.Controllers {
                 //
                 //If Not (true) Then Exit Function
                 //
-                string AttrDisabled = string.Empty;
+                string AttrDisabled = "";
                 string Value_Local = null;
                 string StyleWidth_Local = null;
                 int Rows_Local = 0;
@@ -1164,10 +1164,10 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string html_GetFormInputDate(string TagName, string DefaultValue = "", string Width = "", string Id = "") {
-            string result = string.Empty;
+            string result = "";
             try {
                 string HeadJS = null;
-                string DateString = string.Empty;
+                string DateString = "";
                 DateTime DateValue = default(DateTime);
                 string iDefaultValue = null;
                 int iWidth = 0;
@@ -1265,7 +1265,7 @@ namespace Contensive.Core.Controllers {
                 string iTagValue = null;
                 string iCurrentValue = null;
                 string ihtmlId = null;
-                string TagID = string.Empty;
+                string TagID = "";
                 //
                 iTagName = genericController.encodeText(TagName);
                 iTagValue = genericController.encodeText(TagValue);
@@ -1345,7 +1345,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string html_GetFormInputCheckListByIDList(string TagName, string SecondaryContentName, string CheckedIDList, string CaptionFieldName = "", bool readOnlyField = false) {
-            string Result = string.Empty;
+            string Result = "";
             try {
                 string SQL = null;
                 int CS = 0;
@@ -1357,7 +1357,7 @@ namespace Contensive.Core.Controllers {
                 string GroupCaption = null;
                 bool CanSeeHiddenFields = false;
                 Models.Complex.cdefModel SecondaryCDef = null;
-                string ContentIDList = string.Empty;
+                string ContentIDList = "";
                 bool Found = false;
                 int RecordID = 0;
                 string SingularPrefix = null;
@@ -1436,13 +1436,13 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string html_GetFormInputCS(int CSPointer, string ContentName, string FieldName, int Height = 1, int Width = 40, string htmlId = "") {
-            string returnResult = string.Empty;
+            string returnResult = "";
             try {
                 bool IsEmptyList = false;
                 string Stream = null;
                 string MethodName = null;
                 string FieldCaption = null;
-                string FieldValueVariant = string.Empty;
+                string FieldValueVariant = "";
                 string FieldValueText = null;
                 int FieldValueInteger = 0;
                 int fieldTypeId = 0;
@@ -1455,7 +1455,7 @@ namespace Contensive.Core.Controllers {
                 Models.Complex.cdefModel Contentdefinition = null;
                 bool FieldHTMLContent = false;
                 int CSLookup = 0;
-                string FieldLookupList = string.Empty;
+                string FieldLookupList = "";
                 //
                 MethodName = "main_GetFormInputCS";
                 //
@@ -1704,7 +1704,7 @@ namespace Contensive.Core.Controllers {
         // main_Gets a value in a hidden form field, Handles name and value encoding
         //
         public string html_GetFormInputHidden(string TagName, string TagValue, string htmlId = "") {
-            string result = string.Empty;
+            string result = "";
             try {
                 result = "\r<input type=\"hidden\" NAME=\"" + genericController.encodeHTML(genericController.encodeText(TagName)) + "\"";
                 //
@@ -1860,7 +1860,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string html_GetFormInputField(string ContentName, string FieldName, string htmlName = "", string HtmlValue = "", string HtmlClass = "", string HtmlId = "", string HtmlStyle = "", int ManyToManySourceRecordID = 0) {
-            string result = string.Empty;
+            string result = "";
             try {
                 bool IgnoreBoolean = false;
                 string LookupContentName = null;
@@ -2128,10 +2128,10 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public string main_GetEditorAddonListJSON(csv_contentTypeEnum ContentType) {
-            string result = string.Empty;
+            string result = "";
             try {
                 string AddonName = null;
-                string LastAddonName = string.Empty;
+                string LastAddonName = "";
                 int CSAddons = 0;
                 string DefaultAddonOption_String = null;
                 bool UseAjaxDefaultAddonOptions = false;
@@ -2505,7 +2505,7 @@ namespace Contensive.Core.Controllers {
                 string ContentCriteria = null;
                 string RecordName = null;
                 string SrcSelectorInner = null;
-                string SrcSelectorSuffix = string.Empty;
+                string SrcSelectorSuffix = "";
                 object[,] Cell = null;
                 int RowCnt = 0;
                 int RowPtr = 0;
@@ -2822,10 +2822,10 @@ namespace Contensive.Core.Controllers {
             string[] Arg = null;
             string ArgName = null;
             string ArgValue = null;
-            string AddonOptionConstructor = string.Empty;
-            string addonOption_String = string.Empty;
+            string AddonOptionConstructor = "";
+            string addonOption_String = "";
             int fieldType = 0;
-            string Copy = string.Empty;
+            string Copy = "";
             string MethodName = null;
             int RecordID = 0;
             string FieldName = null;
@@ -3708,9 +3708,9 @@ namespace Contensive.Core.Controllers {
                 string iPresetNameValueList = null;
                 string MenuName = null;
                 bool MenuHasBranches = false;
-                string LowestRequiredMenuName = string.Empty;
+                string LowestRequiredMenuName = "";
                 string ClipBoard = null;
-                string PasteLink = string.Empty;
+                string PasteLink = "";
                 int Position = 0;
                 string[] ClipBoardArray = null;
                 int ClipboardContentID = 0;
@@ -4180,7 +4180,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string getPanelBottom(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "") {
-            string result = string.Empty;
+            string result = "";
             try {
                 //Dim MyStylePanel As String
                 //Dim MyStyleHilite As String
@@ -4230,7 +4230,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string getToolsPanel() {
-            string result = string.Empty;
+            string result = "";
             try {
                 string copyNameValue = null;
                 string CopyName = null;
@@ -4239,7 +4239,7 @@ namespace Contensive.Core.Controllers {
                 int VisitMin = 0;
                 int VisitHrs = 0;
                 int VisitSec = 0;
-                string DebugPanel = string.Empty;
+                string DebugPanel = "";
                 string Copy = null;
                 string[] CopySplit = null;
                 int Ptr = 0;
@@ -4251,9 +4251,9 @@ namespace Contensive.Core.Controllers {
                 string MethodName = null;
                 string TagID = null;
                 stringBuilderLegacyController ToolsPanel = null;
-                string OptionsPanel = string.Empty;
+                string OptionsPanel = "";
                 stringBuilderLegacyController LinkPanel = null;
-                string LoginPanel = string.Empty;
+                string LoginPanel = "";
                 bool iValueBoolean = false;
                 string WorkingQueryString = null;
                 string BubbleCopy = null;
@@ -5109,7 +5109,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         public string getLiveTabs() {
-            string result = string.Empty;
+            string result = "";
             try {
                 if (cpCore.doc.menuLiveTab == null) {
                     cpCore.doc.menuLiveTab = new menuLiveTabController();
@@ -5144,7 +5144,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         public string getComboTabs() {
-            string result = string.Empty;
+            string result = "";
             try {
                 if (cpCore.doc.menuComboTab == null) {
                     cpCore.doc.menuComboTab = new menuComboTabController();

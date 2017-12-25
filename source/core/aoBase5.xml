@@ -1234,16 +1234,16 @@
   </CDef>
  -->
   <Addon name="Admin Site" guid="{c2de2acf-ca39-4668-b417-aa491e7d8460}" type="Add-on">
-    <DotNetClass><![CDATA[Contensive.Addons.AdminSite.getAdminSiteClass]]></DotNetClass>
+    <DotNetClass><![CDATA[Contensive.Core.Addons.AdminSite.getHtmlBodyClass]]></DotNetClass>
     <jsheadscriptsrc>/contensiveBase/base.js</jsheadscriptsrc>
     <styleslinkhref>/contensiveBase/base.css</styleslinkhref>
     <BlockEditTools>Yes</BlockEditTools>
     <IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-    <IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+    <IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
     <htmlDocument>Yes</htmlDocument>
   </Addon>
   <Addon name="setAdminSiteFieldHelp" guid="{a89a0a11-cbdd-4bb5-995e-0dfaaf3e3111}" type="Add-on">
-		<DotNetClass><![CDATA[Contensive.Addons.AdminSite.setAdminSiteFieldHelpClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.Core.Addons.AdminSite.setAdminSiteFieldHelpClass]]></DotNetClass>
 		<BlockEditTools>Yes</BlockEditTools>
 		<RemoteMethod>Yes</RemoteMethod>
 	</Addon>
@@ -1251,43 +1251,41 @@
 		<CopyText><![CDATA[<ac type="childlist" name="$list name$">]]></CopyText>
 		<ArgumentList><![CDATA[List Name]]></ArgumentList>
 		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-		<IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+		<IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
 		<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
 		<Content>Yes</Content>
 		<Admin>Yes</Admin>
 	</Addon>
 	<Addon name="Login Page" guid="{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}" type="Add-on">
-		<DotNetClass><![CDATA[Contensive.Addons.loginPageClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.Core.Addons.Login.getLoginPageClass]]></DotNetClass>
     <jsheadscriptsrc>/contensiveBase/base.js</jsheadscriptsrc>
     <styleslinkhref>/contensiveBase/base.css</styleslinkhref>
     <BlockEditTools>Yes</BlockEditTools>
 		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-		<IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+		<IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
 	</Addon>
 	<Addon name="Page Manager" guid="{3a01572e-0f08-4feb-b189-18371752a3c3}" type="Add-on">
-		<DotNetClass><![CDATA[Contensive.Addons.PageManager.getPageManagerClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.Core.Addons.PageManager.getHtmlBodyClass]]></DotNetClass>
     <jsheadscriptsrc>/contensiveBase/base.js</jsheadscriptsrc>
     <styleslinkhref>/contensiveBase/base.css</styleslinkhref>
     <BlockEditTools>Yes</BlockEditTools>
 		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-		<IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+		<IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
     <htmlDocument>Yes</htmlDocument>
   </Addon>
 	<Addon name="savePageManagerChildListSort" guid="{8429641A-03C9-4CD1-9369-5B9F2FA509E9}" type="Add-on">
-		<DotNetClass><![CDATA[Contensive.Addons.PageManager.savePageManagerChildListSortClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.Addons.PageManager.saveChildPageListDraggableClass]]></DotNetClass>
 		<BlockEditTools>Yes</BlockEditTools>
 		<RemoteMethod>Yes</RemoteMethod>
 	</Addon>
   <Addon name="Login Form" guid="{E23C5941-19C2-4164-BCFD-83D6DD42F651}" type="Add-on">
-    <ActiveXProgramID><![CDATA[aoLoginForm.LoginClass]]></ActiveXProgramID>
+    <DotNetClass><![CDATA[Contensive.Core.Addons.Login.getLoginFormClass]]></DotNetClass>
     <jsheadscriptsrc>/contensiveBase/base.js</jsheadscriptsrc>
     <styleslinkhref>/contensiveBase/base.css</styleslinkhref>
     <ArgumentList>Force Default Login=false</ArgumentList>
-    <Help><![CDATA[<p>This is more complete instructions. This appears in the help bubble.</p>]]></Help>
-    <HelpLink><![CDATA[http://www.Contensive.com]]></HelpLink>
     <BlockEditTools>Yes</BlockEditTools>
     <IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-    <IncludeAddon name="Bootstrap 3.3.7 CSS" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+    <IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
   </Addon>
   <SQLIndex IndexName="ccContentContentTableID" DataSourceName="Default" TableName="ccContent" FieldNameList="ContentTableID"  />
 	<SQLIndex IndexName="ccGroupRulesGroupID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="GroupID"  />

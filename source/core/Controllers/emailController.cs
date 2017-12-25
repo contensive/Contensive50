@@ -357,10 +357,10 @@ namespace Contensive.Core.Controllers {
                 string EmailFrom = null;
                 string EmailSubjectSource = null;
                 string EmailBodySource = null;
-                string ConfirmBody = string.Empty;
+                string ConfirmBody = "";
                 bool EmailAllowLinkEID = false;
                 int EmailToConfirmationMemberID = 0;
-                string EmailStatusMessage = string.Empty;
+                string EmailStatusMessage = "";
                 int EMailToMemberID = 0;
                 string EmailSubject = null;
                 string ClickFlagQuery = null;
@@ -370,7 +370,7 @@ namespace Contensive.Core.Controllers {
                 string SelectList = null;
                 int EMailTemplateID = 0;
                 string EmailTemplate = null;
-                string EmailTemplateSource = string.Empty;
+                string EmailTemplateSource = "";
                 int CS = 0;
                 bool isValid = false;
                 //
@@ -587,19 +587,19 @@ namespace Contensive.Core.Controllers {
         /// <param name="ConfirmationMemberID"></param>
         public void sendConfirmationTest(int EmailID, int ConfirmationMemberID) {
             try {
-                string ConfirmFooter = string.Empty;
+                string ConfirmFooter = "";
                 int TotalCnt = 0;
                 int BlankCnt = 0;
                 int DupCnt = 0;
-                string DupList = string.Empty;
+                string DupList = "";
                 int BadCnt = 0;
-                string BadList = string.Empty;
+                string BadList = "";
                 int EmailLen = 0;
                 string LastEmail = null;
                 string Emailtext = null;
-                string LastDupEmail = string.Empty;
+                string LastDupEmail = "";
                 string EmailLine = null;
-                string TotalList = string.Empty;
+                string TotalList = "";
                 string EMailName = null;
                 int EmailMemberID = 0;
                 int Posat = 0;
@@ -756,7 +756,7 @@ namespace Contensive.Core.Controllers {
         //
         public void sendForm(string SendTo, string SendFrom, string SendSubject) {
             try {
-                string Message = string.Empty;
+                string Message = "";
                 string iSendTo = null;
                 string iSendFrom = null;
                 string iSendSubject = null;

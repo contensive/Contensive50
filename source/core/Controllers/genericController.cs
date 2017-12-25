@@ -3891,7 +3891,7 @@ namespace Contensive.Core.Controllers {
             string normalizedRoute = route.ToLower().Trim();
             try {
                 if (string.IsNullOrEmpty(normalizedRoute)) {
-                    normalizedRoute = string.Empty;
+                    normalizedRoute = "";
                 } else {
                     normalizedRoute = genericController.convertToUnixSlash(normalizedRoute);
                     while (normalizedRoute.IndexOf("//") >= 0) {

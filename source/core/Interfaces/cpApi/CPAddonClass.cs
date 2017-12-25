@@ -507,7 +507,7 @@ namespace Contensive.Core {
             try {
                 string ignoreReturnedCollectionGuid = "";
                 var tmpList = new List<string> { };
-                returnOk = addonInstallClass.InstallCollectionsFromPrivateFile(cp.core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, ref tmpList);
+                returnOk = collectionController.InstallCollectionsFromPrivateFile(cp.core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, ref tmpList);
             } catch (Exception ex) {
                 cp.core.handleException(ex);
                 if (!cp.core.siteProperties.trapErrors) {

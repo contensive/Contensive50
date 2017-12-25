@@ -111,9 +111,7 @@
     <Content Include="ccLib\ClientSide\ccDynamicTab.js" />
     <Content Include="ccLib\ClientSide\Core.js" />
     <Content Include="ccLib\ClientSide\cross.html" />
-    <Content Include="ccLib\ClientSide\debug.js" />
     <Content Include="ccLib\ClientSide\dialogs.js" />
-    <Content Include="ccLib\ClientSide\domviewer.htm" />
     <Content Include="ccLib\ClientSide\DynamicOptions.js" />
     <Content Include="ccLib\ClientSide\forms.js" />
     <Content Include="ccLib\ClientSide\mktree.js" />
@@ -581,11 +579,21 @@
     <Content Include="ccLib\Popup\WaitPageClose.htm" />
     <Content Include="ccLib\Popup\WaitPageOpen.htm" />
     <Content Include="contensiveBase\TemplateHomeDefault.html" />
-    <Content Include="default.aspx" />
-    <Content Include="favicon.ico" />
-    <Content Include="Global.asax" />
-    <Content Include="helloworld.aspx" />
-    <Content Include="helloworld.html" />
+    <Content Include="default.aspx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="favicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Global.asax">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="helloworld.aspx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="helloworld.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="quickEditor\styles.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -595,13 +603,16 @@
     <Compile Include="configurationClass.vb" />
     <Compile Include="default.aspx.designer.vb">
       <DependentUpon>default.aspx</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="default.aspx.vb">
       <DependentUpon>default.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="loggerClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

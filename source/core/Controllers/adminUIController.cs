@@ -209,7 +209,7 @@ namespace Contensive.Core {
         //========================================================================
         //
         public string GetHeader(string HeaderMessage, string RightSideMessage = "") {
-            string s = string.Empty;
+            string s = "";
             try {
                 if (string.IsNullOrEmpty(RightSideMessage)) {
                     RightSideMessage = cpCore.doc.profileStartTime.ToString("G");
@@ -243,7 +243,7 @@ namespace Contensive.Core {
         //
         //
         public string GetButtonsFromList(string ButtonList, bool AllowDelete, bool AllowAdd, string ButtonName) {
-            string s = string.Empty;
+            string s = "";
             try {
                 string[] Buttons = null;
                 int Ptr = 0;
@@ -339,7 +339,7 @@ namespace Contensive.Core {
             try {
                 //
                 int Ptr = 0;
-                string Nav = string.Empty;
+                string Nav = "";
                 int NavStart = 0;
                 int NavEnd = 0;
                 //
@@ -393,14 +393,14 @@ namespace Contensive.Core {
         //========================================================================
         //
         public string GetBody(string Caption, string ButtonListLeft, string ButtonListRight, bool AllowAdd, bool AllowDelete, string Description, string ContentSummary, int ContentPadding, string Content) {
-            string result = string.Empty;
+            string result = "";
             try {
-                string ContentCell = string.Empty;
+                string ContentCell = "";
                 stringBuilderLegacyController Stream = new stringBuilderLegacyController();
                 string ButtonBar = null;
-                string LeftButtons = string.Empty;
-                string RightButtons = string.Empty;
-                string CellContentSummary = string.Empty;
+                string LeftButtons = "";
+                string RightButtons = "";
+                string CellContentSummary = "";
                 //
                 // Build ButtonBar
                 //
@@ -532,7 +532,7 @@ namespace Contensive.Core {
         //========================================================================
         //
         public string GetEditPanel(bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
-            string result = string.Empty;
+            string result = "";
             try {
                 stringBuilderLegacyController FastString = new stringBuilderLegacyController();
                 //
@@ -628,7 +628,7 @@ namespace Contensive.Core {
         //==========================================================================================
         //
         private string GetReport_CellHeader(int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
-            string result = string.Empty;
+            string result = "";
             try {
                 string Style = null;
                 string Copy = null;
@@ -735,7 +735,7 @@ namespace Contensive.Core {
         //=============================================================================
         //
         public string GetReport(int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle) {
-            string result = string.Empty;
+            string result = "";
             try {
                 int ColCnt = Cells.GetUpperBound(1);
                 bool[] ColSortable = new bool[ColCnt + 1];
@@ -762,7 +762,7 @@ namespace Contensive.Core {
         //=============================================================================
         //
         public string GetReport2(int RowCount, string[] ColCaption, string[] ColAlign, string[] ColWidth, string[,] Cells, int PageSize, int PageNumber, string PreTableCopy, string PostTableCopy, int DataRowCount, string ClassStyle, bool[] ColSortable, int DefaultSortColumnPtr) {
-            string result = string.Empty;
+            string result = "";
             try {
                 string RQS = null;
                 int RowBAse = 0;

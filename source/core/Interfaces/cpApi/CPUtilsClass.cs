@@ -312,7 +312,7 @@ namespace Contensive.Core {
             string ignoreUserMessage = "";
             string ignoreGuid = "";
             var ignoreList = new List<string> { };
-            addonInstallClass.InstallCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, ref ignoreList );
+            collectionController.InstallCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, ref ignoreList );
             return taskId;
         }
         //
@@ -328,7 +328,7 @@ namespace Contensive.Core {
             string ignoreUserMessage = "";
             List<string> ignoreList1 = new List<string>();
             List<string> ignoreList2 = new List<string>();
-            addonInstallClass.InstallCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, ref ignoreList2);
+            collectionController.InstallCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, ref ignoreList2);
             return taskId;
         }
         //
@@ -352,7 +352,7 @@ namespace Contensive.Core {
         public override int installCollectionFromLibrary(string collectionGuid) {
             int taskId = 0;
             string ignoreUserMessage = "";
-            addonInstallClass.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false);
+            collectionController.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false);
             return taskId;
         }
         //

@@ -319,12 +319,12 @@ namespace Contensive.Core {
             try {
                 result = cpCore.html.cs_getRecordAddLink(cs, PresetNameValueList, AllowPaste);
                 if (result == null) {
-                    result = string.Empty;
+                    result = "";
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex); // "Unexpected error in cs.GetAddLink")
                 throw;
-                result = string.Empty;
+                result = "";
             }
             return encodeText(result);
         }

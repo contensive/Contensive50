@@ -183,7 +183,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("cache key cannot be blank");
                 } else {
-                    string wrapperKey = getWrapperKey(cpCore.serverConfig.appConfig.name, key);
+                    string wrapperKey = getWrapperKey(key);
                     if (cpCore.serverConfig.enableLocalMemoryCache) {
                         //
                         // -- save local memory cache
@@ -306,7 +306,10 @@ namespace Contensive.Core.Controllers {
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
-                throw;
+                // 20171222 
+                // -- cache errors should be warnings, not critical errors. Dont take down the application over a cache issue.
+                // -- cache errors likely did not original above the cache api, so failing the caller would not be productive
+                //throw;
             }
             return result;
         }
@@ -325,7 +328,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("key cannot be blank");
                 } else {
-                    string wrapperKey = getWrapperKey(cpCore.serverConfig.appConfig.name, key);
+                    string wrapperKey = getWrapperKey(key);
                     if (remoteCacheInitialized) {
                         //
                         // -- use remote cache
@@ -635,8 +638,8 @@ namespace Contensive.Core.Controllers {
         /// <param name="key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        private string getWrapperKey(string appName, string key) {
-            string result = appName + "-" + key;
+        private string getWrapperKey(string key) {
+            string result = cpCore.serverConfig.appConfig.name + "-" + cpCore.codeVersion() + "-" + key;
             result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_");
             result = result.Replace(" ", "_");
             //

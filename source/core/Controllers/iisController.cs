@@ -807,7 +807,7 @@ namespace Contensive.Core.Controllers {
                 const string rnRedirectCycleFlag = "cycleFlag";
                 string EncodedLink = null;
                 string Copy = null;
-                string ShortLink = string.Empty;
+                string ShortLink = "";
                 string FullLink = null;
                 int redirectCycles = 0;
                 //
@@ -1121,7 +1121,7 @@ namespace Contensive.Core.Controllers {
             string iContentName = null;
             int iRecordID = 0;
             string iFieldName = null;
-            string LinkPrefix = string.Empty;
+            string LinkPrefix = "";
             string EncodedLink = null;
             string NonEncodedLink = "";
             //

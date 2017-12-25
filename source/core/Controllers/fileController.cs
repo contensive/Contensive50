@@ -773,8 +773,8 @@ namespace Contensive.Core.Controllers {
           FastZip fastZip = new FastZip();
                 string fileFilter = null;
                 string absPathFilename = null;
-                string path = string.Empty;
-                string filename = string.Empty;
+                string path = "";
+                string filename = "";
                 //
                 absPathFilename = convertToAbsPath(PathFilename);
                 splitPathFilename(absPathFilename, ref path, ref filename);
@@ -912,7 +912,7 @@ namespace Contensive.Core.Controllers {
         public bool upload(string htmlTagName, string path, ref string returnFilename) {
             bool success = false;
             try {
-                returnFilename = string.Empty;
+                returnFilename = "";
                 //
                 string key = htmlTagName.ToLower();
                 if (cpCore.docProperties.containsKey(key)) {

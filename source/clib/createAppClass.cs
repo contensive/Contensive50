@@ -57,7 +57,7 @@ namespace  Contensive.CLI {
                     Console.Write("\n\r\t3 Local Mode, cdn as second iis site as cdn." + appName);
                     Console.Write("\n\r\t4 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
                     appArchitecture = cliController.promptForReply("Enter 1,2,3, or 4", "1");
-                    appConfig.adminRoute = string.Empty;
+                    appConfig.adminRoute = "";
                     bool routeOk = false;
                     do
                     {

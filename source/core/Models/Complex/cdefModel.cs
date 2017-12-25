@@ -1692,7 +1692,7 @@ namespace Contensive.Core.Models.Complex {
         //========================================================================
         //
         public static string GetContentFieldProperty(coreClass cpcore, string ContentName, string FieldName, string PropertyName) {
-            string result = string.Empty;
+            string result = "";
             try {
                 string UcaseFieldName = genericController.vbUCase(genericController.encodeText(FieldName));
                 Models.Complex.cdefModel Contentdefinition = Models.Complex.cdefModel.getCdef(cpcore, genericController.encodeText(ContentName));

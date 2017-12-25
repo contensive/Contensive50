@@ -670,7 +670,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================================================
         //
         public static string getTagInnerHTML(string PageSource, string Tag, bool ReturnAll) {
-            string result = string.Empty;
+            string result = "";
             try {
                 //
                 int TagStart = 0;

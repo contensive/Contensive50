@@ -137,7 +137,7 @@ namespace Contensive.Core.Controllers {
         //===============================================================================
         //
         public string getMenuType(string MenuName, bool ClickToOpen, int Direction, string StyleSheetPrefix = "") {
-            string result = string.Empty;
+            string result = "";
             try {
                 int MenuStyle = 0;
                 //
@@ -591,7 +591,7 @@ namespace Contensive.Core.Controllers {
         //
         public void menu_AddEntry(string Name, string ParentName = "", string ImageLink = "", string ImageOverLink = "", string Link = "", string Caption = "", string StyleSheet = "", string StyleSheetHover = "", bool NewWindow = false) {
             string Image = null;
-            string ImageOver = string.Empty;
+            string ImageOver = "";
             //
             Image = genericController.encodeText(ImageLink);
             if (!string.IsNullOrEmpty(Image)) {
@@ -610,7 +610,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public string menu_GetClose() {
-            string result = string.Empty;
+            string result = "";
             try {
                 string MenuFlyoutIcon = null;
                 //

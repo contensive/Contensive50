@@ -61,7 +61,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="executeContext"></param>
         /// <returns></returns>
         public string execute(Models.Entity.addonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            string result = string.Empty;
+            string result = "";
             bool rootLevelAddon = cpCore.doc.addonsCurrentlyRunningIdList.Count.Equals(0);
             try {
                 if (addon == null) {
@@ -342,7 +342,7 @@ namespace Contensive.Core.Controllers {
                             //
                             result = addon.CopyText + addon.Copy;
                             if (!string.IsNullOrEmpty(result)) {
-                                string ignoreLayoutErrors = string.Empty;
+                                string ignoreLayoutErrors = "";
                                 result = cpCore.html.executeContentCommands(null, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
                             }
                             switch (executeContext.addonType) {
@@ -382,7 +382,7 @@ namespace Contensive.Core.Controllers {
                         if (addon.ScriptingCode != "") {
                             //
                             // Get Language
-                            string ScriptingLanguage = string.Empty;
+                            string ScriptingLanguage = "";
                             if (addon.ScriptingLanguageID != 0) {
                                 ScriptingLanguage = cpCore.db.getRecordName("Scripting Languages", addon.ScriptingLanguageID);
                             }
@@ -533,7 +533,7 @@ namespace Contensive.Core.Controllers {
                                 //
                                 // Edit Icon
                                 string EditWrapperHTMLID = "eWrapper" + cpCore.doc.pageAddonCnt;
-                                string DialogList = string.Empty;
+                                string DialogList = "";
                                 string HelpIcon = getHelpBubble(addon.id, addon.Help, addon.CollectionID, ref DialogList);
                                 if (cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                     string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
@@ -541,7 +541,7 @@ namespace Contensive.Core.Controllers {
                                     AddonEditIcon = "<a href=\"/" + cpCore.serverConfig.appConfig.adminRoute + "?cid=" + cdefModel.getContentId(cpCore, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
                                     string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
                                     string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + cpCore.doc.editWrapperCnt, ref DialogList);
-                                    string SiteStylesEditIcon = string.Empty; // ?????
+                                    string SiteStylesEditIcon = ""; // ?????
                                     string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
                                     ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
                                     result = cpCore.html.getEditWrapper("<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
@@ -617,7 +617,7 @@ namespace Contensive.Core.Controllers {
                 string Copy = null;
                 string Button = null;
                 adminUIController Adminui = new adminUIController(cpCore);
-                string ButtonList = string.Empty;
+                string ButtonList = "";
                 string Filename = null;
                 string NonEncodedLink = null;
                 string EncodedLink = null;
@@ -628,12 +628,12 @@ namespace Contensive.Core.Controllers {
                 int TabCnt = 0;
                 stringBuilderLegacyController TabCell = null;
                 bool loadOK = true;
-                string FieldValue = string.Empty;
+                string FieldValue = "";
                 string FieldDescription = null;
                 string FieldDefaultValue = null;
                 bool IsFound = false;
-                string Name = string.Empty;
-                string Description = string.Empty;
+                string Name = "";
+                string Description = "";
                 XmlDocument Doc = new XmlDocument();
                 //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode TabNode = null;
@@ -1296,11 +1296,11 @@ namespace Contensive.Core.Controllers {
                 int OptionPtr = 0;
                 int OptionCnt = 0;
                 string[] OptionValues = null;
-                string OptionSuffix = string.Empty;
+                string OptionSuffix = "";
                 string LCaseOptionDefault = null;
                 int Pos = 0;
                 stringBuilderLegacyController FastString = null;
-                string Copy = string.Empty;
+                string Copy = "";
                 //
                 FastString = new stringBuilderLegacyController();
                 //
@@ -1432,7 +1432,7 @@ namespace Contensive.Core.Controllers {
                 var engine = new Microsoft.ClearScript.Windows.VBScriptEngine();
                 //string[] Lines = null;
                 string[] Args = { };
-                string EntryPointArgs = string.Empty;
+                string EntryPointArgs = "";
                 string WorkingCode = Code;
                 //
                 if (string.IsNullOrEmpty(EntryPoint)) {
@@ -1676,7 +1676,7 @@ namespace Contensive.Core.Controllers {
                             string AddonVersionPath = "";
                             var tmpDate = new DateTime();
                             string tmpName = "";
-                            addonInstallClass.GetCollectionConfig(cpCore, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
+                            collectionController.GetCollectionConfig(cpCore, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
                             if (string.IsNullOrEmpty(AddonVersionPath)) {
                                 throw new ApplicationException("The assembly for addon [" + addon.name + "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.");
                             } else {
@@ -1947,9 +1947,9 @@ namespace Contensive.Core.Controllers {
                 string FormInput = null;
                 int OptionPtr = 0;
                 string QueryString = null;
-                string LocalCode = string.Empty;
-                string CopyHeader = string.Empty;
-                string CopyContent = string.Empty;
+                string LocalCode = "";
+                string CopyHeader = "";
+                string CopyContent = "";
                 string BubbleJS = null;
                 string[] OptionSplit = null;
                 string OptionName = null;
@@ -2190,16 +2190,16 @@ namespace Contensive.Core.Controllers {
         //   cpcore.main_Get Addon Styles Bubble Editor
         //
         public string getAddonStylesBubble(int addonId, ref string return_DialogList) {
-            string result = string.Empty;
+            string result = "";
             try {
-                //Dim DefaultStylesheet As String = String.Empty
-                //Dim StyleSheet As String = String.Empty
+                //Dim DefaultStylesheet As String = ""
+                //Dim StyleSheet As String = ""
                 string QueryString = null;
-                string LocalCode = string.Empty;
-                string CopyHeader = string.Empty;
+                string LocalCode = "";
+                string CopyHeader = "";
                 string CopyContent = null;
                 string BubbleJS = null;
-                //Dim AddonName As String = String.Empty
+                //Dim AddonName As String = ""
                 //
                 if (cpCore.doc.authContext.isAuthenticated && true) {
                     if (cpCore.doc.authContext.isEditingAnything()) {
@@ -2231,7 +2231,7 @@ namespace Contensive.Core.Controllers {
                         QueryString = cpCore.doc.refreshQueryString;
                         QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
-                        string Dialog = string.Empty;
+                        string Dialog = "";
 
                         Dialog = Dialog + "<div class=\"ccCon helpDialogCon\">"
                             + cpCore.html.html_GetUploadFormStart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
@@ -2263,13 +2263,13 @@ namespace Contensive.Core.Controllers {
         public string getHelpBubble(int addonId, string helpCopy, int CollectionID, ref string return_DialogList) {
             string result = "";
             string QueryString = null;
-            string LocalCode = string.Empty;
+            string LocalCode = "";
             string CopyContent = null;
             string BubbleJS = null;
-            string AddonName = string.Empty;
+            string AddonName = "";
             int StyleSN = 0;
             string InnerCopy = null;
-            string CollectionCopy = string.Empty;
+            string CollectionCopy = "";
             //
             if (cpCore.doc.authContext.isAuthenticated) {
                 if (cpCore.doc.authContext.isEditingAnything()) {
@@ -2355,8 +2355,8 @@ namespace Contensive.Core.Controllers {
                 string FormInput = null;
                 int OptionPtr = 0;
                 string QueryString = null;
-                string LocalCode = string.Empty;
-                string CopyHeader = string.Empty;
+                string LocalCode = "";
+                string CopyHeader = "";
                 string CopyContent = null;
                 string BubbleJS = null;
                 string[] OptionSplit = null;
@@ -2365,7 +2365,7 @@ namespace Contensive.Core.Controllers {
                 int Ptr = 0;
                 int Pos = 0;
                 int CS = 0;
-                string AddonName = string.Empty;
+                string AddonName = "";
                 int StyleSN = 0;
                 string HTMLViewerBubbleID = null;
                 //
@@ -2445,7 +2445,7 @@ namespace Contensive.Core.Controllers {
                 string Copy = null;
                 string Button = null;
                 adminUIController Adminui = new adminUIController(cpCore);
-                string ButtonList = string.Empty;
+                string ButtonList = "";
                 string Filename = null;
                 string NonEncodedLink = null;
                 string EncodedLink = null;
@@ -2455,12 +2455,12 @@ namespace Contensive.Core.Controllers {
                 string TabHeading = null;
                 int TabCnt = 0;
                 stringBuilderLegacyController TabCell = null;
-                string FieldValue = string.Empty;
+                string FieldValue = "";
                 string FieldDescription = null;
                 string FieldDefaultValue = null;
                 bool IsFound = false;
-                string Name = string.Empty;
-                string Description = string.Empty;
+                string Name = "";
+                string Description = "";
                 XmlDocument Doc = new XmlDocument();
                 //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode TabNode = null;
@@ -3119,7 +3119,7 @@ namespace Contensive.Core.Controllers {
             string tempgetFormContent_decodeSelector = null;
             try {
                 //
-                string ExpandedSelector = string.Empty;
+                string ExpandedSelector = "";
                 Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
                 string OptionCaption = null;
                 string OptionValue = null;
@@ -3127,7 +3127,7 @@ namespace Contensive.Core.Controllers {
                 int OptionPtr = 0;
                 int OptionCnt = 0;
                 string[] OptionValues = null;
-                string OptionSuffix = string.Empty;
+                string OptionSuffix = "";
                 string LCaseOptionDefault = null;
                 int Pos = 0;
                 bool Checked = false;
@@ -3153,7 +3153,7 @@ namespace Contensive.Core.Controllers {
                 string FieldHelp = null;
                 string AuthoringStatusMessage = null;
                 string Delimiter = null;
-                string Copy = string.Empty;
+                string Copy = "";
                 adminUIController Adminui = new adminUIController(cpCore);
                 //
                 string FieldName = null;
@@ -3446,7 +3446,7 @@ namespace Contensive.Core.Controllers {
         //   Apply a wrapper to content
         //
         private string addWrapperToResult(string Content, int WrapperID, string WrapperSourceForComment = "") {
-            string s = string.Empty;
+            string s = "";
             try {
                 //
                 int Pos = 0;
@@ -3512,7 +3512,7 @@ namespace Contensive.Core.Controllers {
         // main_Get an XML nodes attribute based on its name
         //
         public string xml_GetAttribute(bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
-            string result = string.Empty;
+            string result = "";
             try {
                 //
                 //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
@@ -3714,30 +3714,30 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         /// <returns></returns>
         public static string GetAddonManager(coreClass cpCore) {
-            string addonManager = "";
+            string result = "";
             try {
                 bool AddonStatusOK = true;
                 try {
                     addonModel addon = addonModel.create(cpCore, addonGuidAddonManager);
-                    addonManager = cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
+                    result = cpCore.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() { addonType = CPUtilsBaseClass.addonContext.ContextAdmin });
                     //addonManager = cpCore.addon.execute_legacy2(0, addonGuidAddonManager, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
                 } catch (Exception ex) {
                     cpCore.handleException(new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
                     AddonStatusOK = false;
                 }
-                if (string.IsNullOrEmpty(addonManager)) {
+                if (string.IsNullOrEmpty(result)) {
                     cpCore.handleException(new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
-                    addon_AddonMngrSafeClass AddonMan = new addon_AddonMngrSafeClass(cpCore);
-                    addonManager = AddonMan.GetForm_SafeModeAddonManager();
+                    Addons.SafeAddonManager.addonManagerClass AddonMan = new Addons.SafeAddonManager.addonManagerClass(cpCore);
+                    result = AddonMan.GetForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
             }
-            return addonManager;
+            return result;
         }
         //
         //====================================================================================================

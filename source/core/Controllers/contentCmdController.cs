@@ -499,7 +499,7 @@ namespace Contensive.Core.Controllers {
                         //   E - { "command" : { "name" : "The Name" , "secondArgument" : "secondValue" } }
                         //
                         string cmdTypeName = cmd.GetType().FullName.ToLower();
-                        string cmdText = string.Empty;
+                        string cmdText = "";
                         if (cmdTypeName == "system.string") {
                             //
                             // case A & B, the cmdDef is a string

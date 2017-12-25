@@ -164,7 +164,7 @@ namespace Contensive.Core.Controllers {
                 string PeopleLanguage = "";
                 string UcasePeopleLanguage = null;
                 string serverFilePath = "";
-                string ReplaceInstructions = string.Empty;
+                string ReplaceInstructions = "";
                 string Link = null;
                 int NotUsedID = 0;
                 string addonOptionString = null;
@@ -2183,11 +2183,11 @@ namespace Contensive.Core.Controllers {
         public static string upgradeActiveContent( coreClass cpCore, string Source) {
             string result = Source;
             try {
-                string RecordVirtualPath = string.Empty;
+                string RecordVirtualPath = "";
                 string RecordVirtualFilename = null;
                 string RecordFilename = null;
                 string RecordFilenameNoExt = null;
-                string RecordFilenameExt = string.Empty;
+                string RecordFilenameExt = "";
                 string[] SizeTest = null;
                 string RecordAltSizeList = null;
                 int TagPosEnd = 0;
