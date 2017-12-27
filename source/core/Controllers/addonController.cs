@@ -399,7 +399,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // -- DotNet
                         if (addon.DotNetClass != "") {
-                            result += execute_assembly(addon, AddonCollectionModel.create(cpCore, addon.CollectionID));
+                            result += execute_assembly( executeContext, addon, AddonCollectionModel.create(cpCore, addon.CollectionID));
                         }
                         //
                         // -- RemoteAssetLink
@@ -931,42 +931,42 @@ namespace Contensive.Core.Controllers {
                                                                     case "integer":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "boolean":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValue));
+                                                                            Copy = cpCore.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
-                                                                            Copy += cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy += cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValue));
+                                                                            Copy = cpCore.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                         }
                                                                         break;
                                                                     case "float":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputDate(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputDate(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "file":
                                                                     case "imagefile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (string.IsNullOrEmpty(FieldValue)) {
-                                                                                Copy = cpCore.html.html_GetFormInputFile(FieldName);
+                                                                                Copy = cpCore.html.inputFile(FieldName);
                                                                             } else {
                                                                                 NonEncodedLink = cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, FieldValue);
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
@@ -975,7 +975,7 @@ namespace Contensive.Core.Controllers {
                                                                                 cpCore.privateFiles.splitPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
-                                                                                + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.html_GetFormInputCheckBox2(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.html_GetFormInputFile(FieldName);
+                                                                                + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.inputFile(FieldName);
                                                                             }
                                                                         }
                                                                         //Call s.Add("&nbsp;</span></nobr></td>")
@@ -983,7 +983,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "currency":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
@@ -994,7 +994,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "textfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             FieldValue = cpCore.cdnFiles.readFile(FieldValue);
                                                                             if (FieldHTML) {
@@ -1007,7 +1007,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "cssfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
@@ -1015,7 +1015,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "xmlfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
@@ -1023,7 +1023,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "link":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
                                                                         }
@@ -1033,7 +1033,7 @@ namespace Contensive.Core.Controllers {
                                                                         // text
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            string tmp = cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            string tmp = cpCore.html.inputHidden(FieldName, FieldValue);
                                                                             Copy = FieldValue + tmp;
                                                                         } else {
                                                                             if (FieldHTML) {
@@ -1643,16 +1643,13 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        private string execute_assembly(Models.Entity.addonModel addon, AddonCollectionModel addonCollection) {
+        private string execute_assembly(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Entity.addonModel addon, AddonCollectionModel addonCollection) {
             string result = "";
             try {
                 bool AddonFound = false;
+                string warningMessage = "The addon [" + addon.name + "] dotnet code could not be executed because no assembly was found with namespace [" + addon.DotNetClass + "].";
                 //
-                // -- try appbase folder
-                // ***** no -- if we convert to moving addons into the application's private path (wwwroot/bin)...
-                // ***** because the addon solution has to be for both web apps and non-web apps running on the server at the same time. so - loadFrom(addon path) is required
-                //
-                // -- try development bypass folder (addonAssemblyBypass)
+                // -- development bypass folder (addonAssemblyBypass)
                 // -- purpose is to provide a path that can be hardcoded in visual studio after-build event to make development easier
                 string commonAssemblyPath = cpCore.programDataFiles.rootLocalPath + "AddonAssemblyBypass\\";
                 if (!Directory.Exists(commonAssemblyPath)) {
@@ -1662,38 +1659,48 @@ namespace Contensive.Core.Controllers {
                 }
                 if (!AddonFound) {
                     //
-                    // -- try app /bin folder
+                    // -- application path (background from program files, forground from appRoot)
                     // -- purpose is to allow add-ons to be included in the website's (wwwRoot) assembly. So a website's custom addons are within the wwwRoot build, not separate
-                    string addonAppRootPath = cpCore.privateFiles.joinPath(cpCore.appRootFiles.rootLocalPath, "bin\\");
-                    result = execute_assembly_byFilePath(addon.id, addon.name, addonAppRootPath, addon.DotNetClass, true, ref AddonFound);
+                    string appPath = "";
+                    if ( executeContext.backgroundProcess ) {
+                        //
+                        // -- background - program files installation folder
+                        appPath = cpCore.programFiles.rootLocalPath;
+                    } else {
+                        //
+                        // -- foreground - appRootPath
+                        appPath = cpCore.privateFiles.joinPath(cpCore.appRootFiles.rootLocalPath, "bin\\");
+                    }
+
+
+                    string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                    UriBuilder uri = new UriBuilder(codeBase);
+                    string path = Uri.UnescapeDataString(uri.Path);
+                    appPath = Path.GetDirectoryName(path);
+
+
+                    result = execute_assembly_byFilePath(addon.id, addon.name, appPath, addon.DotNetClass, true, ref AddonFound);
                     if (!AddonFound) {
                         //
                         // -- try addon folder
                         // -- purpose is to have a repository where addons can be stored for now web and non-web apps, and allow permissions to be installed with online upload
-                        if (string.IsNullOrEmpty(addonCollection.ccguid)) {
-                            throw new ApplicationException("The assembly for addon [" + addon.name + "] could not be executed because it's collection has an invalid guid.");
+                        if ( addonCollection == null ) {
+                            throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon has no collection set.");
+                        } else if (string.IsNullOrEmpty(addonCollection.ccguid)) {
+                            throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon collection [" + addonCollection.name + "] has no guid.");
                         } else {
                             string AddonVersionPath = "";
                             var tmpDate = new DateTime();
                             string tmpName = "";
                             collectionController.GetCollectionConfig(cpCore, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
                             if (string.IsNullOrEmpty(AddonVersionPath)) {
-                                throw new ApplicationException("The assembly for addon [" + addon.name + "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.");
+                                throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the path could not be determined for collection [" + addonCollection.name + "].");
                             } else {
                                 string AddonPath = cpCore.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
                                 string appAddonPath = cpCore.privateFiles.joinPath(cpCore.privateFiles.rootLocalPath, AddonPath);
                                 result = execute_assembly_byFilePath(addon.id, addon.name, appAddonPath, addon.DotNetClass, false, ref AddonFound);
                                 if (!AddonFound) {
-                                    //
-                                    // assembly not found in addon path and in development path, if core collection, try in local /bin nm 
-                                    //
-                                    if (addonCollection.ccguid != CoreCollectionGuid) {
-                                        //
-                                        // assembly not found
-                                        //
-                                        throw new ApplicationException("The addon [" + addon.name + "] could not be executed because it's assembly could not be found in the server common assembly path [" + commonAssemblyPath + "], the application binary folder [" + addonAppRootPath + "], or in the legacy collection folder [" + appAddonPath + "].");
-                                    } else {
-                                    }
+                                    throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
                                 }
                             }
                         }
@@ -1702,7 +1709,6 @@ namespace Contensive.Core.Controllers {
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
-                throw ex;
             }
             return result;
         }
@@ -2146,7 +2152,7 @@ namespace Contensive.Core.Controllers {
                             }
                             CopyContent = ""
                                 + CopyContent + "</table>"
-                                + cpCore.html.html_GetFormInputHidden("Type", FormTypeAddonSettingsEditor) + cpCore.html.html_GetFormInputHidden("ContentName", ContentName) + cpCore.html.html_GetFormInputHidden("RecordID", RecordID) + cpCore.html.html_GetFormInputHidden("FieldName", FieldName) + cpCore.html.html_GetFormInputHidden("ACInstanceID", ACInstanceID);
+                                + cpCore.html.inputHidden("Type", FormTypeAddonSettingsEditor) + cpCore.html.inputHidden("ContentName", ContentName) + cpCore.html.inputHidden("RecordID", RecordID) + cpCore.html.inputHidden("FieldName", FieldName) + cpCore.html.inputHidden("ACInstanceID", ACInstanceID);
                         }
                         //
                         BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodes.Count + "',this);return false;\"";
@@ -2156,7 +2162,7 @@ namespace Contensive.Core.Controllers {
                         return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
                             + cpCore.html.html_GetUploadFormStart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.html_GetFormButton("Update", "HelpBubbleButton") + "</td></tr>"
+                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.inputButton("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                             + "</table>"
                             + "</form>"
@@ -2225,7 +2231,7 @@ namespace Contensive.Core.Controllers {
                         CopyContent = ""
                         + CopyContent + "</tr>"
                         + "</table>"
-                        + cpCore.html.html_GetFormInputHidden("Type", FormTypeAddonStyleEditor) + cpCore.html.html_GetFormInputHidden("AddonID", addonId) + "";
+                        + cpCore.html.inputHidden("Type", FormTypeAddonStyleEditor) + cpCore.html.inputHidden("AddonID", addonId) + "";
                         //
                         BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + cpCore.doc.helpCodes.Count + "',this);return false;\"";
                         QueryString = cpCore.doc.refreshQueryString;
@@ -2236,7 +2242,7 @@ namespace Contensive.Core.Controllers {
                         Dialog = Dialog + "<div class=\"ccCon helpDialogCon\">"
                             + cpCore.html.html_GetUploadFormStart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.html_GetFormButton("Update", "HelpBubbleButton") + "</td></tr>"
+                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.inputButton("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                             + "</table>"
                             + "</form>"
@@ -2775,42 +2781,42 @@ namespace Contensive.Core.Controllers {
                                                                     case "integer":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "boolean":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValue));
+                                                                            Copy = cpCore.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>");
-                                                                            Copy += cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy += cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValue));
+                                                                            Copy = cpCore.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                         }
                                                                         break;
                                                                     case "float":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputDate(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputDate(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "file":
                                                                     case "imagefile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (string.IsNullOrEmpty(FieldValue)) {
-                                                                                Copy = cpCore.html.html_GetFormInputFile(FieldName);
+                                                                                Copy = cpCore.html.inputFile(FieldName);
                                                                             } else {
                                                                                 NonEncodedLink = cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, FieldValue);
                                                                                 EncodedLink = EncodeURL(NonEncodedLink);
@@ -2819,7 +2825,7 @@ namespace Contensive.Core.Controllers {
                                                                                 cpCore.privateFiles.splitPathFilename(FieldValue,  ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
-                                                                                + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.html_GetFormInputCheckBox2(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.html_GetFormInputFile(FieldName);
+                                                                                + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.inputFile(FieldName);
                                                                             }
                                                                         }
                                                                         //Call s.Add("&nbsp;</span></nobr></td>")
@@ -2827,7 +2833,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "currency":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
@@ -2838,7 +2844,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "textfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             FieldValue = cpCore.cdnFiles.readFile(FieldValue);
                                                                             if (FieldHTML) {
@@ -2851,7 +2857,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "cssfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
@@ -2859,7 +2865,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "xmlfile":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
@@ -2867,7 +2873,7 @@ namespace Contensive.Core.Controllers {
                                                                     case "link":
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
                                                                         }
@@ -2877,7 +2883,7 @@ namespace Contensive.Core.Controllers {
                                                                         // text
                                                                         //
                                                                         if (FieldReadOnly) {
-                                                                            Copy = FieldValue + cpCore.html.html_GetFormInputHidden(FieldName, FieldValue);
+                                                                            Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
                                                                             if (FieldHTML) {
                                                                                 Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);

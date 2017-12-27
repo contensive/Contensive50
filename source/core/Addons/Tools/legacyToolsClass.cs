@@ -1412,7 +1412,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(cpCore.html.getPanel(FormPanel));
                 //
                 cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
-                Stream.Add(cpCore.html.html_GetFormInputHidden("ReloadCDef", ReloadCDef));
+                Stream.Add(cpCore.html.inputHidden("ReloadCDef", ReloadCDef));
                 result =  htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -1847,7 +1847,7 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // ----- Done with diagnostics
                         //
-                        Stream.Add(cpCore.html.html_GetFormInputHidden("DiagActionCount", DiagActionCount));
+                        Stream.Add(cpCore.html.inputHidden("DiagActionCount", DiagActionCount));
                     }
                 }
                 //
@@ -2061,7 +2061,7 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>");
-                Stream.Add(cpCore.html.html_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry));
+                Stream.Add(cpCore.html.inputCheckbox("AddAdminMenuEntry", AddAdminMenuEntry));
                 Stream.Add("<br><br>");
                 //
                 //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
@@ -2185,7 +2185,7 @@ namespace Contensive.Core.Addons.Tools {
                         if (!string.IsNullOrEmpty(Caption)) {
                             Panel = Panel + "<tr>";
                             Panel = Panel + "<td width=\"30\" align=\"right\">";
-                            Panel = Panel + cpCore.html.html_GetFormInputRadioBox("DiagAction" + DiagActionCount, DiagActions[ActionPointer].Command, "");
+                            Panel = Panel + cpCore.html.inputRadio("DiagAction" + DiagActionCount, DiagActions[ActionPointer].Command, "");
                             Panel = Panel + "</td>";
                             Panel = Panel + "<td width=\"100%\">" + SpanClassAdminNormal + Caption + "</SPAN></td>";
                             Panel = Panel + "</tr>";
@@ -3111,7 +3111,7 @@ namespace Contensive.Core.Addons.Tools {
                             // put the menu into the current menu format
                             //
                             formFieldId = fieldsort.field.id;
-                            streamRow.Add(cpCore.html.html_GetFormInputHidden("dtfaID." + RecordCount, formFieldId));
+                            streamRow.Add(cpCore.html.inputHidden("dtfaID." + RecordCount, formFieldId));
                             streamRow.Add("<tr>");
                             //
                             // edit button
@@ -3134,7 +3134,7 @@ namespace Contensive.Core.Addons.Tools {
                                 //
                                 // inherited property
                                 //
-                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + cpCore.html.html_GetFormInputCheckBox2("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
+                                streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + cpCore.html.inputCheckbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                             } else {
                                 //
                                 // CDef has a parent, but the field is non-inherited, test for a matching Parent Field
@@ -3151,7 +3151,7 @@ namespace Contensive.Core.Addons.Tools {
                                     streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + SpanClassAdminSmall + "False**</span></td>");
                                     NeedFootNote2 = true;
                                 } else {
-                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + cpCore.html.html_GetFormInputCheckBox2("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
+                                    streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + cpCore.html.inputCheckbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                                 }
                             }
                             //
@@ -3212,7 +3212,7 @@ namespace Contensive.Core.Addons.Tools {
                                 }
                                 cpCore.db.csClose(ref CSPointer);
                             } else if (FieldLocked) {
-                                streamRow.Add(cpCore.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + cpCore.html.html_GetFormInputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
+                                streamRow.Add(cpCore.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + cpCore.html.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
                             } else {
                                 TypeSelect = TypeSelectTemplate;
                                 TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
@@ -3291,7 +3291,7 @@ namespace Contensive.Core.Addons.Tools {
                             }
                         }
                         Stream.Add(StreamValidRows.Text);
-                        Stream.Add(cpCore.html.html_GetFormInputHidden("dtfaRecordCount", RecordCount));
+                        Stream.Add(cpCore.html.inputHidden("dtfaRecordCount", RecordCount));
                     }
                     Stream.Add("</table>");
                     //Stream.Add( cpcore.htmldoc.main_GetPanelButtons(ButtonList, "Button"))
@@ -3309,7 +3309,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Save the content selection
                     //
-                    Stream.Add(cpCore.html.html_GetFormInputHidden(RequestNameToolContentID, ContentID));
+                    Stream.Add(cpCore.html.inputHidden(RequestNameToolContentID, ContentID));
                 } else {
                     //
                     // content tables that have edit forms to Configure
@@ -3321,7 +3321,7 @@ namespace Contensive.Core.Addons.Tools {
                     Stream.Add(cpCore.html.getPanel(FormPanel));
                 }
                 //
-                Stream.Add(cpCore.html.html_GetFormInputHidden("ReloadCDef", ReloadCDef));
+                Stream.Add(cpCore.html.inputHidden("ReloadCDef", ReloadCDef));
                 result = htmlController.legacy_openFormTable(cpCore, ButtonList) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -3337,7 +3337,7 @@ namespace Contensive.Core.Addons.Tools {
             if (Inherited) {
                 tempGetForm_ConfigureEdit_CheckBox = tempGetForm_ConfigureEdit_CheckBox + SpanClassAdminSmall + Value + "</SPAN>";
             } else {
-                tempGetForm_ConfigureEdit_CheckBox = tempGetForm_ConfigureEdit_CheckBox + cpCore.html.html_GetFormInputCheckBox(Label, Value);
+                tempGetForm_ConfigureEdit_CheckBox = tempGetForm_ConfigureEdit_CheckBox + cpCore.html.inputCheckbox(Label, Value);
             }
             return tempGetForm_ConfigureEdit_CheckBox + "</nobr></td>";
         }
@@ -3417,7 +3417,7 @@ namespace Contensive.Core.Addons.Tools {
                     }
                 }
                 //
-                result = result + cpCore.html.html_GetFormStart();
+                result = result + cpCore.html.formStart();
                 TableColSpan = 3;
                 result = result + StartTable(2, 0, 0);
                 //
@@ -3429,7 +3429,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     // Add/Drop Indexes form
                     //
-                    result = result + cpCore.html.html_GetFormInputHidden("PreviousTableID", TableID);
+                    result = result + cpCore.html.inputHidden("PreviousTableID", TableID);
                     //
                     // Drop Indexes
                     //
@@ -3451,7 +3451,7 @@ namespace Contensive.Core.Addons.Tools {
                             IndexName = genericController.encodeText(Rows[5, RowPointer]);
                             if (!string.IsNullOrEmpty(IndexName)) {
                                 result = result + StartTableRow();
-                                Copy = cpCore.html.html_GetFormInputCheckBox2("DropIndex." + RowPointer, false) + cpCore.html.html_GetFormInputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
+                                Copy = cpCore.html.inputCheckbox("DropIndex." + RowPointer, false) + cpCore.html.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
                                 result = result + GetTableCell(Copy,"",0, TableRowEven);
                                 result = result + GetTableCell(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
                                 result = result + GetTableCell("&nbsp;","",0, TableRowEven);
@@ -3459,7 +3459,7 @@ namespace Contensive.Core.Addons.Tools {
                                 TableRowEven = !TableRowEven;
                             }
                         }
-                        result = result + cpCore.html.html_GetFormInputHidden("DropCount", RowMax + 1);
+                        result = result + cpCore.html.inputHidden("DropCount", RowMax + 1);
                     }
                     //
                     // Add Indexes
@@ -3480,14 +3480,14 @@ namespace Contensive.Core.Addons.Tools {
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             result = result + StartTableRow();
-                            Copy = cpCore.html.html_GetFormInputCheckBox2("AddIndex." + RowPointer, false) + cpCore.html.html_GetFormInputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
+                            Copy = cpCore.html.inputCheckbox("AddIndex." + RowPointer, false) + cpCore.html.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
                             result = result + GetTableCell(Copy,"",0, TableRowEven);
                             result = result + GetTableCell("&nbsp;","",0, TableRowEven);
                             result = result + GetTableCell("&nbsp;","",0, TableRowEven);
                             result = result + kmaEndTableRow;
                             TableRowEven = !TableRowEven;
                         }
-                        result = result + cpCore.html.html_GetFormInputHidden("AddCount", RowMax + 1);
+                        result = result + cpCore.html.inputHidden("AddCount", RowMax + 1);
                     }
                     //
                     // Spacers
@@ -3939,10 +3939,10 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(SpanClassAdminNormal);
                 Stream.Add("<br>");
                 //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolLoadTemplates)
-                Stream.Add("<br>" + cpCore.html.html_GetFormInputCheckBox2("AllowBodyHTML", AllowBodyHTML) + " Update/Import Soft Templates from the Body of .HTM and .HTML files");
-                Stream.Add("<br>" + cpCore.html.html_GetFormInputCheckBox2("AllowScriptLink", AllowScriptLink) + " Update/Import Hard Templates with links to .ASP and .ASPX scripts");
-                Stream.Add("<br>" + cpCore.html.html_GetFormInputCheckBox2("AllowImageImport", AllowImageImport) + " Update/Import image links (.GIF,.JPG,.PDF ) into the resource library");
-                Stream.Add("<br>" + cpCore.html.html_GetFormInputCheckBox2("AllowStyleImport", AllowStyleImport) + " Import style sheets (.CSS) to Dynamic Styles");
+                Stream.Add("<br>" + cpCore.html.inputCheckbox("AllowBodyHTML", AllowBodyHTML) + " Update/Import Soft Templates from the Body of .HTM and .HTML files");
+                Stream.Add("<br>" + cpCore.html.inputCheckbox("AllowScriptLink", AllowScriptLink) + " Update/Import Hard Templates with links to .ASP and .ASPX scripts");
+                Stream.Add("<br>" + cpCore.html.inputCheckbox("AllowImageImport", AllowImageImport) + " Update/Import image links (.GIF,.JPG,.PDF ) into the resource library");
+                Stream.Add("<br>" + cpCore.html.inputCheckbox("AllowStyleImport", AllowStyleImport) + " Import style sheets (.CSS) to Dynamic Styles");
                 Stream.Add("</SPAN>");
                 //
                 ButtonList = ButtonCancel + "," + ButtonImportTemplates;
@@ -4369,16 +4369,16 @@ namespace Contensive.Core.Addons.Tools {
                     if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                         RecordID = cpCore.db.csGetInteger(CS, "ID");
                         if (genericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
-                            TopHalf = TopHalf + "<div>" + cpCore.html.html_GetFormInputCheckBox2("Cdef" + RowPtr, true) + cpCore.html.html_GetFormInputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + cpCore.db.csGetText(CS, "Name") + "</div>";
+                            TopHalf = TopHalf + "<div>" + cpCore.html.inputCheckbox("Cdef" + RowPtr, true) + cpCore.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + cpCore.db.csGetText(CS, "Name") + "</div>";
                         } else {
-                            BottomHalf = BottomHalf + "<div>" + cpCore.html.html_GetFormInputCheckBox2("Cdef" + RowPtr, false) + cpCore.html.html_GetFormInputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + cpCore.db.csGetText(CS, "Name") + "</div>";
+                            BottomHalf = BottomHalf + "<div>" + cpCore.html.inputCheckbox("Cdef" + RowPtr, false) + cpCore.html.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + cpCore.db.csGetText(CS, "Name") + "</div>";
                         }
                     }
                     cpCore.db.csGoNext(CS);
                     RowPtr = RowPtr + 1;
                 }
                 cpCore.db.csClose(ref CS);
-                Stream.Add(TopHalf + BottomHalf + cpCore.html.html_GetFormInputHidden("CDefRowCnt", RowPtr));
+                Stream.Add(TopHalf + BottomHalf + cpCore.html.inputHidden("CDefRowCnt", RowPtr));
                 //
                 result = htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonFindAndReplace) + Stream.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {

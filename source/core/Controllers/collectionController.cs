@@ -1614,7 +1614,7 @@ namespace Contensive.Core {
                             }
                         }
                         //
-                        cpCore.privateFiles.DeleteFileFolder(workingPath);
+                        cpCore.privateFiles.deleteFolder(workingPath);
                     }
                     //
                     // Upgrade the server from the collection files
@@ -1925,7 +1925,7 @@ namespace Contensive.Core {
                                                                                             if (allowLogging) {
                                                                                                 logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), working folder not deleted because debugging. Delete tmp folders when finished.");
                                                                                             } else {
-                                                                                                cpCore.privateFiles.DeleteFileFolder(workingPath);
+                                                                                                cpCore.privateFiles.deleteFolder(workingPath);
                                                                                             }
                                                                                             //
                                                                                             // Upgrade the apps from the collection files, do not install on any apps
@@ -2343,7 +2343,7 @@ namespace Contensive.Core {
                                                                 }
                                                                 //
                                                                 // -- remove child installation working folder
-                                                                cpCore.privateFiles.DeleteFileFolder(ChildWorkingPath);
+                                                                cpCore.privateFiles.deleteFolder(ChildWorkingPath);
                                                             } else {
                                                                 //
                                                                 //
@@ -2394,7 +2394,7 @@ namespace Contensive.Core {
                     //
                     // delete the working folder
                     //
-                    cpCore.privateFiles.DeleteFileFolder(tmpInstallPath);
+                    cpCore.privateFiles.deleteFolder(tmpInstallPath);
                 }
                 //
                 // If the collection parsed correctly, update the Collections.xml file
@@ -5075,7 +5075,7 @@ namespace Contensive.Core {
                     if (!InstallCollectionsFromPrivateFolder(cpCore, tmpFolderPath, ref returnErrorMessage, ref ignoreList, isNewBuild, ref nonCriticalErrorList)) {
                         throw new ApplicationException(returnErrorMessage);
                     }
-                    cpCore.privateFiles.DeleteFileFolder(tmpFolderPath);
+                    cpCore.privateFiles.deleteFolder(tmpFolderPath);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);

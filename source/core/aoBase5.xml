@@ -1287,6 +1287,11 @@
     <IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
     <IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
   </Addon>
+  <Addon name="Housekeep" guid="" type="Add-on">
+    <DotNetClass><![CDATA[Contensive.Core.Addons.Housekeeping.houseKeepClass]]></DotNetClass>
+		<ProcessInterval>60</ProcessInterval>
+  </Addon>
+
   <SQLIndex IndexName="ccContentContentTableID" DataSourceName="Default" TableName="ccContent" FieldNameList="ContentTableID"  />
 	<SQLIndex IndexName="ccGroupRulesGroupID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="GroupID"  />
 	<SQLIndex IndexName="ccGroupRulesContentID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="ContentID"  />

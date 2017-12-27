@@ -109,6 +109,10 @@ namespace Contensive.BaseClasses
 			/// </summary>
 			/// <returns></returns>
 			public bool forceHtmlDocument {get; set;} = false;
+            /// <summary>
+            /// When true, the environment is run from the task subsystem, without a UI. Assemblies from base collection run from program files. Addon return is ignored.
+            /// </summary>
+            public bool backgroundProcess { get; set; } = false;
 		}
 
 		public abstract string ConvertHTML2Text(string Source);

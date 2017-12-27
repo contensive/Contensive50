@@ -382,7 +382,7 @@ namespace Contensive.Core.Controllers {
         //   Deletes a file if it exists
         //========================================================================
         //
-        public void DeleteFileFolder(string PathName) {
+        public void deleteFolder(string PathName) {
             try {
                 if (!string.IsNullOrEmpty(PathName)) {
                     string localPath = joinPath(rootLocalPath, PathName);

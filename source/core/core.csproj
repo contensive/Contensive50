@@ -78,6 +78,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addons\_blank.cs" />
     <Compile Include="Addons\SafeAddonManager\addonManagerClass.cs" />
     <Compile Include="Addons\AdminSite\closeAjaxIndexFilter.cs" />
     <Compile Include="Addons\AdminSite\getHtmlBodyClass.cs" />

@@ -373,11 +373,21 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// Set a site property
+        /// Set a site property from an integer
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="Value"></param>
         public void setProperty(string propertyName, int Value) {
+            setProperty(propertyName, Value.ToString());
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// Set a site property from a date 
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="Value"></param>
+        public void setProperty(string propertyName, DateTime Value) {
             setProperty(propertyName, Value.ToString());
         }
         //
@@ -506,6 +516,17 @@ namespace Contensive.Core.Controllers {
         /// <returns></returns>
         public int getInteger(string PropertyName, int DefaultValue = 0) {
             return genericController.EncodeInteger(getText(PropertyName, DefaultValue.ToString()));
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// get site property and return double
+        /// </summary>
+        /// <param name="PropertyName"></param>
+        /// <param name="DefaultValue"></param>
+        /// <returns></returns>
+        public double getNumber(string PropertyName, double DefaultValue = 0) {
+            return genericController.EncodeNumber(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================

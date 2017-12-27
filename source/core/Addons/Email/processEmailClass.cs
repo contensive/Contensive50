@@ -14,46 +14,36 @@ using Contensive.Core.Controllers;
 using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 using Contensive.Core.Models.Complex;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Core.Addons.Email {
-    public class processEmailClass {
+    public class processEmailClass  : Contensive.BaseClasses.AddonBaseClass{
         //
-        private coreClass cpCore;
-        //
-        // copy of object from csv
-        //
-        //Private Enum AddonContextEnum
-        //    ' should have been addonContextPage, etc
-        //    ContextPage = 1
-        //    ContextAdmin = 2
-        //    ContextTemplate = 3
-        //    contextEmail = 4
-        //    ContextRemoteMethod = 5
-        //    ContextOnNewVisit = 6
-        //    ContextOnPageEnd = 7
-        //    ContextOnPageStart = 8
-        //    ContextEditor = 9
-        //    ContextHelpUser = 10
-        //    ContextHelpAdmin = 11
-        //    ContextHelpDeveloper = 12
-        //    ContextOnContentChange = 13
-        //    ContextFilter = 14
-        //    ContextSimple = 15
-        //    ContextOnBodyStart = 16
-        //    ContextOnBodyEnd = 17
-        //End Enum
-        //
-        //
-        //
-        public processEmailClass(coreClass cpCore) : base() {
-            cpCore = this.cpCore;
+        //====================================================================================================
+        /// <summary>
+        /// addon interface
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <returns></returns>
+        public override object Execute(CPBaseClass cp) {
+            string result = "";
+            try {
+                //
+                // -- ok to cast cpbase to cp because they build from the same solution
+                //this.cp = (CPClass)cp;
+                coreClass cpCore = ((CPClass)cp).core;
+                ProcessEmail(cpCore);
+            } catch (Exception ex) {
+                cp.Site.ErrorReport(ex);
+            }
+            return result;
         }
         //
         //==========================================================================================
         //   Process Group and Conditional Email
         //==========================================================================================
         //
-        public void ProcessEmail() {
+        public void ProcessEmail(coreClass cpCore) {
             try {
                 smtpController SMTPHandler = null;
                 string EmailHandlerFolder = null;
@@ -73,7 +63,7 @@ namespace Contensive.Core.Addons.Email {
         //   Process Group and Conditional Email
         //==========================================================================================
         //
-        private void ProcessEmailForApp() {
+        private void ProcessEmailForApp(coreClass cpCore) {
             DateTime EmailServiceLastCheck = default(DateTime);
             bool IsNewHour = false;
             bool IsNewDay = false;
@@ -89,11 +79,11 @@ namespace Contensive.Core.Addons.Email {
                     //
                     // Send Submitted Group Email (submitted, not sent, no conditions)
                     //
-                    ProcessEmail_GroupEmail(cpCore.siteProperties.dataBuildVersion);
+                    ProcessEmail_GroupEmail(cpCore);
                     //
                     // Send Conditional Email - Offset days after Joining
                     //
-                    ProcessEmail_ConditionalEmail(cpCore.siteProperties.dataBuildVersion, IsNewHour, IsNewDay);
+                    ProcessEmail_ConditionalEmail(cpCore, IsNewHour, IsNewDay);
                 }
             }
         }
@@ -103,7 +93,7 @@ namespace Contensive.Core.Addons.Email {
         //       Opens all email records, and calls send with each email, each person
         //==========================================================================================
         //
-        private void ProcessEmail_GroupEmail(string ignore_buildversion) {
+        private void ProcessEmail_GroupEmail(coreClass cpCore) {
             try {
                 //
                 //Dim siteStyles As String
@@ -162,7 +152,7 @@ namespace Contensive.Core.Addons.Email {
                         emailID = cpCore.db.csGetInteger(CSEmail, "ID");
                         EmailMemberID = cpCore.db.csGetInteger(CSEmail, "ModifiedBy");
                         EmailTemplateID = cpCore.db.csGetInteger(CSEmail, "EmailTemplateID");
-                        EmailTemplate = GetEmailTemplate(EmailTemplateID);
+                        EmailTemplate = GetEmailTemplate(cpCore, EmailTemplateID);
                         EmailAddLinkEID = cpCore.db.csGetBoolean(CSEmail, "AddLinkEID");
                         //exclusiveStyles = cpCore.asv.csv_cs_getText(CSEmail, "exclusiveStyles")
                         EmailFrom = cpCore.db.csGetText(CSEmail, "FromAddress");
@@ -239,7 +229,7 @@ namespace Contensive.Core.Addons.Email {
                                 }
                                 EmailStatusList = EmailStatusList + "Not Sent to " + PeopleName + ", duplicate email address (" + Email + ")" + BR;
                             } else {
-                                EmailStatusList = EmailStatusList + SendEmailRecord(PeopleID, emailID, DateTime.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, cpCore.db.csGet(CSEmail, "CopyFilename"), cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.csGetBoolean(CSEmail, "AddLinkEID"), "") + BR;
+                                EmailStatusList = EmailStatusList + SendEmailRecord(cpCore, PeopleID, emailID, DateTime.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, cpCore.db.csGet(CSEmail, "CopyFilename"), cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.csGetBoolean(CSEmail, "AddLinkEID"), "") + BR;
                                 //EmailStatusList = EmailStatusList & SendEmailRecord( PeopleID, EmailID, 0, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), "") & BR
                             }
                             LastEmail = Email;
@@ -251,7 +241,7 @@ namespace Contensive.Core.Addons.Email {
                         //
                         EmailCopy = cpCore.db.csGet(CSEmail, "copyfilename");
                         ConfirmationMemberID = cpCore.db.csGetInteger(CSEmail, "testmemberid");
-                        SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, PrimaryLink, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList);
+                        SendConfirmationEmail(cpCore, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, PrimaryLink, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList);
                         //            CSPeople = cpCore.asv.csOpenRecord("people", ConfirmationMemberID)
                         //            If cpCore.asv.csv_IsCSOK(CSPeople) Then
                         //                ClickFlagQuery = RequestNameEmailClickFlag & "=" & EmailDropID & "&" & RequestNameEmailMemberID & "=" & ConfirmationMemberID
@@ -299,7 +289,7 @@ namespace Contensive.Core.Addons.Email {
         //
         //==========================================================================================
         //
-        private void ProcessEmail_ConditionalEmail(string ignore_buildversion, bool IsNewHour, bool IsNewDay) {
+        private void ProcessEmail_ConditionalEmail(coreClass cpCore, bool IsNewHour, bool IsNewDay) {
             try {
                 //
                 //
@@ -407,16 +397,16 @@ namespace Contensive.Core.Addons.Email {
                         CSEmail = cpCore.db.cs_openContentRecord("Conditional Email", emailID);
                         if (cpCore.db.csOk(CSEmail)) {
                             EmailTemplateID = cpCore.db.csGetInteger(CSEmail, "EmailTemplateID");
-                            EmailTemplate = GetEmailTemplate(EmailTemplateID);
+                            EmailTemplate = GetEmailTemplate(cpCore, EmailTemplateID);
                             FromAddress = cpCore.db.csGetText(CSEmail, "FromAddress");
                             ConfirmationMemberID = cpCore.db.csGetInteger(CSEmail, "testmemberid");
                             EmailAddLinkEID = cpCore.db.csGetBoolean(CSEmail, "AddLinkEID");
                             EmailSubject = cpCore.db.csGet(CSEmail, "Subject");
                             EmailCopy = cpCore.db.csGet(CSEmail, "CopyFilename");
                             //emailStyles = cpCore.email.getStyles(emailID)
-                            EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), EmailAddLinkEID, "");
+                            EmailStatus = SendEmailRecord(cpCore, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), EmailAddLinkEID, "");
                             //EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), EmailAddLinkEID, EmailInlineStyles)
-                            SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
+                            SendConfirmationEmail(cpCore, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
                         }
                         cpCore.db.csClose(ref CSEmail);
                         cpCore.db.csGoNext(CSEmailBig);
@@ -469,16 +459,16 @@ namespace Contensive.Core.Addons.Email {
                         CSEmail = cpCore.db.cs_openContentRecord("Conditional Email", emailID);
                         if (cpCore.db.csOk(CSEmail)) {
                             EmailTemplateID = cpCore.db.csGetInteger(CSEmail, "EmailTemplateID");
-                            EmailTemplate = GetEmailTemplate(EmailTemplateID);
+                            EmailTemplate = GetEmailTemplate(cpCore, EmailTemplateID);
                             FromAddress = cpCore.db.csGetText(CSEmail, "FromAddress");
                             ConfirmationMemberID = cpCore.db.csGetInteger(CSEmail, "testmemberid");
                             EmailAddLinkEID = cpCore.db.csGetBoolean(CSEmail, "AddLinkEID");
                             EmailSubject = cpCore.db.csGet(CSEmail, "Subject");
                             EmailCopy = cpCore.db.csGet(CSEmail, "CopyFilename");
                             //emailStyles = cpCore.email.getStyles(emailID)
-                            EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.csGet(CSEmail, "Subject"), cpCore.db.csGet(CSEmail, "CopyFilename"), cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.csGetBoolean(CSEmail, "AddLinkEID"), "");
+                            EmailStatus = SendEmailRecord(cpCore, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.csGet(CSEmail, "Subject"), cpCore.db.csGet(CSEmail, "CopyFilename"), cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.csGetBoolean(CSEmail, "AddLinkEID"), "");
                             //EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
-                            SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
+                            SendConfirmationEmail(cpCore, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
                         }
                         cpCore.db.csClose(ref CSEmail);
                         cpCore.db.csGoNext(CSEmailBig);
@@ -522,16 +512,16 @@ namespace Contensive.Core.Addons.Email {
                             CSEmail = cpCore.db.cs_openContentRecord("Conditional Email", emailID);
                             if (cpCore.db.csOk(CSEmail)) {
                                 EmailTemplateID = cpCore.db.csGetInteger(CSEmail, "EmailTemplateID");
-                                EmailTemplate = GetEmailTemplate(EmailTemplateID);
+                                EmailTemplate = GetEmailTemplate(cpCore, EmailTemplateID);
                                 FromAddress = cpCore.db.csGetText(CSEmail, "FromAddress");
                                 ConfirmationMemberID = cpCore.db.csGetInteger(CSEmail, "testmemberid");
                                 EmailAddLinkEID = cpCore.db.csGetBoolean(CSEmail, "AddLinkEID");
                                 EmailSubject = cpCore.db.csGet(CSEmail, "Subject");
                                 EmailCopy = cpCore.db.csGet(CSEmail, "CopyFilename");
                                 //emailStyles = cpCore.email.getStyles(emailID)
-                                EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.csGet(CSEmail, "Subject"), cpCore.db.csGet(CSEmail, "CopyFilename"), cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.csGetBoolean(CSEmail, "AddLinkEID"), "");
+                                EmailStatus = SendEmailRecord(cpCore, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.csGet(CSEmail, "Subject"), cpCore.db.csGet(CSEmail, "CopyFilename"), cpCore.db.csGetBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.csGetBoolean(CSEmail, "AddLinkEID"), "");
                                 //EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
-                                SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
+                                SendConfirmationEmail(cpCore, ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
                             }
                             cpCore.db.csClose(ref CSEmail);
                             cpCore.db.csGoNext(CSEmailBig);
@@ -568,7 +558,7 @@ namespace Contensive.Core.Addons.Email {
         /// <param name="EmailAllowLinkEID"></param>
         /// <param name="emailStyles"></param>
         /// <returns>OK if successful, else returns user error.</returns>
-        private string SendEmailRecord(int MemberID, int emailID, DateTime DateBlockExpires, int EmailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
+        private string SendEmailRecord(coreClass cpCore, int MemberID, int emailID, DateTime DateBlockExpires, int EmailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
             string returnStatus = "";
             int CSPeople = 0;
             int CSLog = 0;
@@ -615,7 +605,7 @@ namespace Contensive.Core.Addons.Email {
                     //
                     // Get the Template
                     //
-                    protocolHostLink = "http://" + GetPrimaryDomainName();
+                    protocolHostLink = "http://" + GetPrimaryDomainName(cpCore);
                     //
                     // Get the Member
                     //
@@ -751,13 +741,13 @@ namespace Contensive.Core.Addons.Email {
         //
         //======================================================================================
         //
-        private string GetPrimaryDomainName() {
+        private string GetPrimaryDomainName(coreClass cpCore) {
             return cpCore.serverConfig.appConfig.domainList[0];
         }
         //
         //
         //
-        private string GetEmailTemplate(int EmailTemplateID) {
+        private string GetEmailTemplate(coreClass cpCore, int EmailTemplateID) {
             string tempGetEmailTemplate = null;
             try {
                 tempGetEmailTemplate = "";
@@ -800,7 +790,7 @@ namespace Contensive.Core.Addons.Email {
         /// <param name="emailStyles"></param>
         /// <param name="EmailFrom"></param>
         /// <param name="EmailStatusList"></param>
-        private void SendConfirmationEmail(int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string EmailCopy, string emailStyles, string EmailFrom, string EmailStatusList) {
+        private void SendConfirmationEmail(coreClass cpCore, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string EmailCopy, string emailStyles, string EmailFrom, string EmailStatusList) {
             try {
                 //
                 int CSPeople = 0;
@@ -851,11 +841,11 @@ namespace Contensive.Core.Addons.Email {
                     //
                     ConfirmBody = "<HTML><Head>"
                     + "<Title>Email Confirmation</Title>"
-                    + "<Base href=\"http://" + GetPrimaryDomainName() + requestAppRootPath + "\">"
+                    + "<Base href=\"http://" + GetPrimaryDomainName(cpCore) + requestAppRootPath + "\">"
                     + emailStyles + "</Head><BODY><div style=\"padding:10px;\">"
                     + "The follow email has been sent." + BR + BR + "If this email includes personalization, each email sent was personalized to its recipient. This confirmation has been personalized to you." + BR + BR + "Subject: " + EmailSubject + BR + "From: " + EmailFrom + BR + "Body" + BR + "----------------------------------------------------------------------" + BR + EmailBody + BR + "----------------------------------------------------------------------" + BR + "--- recipient list ---" + BR + EmailStatusList + "--- end of list ---" + BR + "</div></BODY></HTML>";
                     ConfirmBody = ConvertLinksToAbsolute(ConfirmBody, PrimaryLink + "/");
-                    cpCore.email.send(cpCore.db.csGetText(CSPeople, "Email"), EmailFrom, "Email confirmation from " + GetPrimaryDomainName(), ConfirmBody, "", "", "", true, true, 0);
+                    cpCore.email.send(cpCore.db.csGetText(CSPeople, "Email"), EmailFrom, "Email confirmation from " + GetPrimaryDomainName(cpCore), ConfirmBody, "", "", "", true, true, 0);
                 }
                 cpCore.db.csClose(ref CSPeople);
             } catch (Exception ex) {

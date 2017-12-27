@@ -269,7 +269,7 @@ namespace Contensive.Core {
         //
         public override object GetFormInput(string ContentName, string FieldName, string Height = "", string Width = "", string HtmlId = "") {
             if (true) {
-                return cpCore.html.html_GetFormInputCS(cs, ContentName, FieldName, genericController.EncodeInteger(Height), genericController.EncodeInteger(Width), HtmlId);
+                return cpCore.html.inputCs(cs, ContentName, FieldName, genericController.EncodeInteger(Height), genericController.EncodeInteger(Width), HtmlId);
             } else {
                 return "";
             }

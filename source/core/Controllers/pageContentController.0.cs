@@ -1962,7 +1962,7 @@ namespace Contensive.Core.Controllers {
                             if (cpcore.db.csOk(CSPeople)) {
                                 Body = f.RepeatCell;
                                 Body = genericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
-                                Body = genericController.vbReplace(Body, "{{FIELD}}", cpcore.html.html_GetFormInputCS(CSPeople, "People", tempVar.PeopleField), 1, 99, 1);
+                                Body = genericController.vbReplace(Body, "{{FIELD}}", cpcore.html.inputCs(CSPeople, "People", tempVar.PeopleField), 1, 99, 1);
                                 RepeatBody = RepeatBody + Body;
                                 HasRequiredFields = HasRequiredFields || tempVar.REquired;
                             }
@@ -1973,7 +1973,7 @@ namespace Contensive.Core.Controllers {
                             //
                             GroupValue = cpcore.doc.authContext.IsMemberOfGroup2(cpcore, tempVar.GroupName);
                             Body = f.RepeatCell;
-                            Body = genericController.vbReplace(Body, "{{CAPTION}}", cpcore.html.html_GetFormInputCheckBox2("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
+                            Body = genericController.vbReplace(Body, "{{CAPTION}}", cpcore.html.inputCheckbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
                             Body = genericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
                             RepeatBody = RepeatBody + Body;
                             GroupRowPtr = GroupRowPtr + 1;
@@ -1990,7 +1990,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 tempgetFormPage = ""
-                + errorController.error_GetUserError(cpcore) + cpcore.html.html_GetUploadFormStart() + cpcore.html.html_GetFormInputHidden("ContensiveFormPageID", FormPageID) + cpcore.html.html_GetFormInputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpcore.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + cpcore.html.html_GetUploadFormEnd();
+                + errorController.error_GetUserError(cpcore) + cpcore.html.html_GetUploadFormStart() + cpcore.html.inputHidden("ContensiveFormPageID", FormPageID) + cpcore.html.inputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpcore.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + cpcore.html.html_GetUploadFormEnd();
                 //
                 return tempgetFormPage;
                 //

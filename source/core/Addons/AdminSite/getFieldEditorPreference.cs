@@ -70,7 +70,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     foreach (DataRow rsDr in dt.Rows) {
                         int addonId = genericController.EncodeInteger(rsDr["addonid"]);
                         if ((addonId != 0) & (addonId != addonDefaultEditorId)) {
-                            result = result + "\r\n\t<div class=\"radioCon\">" + cpCore.html.html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + genericController.encodeText(rsDr["addonName"]) + "</div>";
+                            result = result + "\r\n\t<div class=\"radioCon\">" + cpCore.html.inputRadio(radioGroupName, genericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + genericController.encodeText(rsDr["addonName"]) + "</div>";
                         }
 
                     }
@@ -89,7 +89,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 result = ""
                                         + "\r\n\t<h1>Editor Preference</h1>"
                                         + "\r\n\t<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>"
-                                        + "\r\n\t<div class=\"radioCon\">" + cpCore.html.html_GetFormInputRadioBox("setEditorPreference" + fieldId, "0", "0") + "&nbsp;Use Default Editor" + addonDefaultEditorName + "</div>"
+                                        + "\r\n\t<div class=\"radioCon\">" + cpCore.html.inputRadio("setEditorPreference" + fieldId, "0", "0") + "&nbsp;Use Default Editor" + addonDefaultEditorName + "</div>"
                                         + "\r\n\t" + result + "\r\n\t<div class=\"buttonCon\">"
                                         + "\r\n\t<button type=\"button\" onclick=\"" + OnClick + "\">Select</button>"
                                         + "\r\n\t</div>"

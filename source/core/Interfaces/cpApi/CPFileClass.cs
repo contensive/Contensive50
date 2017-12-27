@@ -304,11 +304,11 @@ namespace Contensive.Core {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override void DeleteFolder(string pathFolderName) {
             if (cpCore.appRootFiles.isinPhysicalPath(pathFolderName)) {
-                cpCore.appRootFiles.DeleteFileFolder(pathFolderName);
+                cpCore.appRootFiles.deleteFolder(pathFolderName);
             } else if (cpCore.privateFiles.isinPhysicalPath(pathFolderName)) {
-                cpCore.appRootFiles.DeleteFileFolder(pathFolderName);
+                cpCore.appRootFiles.deleteFolder(pathFolderName);
             } else if (cpCore.cdnFiles.isinPhysicalPath(pathFolderName)) {
-                cpCore.appRootFiles.DeleteFileFolder(pathFolderName);
+                cpCore.appRootFiles.deleteFolder(pathFolderName);
             } else {
                 throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));
             }

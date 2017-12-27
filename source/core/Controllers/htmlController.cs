@@ -203,7 +203,7 @@ namespace Contensive.Core.Controllers {
                         //                    cpcore.handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
 
                         cpCore.handleException(new Exception("Error creating select list from content [" + ContentName + "] called [" + MenuName + "]. Selection of [" + RowCnt + "] records exceeds [" + cpCore.siteProperties.selectFieldLimit + "], the current Site Property SelectFieldLimit."));
-                        result = result + html_GetFormInputHidden(MenuNameFPO, CurrentValue);
+                        result = result + inputHidden(MenuNameFPO, CurrentValue);
                         if (CurrentValue == 0) {
                             result = html_GetFormInputText2(MenuName, "0");
                         } else {
@@ -521,7 +521,7 @@ namespace Contensive.Core.Controllers {
                         // Selection is too big
                         //
                         cpCore.handleException(new Exception("While building a group members list for group [" + groupController.group_GetGroupName(cpCore, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + cpCore.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
-                        result = result + html_GetFormInputHidden(MenuNameFPO, iCurrentValue);
+                        result = result + inputHidden(MenuNameFPO, iCurrentValue);
                         if (iCurrentValue != 0) {
                             CSPointer = cpCore.db.csOpenRecord("people", iCurrentValue);
                             if (cpCore.db.csOk(CSPointer)) {
@@ -931,7 +931,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         // Starts an HTML form, Should be closed with PrintFormEnd
         //
-        public string html_GetFormStart(string ActionQueryString = null, string htmlName = "", string htmlId = "", string htmlMethod = "") {
+        public string formStart(string ActionQueryString = null, string htmlName = "", string htmlId = "", string htmlMethod = "") {
             string temphtml_GetFormStart = null;
             try {
                 //
@@ -1163,7 +1163,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string html_GetFormInputDate(string TagName, string DefaultValue = "", string Width = "", string Id = "") {
+        public string inputDate(string TagName, string DefaultValue = "", string Width = "", string Id = "") {
             string result = "";
             try {
                 string HeadJS = null;
@@ -1236,25 +1236,25 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         // main_Get an HTML Form file upload input
         //
-        public string html_GetFormInputFile2(string TagName, string htmlId = "", string HtmlClass = "") {
+        public string inputFile(string TagName, string htmlId = "", string HtmlClass = "") {
             //
             return "<input TYPE=\"file\" name=\"" + TagName + "\" id=\"" + htmlId + "\" class=\"" + HtmlClass + "\">";
             //
         }
-        //
-        //====================================================================================================
-        // main_Get an HTML Form file upload input
-        //
-        public string html_GetFormInputFile(string TagName, string htmlId = "") {
-            //
-            return html_GetFormInputFile2(TagName, htmlId);
-            //
-        }
+        ////
+        ////====================================================================================================
+        //// main_Get an HTML Form file upload input
+        ////
+        //public string inputFile(string TagName, string htmlId = "") {
+        //    //
+        //    return inputFile(TagName, htmlId);
+        //    //
+        //}
         //
         //====================================================================================================
         // main_Get an HTML Form input
         //
-        public string html_GetFormInputRadioBox(string TagName, string TagValue, string CurrentValue, string htmlId = "") {
+        public string inputRadio(string TagName, string TagValue, string CurrentValue, string htmlId = "") {
             string temphtml_GetFormInputRadioBox = null;
             try {
                 //
@@ -1298,17 +1298,17 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string html_GetFormInputCheckBox(string TagName, string DefaultValue = "", string htmlId = "") {
-            return html_GetFormInputCheckBox2(genericController.encodeText(TagName), genericController.encodeBoolean(DefaultValue), genericController.encodeText(htmlId));
+        public string inputCheckbox(string TagName, string DefaultValue) {
+            return inputCheckbox(genericController.encodeText(TagName), genericController.encodeBoolean(DefaultValue));
         }
         //
         //====================================================================================================
         //
-        public string html_GetFormInputCheckBox2(string TagName, bool DefaultValue = false, string HtmlId = "", bool Disabled = false, string HtmlClass = "") {
+        public string inputCheckbox(string TagName, bool DefaultValue = false, string HtmlId = "", bool Disabled = false, string HtmlClass = "") {
             string temphtml_GetFormInputCheckBox2 = null;
             try {
                 //
-                temphtml_GetFormInputCheckBox2 = "<input TYPE=\"CheckBox\" NAME=\"" + TagName + "\" VALUE=\"1\"";
+                temphtml_GetFormInputCheckBox2 = "<input type=\"CheckBox\" NAME=\"" + TagName + "\" value=\"1\"";
                 if (!string.IsNullOrEmpty(HtmlId)) {
                     temphtml_GetFormInputCheckBox2 = temphtml_GetFormInputCheckBox2 + " id=\"" + HtmlId + "\"";
                 }
@@ -1435,7 +1435,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string html_GetFormInputCS(int CSPointer, string ContentName, string FieldName, int Height = 1, int Width = 40, string htmlId = "") {
+        public string inputCs(int CSPointer, string ContentName, string FieldName, int Height = 1, int Width = 40, string htmlId = "") {
             string returnResult = "";
             try {
                 bool IsEmptyList = false;
@@ -1564,7 +1564,7 @@ namespace Contensive.Core.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = genericController.encodeText(genericController.encodeBoolean(FieldValueVariant));
                                     } else {
-                                        returnResult = html_GetFormInputCheckBox2(FieldName, genericController.encodeBoolean(FieldValueVariant));
+                                        returnResult = inputCheckbox(FieldName, genericController.encodeBoolean(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -1594,7 +1594,7 @@ namespace Contensive.Core.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
                                     } else {
-                                        returnResult = FieldValueText + "<br>change: " + html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant));
+                                        returnResult = FieldValueText + "<br>change: " + inputFile(FieldName, genericController.encodeText(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -1605,7 +1605,7 @@ namespace Contensive.Core.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
                                     } else {
-                                        returnResult = "<img src=\"" + genericController.getCdnFileLink(cpCore, FieldValueText) + "\"><br>change: " + html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant));
+                                        returnResult = "<img src=\"" + genericController.getCdnFileLink(cpCore, FieldValueText) + "\"><br>change: " + inputFile(FieldName, genericController.encodeText(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -1672,18 +1672,18 @@ namespace Contensive.Core.Controllers {
             }
             return returnResult;
         }
+        ////
+        ////====================================================================================================
+        //// Print an HTML Form Button element named BUTTON
+        ////
+        //public string inputButton(string ButtonLabel, string Name = "", string htmlId = "", string OnClick = "") {
+        //    return inputButton(ButtonLabel, Name, htmlId, OnClick, false);
+        //}
         //
         //====================================================================================================
         // Print an HTML Form Button element named BUTTON
         //
-        public string html_GetFormButton(string ButtonLabel, string Name = "", string htmlId = "", string OnClick = "") {
-            return html_GetFormButton2(ButtonLabel, Name, htmlId, OnClick, false);
-        }
-        //
-        //====================================================================================================
-        // Print an HTML Form Button element named BUTTON
-        //
-        public string html_GetFormButton2(string ButtonLabel, string Name = "button", string htmlId = "", string OnClick = "", bool Disabled = false) {
+        public string inputButton(string ButtonLabel, string Name = "button", string htmlId = "", string OnClick = "", bool Disabled = false) {
             string s = null;
             try {
                 s = "<input TYPE=\"SUBMIT\""
@@ -1703,7 +1703,7 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         // main_Gets a value in a hidden form field, Handles name and value encoding
         //
-        public string html_GetFormInputHidden(string TagName, string TagValue, string htmlId = "") {
+        public string inputHidden(string TagName, string TagValue, string htmlId = "") {
             string result = "";
             try {
                 result = "\r<input type=\"hidden\" NAME=\"" + genericController.encodeHTML(genericController.encodeText(TagName)) + "\"";
@@ -1727,14 +1727,14 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string html_GetFormInputHidden(string TagName, bool TagValue, string htmlId = "") {
-            return html_GetFormInputHidden(TagName, TagValue.ToString(), htmlId);
+        public string inputHidden(string TagName, bool TagValue, string htmlId = "") {
+            return inputHidden(TagName, TagValue.ToString(), htmlId);
         }
         //
         //====================================================================================================
         //
-        public string html_GetFormInputHidden(string TagName, int TagValue, string htmlId = "") {
-            return html_GetFormInputHidden(TagName, TagValue.ToString(), htmlId);
+        public string inputHidden(string TagName, int TagValue, string htmlId = "") {
+            return inputHidden(TagName, TagValue.ToString(), htmlId);
         }
         //
         //====================================================================================================
@@ -1859,7 +1859,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public string html_GetFormInputField(string ContentName, string FieldName, string htmlName = "", string HtmlValue = "", string HtmlClass = "", string HtmlId = "", string HtmlStyle = "", int ManyToManySourceRecordID = 0) {
+        public string inputField(string ContentName, string FieldName, string htmlName = "", string HtmlValue = "", string HtmlClass = "", string HtmlId = "", string HtmlStyle = "", int ManyToManySourceRecordID = 0) {
             string result = "";
             try {
                 bool IgnoreBoolean = false;
@@ -1885,7 +1885,7 @@ namespace Contensive.Core.Controllers {
                             //
                             //
                             //
-                            result = html_GetFormInputCheckBox2(InputName, genericController.encodeBoolean(HtmlValue) == true, HtmlId, false, HtmlClass);
+                            result = inputCheckbox(InputName, genericController.encodeBoolean(HtmlValue) == true, HtmlId, false, HtmlClass);
                             if (!string.IsNullOrEmpty(HtmlStyle)) {
                                 result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
                             }
@@ -1915,7 +1915,7 @@ namespace Contensive.Core.Controllers {
                             //
                             //
                             //
-                            result = html_GetFormInputDate(InputName, HtmlValue, "", HtmlId);
+                            result = inputDate(InputName, HtmlValue, "", HtmlId);
                             if (!string.IsNullOrEmpty(HtmlClass)) {
                                 result = genericController.vbReplace(result, ">", " class=\"" + HtmlClass + "\">");
                             }
@@ -1929,15 +1929,15 @@ namespace Contensive.Core.Controllers {
                             //
                             //
                             if (string.IsNullOrEmpty(HtmlValue)) {
-                                result = html_GetFormInputFile2(InputName, HtmlId, HtmlClass);
+                                result = inputFile(InputName, HtmlId, HtmlClass);
                             } else {
 
                                 string FieldValuefilename = "";
                                 string FieldValuePath = "";
                                 cpCore.cdnFiles.splitPathFilename(HtmlValue, ref FieldValuePath, ref FieldValuefilename);
                                 result = result + "<a href=\"http://" + genericController.EncodeURL(cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, HtmlValue)) + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + FieldValuefilename + "]</A>";
-                                result = result + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + html_GetFormInputCheckBox2(InputName + ".Delete", false);
-                                result = result + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + html_GetFormInputFile2(InputName, HtmlId, HtmlClass);
+                                result = result + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + inputCheckbox(InputName + ".Delete", false);
+                                result = result + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + inputFile(InputName, HtmlId, HtmlClass);
                             }
                             if (!string.IsNullOrEmpty(HtmlStyle)) {
                                 result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
@@ -1959,14 +1959,14 @@ namespace Contensive.Core.Controllers {
                             //
                             //
                             if (string.IsNullOrEmpty(HtmlValue)) {
-                                result = html_GetFormInputFile2(InputName, HtmlId, HtmlClass);
+                                result = inputFile(InputName, HtmlId, HtmlClass);
                             } else {
                                 string FieldValuefilename = "";
                                 string FieldValuePath = "";
                                 cpCore.cdnFiles.splitPathFilename(HtmlValue, ref FieldValuePath, ref FieldValuefilename);
                                 result = result + "<a href=\"http://" + genericController.EncodeURL(cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, HtmlValue)) + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + FieldValuefilename + "]</A>";
-                                result = result + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + html_GetFormInputCheckBox2(InputName + ".Delete", false);
-                                result = result + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + html_GetFormInputFile2(InputName, HtmlId, HtmlClass);
+                                result = result + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + inputCheckbox(InputName + ".Delete", false);
+                                result = result + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + inputFile(InputName, HtmlId, HtmlClass);
                             }
                             if (!string.IsNullOrEmpty(HtmlStyle)) {
                                 result = genericController.vbReplace(result, ">", " style=\"" + HtmlStyle + "\">");
@@ -3424,7 +3424,7 @@ namespace Contensive.Core.Controllers {
                                                 for (main_MemberShipPointer = 0; main_MemberShipPointer < main_MemberShipCount; main_MemberShipPointer++) {
                                                     if (main_MemberShip[main_MemberShipPointer] == (RecordID)) {
                                                         RuleCopy = main_MemberShipRuleCopy[main_MemberShipPointer];
-                                                        returnHtml += html_GetFormInputHidden(TagName + "." + CheckBoxCnt, true);
+                                                        returnHtml += inputHidden(TagName + "." + CheckBoxCnt, true);
                                                         Found = true;
                                                         break;
                                                     }
@@ -4301,8 +4301,8 @@ namespace Contensive.Core.Controllers {
                         BubbleCopy = "Use the Tools Panel to enable features such as editing and debugging tools. It also includes links to the admin site, the support site and the My Profile page.";
                         result = result + getPanelHeader("Contensive Tools Panel" + helpLink);
                         //
-                        ToolsPanel.Add(cpCore.html.html_GetFormStart(WorkingQueryString));
-                        ToolsPanel.Add(cpCore.html.html_GetFormInputHidden("Type", FormTypeToolsPanel));
+                        ToolsPanel.Add(cpCore.html.formStart(WorkingQueryString));
+                        ToolsPanel.Add(cpCore.html.inputHidden("Type", FormTypeToolsPanel));
                         //
                         if (true) {
                             //
@@ -4329,7 +4329,7 @@ namespace Contensive.Core.Controllers {
                             helpLink = "";
                             //helpLink = main_GetHelpLink(7, "Enable Editing", "Display the edit tools for basic content, such as pages, copy and sections. ")
                             iValueBoolean = cpCore.visitProperty.getBoolean("AllowEditing");
-                            Tag = cpCore.html.html_GetFormInputCheckBox2(EditTagID, iValueBoolean, EditTagID);
+                            Tag = cpCore.html.inputCheckbox(EditTagID, iValueBoolean, EditTagID);
                             Tag = genericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + QuickEditTagID + "').checked=false;document.getElementById('" + AdvancedEditTagID + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + EditTagID + "\">" + Tag + "&nbsp;Edit</LABEL>" + helpLink + "\r</div>";
@@ -4339,7 +4339,7 @@ namespace Contensive.Core.Controllers {
                             helpLink = "";
                             //helpLink = main_GetHelpLink(8, "Enable Quick Edit", "Display the quick editor to edit the main page content.")
                             iValueBoolean = cpCore.visitProperty.getBoolean("AllowQuickEditor");
-                            Tag = cpCore.html.html_GetFormInputCheckBox2(QuickEditTagID, iValueBoolean, QuickEditTagID);
+                            Tag = cpCore.html.inputCheckbox(QuickEditTagID, iValueBoolean, QuickEditTagID);
                             Tag = genericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + EditTagID + "').checked=false;document.getElementById('" + AdvancedEditTagID + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + QuickEditTagID + "\">" + Tag + "&nbsp;Quick Edit</LABEL>" + helpLink + "\r</div>";
@@ -4349,7 +4349,7 @@ namespace Contensive.Core.Controllers {
                             helpLink = "";
                             //helpLink = main_GetHelpLink(0, "Enable Advanced Edit", "Display the edit tools for advanced content, such as templates and add-ons. Basic content edit tools are also displayed.")
                             iValueBoolean = cpCore.visitProperty.getBoolean("AllowAdvancedEditor");
-                            Tag = cpCore.html.html_GetFormInputCheckBox2(AdvancedEditTagID, iValueBoolean, AdvancedEditTagID);
+                            Tag = cpCore.html.inputCheckbox(AdvancedEditTagID, iValueBoolean, AdvancedEditTagID);
                             Tag = genericController.vbReplace(Tag, ">", " onClick=\"document.getElementById('" + QuickEditTagID + "').checked=false;document.getElementById('" + EditTagID + "').checked=false;\">");
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + AdvancedEditTagID + "\">" + Tag + "&nbsp;Advanced Edit</LABEL>" + helpLink + "\r</div>";
@@ -4369,7 +4369,7 @@ namespace Contensive.Core.Controllers {
                             helpLink = "";
                             iValueBoolean = cpCore.visitProperty.getBoolean("AllowDebugging");
                             TagID = "AllowDebugging";
-                            Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, iValueBoolean, TagID);
+                            Tag = cpCore.html.inputCheckbox(TagID, iValueBoolean, TagID);
                             OptionsPanel = OptionsPanel + "\r<div class=\"ccAdminSmall\">"
                             + cr2 + "<LABEL for=\"" + TagID + "\">" + Tag + "&nbsp;Debug</LABEL>" + helpLink + "\r</div>";
                             //
@@ -4462,7 +4462,7 @@ namespace Contensive.Core.Controllers {
                                 TagID = "autologin";
                                 LoginPanel = LoginPanel + ""
                                 + "\r<div class=\"ccAdminSmall\">"
-                                + cr2 + "<LABEL for=\"" + TagID + "\">" + cpCore.html.html_GetFormInputCheckBox2(TagID, true, TagID) + "&nbsp;Login automatically from this computer</LABEL>"
+                                + cr2 + "<LABEL for=\"" + TagID + "\">" + cpCore.html.inputCheckbox(TagID, true, TagID) + "&nbsp;Login automatically from this computer</LABEL>"
                                 + "\r</div>";
                             }
                         }
@@ -4670,7 +4670,7 @@ namespace Contensive.Core.Controllers {
         public static string legacy_openFormTable(coreClass cpCore, string ButtonList) {
             string result = "";
             try {
-                result = cpCore.html.html_GetFormStart();
+                result = cpCore.html.formStart();
                 if (!string.IsNullOrEmpty(ButtonList)) {
                     result = result + cpCore.html.getPanelButtons(ButtonList, "Button");
                 }
@@ -5326,6 +5326,28 @@ namespace Contensive.Core.Controllers {
         //
         public string getRecordEditLink(string ContentName, int RecordID, bool AllowCut = false) {
             return getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), "", cpCore.doc.authContext.isEditing(ContentName));
+        }
+        //
+        //====================================================================================================
+        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
+            string s = "";
+            //
+            if (!string.IsNullOrEmpty(HtmlName)) {
+                s += " name=\"" + HtmlName + "\"";
+            }
+            if (!string.IsNullOrEmpty(HtmlClass)) {
+                s += " class=\"" + HtmlClass + "\"";
+            }
+            if (!string.IsNullOrEmpty(HtmlId)) {
+                s += " id=\"" + HtmlId + "\"";
+            }
+            return "<" + TagName.Trim() + s + ">" + InnerHtml + "</" + TagName.Trim() + ">";
+        }
+        //
+        //====================================================================================================
+        //
+        public static string div( string innerHtml, string htmlName = "", string htmlClass = "", string htmlId = "") {
+            return genericBlockTag("div", innerHtml, htmlName, htmlClass, htmlId);
         }
     }
 }

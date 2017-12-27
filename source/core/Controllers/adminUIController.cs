@@ -166,25 +166,25 @@ namespace Contensive.Core {
                     //
                     // Reload Content Definitions
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.html_GetFormButton(ButtonSaveandInvalidateCache, RequestNameButton);
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.inputButton(ButtonSaveandInvalidateCache, RequestNameButton);
                 }
                 if (AllowMarkReviewed) {
                     //
                     // Reload Content Definitions
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.html_GetFormButton(ButtonMarkReviewed, RequestNameButton);
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.inputButton(ButtonMarkReviewed, RequestNameButton);
                 }
                 if (AllowRefresh) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.html_GetFormButton(ButtonRefresh, RequestNameButton);
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.inputButton(ButtonRefresh, RequestNameButton);
                 }
                 if (AllowCreateDuplicate) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.html_GetFormButton(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.inputButton(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
                 }
                 //
                 tempGetEditButtonBar2 = ""
@@ -262,7 +262,7 @@ namespace Contensive.Core {
                         }
                         //ORIGINAL LINE: Case Trim(ButtonClose)
                         else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonClose).Trim(' ')) {
-                            s = s + cpCore.html.html_GetFormButton(Buttons[Ptr], "", "", "window.close();");
+                            s = s + cpCore.html.inputButton(Buttons[Ptr], "", "", "window.close();");
                         }
                         //ORIGINAL LINE: Case Trim(ButtonAdd)
                         else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonAdd).Trim(' ')) {
@@ -277,7 +277,7 @@ namespace Contensive.Core {
                         }
                         //ORIGINAL LINE: Case Else
                         else {
-                            s = s + cpCore.html.html_GetFormButton(Buttons[Ptr], ButtonName);
+                            s = s + cpCore.html.inputButton(Buttons[Ptr], ButtonName);
                         }
                     }
                 }

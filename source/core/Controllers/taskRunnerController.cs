@@ -30,9 +30,9 @@ namespace Contensive.Core.Controllers {
         //Private cpCore As cpCoreClass
         //
         private string runnerGuid { get; set; } // set in constructor. used to tag tasks assigned to this runner
-                                                //
-                                                // ----- Task Timer
-                                                //
+        //
+        // ----- Task Timer
+        //
         private System.Timers.Timer processTimer { get; set; }
         private const int ProcessTimerMsecPerTick = 5000; // Check processs every 5 seconds
         private bool ProcessTimerInProcess { get; set; }
@@ -196,6 +196,7 @@ namespace Contensive.Core.Controllers {
                                         switch ((command.ToLower())) {
                                             case taskQueueCommandEnumModule.runAddon:
                                                 cpSite.core.addon.execute(Models.Entity.addonModel.create(cpSite.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                                                    backgroundProcess = true,
                                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
                                                     instanceArguments = cmdDetail.docProperties
                                                 });

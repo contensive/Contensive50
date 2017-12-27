@@ -564,7 +564,7 @@ namespace Contensive.Core.Controllers {
                 // Form Wrapper
                 //
                 result = ""
-                    + '\r' + cpCore.html.html_GetUploadFormStart(cpCore.webServer.requestQueryString) + '\r' + cpCore.html.html_GetFormInputHidden("Type", FormTypePageAuthoring) + '\r' + cpCore.html.html_GetFormInputHidden("ID", page.id) + '\r' + cpCore.html.html_GetFormInputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + cpCore.html.html_GetUploadFormEnd();
+                    + '\r' + cpCore.html.html_GetUploadFormStart(cpCore.webServer.requestQueryString) + '\r' + cpCore.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + cpCore.html.inputHidden("ID", page.id) + '\r' + cpCore.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + cpCore.html.html_GetUploadFormEnd();
 
                 //& cr & cpcore.html.main_GetPanelHeader("Contensive Quick Editor") _
 

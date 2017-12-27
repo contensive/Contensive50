@@ -54,61 +54,44 @@ namespace Contensive.Core {
         //
         //
         //
-        private string BlockBase(string TagName, string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            string s = "";
-            //
-            if (!string.IsNullOrEmpty(HtmlName)) {
-                s += " name=\"" + HtmlName + "\"";
-            }
-            if (!string.IsNullOrEmpty(HtmlClass)) {
-                s += " class=\"" + HtmlClass + "\"";
-            }
-            if (!string.IsNullOrEmpty(HtmlId)) {
-                s += " id=\"" + HtmlId + "\"";
-            }
-            return "<" + TagName.Trim() + s + ">" + InnerHtml + "</" + TagName.Trim() + ">";
-        }
-        //
-        //
-        //
         public override string div(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.div
         {
-            return BlockBase("div", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("div", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string p(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.p
         {
-            return BlockBase("p", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("p", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string li(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.li
         {
-            return BlockBase("li", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("li", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string ul(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.ul
         {
-            return BlockBase("ul", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("ul", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string ol(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.ol
         {
-            return BlockBase("ol", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("ol", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string CheckBox(string HtmlName, bool HtmlValue = false, string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.CheckBox
         {
-            return cpCore.html.html_GetFormInputCheckBox(HtmlName, HtmlValue.ToString(), HtmlId);
+            return cpCore.html.inputCheckbox(HtmlName, HtmlValue, HtmlId, false, HtmlClass);
         }
         //
         //
@@ -129,9 +112,9 @@ namespace Contensive.Core {
                         cpCore.handleException(new ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"));
                     }
                     if (string.IsNullOrEmpty(ActionQueryString)) {
-                        FormStart = cpCore.html.html_GetFormStart("", HtmlName, HtmlId, Method);
+                        FormStart = cpCore.html.formStart("", HtmlName, HtmlId, Method);
                     } else {
-                        FormStart = cpCore.html.html_GetFormStart(ActionQueryString, HtmlName, HtmlId, Method);
+                        FormStart = cpCore.html.formStart(ActionQueryString, HtmlName, HtmlId, Method);
                     }
 
                 } else {
@@ -161,48 +144,48 @@ namespace Contensive.Core {
         //
         public override string h1(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.h1
         {
-            return BlockBase("h1", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h1", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string h2(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.h2
         {
-            return BlockBase("h2", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h2", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string h3(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.h3
         {
-            return BlockBase("h3", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h3", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string h4(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.h4
         {
-            return BlockBase("h4", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h4", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string h5(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.h5
         {
-            return BlockBase("h5", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h5", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
         //
         //
         //
         public override string h6(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.h6
         {
-            return BlockBase("h6", InnerHtml, HtmlName, HtmlClass, HtmlId);
+            return htmlController.genericBlockTag("h6", InnerHtml, HtmlName, HtmlClass, HtmlId);
         }
 
         public override string RadioBox(string HtmlName, string HtmlValue, string CurrentValue, string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.RadioBox
         {
             if (true) {
-                return cpCore.html.html_GetFormInputRadioBox(HtmlName, HtmlValue, CurrentValue, HtmlId);
+                return cpCore.html.inputRadio(HtmlName, HtmlValue, CurrentValue, HtmlId);
             } else {
                 return "";
             }
@@ -294,7 +277,7 @@ namespace Contensive.Core {
         public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass = "", string HtmlId = "") //Inherits BaseClasses.CPHtmlBaseClass.Hidden
         {
             if (true) {
-                return cpCore.html.html_GetFormInputHidden(HtmlName, HtmlValue, HtmlId);
+                return cpCore.html.inputHidden(HtmlName, HtmlValue, HtmlId);
             } else {
                 return "";
             }
@@ -306,7 +289,7 @@ namespace Contensive.Core {
         {
             string returnValue = "";
             if (true) {
-                returnValue = cpCore.html.html_GetFormInputDate(HtmlName, HtmlValue, Width, HtmlId);
+                returnValue = cpCore.html.inputDate(HtmlName, HtmlValue, Width, HtmlId);
                 if (!string.IsNullOrEmpty(HtmlClass)) {
                     returnValue = returnValue.Replace(">", " class=\"" + HtmlClass + "\">");
                 }
@@ -319,7 +302,7 @@ namespace Contensive.Core {
         public override string InputFile(string HtmlName, string HtmlClass = "", string HtmlId = "") {
             string returnValue = "";
             if (true) {
-                returnValue = cpCore.html.html_GetFormInputFile2(HtmlName, HtmlId, HtmlClass);
+                returnValue = cpCore.html.inputFile(HtmlName, HtmlId, HtmlClass);
             }
             return returnValue;
         }
@@ -458,7 +441,7 @@ namespace Contensive.Core {
         public override string Button(string HtmlName, string HtmlValue = "", string HtmlClass = "", string HtmlId = "") {
             string tempButton = null;
             if (true) {
-                tempButton = cpCore.html.html_GetFormButton(HtmlValue, HtmlName, HtmlId, "");
+                tempButton = cpCore.html.inputButton(HtmlValue, HtmlName, HtmlId, "");
                 if (!string.IsNullOrEmpty(HtmlClass)) {
                     tempButton = tempButton.Replace(">", " class=\"" + HtmlClass + "\">");
                 }

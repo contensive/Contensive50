@@ -1028,7 +1028,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Close Tables
                     //
                     Content.Add(Adminui.EditTableClose);
-                    Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormClearCache));
+                    Content.Add(cpCore.html.inputHidden(rnAdminSourceForm, AdminFormClearCache));
                 }
                 //
                 Description = "Hit Apply or OK to clear all current content caches";
@@ -1142,7 +1142,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Close Tables
                     //
                     Content.Add(Adminui.EditTableClose);
-                    Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormSecurityControl));
+                    Content.Add(cpCore.html.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
                 }
                 //
                 Description = "Use this tool to enter multiple Meta Keywords";
@@ -2260,8 +2260,8 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         private const string RequestNameAdminDepth = "ad";
         private const string RequestNameAdminForm = "af";
-        private const string RequestNameAdminSourceForm = "asf";
-        private const string RequestNameAdminAction = "aa";
+        private const string rnAdminSourceForm = "asf";
+        private const string rnAdminAction = "aa";
         //Private Const RequestNameFieldName = "fn"
         private const string RequestNameTitleExtension = "tx";
         //
@@ -2442,7 +2442,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 int RecordTop_NextPage = 0;
                 int RecordTop_PreviousPage = 0;
                 int ColumnWidth = 0;
-                string ButtonBar = null;
+                
                 string TitleBar = null;
                 string FindWordValue = null;
                 string ButtonObject = null;
@@ -2585,9 +2585,9 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             AllowAdd = adminContent.AllowAdd & (!IsLimitedToSubContent) && (allowCMAdd);
                             if (MenuDepth > 0) {
-                                LeftButtons = LeftButtons + cpCore.html.html_GetFormButton(ButtonClose,"","", "window.close();");
+                                LeftButtons = LeftButtons + cpCore.html.inputButton(ButtonClose,"","", "window.close();");
                             } else {
-                                LeftButtons = LeftButtons + cpCore.html.html_GetFormButton(ButtonCancel);
+                                LeftButtons = LeftButtons + cpCore.html.inputButton(ButtonCancel);
                                 //LeftButtons = LeftButtons & cpCore.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
                             }
                             if (AllowAdd) {
@@ -2626,7 +2626,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             } else {
                                 PageCount = EncodeInteger(1 + EncodeInteger(Math.Floor(EncodeNumber((recordCnt - 1) / IndexConfig.RecordsPerPage))));
                             }
-                            ButtonBar = Adminui.GetButtonBarForIndex(LeftButtons, RightButtons, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, PageCount);
+                            string ButtonBar = Adminui.GetButtonBarForIndex(LeftButtons, RightButtons, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, PageCount);
                             //ButtonBar = AdminUI.GetButtonBar(LeftButtons, RightButtons)
                             //
                             // ----- TitleBar
@@ -2981,7 +2981,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     // --- Edit button column
                                     //
                                     DataTable_DataRows += "<td align=center " + RowColor + ">";
-                                    URI = "\\" + cpCore.serverConfig.appConfig.adminRoute + "?" + RequestNameAdminAction + "=" + AdminActionNop + "&cid=" + adminContent.Id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + genericController.EncodeRequestVariable(TitleExtension) + "&ad=" + MenuDepth + "&" + RequestNameAdminSourceForm + "=" + AdminForm + "&" + RequestNameAdminForm + "=" + AdminFormEdit;
+                                    URI = "\\" + cpCore.serverConfig.appConfig.adminRoute + "?" + rnAdminAction + "=" + AdminActionNop + "&cid=" + adminContent.Id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + genericController.EncodeRequestVariable(TitleExtension) + "&ad=" + MenuDepth + "&" + rnAdminSourceForm + "=" + AdminForm + "&" + RequestNameAdminForm + "=" + AdminFormEdit;
                                     if (WherePairCount > 0) {
                                         for (WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
                                             URI = URI + "&wl" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + genericController.EncodeRequestVariable(WherePair[1, WhereCount]);
@@ -3080,7 +3080,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "\r\n  }"
                                 + "\r\n} "
                                 + "\r\n</script>";
-                            DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br>" + cpCore.html.html_GetFormButton(ButtonFind,"", "FindButton") + "</td>";
+                            DataTable_FindRow = DataTable_FindRow + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"60\" height=\"1\" ><br>" + cpCore.html.inputButton(ButtonFind,"", "FindButton") + "</td>";
                             ColumnPointer = 0;
                             foreach (var kvp in IndexConfig.Columns) {
                                 indexConfigColumnClass column = kvp.Value;
@@ -3126,16 +3126,17 @@ namespace Contensive.Core.Addons.AdminSite {
                             // Assemble LiveWindowTable
                             //
                             // Stream.Add( OpenLiveWindowTable)
-                            Stream.Add("\r\n" + cpCore.html.html_GetFormStart("", "adminForm"));
-                            Stream.Add("<input type=\"hidden\" name=\"indexGoToPage\" value=\"\">");
+                            Stream.Add(cpCore.html.formStart("", "adminForm"));
                             Stream.Add(ButtonBar);
                             Stream.Add(Adminui.GetTitleBar(TitleBar, HeaderDescription));
                             Stream.Add(FilterDataTable);
                             Stream.Add(ButtonBar);
                             Stream.Add(cpCore.html.getPanel("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\", height=\"10\" >"));
-                            Stream.Add("<input type=hidden name=Columncnt VALUE=" + IndexConfig.Columns.Count + ">");
+                            Stream.Add(cpCore.html.inputHidden(rnAdminSourceForm, AdminFormIndex));
+                            Stream.Add(cpCore.html.inputHidden("cid", adminContent.Id));
+                            Stream.Add(cpCore.html.inputHidden("indexGoToPage", ""));
+                            Stream.Add(cpCore.html.inputHidden("Columncnt", IndexConfig.Columns.Count ));
                             Stream.Add("</form>");
-                            //  Stream.Add( CloseLiveWindowTable)
                             cpCore.html.addTitle(adminContent.Name);
                         }
                     }
@@ -3705,8 +3706,8 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // ----- Other
                 //
-                AdminAction = cpCore.docProperties.getInteger(RequestNameAdminAction);
-                AdminSourceForm = cpCore.docProperties.getInteger(RequestNameAdminSourceForm);
+                AdminAction = cpCore.docProperties.getInteger(rnAdminAction);
+                AdminSourceForm = cpCore.docProperties.getInteger(rnAdminSourceForm);
                 AdminForm = cpCore.docProperties.getInteger(RequestNameAdminForm);
                 AdminButton = cpCore.docProperties.getText(RequestNameButton);
                 //
@@ -7026,7 +7027,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                 }
                 //ORIGINAL LINE: Case "CCEMAIL"
-                else if (genericController.vbUCase(adminContent.ContentTableName) == "CCEMAIL") {
+                else if (adminContent.ContentTableName.ToLower() == "ccemail") {
                     //
                     // ----- Email table
                     //
@@ -7057,21 +7058,21 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                         EditSectionButtonBar = "";
                         if (MenuDepth > 0) {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonClose, "", "", "window.close();");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonClose, "", "", "window.close();");
                         } else {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonCancel, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonCancel, "", "", "Return processSubmit(this)");
                         }
                         if ((AllowDelete) && (cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore))) {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
                         }
                         if ((!EmailSubmitted) && (!EmailSent)) {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonSave, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonOK, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonSendTest, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonSave, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonOK, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonSendTest, "", "", "Return processSubmit(this)");
                         } else if (AllowAdd) {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonCreateDuplicate, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonCreateDuplicate, "", "", "Return processSubmit(this)");
                         }
-                        EditSectionButtonBar = cpCore.html.getPanel(EditSectionButtonBar, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 4);
+                        EditSectionButtonBar = htmlController.div( EditSectionButtonBar,"", "ccButtonCon");
                         //
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
@@ -7100,31 +7101,31 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                         EditSectionButtonBar = "";
                         if (MenuDepth > 0) {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonClose, "", "", "window.close();");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonClose, "", "", "window.close();");
                         } else {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonCancel, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonCancel, "", "", "Return processSubmit(this)");
                         }
                         if (AllowDelete) {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
                         }
                         if (!EmailSubmitted) {
                             //
                             // Not Submitted
                             //
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonSave, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonOK, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton2(ButtonActivate, "", "", "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonSendTest, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonSave, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonOK, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonActivate, "", "", "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonSendTest, "", "", "Return processSubmit(this)");
                         } else {
                             //
                             // Submitted
                             //
                             if (AllowAdd) {
-                                EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonCreateDuplicate, "", "", "Return processSubmit(this)");
+                                EditSectionButtonBar +=  cpCore.html.inputButton(ButtonCreateDuplicate, "", "", "Return processSubmit(this)");
                             }
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonDeactivate, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonDeactivate, "", "", "Return processSubmit(this)");
                         }
-                        EditSectionButtonBar = cpCore.html.getPanel(EditSectionButtonBar, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 4);
+                        EditSectionButtonBar = htmlController.div(EditSectionButtonBar, "", "ccButtonCon");
                         //
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
@@ -7157,25 +7158,25 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                         EditSectionButtonBar = "";
                         if (MenuDepth > 0) {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonClose, "", "", "window.close();");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonClose, "", "", "window.close();");
                         } else {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonCancel, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonCancel, "", "", "Return processSubmit(this)");
                         }
                         if (editRecord.id != 0) {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonDeleteEmail, "", "", "If(!DeleteCheck())Return False;");
                         }
                         if ((!EmailSubmitted) && (!EmailSent)) {
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonSave, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonOK, "", "", "Return processSubmit(this)");
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton2(ButtonSend, "", "", "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonSendTest, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonSave, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonOK, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonSend, "", "", "Return processSubmit(this)", (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest));
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonSendTest, "", "", "Return processSubmit(this)");
                         } else {
                             //
                             // Submitted
                             //
-                            EditSectionButtonBar = EditSectionButtonBar + cpCore.html.html_GetFormButton(ButtonCreateDuplicate, "", "", "Return processSubmit(this)");
+                            EditSectionButtonBar +=  cpCore.html.inputButton(ButtonCreateDuplicate, "", "", "Return processSubmit(this)");
                         }
-                        EditSectionButtonBar = cpCore.html.getPanel(EditSectionButtonBar, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 4);
+                        EditSectionButtonBar = htmlController.div(EditSectionButtonBar, "", "ccButtonCon");
                         //
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription));
@@ -7819,7 +7820,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             // Publish Checkbox
                                             //
-                                            Body += ("<td align=\"center\" valign=\"top\" " + RowColor + ">" + cpCore.html.html_GetFormInputCheckBox2("row" + RecordCount, false) + cpCore.html.html_GetFormInputHidden("rowid" + RecordCount, RecordID) + cpCore.html.html_GetFormInputHidden("rowcontentname" + RecordCount, ContentName) + "</td>");
+                                            Body += ("<td align=\"center\" valign=\"top\" " + RowColor + ">" + cpCore.html.inputCheckbox("row" + RecordCount, false) + cpCore.html.inputHidden("rowid" + RecordCount, RecordID) + cpCore.html.inputHidden("rowcontentname" + RecordCount, ContentName) + "</td>");
                                             //
                                             // Submitted
                                             //
@@ -7949,7 +7950,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         Body += "\r<tr><td width=\"100%\" colspan=\"9\" class=\"ccAdminSmall\">** To view these records on the public site you must disable Rendering Mode because they are deleted records that have not been published.</td></tr>";
                     }
                     Body += "\r</table>";
-                    Body += cpCore.html.html_GetFormInputHidden("RowCnt", RecordCount);
+                    Body += cpCore.html.inputHidden("RowCnt", RecordCount);
                     Body = "<div style=\"Background-color:white;\">" + Body + "</div>";
                     //
                     // Headers, etc
@@ -7965,7 +7966,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     // Assemble Page
                     //
-                    Body += cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormPublishing);
+                    Body += cpCore.html.inputHidden(rnAdminSourceForm, AdminFormPublishing);
                 }
                 //
                 Caption = SpanClassAdminNormal + "<strong>Workflow Publishing</strong></span>";
@@ -8341,8 +8342,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueBoolean = genericController.encodeBoolean(FieldValueObject);
-                                        EditorString += (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueBoolean)));
-                                        EditorString += (cpCore.html.html_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, "", true, "checkBox"));
+                                        EditorString += (cpCore.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueBoolean)));
+                                        EditorString += (cpCore.html.inputCheckbox(FormFieldLCaseName, FieldValueBoolean, "", true, "checkBox"));
                                         EditorString += WhyReadOnlyMsg;
                                         //
                                         break;
@@ -8355,7 +8356,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         NonEncodedLink = cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, FieldValueText);
                                         EncodedLink = genericController.EncodeURL(NonEncodedLink);
-                                        EditorString += (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, ""));
+                                        EditorString += (cpCore.html.inputHidden(FormFieldLCaseName, ""));
                                         if (string.IsNullOrEmpty(FieldValueText)) {
                                             EditorString += ("[no file]");
                                         } else {
@@ -8373,7 +8374,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueInteger = genericController.EncodeInteger(FieldValueObject);
-                                        EditorString += (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)));
+                                        EditorString += (cpCore.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)));
                                         //Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                         LookupContentName = "";
                                         if (field.lookupContentID != 0) {
@@ -8412,7 +8413,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueInteger = genericController.EncodeInteger(FieldValueObject);
-                                        EditorString += (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)));
+                                        EditorString += (cpCore.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)));
                                         if (FieldValueInteger == 0) {
                                             EditorString += ("None");
                                         } else {
@@ -8456,7 +8457,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueNumber = genericController.EncodeNumber(FieldValueObject);
-                                        EditorString += (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueNumber)));
+                                        EditorString += (cpCore.html.inputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueNumber)));
                                         EditorString += (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueNumber.ToString(), -1, -1, "", false, true, "text"));
                                         EditorString += (string.Format("{0:C}", FieldValueNumber));
                                         EditorString += WhyReadOnlyMsg;
@@ -8473,7 +8474,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         } else {
                                             FieldValueText = encodeText(FieldValueDate);
                                         }
-                                        EditorString += (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText));
+                                        EditorString += (cpCore.html.inputHidden(FormFieldLCaseName, FieldValueText));
                                         EditorString += (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, -1, -1, "", false, true, "date"));
                                         EditorString += WhyReadOnlyMsg;
                                         //
@@ -8486,7 +8487,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorString += (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText));
+                                        EditorString += (cpCore.html.inputHidden(FormFieldLCaseName, FieldValueText));
                                         EditorString += (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, -1, -1, "", false, true, "number"));
                                         EditorString += WhyReadOnlyMsg;
                                         //
@@ -8502,7 +8503,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             return_NewFieldList = return_NewFieldList + "," + FieldName;
                                             FieldValueText = genericController.encodeText(FieldValueObject);
-                                            EditorString += cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText);
+                                            EditorString += cpCore.html.inputHidden(FormFieldLCaseName, FieldValueText);
                                             EditorStyleModifier = "textexpandable";
                                             FieldRows = (cpCore.userProperty.getInteger(adminContent.Name + "." + FieldName + ".RowHeight", 10));
                                             EditorString += cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, "", FormFieldLCaseName, false, true);
@@ -8512,7 +8513,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                             //
                                             return_NewFieldList = return_NewFieldList + "," + FieldName;
                                             FieldValueText = genericController.encodeText(FieldValueObject);
-                                            EditorString += cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText);
+                                            EditorString += cpCore.html.inputHidden(FormFieldLCaseName, FieldValueText);
                                             //
                                             EditorStyleModifier = "text";
                                             FieldRows = (cpCore.userProperty.getInteger(adminContent.Name + "." + FieldName + ".PixelHeight", 500));
@@ -8533,7 +8534,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorString += cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText);
+                                        EditorString += cpCore.html.inputHidden(FormFieldLCaseName, FieldValueText);
                                         if (field.Password) {
                                             //
                                             // Password forces simple text box
@@ -8553,7 +8554,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorString += cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText);
+                                        EditorString += cpCore.html.inputHidden(FormFieldLCaseName, FieldValueText);
                                         EditorStyleModifier = "textexpandable";
                                         FieldRows = (cpCore.userProperty.getInteger(adminContent.Name + "." + FieldName + ".RowHeight", 10));
                                         EditorString += cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, "", FormFieldLCaseName, false, true);
@@ -8564,7 +8565,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         //
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueText = genericController.encodeText(FieldValueObject);
-                                        EditorString += cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText);
+                                        EditorString += cpCore.html.inputHidden(FormFieldLCaseName, FieldValueText);
                                         if (field.Password) {
                                             //
                                             // Password forces simple text box
@@ -8622,7 +8623,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         return_NewFieldList = return_NewFieldList + "," + FieldName;
                                         FieldValueBoolean = genericController.encodeBoolean(FieldValueObject);
                                         //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
-                                        EditorString += (cpCore.html.html_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean,"",false, "checkBox"));
+                                        EditorString += (cpCore.html.inputCheckbox(FormFieldLCaseName, FieldValueBoolean,"",false, "checkBox"));
                                         //s.Add( "&nbsp;</span></nobr></td>")
                                         //
                                         break;
@@ -8635,7 +8636,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         FieldValueText = genericController.encodeText(FieldValueObject);
                                         //Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                         if (string.IsNullOrEmpty(FieldValueText)) {
-                                            EditorString += (cpCore.html.html_GetFormInputFile2(FormFieldLCaseName,"", "file"));
+                                            EditorString += (cpCore.html.inputFile(FormFieldLCaseName,"", "file"));
                                         } else {
                                             NonEncodedLink = cpCore.webServer.requestDomain + genericController.getCdnFileLink(cpCore, FieldValueText);
                                             EncodedLink = genericController.encodeHTML(NonEncodedLink);
@@ -8643,8 +8644,8 @@ namespace Contensive.Core.Addons.AdminSite {
                                             string path = "";
                                             cpCore.cdnFiles.splitPathFilename(FieldValueText, ref path, ref filename);
                                             EditorString += ("&nbsp;<a href=\"http://" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
-                                            EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.html_GetFormInputCheckBox2(FormFieldLCaseName + ".DeleteFlag", false));
-                                            EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.html_GetFormInputFile2(FormFieldLCaseName,"", "file"));
+                                            EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + cpCore.html.inputCheckbox(FormFieldLCaseName + ".DeleteFlag", false));
+                                            EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + cpCore.html.inputFile(FormFieldLCaseName,"", "file"));
                                         }
                                         //
                                         break;
@@ -8737,7 +8738,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                         } else {
                                             FieldValueText = encodeText(FieldValueDate);
                                         }
-                                        EditorString += (cpCore.html.html_GetFormInputDate(FormFieldLCaseName, FieldValueText));
+                                        EditorString += (cpCore.html.inputDate(FormFieldLCaseName, FieldValueText));
                                         //s.Add( "&nbsp;</span></nobr></td>")
                                         break;
                                     case FieldTypeIdAutoIdIncrement:
@@ -9232,14 +9233,14 @@ namespace Contensive.Core.Addons.AdminSite {
                                 if (editRecord.Read_Only) {
                                     HTMLFieldString = genericController.encodeText(cpCore.db.csOk(CSRules));
                                 } else {
-                                    HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("ContentWatchList." + cpCore.db.csGet(CSLists, "ID"), cpCore.db.csOk(CSRules));
+                                    HTMLFieldString = cpCore.html.inputCheckbox("ContentWatchList." + cpCore.db.csGet(CSLists, "ID"), cpCore.db.csOk(CSRules));
                                 }
                                 cpCore.db.csClose(ref CSRules);
                             } else {
                                 if (editRecord.Read_Only) {
                                     HTMLFieldString = genericController.encodeText(false);
                                 } else {
-                                    HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("ContentWatchList." + cpCore.db.csGet(CSLists, "ID"), false);
+                                    HTMLFieldString = cpCore.html.inputCheckbox("ContentWatchList." + cpCore.db.csGet(CSLists, "ID"), false);
                                 }
                             }
                             //
@@ -9267,7 +9268,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         if (editRecord.Read_Only) {
                             HTMLFieldString = cpCore.html.encodeHTML(Copy);
                         } else {
-                            HTMLFieldString = cpCore.html.html_GetFormInputDate("ContentWatchExpires", Copy, cpCore.siteProperties.defaultFormInputWidth.ToString());
+                            HTMLFieldString = cpCore.html.inputDate("ContentWatchExpires", Copy, cpCore.siteProperties.defaultFormInputWidth.ToString());
                             //HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchExpires"" cols=""" & cpCore.app.SiteProperty_DefaultFormInputWidth & """>" & Copy & "</textarea>"
                         }
                         FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
@@ -9293,7 +9294,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         // ----- close the panel
                         //
                         string s = ""
-                        +Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose + cpCore.html.html_GetFormInputHidden("WhatsNewResponse", "-1") + cpCore.html.html_GetFormInputHidden("contentwatchrecordid", ContentWatchRecordID.ToString());
+                        +Adminui.EditTableOpen + FastString.Text + Adminui.EditTableClose + cpCore.html.inputHidden("WhatsNewResponse", "-1") + cpCore.html.inputHidden("contentwatchrecordid", ContentWatchRecordID.ToString());
                         tempGetForm_Edit_ContentTracking = Adminui.GetEditPanel((!allowAdminTabs), "Content Tracking", "Include in Content Watch Lists", s);
                         EditSectionPanelCount = EditSectionPanelCount + 1;
                         //
@@ -9394,7 +9395,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // -- Active
                 Copy = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
-                HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("active", editRecord.active);
+                HTMLFieldString = cpCore.html.inputCheckbox("active", editRecord.active);
                 FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Active", Copy, false, false, ""));
                 //
                 // ----- If Page Content , check if this is the default PageNotFound page
@@ -9406,9 +9407,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     Copy = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docpCore.main_";
                     Checked = ((editRecord.id != 0) && (editRecord.id == (cpCore.siteProperties.getInteger("LandingPageID", 0))));
                     if (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
-                        HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("LandingPageID", Checked);
+                        HTMLFieldString = cpCore.html.inputCheckbox("LandingPageID", Checked);
                     } else {
-                        HTMLFieldString = "<b>" + genericController.GetYesNo(Checked) + "</b>" + cpCore.html.html_GetFormInputHidden("LandingPageID", Checked);
+                        HTMLFieldString = "<b>" + genericController.GetYesNo(Checked) + "</b>" + cpCore.html.inputHidden("LandingPageID", Checked);
                     }
                     //HTMLFieldString = HTMLFieldString;
                     FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Set Default Landing Page", Copy, false, false, ""));
@@ -9418,9 +9419,9 @@ namespace Contensive.Core.Addons.AdminSite {
                     Copy = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked.";
                     Checked = ((editRecord.id != 0) && (editRecord.id == (cpCore.siteProperties.getInteger("PageNotFoundPageID", 0))));
                     if (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
-                        HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("PageNotFound", Checked);
+                        HTMLFieldString = cpCore.html.inputCheckbox("PageNotFound", Checked);
                     } else {
-                        HTMLFieldString = "<b>" + genericController.GetYesNo(Checked) + "</b>" + cpCore.html.html_GetFormInputHidden("PageNotFound", Checked);
+                        HTMLFieldString = "<b>" + genericController.GetYesNo(Checked) + "</b>" + cpCore.html.inputHidden("PageNotFound", Checked);
                     }
                     //            If (EditRecord.ID <> 0) And (EditRecord.ID = cpCore.main_GetSiteProperty2("PageNotFoundPageID", "0", True)) Then
                     //                HTMLFieldString = cpCore.main_GetFormInputCheckBox2("PageNotFound", True)
@@ -9499,7 +9500,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         if (cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)) {
                             HTMLFieldString = cpCore.html.html_GetFormInputText2("ccguid", HTMLFieldString,-1,-1,"",false, false) + "";
                         } else {
-                            HTMLFieldString = cpCore.html.html_GetFormInputText2("ccguid", HTMLFieldString,-1,-1,"",false, true) + cpCore.html.html_GetFormInputHidden("ccguid", HTMLFieldString);
+                            HTMLFieldString = cpCore.html.html_GetFormInputText2("ccguid", HTMLFieldString,-1,-1,"",false, true) + cpCore.html.inputHidden("ccguid", HTMLFieldString);
                         }
                     }
                     FastString.Add(Adminui.GetEditRow(HTMLFieldString, "GUID", FieldHelp, false, false, ""));
@@ -9550,7 +9551,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     //
                     if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
-                        HTMLFieldString = HTMLFieldString + cpCore.html.html_GetFormInputHidden("ContentControlID", FieldValueInteger);
+                        HTMLFieldString = HTMLFieldString + cpCore.html.inputHidden("ContentControlID", FieldValueInteger);
                     } else {
                         RecordContentName = editRecord.contentControlId_Name;
                         cdefModel RecordCDef = null;
@@ -9778,7 +9779,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (string.IsNullOrEmpty(SitePropertyName)) {
                     HTMLFieldString = "This Site Property is not defined";
                 } else {
-                    HTMLFieldString = cpCore.html.html_GetFormInputHidden("name", SitePropertyName);
+                    HTMLFieldString = cpCore.html.inputHidden("name", SitePropertyName);
                     Dictionary<string, string> instanceOptions = new Dictionary<string, string>();
                     Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
                     instanceOptions.Add(SitePropertyName, SitePropertyValue);
@@ -10026,7 +10027,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // --- Start a form to make a refresh button
                 //
-                Stream.Add(cpCore.html.html_GetFormStart());
+                Stream.Add(cpCore.html.formStart());
                 Stream.Add(cpCore.html.getPanelButtons(ButtonCancel + "," + ButtonRefresh, "" + RequestNameButton + ""));
                 Stream.Add("<input TYPE=\"hidden\" NAME=\"asf\" VALUE=\"" + AdminFormQuickStats + "\">");
                 Stream.Add(cpCore.html.getPanel(" "));
@@ -10335,7 +10336,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     if (readOnlyField) {
                         f.Add("No");
                     } else {
-                        f.Add(cpCore.html.html_GetFormInputCheckBox2("OverrideDuplicate", false));
+                        f.Add(cpCore.html.inputCheckbox("OverrideDuplicate", false));
                     }
                     f.Add("</span></td></tr>");
                     //
@@ -10704,7 +10705,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             f.Add("<tr><td class=\"ccAdminEditCaption\">" + Caption + "</td>");
                             f.Add("<td class=\"ccAdminEditField\">");
                             f.Add("<table border=0 cellpadding=0 cellspacing=0 width=\"100%\" ><tr>");
-                            f.Add("<td width=\"40%\">" + cpCore.html.html_GetFormInputHidden("Memberrules." + GroupCount + ".ID", GroupID) + cpCore.html.html_GetFormInputCheckBox2("MemberRules." + GroupCount, GroupActive) + GroupCaption + "</td>");
+                            f.Add("<td width=\"40%\">" + cpCore.html.inputHidden("Memberrules." + GroupCount + ".ID", GroupID) + cpCore.html.inputCheckbox("MemberRules." + GroupCount, GroupActive) + GroupCaption + "</td>");
                             f.Add("<td width=\"30%\"> Expires " + cpCore.html.html_GetFormInputText2("MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20) + "</td>");
                             f.Add("<td width=\"30%\">" + ReportLink + "</td>");
                             f.Add("</tr></table>");
@@ -10990,13 +10991,13 @@ namespace Contensive.Core.Addons.AdminSite {
                             FastString.Add("<input type=\"hidden\" name=\"GroupID" + GroupCount + "\" value=\"" + cpCore.db.csGet(CS, "ID") + "\">");
                             FastString.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"400\"><tr>");
                             if (GroupFound) {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("Group" + GroupCount, true) + GroupName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("GroupRuleAllowAdd" + GroupCount, GroupRules[GroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("GroupRuleAllowDelete" + GroupCount, GroupRules[GroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
+                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("Group" + GroupCount, true) + GroupName + "</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("GroupRuleAllowAdd" + GroupCount, GroupRules[GroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("GroupRuleAllowDelete" + GroupCount, GroupRules[GroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
                             } else {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("Group" + GroupCount, false) + GroupName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("GroupRuleAllowAdd" + GroupCount, false) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("GroupRuleAllowDelete" + GroupCount, false) + " Allow Delete</span></td>");
+                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("Group" + GroupCount, false) + GroupName + "</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("GroupRuleAllowAdd" + GroupCount, false) + " Allow Add</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("GroupRuleAllowDelete" + GroupCount, false) + " Allow Delete</span></td>");
                             }
                             FastString.Add("</tr></table>");
                             FastString.Add("</span></td>");
@@ -11107,13 +11108,13 @@ namespace Contensive.Core.Addons.AdminSite {
                             FastString.Add("<input type=\"hidden\" name=\"ContentID" + ContentCount + "\" value=\"" + cpCore.db.csGet(CS, "ID") + "\">");
                             FastString.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"400\"><tr>");
                             if (ContentFound) {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("Content" + ContentCount, true) + ContentName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("ContentGroupRuleAllowAdd" + ContentCount, ContentGroupRules[ContentGroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("ContentGroupRuleAllowDelete" + ContentCount, ContentGroupRules[ContentGroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
+                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("Content" + ContentCount, true) + ContentName + "</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("ContentGroupRuleAllowAdd" + ContentCount, ContentGroupRules[ContentGroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("ContentGroupRuleAllowDelete" + ContentCount, ContentGroupRules[ContentGroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
                             } else {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("Content" + ContentCount, false) + ContentName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("ContentGroupRuleAllowAdd" + ContentCount, false) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.html_GetFormInputCheckBox2("ContentGroupRuleAllowDelete" + ContentCount, false) + " Allow Delete</span></td>");
+                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("Content" + ContentCount, false) + ContentName + "</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("ContentGroupRuleAllowAdd" + ContentCount, false) + " Allow Add</span></td>");
+                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + cpCore.html.inputCheckbox("ContentGroupRuleAllowDelete" + ContentCount, false) + " Allow Delete</span></td>");
                             }
                             FastString.Add("</tr></table>");
                             FastString.Add("</span></td>");
@@ -12125,7 +12126,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 s = genericController.vbReplace(s, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\">");
                 s = genericController.vbReplace(s, ">", " autocomplete=\"off\">");
                 s = genericController.vbReplace(s, ">", " id=\"adminEditForm\">");
-                s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
+                s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
                 s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + TitleExtension + "\">";
                 s = s + "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + MenuDepth + "\">";
                 s = s + "\r\n<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
@@ -12854,7 +12855,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             RecordID = cpCore.db.csGetInteger(CS, "ID");
                             DateCompleted = cpCore.db.csGetDate(CS, "DateCompleted");
                             ResultMessage = cpCore.db.csGetText(CS, "ResultMessage");
-                            Cells[RowPointer, 0] = cpCore.html.html_GetFormInputCheckBox2("Row" + RowPointer) + cpCore.html.html_GetFormInputHidden("RowID" + RowPointer, RecordID);
+                            Cells[RowPointer, 0] = cpCore.html.inputCheckbox("Row" + RowPointer) + cpCore.html.inputHidden("RowID" + RowPointer, RecordID);
                             Cells[RowPointer, 1] = cpCore.db.csGetText(CS, "name");
                             Cells[RowPointer, 2] = cpCore.db.csGetText(CS, "CreatedByName");
                             Cells[RowPointer, 3] = cpCore.db.csGetDate(CS, "DateAdded").ToShortDateString();
@@ -12898,7 +12899,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         }
                     }
                     cpCore.db.csClose(ref CS);
-                    Tab0.Add(cpCore.html.html_GetFormInputHidden("RowCnt", RowPointer));
+                    Tab0.Add(cpCore.html.inputHidden("RowCnt", RowPointer));
                     Cell = Adminui.GetReport(RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add(Cell);
                     //Tab0.Add( "<div style=""height:200px;"">" & Cell & "</div>"
@@ -12936,7 +12937,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     ButtonListLeft = ButtonCancel + "," + ButtonRefresh + "," + ButtonDelete;
                     //ButtonListLeft = ButtonCancel & "," & ButtonRefresh & "," & ButtonDelete & "," & ButtonRequestDownload
                     ButtonListRight = "";
-                    Content = Content + cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormDownloads);
+                    Content = Content + cpCore.html.inputHidden(rnAdminSourceForm, AdminFormDownloads);
                 }
                 //
                 Caption = "Download Manager";
@@ -13111,7 +13112,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //
                 // moved this to GetEditTabContent - so one is added for each tab.
                 //
-                returnHtml += cpCore.html.html_GetFormInputHidden("FormFieldList", FormFieldList);
+                returnHtml += cpCore.html.inputHidden("FormFieldList", FormFieldList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -13480,7 +13481,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         while (cpCore.db.csOk(CS) && (RowPointer < PageSize)) {
                             RecordID = cpCore.db.csGetInteger(CS, "ID");
                             //DateCompleted = cpCore.db.cs_getDate(CS, "DateCompleted")
-                            Cells[RowPointer, 0] = cpCore.html.html_GetFormInputCheckBox2("Row" + RowPointer) + cpCore.html.html_GetFormInputHidden("RowID" + RowPointer, RecordID);
+                            Cells[RowPointer, 0] = cpCore.html.inputCheckbox("Row" + RowPointer) + cpCore.html.inputHidden("RowID" + RowPointer, RecordID);
                             Cells[RowPointer, 1] = cpCore.db.csGetText(CS, "name");
                             Cells[RowPointer, 2] = cpCore.db.csGet(CS, "CreatedBy");
                             Cells[RowPointer, 3] = cpCore.db.csGetDate(CS, "DateAdded").ToShortDateString();
@@ -13491,7 +13492,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     }
                     cpCore.db.csClose(ref CS);
                     string Cell = null;
-                    Tab0.Add(cpCore.html.html_GetFormInputHidden("RowCnt", RowPointer));
+                    Tab0.Add(cpCore.html.inputHidden("RowCnt", RowPointer));
                     adminUIController Adminui = new adminUIController(cpCore);
                     Cell = Adminui.GetReport(RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add("<div>" + Cell + "</div>");
@@ -14106,8 +14107,8 @@ namespace Contensive.Core.Addons.AdminSite {
                         FieldValue = cpCore.html.html_GetFormInputText2("ChildContentName", ChildContentName, 1, 40);
                         Content.Add(Adminui.GetEditRow(FieldValue, "New Child Content Name", "", false, false, ""));
                         //
-                        FieldValue = cpCore.html.html_GetFormInputRadioBox("NewGroup", false.ToString(), NewGroup.ToString()) + cpCore.html.main_GetFormInputSelect2("GroupID", GroupID, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
-                            + "<br>" + cpCore.html.html_GetFormInputRadioBox("NewGroup", true.ToString(), NewGroup.ToString()) + cpCore.html.html_GetFormInputText2("NewGroupName", NewGroupName) + "(Create a new group)";
+                        FieldValue = cpCore.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + cpCore.html.main_GetFormInputSelect2("GroupID", GroupID, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
+                            + "<br>" + cpCore.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + cpCore.html.html_GetFormInputText2("NewGroupName", NewGroupName) + "(Create a new group)";
                         Content.Add(Adminui.GetEditRow(FieldValue, "Content Manager Group", "", false, false, ""));
                         //            '
                         //            FieldValue = cpCore.main_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry) & "(Add Navigator Entry under Manager Site Content &gt; Advanced)"
@@ -14118,7 +14119,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         ButtonList = ButtonOK + "," + ButtonCancel;
                     }
-                    Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormContentChildTool));
+                    Content.Add(cpCore.html.inputHidden(rnAdminSourceForm, AdminFormContentChildTool));
                 }
                 //
                 Caption = "Create Content Definition";
@@ -14350,11 +14351,11 @@ namespace Contensive.Core.Addons.AdminSite {
                     Content.Add(Adminui.GetEditRow(Copy, Caption));
                     //
                     Caption = "Purge Content Files";
-                    Copy = cpCore.html.html_GetFormInputCheckBox2("ArchiveAllowFileClean", ArchiveAllowFileClean) + "&nbsp;Delete Contensive content files with no associated database record.";
+                    Copy = cpCore.html.inputCheckbox("ArchiveAllowFileClean", ArchiveAllowFileClean) + "&nbsp;Delete Contensive content files with no associated database record.";
                     Content.Add(Adminui.GetEditRow(Copy, Caption));
                     //
                     Content.Add(Adminui.EditTableClose);
-                    Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminformHousekeepingControl));
+                    Content.Add(cpCore.html.inputHidden(rnAdminSourceForm, AdminformHousekeepingControl));
                     ButtonList = ButtonCancel + ",Refresh," + ButtonSave + "," + ButtonOK;
                 }
                 //
@@ -14516,7 +14517,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (RecordID != 0) {
                     EditIcon = "<a href=\"?cid=" + cdefModel.getContentId(cpCore, ContentName) + "&id=" + RecordID + "&" + RequestNameAdminForm + "=4\" target=_blank><img src=\"/ccLib/images/IconContentEdit.gif\" border=0 alt=\"Edit content\" valign=absmiddle></a>";
                 } else {
-                    EditIcon = "<a href=\"?cid=" + cdefModel.getContentId(cpCore, ContentName) + "&" + RequestNameAdminForm + "=4&" + RequestNameAdminAction + "=2&ad=1&wc=" + genericController.EncodeURL("name=" + CopyName) + "\" target=_blank><img src=\"/ccLib/images/IconContentEdit.gif\" border=0 alt=\"Edit content\" valign=absmiddle></a>";
+                    EditIcon = "<a href=\"?cid=" + cdefModel.getContentId(cpCore, ContentName) + "&" + RequestNameAdminForm + "=4&" + rnAdminAction + "=2&ad=1&wc=" + genericController.EncodeURL("name=" + CopyName) + "\" target=_blank><img src=\"/ccLib/images/IconContentEdit.gif\" border=0 alt=\"Edit content\" valign=absmiddle></a>";
                 }
                 if (string.IsNullOrEmpty(Copy)) {
                     Copy = "&nbsp;";
@@ -14596,7 +14597,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         //
                         Content = ""
                             + "<p>You must be a content manager of " + adminContent.Name + " to use this tool. Hit Cancel to return to main admin page.</p>"
-                            + cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
+                            + cpCore.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                         ButtonList = ButtonCancelAll;
                     } else {
                         IsRecordLimitSet = false;
@@ -14667,7 +14668,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 Content = ""
                                     + "<p>This selection has no records.. Hit Cancel to return to the " + adminContent.Name + " list page.</p>"
-                                    + cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
+                                    + cpCore.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 ButtonList = ButtonCancel;
                             } else if (Button == ButtonRequestDownload) {
                                 //
@@ -14684,7 +14685,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                 //
                                 Content = ""
                                     + "<p>Your export has been requested and will be available shortly in the <a href=\"?" + RequestNameAdminForm + "=" + AdminFormDownloads + "\">Download Manager</a>. Hit Cancel to return to the " + adminContent.Name + " list page.</p>"
-                                    + cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
+                                    + cpCore.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 //
                                 ButtonList = ButtonCancel;
                             } else {
@@ -14725,7 +14726,7 @@ namespace Contensive.Core.Addons.AdminSite {
                                     + cr2 + ".exportTblCaption {width:100px;}"
                                     + cr2 + ".exportTblInput {}"
                                     + "\r</style>"
-                                    + Content + cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
+                                    + Content + cpCore.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) + "";
                                 ButtonList = ButtonCancel + "," + ButtonRequestDownload;
                                 if (cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)) {
                                     ButtonList = ButtonList + "," + ButtonRefresh;
@@ -15330,7 +15331,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 //Stream.Add( cpCore.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
 
                 Content = ""
-                    + Stream.Text + cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns) + "";
+                    + Stream.Text + cpCore.html.inputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns) + "";
                 tempGetForm_Index_SetColumns = Adminui.GetBody(Title, ButtonOK + "," + ButtonReset, "", false, false, Description, "", 10, Content);
                 //
                 //
@@ -15578,9 +15579,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                     AllowPublic = genericController.encodeBoolean("," + PublicList + ",".IndexOf("," + FeatureName + ",", System.StringComparison.OrdinalIgnoreCase) + 1);
                                     Copy += "\r\n<tr>"
                                         + TDLeft + FeatureName + "</td>"
-                                        + TDCenter + cpCore.html.html_GetFormInputCheckBox2(FeatureName + ".admin", AllowAdmin) + "</td>"
-                                        + TDCenter + cpCore.html.html_GetFormInputCheckBox2(FeatureName + ".cm", AllowCM) + "</td>"
-                                        + TDCenter + cpCore.html.html_GetFormInputCheckBox2(FeatureName + ".public", AllowPublic) + "</td>"
+                                        + TDCenter + cpCore.html.inputCheckbox(FeatureName + ".admin", AllowAdmin) + "</td>"
+                                        + TDCenter + cpCore.html.inputCheckbox(FeatureName + ".cm", AllowCM) + "</td>"
+                                        + TDCenter + cpCore.html.inputCheckbox(FeatureName + ".public", AllowPublic) + "</td>"
                                         + "</tr>";
                                     RowPtr = RowPtr + 1;
                                 }
@@ -15594,7 +15595,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             Copy = "\r\n" + genericController.StartTable(20, 0, 0) + "<tr><td>" + genericController.htmlIndent(Copy) + "</td></tr>\r\n" + kmaEndTable;
                             Content.Add(Copy);
                             ButtonList = ButtonCancel + "," + ButtonRefresh + "," + ButtonSave + "," + ButtonOK;
-                            Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEditorConfig));
+                            Content.Add(cpCore.html.inputHidden(rnAdminSourceForm, AdminFormEditorConfig));
                             cpCore.html.addTitle("Editor Settings");
                             tempGetForm_EditConfig = Adminui.GetBody("Editor Configuration", ButtonList, "", true, true, Description, "", 0, Content.Text);
                         }
@@ -15665,7 +15666,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // List Add-ons to include
                     //
 
-                    Copy = cpCore.html.html_GetFormInputCheckBox2("AllowAutoLogin", AllowAutoLogin);
+                    Copy = cpCore.html.inputCheckbox("AllowAutoLogin", AllowAutoLogin);
                     Copy += "<div>When checked, returning users are automatically logged-in, without requiring a username or password. This is very convenient, but creates a high security risk. Each time you login, you will be given the option to not allow Auto-Login from that computer.</div>";
                     Content.Add(Adminui.GetEditRow(Copy, "Allow Auto Login", "", false, false, ""));
                     //
@@ -15676,7 +15677,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Close Tables
                     //
                     Content.Add(Adminui.EditTableClose);
-                    Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormBuilderCollection));
+                    Content.Add(cpCore.html.inputHidden(rnAdminSourceForm, AdminFormBuilderCollection));
                 }
                 //
                 Description = "Use this tool to modify the site security settings";
@@ -16538,7 +16539,7 @@ namespace Contensive.Core.Addons.AdminSite {
         //
         private string GetFormInputDateWithFocus2(string ElementName, string CurrentValue = "", string Width = "", string ElementID = "", string OnFocusJavascript = "", string HtmlClass = "") {
             string tempGetFormInputDateWithFocus2 = null;
-            tempGetFormInputDateWithFocus2 = cpCore.html.html_GetFormInputDate(ElementName, CurrentValue, Width, ElementID);
+            tempGetFormInputDateWithFocus2 = cpCore.html.inputDate(ElementName, CurrentValue, Width, ElementID);
             if (!string.IsNullOrEmpty(OnFocusJavascript)) {
                 tempGetFormInputDateWithFocus2 = genericController.vbReplace(tempGetFormInputDateWithFocus2, ">", " onFocus=\"" + OnFocusJavascript + "\">");
             }
@@ -16653,12 +16654,12 @@ namespace Contensive.Core.Addons.AdminSite {
                     // ----- ButtonBar
                     //
                     if (MenuDepth > 0) {
-                        LeftButtons += cpCore.html.html_GetFormButton(ButtonClose,"","", "window.close();");
+                        LeftButtons += cpCore.html.inputButton(ButtonClose,"","", "window.close();");
                     } else {
-                        LeftButtons += cpCore.html.html_GetFormButton(ButtonCancel);
+                        LeftButtons += cpCore.html.inputButton(ButtonCancel);
                         //LeftButtons &= cpCore.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
                     }
-                    LeftButtons += cpCore.html.html_GetFormButton(ButtonSearch);
+                    LeftButtons += cpCore.html.inputButton(ButtonSearch);
                     //LeftButtons &= cpCore.main_GetFormButton(ButtonSearch, , , "return processSubmit(this)")
                     ButtonBar = Adminui.GetButtonBar(LeftButtons, "");
                     //
@@ -16789,7 +16790,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     //
                     RowPointer = 0;
                     for (FieldPtr = 0; FieldPtr < FieldCnt; FieldPtr++) {
-                        returnForm = returnForm + cpCore.html.html_GetFormInputHidden("fieldname" + FieldPtr, FieldNames[FieldPtr]);
+                        returnForm = returnForm + cpCore.html.inputHidden("fieldname" + FieldPtr, FieldNames[FieldPtr]);
                         RowEven = ((RowPointer % 2) == 0);
                         FieldMatchOption = FieldMatchOptions[FieldPtr];
                         switch (fieldTypeId[FieldPtr]) {
@@ -16801,12 +16802,12 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
                                 + "<td class=\"ccAdminEditField\">"
                                 + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEquals).ToString(), FieldMatchOption.ToString(), "") + "=</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEquals).ToString(), FieldMatchOption.ToString(), "") + "=</div>"
+                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
+                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
                                 + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputDateWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], "5", "", "", "ccAdvSearchText") + "</div>"
                                 + "</div>"
                                 + "</td>"
@@ -16824,12 +16825,12 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
                                 + "<td class=\"ccAdminEditField\">"
                                 + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "n" + FieldPtr) + "=</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
-                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "n" + FieldPtr) + "=</div>"
+                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
+                                + "<div style=\"display:block;float:left;width:50px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
                                 + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('n" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
                                 + "</div>"
                                 + "</td>"
@@ -16868,9 +16869,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
                                 + "<td class=\"ccAdminEditField\">"
                                 + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
                                 + "</div>"
                                 + "</td>"
                                 + "</tr>";
@@ -16898,9 +16899,9 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
                                 + "<td class=\"ccAdminEditField\">"
                                 + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchTrue).ToString(), FieldMatchOption.ToString(), "") + "true</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchFalse).ToString(), FieldMatchOption.ToString(), "") + "false</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchTrue).ToString(), FieldMatchOption.ToString(), "") + "true</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchFalse).ToString(), FieldMatchOption.ToString(), "") + "false</div>"
                                 + "</div>"
                                 + "</td>"
                                 + "</tr>";
@@ -16933,10 +16934,10 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
                                 + "<td class=\"ccAdminEditField\">"
                                 + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                                + "<div style=\"display:block;float:left;width:150px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                                + "<div style=\"display:block;float:left;width:150px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
                                 + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
                                 + "</div>"
                                 + "</td>"
@@ -17000,10 +17001,10 @@ namespace Contensive.Core.Addons.AdminSite {
                                 + "<td class=\"ccAdminEditCaption\">" + FieldCaption[FieldPtr] + "</td>"
                                 + "<td class=\"ccAdminEditField\">"
                                 + "<div style=\"display:block;float:left;width:800px;\">"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
-                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
-                                + "<div style=\"display:block;float:left;width:150px;\">" + cpCore.html.html_GetFormInputRadioBox("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchIgnore).ToString(), FieldMatchOption.ToString(), "") + "ignore</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
+                                + "<div style=\"display:block;float:left;width:100px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
+                                + "<div style=\"display:block;float:left;width:150px;\">" + cpCore.html.inputRadio("FieldMatch" + FieldPtr, EncodeInteger(FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
                                 + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2("fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
                                 + "</div>"
                                 + "</td>"
@@ -17056,7 +17057,7 @@ namespace Contensive.Core.Addons.AdminSite {
                     // Assemble LiveWindowTable
                     //
                     //        Stream.Add( OpenLiveWindowTable)
-                    Stream.Add("\r\n" + cpCore.html.html_GetFormStart());
+                    Stream.Add("\r\n" + cpCore.html.formStart());
                     Stream.Add(ButtonBar);
                     Stream.Add(TitleBar);
                     Stream.Add(Content);

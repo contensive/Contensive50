@@ -748,7 +748,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                                                 //
                                                                 // Not installed yet
                                                                 //
-                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + cpCore.html.html_GetFormInputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + cpCore.html.html_GetFormInputHidden("LibraryRowName" + RowPtr, Collectionname);
+                                                                Cells3[RowPtr, 0] = "<input TYPE=\"CheckBox\" NAME=\"LibraryRow\" VALUE=\"" + RowPtr + "\" onClick=\"clearLibraryRows('" + RowPtr + "');\">" + cpCore.html.inputHidden("LibraryRowGuid" + RowPtr, CollectionGuid) + cpCore.html.inputHidden("LibraryRowName" + RowPtr, Collectionname);
                                                                 //Cells3(RowPtr, 0) = cpcore.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & cpcore.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & cpcore.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
                                                                 Cells3[RowPtr, 1] = Collectionname + "&nbsp;";
                                                                 Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
@@ -776,7 +776,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     + "<div style=\"width:100%\">" + Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>"
                                     + "";
                                     BodyHTML = Adminui.GetEditPanel(true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
-                                    BodyHTML = BodyHTML + cpCore.html.html_GetFormInputHidden("AOCnt", RowPtr);
+                                    BodyHTML = BodyHTML + cpCore.html.inputHidden("AOCnt", RowPtr);
                                     cpCore.html.addLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                                 }
                                 //
@@ -838,7 +838,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 Cells = tempVar3;
                                 RowPtr = 0;
                                 while (cpCore.db.csOk(CS)) {
-                                    Cells[RowPtr, 0] = cpCore.html.html_GetFormInputCheckBox2("AC" + RowPtr) + cpCore.html.html_GetFormInputHidden("ACID" + RowPtr, cpCore.db.csGetInteger(CS, "ID"));
+                                    Cells[RowPtr, 0] = cpCore.html.inputCheckbox("AC" + RowPtr) + cpCore.html.inputHidden("ACID" + RowPtr, cpCore.db.csGetInteger(CS, "ID"));
                                     //Cells(RowPtr, 1) = "<a href=""" & cpcore.app.SiteProperty_AdminURL & "?id=" & cpcore.app.cs_getInteger(CS, "ID") & "&cid=" & cpcore.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
                                     Cells[RowPtr, 1] = cpCore.db.csGetText(CS, "name");
                                     if (DisplaySystem) {
@@ -852,7 +852,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 cpCore.db.csClose(ref CS);
                                 BodyHTML = "<div style=\"width:100%\">" + Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
                                 BodyHTML = Adminui.GetEditPanel(true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
-                                BodyHTML = BodyHTML + cpCore.html.html_GetFormInputHidden("accnt", RowPtr);
+                                BodyHTML = BodyHTML + cpCore.html.inputHidden("accnt", RowPtr);
                                 cpCore.html.addLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
@@ -865,16 +865,16 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 } else {
                                     Body.Add(Adminui.EditTableOpen);
                                     if (cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)) {
-                                        Body.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
+                                        Body.Add(Adminui.GetEditRow(cpCore.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
                                     }
-                                    Body.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
+                                    Body.Add(Adminui.GetEditRow(cpCore.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));
                                     FormInput = ""
                                         + "<table id=\"UploadInsert\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
                                         + "</table>"
                                         + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
                                         + "<tr><td align=\"left\"><a href=\"#\" onClick=\"InsertUpload(); return false;\">+ Add more files</a></td></tr>"
                                         + "</table>"
-                                        + cpCore.html.html_GetFormInputHidden("UploadCount", 1, "UploadCount") + "";
+                                        + cpCore.html.inputHidden("UploadCount", 1, "UploadCount") + "";
                                     Body.Add(Adminui.GetEditRow(FormInput, "&nbsp;", "", true, false, ""));
                                     Body.Add(Adminui.EditTableClose);
                                 }
@@ -887,7 +887,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 Content.Add(cpCore.html.getLiveTabs());
                                 //
                                 ButtonList = ButtonCancel + "," + ButtonOK;
-                                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
+                                Content.Add(cpCore.html.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));
                             }
                         }
                     }

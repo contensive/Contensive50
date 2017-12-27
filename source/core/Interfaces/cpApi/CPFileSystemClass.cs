@@ -124,7 +124,7 @@ namespace Contensive.Core {
         //
         //==========================================================================================
         public override void deleteFolder(string folderPath) {
-            fileSystem.DeleteFileFolder(folderPath);
+            fileSystem.deleteFolder(folderPath);
         }
         //
         //==========================================================================================

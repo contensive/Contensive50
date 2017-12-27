@@ -309,5 +309,33 @@ namespace Contensive.Core.Controllers {
             Console.WriteLine("install, " + message);
             appendLog(cpCore, message, "install");
         }
+        //
+        //
+        //
+        public static  void housekeepLogFolder(coreClass cpCore) {
+            try {
+                //
+                DateTime LogDate = default(DateTime);
+                //Dim fs As New fileSystemClass
+                FileInfo[] FileList = null;
+                //
+                LogDate = DateTime.Now.AddDays(-30);
+                FileList = cpCore.privateFiles.getFileList("logs\\");
+                foreach (FileInfo file in FileList) {
+                    if (file.CreationTime < LogDate) {
+                        cpCore.privateFiles.deleteFile("logs\\" + file.Name);
+                    }
+                }
+                //
+                return;
+                //
+            } catch (Exception ex) {
+                ;
+            }
+            //ErrorTrap:
+            //throw new ApplicationException("Unexpected exception");
+        }
+
+
     }
 }

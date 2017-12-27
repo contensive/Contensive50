@@ -164,9 +164,9 @@ namespace Contensive.Core.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
                         + htmlIndent(loginForm) + "\r</table>"
                         + "";
-                    loginForm = loginForm + cpcore.html.html_GetFormInputHidden("Type", FormTypeLogin) + cpcore.html.html_GetFormInputHidden("email", cpcore.doc.authContext.user.Email) + cpcore.html.getPanelButtons(ButtonLogin, "Button") + "";
+                    loginForm = loginForm + cpcore.html.inputHidden("Type", FormTypeLogin) + cpcore.html.inputHidden("email", cpcore.doc.authContext.user.Email) + cpcore.html.getPanelButtons(ButtonLogin, "Button") + "";
                     loginForm = ""
-                        + cpcore.html.html_GetFormStart(QueryString) + htmlIndent(loginForm) + "\r</form>"
+                        + cpcore.html.formStart(QueryString) + htmlIndent(loginForm) + "\r</form>"
                         + "";
 
                     //-------
@@ -268,7 +268,7 @@ namespace Contensive.Core.Controllers {
                     //
                     //
                     returnResult = ""
-                    + returnResult + cpcore.html.html_GetFormInputHidden("Type", FormTypeSendPassword) + "";
+                    + returnResult + cpcore.html.inputHidden("Type", FormTypeSendPassword) + "";
                     foreach (string key in cpcore.docProperties.getKeyList()) {
                         var tempVar = cpcore.docProperties.getProperty(key);
                         if (tempVar.IsForm) {
@@ -281,7 +281,7 @@ namespace Contensive.Core.Controllers {
                                 case "EMAIL":
                                     break;
                                 default:
-                                    returnResult = returnResult + cpcore.html.html_GetFormInputHidden(tempVar.Name, tempVar.Value);
+                                    returnResult = returnResult + cpcore.html.inputHidden(tempVar.Name, tempVar.Value);
                                     break;
                             }
                         }
@@ -291,7 +291,7 @@ namespace Contensive.Core.Controllers {
                     QueryString = genericController.ModifyQueryString(QueryString, "S", "");
                     QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "");
                     returnResult = ""
-                    + cpcore.html.html_GetFormStart(QueryString) + htmlIndent(returnResult) + "\r</form>"
+                    + cpcore.html.formStart(QueryString) + htmlIndent(returnResult) + "\r</form>"
                     + "";
                 }
             } catch (Exception ex) {

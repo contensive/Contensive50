@@ -201,7 +201,7 @@ namespace Contensive.Core {
         //
         //====================================================================================================
         public string getFormInput(string ContentName, string FieldName, int HeightLines = 1, int WidthRows = 40, string HtmlId = "") {
-            return cpCore.html.html_GetFormInputCS(csPtr, ContentName, FieldName, HeightLines, WidthRows, HtmlId);
+            return cpCore.html.inputCs(csPtr, ContentName, FieldName, HeightLines, WidthRows, HtmlId);
         }
         //
         //====================================================================================================
