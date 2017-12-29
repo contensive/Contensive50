@@ -130,8 +130,9 @@ namespace Contensive.Core.Controllers {
         //
         public string emailBlockList_Local { get; set; } = "";
         public bool emailBlockListLocalLoaded { get; set; }
-
-        public TextWriterTraceListener myListener = null;
+        //
+        // list of log files, managed in logController
+        public Dictionary<string, TextWriterTraceListener> logList = new Dictionary<string, TextWriterTraceListener>();
         //
         //====================================================================================================
         // -- lookup contentId by contentName

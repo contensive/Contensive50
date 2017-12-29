@@ -52,81 +52,96 @@ namespace Contensive.Core.Controllers {
         /// <remarks></remarks>
         public static void appendLog(coreClass cpCore, string LogLine, string LogFolder = "", string LogNamePrefix = "", bool allowErrorHandling = true) {
             try {
-                //
-                int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
-                string threadName = threadId.ToString("00000000");
-                string absContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine + "\r\n";
                 Console.WriteLine(LogLine);
-                //
                 if (string.IsNullOrEmpty(LogFolder) || cpCore.serverConfig.enableLogging) {
-                    try {
-                        fileController fileSystem = null;
-                        if (cpCore.serverConfig != null) {
-                            if (cpCore.serverConfig.appConfig != null) {
+                    int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
+                    string threadName = threadId.ToString("00000000");
+                    string absContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
+                    //
+                    bool useTrace = false;
+                    if (useTrace) {
+                        string logName = (cpCore.serverConfig.appConfig.name + "/log/" + LogFolder).ToLower();
+                        if (!cpCore.doc.logList.ContainsKey(logName)) {
+                            string logPathFile = cpCore.privateFiles.rootLocalPath + "logs\\" + LogFolder.ToLower() + "\\" + getDateString(DateTime.Now) + ".log";
+                            if (!cpCore.privateFiles.fileExists(logPathFile)) {
+                                cpCore.privateFiles.appendFile(logPathFile, "");
+                            }
+                            cpCore.doc.logList.Add(logName, new TextWriterTraceListener(logPathFile, logName));
+                            //Console.WriteLine("createLog [" + logPathFile + "]");
+                        }
+                        cpCore.doc.logList[logName].WriteLine(absContent);
+                    } else {
+                        //
+                        // -- until trace works
+                        try {
+                            fileController fileSystem = null;
+                            if (cpCore.serverConfig != null) {
+                                if (cpCore.serverConfig.appConfig != null) {
+                                    //
+                                    // -- use app log space
+                                    fileSystem = cpCore.privateFiles;
+                                }
+                            }
+                            if (fileSystem == null) {
                                 //
-                                // -- use app log space
-                                fileSystem = cpCore.privateFiles;
+                                // -- no app or no server, use program data files
+                                fileSystem = cpCore.programDataFiles;
                             }
-                        }
-                        if (fileSystem == null) {
+                            string FilenameNoExt = getDateString(DateTime.Now);
+                            string logPath = LogFolder;
+                            if (!string.IsNullOrEmpty(logPath)) {
+                                logPath = logPath + "\\";
+                            }
+                            logPath = "logs\\" + logPath;
                             //
-                            // -- no app or no server, use program data files
-                            fileSystem = cpCore.programDataFiles;
-                        }
-                        string FilenameNoExt = getDateString(DateTime.Now);
-                        string logPath = LogFolder;
-                        if (!string.IsNullOrEmpty(logPath)) {
-                            logPath = logPath + "\\";
-                        }
-                        logPath = "logs\\" + logPath;
-                        //
-                        // check for serverconfig, then for appConfig, else use programdata folder
-                        //
-                        int FileSize = 0;
-                        if (!fileSystem.pathExists(logPath)) {
-                            fileSystem.createPath(logPath);
-                        } else {
-                            FileInfo[] logFiles = fileSystem.getFileList(logPath);
-                            foreach (FileInfo fileInfo in logFiles) {
-                                if (fileInfo.Name.ToLower() == FilenameNoExt.ToLower() + ".log") {
-                                    FileSize = (int)fileInfo.Length;
-                                    break;
+                            // check for serverconfig, then for appConfig, else use programdata folder
+                            //
+                            int FileSize = 0;
+                            if (!fileSystem.pathExists(logPath)) {
+                                fileSystem.createPath(logPath);
+                            } else {
+                                FileInfo[] logFiles = fileSystem.getFileList(logPath);
+                                foreach (FileInfo fileInfo in logFiles) {
+                                    if (fileInfo.Name.ToLower() == FilenameNoExt.ToLower() + ".log") {
+                                        FileSize = (int)fileInfo.Length;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        string PathFilenameNoExt = logPath + FilenameNoExt;
-                        //
-                        // -- add to log file
-                        if (FileSize < 10000000) {
-                            int RetryCnt = 0;
-                            bool SaveOK = false;
-                            string FileSuffix = "";
-                            while ((!SaveOK) && (RetryCnt < 10)) {
-                                SaveOK = true;
-                                try {
-                                    fileSystem.appendFile(PathFilenameNoExt + FileSuffix + ".log", absContent);
-                                } catch (IOException ex) {
-                                    //
-                                    // permission denied - happens when more then one process are writing at once, go to the next suffix
-                                    //
-                                    FileSuffix = "-" + (RetryCnt + 1).ToString();
-                                    RetryCnt = RetryCnt + 1;
-                                    SaveOK = false;
-                                } catch (Exception ex) {
-                                    //
-                                    // unknown error
-                                    //
-                                    FileSuffix = "-" + (RetryCnt + 1).ToString();
-                                    RetryCnt = RetryCnt + 1;
-                                    SaveOK = false;
+                            string PathFilenameNoExt = logPath + FilenameNoExt;
+                            //
+                            // -- add to log file
+                            if (FileSize < 10000000) {
+                                int RetryCnt = 0;
+                                bool SaveOK = false;
+                                string FileSuffix = "";
+                                while ((!SaveOK) && (RetryCnt < 10)) {
+                                    SaveOK = true;
+                                    try {
+                                        fileSystem.appendFile(PathFilenameNoExt + FileSuffix + ".log", absContent + "\r\n");
+                                    } catch (IOException ex) {
+                                        //
+                                        // permission denied - happens when more then one process are writing at once, go to the next suffix
+                                        //
+                                        FileSuffix = "-" + (RetryCnt + 1).ToString();
+                                        RetryCnt = RetryCnt + 1;
+                                        SaveOK = false;
+                                    } catch (Exception ex) {
+                                        //
+                                        // unknown error
+                                        //
+                                        FileSuffix = "-" + (RetryCnt + 1).ToString();
+                                        RetryCnt = RetryCnt + 1;
+                                        SaveOK = false;
+                                    }
                                 }
                             }
+                        } catch (Exception) {
+                            // -- ignore errors in error handling
                         }
-                    } catch (Exception ex) {
-                        // -- ignore errors in error handling
                     }
                 }
-            } catch (Exception ex) {
+            } catch (Exception) {
                 // -- ignore errors in error handling
             } finally {
                 //
@@ -184,17 +199,12 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Create a string with year, month, date in the form 20151206
         /// </summary>
-        /// <param name="sourceDate"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public static string getDateString(DateTime sourceDate) {
             return sourceDate.Year + sourceDate.Month.ToString().PadLeft(2, '0') + sourceDate.Day.ToString().PadLeft(2, '0');
         }
         //
         //=====================================================================================================
         //   Insert into the ActivityLog
-        //=====================================================================================================
-        //
         public static void logActivity(coreClass cpcore, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorID = 0, int VisitID = 0) {
             try {
                 //
@@ -213,7 +223,7 @@ namespace Contensive.Core.Controllers {
                 //
                 return;
                 //
-            } catch( Exception ex ) {
+            } catch (Exception ex) {
                 cpcore.handleException(ex);
             }
             //ErrorTrap:
@@ -228,11 +238,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         internal static void log_appendLogPageNotFound(coreClass cpCore, string PageNotFoundLink) {
-            try {
-                appendLog(cpCore, "\"" + cpCore.doc.profileStartTime.ToString("") + "\",\"App=" + cpCore.serverConfig.appConfig.name + "\",\"main_VisitId=" + cpCore.doc.authContext.visit.id + "\",\"" + PageNotFoundLink + "\",\"Referrer=" + cpCore.webServer.requestReferrer + "\"", "performance", "pagenotfound");
-            } catch (Exception ex) {
-                throw (ex);
-            }
+            appendLog(cpCore, "bad link [" + PageNotFoundLink + "], referrer [" + cpCore.webServer.requestReferrer + "]", "BadLink");
         }
         //
         //================================================================================================
@@ -259,7 +265,7 @@ namespace Contensive.Core.Controllers {
         //           count - the number of times the key was attempted to add. "This error was reported 100 times"
         //================================================================================================
         //
-        public static void csv_reportWarning(coreClass cpcore, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
+        public static void reportWarning(coreClass cpcore, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
             string SQL = null;
             int warningId = 0;
             int CS = 0;
@@ -310,23 +316,18 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         public static void appendDebugLog(coreClass cpCore, string message) {
-            if (cpCore.doc.myListener == null) {
-                cpCore.doc.myListener = new TextWriterTraceListener( cpCore.privateFiles.rootLocalPath + "debug\\" + getDateString(DateTime.Now) + ".log", "myListener");
-            }
-            cpCore.doc.myListener.WriteLine(message);
-            //appendLog(cpCore, message, "debug");
+            appendLog(cpCore, message, "debug");
         }
         //
         //====================================================================================================
         //
-        internal static void appendInstallLog(coreClass cpCore, string message) {
-            Console.WriteLine("install, " + message);
+        public static void appendInstallLog(coreClass cpCore, string message) {
             appendLog(cpCore, message, "install");
         }
         //
+        //====================================================================================================
         //
-        //
-        public static  void housekeepLogFolder(coreClass cpCore) {
+        public static void housekeepLogFolder(coreClass cpCore) {
             try {
                 //
                 DateTime LogDate = default(DateTime);
