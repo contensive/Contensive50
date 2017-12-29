@@ -106,7 +106,7 @@ namespace Contensive.Core.Addons.AdminSite {
                         + "\r\nresponse:"
                         + "\r\n" + returnHtml;
                 DateTime rightNow = DateTime.Now;
-                logController.appendLog(cpCore, SaveContent, "admin", rightNow.Year + rightNow.Month.ToString("00") + rightNow.Day.ToString("00") + rightNow.Hour.ToString("00") + rightNow.Minute.ToString("00") + rightNow.Second.ToString("00"));
+                //logController.appendLog(cpCore, SaveContent, "admin", rightNow.Year + rightNow.Month.ToString("00") + rightNow.Day.ToString("00") + rightNow.Hour.ToString("00") + rightNow.Minute.ToString("00") + rightNow.Second.ToString("00"));
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }

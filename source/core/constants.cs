@@ -674,6 +674,8 @@ namespace Contensive.Core {
         // Debugging info
         //------------------------------------------------------------------------
         //
+
+        public const bool useMicrosoftTraceLogging = false;
         public const int TestPointTab = 2;
         public const char debug_TestPointTabChr = '-';
         public static double CPTickCountBase;

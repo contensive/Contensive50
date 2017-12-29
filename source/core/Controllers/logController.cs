@@ -58,8 +58,7 @@ namespace Contensive.Core.Controllers {
                     string threadName = threadId.ToString("00000000");
                     string absContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
                     //
-                    bool useTrace = false;
-                    if (useTrace) {
+                    if (useMicrosoftTraceLogging) {
                         string logName = (cpCore.serverConfig.appConfig.name + "/log/" + LogFolder).ToLower();
                         if (!cpCore.doc.logList.ContainsKey(logName)) {
                             string logPathFile = cpCore.privateFiles.rootLocalPath + "logs\\" + LogFolder.ToLower() + "\\" + getDateString(DateTime.Now) + ".log";
@@ -100,13 +99,13 @@ namespace Contensive.Core.Controllers {
                             if (!fileSystem.pathExists(logPath)) {
                                 fileSystem.createPath(logPath);
                             } else {
-                                FileInfo[] logFiles = fileSystem.getFileList(logPath);
-                                foreach (FileInfo fileInfo in logFiles) {
-                                    if (fileInfo.Name.ToLower() == FilenameNoExt.ToLower() + ".log") {
-                                        FileSize = (int)fileInfo.Length;
-                                        break;
-                                    }
-                                }
+                                //FileInfo[] logFiles = fileSystem.getFileList(logPath);
+                                //foreach (FileInfo fileInfo in logFiles) {
+                                //    if (fileInfo.Name.ToLower() == FilenameNoExt.ToLower() + ".log") {
+                                //        FileSize = (int)fileInfo.Length;
+                                //        break;
+                                //    }
+                                //}
                             }
                             string PathFilenameNoExt = logPath + FilenameNoExt;
                             //
@@ -119,14 +118,14 @@ namespace Contensive.Core.Controllers {
                                     SaveOK = true;
                                     try {
                                         fileSystem.appendFile(PathFilenameNoExt + FileSuffix + ".log", absContent + "\r\n");
-                                    } catch (IOException ex) {
+                                    } catch (IOException) {
                                         //
                                         // permission denied - happens when more then one process are writing at once, go to the next suffix
                                         //
                                         FileSuffix = "-" + (RetryCnt + 1).ToString();
                                         RetryCnt = RetryCnt + 1;
                                         SaveOK = false;
-                                    } catch (Exception ex) {
+                                    } catch (Exception) {
                                         //
                                         // unknown error
                                         //

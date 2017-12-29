@@ -178,7 +178,7 @@ namespace Contensive.Core.Controllers {
         private void setWrappedContent(string key, cacheWrapperClass wrappedContent) {
             try {
                 //
-                logController.appendCacheLog(cpCore,"setWrappedContent(" + key + ")");
+                //logController.appendCacheLog(cpCore,"setWrappedContent(" + key + ")");
                 //
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("cache key cannot be blank");
@@ -242,8 +242,8 @@ namespace Contensive.Core.Controllers {
                 if (!(string.IsNullOrEmpty(key))) {
                     //
                     // -- read cacheWrapper
-                    logController.appendCacheLog(cpCore, "getObject(" + key + "), enter");
-                    Stopwatch sw = Stopwatch.StartNew();
+                    //logController.appendCacheLog(cpCore, "getObject(" + key + "), enter");
+                    //Stopwatch sw = Stopwatch.StartNew();
                     wrappedContent = getWrappedContent(key);
                     if (wrappedContent != null) {
                         //
@@ -259,7 +259,7 @@ namespace Contensive.Core.Controllers {
                             if (wrappedContent.dependentKeyList.Count == 0) {
                                 //
                                 // -- no dependent objects
-                                logController.appendCacheLog(cpCore,"GetObject(" + key + "), no dependentKeyList");
+                                //logController.appendCacheLog(cpCore,"GetObject(" + key + "), no dependentKeyList");
                             } else {
                                 foreach (string dependentKey in wrappedContent.dependentKeyList) {
                                     cacheWrapperClass dependantObject = getWrappedContent(dependentKey);
@@ -267,7 +267,7 @@ namespace Contensive.Core.Controllers {
                                         dateCompare = dependantObject.saveDate.CompareTo(wrappedContent.saveDate);
                                         if (dateCompare >= 0) {
                                             cacheMiss = true;
-                                            logController.appendCacheLog(cpCore,"GetObject(" + key + "), invalidated because the dependantobject [" + dependentKey + "] has a saveDate [" + dependantObject.saveDate.ToString() + "] after the cacheObject's dateDate [" + wrappedContent.saveDate.ToString() + "]");
+                                            logController.appendCacheLog(cpCore,"GetObject(" + key + "), invalidated because the dependantobject [" + dependentKey + "] has a saveDate [" + dependantObject.saveDate.ToString() + "] after the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "]");
                                             break;
                                         }
                                     }
@@ -301,8 +301,8 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                     }
-                    logController.appendCacheLog(cpCore,"getObject(" + key + "), exit(" + sw.ElapsedMilliseconds + "ms)");
-                    sw.Stop();
+                    //logController.appendCacheLog(cpCore,"getObject(" + key + "), exit(" + sw.ElapsedMilliseconds + "ms)");
+                    //sw.Stop();
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -324,7 +324,7 @@ namespace Contensive.Core.Controllers {
         private cacheWrapperClass getWrappedContent(string key) {
             cacheWrapperClass result = null;
             try {
-                logController.appendCacheLog(cpCore,"getWrappedContent(" + key + "), enter ");
+                //logController.appendCacheLog(cpCore,"getWrappedContent(" + key + "), enter ");
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("key cannot be blank");
                 } else {
@@ -350,7 +350,7 @@ namespace Contensive.Core.Controllers {
                             }
                         }
                         if (result != null) {
-                            logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), remoteCache hit");
+                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), remoteCache hit");
                         } else {
                             logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), remoteCache miss");
                         }
@@ -361,7 +361,7 @@ namespace Contensive.Core.Controllers {
                         //Dim cache As ObjectCache = MemoryCache.Default
                         result = (cacheWrapperClass)MemoryCache.Default[wrapperKey];
                         if (result != null) {
-                            logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), memoryCache hit");
+                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), memoryCache hit");
                         } else {
                             logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), memoryCache miss");
                         }
@@ -378,12 +378,12 @@ namespace Contensive.Core.Controllers {
                         if (string.IsNullOrEmpty(serializedDataObject)) {
                             logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), file miss");
                         } else {
-                            logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), file hit, write to memory cache");
+                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), file hit, write to memory cache");
                             result = Newtonsoft.Json.JsonConvert.DeserializeObject<cacheWrapperClass>(serializedDataObject);
                             setWrappedContent_MemoryCache(wrapperKey, result);
                         }
                         if (result != null) {
-                            logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), fileCache hit");
+                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), fileCache hit");
                         } else {
                             logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), fileCache miss");
                         }
@@ -396,7 +396,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), exit ");
+                //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), exit ");
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
