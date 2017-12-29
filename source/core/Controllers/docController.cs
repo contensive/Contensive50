@@ -59,64 +59,143 @@ namespace Contensive.Core.Controllers {
         //
         // -- others to be sorted
         public int editWrapperCnt { get; set; } = 0;
+        //
+        // -- todo
         public string docBodyFilter { get; set; } = "";
+        //
+        // -- todo
         public bool legacySiteStyles_Loaded { get; set; } = false;
+        //
+        // -- todo
         public int menuSystemCloseCount { get; set; } = 0;
-
+        //
+        // -- todo
         internal class helpStuff {
             public String code;
             public String caption;
         }
-
-        internal List<helpStuff> helpCodes { get; set; }
-
+        //
+        // -- In advanced edit, each addon edit header has several help-bubble popups. This is a list for them.
+        internal List<helpStuff> helpCodes { get; set; } = new List<helpStuff>();
+        //
+        // -- todo
         internal int helpDialogCnt { get; set; } = 0;
+        //
+        // -- todo
         public string refreshQueryString { get; set; } = ""; // the querystring required to return to the current state (perform a refresh)
+        //
+        // -- todo
         public int redirectContentID { get; set; } = 0;
+        //
+        // -- todo
         public int redirectRecordID { get; set; } = 0;
-        //Public Property isStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
+        //
+        // -- todo
         public bool outputBufferEnabled { get; set; } = true; // when true (default), stream is buffered until page is done
-                                                              // Public Property docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
-                                                              //Public Property metaContent_TemplateStyleSheetTag As String = ""
+        //
+        // -- todo
         public menuComboTabController menuComboTab { get; set; }
+        //
+        // -- todo
         public menuLiveTabController menuLiveTab { get; set; }
+        //
+        // -- todo
         public string adminWarning { get; set; } = ""; // Message - when set displays in an admin hint box in the page
+        //
+        // -- todo
         public int adminWarningPageID { get; set; } = 0; // PageID that goes with the warning
+        //
+        // -- todo
         public int checkListCnt { get; set; } = 0; // cnt of the main_GetFormInputCheckList calls - used for javascript
+        //
+        // -- todo
         public string includedAddonIDList { get; set; } = "";
+        //
+        // -- todo
         public int inputDateCnt { get; set; } = 0;
+        //
+        // -- todo
         public List<cacheInputSelectClass> inputSelectCache = new List<cacheInputSelectClass>() { };
+        //
+        // -- todo
         public int formInputTextCnt { get; set; } = 0;
+        //
+        // -- todo
         public string quickEditCopy { get; set; } = "";
+        //
+        // -- todo
         public string siteStructure { get; set; } = "";
+        //
+        // -- todo
         public bool siteStructure_LocalLoaded { get; set; } = false;
+        //
+        // -- todo
         public string bodyContent { get; set; } = ""; // stored here so cp.doc.content valid during bodyEnd event
+        //
+        // -- todo
         public int landingPageID { get; set; } = 0;
+        //
+        // -- todo
         public string redirectLink { get; set; } = "";
+        //
+        // -- todo
         public string redirectReason { get; set; } = "";
+        //
+        // -- todo
         public bool redirectBecausePageNotFound { get; set; } = false;
         //
-        // -- addon call depth. When an addon is called, it saves the value interanlly and increments. When level0 exits and htmlDocument is true, the output is wrapped with an html doc
-        //Public Property addonDepth As Integer = 0
+        // -- todo
         internal List<string> errList { get; set; } // exceptions collected during document construction
+        //
+        // -- todo
         public int errorCount { get; set; } = 0;
+        //
+        // -- todo
         internal List<string> userErrorList = new List<string>() { };
+        //
+        // -- todo
         public string debug_iUserError { get; set; } = ""; // User Error String
+        //
+        // -- todo
         public string trapLogMessage { get; set; } = ""; // The content of the current traplog (keep for popups if no Csv)
+        //
+        // -- todo
         public string testPointMessage { get; set; } = "";
+        //
+        // -- todo
         public bool visitPropertyAllowDebugging { get; set; } = false; // if true, send main_TestPoint messages to the stream
+        //
+        // -- todo
         public Models.Context.authContextModel authContext;
+        //
+        // -- todo
         internal Stopwatch appStopWatch { get; set; } = Stopwatch.StartNew();
+        //
+        // -- todo
         public DateTime profileStartTime { get; set; } // set in constructor
+        //
+        // -- todo
         public int profileStartTickCount { get; set; } = 0;
+        //
+        // -- todo
         public bool allowDebugLog { get; set; } = false; // turn on in script -- use to write /debug.log in content files for whatever is needed
+        //
+        // -- todo
         public bool blockExceptionReporting { get; set; } = false; // used so error reporting can not call itself
-                                                                   //Public Property pageErrorWithoutCsv As Boolean = False                  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
-                                                                   //Public Property closePageCounter As Integer = 0
+        //
+        // -- todo
         public bool continueProcessing { get; set; } = false; // when false, routines should not add to the output and immediately exit
+        //
+        // -- todo
         public bool upgradeInProgress { get; set; }
+        //
+        // -- todo
         internal List<int> addonIdListRunInThisDoc { get; set; } = new List<int>();
+        //
+        // -- todo
         internal List<int> addonsCurrentlyRunningIdList { get; set; } = new List<int>();
+        //
+        // -- todo
         public int pageAddonCnt { get; set; } = 0;
         //
         // -- persistant store for cdef complex model
@@ -125,13 +204,11 @@ namespace Contensive.Core.Controllers {
         // -- persistant store for tableSchema complex mode
         internal Dictionary<string, Models.Complex.tableSchemaModel> tableSchemaDictionary { get; set; }
         //
-        // Email Block List - these are people who have asked to not have email sent to them from this site
-        //   Loaded ondemand by csv_GetEmailBlockList
-        //
+        // -- Email Block List - these are people who have asked to not have email sent to them from this site, Loaded ondemand by csv_GetEmailBlockList
         public string emailBlockList_Local { get; set; } = "";
         public bool emailBlockListLocalLoaded { get; set; }
         //
-        // list of log files, managed in logController
+        // -- list of log files, managed in logController
         public Dictionary<string, TextWriterTraceListener> logList = new Dictionary<string, TextWriterTraceListener>();
         //
         //====================================================================================================
@@ -154,8 +231,7 @@ namespace Contensive.Core.Controllers {
         }
         internal void contentNameIdDictionaryClear() {
             _contentNameIdDictionary = null;
-        }
-        private Dictionary<string, int> _contentNameIdDictionary = null;
+        } private Dictionary<string, int> _contentNameIdDictionary = null;
         //
         //====================================================================================================
         // -- lookup contentModel by contentId
@@ -1726,51 +1802,44 @@ namespace Contensive.Core.Controllers {
             string tempVar = "";
             addLinkAlias(cpcore, linkAlias, PageID, QueryStringSuffix, false, false, ref tempVar);
         }
-
-        //INSTANT C# NOTE: Overloaded method(s) are created above to convert the following method having optional parameters:
-        //ORIGINAL LINE: Public Shared Sub addLinkAlias(cpcore As coreClass, linkAlias As String, PageID As Integer, QueryStringSuffix As String, Optional OverRideDuplicate As Boolean = False, Optional DupCausesWarning As Boolean = False, Optional ByRef return_WarningMessage As String = "")
+        //
+        //====================================================================================================
+        /// <summary>
+        /// process content after a save. tracked in admin, and contentSet activity
+        /// </summary>
         public static void addLinkAlias(coreClass cpcore, string linkAlias, int PageID, string QueryStringSuffix, bool OverRideDuplicate, bool DupCausesWarning, ref string return_WarningMessage) {
-            const string SafeString = "0123456789abcdefghijklmnopqrstuvwxyz-_/";
-            int Ptr = 0;
-            string TestChr = null;
-            string Src = null;
-            string FieldList = null;
-            int LinkAliasPageID = 0;
-            int PageContentCID = 0;
-            string WorkingLinkAlias = null;
-            int CS = 0;
-            bool AllowLinkAlias = false;
-            //
-            if (true) {
-                AllowLinkAlias = cpcore.siteProperties.getBoolean("allowLinkAlias", false);
-                WorkingLinkAlias = linkAlias;
+            try {
+                const string SafeString = "0123456789abcdefghijklmnopqrstuvwxyz-_/";
+                int Ptr = 0;
+                string TestChr = null;
+                string Src = null;
+                int LinkAliasPageID = 0;
+                int PageContentCID = 0;
+                int CS = 0;
+                bool AllowLinkAlias = cpcore.siteProperties.getBoolean("allowLinkAlias", false);
+                //
+                string WorkingLinkAlias = linkAlias;
                 if (!string.IsNullOrEmpty(WorkingLinkAlias)) {
                     //
                     // remove nonsafe URL characters
-                    //
-                    Src = WorkingLinkAlias;
-                    Src = genericController.vbReplace(Src, "’", "'");
-                    Src = genericController.vbReplace(Src, "\t", " ");
+                    Src = WorkingLinkAlias.Replace('\t',' ');
                     WorkingLinkAlias = "";
-                    //INSTANT C# NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of Len(Src) + 1 for every iteration:
-                    int tempVar2 = Src.Length + 1;
-                    for (Ptr = 1; Ptr <= tempVar2; Ptr++) {
-                        TestChr = Src.Substring(Ptr - 1, 1);
-                        if (genericController.vbInstr(1, SafeString, TestChr, 1) != 0) {
-                        } else {
+                    for (Ptr = 0; Ptr < Src.Length; Ptr++) {
+                        TestChr = Src.Substring(Ptr, 1);
+                        if (!SafeString.Contains(TestChr)) {
                             TestChr = "\t";
                         }
-                        WorkingLinkAlias = WorkingLinkAlias + TestChr;
+                        WorkingLinkAlias += TestChr;
                     }
                     Ptr = 0;
-                    while (genericController.vbInstr(1, WorkingLinkAlias, "\t\t") != 0 && (Ptr < 100)) {
+                    while (WorkingLinkAlias.Contains("\t\t") && (Ptr < 100)) {
                         WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, "\t\t", "\t");
                         Ptr = Ptr + 1;
                     }
                     if (WorkingLinkAlias.Substring(WorkingLinkAlias.Length - 1) == "\t") {
-                        WorkingLinkAlias = WorkingLinkAlias.Left( WorkingLinkAlias.Length - 1);
+                        WorkingLinkAlias = WorkingLinkAlias.Left(WorkingLinkAlias.Length - 1);
                     }
-                    if (WorkingLinkAlias.Left( 1) == "\t") {
+                    if (WorkingLinkAlias.Left(1) == "\t") {
                         WorkingLinkAlias = WorkingLinkAlias.Substring(1);
                     }
                     WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, "\t", "-");
@@ -1778,7 +1847,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Make sure there is not a folder or page in the wwwroot that matches this Alias
                         //
-                        if (WorkingLinkAlias.Left( 1) != "/") {
+                        if (WorkingLinkAlias.Left(1) != "/") {
                             WorkingLinkAlias = "/" + WorkingLinkAlias;
                         }
                         //
@@ -1814,15 +1883,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // Make sure there is one here for this
                             //
-                            if (true) {
-                                FieldList = "Name,PageID,QueryStringSuffix";
-                            } else {
-                                //
-                                // must be > 33914 to run this routine
-                                //
-                                FieldList = "Name,PageID,'' as QueryStringSuffix";
-                            }
-                            CS = cpcore.db.csOpen("Link Aliases", "name=" + cpcore.db.encodeSQLText(WorkingLinkAlias),"", false, 0, false, false, FieldList);
+                            CS = cpcore.db.csOpen("Link Aliases", "name=" + cpcore.db.encodeSQLText(WorkingLinkAlias), "", false, 0, false, false, "Name,PageID,QueryStringSuffix");
                             if (!cpcore.db.csOk(CS)) {
                                 //
                                 // Alias not found, create a Link Aliases
@@ -1907,6 +1968,9 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
+            } catch (Exception) {
+
+                throw;
             }
         }
         //
