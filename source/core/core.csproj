@@ -182,31 +182,36 @@
     <Compile Include="Controllers\_blankStaticController.cs" />
     <Compile Include="Extensions\extensionMethodsClass.cs" />
     <Compile Include="Extensions\webClientExtensionClass.cs" />
-    <Compile Include="Interfaces\coreClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPAddonClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPBlockClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPCacheClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPContentClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPContextClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPCSClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPDbClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPDocClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPEmailClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPFileClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPFileSystemClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPGroupClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPHtmlClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPRequestClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPResponseClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPSiteClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPUserClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPUserErrorClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPUtilsClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPVisitClass.cs" />
-    <Compile Include="Interfaces\cpApi\CPVisitorClass.cs" />
-    <Compile Include="Interfaces\cpApi\NumericHelper.cs" />
-    <Compile Include="Interfaces\mainCsvCompatibilityClass.cs" />
+    <Compile Include="Models\Entity\emailQueueModel.cs" />
+    <Compile Include="Models\Entity\conditionalEmailModel.cs" />
+    <Compile Include="Models\Entity\groupEmailModel.cs" />
+    <Compile Include="Models\Entity\systemEmailModel.cs" />
+    <Compile Include="Models\Entity\emailTemplateModel.cs" />
+    <Compile Include="Views\coreClass.cs" />
+    <Compile Include="Views\cpApi\CPAddonClass.cs" />
+    <Compile Include="Views\cpApi\CPBlockClass.cs" />
+    <Compile Include="Views\cpApi\CPCacheClass.cs" />
+    <Compile Include="Views\cpApi\CPClass.cs" />
+    <Compile Include="Views\cpApi\CPContentClass.cs" />
+    <Compile Include="Views\cpApi\CPContextClass.cs" />
+    <Compile Include="Views\cpApi\CPCSClass.cs" />
+    <Compile Include="Views\cpApi\CPDbClass.cs" />
+    <Compile Include="Views\cpApi\CPDocClass.cs" />
+    <Compile Include="Views\cpApi\CPEmailClass.cs" />
+    <Compile Include="Views\cpApi\CPFileClass.cs" />
+    <Compile Include="Views\cpApi\CPFileSystemClass.cs" />
+    <Compile Include="Views\cpApi\CPGroupClass.cs" />
+    <Compile Include="Views\cpApi\CPHtmlClass.cs" />
+    <Compile Include="Views\cpApi\CPRequestClass.cs" />
+    <Compile Include="Views\cpApi\CPResponseClass.cs" />
+    <Compile Include="Views\cpApi\CPSiteClass.cs" />
+    <Compile Include="Views\cpApi\CPUserClass.cs" />
+    <Compile Include="Views\cpApi\CPUserErrorClass.cs" />
+    <Compile Include="Views\cpApi\CPUtilsClass.cs" />
+    <Compile Include="Views\cpApi\CPVisitClass.cs" />
+    <Compile Include="Views\cpApi\CPVisitorClass.cs" />
+    <Compile Include="Views\cpApi\NumericHelper.cs" />
+    <Compile Include="Views\mainCsvCompatibilityClass.cs" />
     <Compile Include="Models\Complex\cdefFieldModel.cs" />
     <Compile Include="Models\Complex\cdefModel.cs" />
     <Compile Include="Models\Complex\routeDictionaryModel.cs" />
@@ -261,7 +266,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="aoBase5.xml" />
+    <Content Include="aoBase5.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Models\dataModelFields.txt" />
   </ItemGroup>
   <ItemGroup>

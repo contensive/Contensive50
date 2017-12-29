@@ -503,7 +503,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     // block the reset because we will loose the error message
                                     //
                                     //IISResetRequired = False
-                                    errorController.error_AddUserError(cpCore, "This Add-on Collection did not install correctly, " + ErrorMessage);
+                                    errorController.addUserError(cpCore, "This Add-on Collection did not install correctly, " + ErrorMessage);
                                 } else {
                                     //
                                     // Save the first collection as the installed collection
@@ -525,9 +525,9 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 UpgradeOK = collectionController.InstallCollectionsFromPrivateFolder(cpCore, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, ref nonCriticalErrorList);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
-                                        errorController.error_AddUserError(cpCore, "The Add-on Collection did not install correctly, but no detailed error message was given.");
+                                        errorController.addUserError(cpCore, "The Add-on Collection did not install correctly, but no detailed error message was given.");
                                     } else {
-                                        errorController.error_AddUserError(cpCore, "The Add-on Collection did not install correctly, " + ErrorMessage);
+                                        errorController.addUserError(cpCore, "The Add-on Collection did not install correctly, " + ErrorMessage);
                                     }
                                 } else {
                                     foreach (string installedCollectionGuid in InstalledCollectionGuidList) {
@@ -620,7 +620,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     UserError = "There was an error reading the Collection Library. The site may be unavailable.";
                                     HandleClassAppendLog("AddonManager", UserError);
                                     status += "<br>" + UserError;
-                                    errorController.error_AddUserError(cpCore, UserError);
+                                    errorController.addUserError(cpCore, UserError);
                                     parseError = true;
                                 }
                                 Ptr = 0;
@@ -629,7 +629,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                         UserError = "There was an error reading the Collection Library file. The '" + CollectionListRootNode + "' element was not found.";
                                         HandleClassAppendLog("AddonManager", UserError);
                                         status += "<br>" + UserError;
-                                        errorController.error_AddUserError(cpCore, UserError);
+                                        errorController.addUserError(cpCore, UserError);
                                     } else {
                                         //
                                         // Go through file to validate the XML, and build status message -- since service process can not communicate to user

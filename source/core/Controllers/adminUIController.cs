@@ -55,7 +55,7 @@ namespace Contensive.Core {
                 // Add Errors
                 //
                 if (cpCore.doc.debug_iUserError != "") {
-                    Copy += "<div>" + errorController.error_GetUserError(cpCore) + "</div>";
+                    Copy += "<div>" + errorController.getUserError(cpCore) + "</div>";
                 }
                 //
                 if (!string.IsNullOrEmpty(Copy)) {
@@ -166,25 +166,25 @@ namespace Contensive.Core {
                     //
                     // Reload Content Definitions
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.inputButton(ButtonSaveandInvalidateCache, RequestNameButton);
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.button(ButtonSaveandInvalidateCache, RequestNameButton);
                 }
                 if (AllowMarkReviewed) {
                     //
                     // Reload Content Definitions
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.inputButton(ButtonMarkReviewed, RequestNameButton);
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.button(ButtonMarkReviewed, RequestNameButton);
                 }
                 if (AllowRefresh) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.inputButton(ButtonRefresh, RequestNameButton);
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.button(ButtonRefresh, RequestNameButton);
                 }
                 if (AllowCreateDuplicate) {
                     //
                     // just like a save, but don't save jsut redraw
                     //
-                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.inputButton(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
+                    tempGetEditButtonBar2 = tempGetEditButtonBar2 + cpCore.html.button(ButtonCreateDuplicate, RequestNameButton, "", "return processSubmit(this)");
                 }
                 //
                 tempGetEditButtonBar2 = ""
@@ -262,7 +262,7 @@ namespace Contensive.Core {
                         }
                         //ORIGINAL LINE: Case Trim(ButtonClose)
                         else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonClose).Trim(' ')) {
-                            s = s + cpCore.html.inputButton(Buttons[Ptr], "", "", "window.close();");
+                            s = s + cpCore.html.button(Buttons[Ptr], "", "", "window.close();");
                         }
                         //ORIGINAL LINE: Case Trim(ButtonAdd)
                         else if (Buttons[Ptr].Trim(' ') == encodeText(ButtonAdd).Trim(' ')) {
@@ -277,7 +277,7 @@ namespace Contensive.Core {
                         }
                         //ORIGINAL LINE: Case Else
                         else {
-                            s = s + cpCore.html.inputButton(Buttons[Ptr], ButtonName);
+                            s = s + cpCore.html.button(Buttons[Ptr], ButtonName);
                         }
                     }
                 }
@@ -422,7 +422,7 @@ namespace Contensive.Core {
                 + htmlIndent(Content) + "\r</div>";
                 result = result + htmlIndent(ButtonBar) + htmlIndent(GetTitleBar(Caption, Description)) + htmlIndent(CellContentSummary) + htmlIndent(ContentCell) + htmlIndent(ButtonBar) + "";
 
-                result = '\r' + cpCore.html.html_GetUploadFormStart() + htmlIndent(result) + '\r' + cpCore.html.html_GetUploadFormEnd();
+                result = '\r' + cpCore.html.formStartMultipart() + htmlIndent(result) + '\r' + cpCore.html.formEnd();
             } catch (Exception ex) {
                 cpCore.handleException(ex);
             }

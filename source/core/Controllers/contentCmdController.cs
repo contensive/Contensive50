@@ -12,6 +12,7 @@ using static Contensive.Core.Controllers.genericController;
 using static Contensive.Core.constants;
 using System.Linq;
 using System.Data;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Core.Controllers {
     public class contentCmdController {
@@ -929,6 +930,29 @@ namespace Contensive.Core.Controllers {
             }
             return returnValue;
         }
+        //
+        //====================================================================================================
+        //   encode (execute) all {% -- %} commands
+        //
+        public static string executeContentCommands(coreClass cpCore, string Source, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated, ref string Return_ErrorMessage) {
+            string returnValue = "";
+            try {
+                int LoopPtr = 0;
+                //contentCmdController contentCmd = new contentCmdController(cpCore);
+                //
+                returnValue = Source;
+                LoopPtr = 0;
+                while ((LoopPtr < 10) && ((returnValue.IndexOf(contentReplaceEscapeStart) != -1))) {
+                    returnValue = contentCmdController.ExecuteCmd(cpCore, returnValue, Context, personalizationPeopleId, personalizationIsAuthenticated);
+                    LoopPtr = LoopPtr + 1;
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+            return returnValue;
+        }
+
     }
 }
 

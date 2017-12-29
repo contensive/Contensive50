@@ -64,7 +64,7 @@ namespace Contensive.Core.Controllers {
         private const int f_DefaultValue = 19;
         private const int f_RSSTitleField = 20;
         private const int f_RSSDescriptionField = 21;
-        private const int f_MemberSelectGroupID = 22;
+        private const int f_MemberSelectGroupId = 22;
         private const int f_EditTab = 23;
         private const int f_Scramble = 24;
         private const int f_LookupList = 25;
@@ -98,11 +98,11 @@ namespace Contensive.Core.Controllers {
         //   2/20/2010 - changed to include includebasefield
         //========================================================================
         //
-        public string GetXMLContentDefinition3(string ContentName = "", bool IncludeBaseFields = false) {
+        public string getApplicationCollectionXml(bool IncludeBaseFields = false) {
             string tempGetXMLContentDefinition3 = null;
             try {
                 //
-               
+                string ContentName = "";
                 int FieldCnt = 0;
                 string FieldName = null;
                 int FieldContentID = 0;
@@ -379,7 +379,6 @@ namespace Contensive.Core.Controllers {
                                     sb.Append(" DefaultValue=\"" + xmlValueText(CFields[f_DefaultValue, CFieldPtr]) + "\"");
                                     sb.Append(" RSSTitle=\"" + xmlValueBoolean(CFields[f_RSSTitleField, CFieldPtr]) + "\"");
                                     sb.Append(" RSSDescription=\"" + xmlValueBoolean(CFields[f_RSSDescriptionField, CFieldPtr]) + "\"");
-                                    sb.Append(" MemberSelectGroupID=\"" + xmlValueText(CFields[f_MemberSelectGroupID, CFieldPtr]) + "\"");
                                     sb.Append(" EditTab=\"" + xmlValueText(CFields[f_EditTab, CFieldPtr]) + "\"");
                                     sb.Append(" Scramble=\"" + xmlValueBoolean(CFields[f_Scramble, CFieldPtr]) + "\"");
                                     sb.Append(" LookupList=\"" + xmlValueText(CFields[f_LookupList, CFieldPtr]) + "\"");
@@ -408,6 +407,15 @@ namespace Contensive.Core.Controllers {
                                     RecordID = genericController.EncodeInteger(CFields[f_ManyToManyRuleContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
                                     sb.Append(" ManyToManyRuleContent=\"" + genericController.encodeHTML(RecordName) + "\"");
+                                    //
+                                    RecordID = genericController.EncodeInteger(CFields[f_MemberSelectGroupId, CFieldPtr]);
+                                    RecordName = "";
+                                    if (RecordID>0) {
+                                        RecordName = cpCore.db.getRecordName("groups", RecordID);
+                                    }
+                                    sb.Append(" MemberSelectGroup=\"" + xmlValueText(CFields[f_MemberSelectGroupId, CFieldPtr]) + "\"");
+
+
                                     sb.Append(" >");
                                     //
                                     HelpCnt = 0;

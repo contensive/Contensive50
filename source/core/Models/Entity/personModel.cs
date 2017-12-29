@@ -176,5 +176,87 @@ namespace Contensive.Core.Models.Entity {
         public static personModel createDefault(coreClass cpcore) {
             return createDefault<personModel>(cpcore);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return a list of people in a any one of a list of groups. If requireBuldEmail true, the list only includes those with allowBulkEmail.
+        /// </summary>
+        /// <param name="cpcore"></param>
+        /// <param name="groupList"></param>
+        /// <param name="requireBulkEmail"></param>
+        /// <returns></returns>
+        public static List<personModel> createListFromGroupList( coreClass cpcore, List<string> groupList, bool requireBulkEmail ) {
+            var personList = new List<personModel> { };
+            try {
+                string sqlGroups = "";
+                foreach (string group in groupList) {
+                    if (!string.IsNullOrWhiteSpace(group)) {
+                        if (!group.Equals(groupList.First<string>())) {
+                            sqlGroups += "or";
+                        }
+                        sqlGroups += "(ccgroups.Name=" + cpcore.db.encodeSQLText(group) + ")";
+                    }
+                }
+                string sqlCriteria = ""
+                    + "SELECT DISTINCT ccMembers.ID"
+                    + " FROM ((ccMembers"
+                    + " LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID)"
+                    + " LEFT JOIN ccgroups ON ccMemberRules.GroupID = ccgroups.ID)"
+                    + " WHERE (ccMembers.Active>0)"
+                    + " and(ccMemberRules.Active>0)"
+                    + " and(ccgroups.Active>0)"
+                    + " and((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime) + "))";
+                if (requireBulkEmail) {
+                    sqlCriteria += "and(ccMembers.AllowBulkEmail>0)and(ccgroups.AllowBulkEmail>0)";
+                }
+                if (!string.IsNullOrEmpty(sqlGroups)) {
+                    sqlCriteria += "and(" + sqlGroups + ")";
+                }
+                personList = createList(cpcore, sqlCriteria);
+            } catch (Exception) {
+                throw;
+            }
+            return personList;
+        }
+        //
+        public static List<int> createidListForEmail(coreClass cpcore, int emailId) {
+            var result = new List<int> { };
+            string sqlCriteria = ""
+                    + " select"
+                    + " u.id as id"
+                    + " "
+                    + " from "
+                    + " (((ccMembers u"
+                    + " left join ccMemberRules mr on mr.memberid=u.id)"
+                    + " left join ccGroups g on g.id=mr.groupid)"
+                    + " left join ccEmailGroups r on r.groupid=g.id)"
+                    + " "
+                    + " where "
+                    + " (r.EmailID=" + emailId.ToString() + ")"
+                    + " and(r.Active<>0)"
+                    + " and(g.Active<>0)"
+                    + " and(g.AllowBulkEmail<>0)"
+                    + " and(mr.Active<>0)"
+                    + " and(u.Active<>0)"
+                    + " and(u.AllowBulkEmail<>0)"
+                    + " and((mr.DateExpires is null)OR(mr.DateExpires>" + cpcore.db.encodeSQLDate(DateTime.Now)  + ")) "
+                    + " "
+                    + " group by "
+                    + " u.ID, u.Name, u.Email "
+                    + " "
+                    + " having ((u.Email Is Not Null) and(u.Email<>'')) "
+                    + " "
+                    + " order by u.Email,u.ID"
+                    + " ";
+            var cs = new csController(cpcore);
+            if (cs.openSQL(sqlCriteria)) {
+                do {
+                    result.Add(cs.getInteger("id"));
+                    cs.goNext();
+                } while (cs.OK());
+            }
+            cs.Close();
+            return result;
+        }
     }
 }

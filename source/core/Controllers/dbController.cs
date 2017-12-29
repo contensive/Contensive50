@@ -1446,7 +1446,7 @@ namespace Contensive.Core.Controllers {
                         // delete any files (only if filename is part of select)
                         //
                         string fieldName = null;
-                        Models.Complex.CDefFieldModel field = null;
+                        Models.Complex.cdefFieldModel field = null;
                         foreach (var selectedFieldName in contentSetStore[CSPointer].CDef.selectList) {
                             if (contentSetStore[CSPointer].CDef.fields.ContainsKey(selectedFieldName.ToLower())) {
                                 field = contentSetStore[CSPointer].CDef.fields[selectedFieldName.ToLower()];
@@ -2315,8 +2315,8 @@ namespace Contensive.Core.Controllers {
                         DataSourceName = CDef.ContentDataSourceName;
                         TableName = CDef.ContentTableName;
                         if (CDef.fields.Count > 0) {
-                            foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in CDef.fields) {
-                                Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                            foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in CDef.fields) {
+                                Models.Complex.cdefFieldModel field = keyValuePair.Value;
                                 FieldName = field.nameLc;
                                 if ((!string.IsNullOrEmpty(FieldName)) && (!string.IsNullOrEmpty(field.defaultValue))) {
                                     switch (genericController.vbUCase(FieldName)) {
@@ -2633,7 +2633,7 @@ namespace Contensive.Core.Controllers {
                         // Updateable -- enterprete the value
                         //
                         //ContentName = .ContentName
-                        Models.Complex.CDefFieldModel field = null;
+                        Models.Complex.cdefFieldModel field = null;
                         if (!tempVar.CDef.fields.ContainsKey(FieldName.ToLower())) {
                             try {
                                 fieldValue = genericController.encodeText(cs_getValue(CSPointer, FieldName));
@@ -2839,7 +2839,7 @@ namespace Contensive.Core.Controllers {
                             FieldValue = "";
                         }
                         if (!string.IsNullOrEmpty(tempVar.CDef.Name)) {
-                            Models.Complex.CDefFieldModel field = null;
+                            Models.Complex.cdefFieldModel field = null;
                             if (!tempVar.CDef.fields.ContainsKey(FieldNameLc)) {
                                 throw new ArgumentException("The field [" + FieldName + "] could Not be found In content [" + tempVar.CDef.Name + "]");
                             } else {
@@ -3180,7 +3180,7 @@ namespace Contensive.Core.Controllers {
                             //
                             LiveRecordInactive = (UcaseFieldName == "ACTIVE" && (!genericController.encodeBoolean(writeCacheValue)));
                             FieldFoundCount += 1;
-                            Models.Complex.CDefFieldModel field = tempVar.CDef.fields[FieldName.ToLower()];
+                            Models.Complex.cdefFieldModel field = tempVar.CDef.fields[FieldName.ToLower()];
                             SQLSetPair = "";
                             FieldReadOnly = (field.ReadOnly);
                             FieldAdminAuthorable = ((!field.ReadOnly) & (!field.NotEditable) & (field.authorable));
@@ -4270,8 +4270,8 @@ namespace Contensive.Core.Controllers {
                 if (!csOk(CS)) {
                     throw new ArgumentException("dataset is not valid");
                 } else {
-                    foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in contentSetStore[CS].CDef.fields) {
-                        Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in contentSetStore[CS].CDef.fields) {
+                        Models.Complex.cdefFieldModel field = keyValuePair.Value;
                         FieldName = field.nameLc;
                         if ((!string.IsNullOrEmpty(FieldName)) && (!string.IsNullOrEmpty(field.defaultValue))) {
                             switch (genericController.vbUCase(FieldName)) {
@@ -4718,7 +4718,7 @@ namespace Contensive.Core.Controllers {
         public void createContentFieldFromTableField(string ContentName, string FieldName, int ADOFieldType) {
             try {
                 //
-                Models.Complex.CDefFieldModel field = new Models.Complex.CDefFieldModel();
+                Models.Complex.cdefFieldModel field = new Models.Complex.cdefFieldModel();
                 //
                 field.fieldTypeId = cpCore.db.getFieldTypeIdByADOType(ADOFieldType);
                 field.caption = FieldName;

@@ -85,7 +85,7 @@ namespace Contensive.Core.Controllers {
         public int checkListCnt { get; set; } = 0; // cnt of the main_GetFormInputCheckList calls - used for javascript
         public string includedAddonIDList { get; set; } = "";
         public int inputDateCnt { get; set; } = 0;
-        public List<main_InputSelectCacheType> inputSelectCache = new List<main_InputSelectCacheType>() { };
+        public List<cacheInputSelectClass> inputSelectCache = new List<cacheInputSelectClass>() { };
         public int formInputTextCnt { get; set; } = 0;
         public string quickEditCopy { get; set; } = "";
         public string siteStructure { get; set; } = "";
@@ -124,6 +124,14 @@ namespace Contensive.Core.Controllers {
         //
         // -- persistant store for tableSchema complex mode
         internal Dictionary<string, Models.Complex.tableSchemaModel> tableSchemaDictionary { get; set; }
+        //
+        // Email Block List - these are people who have asked to not have email sent to them from this site
+        //   Loaded ondemand by csv_GetEmailBlockList
+        //
+        public string emailBlockList_Local { get; set; } = "";
+        public bool emailBlockListLocalLoaded { get; set; }
+
+        public TextWriterTraceListener myListener = null;
         //
         //====================================================================================================
         // -- lookup contentId by contentName
@@ -491,7 +499,7 @@ namespace Contensive.Core.Controllers {
                 if (cpCore.doc.debug_iUserError != "") {
                     result = result + ""
                         + "\r<tr>"
-                        + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + errorController.error_GetUserError(cpCore) + "</div></td>"
+                        + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + errorController.getUserError(cpCore) + "</div></td>"
                         + "\r</tr>";
                 }
                 if (readOnlyField) {
@@ -507,7 +515,7 @@ namespace Contensive.Core.Controllers {
                 }
                 result = result + "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
-                    + cr2 + "<td class=\"qeRow qeRight\">" + cpCore.html.html_GetFormInputText2("name", page.name, 1, 0, "", false, readOnlyField) + "</td>"
+                    + cr2 + "<td class=\"qeRow qeRight\">" + cpCore.html.inputText("name", page.name, 1, 0, "", false, readOnlyField) + "</td>"
                     + "\r</tr>"
                     + "";
                 //
@@ -564,7 +572,7 @@ namespace Contensive.Core.Controllers {
                 // Form Wrapper
                 //
                 result = ""
-                    + '\r' + cpCore.html.html_GetUploadFormStart(cpCore.webServer.requestQueryString) + '\r' + cpCore.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + cpCore.html.inputHidden("ID", page.id) + '\r' + cpCore.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + cpCore.html.html_GetUploadFormEnd();
+                    + '\r' + cpCore.html.formStartMultipart(cpCore.webServer.requestQueryString) + '\r' + cpCore.html.inputHidden("Type", FormTypePageAuthoring) + '\r' + cpCore.html.inputHidden("ID", page.id) + '\r' + cpCore.html.inputHidden("ContentName", LiveRecordContentName) + '\r' + result + "\r" + cpCore.html.formEnd();
 
                 //& cr & cpcore.html.main_GetPanelHeader("Contensive Quick Editor") _
 
@@ -1357,7 +1365,7 @@ namespace Contensive.Core.Controllers {
                 Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", cpCore.doc.profileStartTime.ToString());
                 Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpCore.doc.authContext.user.name);
                 //
-                cpCore.email.sendGroup(cpCore.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
+                emailController.sendGroup(cpCore, cpCore.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
                 //
                 return;
                 //
@@ -2281,7 +2289,7 @@ namespace Contensive.Core.Controllers {
             cpCore.db.csClose(ref CS);
             //
             // -- ok, temp work-around for the damn cache not invalidating correctly -- the nuclear solution
-            cpCore.cache.invalidateAll();
+            //cpCore.cache.invalidateAll();
         }
         //
         public void markRecordReviewed(string ContentName, int RecordID) {

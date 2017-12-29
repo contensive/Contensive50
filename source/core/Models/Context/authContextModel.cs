@@ -802,20 +802,20 @@ namespace Contensive.Core.Models.Context {
                     // ----- loginFieldValue blank, stop here
                     //
                     if (allowEmailLogin) {
-                        errorController.error_AddUserError(cpCore, "A valid login requires a non-blank username or email.");
+                        errorController.addUserError(cpCore, "A valid login requires a non-blank username or email.");
                     } else {
-                        errorController.error_AddUserError(cpCore, "A valid login requires a non-blank username.");
+                        errorController.addUserError(cpCore, "A valid login requires a non-blank username.");
                     }
                 } else if ((!allowNoPasswordLogin) && (string.IsNullOrEmpty(iPassword))) {
                     //
                     // ----- password blank, stop here
                     //
-                    errorController.error_AddUserError(cpCore, "A valid login requires a non-blank password.");
+                    errorController.addUserError(cpCore, "A valid login requires a non-blank password.");
                 } else if (visit.LoginAttempts >= cpCore.siteProperties.maxVisitLoginAttempts) {
                     //
                     // ----- already tried 5 times
                     //
-                    errorController.error_AddUserError(cpCore, badLoginUserError);
+                    errorController.addUserError(cpCore, badLoginUserError);
                 } else {
                     if (allowEmailLogin) {
                         //
@@ -836,12 +836,12 @@ namespace Contensive.Core.Models.Context {
                         //
                         // ----- loginFieldValue not found, stop here
                         //
-                        errorController.error_AddUserError(cpCore, badLoginUserError);
+                        errorController.addUserError(cpCore, badLoginUserError);
                     } else if ((!genericController.encodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (cpCore.db.csGetRowCount(CS) > 1)) {
                         //
                         // ----- AllowDuplicates is false, and there are more then one record
                         //
-                        errorController.error_AddUserError(cpCore, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.");
+                        errorController.addUserError(cpCore, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.");
                     } else {
                         //
                         // ----- search all found records for the correct password
@@ -891,7 +891,7 @@ namespace Contensive.Core.Models.Context {
                             cpCore.db.csGoNext(CS);
                         }
                         if (returnUserId == 0) {
-                            errorController.error_AddUserError(cpCore, badLoginUserError);
+                            errorController.addUserError(cpCore, badLoginUserError);
                         }
                     }
                     cpCore.db.csClose(ref CS);
@@ -1546,7 +1546,7 @@ namespace Contensive.Core.Models.Context {
         public bool isLoginOK(coreClass cpcore, string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
             bool result = (authenticateGetId(cpcore, Username, Password) != 0);
             if (!result) {
-                ErrorMessage = errorController.error_GetUserError(cpcore);
+                ErrorMessage = errorController.getUserError(cpcore);
             }
             return result;
         }

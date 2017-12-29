@@ -73,7 +73,8 @@ namespace Contensive.Core.Addons.Primitives {
                         string Sender = cpCore.siteProperties.getText("EmailOrderFromAddress");
                         string subject = cpCore.webServer.requestDomain + " Online Order Pending, #" + ConfirmOrderID;
                         string Message = "<p>An order confirmation has been recieved from PayPal for " + cpCore.webServer.requestDomain + "</p>";
-                        cpCore.email.send_Legacy(Recipient, Sender, subject, Message, 0, false, true);
+                        string sendStatus = "";
+                        emailController.sendAdHoc( cpCore, Recipient, Sender, subject, Message,"","","", false, true,0, ref sendStatus);
                     }
                 }
                 cpCore.doc.continueProcessing = false;

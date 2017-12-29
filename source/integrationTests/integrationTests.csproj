@@ -100,13 +100,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="cpCSTests.cs" />
-    <Compile Include="cpCacheTests.cs" />
-    <Compile Include="cpContentTests.cs" />
-    <Compile Include="cpSecurityTests.cs" />
-    <Compile Include="cpTests.cs" />
-    <Compile Include="cpBlockTests.cs" />
-    <Compile Include="NumericHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

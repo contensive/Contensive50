@@ -54,7 +54,9 @@ namespace Contensive.Core.Controllers {
                 //
                 logController.appendLog(cpcore, iMessage, "", "testPoints_" + cpcore.serverConfig.appConfig.name);
             }
-        } //====================================================================================================
+        }
+        //
+        //====================================================================================================
         #region  IDisposable Support 
         //
         // this class must implement System.IDisposable

@@ -1913,7 +1913,7 @@ namespace Contensive.Core {
         //
         // Cache the input selects (admin uses the same ones over and over)
         //
-        public class main_InputSelectCacheType {
+        public class cacheInputSelectClass {
             public string SelectRaw;
             public string ContentName;
             public string Criteria;

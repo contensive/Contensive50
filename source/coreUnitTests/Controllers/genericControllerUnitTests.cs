@@ -3,7 +3,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Core.Controllers;
 
-namespace clibCoreUnitTests {
+namespace coreTests {
     [TestClass]
     public class genericControllerUnitTests {
         [TestMethod]

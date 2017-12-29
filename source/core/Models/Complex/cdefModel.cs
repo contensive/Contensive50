@@ -62,7 +62,7 @@ namespace Contensive.Core.Models.Complex {
         public int parentID { get; set; } // read from Db, if not IgnoreContentControl, the ID of the parent content
         public string parentName { get; set; } // read from xml, used to set parentId
         public string TimeStamp { get; set; } // string that changes if any record in Content Definition changes, in memory only
-        public Dictionary<string, Models.Complex.CDefFieldModel> fields { get; set; } = new Dictionary<string, Models.Complex.CDefFieldModel>();
+        public Dictionary<string, Models.Complex.cdefFieldModel> fields { get; set; } = new Dictionary<string, Models.Complex.cdefFieldModel>();
         public SortedList<string, CDefAdminColumnClass> adminColumns { get; set; } = new SortedList<string, CDefAdminColumnClass>();
         public string ContentControlCriteria { get; set; } // String created from ParentIDs used to select records
         public List<string> selectList { get; set; } = new List<string>();
@@ -153,7 +153,7 @@ namespace Contensive.Core.Models.Complex {
                         //
                     } else {
                         result = new Models.Complex.cdefModel();
-                        result.fields = new Dictionary<string, Models.Complex.CDefFieldModel>();
+                        result.fields = new Dictionary<string, Models.Complex.cdefFieldModel>();
                         result.set_childIdList(cpcore, new List<int>());
                         result.selectList = new List<string>();
                         // -- !!!!! changed to string because dotnet json cannot serialize an integer key
@@ -197,9 +197,9 @@ namespace Contensive.Core.Models.Complex {
                         } else {
                             Models.Complex.cdefModel parentCdef = create(cpcore, result.parentID, loadInvalidFields, forceDbLoad);
                             foreach (var keyvaluepair in parentCdef.fields) {
-                                Models.Complex.CDefFieldModel parentField = keyvaluepair.Value;
-                                Models.Complex.CDefFieldModel childField = new Models.Complex.CDefFieldModel();
-                                childField = (Models.Complex.CDefFieldModel)parentField.Clone();
+                                Models.Complex.cdefFieldModel parentField = keyvaluepair.Value;
+                                Models.Complex.cdefFieldModel childField = new Models.Complex.cdefFieldModel();
+                                childField = (Models.Complex.cdefFieldModel)parentField.Clone();
                                 childField.inherited = true;
                                 result.fields.Add(childField.nameLc.ToLower(), childField);
                                 if (!((parentField.fieldTypeId == FieldTypeIdManyToMany) || (parentField.fieldTypeId == FieldTypeIdRedirect))) {
@@ -315,7 +315,7 @@ namespace Contensive.Core.Models.Complex {
                                         //
                                         result.fields.Remove(fieldNameLower);
                                     }
-                                    Models.Complex.CDefFieldModel field = new Models.Complex.CDefFieldModel();
+                                    Models.Complex.cdefFieldModel field = new Models.Complex.cdefFieldModel();
                                     int fieldIndexColumn = -1;
                                     int fieldTypeId = genericController.EncodeInteger(rowWithinLoop[15]);
                                     if (genericController.encodeText(rowWithinLoop[4]) != "") {
@@ -429,8 +429,8 @@ namespace Contensive.Core.Models.Complex {
                 //
                 if (cdef.Id > 0) {
                     int cnt = 0;
-                    foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in cdef.fields) {
-                        Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in cdef.fields) {
+                        Models.Complex.cdefFieldModel field = keyValuePair.Value;
                         FieldActive = field.active;
                         FieldWidth = genericController.EncodeInteger(field.indexWidth);
                         if (FieldActive && (FieldWidth > 0)) {
@@ -892,7 +892,7 @@ namespace Contensive.Core.Models.Complex {
                 bool CDefFound = false;
                 int InstalledByCollectionID = 0;
                 sqlFieldListClass sqlList = null;
-                Models.Complex.CDefFieldModel field = null;
+                Models.Complex.cdefFieldModel field = null;
                 int ContentIDofContent = 0;
                 //
                 if (string.IsNullOrEmpty(contentName)) {
@@ -1086,7 +1086,7 @@ namespace Contensive.Core.Models.Complex {
                                 // CDef does not inherit its fields, create what is needed for a non-inherited CDef
                                 //
                                 if (!cpcore.db.isCdefField(returnContentId, "ID")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "id";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdAutoIdIncrement;
@@ -1099,7 +1099,7 @@ namespace Contensive.Core.Models.Complex {
                                 }
                                 //
                                 if (!cpcore.db.isCdefField(returnContentId, "name")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "name";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdText;
@@ -1112,7 +1112,7 @@ namespace Contensive.Core.Models.Complex {
                                 }
                                 //
                                 if (!cpcore.db.isCdefField(returnContentId, "active")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "active";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdBoolean;
@@ -1125,7 +1125,7 @@ namespace Contensive.Core.Models.Complex {
                                 }
                                 //
                                 if (!cpcore.db.isCdefField(returnContentId, "sortorder")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "sortorder";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdText;
@@ -1138,7 +1138,7 @@ namespace Contensive.Core.Models.Complex {
                                 }
                                 //
                                 if (!cpcore.db.isCdefField(returnContentId, "dateadded")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "dateadded";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdDate;
@@ -1150,7 +1150,7 @@ namespace Contensive.Core.Models.Complex {
                                     verifyCDefField_ReturnID(cpcore, contentName, field);
                                 }
                                 if (!cpcore.db.isCdefField(returnContentId, "createdby")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "createdby";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdLookup;
@@ -1163,7 +1163,7 @@ namespace Contensive.Core.Models.Complex {
                                     verifyCDefField_ReturnID(cpcore, contentName, field);
                                 }
                                 if (!cpcore.db.isCdefField(returnContentId, "modifieddate")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "modifieddate";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdDate;
@@ -1175,7 +1175,7 @@ namespace Contensive.Core.Models.Complex {
                                     verifyCDefField_ReturnID(cpcore, contentName, field);
                                 }
                                 if (!cpcore.db.isCdefField(returnContentId, "modifiedby")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "modifiedby";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdLookup;
@@ -1188,7 +1188,7 @@ namespace Contensive.Core.Models.Complex {
                                     verifyCDefField_ReturnID(cpcore, contentName, field);
                                 }
                                 if (!cpcore.db.isCdefField(returnContentId, "ContentControlId")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "contentcontrolid";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdLookup;
@@ -1201,7 +1201,7 @@ namespace Contensive.Core.Models.Complex {
                                     verifyCDefField_ReturnID(cpcore, contentName, field);
                                 }
                                 if (!cpcore.db.isCdefField(returnContentId, "CreateKey")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "createkey";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdInteger;
@@ -1213,7 +1213,7 @@ namespace Contensive.Core.Models.Complex {
                                     verifyCDefField_ReturnID(cpcore, contentName, field);
                                 }
                                 if (!cpcore.db.isCdefField(returnContentId, "ccGuid")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "ccguid";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdText;
@@ -1226,7 +1226,7 @@ namespace Contensive.Core.Models.Complex {
                                 }
                                 // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
                                 if (!cpcore.db.isCdefField(returnContentId, "ContentCategoryId")) {
-                                    field = new Models.Complex.CDefFieldModel();
+                                    field = new Models.Complex.cdefFieldModel();
                                     field.nameLc = "contentcategoryid";
                                     field.active = true;
                                     field.fieldTypeId = FieldTypeIdInteger;
@@ -1265,7 +1265,7 @@ namespace Contensive.Core.Models.Complex {
         //
         // ====================================================================================================================
         //
-        public static int verifyCDefField_ReturnID(coreClass cpcore, string ContentName, Models.Complex.CDefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
+        public static int verifyCDefField_ReturnID(coreClass cpcore, string ContentName, Models.Complex.cdefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
         {
             int returnId = 0;
             try {
@@ -1694,15 +1694,14 @@ namespace Contensive.Core.Models.Complex {
         public static string GetContentFieldProperty(coreClass cpcore, string ContentName, string FieldName, string PropertyName) {
             string result = "";
             try {
-                string UcaseFieldName = genericController.vbUCase(genericController.encodeText(FieldName));
-                Models.Complex.cdefModel Contentdefinition = Models.Complex.cdefModel.getCdef(cpcore, genericController.encodeText(ContentName));
-                if ((string.IsNullOrEmpty(UcaseFieldName)) || (Contentdefinition.fields.Count < 1)) {
-                    throw (new ApplicationException("Content Name [" + genericController.encodeText(ContentName) + "] or FieldName [" + genericController.encodeText(FieldName) + "] was not valid")); // handleLegacyError14(MethodName, "")
+                cdefModel Contentdefinition = cdefModel.getCdef(cpcore, ContentName);
+                if ((string.IsNullOrEmpty(FieldName)) || (Contentdefinition.fields.Count < 1)) {
+                    throw (new ApplicationException("Content Name [" + genericController.encodeText(ContentName) + "] or FieldName [" + FieldName + "] was not valid")); 
                 } else {
-                    foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
-                        Models.Complex.CDefFieldModel field = keyValuePair.Value;
-                        if (UcaseFieldName == genericController.vbUCase(field.nameLc)) {
-                            switch (genericController.vbUCase(genericController.encodeText(PropertyName))) {
+                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in Contentdefinition.fields) {
+                        Models.Complex.cdefFieldModel field = keyValuePair.Value;
+                        if (FieldName.ToLower() == field.nameLc) {
+                            switch (PropertyName.ToUpper()) {
                                 case "FIELDTYPE":
                                 case "TYPE":
                                     result = field.fieldTypeId.ToString();

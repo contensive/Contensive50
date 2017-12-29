@@ -14,6 +14,7 @@ using Contensive.BaseClasses;
 using System.IO;
 using System.Data;
 using Contensive.Core.Models.Complex;
+using System.Linq;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -343,7 +344,7 @@ namespace Contensive.Core.Controllers {
                             result = addon.CopyText + addon.Copy;
                             if (!string.IsNullOrEmpty(result)) {
                                 string ignoreLayoutErrors = "";
-                                result = cpCore.html.executeContentCommands(null, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
+                                result = contentCmdController.executeContentCommands(cpCore, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
                             }
                             switch (executeContext.addonType) {
                                 case CPUtilsBaseClass.addonContext.ContextEditor:
@@ -933,7 +934,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "boolean":
@@ -949,7 +950,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
@@ -988,7 +989,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
                                                                             }
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "textfile":
@@ -1000,7 +1001,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (FieldHTML) {
                                                                                 Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
+                                                                                Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                             }
                                                                         }
                                                                         break;
@@ -1009,7 +1010,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
+                                                                            Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "xmlfile":
@@ -1017,7 +1018,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
+                                                                            Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "link":
@@ -1025,7 +1026,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     default:
@@ -1039,7 +1040,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (FieldHTML) {
                                                                                 Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                                Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                             }
                                                                         }
                                                                         break;
@@ -1092,7 +1093,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // Text edit
                                                                 //
-                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue);
+                                                                Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue);
                                                             }
                                                             TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
@@ -1115,7 +1116,7 @@ namespace Contensive.Core.Controllers {
                                                                 Copy = cpCore.cdnFiles.readFile(fieldfilename);
                                                             }
                                                             if (!FieldReadOnly) {
-                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, Copy, 10);
+                                                                Copy = cpCore.html.inputTextExpandable(FieldName, Copy, 10);
                                                             }
                                                         }
                                                         TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
@@ -1182,7 +1183,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 if (dt.Rows.Count > 0) {
                                                                     if (dt.Rows.Count == 1 && dt.Columns.Count == 1) {
-                                                                        Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(something[0, 0]), 0, 0, "", false, true);
+                                                                        Copy = cpCore.html.inputText("result", genericController.encodeText(something[0, 0]), 0, 0, "", false, true);
                                                                     } else {
                                                                         foreach (DataRow dr in dt.Rows) {
                                                                             //
@@ -1401,7 +1402,7 @@ namespace Contensive.Core.Controllers {
                     //
 
                     selector = genericController.decodeNvaArgument(selector);
-                    result = cpCore.html.html_GetFormInputText2(SitePropertyName, selector, 1, 20);
+                    result = cpCore.html.inputText(SitePropertyName, selector, 1, 20);
                 }
 
                 FastString = null;
@@ -1744,10 +1745,9 @@ namespace Contensive.Core.Controllers {
                                     //
                                     try {
                                         bool isAddonAssembly = false;
-                                        //
-                                        // -- find type in collection directly
-                                        Type addonType = testAssembly.GetType(typeFullName);
-                                        if (addonType != null) {
+                                        var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
+                                        Type addonType;
+                                        if (typeMap.TryGetValue(typeFullName, out addonType)) {
                                             if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
                                                 //
                                                 // -- assembly is public, not abstract, based on a base type
@@ -1762,34 +1762,53 @@ namespace Contensive.Core.Controllers {
                                                     }
                                                 }
                                             }
-                                        } else {
-                                            //
-                                            // -- not found, interate through types to eliminate non-assemblies
-                                            // -- consider removing all this, just go with test1
-                                            foreach (var testType in testAssembly.GetTypes()) {
-                                                //
-                                                // Loop through each type in the Assembly looking for our typename, public, and non-abstract
-                                                //
-                                                if ((testType.IsPublic) & (!((testType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (testType.BaseType != null)) {
-                                                    //
-                                                    // -- assembly is public, not abstract, based on a base type
-                                                    if (testType.BaseType.FullName != null) {
-                                                        //
-                                                        // -- assembly has a baseType fullname
-                                                        if ((testType.BaseType.FullName.ToLower() == "addonbaseclass") || (testType.BaseType.FullName.ToLower() == "contensive.baseclasses.addonbaseclass")) {
-                                                            //
-                                                            // -- valid addon assembly
-                                                            isAddonAssembly = true;
-                                                            if ((testType.FullName.Trim().ToLower() == typeFullName.Trim().ToLower())) {
-                                                                addonType = testType;
-                                                                AddonFound = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
                                         }
+                                        ////
+                                        //// -- find type in collection directly
+                                        //addonType = testAssembly.GetType(typeFullName);
+                                        //if (addonType != null) {
+                                        //    if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
+                                        //        //
+                                        //        // -- assembly is public, not abstract, based on a base type
+                                        //        if (addonType.BaseType.FullName != null) {
+                                        //            //
+                                        //            // -- assembly has a baseType fullname
+                                        //            if ((addonType.BaseType.FullName.ToLower() == "addonbaseclass") || (addonType.BaseType.FullName.ToLower() == "contensive.baseclasses.addonbaseclass")) {
+                                        //                //
+                                        //                // -- valid addon assembly
+                                        //                isAddonAssembly = true;
+                                        //                AddonFound = true;
+                                        //            }
+                                        //        }
+                                        //    }
+                                        //} else {
+                                        //    //
+                                        //    // -- not found, interate through types to eliminate non-assemblies
+                                        //    // -- consider removing all this, just go with test1
+                                        //    foreach (var testType in testAssembly.GetTypes()) {
+                                        //        //
+                                        //        // Loop through each type in the Assembly looking for our typename, public, and non-abstract
+                                        //        //
+                                        //        if ((testType.IsPublic) & (!((testType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (testType.BaseType != null)) {
+                                        //            //
+                                        //            // -- assembly is public, not abstract, based on a base type
+                                        //            if (testType.BaseType.FullName != null) {
+                                        //                //
+                                        //                // -- assembly has a baseType fullname
+                                        //                if ((testType.BaseType.FullName.ToLower() == "addonbaseclass") || (testType.BaseType.FullName.ToLower() == "contensive.baseclasses.addonbaseclass")) {
+                                        //                    //
+                                        //                    // -- valid addon assembly
+                                        //                    isAddonAssembly = true;
+                                        //                    if ((testType.FullName.Trim().ToLower() == typeFullName.Trim().ToLower())) {
+                                        //                        addonType = testType;
+                                        //                        AddonFound = true;
+                                        //                        break;
+                                        //                    }
+                                        //                }
+                                        //            }
+                                        //        }
+                                        //    }
+                                        //}
                                         if (AddonFound) {
                                             try {
                                                 //
@@ -1841,14 +1860,14 @@ namespace Contensive.Core.Controllers {
                                         if (!isAddonAssembly) {
                                             //
                                             // -- not an addon assembly
-                                            cpCore.assemblySkipList.Add(TestFilePathname);
+                                            //cpCore.assemblySkipList.Add(TestFilePathname);
                                         }
-                                    } catch (ReflectionTypeLoadException ex) {
+                                    } catch (ReflectionTypeLoadException) {
                                         //
                                         // exceptin thrown out of application bin folder when xunit library included -- ignore
                                         //
                                         cpCore.assemblySkipList.Add(TestFilePathname);
-                                    } catch (Exception ex) {
+                                    } catch (Exception) {
                                         //
                                         // problem loading types
                                         //
@@ -2117,7 +2136,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             OptionDefault = genericController.decodeNvaArgument(OptionDefault);
                                             FormInput = ""
-                                                + cpCore.html.html_GetFormInputText2(OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                                + cpCore.html.inputText(OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                             //EditorString = cpcore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
                                             break;
                                         case "checkbox":
@@ -2143,7 +2162,7 @@ namespace Contensive.Core.Controllers {
                                     //
 
                                     OptionSelector = genericController.decodeNvaArgument(OptionSelector);
-                                    FormInput = cpCore.html.html_GetFormInputText2(OptionName, OptionSelector, 1, 20);
+                                    FormInput = cpCore.html.inputText(OptionName, OptionSelector, 1, 20);
                                 }
                                 CopyContent = CopyContent + "<tr>"
                                     + "<td class=\"bbLeft\">" + OptionName + "</td>"
@@ -2160,9 +2179,9 @@ namespace Contensive.Core.Controllers {
                         QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
-                            + cpCore.html.html_GetUploadFormStart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
+                            + cpCore.html.formStartMultipart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.inputButton("Update", "HelpBubbleButton") + "</td></tr>"
+                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.button("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                             + "</table>"
                             + "</form>"
@@ -2222,7 +2241,7 @@ namespace Contensive.Core.Controllers {
                             + ""
                             + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                             + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccContentCon ccAdminSmall\">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>"
-                            + "<tr><td style=\"padding-bottom:5px;\" class=\"ccContentCon ccAdminSmall\"><b>Custom Stylesheet</b>" + cpCore.html.html_GetFormInputTextExpandable2("CustomStyles", addon.StylesFilename.content, 10, "400px") + "</td></tr>";
+                            + "<tr><td style=\"padding-bottom:5px;\" class=\"ccContentCon ccAdminSmall\"><b>Custom Stylesheet</b>" + cpCore.html.inputTextExpandable("CustomStyles", addon.StylesFilename.content, 10, "400px") + "</td></tr>";
                         //If DefaultStylesheet = "" Then
                         //    CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
                         //Else
@@ -2240,9 +2259,9 @@ namespace Contensive.Core.Controllers {
                         string Dialog = "";
 
                         Dialog = Dialog + "<div class=\"ccCon helpDialogCon\">"
-                            + cpCore.html.html_GetUploadFormStart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
+                            + cpCore.html.formStartMultipart() + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + cpCore.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
-                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.inputButton("Update", "HelpBubbleButton") + "</td></tr>"
+                            + "<tr><td class=\"ccButtonCon\">" + cpCore.html.button("Update", "HelpBubbleButton") + "</td></tr>"
                             + "<tr><td class=\"ccContentCon\">" + CopyContent + "</td></tr>"
                             + "</table>"
                             + "</form>"
@@ -2391,7 +2410,7 @@ namespace Contensive.Core.Controllers {
                         CopyContent = ""
                             + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                             + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">This is the HTML produced by this add-on. Carrage returns and tabs have been added or modified to enhance readability.</td></tr>"
-                            + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + cpCore.html.html_GetFormInputTextExpandable2("DefaultStyles", "", 10, "400px", HTMLViewerBubbleID + "_dst",false, false) + "</td></tr>"
+                            + "<tr><td style=\"width:400px;background-color:transparent;\" class=\"ccAdminSmall\">" + cpCore.html.inputTextExpandable("DefaultStyles", "", 10, "400px", HTMLViewerBubbleID + "_dst",false, false) + "</td></tr>"
                             + "</tr>"
                             + "</table>"
                             + "";
@@ -2783,7 +2802,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "boolean":
@@ -2799,7 +2818,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "date":
@@ -2838,7 +2857,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
                                                                                 FieldValue = String.Format("C", FieldValue);
                                                                             }
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     case "textfile":
@@ -2850,7 +2869,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (FieldHTML) {
                                                                                 Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
+                                                                                Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                             }
                                                                         }
                                                                         break;
@@ -2859,7 +2878,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
+                                                                            Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "xmlfile":
@@ -2867,7 +2886,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue, 5);
+                                                                            Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue, 5);
                                                                         }
                                                                         break;
                                                                     case "link":
@@ -2875,7 +2894,7 @@ namespace Contensive.Core.Controllers {
                                                                         if (FieldReadOnly) {
                                                                             Copy = FieldValue + cpCore.html.inputHidden(FieldName, FieldValue);
                                                                         } else {
-                                                                            Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                            Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                         }
                                                                         break;
                                                                     default:
@@ -2888,7 +2907,7 @@ namespace Contensive.Core.Controllers {
                                                                             if (FieldHTML) {
                                                                                 Copy = cpCore.html.getFormInputHTML(FieldName, FieldValue);
                                                                             } else {
-                                                                                Copy = cpCore.html.html_GetFormInputText2(FieldName, FieldValue);
+                                                                                Copy = cpCore.html.inputText(FieldName, FieldValue);
                                                                             }
                                                                         }
                                                                         break;
@@ -2941,7 +2960,7 @@ namespace Contensive.Core.Controllers {
                                                                 //
                                                                 // Text edit
                                                                 //
-                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, FieldValue);
+                                                                Copy = cpCore.html.inputTextExpandable(FieldName, FieldValue);
                                                             }
                                                             TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
                                                         }
@@ -2964,7 +2983,7 @@ namespace Contensive.Core.Controllers {
                                                                 Copy = cpCore.cdnFiles.readFile(fieldfilename);
                                                             }
                                                             if (!FieldReadOnly) {
-                                                                Copy = cpCore.html.html_GetFormInputTextExpandable(FieldName, Copy, 10);
+                                                                Copy = cpCore.html.inputTextExpandable(FieldName, Copy, 10);
                                                             }
                                                         }
                                                         TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, false, false, ""));
@@ -3033,7 +3052,7 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     // Single result, display with no table
                                                                     //
-                                                                    Copy = cpCore.html.html_GetFormInputText2("result", genericController.encodeText(dataArray[0, 0]),-1,-1,"",false, true);
+                                                                    Copy = cpCore.html.inputText("result", genericController.encodeText(dataArray[0, 0]),-1,-1,"",false, true);
                                                                 } else {
                                                                     //
                                                                     // Build headers
@@ -3263,7 +3282,7 @@ namespace Contensive.Core.Controllers {
                     //
 
                     selector = genericController.decodeNvaArgument(selector);
-                    tempgetFormContent_decodeSelector = cpCore.html.html_GetFormInputText2(SitePropertyName, selector, 1, 20);
+                    tempgetFormContent_decodeSelector = cpCore.html.inputText(SitePropertyName, selector, 1, 20);
                 }
 
                 FastString = null;

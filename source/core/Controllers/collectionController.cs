@@ -35,7 +35,7 @@ namespace Contensive.Core {
         //               field attributes updated if .isBaseField matches
         //==========================================================================================================================
         //
-        private static bool installCollection_AddMiniCollectionSrcToDst(coreClass cpCore, ref miniCollectionModel dstCollection, miniCollectionModel srcCollection, bool SrcIsUserCDef) {
+        private static bool addMiniCollectionSrcToDst(coreClass cpCore, ref miniCollectionModel dstCollection, miniCollectionModel srcCollection, bool SrcIsUserCDef) {
             bool returnOk = true;
             try {
                 string HelpSrc = null;
@@ -44,9 +44,9 @@ namespace Contensive.Core {
                 bool HelpChanged = false;
                 string Copy = null;
                 string n = null;
-                Models.Complex.CDefFieldModel srcCollectionCdefField = null;
+                Models.Complex.cdefFieldModel srcCollectionCdefField = null;
                 Models.Complex.cdefModel dstCollectionCdef = null;
-                Models.Complex.CDefFieldModel dstCollectionCdefField = null;
+                Models.Complex.cdefFieldModel dstCollectionCdefField = null;
                 bool IsMatch = false;
                 string DstKey = null;
                 string SrcKey = null;
@@ -80,7 +80,7 @@ namespace Contensive.Core {
                                 tempVar.IsBaseContent = false;
                                 tempVar.dataChanged = true;
                                 foreach (var dstFieldKeyValuePair in tempVar.fields) {
-                                    Models.Complex.CDefFieldModel field = dstFieldKeyValuePair.Value;
+                                    Models.Complex.cdefFieldModel field = dstFieldKeyValuePair.Value;
                                     if (field.isBaseField) {
                                         field.isBaseField = false;
                                         //field.Changed = True
@@ -573,7 +573,7 @@ namespace Contensive.Core {
                                 //
                                 // field was not found in dst, add it and populate
                                 //
-                                dstCollectionCdef.fields.Add(SrcFieldName.ToLower(), new Models.Complex.CDefFieldModel());
+                                dstCollectionCdef.fields.Add(SrcFieldName.ToLower(), new Models.Complex.cdefFieldModel());
                                 dstCollectionCdefField = dstCollectionCdef.fields[SrcFieldName.ToLower()];
                                 okToUpdateDstFromSrc = true;
                                 HelpChanged = true;
@@ -1335,7 +1335,7 @@ namespace Contensive.Core {
                 string Content = null;
                 //
                 XML = new collectionXmlController(cpCore);
-                Content = XML.GetXMLContentDefinition3("", IncludeBaseFields);
+                Content = XML.getApplicationCollectionXml(IncludeBaseFields);
                 cpCore.privateFiles.saveFile(privateFilesPathFilename, Content);
                 XML = null;
             } catch (Exception ex) {
@@ -1355,7 +1355,7 @@ namespace Contensive.Core {
         //       Unzips any collection files
         //       Returns true if it all downloads OK
         //
-        private static bool DownloadCollectionFiles(coreClass cpCore, string workingPath, string CollectionGuid, ref DateTime return_CollectionLastChangeDate, ref string return_ErrorMessage) {
+        private static bool downloadCollectionFiles(coreClass cpCore, string workingPath, string CollectionGuid, ref DateTime return_CollectionLastChangeDate, ref string return_ErrorMessage) {
             bool tempDownloadCollectionFiles = false;
             tempDownloadCollectionFiles = false;
             try {
@@ -1603,12 +1603,12 @@ namespace Contensive.Core {
                         cpCore.privateFiles.createPath(workingPath);
                         //
                         DateTime CollectionLastChangeDate = default(DateTime);
-                        UpgradeOK = DownloadCollectionFiles(cpCore, workingPath, collectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage);
+                        UpgradeOK = downloadCollectionFiles(cpCore, workingPath, collectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage);
                         if (!UpgradeOK) {
                             //UpgradeOK = UpgradeOK;
                         } else {
                             List<string> collectionGuidList = new List<string>();
-                            UpgradeOK = BuildLocalCollectionReposFromFolder(cpCore, workingPath, CollectionLastChangeDate, ref collectionGuidList, ref return_ErrorMessage, false);
+                            UpgradeOK = buildLocalCollectionReposFromFolder(cpCore, workingPath, CollectionLastChangeDate, ref collectionGuidList, ref return_ErrorMessage, false);
                             if (!UpgradeOK) {
                                 //UpgradeOK = UpgradeOK;
                             }
@@ -1910,13 +1910,13 @@ namespace Contensive.Core {
                                                                                             //
                                                                                             cpCore.privateFiles.createPath(workingPath);
                                                                                             //
-                                                                                            returnOk = DownloadCollectionFiles(cpCore, workingPath, LibGUID, ref CollectionLastChangeDate, ref return_ErrorMessage);
+                                                                                            returnOk = downloadCollectionFiles(cpCore, workingPath, LibGUID, ref CollectionLastChangeDate, ref return_ErrorMessage);
                                                                                             if (allowLogging) {
                                                                                                 logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), DownloadCollectionFiles returned " + returnOk);
                                                                                             }
                                                                                             if (returnOk) {
                                                                                                 List<string> listGuidList = new List<string>();
-                                                                                                returnOk = BuildLocalCollectionReposFromFolder(cpCore, workingPath, CollectionLastChangeDate, ref listGuidList, ref return_ErrorMessage, allowLogging);
+                                                                                                returnOk = buildLocalCollectionReposFromFolder(cpCore, workingPath, CollectionLastChangeDate, ref listGuidList, ref return_ErrorMessage, allowLogging);
                                                                                                 if (allowLogging) {
                                                                                                     logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), BuildLocalCollectionFolder returned " + returnOk);
                                                                                                 }
@@ -1997,7 +1997,7 @@ namespace Contensive.Core {
         //   This is the routine that updates the Collections.xml file
         //       - if it parses ok
         //
-        public static bool BuildLocalCollectionReposFromFolder(coreClass cpCore, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> return_CollectionGUIDList, ref string return_ErrorMessage, bool allowLogging) {
+        public static bool buildLocalCollectionReposFromFolder(coreClass cpCore, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> return_CollectionGUIDList, ref string return_ErrorMessage, bool allowLogging) {
             bool success = false;
             try {
                 if (cpCore.privateFiles.pathExists(sourcePrivateFolderPath)) {
@@ -2006,7 +2006,7 @@ namespace Contensive.Core {
                     foreach (FileInfo file in SrcFileNamelist) {
                         if ((file.Extension == ".zip") || (file.Extension == ".xml")) {
                             string collectionGuid = "";
-                            success = BuildLocalCollectionRepoFromFile(cpCore, sourcePrivateFolderPath + file.Name, CollectionLastChangeDate, ref collectionGuid, ref return_ErrorMessage, allowLogging);
+                            success = buildLocalCollectionRepoFromFile(cpCore, sourcePrivateFolderPath + file.Name, CollectionLastChangeDate, ref collectionGuid, ref return_ErrorMessage, allowLogging);
                             return_CollectionGUIDList.Add(collectionGuid);
                         }
                     }
@@ -2020,7 +2020,7 @@ namespace Contensive.Core {
         //
         //
         //
-        public static bool BuildLocalCollectionRepoFromFile(coreClass cpCore, string collectionPathFilename, DateTime CollectionLastChangeDate, ref string return_CollectionGUID, ref string return_ErrorMessage, bool allowLogging) {
+        public static bool buildLocalCollectionRepoFromFile(coreClass cpCore, string collectionPathFilename, DateTime CollectionLastChangeDate, ref string return_CollectionGUID, ref string return_ErrorMessage, bool allowLogging) {
             bool tempBuildLocalCollectionRepoFromFile = false;
             bool result = true;
             try {
@@ -2316,7 +2316,7 @@ namespace Contensive.Core {
                                                                 //
                                                                 // down an imported collection file
                                                                 //
-                                                                StatusOK = DownloadCollectionFiles(cpCore, ChildWorkingPath, ChildCollectionGUID, ref ChildCollectionLastChangeDate, ref return_ErrorMessage);
+                                                                StatusOK = downloadCollectionFiles(cpCore, ChildWorkingPath, ChildCollectionGUID, ref ChildCollectionLastChangeDate, ref return_ErrorMessage);
                                                                 if (!StatusOK) {
 
                                                                     logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
@@ -2331,7 +2331,7 @@ namespace Contensive.Core {
                                                                     // install the downloaded file
                                                                     //
                                                                     List<string> ChildCollectionGUIDList = new List<string>();
-                                                                    StatusOK = BuildLocalCollectionReposFromFolder(cpCore, ChildWorkingPath, ChildCollectionLastChangeDate, ref ChildCollectionGUIDList, ref return_ErrorMessage, allowLogging);
+                                                                    StatusOK = buildLocalCollectionReposFromFolder(cpCore, ChildWorkingPath, ChildCollectionLastChangeDate, ref ChildCollectionGUIDList, ref return_ErrorMessage, allowLogging);
                                                                     if (!StatusOK) {
                                                                         logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
                                                                         if (string.IsNullOrEmpty(return_ErrorMessage)) {
@@ -2964,7 +2964,7 @@ namespace Contensive.Core {
                                                                                             int fieldTypeId = -1;
                                                                                             int FieldLookupContentID = -1;
                                                                                             foreach (var keyValuePair in CDef.fields) {
-                                                                                                Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                                                                                                Models.Complex.cdefFieldModel field = keyValuePair.Value;
                                                                                                 if (genericController.vbLCase(field.nameLc) == FieldName) {
                                                                                                     fieldTypeId = field.fieldTypeId;
                                                                                                     FieldLookupContentID = field.lookupContentID;
@@ -3613,7 +3613,7 @@ namespace Contensive.Core {
                 DateTime CollectionLastChangeDate;
                 //
                 CollectionLastChangeDate = DateTime.Now;
-                returnSuccess = BuildLocalCollectionReposFromFolder(cpCore, privateFolder, CollectionLastChangeDate, ref return_CollectionGUIDList, ref return_ErrorMessage, false);
+                returnSuccess = buildLocalCollectionReposFromFolder(cpCore, privateFolder, CollectionLastChangeDate, ref return_CollectionGUIDList, ref return_ErrorMessage, false);
                 if (!returnSuccess) {
                     //
                     // BuildLocal failed, log it and do not upgrade
@@ -3647,7 +3647,7 @@ namespace Contensive.Core {
                 DateTime CollectionLastChangeDate;
                 //
                 CollectionLastChangeDate = DateTime.Now;
-                returnSuccess = BuildLocalCollectionRepoFromFile(cpCore, pathFilename, CollectionLastChangeDate, ref return_CollectionGUID, ref return_ErrorMessage, false);
+                returnSuccess = buildLocalCollectionRepoFromFile(cpCore, pathFilename, CollectionLastChangeDate, ref return_CollectionGUID, ref return_ErrorMessage, false);
                 if (!returnSuccess) {
                     //
                     // BuildLocal failed, log it and do not upgrade
@@ -3698,7 +3698,7 @@ namespace Contensive.Core {
         //       block some file extensions
         //===============================================================================================
         //
-        private static void CopyInstallToDst(coreClass cpCore, string SrcPath, string DstPath, string BlockFileList, string BlockFolderList) {
+        private static void copyInstallPathToDstPath(coreClass cpCore, string SrcPath, string DstPath, string BlockFileList, string BlockFolderList) {
             try {
                 FileInfo[] FileInfoArray = null;
                 DirectoryInfo[] FolderInfoArray = null;
@@ -3741,7 +3741,7 @@ namespace Contensive.Core {
                     FolderInfoArray = cpCore.privateFiles.getFolderList(SrcFolder);
                     foreach (DirectoryInfo folder in FolderInfoArray) {
                         if (("," + BlockFolderList + ",").IndexOf("," + folder.Name + ",", System.StringComparison.OrdinalIgnoreCase)  == -1) {
-                            CopyInstallToDst(cpCore, SrcPath + folder.Name + "\\", DstPath + folder.Name + "\\", BlockFileList, "");
+                            copyInstallPathToDstPath(cpCore, SrcPath + folder.Name + "\\", DstPath + folder.Name + "\\", BlockFileList, "");
                         }
                     }
                 }
@@ -5096,7 +5096,7 @@ namespace Contensive.Core {
                 miniCollectionModel miniCollectionToAdd = new miniCollectionModel();
                 miniCollectionModel miniCollectionWorking = installCollection_GetApplicationMiniCollection(cpCore, isNewBuild);
                 miniCollectionToAdd = installCollection_LoadXmlToMiniCollection(cpCore, XMLText, isBaseCollection, false, isNewBuild, miniCollectionWorking);
-                installCollection_AddMiniCollectionSrcToDst(cpCore, ref miniCollectionWorking, miniCollectionToAdd, true);
+                addMiniCollectionSrcToDst(cpCore, ref miniCollectionWorking, miniCollectionToAdd, true);
                 installCollection_BuildDbFromMiniCollection(cpCore, miniCollectionWorking, cpCore.siteProperties.dataBuildVersion, isNewBuild, ref nonCriticalErrorList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -5137,7 +5137,7 @@ namespace Contensive.Core {
             miniCollectionModel result = null;
             try {
                 Models.Complex.cdefModel DefaultCDef = null;
-                Models.Complex.CDefFieldModel DefaultCDefField = null;
+                Models.Complex.cdefFieldModel DefaultCDefField = null;
                 string contentNameLc = null;
                 collectionXmlController XMLTools = new collectionXmlController(cpCore);
                 //Dim AddonClass As New addonInstallClass(cpCore)
@@ -5297,7 +5297,7 @@ namespace Contensive.Core {
                                             tempVar.DeveloperOnly = GetXMLAttributeBoolean(cpCore, Found, CDef_NodeWithinLoop, "DeveloperOnly", DefaultCDef.DeveloperOnly);
                                             tempVar.DropDownFieldList = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "DropDownFieldList", DefaultCDef.DropDownFieldList);
                                             tempVar.EditorGroupName = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "EditorGroupName", DefaultCDef.EditorGroupName);
-                                            tempVar.fields = new Dictionary<string, Models.Complex.CDefFieldModel>();
+                                            tempVar.fields = new Dictionary<string, Models.Complex.cdefFieldModel>();
                                             tempVar.IconLink = GetXMLAttribute(cpCore, Found, CDef_NodeWithinLoop, "IconLink", DefaultCDef.IconLink);
                                             tempVar.IconHeight = GetXMLAttributeInteger(cpCore, Found, CDef_NodeWithinLoop, "IconHeight", DefaultCDef.IconHeight);
                                             tempVar.IconWidth = GetXMLAttributeInteger(cpCore, Found, CDef_NodeWithinLoop, "IconWidth", DefaultCDef.IconWidth);
@@ -5328,11 +5328,11 @@ namespace Contensive.Core {
                                                     if (DefaultCDef.fields.ContainsKey(FieldName)) {
                                                         DefaultCDefField = DefaultCDef.fields[FieldName];
                                                     } else {
-                                                        DefaultCDefField = new Models.Complex.CDefFieldModel();
+                                                        DefaultCDefField = new Models.Complex.cdefFieldModel();
                                                     }
                                                     //
                                                     if (!(result.CDef[ContentName.ToLower()].fields.ContainsKey(FieldName.ToLower()))) {
-                                                        result.CDef[ContentName.ToLower()].fields.Add(FieldName.ToLower(), new Models.Complex.CDefFieldModel());
+                                                        result.CDef[ContentName.ToLower()].fields.Add(FieldName.ToLower(), new Models.Complex.cdefFieldModel());
                                                     }
                                                     var tempVar2 = result.CDef[ContentName.ToLower()].fields[FieldName.ToLower()];
                                                     tempVar2.nameLc = FieldName.ToLower();
@@ -5379,7 +5379,7 @@ namespace Contensive.Core {
                                                     tempVar2.Required = GetXMLAttributeBoolean(cpCore, Found, CDefChildNode, "Required", DefaultCDefField.Required);
                                                     tempVar2.RSSTitleField = GetXMLAttributeBoolean(cpCore, Found, CDefChildNode, "RSSTitle", DefaultCDefField.RSSTitleField);
                                                     tempVar2.RSSDescriptionField = GetXMLAttributeBoolean(cpCore, Found, CDefChildNode, "RSSDescriptionField", DefaultCDefField.RSSDescriptionField);
-                                                    tempVar2.MemberSelectGroupID = GetXMLAttributeInteger(cpCore, Found, CDefChildNode, "MemberSelectGroupID", DefaultCDefField.MemberSelectGroupID);
+                                                    tempVar2.MemberSelectGroupID = cpCore.db.getRecordID("groups",GetXMLAttribute(cpCore, Found, CDefChildNode, "MemberSelectGroup",""));
                                                     tempVar2.editTabName = GetXMLAttribute(cpCore, Found, CDefChildNode, "EditTab", DefaultCDefField.editTabName);
                                                     tempVar2.Scramble = GetXMLAttributeBoolean(cpCore, Found, CDefChildNode, "Scramble", DefaultCDefField.Scramble);
                                                     tempVar2.lookupList = GetXMLAttribute(cpCore, Found, CDefChildNode, "LookupList", DefaultCDefField.lookupList);
@@ -5779,7 +5779,7 @@ namespace Contensive.Core {
                     Models.Complex.cdefModel workingCdef = keypairvalue.Value;
                     ContentName = workingCdef.Name;
                     foreach (var fieldKeyValuePair in workingCdef.fields) {
-                        Models.Complex.CDefFieldModel field = fieldKeyValuePair.Value;
+                        Models.Complex.cdefFieldModel field = fieldKeyValuePair.Value;
                         FieldName = field.nameLc;
                         var tempVar = Collection.CDef[ContentName.ToLower()].fields[FieldName.ToLower()];
                         if (tempVar.HelpChanged) {
@@ -6073,7 +6073,7 @@ namespace Contensive.Core {
                         FieldSize = 0;
                         FieldCount = 0;
                         foreach (var nameValuePair in cdef.fields) {
-                            Models.Complex.CDefFieldModel field = nameValuePair.Value;
+                            Models.Complex.cdefFieldModel field = nameValuePair.Value;
                             if (field.dataChanged) {
                                 fieldId = Models.Complex.cdefModel.verifyCDefField_ReturnID(cpCore, ContentName, field);
                             }

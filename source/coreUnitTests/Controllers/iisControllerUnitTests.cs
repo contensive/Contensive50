@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Core.Controllers;
 using Microsoft.Web.Administration;
 
-namespace clibCoreUnitTests {
+namespace coreTests {
     [TestClass]
     public class iisControllerUnitTests {
         [TestMethod]

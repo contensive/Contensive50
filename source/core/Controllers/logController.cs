@@ -304,6 +304,20 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
+        public static void appendCacheLog(coreClass cpCore, string message) {
+            appendLog(cpCore, message, "cache");
+        }
+        //
+        //====================================================================================================
+        public static void appendDebugLog(coreClass cpCore, string message) {
+            if (cpCore.doc.myListener == null) {
+                cpCore.doc.myListener = new TextWriterTraceListener( cpCore.privateFiles.rootLocalPath + "debug\\" + getDateString(DateTime.Now) + ".log", "myListener");
+            }
+            cpCore.doc.myListener.WriteLine(message);
+            //appendLog(cpCore, message, "debug");
+        }
+        //
+        //====================================================================================================
         //
         internal static void appendInstallLog(coreClass cpCore, string message) {
             Console.WriteLine("install, " + message);

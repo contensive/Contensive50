@@ -172,7 +172,7 @@ namespace Contensive.Core.Controllers {
                     //-------
 
                     Panel = ""
-                        + errorController.error_GetUserError(cpcore) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
+                        + errorController.getUserError(cpcore) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
                     //
                     // ----- Password Form
                     //
@@ -350,15 +350,209 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         // ----- Process the send password form
-        //========================================================================
         //
-        public static void processFormSendPassword(coreClass cpcore) {
+        public static void processFormSendPassword(coreClass cpCore) {
             try {
-                cpcore.email.sendPassword(cpcore.docProperties.getText("email"));
+                string returnUserMessage = "";
+                sendPassword(cpCore, cpCore.docProperties.getText("email"), ref returnUserMessage);
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
                 throw;
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Send the Member his username and password
+        /// </summary>
+        /// <param name="Email"></param>
+        /// <returns></returns>
+        public static bool sendPassword(coreClass cpCore, string Email, ref string returnUserMessage) {
+            bool result = false;
+            returnUserMessage = "";
+            try {
+                string sqlCriteria = null;
+                string Message = "";
+                int CS = 0;
+                string workingEmail = null;
+                string FromAddress = "";
+                string subject = "";
+                bool allowEmailLogin = false;
+                string Password = null;
+                string Username = null;
+                bool updateUser = false;
+                int atPtr = 0;
+                int Index = 0;
+                string EMailName = null;
+                bool usernameOK = false;
+                int recordCnt = 0;
+                int Ptr = 0;
+                //
+                const string passwordChrs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999";
+                const int passwordChrsLength = 62;
+                //
+                workingEmail = genericController.encodeText(Email);
+                //
+                result = false;
+                if (string.IsNullOrEmpty(workingEmail)) {
+                    //hint = "110"
+                    errorController.addUserError(cpCore, "Please enter your email address before requesting your username and password.");
+                } else {
+                    //hint = "120"
+                    atPtr = genericController.vbInstr(1, workingEmail, "@");
+                    if (atPtr < 2) {
+                        //
+                        // email not valid
+                        //
+                        //hint = "130"
+                        errorController.addUserError(cpCore, "Please enter a valid email address before requesting your username and password.");
+                    } else {
+                        //hint = "140"
+                        EMailName = vbMid(workingEmail, 1, atPtr - 1);
+                        //
+                        logController.logActivity2(cpCore, "password request for email " + workingEmail, cpCore.doc.authContext.user.id, cpCore.doc.authContext.user.OrganizationID);
+                        //
+                        allowEmailLogin = cpCore.siteProperties.getBoolean("allowEmailLogin", false);
+                        recordCnt = 0;
+                        sqlCriteria = "(email=" + cpCore.db.encodeSQLText(workingEmail) + ")";
+                        if (true) {
+                            sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + cpCore.db.encodeSQLDate(DateTime.Now) + "))";
+                        }
+                        CS = cpCore.db.csOpen("People", sqlCriteria, "ID", SelectFieldList: "username,password", PageSize: 1);
+                        if (!cpCore.db.csOk(CS)) {
+                            //
+                            // valid login account for this email not found
+                            //
+                            if (encodeText(vbMid(workingEmail, atPtr + 1)).ToLower() == "contensive.com") {
+                                //
+                                // look for expired account to renew
+                                //
+                                cpCore.db.csClose(ref CS);
+                                CS = cpCore.db.csOpen("People", "((email=" + cpCore.db.encodeSQLText(workingEmail) + "))", "ID", PageSize: 1);
+                                if (cpCore.db.csOk(CS)) {
+                                    //
+                                    // renew this old record
+                                    //
+                                    //hint = "150"
+                                    cpCore.db.csSet(CS, "developer", "1");
+                                    cpCore.db.csSet(CS, "admin", "1");
+                                    cpCore.db.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
+                                } else {
+                                    //
+                                    // inject support record
+                                    //
+                                    //hint = "150"
+                                    cpCore.db.csClose(ref CS);
+                                    CS = cpCore.db.csInsertRecord("people");
+                                    cpCore.db.csSet(CS, "name", "Contensive Support");
+                                    cpCore.db.csSet(CS, "email", workingEmail);
+                                    cpCore.db.csSet(CS, "developer", "1");
+                                    cpCore.db.csSet(CS, "admin", "1");
+                                    cpCore.db.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
+                                }
+                                cpCore.db.csSave2(CS);
+                            } else {
+                                //hint = "155"
+                                errorController.addUserError(cpCore, "No current user was found matching this email address. Please try again. ");
+                            }
+                        }
+                        if (cpCore.db.csOk(CS)) {
+                            //hint = "160"
+                            FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" + cpCore.webServer.requestDomain);
+                            subject = "Password Request at " + cpCore.webServer.requestDomain;
+                            Message = "";
+                            while (cpCore.db.csOk(CS)) {
+                                //hint = "170"
+                                updateUser = false;
+                                if (string.IsNullOrEmpty(Message)) {
+                                    //hint = "180"
+                                    Message = "This email was sent in reply to a request at " + cpCore.webServer.requestDomain + " for the username and password associated with this email address. ";
+                                    Message = Message + "If this request was made by you, please return to the login screen and use the following:\r\n";
+                                    Message = Message + "\r\n";
+                                } else {
+                                    //hint = "190"
+                                    Message = Message + "\r\n";
+                                    Message = Message + "Additional user accounts with the same email address: \r\n";
+                                }
+                                //
+                                // username
+                                //
+                                //hint = "200"
+                                Username = cpCore.db.csGetText(CS, "Username");
+                                usernameOK = true;
+                                if (!allowEmailLogin) {
+                                    //hint = "210"
+                                    if (Username != Username.Trim()) {
+                                        //hint = "220"
+                                        Username = Username.Trim();
+                                        updateUser = true;
+                                    }
+                                    if (string.IsNullOrEmpty(Username)) {
+                                        //hint = "230"
+                                        //username = emailName & Int(Rnd() * 9999)
+                                        usernameOK = false;
+                                        Ptr = 0;
+                                        while (!usernameOK && (Ptr < 100)) {
+                                            //hint = "240"
+                                            Username = EMailName + EncodeInteger(Math.Floor(EncodeNumber(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
+                                            usernameOK = !cpCore.doc.authContext.isLoginOK(cpCore, Username, "test");
+                                            Ptr = Ptr + 1;
+                                        }
+                                        //hint = "250"
+                                        if (usernameOK) {
+                                            updateUser = true;
+                                        }
+                                    }
+                                    //hint = "260"
+                                    Message = Message + " username: " + Username + "\r\n";
+                                }
+                                //hint = "270"
+                                if (usernameOK) {
+                                    //
+                                    // password
+                                    //
+                                    //hint = "280"
+                                    Password = cpCore.db.csGetText(CS, "Password");
+                                    if (Password.Trim() != Password) {
+                                        //hint = "290"
+                                        Password = Password.Trim();
+                                        updateUser = true;
+                                    }
+                                    //hint = "300"
+                                    if (string.IsNullOrEmpty(Password)) {
+                                        //hint = "310"
+                                        for (Ptr = 0; Ptr <= 8; Ptr++) {
+                                            //hint = "320"
+                                            Index = EncodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
+                                            Password = Password + vbMid(passwordChrs, Index, 1);
+                                        }
+                                        //hint = "330"
+                                        updateUser = true;
+                                    }
+                                    //hint = "340"
+                                    Message = Message + " password: " + Password + "\r\n";
+                                    result = true;
+                                    if (updateUser) {
+                                        //hint = "350"
+                                        cpCore.db.csSet(CS, "username", Username);
+                                        cpCore.db.csSet(CS, "password", Password);
+                                    }
+                                    recordCnt = recordCnt + 1;
+                                }
+                                cpCore.db.csGoNext(CS);
+                            }
+                        }
+                    }
+                }
+                if (result) {
+                    string sendStatus = "";
+                    emailController.sendAdHoc(cpCore, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+            return result;
         }
         //
         //========================================================================
@@ -384,10 +578,10 @@ namespace Contensive.Core.Controllers {
                 loginForm_Password = cpcore.docProperties.getText("password");
                 //
                 if (!genericController.encodeBoolean(cpcore.siteProperties.getBoolean("AllowMemberJoin", false))) {
-                    errorController.error_AddUserError(cpcore, "This site does not accept public main_MemberShip.");
+                    errorController.addUserError(cpcore, "This site does not accept public main_MemberShip.");
                 } else {
                     if (!cpcore.doc.authContext.isNewLoginOK(cpcore, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
-                        errorController.error_AddUserError(cpcore, ErrorMessage);
+                        errorController.addUserError(cpcore, ErrorMessage);
                     } else {
                         if (!(cpcore.doc.debug_iUserError != "")) {
                             CS = cpcore.db.csOpen("people", "ID=" + cpcore.db.encodeSQLNumber(cpcore.doc.authContext.user.id));

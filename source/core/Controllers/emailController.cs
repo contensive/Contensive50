@@ -19,55 +19,50 @@ namespace Contensive.Core.Controllers {
     //
     //====================================================================================================
     /// <summary>
-    /// static class controller
+    /// manage email send and receive
     /// </summary>
     public class emailController : IDisposable {
         //
-        // ----- constants
-        //
-        //Private Const invalidationDaysDefault As Double = 365
-        //
-        // ----- objects constructed that must be disposed
-        //
-        //Private cacheClient As Enyim.Caching.MemcachedClient
-        //
         // ----- private instance storage
         //
-        private coreClass cpcore;
+        private coreClass cpCore;
         //
-        // Email Block List - these are people who have asked to not have email sent to them from this site
-        //   Loaded ondemand by csv_GetEmailBlockList
+        //====================================================================================================
         //
-        private string email_BlockList_Local { get; set; } = "";
-        private bool email_BlockList_LocalLoaded { get; set; }
+        private static void appendEmailLog( coreClass cpCore, string logCopy ) {
+            logController.appendLog(cpCore, logCopy, "email");
+        }
         //
-        private string getBlockList() {
+        //====================================================================================================
+        //
+        public static string getBlockList(coreClass cpCore) {
             //
-            string Filename = null;
+            string privatePathFilename = null;
             //
-            if (!email_BlockList_LocalLoaded) {
-                Filename = "Config\\SMTPBlockList.txt";
-                email_BlockList_Local = cpcore.privateFiles.readFile(Filename);
-                email_BlockList_LocalLoaded = true;
+            if (!cpCore.doc.emailBlockListLocalLoaded) {
+                privatePathFilename = "etc\\SMTPBlockList.txt";
+                cpCore.doc.emailBlockList_Local = cpCore.privateFiles.readFile(privatePathFilename);
+                cpCore.doc.emailBlockListLocalLoaded = true;
             }
-            return email_BlockList_Local;
+            return cpCore.doc.emailBlockList_Local;
             //
         }
-
         //
+        //====================================================================================================
         //
+        public static bool isOnBlockedList(coreClass cpCore, string emailAddress) {
+            return (getBlockList(cpCore).IndexOf("\r\n" + emailAddress + "\t", StringComparison.CurrentCultureIgnoreCase) >= 0);
+        }
         //
-        public void addToBlockList(string EmailAddress) {
-            var blockList = getBlockList();
-            if (string.IsNullOrEmpty(EmailAddress)) {
+        //====================================================================================================
+        //
+        public static void addToBlockList( coreClass cpCore, string EmailAddress) {
+            var blockList = getBlockList(cpCore);
+            if (!verifyEmailAddress(cpCore, EmailAddress)) {
                 //
                 // bad email address
                 //
-            } else if ((EmailAddress.IndexOf("@")  == -1) || (EmailAddress.IndexOf(".")  == -1)) {
-                //
-                // bad email address
-                //
-            } else if (blockList.IndexOf("\r\n" + EmailAddress + "\t") >= 0) {
+            } else if (isOnBlockedList( cpCore, EmailAddress )) {
                 //
                 // They are already in the list
                 //
@@ -75,51 +70,101 @@ namespace Contensive.Core.Controllers {
                 //
                 // add them to the list
                 //
-                email_BlockList_Local = getBlockList() + "\r\n" + EmailAddress + "\t" + DateTime.Now;
-                cpcore.privateFiles.saveFile("Config\\SMTPBlockList.txt", email_BlockList_Local);
-                email_BlockList_LocalLoaded = false;
+                cpCore.doc.emailBlockList_Local = blockList + "\r\n" + EmailAddress + "\t" + DateTime.Now;
+                cpCore.privateFiles.saveFile("Config\\SMTPBlockList.txt", cpCore.doc.emailBlockList_Local);
+                cpCore.doc.emailBlockListLocalLoaded = false;
             }
+        }
+        //
+        //====================================================================================================
+        //
+        private static bool verifyEmail(coreClass cpCore, emailClass email, string returnUserWarning) {
+            bool result = false;
+            try {
+                if (!verifyEmailAddress(cpCore, email.toAddress)) {
+                    //
+                    returnUserWarning = "The to-address is not valid.";
+                } else if (!verifyEmailAddress(cpCore, email.fromAddress)) {
+                    //
+                    returnUserWarning = "The from-address is not valid.";
+                } else {
+                    result = true;
+                }
+                //
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// email address must have at least one character before the @, and have a valid email domain
+        /// </summary>
+        private static bool verifyEmailAddress(coreClass cpCore, string EmailAddress) {
+            bool result = false;
+            try {
+                if (!string.IsNullOrWhiteSpace(EmailAddress)) {
+                    string[] SplitArray = null;
+                    if (EmailAddress.IndexOf("@") > 0) {
+                        SplitArray = EmailAddress.Split('@');
+                        if (SplitArray.GetUpperBound(0) == 1) {
+                            result = verifyEmailDomain(cpCore, SplitArray[1]);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Server must have at least 3 digits, and one dot in the middle
+        /// </summary>
+        public static bool verifyEmailDomain(coreClass cpCore, string emailDomain) {
+            bool result = false;
+            try {
+                //
+                string[] SplitArray = null;
+                //
+                if (!string.IsNullOrWhiteSpace(emailDomain)) {
+                    SplitArray = emailDomain.Split('.');
+                    if (SplitArray.GetUpperBound(0) > 0) {
+                        if ((SplitArray[0].Length > 0) && (SplitArray[1].Length > 0)) {
+                            result = true;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+            }
+            return result;
         }
         //
         //====================================================================================================
         /// <summary>
         /// Send Email
         /// </summary>
-        /// <param name="ToAddress"></param>
-        /// <param name="FromAddress"></param>
-        /// <param name="SubjectMessage"></param>
-        /// <param name="BodyMessage"></param>
-        /// <param name="BounceAddress"></param>
-        /// <param name="ReplyToAddress"></param>
-        /// <param name="ResultLogFilename"></param>
-        /// <param name="isImmediate"></param>
-        /// <param name="isHTML"></param>
-        /// <param name="emailIdOrZeroForLog"></param>
-        /// <returns>OK if send is successful, otherwise returns the principle issue as a user error.</returns>
-        public string send(string ToAddress, string FromAddress, string SubjectMessage, string BodyMessage, string BounceAddress, string ReplyToAddress, string ResultLogFilename, bool isImmediate, bool isHTML, int emailIdOrZeroForLog) {
-            string returnStatus = "";
+        /// <returns>false if the email is not sent successfully and the returnUserWarning argument contains a user compatible message. If true, the returnUserWanting may contain a user compatible message about email issues.</returns>
+        public static bool sendAdHoc(coreClass cpCore, string ToAddress, string FromAddress, string SubjectMessage, string BodyMessage, string BounceAddress, string ReplyToAddress, string ResultLogFilename, bool isImmediate, bool isHTML, int emailIdOrZeroForLog, ref string returnSendStatus) {
+            bool result = false;
             try {
                 //
                 string htmlBody = null;
                 string rootUrl = null;
-                smtpController EmailHandler = new smtpController(cpcore);
                 string iResultLogPathPage = null;
-                string WarningMsg = "";
-                int CSLog = 0;
                 //
-                if (string.IsNullOrEmpty(ToAddress)) {
-                    // block
-                } else if ((ToAddress.IndexOf("@")  == -1) || (ToAddress.IndexOf(".")  == -1)) {
-                    // block
-                } else if (string.IsNullOrEmpty(FromAddress)) {
-                    // block
-                } else if ((FromAddress.IndexOf("@")  == -1) || (FromAddress.IndexOf(".")  == -1)) {
-                    // block
-                } else if (0 != genericController.vbInstr(1, getBlockList(), "\r\n" + ToAddress + "\r\n", 1)) {
+                if (!verifyEmailAddress( cpCore, ToAddress)) {
                     //
-                    // They are in the block list
+                    returnSendStatus = "Email not sent because the to-address is not valid.";
+                } else if (!verifyEmailAddress(cpCore, FromAddress)) {
                     //
-                    returnStatus = "Recipient has blocked this email";
+                    returnSendStatus = "Email not sent because the from-address is not valid.";
+                } else if (0 != genericController.vbInstr(1, getBlockList(cpCore), "\r\n" + ToAddress + "\r\n", 1)) {
+                    //
+                    returnSendStatus = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                 } else {
                     //
                     iResultLogPathPage = ResultLogFilename;
@@ -127,23 +172,23 @@ namespace Contensive.Core.Controllers {
                     // Test for from-address / to-address matches
                     //
                     if (genericController.vbLCase(FromAddress) == genericController.vbLCase(ToAddress)) {
-                        FromAddress = cpcore.siteProperties.getText("EmailFromAddress", "");
+                        FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "");
                         if (string.IsNullOrEmpty(FromAddress)) {
                             //
                             //
                             //
                             FromAddress = ToAddress;
-                            WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering.";
+                            returnSendStatus = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering.";
                         } else if (genericController.vbLCase(FromAddress) == genericController.vbLCase(ToAddress)) {
                             //
                             //
                             //
-                            WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering.";
+                            returnSendStatus = "The from-address matches the to-address [" + FromAddress + "] . This email was sent, but may be blocked by spam filtering.";
                         } else {
                             //
                             //
                             //
-                            WarningMsg = "The from-address matches the to-address. The from-address was changed to " + FromAddress + " to prevent it from being blocked by spam filtering.";
+                            returnSendStatus = "The from-address matches the to-address. The from-address was changed to [" + FromAddress + "] to prevent it from being blocked by spam filtering.";
                         }
                     }
                     //
@@ -151,7 +196,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Fix links for HTML send
                         //
-                        rootUrl = "http://" + cpcore.serverConfig.appConfig.domainList[0] + "/";
+                        rootUrl = "http://" + cpCore.serverConfig.appConfig.domainList[0] + "/";
                         BodyMessage = genericController.ConvertLinksToAbsolute(BodyMessage, rootUrl);
                         //
                         // compose body
@@ -166,59 +211,26 @@ namespace Contensive.Core.Controllers {
                             + "<Base href=\"" + rootUrl + "\" >"
                             + BodyMessage + "</body>"
                             + "</html>";
-                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, cpcore.siteProperties.getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "");
-                    } else {
-                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, cpcore.siteProperties.getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "");
                     }
-                    if (string.IsNullOrEmpty(returnStatus)) {
-                        returnStatus = WarningMsg;
-                    }
-                    //
-                    // ----- Log the send
-                    //
-                    if (true) {
-                        CSLog = cpcore.db.csInsertRecord("Email Log", 0);
-                        if (cpcore.db.csOk(CSLog)) {
-                            cpcore.db.csSet(CSLog, "Name", "System Email Send " + encodeText(DateTime.Now));
-                            cpcore.db.csSet(CSLog, "LogType", EmailLogTypeImmediateSend);
-                            cpcore.db.csSet(CSLog, "SendStatus", returnStatus);
-                            cpcore.db.csSet(CSLog, "toaddress", ToAddress);
-                            cpcore.db.csSet(CSLog, "fromaddress", FromAddress);
-                            cpcore.db.csSet(CSLog, "Subject", SubjectMessage);
-                            if (emailIdOrZeroForLog != 0) {
-                                cpcore.db.csSet(CSLog, "emailid", emailIdOrZeroForLog);
-                            }
-                        }
-                        cpcore.db.csClose(ref CSLog);
-                    }
+                    addToQueue(cpCore, isImmediate, new emailClass() {
+                         attempts = 0,
+                         BounceAddress = BounceAddress,
+                         fromAddress = FromAddress,
+                         htmlBody = htmlBody,
+                         replyToAddress = ReplyToAddress,
+                         subject = SubjectMessage,
+                         textBody = BodyMessage,
+                         toAddress = ToAddress
+                    });
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
                 throw;
             }
-            return returnStatus;
+            return result;
         }
-        //        '
-        //        '
-        //        '
-        //        Public Function getStyles(ByVal EmailID As Integer) As String
-        //            On Error GoTo ErrorTrap 'Const Tn = "getEmailStyles": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-        //            '
-        //            getStyles = cpcore.html.html_getStyleSheet2(csv_contentTypeEnum.contentTypeEmail, 0, genericController.EncodeInteger(EmailID))
-        //            If getStyles <> "" Then
-        //                getStyles = "" _
-        //                    & vbCrLf & StyleSheetStart _
-        //                    & vbCrLf & getStyles _
-        //                    & vbCrLf & StyleSheetEnd
-        //            End If
-        //            '
-        //            '
-        //            Exit Function
-        ////ErrorTrap:
-        //            cpcore.handleException(New Exception("Unexpected exception"))
-        //        End Function
-        //  
-        //========================================================================
+        //
+        //====================================================================================================
         /// <summary>
         /// Send email to a memberId, returns ok if send is successful, otherwise returns the principle issue as a user error.
         /// </summary>
@@ -232,127 +244,80 @@ namespace Contensive.Core.Controllers {
         /// <param name="template"></param>
         /// <param name="EmailAllowLinkEID"></param>
         /// <returns> returns ok if send is successful, otherwise returns the principle issue as a user error</returns>
-        public string sendPerson(int personId, string FromAddress, string subject, string Body, bool Immediate, bool HTML, int emailIdOrZeroForLog, string template, bool EmailAllowLinkEID) {
-            string returnStatus = "";
+        public static bool sendPerson(coreClass cpCore, personModel person, string FromAddress, string subject, string Body, bool Immediate, bool HTML, int emailIdOrZeroForLog, string template, bool EmailAllowLinkEID, ref string returnSendStatus, string queryStringForLinkAppend ) {
+            bool result = false;
             try {
-                int CS = 0;
-                string ToAddress = null;
-                string layoutError = "";
-                string subjectEncoded = null;
-                string bodyEncoded = null;
-                string templateEncoded = null;
-                //
-                subjectEncoded = subject;
-                bodyEncoded = Body;
-                templateEncoded = template;
-                //
-                CS = cpcore.db.cs_openContentRecord("People", personId, 0, false, false, "email");
-                if (cpcore.db.csOk(CS)) {
-                    ToAddress = encodeText(cpcore.db.csGetText(CS, "email")).Trim(' ');
-                    if (string.IsNullOrEmpty(ToAddress)) {
-                        returnStatus = "The email was not sent because the to-address was blank.";
-                    } else if ((ToAddress.IndexOf("@")  == -1) || (ToAddress.IndexOf(".")  == -1)) {
-                        returnStatus = "The email was not sent because the to-address [" + ToAddress + "] was not valid.";
-                    } else if (string.IsNullOrEmpty(FromAddress)) {
-                        returnStatus = "The email was not sent because the from-address was blank.";
-                    } else if ((FromAddress.IndexOf("@")  == -1) || (FromAddress.IndexOf(".")  == -1)) {
-                        returnStatus = "The email was not sent because the from-address [" + FromAddress + "] was not valid.";
-                    } else {
+                if (person == null) {
+                    returnSendStatus = "The email was not sent because the recipient could not be found by thier id [" + person.id.ToString() + "]";
+                } else {
+                    //
+                    // -- personalize subject
+                    string personalizedSubject = subject;
+                    personalizedSubject  = contentCmdController.executeContentCommands(cpCore, personalizedSubject, CPUtilsBaseClass.addonContext.ContextEmail, person.id, true, ref returnSendStatus);
+                    personalizedSubject = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, personalizedSubject, person.id, queryStringForLinkAppend);
+                    //
+                    // -- personalize body
+                    string personalizedBody = Body;
+                    personalizedBody = contentCmdController.executeContentCommands(cpCore, personalizedBody, CPUtilsBaseClass.addonContext.ContextEmail, person.id, true, ref returnSendStatus);
+                    personalizedBody = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, personalizedBody, person.id, queryStringForLinkAppend);
+                    //
+                    // -- encode template
+                    if (!string.IsNullOrWhiteSpace(template)) {
+                        string personalizedTemplate = template;
+                        personalizedTemplate = contentCmdController.executeContentCommands(cpCore, personalizedTemplate, CPUtilsBaseClass.addonContext.ContextEmail, person.id, true, ref returnSendStatus);
+                        personalizedTemplate = activeContentController.convertActiveContentToHtmlForEmailSend(cpCore, personalizedTemplate, person.id, queryStringForLinkAppend);
                         //
-                        // encode subject
-                        //
-                        subjectEncoded = cpcore.html.executeContentCommands(null, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, true, ref layoutError);
-                        subjectEncoded = activeContentController.convertActiveContentToHtmlForEmailSend(cpcore, subjectEncoded, personId, "");
-                        //subjectEncoded = cpcore.html.convertActiveContent_internal(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
-                        //
-                        // encode Body
-                        //
-                        bodyEncoded = cpcore.html.executeContentCommands(null, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, true, ref layoutError);
-                        bodyEncoded = activeContentController.convertActiveContentToHtmlForEmailSend(cpcore, bodyEncoded, personId, "");
-                        //bodyEncoded = cpcore.html.convertActiveContent_internal(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
-                        //
-                        // encode template
-                        //
-                        if (!string.IsNullOrEmpty(templateEncoded)) {
-                            templateEncoded = cpcore.html.executeContentCommands(null, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, true, ref layoutError);
-                            templateEncoded = activeContentController.convertActiveContentToHtmlForEmailSend(cpcore, templateEncoded, personId, "");
-                            //templateEncoded = cpcore.html.convertActiveContent_internal(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList[0], True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
-                            //
-                            if (templateEncoded.IndexOf(fpoContentBox)  != -1) {
-                                bodyEncoded = genericController.vbReplace(templateEncoded, fpoContentBox, bodyEncoded);
-                            } else {
-                                bodyEncoded = templateEncoded + bodyEncoded;
-                            }
+                        // -- merge body into template
+                        if (personalizedTemplate.IndexOf(fpoContentBox) != -1) {
+                            personalizedBody = genericController.vbReplace(personalizedTemplate, fpoContentBox, personalizedBody);
+                        } else {
+                            personalizedBody = personalizedTemplate + personalizedBody;
                         }
-                        bodyEncoded = genericController.vbReplace(bodyEncoded, "#member_id#", personId.ToString());
-                        bodyEncoded = genericController.vbReplace(bodyEncoded, "#member_email#", ToAddress);
-                        //
-                        returnStatus = send(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog);
+                    }
+                    //
+                    // -- customized fields added by trigger code
+                    personalizedBody = genericController.vbReplace(personalizedBody, "#member_id#", person.id.ToString());
+                    personalizedBody = genericController.vbReplace(personalizedBody, "#member_email#", person.Email);
+
+                    var email = new emailClass() {
+                        attempts = 0,
+                        BounceAddress = "",
+                        emailId = 0,
+                        fromAddress = FromAddress,
+                        htmlBody = personalizedBody,
+                        replyToAddress = "",
+                        subject = personalizedSubject,
+                        textBody = personalizedBody,
+                        toAddress = person.Email
+                    };
+                    if (verifyEmail(cpCore, email, returnSendStatus)) {
+                        addToQueue(cpCore, Immediate, email);
+                        result = true;
                     }
                 }
-                cpcore.db.csClose(ref CS);
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
                 throw;
             }
-            return returnStatus;
+            return result;
         }
         //
-        //========================================================================
-        // Set the email sql for all members marked to receive the email
-        //   Used to send the email and as body on the email test
-        //========================================================================
-        //
-        public string getGroupSql(int EmailID) {
-            return "SELECT "
-                    + " u.ID AS ID"
-                    + " ,u.Name AS Name"
-                    + " ,u.Email AS Email "
-                    + " "
-                    + " from "
-                    + " (((ccMembers u"
-                    + " left join ccMemberRules mr on mr.memberid=u.id)"
-                    + " left join ccGroups g on g.id=mr.groupid)"
-                    + " left join ccEmailGroups r on r.groupid=g.id)"
-                    + " "
-                    + " where "
-                    + " (r.EmailID=1) "
-                    + " and(r.Active<>0) "
-                    + " and(g.Active<>0) "
-                    + " and(g.AllowBulkEmail<>0) "
-                    + " and(mr.Active<>0) "
-                    + " and(u.Active<>0) "
-                    + " and(u.AllowBulkEmail<>0)"
-                    + " AND((mr.DateExpires is null)OR(mr.DateExpires>'20161205 22:40:58:184')) "
-                    + " "
-                    + " group by "
-                    + " u.ID, u.Name, u.Email "
-                    + " "
-                    + " having ((u.Email Is Not Null) and(u.Email<>'')) "
-                    + " "
-                    + " order by u.Email,u.ID"
-                    + " ";
-        }
-        //
-        // ----- Need to test this and make it public
-        //
-        //   This is what the admin site should call for both test and group email
-        //   Making it public lets developers send email that administrators can control
-        //
-        public string sendSystem(string EMailName, string AdditionalCopy, int AdditionalMemberIDOrZero) {
+        //====================================================================================================
+        /// <summary>
+        /// Send System Email. System emails are admin editable emails that can be programmatically sent, or sent by application events like page visits.
+        /// </summary>
+        /// <param name="cpCore"></param>
+        /// <param name="emailName"></param>
+        /// <param name="appendedCopy"></param>
+        /// <param name="AdditionalMemberIDOrZero"></param>
+        /// <returns></returns>
+        public static string sendSystem(coreClass cpCore, string emailName, string appendedCopy = "", int AdditionalMemberIDOrZero = 0) {
             string returnString = "";
             try {
                 //
                 bool isAdmin = false;
                 int iAdditionalMemberID = 0;
-                string layoutError = null;
-                string emailstyles = null;
                 int EmailRecordID = 0;
-                int CSPeople = 0;
-                int CSEmail = 0;
-                int CSLog = 0;
-                string EmailToAddress = null;
-                string EmailToName = null;
                 string SQL = null;
                 string EmailFrom = null;
                 string EmailSubjectSource = null;
@@ -361,231 +326,140 @@ namespace Contensive.Core.Controllers {
                 bool EmailAllowLinkEID = false;
                 int EmailToConfirmationMemberID = 0;
                 string EmailStatusMessage = "";
-                int EMailToMemberID = 0;
-                string EmailSubject = null;
-                string ClickFlagQuery = null;
-                string EmailBody = null;
-                string EmailStatus = null;
+                
                 string BounceAddress = null;
-                string SelectList = null;
                 int EMailTemplateID = 0;
-                string EmailTemplate = null;
                 string EmailTemplateSource = "";
                 int CS = 0;
-                bool isValid = false;
                 //
                 returnString = "";
                 iAdditionalMemberID = AdditionalMemberIDOrZero;
                 //
-                if (true) {
-                    SelectList = "ID,TestMemberID,FromAddress,Subject,copyfilename,AddLinkEID,AllowSpamFooter,EmailTemplateID";
-                } else {
-                    SelectList = "ID,TestMemberID,FromAddress,Subject,copyfilename,AddLinkEID,AllowSpamFooter,0 as EmailTemplateID";
-                }
-                CSEmail = cpcore.db.csOpen("System Email", "name=" + cpcore.db.encodeSQLText(EMailName), "ID", false, 0, false, false, SelectList);
-                if (!cpcore.db.csOk(CSEmail)) {
-                    //
-                    // ----- Email was not found
-                    //
-                    cpcore.db.csClose(ref CSEmail);
-                    CSEmail = cpcore.db.csInsertRecord("System Email");
-                    cpcore.db.csSet(CSEmail, "name", EMailName);
-                    cpcore.db.csSet(CSEmail, "Subject", EMailName);
-                    cpcore.db.csSet(CSEmail, "FromAddress", cpcore.siteProperties.getText("EmailAdmin", "webmaster@" + cpcore.serverConfig.appConfig.domainList[0]));
-                    //Call app.csv_SetCS(CSEmail, "caption", EmailName)
-                    cpcore.db.csClose(ref CSEmail);
-                    cpcore.handleException(new ApplicationException("No system email was found with the name [" + EMailName + "]. A new email blank was created but not sent."));
+                systemEmailModel email = systemEmailModel.createByName(cpCore, emailName);
+                if ( email == null ) {
+                    email = systemEmailModel.add(cpCore);
+                    email.name = emailName; 
+                    email.Subject = emailName;
+                    email.FromAddress = cpCore.siteProperties.getText("EmailAdmin", "webmaster@" + cpCore.serverConfig.appConfig.domainList[0]);
+                    email.save(cpCore);
+                    cpCore.handleException(new ApplicationException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
                 } else {
                     //
                     // --- collect values needed for send
                     //
-                    EmailRecordID = cpcore.db.csGetInteger(CSEmail, "ID");
-                    EmailToConfirmationMemberID = cpcore.db.csGetInteger(CSEmail, "testmemberid");
-                    EmailFrom = cpcore.db.csGetText(CSEmail, "FromAddress");
-                    EmailSubjectSource = cpcore.db.csGetText(CSEmail, "Subject");
-                    EmailBodySource = cpcore.db.csGet(CSEmail, "copyfilename") + AdditionalCopy;
-                    EmailAllowLinkEID = cpcore.db.csGetBoolean(CSEmail, "AddLinkEID");
-                    BounceAddress = cpcore.siteProperties.getText("EmailBounceAddress", "");
+                    EmailRecordID = email.id;
+                    EmailToConfirmationMemberID = email.TestMemberID;
+                    EmailFrom = email.FromAddress;
+                    EmailSubjectSource = email.Subject;
+                    EmailBodySource = cpCore.cdnFiles.readFile( email.CopyFilename ) + appendedCopy;
+                    EmailAllowLinkEID = email.AddLinkEID;
+                    BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "");
                     if (string.IsNullOrEmpty(BounceAddress)) {
                         BounceAddress = EmailFrom;
                     }
-                    EMailTemplateID = cpcore.db.csGetInteger(CSEmail, "EmailTemplateID");
-                    //
-                    // Get the Email Template
-                    //
-                    if (EMailTemplateID != 0) {
-                        CS = cpcore.db.cs_openContentRecord("Email Templates", EMailTemplateID);
-                        if (cpcore.db.csOk(CS)) {
-                            EmailTemplateSource = cpcore.db.csGet(CS, "BodyHTML");
-                        }
-                        cpcore.db.csClose(ref CS);
+                    emailTemplateModel emailTemplate = emailTemplateModel.create(cpCore, email.EmailTemplateID);
+                    if ( emailTemplate!=null) {
+                        EmailTemplateSource = emailTemplate.BodyHTML;
                     }
-                    if (string.IsNullOrEmpty(EmailTemplateSource)) {
+                    if (string.IsNullOrWhiteSpace(EmailTemplateSource)) {
                         EmailTemplateSource = "<div style=\"padding:10px\"><ac type=content></div>";
                     }
                     //
-                    // add styles to the template
-                    //
-                    //emailstyles = getStyles(EmailRecordID)
-                    //EmailTemplateSource = emailstyles & EmailTemplateSource
-                    //
                     // Spam Footer
                     //
-                    if (cpcore.db.csGetBoolean(CSEmail, "AllowSpamFooter")) {
+                    if (email.AllowSpamFooter) {
                         //
                         // This field is default true, and non-authorable
                         // It will be true in all cases, except a possible unforseen exception
                         //
-                        EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML("http://" + cpcore.serverConfig.appConfig.domainList[0] + "/" + cpcore.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                        EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML("http://" + cpCore.serverConfig.appConfig.domainList[0] + "/" + cpCore.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", cpCore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                     }
                     //
                     // --- Send message to the additional member
                     //
                     if (iAdditionalMemberID != 0) {
-                        EmailStatusMessage = EmailStatusMessage + BR + "Primary Recipient:" + BR;
-                        CSPeople = cpcore.db.cs_openContentRecord("People", iAdditionalMemberID, 0, false, false, "ID,Name,Email");
-                        if (cpcore.db.csOk(CSPeople)) {
-                            EMailToMemberID = cpcore.db.csGetInteger(CSPeople, "ID");
-                            EmailToName = cpcore.db.csGetText(CSPeople, "name");
-                            EmailToAddress = cpcore.db.csGetText(CSPeople, "email");
-                            if (string.IsNullOrEmpty(EmailToAddress)) {
-                                EmailStatusMessage = EmailStatusMessage + "&nbsp;&nbsp;Error: Not Sent to " + EmailToName + " (people #" + EMailToMemberID + ") because their email address was blank." + BR;
+                        EmailStatusMessage +=  BR + "Primary Recipient:" + BR;
+                        personModel person = personModel.create(cpCore, iAdditionalMemberID);
+                        if (person == null) {
+                            EmailStatusMessage += "&nbsp;&nbsp;Error: Not sent additional user [#" + iAdditionalMemberID + "] because the user record could not be found." + BR;
+                        } else {
+                            if (string.IsNullOrWhiteSpace(person.Email)) {
+                                EmailStatusMessage += "&nbsp;&nbsp;Error: Not sent additional user [#" + iAdditionalMemberID + "] because their email address was blank." + BR;
                             } else {
-                                EmailStatus = sendPerson(iAdditionalMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, false, true, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID);
-                                if (string.IsNullOrEmpty(EmailStatus)) {
-                                    EmailStatus = "ok";
-                                }
-                                EmailStatusMessage = EmailStatusMessage + "&nbsp;&nbsp;Sent to " + EmailToName + " at " + EmailToAddress + ", Status = " + EmailStatus + BR;
+                                string EmailStatus = "";
+                                string queryStringForLinkAppend = "";
+                                sendPerson(cpCore, person, EmailFrom, EmailSubjectSource, EmailBodySource, false, true, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID, ref EmailStatus, queryStringForLinkAppend);
+                                EmailStatusMessage += "&nbsp;&nbsp;Sent to " + person.name + " at " + person.Email + ", Status = " + EmailStatus + BR;
                             }
                         }
-                        cpcore.db.csClose(ref CSPeople);
                     }
                     //
                     // --- Send message to everyone selected
                     //
-                    EmailStatusMessage = EmailStatusMessage + BR + "Recipients in selected System Email groups:" + BR;
-                    SQL = getGroupSql(EmailRecordID);
-                    CSPeople = cpcore.db.csOpenSql_rev("default", SQL);
-                    while (cpcore.db.csOk(CSPeople)) {
-                        EMailToMemberID = cpcore.db.csGetInteger(CSPeople, "ID");
-                        EmailToName = cpcore.db.csGetText(CSPeople, "name");
-                        EmailToAddress = cpcore.db.csGetText(CSPeople, "email");
-                        if (string.IsNullOrEmpty(EmailToAddress)) {
-                            EmailStatusMessage = EmailStatusMessage + "&nbsp;&nbsp;Not Sent to " + EmailToName + ", people #" + EMailToMemberID + " because their email address was blank." + BR;
+                    EmailStatusMessage += BR + "Recipients in selected System Email groups:" + BR;
+                    List<int> peopleIdList = personModel.createidListForEmail(cpCore, EmailRecordID);
+                    foreach (var personId in peopleIdList) {
+                        var person = personModel.create(cpCore, personId);
+                        if (person == null) {
+                            EmailStatusMessage += "&nbsp;&nbsp;Error: Not sent user [#" + iAdditionalMemberID + "] because the user record could not be found." + BR;
                         } else {
-                            EmailStatus = sendPerson(EMailToMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, false, true, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID);
-                            if (string.IsNullOrEmpty(EmailStatus)) {
-                                EmailStatus = "ok";
+                            if (string.IsNullOrWhiteSpace(person.Email)) {
+                                EmailStatusMessage += "&nbsp;&nbsp;Error: Not sent user [#" + iAdditionalMemberID + "] because their email address was blank." + BR;
+                            } else {
+                                string EmailStatus = "";
+                                string queryStringForLinkAppend = "";
+                                sendPerson(cpCore, person, EmailFrom, EmailSubjectSource, EmailBodySource, false, true, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID, ref EmailStatus, queryStringForLinkAppend);
+                                EmailStatusMessage += "&nbsp;&nbsp;Sent to " + person.name + " at " + person.Email + ", Status = " + EmailStatus + BR;
                             }
-                            EmailStatusMessage = EmailStatusMessage + "&nbsp;&nbsp;Sent to " + EmailToName + " at " + EmailToAddress + ", Status = " + EmailStatus + BR;
-                            cpcore.db.csGoNext(CSPeople);
                         }
                     }
-                    cpcore.db.csClose(ref CSPeople);
                     //
                     // --- Send the completion message to the administrator
                     //
                     if (EmailToConfirmationMemberID == 0) {
-                        // AddUserError ("No confirmation email was sent because no confirmation member was selected")
+                        // 
                     } else {
-                        //
-                        // get the confirmation info
-                        //
-                        isValid = false;
-                        CSPeople = cpcore.db.cs_openContentRecord("people", EmailToConfirmationMemberID);
-                        if (cpcore.db.csOk(CSPeople)) {
-                            isValid = cpcore.db.csGetBoolean(CSPeople, "active");
-                            EMailToMemberID = cpcore.db.csGetInteger(CSPeople, "ID");
-                            EmailToName = cpcore.db.csGetText(CSPeople, "name");
-                            EmailToAddress = cpcore.db.csGetText(CSPeople, "email");
-                            isAdmin = cpcore.db.csGetBoolean(CSPeople, "admin");
-                        }
-                        cpcore.db.csClose(ref CSPeople);
-                        //
-                        if (!isValid) {
-                            //returnString = "Administrator: The confirmation email was not sent because the confirmation email person is not selected or inactive, " & EmailStatus
-                        } else {
+                        personModel person = personModel.create(cpCore, EmailToConfirmationMemberID);
+                        if ( person!=null ) {
+                            ConfirmBody =  "<div style=\"padding:10px;\">" + BR;
+                            ConfirmBody +=  "The follow System Email was sent." + BR;
+                            ConfirmBody +=  "" + BR;
+                            ConfirmBody +=  "If this email includes personalization, each email sent was personalized to it's recipient. This confirmation has been personalized to you." + BR;
+                            ConfirmBody +=  "" + BR;
+                            ConfirmBody +=  "Subject: " + EmailSubjectSource + BR;
+                            ConfirmBody +=  "From: " + EmailFrom + BR;
+                            ConfirmBody +=  "Bounces return to: " + BounceAddress + BR;
+                            ConfirmBody +=  "Body:" + BR;
+                            ConfirmBody +=  "<div style=\"clear:all\">----------------------------------------------------------------------</div>" + BR;
+                            ConfirmBody +=  EmailBodySource + BR;
+                            ConfirmBody +=  "<div style=\"clear:all\">----------------------------------------------------------------------</div>" + BR;
+                            ConfirmBody +=  "--- recipient list ---" + BR;
+                            ConfirmBody +=  EmailStatusMessage + BR;
+                            ConfirmBody +=  "--- end of list ---" + BR;
+                            ConfirmBody +=  "</div>";
                             //
-                            // Encode the body
-                            //
-                            EmailBody = EmailBodySource + "";
-                            //
-                            // Encode the template
-                            //
-                            EmailTemplate = EmailTemplateSource;
-                            //
-                            EmailSubject = EmailSubjectSource;
-                            //
-                            ConfirmBody = ConfirmBody + "<div style=\"padding:10px;\">" + BR;
-                            ConfirmBody = ConfirmBody + "The follow System Email was sent." + BR;
-                            ConfirmBody = ConfirmBody + "" + BR;
-                            ConfirmBody = ConfirmBody + "If this email includes personalization, each email sent was personalized to it's recipient. This confirmation has been personalized to you." + BR;
-                            ConfirmBody = ConfirmBody + "" + BR;
-                            ConfirmBody = ConfirmBody + "Subject: " + EmailSubject + BR;
-                            ConfirmBody = ConfirmBody + "From: " + EmailFrom + BR;
-                            ConfirmBody = ConfirmBody + "Bounces return to: " + BounceAddress + BR;
-                            ConfirmBody = ConfirmBody + "Body:" + BR;
-                            ConfirmBody = ConfirmBody + "<div style=\"clear:all\">----------------------------------------------------------------------</div>" + BR;
-                            ConfirmBody = ConfirmBody + EmailBody + BR;
-                            ConfirmBody = ConfirmBody + "<div style=\"clear:all\">----------------------------------------------------------------------</div>" + BR;
-                            ConfirmBody = ConfirmBody + "--- recipient list ---" + BR;
-                            ConfirmBody = ConfirmBody + EmailStatusMessage + BR;
-                            ConfirmBody = ConfirmBody + "--- end of list ---" + BR;
-                            ConfirmBody = ConfirmBody + "</div>";
-                            //
-                            EmailStatus = sendPerson(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " + cpcore.serverConfig.appConfig.domainList[0], ConfirmBody, false, true, EmailRecordID, "", false);
+                            string EmailStatus = "";
+                            string queryStringForLinkAppend = "";
+                            sendPerson(cpCore, person, EmailFrom, "System Email confirmation from " + cpCore.serverConfig.appConfig.domainList[0], ConfirmBody, false, true, EmailRecordID, "", false, ref EmailStatus, queryStringForLinkAppend );
                             if (isAdmin && (!string.IsNullOrEmpty(EmailStatus))) {
                                 returnString = "Administrator: There was a problem sending the confirmation email, " + EmailStatus;
                             }
                         }
                     }
-                    //
-                    // ----- Done
-                    //
-                    cpcore.db.csClose(ref CSPeople);
                 }
-                cpcore.db.csClose(ref CSEmail);
-                //
-                //
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
             }
             return returnString;
         }
         //
-        //========================================================================
-        /// <summary>
-        /// Send Email to address
-        /// </summary>
-        /// <param name="ToAddress"></param>
-        /// <param name="FromAddress"></param>
-        /// <param name="SubjectMessage"></param>
-        /// <param name="BodyMessage"></param>
-        /// <param name="optionalEmailIdForLog"></param>
-        /// <param name="Immediate"></param>
-        /// <param name="HTML"></param>
-        /// <returns>Returns OK if successful, otherwise returns user status</returns>
-        public string send_Legacy(string ToAddress, string FromAddress, string SubjectMessage, string BodyMessage, int optionalEmailIdForLog = 0, bool Immediate = true, bool HTML = false) {
-            string returnStatus = "";
-            try {
-                returnStatus = send(genericController.encodeText(ToAddress), genericController.encodeText(FromAddress), genericController.encodeText(SubjectMessage), genericController.encodeText(BodyMessage), "", "", "", Immediate, genericController.encodeBoolean(HTML), genericController.EncodeInteger(optionalEmailIdForLog));
-            } catch (Exception ex) {
-                cpcore.handleException(ex);
-                throw;
-            }
-            return returnStatus;
-        }
-        //
         //====================================================================================================
         /// <summary>
-        /// send the confirmation email as a test
+        /// send the confirmation email as a test. 
         /// </summary>
         /// <param name="EmailID"></param>
         /// <param name="ConfirmationMemberID"></param>
-        public void sendConfirmationTest(int EmailID, int ConfirmationMemberID) {
+        public static void sendConfirmationTest(coreClass cpCore, int EmailID, int ConfirmationMemberID) {
             try {
                 string ConfirmFooter = "";
                 int TotalCnt = 0;
@@ -615,23 +489,23 @@ namespace Contensive.Core.Controllers {
                 string EmailStatus = null;
                 // Dim emailstyles As String
                 //
-                CS = cpcore.db.csOpenRecord("email", EmailID);
-                if (!cpcore.db.csOk(CS)) {
-                    errorController.error_AddUserError(cpcore, "There was a problem sending the email confirmation. The email record could not be found.");
+                CS = cpCore.db.csOpenRecord("email", EmailID);
+                if (!cpCore.db.csOk(CS)) {
+                    errorController.addUserError(cpCore, "There was a problem sending the email confirmation. The email record could not be found.");
                 } else {
-                    EmailSubject = cpcore.db.csGet(CS, "Subject");
-                    EmailBody = cpcore.db.csGet(CS, "copyFilename");
+                    EmailSubject = cpCore.db.csGet(CS, "Subject");
+                    EmailBody = cpCore.db.csGet(CS, "copyFilename");
                     //
                     // merge in template
                     //
                     EmailTemplate = "";
-                    EMailTemplateID = cpcore.db.csGetInteger(CS, "EmailTemplateID");
+                    EMailTemplateID = cpCore.db.csGetInteger(CS, "EmailTemplateID");
                     if (EMailTemplateID != 0) {
-                        CSTemplate = cpcore.db.csOpenRecord("Email Templates", EMailTemplateID, false, false, "BodyHTML");
-                        if (cpcore.db.csOk(CSTemplate)) {
-                            EmailTemplate = cpcore.db.csGet(CSTemplate, "BodyHTML");
+                        CSTemplate = cpCore.db.csOpenRecord("Email Templates", EMailTemplateID, false, false, "BodyHTML");
+                        if (cpCore.db.csOk(CSTemplate)) {
+                            EmailTemplate = cpCore.db.csGet(CSTemplate, "BodyHTML");
                         }
-                        cpcore.db.csClose(ref CSTemplate);
+                        cpCore.db.csClose(ref CSTemplate);
                     }
                     //
                     // styles
@@ -641,28 +515,26 @@ namespace Contensive.Core.Controllers {
                     //
                     // spam footer
                     //
-                    if (cpcore.db.csGetBoolean(CS, "AllowSpamFooter")) {
+                    if (cpCore.db.csGetBoolean(CS, "AllowSpamFooter")) {
                         //
                         // This field is default true, and non-authorable
                         // It will be true in all cases, except a possible unforseen exception
                         //
-                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML(cpcore.webServer.requestProtocol + cpcore.webServer.requestDomain + requestAppRootPath + cpcore.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + genericController.csv_GetLinkedText("<a href=\"" + genericController.encodeHTML(cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain + requestAppRootPath + cpCore.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", cpCore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                         EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress");
                     }
                     //
                     // Confirm footer
                     //
-                    SQL = getGroupSql(EmailID);
-                    CSPeople = cpcore.db.csOpenSql(SQL);
-                    if (!cpcore.db.csOk(CSPeople)) {
-                        errorController.error_AddUserError(cpcore, "There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.");
+                    var personIdList = personModel.createidListForEmail(cpCore, EmailID);
+                    if ( personIdList.Count==0) {
+                        errorController.addUserError(cpCore, "There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.");
                     } else {
-                        //TotalList = TotalList & "--- all recipients ---" & BR
-                        LastEmail = "empty";
-                        while (cpcore.db.csOk(CSPeople)) {
-                            Emailtext = cpcore.db.csGet(CSPeople, "email");
-                            EMailName = cpcore.db.csGet(CSPeople, "name");
-                            EmailMemberID = cpcore.db.csGetInteger(CSPeople, "ID");
+                        foreach (var personId in personIdList) {
+                            var person = personModel.create(cpCore, personId);
+                            Emailtext = person.Email;
+                            EMailName = person.name;
+                            EmailMemberID = person.id;
                             if (string.IsNullOrEmpty(EMailName)) {
                                 EMailName = "no name (member id " + EmailMemberID + ")";
                             }
@@ -694,33 +566,30 @@ namespace Contensive.Core.Controllers {
                             TotalList = TotalList + EmailLine + BR;
                             LastEmail = Emailtext;
                             TotalCnt = TotalCnt + 1;
-                            cpcore.db.csGoNext(CSPeople);
                         }
-                        //TotalList = TotalList & "--- end all recipients ---" & BR
                     }
-                    cpcore.db.csClose(ref CSPeople);
                     //
                     if (DupCnt == 1) {
-                        errorController.error_AddUserError(cpcore, "There is 1 duplicate email address. See the test email for details.");
+                        errorController.addUserError(cpCore, "There is 1 duplicate email address. See the test email for details.");
                         ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There is 1 duplicate email address. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=\"margin:20px;\">" + DupList + "</div></div>";
                     } else if (DupCnt > 1) {
-                        errorController.error_AddUserError(cpcore, "There are " + DupCnt + " duplicate email addresses. See the test email for details");
+                        errorController.addUserError(cpCore, "There are " + DupCnt + " duplicate email addresses. See the test email for details");
                         ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are " + DupCnt + " duplicate email addresses. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=\"margin:20px;\">" + DupList + "</div></div>";
                     }
                     //
                     if (BadCnt == 1) {
-                        errorController.error_AddUserError(cpcore, "There is 1 invalid email address. See the test email for details.");
+                        errorController.addUserError(cpCore, "There is 1 invalid email address. See the test email for details.");
                         ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There is 1 invalid email address<div style=\"margin:20px;\">" + BadList + "</div></div>";
                     } else if (BadCnt > 1) {
-                        errorController.error_AddUserError(cpcore, "There are " + BadCnt + " invalid email addresses. See the test email for details");
+                        errorController.addUserError(cpCore, "There are " + BadCnt + " invalid email addresses. See the test email for details");
                         ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are " + BadCnt + " invalid email addresses<div style=\"margin:20px;\">" + BadList + "</div></div>";
                     }
                     //
                     if (BlankCnt == 1) {
-                        errorController.error_AddUserError(cpcore, "There is 1 blank email address. See the test email for details");
+                        errorController.addUserError(cpCore, "There is 1 blank email address. See the test email for details");
                         ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There is 1 blank email address.</div>";
                     } else if (BlankCnt > 1) {
-                        errorController.error_AddUserError(cpcore, "There are " + DupCnt + " blank email addresses. See the test email for details.");
+                        errorController.addUserError(cpCore, "There are " + DupCnt + " blank email addresses. See the test email for details.");
                         ConfirmFooter = ConfirmFooter + "<div style=\"clear:all\">WARNING: There are " + BlankCnt + " blank email addresses.</div>";
                     }
                     //
@@ -733,28 +602,31 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     if (ConfirmationMemberID == 0) {
-                        errorController.error_AddUserError(cpcore, "No confirmation email was send because a Confirmation member is not selected");
+                        errorController.addUserError(cpCore, "No confirmation email was send because a Confirmation member is not selected");
                     } else {
-                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;margin:10px;border:1px dashed #888;\">Administrator<br><br>" + ConfirmFooter + "</div>";
-                        EmailStatus = sendPerson(ConfirmationMemberID, cpcore.db.csGetText(CS, "FromAddress"), EmailSubject, EmailBody, true, true, EmailID, EmailTemplate, false);
-                        if (EmailStatus != "ok") {
-                            errorController.error_AddUserError(cpcore, EmailStatus);
+                        personModel person = personModel.create(cpCore, ConfirmationMemberID);
+                        if (person == null) {
+                            errorController.addUserError(cpCore, "No confirmation email was send because a Confirmation member is not selected");
+                        } else { 
+                            EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;margin:10px;border:1px dashed #888;\">Administrator<br><br>" + ConfirmFooter + "</div>";
+                            string queryStringForLinkAppend = "";
+                            string sendStatus = "";
+                            if (!sendPerson(cpCore, person, cpCore.db.csGetText(CS, "FromAddress"), EmailSubject, EmailBody, true, true, EmailID, EmailTemplate, false, ref sendStatus, queryStringForLinkAppend)) {
+                                errorController.addUserError(cpCore, EmailStatus);
+                            }
                         }
                     }
                 }
-                cpcore.db.csClose(ref CS);
+                cpCore.db.csClose(ref CS);
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
                 throw;
             }
         }
         //
-        //========================================================================
-        // main_SendFormEmail
-        //   sends an email with the contents of a form
-        //========================================================================
+        //====================================================================================================
         //
-        public void sendForm(string SendTo, string SendFrom, string SendSubject) {
+        public static void sendForm( coreClass cpCore,string SendTo, string SendFrom, string SendSubject) {
             try {
                 string Message = "";
                 string iSendTo = null;
@@ -766,19 +638,19 @@ namespace Contensive.Core.Controllers {
                 iSendSubject = genericController.encodeText(SendSubject);
                 //
                 if ((iSendTo.IndexOf("@")  == -1)) {
-                    iSendTo = cpcore.siteProperties.getText("TrapEmail");
+                    iSendTo = cpCore.siteProperties.getText("TrapEmail");
                     iSendSubject = "EmailForm with bad Sendto address";
                     Message = "Subject: " + iSendSubject;
                     Message = Message + "\r\n";
                 }
-                Message = Message + "The form was submitted " + cpcore.doc.profileStartTime + "\r\n";
+                Message = Message + "The form was submitted " + cpCore.doc.profileStartTime + "\r\n";
                 Message = Message + "\r\n";
                 Message = Message + "All text fields are included, completed or not.\r\n";
                 Message = Message + "Only those checkboxes that are checked are included.\r\n";
                 Message = Message + "Entries are not in the order they appeared on the form.\r\n";
                 Message = Message + "\r\n";
-                foreach (string key in cpcore.docProperties.getKeyList()) {
-                    var tempVar = cpcore.docProperties.getProperty(key);
+                foreach (string key in cpCore.docProperties.getKeyList()) {
+                    var tempVar = cpCore.docProperties.getProperty(key);
                     if (tempVar.IsForm) {
                         if (genericController.vbUCase(tempVar.Value) == "ON") {
                             Message = Message + tempVar.Name + ": Yes\r\n\r\n";
@@ -787,313 +659,116 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                //
-                send_Legacy(iSendTo, iSendFrom, iSendSubject, Message, 0, false, false);
+                string sendStatus = "";
+                sendAdHoc(cpCore, iSendTo, iSendFrom, iSendSubject, Message,"","","", false, false,0, ref sendStatus);
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
             }
         }
         //
+        //====================================================================================================
         //
-        //
-        public void sendGroup(string GroupList, string FromAddress, string subject, string Body, bool Immediate, bool HTML) {
+        public static void sendGroup(coreClass cpCore, string groupCommaList, string FromAddress, string subject, string Body, bool Immediate, bool HTML) {
             try {
-                string rootUrl = null;
-                string[] Groups = { };
-                int GroupCount = 0;
-                int GroupPointer = 0;
-                string iiGroupList = null;
-                int ParsePosition = 0;
-                string iGroupList = null;
-                string iFromAddress = null;
-                string iSubjectSource = null;
-                string iSubject = null;
-                string iBodySource = null;
-                string iBody = null;
-                bool iImmediate = false;
-                bool iHTML = false;
-                string SQL = null;
-                int CSPointer = 0;
-                int ToMemberID = 0;
-                //
-                iGroupList = genericController.encodeText(GroupList);
-                iFromAddress = genericController.encodeText(FromAddress);
-                iSubjectSource = genericController.encodeText(subject);
-                iBodySource = genericController.encodeText(Body);
-                iImmediate = genericController.encodeBoolean(Immediate);
-                iHTML = genericController.encodeBoolean(HTML);
-                //
-                // Fix links for HTML send - must do it now before encodehtml so eid links will attach
-                //
-                rootUrl = "http://" + cpcore.webServer.requestDomain + requestAppRootPath;
-                iBodySource = genericController.ConvertLinksToAbsolute(iBodySource, rootUrl);
-                //
-                // Build the list of groups
-                //
-                if (!string.IsNullOrEmpty(iGroupList)) {
-                    iiGroupList = iGroupList;
-                    while (!string.IsNullOrEmpty(iiGroupList)) {
-                        Array.Resize(ref Groups, GroupCount + 1);
-                        ParsePosition = genericController.vbInstr(1, iiGroupList, ",");
-                        if (ParsePosition == 0) {
-                            Groups[GroupCount] = iiGroupList;
-                            iiGroupList = "";
-                        } else {
-                            Groups[GroupCount] = iiGroupList.Left( ParsePosition - 1);
-                            iiGroupList = iiGroupList.Substring(ParsePosition);
-                        }
-                        GroupCount = GroupCount + 1;
-                    }
-                }
-                if (GroupCount > 0) {
-                    //
-                    // Build the SQL statement
-                    //
-                    SQL = "SELECT DISTINCT ccMembers.ID"
-                        + " FROM (ccMembers LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID) LEFT JOIN ccgroups ON ccMemberRules.GroupID = ccgroups.ID"
-                        + " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + cpcore.db.encodeSQLDate(cpcore.doc.profileStartTime) + ")) AND (";
-                    for (GroupPointer = 0; GroupPointer < GroupCount; GroupPointer++) {
-                        if (GroupPointer == 0) {
-                            SQL += "(ccgroups.Name=" + cpcore.db.encodeSQLText(Groups[GroupPointer]) + ")";
-                        } else {
-                            SQL += "OR(ccgroups.Name=" + cpcore.db.encodeSQLText(Groups[GroupPointer]) + ")";
+                if (!string.IsNullOrWhiteSpace( groupCommaList)) {
+                    List<string> groupList = groupCommaList.Split(',').ToList<string>().FindAll(t => !string.IsNullOrWhiteSpace(t));
+                    if (groupList.Count > 0) {
+                        List<personModel> personList = personModel.createListFromGroupList( cpCore, groupList, true );
+                        foreach (var person in personList) {
+                            string emailStatus = "";
+                            string queryStringForLinkAppend = "";
+                            sendPerson(cpCore, person, FromAddress, subject, Body, Immediate, HTML, 0, "", false, ref emailStatus, queryStringForLinkAppend);
                         }
                     }
-                    SQL += "));";
-                    CSPointer = cpcore.db.csOpenSql(SQL);
-                    while (cpcore.db.csOk(CSPointer)) {
-                        ToMemberID = genericController.EncodeInteger(cpcore.db.csGetInteger(CSPointer, "ID"));
-                        iSubject = iSubjectSource;
-                        iBody = iBodySource;
-                        //
-
-
-                        // send
-                        //
-                        sendPerson(ToMemberID, iFromAddress, iSubject, iBody, iImmediate, iHTML, 0, "", false);
-                        cpcore.db.csGoNext(CSPointer);
-                    }
                 }
-                //
-                return;
-                //
-                // ----- Error Trap
-                //
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call cpcore.handleLegacyError18(MethodName)
-            //
         }
         //
-        // ----- Need to test this and make it public
-        //
-        //   This is what the admin site should call for both test and group email
-        //   Making it public lets developers send email that administrators can control
-        //
-        public void sendSystem_Legacy(string EMailName, string AdditionalCopy = "", int AdditionalMemberID = 0) {
-            string EmailStatus;
-            //
-            EmailStatus = sendSystem(genericController.encodeText(EMailName), genericController.encodeText(AdditionalCopy), genericController.EncodeInteger(AdditionalMemberID));
-            if (cpcore.doc.authContext.isAuthenticatedAdmin(cpcore) & (!string.IsNullOrEmpty(EmailStatus))) {
-                errorController.error_AddUserError(cpcore, "Administrator: There was a problem sending the confirmation email, " + EmailStatus);
-            }
-            return;
-        }
-        //
-        //=============================================================================
-        // Send the Member his username and password
-        //=============================================================================
-        //
-        public bool sendPassword(string Email) {
-            bool returnREsult = false;
+        //====================================================================================================
+        /// <summary>
+        /// add this email to the email queue
+        /// </summary>
+        private static void addToQueue(coreClass cpCore, bool immediate, emailClass email) {
             try {
-                string sqlCriteria = null;
-                string Message = "";
-                int CS = 0;
-                string workingEmail = null;
-                string FromAddress = "";
-                string subject = "";
-                bool allowEmailLogin = false;
-                string Password = null;
-                string Username = null;
-                bool updateUser = false;
-                int atPtr = 0;
-                int Index = 0;
-                string EMailName = null;
-                bool usernameOK = false;
-                int recordCnt = 0;
-                int Ptr = 0;
-                //
-                const string passwordChrs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999";
-                const int passwordChrsLength = 62;
-                //
-                workingEmail = genericController.encodeText(Email);
-                //
-                returnREsult = false;
-                if (string.IsNullOrEmpty(workingEmail)) {
-                    //hint = "110"
-                    errorController.error_AddUserError(cpcore, "Please enter your email address before requesting your username and password.");
-                } else {
-                    //hint = "120"
-                    atPtr = genericController.vbInstr(1, workingEmail, "@");
-                    if (atPtr < 2) {
+                var record = emailQueueModel.add(cpCore);
+                record.immediate = immediate;
+                record.toAddress = email.toAddress;
+                record.subject = email.subject;
+                record.content = Newtonsoft.Json.JsonConvert.SerializeObject(email);
+                record.attempts = email.attempts;
+                record.save(cpCore);
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Send the emails in the current Queue
+        /// </summary>
+        public static void procesQueue(coreClass cpCore) {
+            try {
+                List<emailQueueModel> queue = emailQueueModel.createList(cpCore, "", "immediate,id desc");
+                foreach (emailQueueModel queueRecord in queue) {
+                    emailQueueModel.delete(cpCore, queueRecord.id);
+                    emailClass email = Newtonsoft.Json.JsonConvert.DeserializeObject<emailClass>(queueRecord.content);
+                    string ignoreMessage = "";
+                    if (smtpController.sendSmtp(cpCore, email, ref ignoreMessage)) {
                         //
-                        // email not valid
-                        //
-                        //hint = "130"
-                        errorController.error_AddUserError(cpcore, "Please enter a valid email address before requesting your username and password.");
+                        // -- success, log the send
+                        var log = emailLogModel.add(cpCore);
+                        log.ToAddress = email.toAddress;
+                        log.FromAddress = email.fromAddress;
+                        log.Subject = email.subject;
+                        log.SendStatus = "ok";
+                        log.LogType = EmailLogTypeImmediateSend;
+                        log.EmailID = email.emailId;
+                        log.save(cpCore);
                     } else {
-                        //hint = "140"
-                        EMailName = vbMid(workingEmail, 1, atPtr - 1);
                         //
-                        logController.logActivity2(cpcore, "password request for email " + workingEmail, cpcore.doc.authContext.user.id, cpcore.doc.authContext.user.OrganizationID);
-                        //
-                        allowEmailLogin = cpcore.siteProperties.getBoolean("allowEmailLogin", false);
-                        recordCnt = 0;
-                        sqlCriteria = "(email=" + cpcore.db.encodeSQLText(workingEmail) + ")";
-                        if (true) {
-                            sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + cpcore.db.encodeSQLDate(DateTime.Now) + "))";
-                        }
-                        CS = cpcore.db.csOpen("People", sqlCriteria, "ID", SelectFieldList: "username,password", PageSize: 1);
-                        if (!cpcore.db.csOk(CS)) {
+                        // -- fail, retry
+                        if (email.attempts > 3) {
                             //
-                            // valid login account for this email not found
+                            // -- too many retries, log error
+                            var log = emailLogModel.add(cpCore);
+                            log.ToAddress = email.toAddress;
+                            log.FromAddress = email.fromAddress;
+                            log.Subject = email.subject;
+                            log.SendStatus = "failed";
+                            log.LogType = EmailLogTypeImmediateSend;
+                            log.EmailID = email.emailId;
+                            log.save(cpCore);
+                        } else {
                             //
-                            if (encodeText(vbMid(workingEmail, atPtr + 1)).ToLower() == "contensive.com") {
-                                //
-                                // look for expired account to renew
-                                //
-                                cpcore.db.csClose(ref CS);
-                                CS = cpcore.db.csOpen("People", "((email=" + cpcore.db.encodeSQLText(workingEmail) + "))", "ID", PageSize: 1);
-                                if (cpcore.db.csOk(CS)) {
-                                    //
-                                    // renew this old record
-                                    //
-                                    //hint = "150"
-                                    cpcore.db.csSet(CS, "developer", "1");
-                                    cpcore.db.csSet(CS, "admin", "1");
-                                    cpcore.db.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
-                                } else {
-                                    //
-                                    // inject support record
-                                    //
-                                    //hint = "150"
-                                    cpcore.db.csClose(ref CS);
-                                    CS = cpcore.db.csInsertRecord("people");
-                                    cpcore.db.csSet(CS, "name", "Contensive Support");
-                                    cpcore.db.csSet(CS, "email", workingEmail);
-                                    cpcore.db.csSet(CS, "developer", "1");
-                                    cpcore.db.csSet(CS, "admin", "1");
-                                    cpcore.db.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
-                                }
-                                cpcore.db.csSave2(CS);
-                            } else {
-                                //hint = "155"
-                                errorController.error_AddUserError(cpcore, "No current user was found matching this email address. Please try again. ");
-                            }
-                        }
-                        if (cpcore.db.csOk(CS)) {
-                            //hint = "160"
-                            FromAddress = cpcore.siteProperties.getText("EmailFromAddress", "info@" + cpcore.webServer.requestDomain);
-                            subject = "Password Request at " + cpcore.webServer.requestDomain;
-                            Message = "";
-                            while (cpcore.db.csOk(CS)) {
-                                //hint = "170"
-                                updateUser = false;
-                                if (string.IsNullOrEmpty(Message)) {
-                                    //hint = "180"
-                                    Message = "This email was sent in reply to a request at " + cpcore.webServer.requestDomain + " for the username and password associated with this email address. ";
-                                    Message = Message + "If this request was made by you, please return to the login screen and use the following:\r\n";
-                                    Message = Message + "\r\n";
-                                } else {
-                                    //hint = "190"
-                                    Message = Message + "\r\n";
-                                    Message = Message + "Additional user accounts with the same email address: \r\n";
-                                }
-                                //
-                                // username
-                                //
-                                //hint = "200"
-                                Username = cpcore.db.csGetText(CS, "Username");
-                                usernameOK = true;
-                                if (!allowEmailLogin) {
-                                    //hint = "210"
-                                    if (Username != Username.Trim()) {
-                                        //hint = "220"
-                                        Username = Username.Trim();
-                                        updateUser = true;
-                                    }
-                                    if (string.IsNullOrEmpty(Username)) {
-                                        //hint = "230"
-                                        //username = emailName & Int(Rnd() * 9999)
-                                        usernameOK = false;
-                                        Ptr = 0;
-                                        while (!usernameOK && (Ptr < 100)) {
-                                            //hint = "240"
-                                            Username = EMailName + EncodeInteger(Math.Floor(EncodeNumber(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
-                                            usernameOK = !cpcore.doc.authContext.isLoginOK(cpcore, Username, "test");
-                                            Ptr = Ptr + 1;
-                                        }
-                                        //hint = "250"
-                                        if (usernameOK) {
-                                            updateUser = true;
-                                        }
-                                    }
-                                    //hint = "260"
-                                    Message = Message + " username: " + Username + "\r\n";
-                                }
-                                //hint = "270"
-                                if (usernameOK) {
-                                    //
-                                    // password
-                                    //
-                                    //hint = "280"
-                                    Password = cpcore.db.csGetText(CS, "Password");
-                                    if (Password.Trim() != Password) {
-                                        //hint = "290"
-                                        Password = Password.Trim();
-                                        updateUser = true;
-                                    }
-                                    //hint = "300"
-                                    if (string.IsNullOrEmpty(Password)) {
-                                        //hint = "310"
-                                        for (Ptr = 0; Ptr <= 8; Ptr++) {
-                                            //hint = "320"
-                                            Index = EncodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
-                                            Password = Password + vbMid(passwordChrs, Index, 1);
-                                        }
-                                        //hint = "330"
-                                        updateUser = true;
-                                    }
-                                    //hint = "340"
-                                    Message = Message + " password: " + Password + "\r\n";
-                                    returnREsult = true;
-                                    if (updateUser) {
-                                        //hint = "350"
-                                        cpcore.db.csSet(CS, "username", Username);
-                                        cpcore.db.csSet(CS, "password", Password);
-                                    }
-                                    recordCnt = recordCnt + 1;
-                                }
-                                cpcore.db.csGoNext(CS);
-                            }
+                            // -- fail, add back to end of queue for retry
+                            email.attempts += 1;
+                            addToQueue(cpCore, false, email);
                         }
                     }
                 }
-                //hint = "360"
-                if (returnREsult) {
-                    cpcore.email.send_Legacy(workingEmail, FromAddress, subject, Message, 0, true, false);
-                    //    main_ClosePageHTML = main_ClosePageHTML & main_GetPopupMessage(app.publicFiles.ReadFile("ccLib\Popup\PasswordSent.htm"), 300, 300, "no")
-                }
+                return;
             } catch (Exception ex) {
-                cpcore.handleException(ex);
-                throw;
+                cpCore.handleException(ex);
             }
-            return returnREsult;
         }
-
+        //
+        //====================================================================================================        
+        /// <summary>
+        /// object for email queue serialization
+        /// </summary>
+        public class emailClass {
+            public string toAddress;
+            public string fromAddress;
+            public string BounceAddress;
+            public string replyToAddress;
+            public string subject;
+            public string textBody;
+            public string htmlBody;
+            public int attempts;
+            public int emailId;
+        }
         //
         //====================================================================================================
         #region  IDisposable Support 
@@ -1107,7 +782,7 @@ namespace Contensive.Core.Controllers {
         protected bool disposed = false;
 
         public emailController(coreClass cpCore) {
-            this.cpcore = cpCore;
+            this.cpCore = cpCore;
         }
         //
         public void Dispose() {
@@ -1117,10 +792,7 @@ namespace Contensive.Core.Controllers {
         }
         //
         ~emailController() {
-            // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
-            //INSTANT C# NOTE: The base class Finalize method is automatically called from the destructor:
-            //base.Finalize();
         }
         //
         //====================================================================================================

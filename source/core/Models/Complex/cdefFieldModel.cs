@@ -22,57 +22,139 @@ namespace Contensive.Core.Models.Complex {
     // ---------------------------------------------------------------------------------------------------
     //
     [Serializable]
-    public class CDefFieldModel : ICloneable, IComparable {
-        public string nameLc { get; set; } // The name of the field
-        public int id { get; set; } // the ID in the ccContentFields Table that this came from
-        public bool active { get; set; } // if the field is available in the admin area
-        public int fieldTypeId { get; set; } // The type of data the field holds
-        public string caption { get; set; } // The caption for displaying the field
-        public bool ReadOnly { get; set; } // was ReadOnly -- If true, this field can not be written back to the database
-        public bool NotEditable { get; set; } // if true, you can only edit new records
-        public bool Required { get; set; } // if true, this field must be entered
-        public string defaultValue { get; set; } // default value on a new record
-        public string HelpMessage { get; set; } // explaination of this field
+    public class cdefFieldModel : ICloneable, IComparable {
+        //
+        // The name of the field
+        public string nameLc { get; set; }
+        //
+        // the ID in the ccContentFields Table that this came from
+        public int id { get; set; }
+        //
+        // if the field is available in the admin area
+        public bool active { get; set; }
+        //
+        // The type of data the field holds
+        public int fieldTypeId { get; set; }
+        //
+        // The caption for displaying the field 
+        public string caption { get; set; }
+        //
+        // was ReadOnly -- If true, this field can not be written back to the database 
+        public bool ReadOnly { get; set; }
+        //
+        // if true, you can only edit new records
+        public bool NotEditable { get; set; }
+        //
+        // if true, this field must be entered
+        public bool Required { get; set; }
+        //
+        // default value on a new record
+        public string defaultValue { get; set; }
+        //
+        // explaination of this field
+        public string HelpMessage { get; set; } 
+        //
         public bool UniqueName { get; set; }
-        public bool TextBuffered { get; set; } // if true, the input is run through RemoveControlCharacters()
-        public bool Password { get; set; } // for text boxes, sets the password attribute
-        public string RedirectID { get; set; } // If TYPEREDIRECT, this is the field that must match ID of this record
-        public string RedirectPath { get; set; } // New Field, If TYPEREDIRECT, this is the path to the next page (if blank, current page is used)
-        public int indexColumn { get; set; } // the column desired in the admin index form
-        public string indexWidth { get; set; } // either number or percentage, blank if not included
-        public int indexSortOrder { get; set; } // alpha sort on index page
-        public int indexSortDirection { get; set; } // 1 sorts forward, -1 backward
-        public bool adminOnly { get; set; } // This field is only available to administrators
-        public bool developerOnly { get; set; } // This field is only available to administrators
-        public bool blockAccess { get; set; } // ***** Field Reused to keep binary compatiblity - "IsBaseField" - if true this is a CDefBase field
-        public bool htmlContent { get; set; } // if true, the HTML editor (active edit) can be used
-        public bool authorable { get; set; } // true if it can be seen in the admin form
-        public bool inherited { get; set; } // if true, this field takes its values from a parent, see ContentID
-        public int contentId { get; set; } // This is the ID of the Content Def that defines these properties
-        public int editSortPriority { get; set; } // The Admin Edit Sort Order
-        public string ManyToManyRulePrimaryField { get; set; } // Rule Field Name for Primary Table
-        public string ManyToManyRuleSecondaryField { get; set; } // Rule Field Name for Secondary Table
-        public bool RSSTitleField { get; set; } // When creating RSS fields from this content, this is the title
-        public bool RSSDescriptionField { get; set; } // When creating RSS fields from this content, this is the description
-        public string editTabName { get; set; } // Editing group - used for the tabs
-        public bool Scramble { get; set; } // save the field scrambled in the Db
-        public string lookupList { get; set; } // If TYPELOOKUP, and LookupContentID is null, this is a comma separated list of choices
+        //
+        // if true, the input is run through RemoveControlCharacters()
+        public bool TextBuffered { get; set; }
+        //
+        // for text boxes, sets the password attribute
+        public bool Password { get; set; }
+        //
+        // If TYPEREDIRECT, this is the field that must match ID of this record
+        public string RedirectID { get; set; }
+        //
+        // New Field, If TYPEREDIRECT, this is the path to the next page (if blank, current page is used)
+        public string RedirectPath { get; set; }
+        //
+        // the column desired in the admin index form
+        public int indexColumn { get; set; }
+        //
+        // either number or percentage, blank if not included
+        public string indexWidth { get; set; }
+        //
+        // alpha sort on index page
+        public int indexSortOrder { get; set; }
+        //
+        // 1 sorts forward, -1 backward
+        public int indexSortDirection { get; set; }
+        //
+        // This field is only available to administrators
+        public bool adminOnly { get; set; }
+        //
+        // This field is only available to administrators
+        public bool developerOnly { get; set; }
+        //
+        // ***** Field Reused to keep binary compatiblity - "IsBaseField" - if true this is a CDefBase field
+        public bool blockAccess { get; set; }
+        //
+        // if true, the HTML editor (active edit) can be used
+        public bool htmlContent { get; set; }
+        //
+        // true if it can be seen in the admin form
+        public bool authorable { get; set; }
+        //
+        // if true, this field takes its values from a parent, see ContentID
+        public bool inherited { get; set; }
+        //
+        // This is the ID of the Content Def that defines these properties
+        public int contentId { get; set; }
+        //
+        // The Admin Edit Sort Order
+        public int editSortPriority { get; set; }
+        //
+        // Rule Field Name for Primary Table
+        public string ManyToManyRulePrimaryField { get; set; }
+        //
+        // Rule Field Name for Secondary Table
+        public string ManyToManyRuleSecondaryField { get; set; }
+        //
+        // When creating RSS fields from this content, this is the title
+        public bool RSSTitleField { get; set; }
+        //
+        // When creating RSS fields from this content, this is the description
+        public bool RSSDescriptionField { get; set; }
+        //
+        // Editing group - used for the tabs
+        public string editTabName { get; set; }
+        //
+        // save the field scrambled in the Db
+        public bool Scramble { get; set; }
+        //
+        // If TYPELOOKUP, and LookupContentID is null, this is a comma separated list of choices
+        public string lookupList { get; set; } 
+        //
         public bool dataChanged { get; set; }
+        //
         public bool isBaseField { get; set; }
+        //
         public bool isModifiedSinceInstalled { get; set; }
+        //
         public string installedByCollectionGuid { get; set; }
+        //
         public string HelpDefault { get; set; }
+        //
         public string HelpCustom { get; set; }
+        //
         public bool HelpChanged { get; set; }
         //
         // fields stored differently in xml collection files
+        //
         //   name is loaded from xml collection files 
         //   id is created during the cacheLoad process when loading from Db (and used in metaData)
         //
         public int lookupContentID { get; set; } // If TYPELOOKUP, (for Db controled sites) this is the content ID of the source table
+        //
         public int RedirectContentID { get; set; } // If TYPEREDIRECT, this is new contentID
+        //
         public int manyToManyContentID { get; set; } // Content containing Secondary Records
-        public int manyToManyRuleContentID { get; set; } // Content with rules between Primary and Secondary
+        //
+        // Content with rules between Primary and Secondary
+        public int manyToManyRuleContentID { get; set; }
+        //
+        // if type is memberselect, this is the group from which user's can be selected
+        // NOTE: this field was originally in the xml as memberselectgroupId, not memberselectgroup. The name is a hold-over 
         public int MemberSelectGroupID { get; set; }
         //
         //====================================================================================================
@@ -95,27 +177,27 @@ namespace Contensive.Core.Models.Complex {
             _RedirectContentName = value;
         }
         private string _RedirectContentName = null;
-        //
-        //====================================================================================================
-        //
-        //INSTANT C# NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
-        //ORIGINAL LINE: Public Property MemberSelectGroupName(cpCore As coreClass) As String
-        public string get_MemberSelectGroupName(coreClass cpCore) {
-            if (_MemberSelectGroupName == null) {
-                if (MemberSelectGroupID > 0) {
-                    _MemberSelectGroupName = "";
-                    DataTable dt = cpCore.db.executeQuery("select name from cccontent where id=" + MemberSelectGroupID.ToString());
-                    if (dt.Rows.Count > 0) {
-                        _MemberSelectGroupName = genericController.encodeText(dt.Rows[0][0]);
-                    }
-                }
-            }
-            return _MemberSelectGroupName;
-        }
-        public void set_MemberSelectGroupName(coreClass cpCore, string value) {
-            _MemberSelectGroupName = value;
-        }
-        private string _MemberSelectGroupName = null;
+        ////
+        ////====================================================================================================
+        ////
+        ////INSTANT C# NOTE: C# does not support parameterized properties - the following property has been divided into two methods:
+        ////ORIGINAL LINE: Public Property MemberSelectGroupName(cpCore As coreClass) As String
+        //public string get_MemberSelectGroupName(coreClass cpCore) {
+        //    if (_MemberSelectGroupName == null) {
+        //        if (MemberSelectGroupID > 0) {
+        //            _MemberSelectGroupName = "";
+        //            DataTable dt = cpCore.db.executeQuery("select name from cccontent where id=" + MemberSelectGroupID.ToString());
+        //            if (dt.Rows.Count > 0) {
+        //                _MemberSelectGroupName = genericController.encodeText(dt.Rows[0][0]);
+        //            }
+        //        }
+        //    }
+        //    return _MemberSelectGroupName;
+        //}
+        //public void set_MemberSelectGroupName(coreClass cpCore, string value) {
+        //    _MemberSelectGroupName = value;
+        //}
+        //private string _MemberSelectGroupName = null;
         //
         //====================================================================================================
         //
@@ -189,7 +271,7 @@ namespace Contensive.Core.Models.Complex {
         //====================================================================================================
         //
         public int CompareTo(object obj) {
-            Models.Complex.CDefFieldModel c = (Models.Complex.CDefFieldModel)obj;
+            Models.Complex.cdefFieldModel c = (Models.Complex.cdefFieldModel)obj;
             return string.Compare(this.nameLc.ToLower(), c.nameLc.ToLower());
         }
     }

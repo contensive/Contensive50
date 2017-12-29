@@ -416,7 +416,7 @@ namespace Contensive.Core.Addons.Tools {
         //
         private class fieldSortClass {
             public string sort;
-            public Models.Complex.CDefFieldModel field;
+            public Models.Complex.cdefFieldModel field;
         }
         //
         //=============================================================================
@@ -679,7 +679,7 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 Stream.Add("<TEXTAREA NAME=\"SQL\" ROWS=\"" + SQLRows + "\" ID=\"SQL\" STYLE=\"width: 800px;\">" + SQL + "</TEXTAREA>");
                 Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
-                Stream.Add("<br><br>Data Source<br>" + cpCore.html.main_GetFormInputSelect("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
+                Stream.Add("<br><br>Data Source<br>" + cpCore.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
                 //
                 SelectFieldWidthLimit = cpCore.siteProperties.getInteger("SelectFieldWidthLimit", 200);
                 if (!string.IsNullOrEmpty(SQLArchive)) {
@@ -702,17 +702,17 @@ namespace Contensive.Core.Addons.Tools {
                 if (IsNull(PageSize)) {
                     PageSize = 100;
                 }
-                Stream.Add("<br>Page Size:<br>" + cpCore.html.html_GetFormInputText("PageSize", PageSize.ToString()));
+                Stream.Add("<br>Page Size:<br>" + cpCore.html.inputText("PageSize", PageSize.ToString()));
                 //
                 if (IsNull(PageNumber)) {
                     PageNumber = 1;
                 }
-                Stream.Add("<br>Page Number:<br>" + cpCore.html.html_GetFormInputText("PageNumber", PageNumber.ToString()));
+                Stream.Add("<br>Page Number:<br>" + cpCore.html.inputText("PageNumber", PageNumber.ToString()));
                 //
                 if (IsNull(Timeout)) {
                     Timeout = 30;
                 }
-                Stream.Add("<br>Timeout (sec):<br>" + cpCore.html.html_GetFormInputText("Timeout", Timeout.ToString()));
+                Stream.Add("<br>Timeout (sec):<br>" + cpCore.html.inputText("Timeout", Timeout.ToString()));
                 //
                 //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolManualQuery))
                 //Stream.Add( cpCore.main_GetFormEnd & "</SPAN>")
@@ -800,13 +800,13 @@ namespace Contensive.Core.Addons.Tools {
                 }
                 Stream.Add(SpanClassAdminNormal);
                 Stream.Add("Data Source<br>");
-                Stream.Add(cpCore.html.main_GetFormInputSelect("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
+                Stream.Add(cpCore.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
                 Stream.Add("<br><br>");
                 Stream.Add("Content Name<br>");
-                Stream.Add(cpCore.html.html_GetFormInputText2("ContentName", ContentName, 1, 40));
+                Stream.Add(cpCore.html.inputText("ContentName", ContentName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(cpCore.html.html_GetFormInputText2("TableName", TableName, 1, 40));
+                Stream.Add(cpCore.html.inputText("TableName", TableName, 1, 40));
                 Stream.Add("<br><br>");
                 Stream.Add("</SPAN>");
                 result = Adminui.GetBody(Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
@@ -887,7 +887,7 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         if (FieldIDToAdd != 0) {
                             foreach (var keyValuePair in CDef.fields) {
-                                Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                                Models.Complex.cdefFieldModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
                                     //If field.Name = FieldNameToAdd Then
                                     if (field.inherited) {
@@ -915,7 +915,7 @@ namespace Contensive.Core.Addons.Tools {
                         ColumnNumberMax = 0;
                         foreach (var keyValuePair in CDef.adminColumns) {
                             Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                            Models.Complex.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                            Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
@@ -951,7 +951,7 @@ namespace Contensive.Core.Addons.Tools {
                                         if (CDef.adminColumns.Count > 1) {
                                             foreach (var keyValuePair in CDef.adminColumns) {
                                                 Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                                Models.Complex.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                                                Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
                                                 CSPointer = cpCore.db.csOpenRecord("Content Fields", field.id);
                                                 cpCore.db.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
                                                 cpCore.db.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
@@ -980,7 +980,7 @@ namespace Contensive.Core.Addons.Tools {
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
                                             Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Models.Complex.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                                            Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
                                             CSPointer = cpCore.db.csOpenRecord("Content Fields", field.id);
                                             if (fieldId == TargetFieldID) {
                                                 cpCore.db.csSet(CSPointer, "IndexColumn", 0);
@@ -1007,7 +1007,7 @@ namespace Contensive.Core.Addons.Tools {
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
                                             Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Models.Complex.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                                            Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             CS1 = cpCore.db.csOpenRecord("Content Fields", field.id);
                                             if ((CDef.fields[FieldName.ToLower()].id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
@@ -1045,7 +1045,7 @@ namespace Contensive.Core.Addons.Tools {
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns.Reverse()) {
                                             Models.Complex.cdefModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Models.Complex.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                                            Models.Complex.cdefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             CS1 = cpCore.db.csOpenRecord("Content Fields", field.id);
                                             if ((field.id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
@@ -1324,8 +1324,8 @@ namespace Contensive.Core.Addons.Tools {
                     } else {
                         Stream.Add(SpanClassAdminNormal + "<br>");
                         bool skipField = false;
-                        foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> keyValuePair in CDef.fields) {
-                            Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                        foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in CDef.fields) {
+                            Models.Complex.cdefFieldModel field = keyValuePair.Value;
                             //
                             // test if this column is in use
                             //
@@ -1408,7 +1408,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 FormPanel = FormPanel + SpanClassAdminNormal + "Select a Content Definition to Configure its Listing Page<br>";
                 //FormPanel = FormPanel & cpCore.main_GetFormInputHidden("af", AdminFormToolConfigureListing)
-                FormPanel = FormPanel + cpCore.html.main_GetFormInputSelect("ContentID", ContentID, "Content");
+                FormPanel = FormPanel + cpCore.html.selectFromContent("ContentID", ContentID, "Content");
                 Stream.Add(cpCore.html.getPanel(FormPanel));
                 //
                 cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
@@ -2053,11 +2053,11 @@ namespace Contensive.Core.Addons.Tools {
                 Stream.Add(SpanClassAdminNormal);
                 //
                 Stream.Add("Parent Content Name<br>");
-                Stream.Add(cpCore.html.main_GetFormInputSelect("ParentContentID", ParentContentID, "Content", ""));
+                Stream.Add(cpCore.html.selectFromContent("ParentContentID", ParentContentID, "Content", ""));
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Child Content Name<br>");
-                Stream.Add(cpCore.html.html_GetFormInputText2("ChildContentName", ChildContentName, 1, 40));
+                Stream.Add(cpCore.html.inputText("ChildContentName", ChildContentName, 1, 40));
                 Stream.Add("<br><br>");
                 //
                 Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>");
@@ -2139,7 +2139,7 @@ namespace Contensive.Core.Addons.Tools {
                             cpCore.db.createSQLTable(CD.ContentDataSourceName, TableName);
                             if (CD.fields.Count > 0) {
                                 foreach (var keyValuePair in CD.fields) {
-                                    Models.Complex.CDefFieldModel field = keyValuePair.Value;
+                                    Models.Complex.cdefFieldModel field = keyValuePair.Value;
                                     Stream.Add("...Field " + field.nameLc + "<br>");
                                     cpCore.db.createSQLTableField(CD.ContentDataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                 }
@@ -2763,11 +2763,11 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Stream.Add("<br>");
                 Stream.Add("Table Name<br>");
-                Stream.Add(cpCore.html.html_GetFormInputText("Tablename", TableName));
+                Stream.Add(cpCore.html.inputText("Tablename", TableName));
                 //
                 Stream.Add("<br><br>");
                 Stream.Add("Data Source<br>");
-                Stream.Add(cpCore.html.main_GetFormInputSelect("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
+                Stream.Add(cpCore.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
                 //
                 //Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
                 Stream.Add("</SPAN>");
@@ -2822,7 +2822,7 @@ namespace Contensive.Core.Addons.Tools {
                 string TypeSelectTemplate = null;
                 string TypeSelect = null;
                 int FieldCount = 0;
-                Models.Complex.CDefFieldModel parentField = null;
+                Models.Complex.cdefFieldModel parentField = null;
                 //
                 ButtonList = ButtonCancel + "," + ButtonSelect;
                 //
@@ -2861,7 +2861,7 @@ namespace Contensive.Core.Addons.Tools {
                                     // problem - looking for the name in the Db using the form's name, but it could have changed.
                                     // have to look field up by id
                                     //
-                                    foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> cdefFieldKvp in CDef.fields) {
+                                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> cdefFieldKvp in CDef.fields) {
                                         if (cdefFieldKvp.Value.id == formFieldId) {
                                             //
                                             // Field was found in CDef
@@ -3073,7 +3073,7 @@ namespace Contensive.Core.Addons.Tools {
                         //
                         // Build a select template for Type
                         //
-                        TypeSelectTemplate = cpCore.html.main_GetFormInputSelect("menuname", -1, "Content Field Types", "", "unknown");
+                        TypeSelectTemplate = cpCore.html.selectFromContent("menuname", -1, "Content Field Types", "", "unknown");
                         //
                         // Index the sort order
                         //
@@ -3140,7 +3140,7 @@ namespace Contensive.Core.Addons.Tools {
                                 // CDef has a parent, but the field is non-inherited, test for a matching Parent Field
                                 //
                                 if (ParentCDef == null) {
-                                    foreach (KeyValuePair<string, Models.Complex.CDefFieldModel> kvp in ParentCDef.fields) {
+                                    foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> kvp in ParentCDef.fields) {
                                         if (kvp.Value.nameLc == fieldsort.field.nameLc) {
                                             parentField = kvp.Value;
                                             break;
@@ -3165,7 +3165,7 @@ namespace Contensive.Core.Addons.Tools {
                             } else if (FieldLocked) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.nameLc + "&nbsp;</SPAN><input type=hidden name=dtfaName." + RecordCount + " value=\"" + fieldsort.field.nameLc + "\">");
                             } else {
-                                streamRow.Add(cpCore.html.html_GetFormInputText2("dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
+                                streamRow.Add(cpCore.html.inputText("dtfaName." + RecordCount, fieldsort.field.nameLc, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3175,7 +3175,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.caption + "</SPAN>");
                             } else {
-                                streamRow.Add(cpCore.html.html_GetFormInputText2("dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
+                                streamRow.Add(cpCore.html.inputText("dtfaCaption." + RecordCount, fieldsort.field.caption, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3185,7 +3185,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.editTabName + "</SPAN>");
                             } else {
-                                streamRow.Add(cpCore.html.html_GetFormInputText2("dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
+                                streamRow.Add(cpCore.html.inputText("dtfaEditTab." + RecordCount, fieldsort.field.editTabName, 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3195,7 +3195,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + genericController.encodeText(fieldsort.field.defaultValue) + "</SPAN>");
                             } else {
-                                streamRow.Add(cpCore.html.html_GetFormInputText2("dtfaDefaultValue." + RecordCount, genericController.encodeText(fieldsort.field.defaultValue), 1, 10));
+                                streamRow.Add(cpCore.html.inputText("dtfaDefaultValue." + RecordCount, genericController.encodeText(fieldsort.field.defaultValue), 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3227,7 +3227,7 @@ namespace Contensive.Core.Addons.Tools {
                             if (fieldsort.field.inherited) {
                                 streamRow.Add(SpanClassAdminSmall + fieldsort.field.editSortPriority + "</SPAN>");
                             } else {
-                                streamRow.Add(cpCore.html.html_GetFormInputText2("dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
+                                streamRow.Add(cpCore.html.inputText("dtfaEditSortPriority." + RecordCount, fieldsort.field.editSortPriority.ToString(), 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -3316,7 +3316,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     FormPanel = FormPanel + SpanClassAdminNormal + "Select a Content Definition to Configure its edit form<br>";
                     FormPanel = FormPanel + "<br>";
-                    FormPanel = FormPanel + cpCore.html.main_GetFormInputSelect(RequestNameToolContentID, ContentID, "Content");
+                    FormPanel = FormPanel + cpCore.html.selectFromContent(RequestNameToolContentID, ContentID, "Content");
                     FormPanel = FormPanel + "</SPAN>";
                     Stream.Add(cpCore.html.getPanel(FormPanel));
                 }
@@ -3424,7 +3424,7 @@ namespace Contensive.Core.Addons.Tools {
                 // Select Table Form
                 //
                 result = result + GetTableRow("<br><br><B>Select table to index</b>", TableColSpan, false);
-                result = result + GetTableRow(cpCore.html.main_GetFormInputSelect("TableID", TableID, "Tables","", "Select a SQL table to start"), TableColSpan, false);
+                result = result + GetTableRow(cpCore.html.selectFromContent("TableID", TableID, "Tables","", "Select a SQL table to start"), TableColSpan, false);
                 if (TableID != 0) {
                     //
                     // Add/Drop Indexes form
@@ -4442,7 +4442,7 @@ namespace Contensive.Core.Addons.Tools {
                 // Process the form
                 Button = cpCore.docProperties.getText("button");
                 //
-                s.Add(cpCore.html.html_GetFormInputText2("GUID", Guid.NewGuid().ToString(), 1, 80));
+                s.Add(cpCore.html.inputText("GUID", Guid.NewGuid().ToString(), 1, 80));
                 //
                 // Display form
                 result= htmlController.legacy_openFormTable(cpCore, ButtonCancel + "," + ButtonCreateGUID) + s.Text + htmlController.legacy_closeFormTable(cpCore, ButtonCancel + "," + ButtonCreateGUID);

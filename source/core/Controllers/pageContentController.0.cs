@@ -81,7 +81,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Encode Template
                     //
-                    LocalTemplateBody = cpCore.html.executeContentCommands(null, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
+                    LocalTemplateBody = contentCmdController.executeContentCommands(cpCore, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
                     returnBody = returnBody + activeContentController.convertActiveContentToHtmlForWebRender(cpCore, LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
                     //
                     // If Content was not found, add it to the end
@@ -254,7 +254,7 @@ namespace Contensive.Core.Controllers {
                         cpCore.userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50);
                     }
                     string stylesheetCommaList = ""; //cpCore.html.main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
-                    addonListJSON = cpCore.html.main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb);
+                    addonListJSON = cpCore.html.JSONeditorAddonList(csv_contentTypeEnum.contentTypeWeb);
                     Editor = cpCore.html.getFormInputHTML("copyFilename", cpCore.doc.quickEditCopy, FieldRows.ToString(), "100%", false, true, addonListJSON, stylesheetCommaList, styleOptionList);
                     returnHtml = genericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor);
                 }
@@ -270,7 +270,7 @@ namespace Contensive.Core.Controllers {
                     }
                     //
                     returnHtml = ""
-                    + cpCore.html.html_GetAdminHintWrapper(cpCore.doc.adminWarning) + returnHtml + "";
+                    + cpCore.html.getAdminHintWrapper(cpCore.doc.adminWarning) + returnHtml + "";
                     cpCore.doc.adminWarning = "";
                 }
                 //
@@ -1018,7 +1018,7 @@ namespace Contensive.Core.Controllers {
                     //
                     if (cpCore.docProperties.getInteger("ContensiveUserForm") == 1) {
                         string FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" + cpCore.webServer.requestDomain);
-                        cpCore.email.sendForm(cpCore.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + cpCore.webServer.requestReferer);
+                        emailController.sendForm(cpCore, cpCore.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + cpCore.webServer.requestReferer);
                         int cs = cpCore.db.csInsertRecord("User Form Response");
                         if (cpCore.db.csOk(cs)) {
                             cpCore.db.csSet(cs, "name", "Form " + cpCore.webServer.requestReferrer);
@@ -1133,35 +1133,35 @@ namespace Contensive.Core.Controllers {
                             // state not working...
                         } else {
                             if (!cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, ClipParentContentName)) {
-                                errorController.error_AddUserError(cpCore, "The paste operation failed because you are not a content manager of the Clip Parent");
+                                errorController.addUserError(cpCore, "The paste operation failed because you are not a content manager of the Clip Parent");
                             } else {
                                 //
                                 // Current identity is a content manager for this content
                                 //
                                 int Position = genericController.vbInstr(1, ClipBoard, ".");
                                 if (Position == 0) {
-                                    errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data is configured incorrectly.");
+                                    errorController.addUserError(cpCore, "The paste operation failed because the clipboard data is configured incorrectly.");
                                 } else {
                                     ClipBoardArray = ClipBoard.Split('.');
                                     if (ClipBoardArray.GetUpperBound(0) == 0) {
-                                        errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data is configured incorrectly.");
+                                        errorController.addUserError(cpCore, "The paste operation failed because the clipboard data is configured incorrectly.");
                                     } else {
                                         ClipChildContentID = genericController.EncodeInteger(ClipBoardArray[0]);
                                         ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray[1]);
                                         if (!Models.Complex.cdefModel.isWithinContent(cpCore, ClipChildContentID, ClipParentContentID)) {
-                                            errorController.error_AddUserError(cpCore, "The paste operation failed because the destination location is not compatible with the clipboard data.");
+                                            errorController.addUserError(cpCore, "The paste operation failed because the destination location is not compatible with the clipboard data.");
                                         } else {
                                             //
                                             // the content definition relationship is OK between the child and parent record
                                             //
                                             ClipChildContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ClipChildContentID);
                                             if (!(!string.IsNullOrEmpty(ClipChildContentName))) {
-                                                errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data content is undefined.");
+                                                errorController.addUserError(cpCore, "The paste operation failed because the clipboard data content is undefined.");
                                             } else {
                                                 if (ClipParentRecordID == 0) {
-                                                    errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data record is undefined.");
+                                                    errorController.addUserError(cpCore, "The paste operation failed because the clipboard data record is undefined.");
                                                 } else if (pageContentController.isChildRecord(cpCore, ClipChildContentName, ClipParentRecordID, ClipChildRecordID)) {
-                                                    errorController.error_AddUserError(cpCore, "The paste operation failed because the destination location is a child of the clipboard data record.");
+                                                    errorController.addUserError(cpCore, "The paste operation failed because the destination location is a child of the clipboard data record.");
                                                 } else {
                                                     //
                                                     // the parent record is not a child of the child record (circular check)
@@ -1169,7 +1169,7 @@ namespace Contensive.Core.Controllers {
                                                     ClipChildRecordName = "record " + ClipChildRecordID;
                                                     CSClip = cpCore.db.cs_open2(ClipChildContentName, ClipChildRecordID, true, true);
                                                     if (!cpCore.db.csOk(CSClip)) {
-                                                        errorController.error_AddUserError(cpCore, "The paste operation failed because the data record referenced by the clipboard could not found.");
+                                                        errorController.addUserError(cpCore, "The paste operation failed because the data record referenced by the clipboard could not found.");
                                                     } else {
                                                         //
                                                         // Paste the edit record record
@@ -1180,7 +1180,7 @@ namespace Contensive.Core.Controllers {
                                                             // Legacy paste - go right to the parent id
                                                             //
                                                             if (!cpCore.db.cs_isFieldSupported(CSClip, "ParentID")) {
-                                                                errorController.error_AddUserError(cpCore, "The paste operation failed because the record you are pasting does not   support the necessary parenting feature.");
+                                                                errorController.addUserError(cpCore, "The paste operation failed because the record you are pasting does not   support the necessary parenting feature.");
                                                             } else {
                                                                 cpCore.db.csSet(CSClip, "ParentID", ClipParentRecordID);
                                                             }
@@ -1197,10 +1197,10 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                                 NameValues = Pair.Split('=');
                                                                 if (NameValues.GetUpperBound(0) == 0) {
-                                                                    errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data Field List is not configured correctly.");
+                                                                    errorController.addUserError(cpCore, "The paste operation failed because the clipboard data Field List is not configured correctly.");
                                                                 } else {
                                                                     if (!cpCore.db.cs_isFieldSupported(CSClip, encodeText(NameValues[0]))) {
-                                                                        errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data Field [" + encodeText(NameValues[0]) + "] is not supported by the location data.");
+                                                                        errorController.addUserError(cpCore, "The paste operation failed because the clipboard data Field [" + encodeText(NameValues[0]) + "] is not supported by the location data.");
                                                                     } else {
                                                                         cpCore.db.csSet(CSClip, encodeText(NameValues[0]), encodeText(NameValues[1]));
                                                                     }
@@ -1685,12 +1685,12 @@ namespace Contensive.Core.Controllers {
                                     }
                                     cpcore.db.csClose(ref CS);
                                     if (!Success) {
-                                        errorController.error_AddUserError(cpcore, "The field [" + tempVar.Caption + "] must be unique, and the value [" + genericController.encodeHTML(FormValue) + "] has already been used.");
+                                        errorController.addUserError(cpcore, "The field [" + tempVar.Caption + "] must be unique, and the value [" + genericController.encodeHTML(FormValue) + "] has already been used.");
                                     }
                                 }
                                 if ((tempVar.REquired | genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
-                                    errorController.error_AddUserError(cpcore, "The field [" + genericController.encodeHTML(tempVar.Caption) + "] is required.");
+                                    errorController.addUserError(cpcore, "The field [" + genericController.encodeHTML(tempVar.Caption) + "] is required.");
                                 } else {
                                     if (!cpcore.db.csOk(CSPeople)) {
                                         CSPeople = cpcore.db.csOpenRecord("people", cpcore.doc.authContext.user.id);
@@ -1990,7 +1990,7 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 tempgetFormPage = ""
-                + errorController.error_GetUserError(cpcore) + cpcore.html.html_GetUploadFormStart() + cpcore.html.inputHidden("ContensiveFormPageID", FormPageID) + cpcore.html.inputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpcore.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + cpcore.html.html_GetUploadFormEnd();
+                + errorController.getUserError(cpcore) + cpcore.html.formStartMultipart() + cpcore.html.inputHidden("ContensiveFormPageID", FormPageID) + cpcore.html.inputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpcore.doc.profileStartTime)) + f.PreRepeat + RepeatBody + f.PostRepeat + cpcore.html.formEnd();
                 //
                 return tempgetFormPage;
                 //
@@ -2181,7 +2181,7 @@ namespace Contensive.Core.Controllers {
                                 }
                                 returnHtml = ""
                                     + "<div style=\"margin: 100px, auto, auto, auto;text-align:left;\">"
-                                    + errorController.error_GetUserError(cpCore) + BlockForm + "</div>";
+                                    + errorController.getUserError(cpCore) + BlockForm + "</div>";
                                 break;
                             }
                         case main_BlockSourceRegistration: {
@@ -2225,7 +2225,7 @@ namespace Contensive.Core.Controllers {
                                 }
                                 returnHtml = ""
                                     + "<div style=\"margin: 100px, auto, auto, auto;text-align:left;\">"
-                                    + errorController.error_GetUserError(cpCore) + BlockForm + "</div>";
+                                    + errorController.getUserError(cpCore) + BlockForm + "</div>";
                                 break;
                             }
                         default: {
@@ -2245,7 +2245,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Encode the copy
                     //
-                    returnHtml = cpCore.html.executeContentCommands(null, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
+                    returnHtml = contentCmdController.executeContentCommands(cpCore, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
                     returnHtml = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (cpCore.doc.refreshQueryString != "") {
                         returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + cpCore.doc.refreshQueryString, 1, 99, 1);
@@ -2267,12 +2267,12 @@ namespace Contensive.Core.Controllers {
                             //
                             // Link authoring, workflow rendering -> do encoding, but no tracking
                             //
-                            returnHtml = cpCore.html.executeContentCommands(null, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
+                            returnHtml = contentCmdController.executeContentCommands(cpCore, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
                             returnHtml = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
-                            returnHtml = cpCore.html.executeContentCommands(null, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
+                            returnHtml = contentCmdController.executeContentCommands(cpCore, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
                             returnHtml = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             cpCore.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + cpCore.doc.page.id);
                         }
@@ -2280,36 +2280,41 @@ namespace Contensive.Core.Controllers {
                         // Page Hit Notification
                         //
                         if ((!cpCore.doc.authContext.visit.ExcludeFromAnalytics) & (cpCore.doc.page.ContactMemberID != 0) && (cpCore.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
-                            if (cpCore.doc.page.AllowHitNotification) {
-                                PageName = cpCore.doc.page.name;
-                                if (string.IsNullOrEmpty(PageName)) {
-                                    PageName = cpCore.doc.page.MenuHeadline;
+                            personModel person = personModel.create(cpCore, cpCore.doc.page.ContactMemberID);
+                            if ( person != null ) {
+                                if (cpCore.doc.page.AllowHitNotification) {
+                                    PageName = cpCore.doc.page.name;
                                     if (string.IsNullOrEmpty(PageName)) {
-                                        PageName = cpCore.doc.page.Headline;
+                                        PageName = cpCore.doc.page.MenuHeadline;
                                         if (string.IsNullOrEmpty(PageName)) {
-                                            PageName = "[no name]";
+                                            PageName = cpCore.doc.page.Headline;
+                                            if (string.IsNullOrEmpty(PageName)) {
+                                                PageName = "[no name]";
+                                            }
                                         }
                                     }
+                                    string Body = "";
+                                    Body = Body + "<p><b>Page Hit Notification.</b></p>";
+                                    Body = Body + "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>";
+                                    Body = Body + genericController.StartTable(4, 1, 1);
+                                    Body = Body + "<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + cpCore.webServer.requestDomain + "/ccLib/images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>";
+                                    Body = Body + getTableRow("Domain", cpCore.webServer.requestDomain, true);
+                                    Body = Body + getTableRow("Link", cpCore.webServer.requestUrl, false);
+                                    Body = Body + getTableRow("Page Name", PageName, true);
+                                    Body = Body + getTableRow("Member Name", cpCore.doc.authContext.user.name, false);
+                                    Body = Body + getTableRow("Member #", encodeText(cpCore.doc.authContext.user.id), true);
+                                    Body = Body + getTableRow("Visit Start Time", encodeText(cpCore.doc.authContext.visit.StartTime), false);
+                                    Body = Body + getTableRow("Visit #", encodeText(cpCore.doc.authContext.visit.id), true);
+                                    Body = Body + getTableRow("Visit IP", cpCore.webServer.requestRemoteIP, false);
+                                    Body = Body + getTableRow("Browser ", cpCore.webServer.requestBrowser, true);
+                                    Body = Body + getTableRow("Visitor #", encodeText(cpCore.doc.authContext.visitor.ID), false);
+                                    Body = Body + getTableRow("Visit Authenticated", encodeText(cpCore.doc.authContext.visit.VisitAuthenticated), true);
+                                    Body = Body + getTableRow("Visit Referrer", cpCore.doc.authContext.visit.HTTP_REFERER, false);
+                                    Body = Body + kmaEndTable;
+                                    string queryStringForLinkAppend = "";
+                                    string emailStatus = "";
+                                    emailController.sendPerson(cpCore, person, cpCore.siteProperties.getText("EmailFromAddress", "info@" + cpCore.webServer.requestDomain), "Page Hit Notification", Body, false, true, 0, "", false, ref emailStatus, queryStringForLinkAppend);
                                 }
-                                string Body = "";
-                                Body = Body + "<p><b>Page Hit Notification.</b></p>";
-                                Body = Body + "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>";
-                                Body = Body + genericController.StartTable(4, 1, 1);
-                                Body = Body + "<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + cpCore.webServer.requestDomain + "/ccLib/images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>";
-                                Body = Body + getTableRow("Domain", cpCore.webServer.requestDomain, true);
-                                Body = Body + getTableRow("Link", cpCore.webServer.requestUrl, false);
-                                Body = Body + getTableRow("Page Name", PageName, true);
-                                Body = Body + getTableRow("Member Name", cpCore.doc.authContext.user.name, false);
-                                Body = Body + getTableRow("Member #", encodeText(cpCore.doc.authContext.user.id), true);
-                                Body = Body + getTableRow("Visit Start Time", encodeText(cpCore.doc.authContext.visit.StartTime), false);
-                                Body = Body + getTableRow("Visit #", encodeText(cpCore.doc.authContext.visit.id), true);
-                                Body = Body + getTableRow("Visit IP", cpCore.webServer.requestRemoteIP, false);
-                                Body = Body + getTableRow("Browser ", cpCore.webServer.requestBrowser, true);
-                                Body = Body + getTableRow("Visitor #", encodeText(cpCore.doc.authContext.visitor.ID), false);
-                                Body = Body + getTableRow("Visit Authenticated", encodeText(cpCore.doc.authContext.visit.VisitAuthenticated), true);
-                                Body = Body + getTableRow("Visit Referrer", cpCore.doc.authContext.visit.HTTP_REFERER, false);
-                                Body = Body + kmaEndTable;
-                                cpCore.email.sendPerson(cpCore.doc.page.ContactMemberID, cpCore.siteProperties.getText("EmailFromAddress", "info@" + cpCore.webServer.requestDomain), "Page Hit Notification", Body, false, true, 0, "", false);
                             }
                         }
                         //
@@ -2325,7 +2330,7 @@ namespace Contensive.Core.Controllers {
                                 // Always
                                 //
                                 if (SystemEMailID != 0) {
-                                    cpCore.email.sendSystem_Legacy(cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id);
+                                    emailController.sendSystem(cpCore, cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id);
                                 }
                                 if (main_AddGroupID != 0) {
                                     groupController.group_AddGroupMember(cpCore, groupController.group_GetGroupName(cpCore, main_AddGroupID));
@@ -2341,7 +2346,7 @@ namespace Contensive.Core.Controllers {
                                 if (ConditionGroupID != 0) {
                                     if (cpCore.doc.authContext.IsMemberOfGroup2(cpCore, groupController.group_GetGroupName(cpCore, ConditionGroupID))) {
                                         if (SystemEMailID != 0) {
-                                            cpCore.email.sendSystem_Legacy(cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id);
+                                            emailController.sendSystem(cpCore, cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id);
                                         }
                                         if (main_AddGroupID != 0) {
                                             groupController.group_AddGroupMember(cpCore, groupController.group_GetGroupName(cpCore, main_AddGroupID));
@@ -2365,7 +2370,7 @@ namespace Contensive.Core.Controllers {
                                             groupController.group_DeleteGroupMember(cpCore, groupController.group_GetGroupName(cpCore, RemoveGroupID));
                                         }
                                         if (SystemEMailID != 0) {
-                                            cpCore.email.sendSystem_Legacy(cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id);
+                                            emailController.sendSystem(cpCore, cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id);
                                         }
                                     }
                                 }
@@ -2452,7 +2457,7 @@ namespace Contensive.Core.Controllers {
                         cpCore.doc.adminWarningPageID = 0;
                     }
                     returnHtml = ""
-                    + cpCore.html.html_GetAdminHintWrapper(cpCore.doc.adminWarning) + returnHtml + "";
+                    + cpCore.html.getAdminHintWrapper(cpCore.doc.adminWarning) + returnHtml + "";
                     cpCore.doc.adminWarning = "";
                 }
             } catch (Exception ex) {
@@ -2611,7 +2616,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Child pages
                     if (allowChildListComposite || cpcore.doc.authContext.isEditingAnything()) {
                         if (!allowChildListComposite) {
-                            Cell = Cell + cpcore.html.html_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
+                            Cell = Cell + cpcore.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
                         }
                         bool AddonStatusOK = false;
                         addonModel addon = addonModel.create(cpcore, cpcore.siteProperties.childListAddonID);
@@ -2807,7 +2812,7 @@ namespace Contensive.Core.Controllers {
         //
         //========================================================================
         //
-        public static string main_GetFeedbackForm(coreClass cpcore, string ContentName, int RecordID, int ToMemberID, string headline = "") {
+        public static string main_GetFeedbackForm(coreClass cpCore, string ContentName, int RecordID, int ToMemberID, string headline = "") {
             string result = "";
             try {
                 string Panel = null;
@@ -2819,24 +2824,22 @@ namespace Contensive.Core.Controllers {
                 int CS = 0;
                 string iContentName = null;
                 int iRecordID = 0;
-                int iToMemberID = 0;
                 string iHeadline = null;
                 //
                 iContentName = genericController.encodeText(ContentName);
                 iRecordID = genericController.EncodeInteger(RecordID);
-                iToMemberID = genericController.EncodeInteger(ToMemberID);
                 iHeadline = genericController.encodeEmptyText(headline, "");
                 //
                 const string FeedbackButtonSubmit = "Submit";
                 //
-                FeedbackButton = cpcore.docProperties.getText("fbb");
+                FeedbackButton = cpCore.docProperties.getText("fbb");
                 switch (FeedbackButton) {
                     case FeedbackButtonSubmit:
                         //
                         // ----- form was submitted, save the note, send it and say thanks
                         //
-                        NoteFromName = cpcore.docProperties.getText("NoteFromName");
-                        NoteFromEmail = cpcore.docProperties.getText("NoteFromEmail");
+                        NoteFromName = cpCore.docProperties.getText("NoteFromName");
+                        NoteFromEmail = cpCore.docProperties.getText("NoteFromEmail");
                         //
                         NoteCopy = NoteCopy + "Feedback Submitted" + BR;
                         NoteCopy = NoteCopy + "From " + NoteFromName + " at " + NoteFromEmail + BR;
@@ -2848,26 +2851,31 @@ namespace Contensive.Core.Controllers {
                         NoteCopy = NoteCopy + BR;
                         NoteCopy = NoteCopy + "<b>Comments</b>" + BR;
                         //
-                        Copy = cpcore.docProperties.getText("NoteCopy");
+                        Copy = cpCore.docProperties.getText("NoteCopy");
                         if (string.IsNullOrEmpty(Copy)) {
                             NoteCopy = NoteCopy + "[no comments entered]" + BR;
                         } else {
-                            NoteCopy = NoteCopy + cpcore.html.convertCRLFToHtmlBreak(Copy) + BR;
+                            NoteCopy = NoteCopy + cpCore.html.convertCRLFToHtmlBreak(Copy) + BR;
                         }
                         //
                         NoteCopy = NoteCopy + BR;
                         NoteCopy = NoteCopy + "<b>Content on which the comments are based</b>" + BR;
                         //
-                        CS = cpcore.db.csOpen(iContentName, "ID=" + iRecordID);
+                        CS = cpCore.db.csOpen(iContentName, "ID=" + iRecordID);
                         Copy = "[the content of this page is not available]" + BR;
-                        if (cpcore.db.csOk(CS)) {
-                            Copy = (cpcore.db.csGet(CS, "copyFilename"));
+                        if (cpCore.db.csOk(CS)) {
+                            Copy = (cpCore.db.csGet(CS, "copyFilename"));
                             //Copy = main_EncodeContent5(Copy, c.authcontext.user.userid, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
                         }
                         NoteCopy = NoteCopy + Copy + BR;
-                        cpcore.db.csClose(ref CS);
+                        cpCore.db.csClose(ref CS);
                         //
-                        cpcore.email.sendPerson(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, false, true, 0, "", false);
+                        personModel person = personModel.create(cpCore, ToMemberID);
+                        if ( person != null ) {
+                            string sendStatus = "";
+                            string queryStringForLinkAppend = "";
+                            emailController.sendPerson(cpCore, person, NoteFromEmail, "Feedback Form Submitted", NoteCopy, false, true, 0, "", false,ref sendStatus, queryStringForLinkAppend);
+                        }
                         //
                         // ----- Note sent, say thanks
                         //
@@ -2877,7 +2885,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- print the feedback submit form
                         //
-                        Panel = "<form Action=\"" + cpcore.webServer.serverFormActionURL + "?" + cpcore.doc.refreshQueryString + "\" Method=\"post\">";
+                        Panel = "<form Action=\"" + cpCore.webServer.serverFormActionURL + "?" + cpCore.doc.refreshQueryString + "\" Method=\"post\">";
                         Panel = Panel + "<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\">";
                         Panel = Panel + "<tr>";
                         Panel = Panel + "<td colspan=\"2\"><p>Your feedback is welcome</p></td>";
@@ -2885,14 +2893,14 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- From Name
                         //
-                        Copy = cpcore.doc.authContext.user.name;
+                        Copy = cpCore.doc.authContext.user.name;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Name</p></td>";
                         Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + genericController.encodeHTML(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";
                         //
                         // ----- From Email address
                         //
-                        Copy = cpcore.doc.authContext.user.Email;
+                        Copy = cpCore.doc.authContext.user.Email;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
                         Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + genericController.encodeHTML(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";
@@ -2901,7 +2909,7 @@ namespace Contensive.Core.Controllers {
                         //
                         Copy = "";
                         Panel = Panel + "<td align=\"right\" width=\"100\" valign=\"top\"><p>Feedback</p></td>";
-                        Panel = Panel + "<td>" + cpcore.html.html_GetFormInputText2("NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
+                        Panel = Panel + "<td>" + cpCore.html.inputText("NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
                         //Panel = Panel & "<td><textarea ID=""TextArea"" rows=""4"" cols=""40"" name=""NoteCopy"">" & Copy & "</textarea></td>"
                         Panel = Panel + "</tr><tr>";
                         //
@@ -2916,7 +2924,7 @@ namespace Contensive.Core.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                cpcore.handleException(ex);
+                cpCore.handleException(ex);
             }
             return result;
         }

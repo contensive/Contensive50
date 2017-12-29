@@ -32,7 +32,8 @@ namespace Contensive.Core.Addons.Primitives {
                 // -- send password
                 string Emailtext = cpCore.docProperties.getText("email");
                 if (!string.IsNullOrEmpty(Emailtext)) {
-                    cpCore.email.sendPassword(Emailtext);
+                    string sendStatus = "";
+                    loginController.sendPassword(cpCore, Emailtext, ref sendStatus);
                     result += ""
                         + "<div style=\"width:300px;margin:100px auto 0 auto;\">"
                         + "<p>An attempt to send login information for email address '" + Emailtext + "' has been made.</p>"
