@@ -753,7 +753,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // -- set linkPathPath to linkAlias
                 if (AllowLinkAliasIfEnabled && cpcore.siteProperties.allowLinkAlias) {
-                    linkPathPage = docController.getLinkAlias(cpcore, PageID, QueryStringSuffix, "");
+                    linkPathPage = linkAliasController.getLinkAlias(cpcore, PageID, QueryStringSuffix, "");
                 }
                 if (string.IsNullOrEmpty(linkPathPage)) {
                     //

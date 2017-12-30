@@ -5861,7 +5861,7 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Update the Link Aliases
                             //
-                            docController.addLinkAlias(cpCore, linkAlias, editRecord.id, "", OverRideDuplicate, DupCausesWarning);
+                            linkAliasController.addLinkAlias(cpCore, linkAlias, editRecord.id, "", OverRideDuplicate, DupCausesWarning);
                         }
                     }
                 }
@@ -15335,14 +15335,14 @@ namespace Contensive.Core.Addons.AdminSite {
                             //
                             // Add the link alias
                             //
-                            docController.addLinkAlias(cpCore, linkAlias, cpCore.db.csGetInteger(CS, "ID"), "", false, true);
+                            linkAliasController.addLinkAlias(cpCore, linkAlias, cpCore.db.csGetInteger(CS, "ID"), "", false, true);
                         } else {
                             //
                             // Add the name
                             //
                             linkAlias = cpCore.db.csGetText(CS, "name");
                             if (!string.IsNullOrEmpty(linkAlias)) {
-                                docController.addLinkAlias(cpCore, linkAlias, cpCore.db.csGetInteger(CS, "ID"), "", false, false);
+                                linkAliasController.addLinkAlias(cpCore, linkAlias, cpCore.db.csGetInteger(CS, "ID"), "", false, false);
                             }
                         }
                         //

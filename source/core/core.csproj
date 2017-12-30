@@ -141,6 +141,7 @@
     <Compile Include="Controllers\dbController.cs" />
     <Compile Include="Controllers\dbServerController.cs" />
     <Compile Include="Controllers\debugController.cs" />
+    <Compile Include="Controllers\linkAliasController.cs" />
     <Compile Include="Controllers\docController.cs" />
     <Compile Include="Controllers\docPropertyController.cs" />
     <Compile Include="Controllers\editorController.cs" />

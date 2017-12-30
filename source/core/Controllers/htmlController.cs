@@ -3925,10 +3925,9 @@ namespace Contensive.Core.Controllers {
         // Return a panel with the input as center
         //========================================================================
         //
-        public string getPanel(string Panel, string StylePanel = "", string StyleHilite = "ccPanelHilite", string StyleShadow = "ccPanelShadow", string Width = "100%", int Padding = 5, int HeightMin = 1) {
-            string tempmain_GetPanel = null;
+        public string getPanel(string content, string StylePanel = "", string StyleHilite = "ccPanelHilite", string StyleShadow = "ccPanelShadow", string Width = "100%", int Padding = 5, int HeightMin = 1) {
+            string result = null;
             string ContentPanelWidth = null;
-            string MethodName = null;
             string MyStylePanel = null;
             string MyStyleHilite = null;
             string MyStyleShadow = null;
@@ -3941,8 +3940,6 @@ namespace Contensive.Core.Controllers {
             string s3 = null;
             string s4 = null;
             string contentPanelWidthStyle = null;
-            //
-            MethodName = "main_GetPanelTop";
             //
             MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel");
             MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite");
@@ -3963,38 +3960,36 @@ namespace Contensive.Core.Controllers {
             //
             s0 = ""
                 + "\r<td style=\"padding:" + MyPadding + "px;vertical-align:top\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(genericController.encodeText(Panel)) + "\r</td>"
+                + genericController.htmlIndent(genericController.encodeText(content)) 
+                + "\r</td>"
                 + "";
             //
             s1 = ""
                 + "\r<tr>"
-                + genericController.htmlIndent(s0) + "\r</tr>"
+                + genericController.htmlIndent(s0) 
+                + "\r</tr>"
                 + "";
             s2 = ""
                 + "\r<table style=\"width:" + contentPanelWidthStyle + ";border:0px;\" class=\"" + MyStylePanel + "\" cellspacing=\"0\">"
-                + genericController.htmlIndent(s1) + "\r</table>"
+                + genericController.htmlIndent(s1) 
+                + "\r</table>"
                 + "";
             s3 = ""
-                + "\r<td width=\"1\" height=\"" + MyHeightMin + "\" class=\"" + MyStyleHilite + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"" + MyHeightMin + "\" width=\"1\" ></td>"
-                + "\r<td width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(s2) + "\r</td>"
-                + "\r<td width=\"1\" class=\"" + MyStyleShadow + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"1\" ></td>"
+                + "\r<td colspan=\"3\" width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
+                + genericController.htmlIndent(s2) 
+                + "\r</td>"
                 + "";
             s4 = ""
                 + "\r<tr>"
-                + cr2 + "<td colspan=\"3\" class=\"" + MyStyleHilite + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"" + MyWidth + "\" ></td>"
-                + "\r</tr>"
-                + "\r<tr>"
-                + genericController.htmlIndent(s3) + "\r</tr>"
-                + "\r<tr>"
-                + cr2 + "<td colspan=\"3\" class=\"" + MyStyleShadow + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"" + MyWidth + "\" ></td>"
+                + genericController.htmlIndent(s3) 
                 + "\r</tr>"
                 + "";
-            tempmain_GetPanel = ""
+            result = ""
                 + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">"
-                + genericController.htmlIndent(s4) + "\r</table>"
+                + genericController.htmlIndent(s4) 
+                + "\r</table>"
                 + "";
-            return tempmain_GetPanel;
+            return result;
         }
         //
         //========================================================================
@@ -4060,17 +4055,11 @@ namespace Contensive.Core.Controllers {
             }
             tempmain_GetPanelTop = tempmain_GetPanelTop + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">";
             //
-            // --- top hilite row
-            //
-            tempmain_GetPanelTop = tempmain_GetPanelTop + cr2 + "<tr>"
-                + cr3 + "<td colspan=\"3\" class=\"" + MyStyleHilite + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"" + MyWidth + "\" ></td>"
-                + cr2 + "</tr>";
-            //
             // --- center row with Panel
             //
-            tempmain_GetPanelTop = tempmain_GetPanelTop + cr2 + "<tr>"
-                + cr3 + "<td width=\"1\" height=\"" + MyHeightMin + "\" class=\"" + MyStyleHilite + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"" + MyHeightMin + "\" width=\"1\" ></td>"
-                + cr3 + "<td width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
+            tempmain_GetPanelTop = tempmain_GetPanelTop 
+                + cr2 + "<tr>"
+                + cr3 + "<td colspan=\"3\" width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
                 + cr4 + "<table border=\"0\" cellpadding=\"" + MyPadding + "\" cellspacing=\"0\" width=\"" + ContentPanelWidth + "\" class=\"" + MyStylePanel + "\">"
                 + cr5 + "<tr>"
                 + cr6 + "<td valign=\"top\" class=\"" + MyStylePanel + "\"><Span class=\"" + MyStylePanel + "\">";
@@ -4084,26 +4073,10 @@ namespace Contensive.Core.Controllers {
         public string getPanelBottom(string StylePanel = "", string StyleHilite = "", string StyleShadow = "", string Width = "", string Padding = "") {
             string result = "";
             try {
-                //Dim MyStylePanel As String
-                //Dim MyStyleHilite As String
-                string MyStyleShadow = null;
-                string MyWidth = null;
-                //Dim MyPadding As String
-                //
-                //MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel")
-                //MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite")
-                MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelShadow");
-                MyWidth = genericController.encodeEmptyText(Width, "100%");
-                //MyPadding = genericController.encodeEmptyText(Padding, "5")
-                //
                 result = result + cr6 + "</span></td>"
                     + cr5 + "</tr>"
                     + cr4 + "</table>"
                     + cr3 + "</td>"
-                    + cr3 + "<td width=\"1\" class=\"" + MyStyleShadow + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"1\" ></td>"
-                    + cr2 + "</tr>"
-                    + cr2 + "<tr>"
-                    + cr3 + "<td colspan=\"3\" class=\"" + MyStyleShadow + "\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" height=\"1\" width=\"" + MyWidth + "\" ></td>"
                     + cr2 + "</tr>"
                     + "\r</table>";
             } catch (Exception ex) {
@@ -4420,10 +4393,10 @@ namespace Contensive.Core.Controllers {
                         //DebugPanel = DebugPanel & main_GetPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", "5")
                         //
                         DebugPanel = DebugPanel + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                        + cr2 + "<tr>"
-                        + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
-                        + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
-                        + cr2 + "</tr>";
+                            + cr2 + "<tr>"
+                            + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
+                            + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
+                            + cr2 + "</tr>";
                         //
                         DebugPanel = DebugPanel + getDebugPanelRow("DOM", "<a class=\"ccAdminLink\" href=\"/ccLib/clientside/DOMViewer.htm\" target=\"_blank\">Click</A>");
                         DebugPanel = DebugPanel + getDebugPanelRow("Trap Errors", genericController.encodeHTML(cpCore.siteProperties.trapErrors.ToString()));
@@ -4901,7 +4874,7 @@ namespace Contensive.Core.Controllers {
                     if (!string.IsNullOrEmpty(Caption)) {
                         result += ""
                                 + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccEditWrapperCaption\">"
-                                + genericController.encodeText(Caption) + "<!-- <img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=22 align=absmiddle> -->"
+                                + genericController.encodeText(Caption)
                                 + "</td></tr></table>";
                     }
                     result += ""

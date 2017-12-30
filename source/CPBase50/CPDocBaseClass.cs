@@ -67,7 +67,8 @@ namespace Contensive.BaseClasses
         public abstract bool get_IsGlobalVar(string Index);
         public abstract bool get_IsVar(string Index);
         public abstract string get_Var(string Index);
-        public abstract void Var(string Index, string Value);
+        public abstract void set_Var(string Index, string Value);
+        //public abstract void Var(string Index, string Value);
     }
 }
 
