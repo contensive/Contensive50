@@ -667,7 +667,7 @@ namespace Contensive.Core {
                 }
                 //
                 if (!string.IsNullOrEmpty(Width)) {
-                    WidthTest = genericController.EncodeInteger(Width.ToLower().Replace("px", ""));
+                    WidthTest = genericController.encodeInteger(Width.ToLower().Replace("px", ""));
                     if (WidthTest != 0) {
                         Style = Style + "width:" + WidthTest + "px;";
                         Copy += "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
@@ -694,7 +694,7 @@ namespace Contensive.Core {
             string VarText;
             //
             VarText = cpCore.docProperties.getText("ColPtr");
-            tempGetReportSortColumnPtr = genericController.EncodeInteger(VarText);
+            tempGetReportSortColumnPtr = genericController.encodeInteger(VarText);
             if ((tempGetReportSortColumnPtr == 0) && (VarText != "0")) {
                 tempGetReportSortColumnPtr = DefaultSortColumnPtr;
             }
@@ -719,7 +719,7 @@ namespace Contensive.Core {
             string VarText;
             //
             VarText = cpCore.docProperties.getText("ColPtr");
-            if ((EncodeInteger(VarText) != 0) || (VarText == "0")) {
+            if ((encodeInteger(VarText) != 0) || (VarText == "0")) {
                 //
                 // A valid ColPtr was found
                 //
@@ -869,9 +869,9 @@ namespace Contensive.Core {
                 // ----- Post Table copy
                 //
                 if ((DataRowCount / (double)ReportPageSize) != Math.Floor((DataRowCount / (double)ReportPageSize))) {
-                    PageCount = EncodeInteger((DataRowCount / (double)ReportPageSize) + 0.5);
+                    PageCount = encodeInteger((DataRowCount / (double)ReportPageSize) + 0.5);
                 } else {
-                    PageCount = EncodeInteger(DataRowCount / (double)ReportPageSize);
+                    PageCount = encodeInteger(DataRowCount / (double)ReportPageSize);
                 }
                 if (PageCount > 1) {
                     result = result + "<br>Page " + ReportPageNumber + " (Row " + (RowBAse) + " of " + DataRowCount + ")";

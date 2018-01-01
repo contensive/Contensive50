@@ -294,18 +294,18 @@ namespace Contensive.Core.Controllers {
                     VerifyBasicTables(cpcore);
                     //
                     // -- verify base collection
-                    logController.appendInstallLog(cpcore, "Install base collection");
+                    logController.appendLogInstall(cpcore, "Install base collection");
                     collectionController.installBaseCollection(cpcore, isNewBuild,ref  nonCriticalErrorList);
                     //
                     // -- Update server config file
-                    logController.appendInstallLog(cpcore, "Update configuration file");
+                    logController.appendLogInstall(cpcore, "Update configuration file");
                     if (!cpcore.serverConfig.appConfig.appStatus.Equals(Models.Context.serverConfigModel.appStatusEnum.OK)) {
                         cpcore.serverConfig.appConfig.appStatus = Models.Context.serverConfigModel.appStatusEnum.OK;
                         cpcore.serverConfig.saveObject(cpcore);
                     }
                     //
                     // -- verify iis configuration
-                    logController.appendInstallLog(cpcore, "Verify iis configuration");
+                    logController.appendLogInstall(cpcore, "Verify iis configuration");
                     Controllers.iisController.verifySite(cpcore, cpcore.serverConfig.appConfig.name, primaryDomain, cpcore.serverConfig.appConfig.appRootFilesPath, "default.aspx");
                     //
                     //---------------------------------------------------------------------
@@ -315,7 +315,7 @@ namespace Contensive.Core.Controllers {
                     if (isNewBuild) {
                         //
                         // -- verify root developer
-                        logController.appendInstallLog(cpcore, "New build, verify root user");
+                        logController.appendLogInstall(cpcore, "New build, verify root user");
                         int cid = Models.Complex.cdefModel.getContentId(cpcore, "people");
                         DataTable dt = cpcore.db.executeQuery("select id from ccmembers where (Developer<>0)");
                         if (dt.Rows.Count == 0) {
@@ -330,7 +330,7 @@ namespace Contensive.Core.Controllers {
                         }
                         //
                         // -- Copy default styles into Template Styles
-                        logController.appendInstallLog(cpcore, "New build, verify legacy styles");
+                        logController.appendLogInstall(cpcore, "New build, verify legacy styles");
                         cpcore.appRootFiles.copyFile("ccLib\\Config\\Styles.css", "Templates\\Styles.css", cpcore.cdnFiles);
                         //
                         // -- set build version so a scratch build will not go through data conversion
@@ -345,7 +345,7 @@ namespace Contensive.Core.Controllers {
                     if (string.CompareOrdinal(DataBuildVersion, cpcore.codeVersion()) < 0) {
                         //
                         // -- data updates
-                        logController.appendInstallLog(cpcore, "Run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + cpcore.codeVersion() + "]");
+                        logController.appendLogInstall(cpcore, "Run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + cpcore.codeVersion() + "]");
                         Upgrade_Conversion(cpcore, DataBuildVersion);
                     }
                     //
@@ -353,7 +353,7 @@ namespace Contensive.Core.Controllers {
                     // ----- Verify content
                     //---------------------------------------------------------------------
                     //
-                    logController.appendInstallLog(cpcore, "Verify records required");
+                    logController.appendLogInstall(cpcore, "Verify records required");
                     //
                     // ##### menus are created in ccBase.xml, this just checks for dups
                     VerifyAdminMenus(cpcore, DataBuildVersion);
@@ -370,7 +370,7 @@ namespace Contensive.Core.Controllers {
                     //       must be after upgrade_conversion
                     //---------------------------------------------------------------------
                     //
-                    logController.appendInstallLog(cpcore, "Verify Site Properties");
+                    logController.appendLogInstall(cpcore, "Verify Site Properties");
                     //
                     cpcore.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild));
                     cpcore.siteProperties.getText("AllowAutoLogin", "False");
@@ -486,7 +486,7 @@ namespace Contensive.Core.Controllers {
                     //---------------------------------------------------------------------
                     //
                     if (true) {
-                        logController.appendInstallLog(cpcore, "Internal upgrade complete, set Buildversion to " + cpcore.codeVersion());
+                        logController.appendLogInstall(cpcore, "Internal upgrade complete, set Buildversion to " + cpcore.codeVersion());
                         cpcore.siteProperties.setProperty("BuildVersion", cpcore.codeVersion());
                         //
                         //---------------------------------------------------------------------
@@ -504,7 +504,7 @@ namespace Contensive.Core.Controllers {
                             string ErrorMessage = "";
                             bool IISResetRequired = false;
                             //RegisterList = ""
-                            logController.appendInstallLog(cpcore, "Upgrading All Local Collections to new server build.");
+                            logController.appendLogInstall(cpcore, "Upgrading All Local Collections to new server build.");
                             string tmpString = "";
                             bool UpgradeOK = collectionController.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(cpcore, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, ref  nonCriticalErrorList);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
@@ -561,8 +561,8 @@ namespace Contensive.Core.Controllers {
                             string Collectionname = null;
                             string CollectionGuid = null;
                             bool localCollectionFound = false;
-                            logController.appendInstallLog(cpcore, "Checking all installed collections for upgrades from Collection Library");
-                            logController.appendInstallLog(cpcore, "...Open collectons.xml");
+                            logController.appendLogInstall(cpcore, "Checking all installed collections for upgrades from Collection Library");
+                            logController.appendLogInstall(cpcore, "...Open collectons.xml");
                             try {
                                 XmlDocument Doc = new XmlDocument();
                                 Doc.LoadXml(collectionController.getCollectionListFile(cpcore));
@@ -574,7 +574,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             // now go through each collection in this app and check the last updated agains the one here
                                             //
-                                            logController.appendInstallLog(cpcore, "...Open site collectons, iterate through all collections");
+                                            logController.appendLogInstall(cpcore, "...Open site collectons, iterate through all collections");
                                             //Dim dt As DataTable
                                             DataTable dt = cpcore.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)");
                                             if (dt.Rows.Count > 0) {
@@ -584,14 +584,14 @@ namespace Contensive.Core.Controllers {
                                                     ErrorMessage = "";
                                                     CollectionGuid = genericController.vbLCase(dt.Rows[rowptr]["ccguid"].ToString());
                                                     Collectionname = dt.Rows[rowptr]["name"].ToString();
-                                                    logController.appendInstallLog(cpcore, "...checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
+                                                    logController.appendLogInstall(cpcore, "...checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
                                                     if (CollectionGuid != "{7c6601a7-9d52-40a3-9570-774d0d43d758}") {
                                                         //
                                                         // upgrade all except base collection from the local collections
                                                         //
                                                         localCollectionFound = false;
                                                         bool upgradeCollection = false;
-                                                        DateTime LastChangeDate = genericController.EncodeDate(dt.Rows[rowptr]["LastChangeDate"]);
+                                                        DateTime LastChangeDate = genericController.encodeDate(dt.Rows[rowptr]["LastChangeDate"]);
                                                         if (LastChangeDate == DateTime.MinValue) {
                                                             //
                                                             // app version has no lastchangedate
@@ -615,7 +615,7 @@ namespace Contensive.Core.Controllers {
                                                                                     break;
                                                                                 case "lastchangedate":
                                                                                     //
-                                                                                    LocalLastChangeDate = genericController.EncodeDate(CollectionNode.InnerText);
+                                                                                    LocalLastChangeDate = genericController.encodeDate(CollectionNode.InnerText);
                                                                                     break;
                                                                             }
                                                                         }
@@ -623,7 +623,7 @@ namespace Contensive.Core.Controllers {
                                                                 }
                                                                 if (CollectionGuid == genericController.vbLCase(LocalGuid)) {
                                                                     localCollectionFound = true;
-                                                                    logController.appendInstallLog(cpcore, "...local collection found");
+                                                                    logController.appendLogInstall(cpcore, "...local collection found");
                                                                     if (LocalLastChangeDate != DateTime.MinValue) {
                                                                         if (LocalLastChangeDate > LastChangeDate) {
                                                                             appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
@@ -636,17 +636,17 @@ namespace Contensive.Core.Controllers {
                                                         }
                                                         ErrorMessage = "";
                                                         if (!localCollectionFound) {
-                                                            logController.appendInstallLog(cpcore, "...site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
+                                                            logController.appendLogInstall(cpcore, "...site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
                                                             bool addonInstallOk = collectionController.installCollectionFromRemoteRepo(cpcore, CollectionGuid, ref  ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
                                                             if (!addonInstallOk) {
                                                                 //
                                                                 // this may be OK so log, but do not call it an error
                                                                 //
-                                                                logController.appendInstallLog(cpcore, "...site collection [" + Collectionname + "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" + CollectionGuid + "]");
+                                                                logController.appendLogInstall(cpcore, "...site collection [" + Collectionname + "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" + CollectionGuid + "]");
                                                             }
                                                         } else {
                                                             if (upgradeCollection) {
-                                                                logController.appendInstallLog(cpcore, "...upgrading collection");
+                                                                logController.appendLogInstall(cpcore, "...upgrading collection");
                                                                 collectionController.installCollectionFromLocalRepo(cpcore, CollectionGuid, cpcore.codeVersion(), ref ErrorMessage, "", isNewBuild, ref nonCriticalErrorList);
                                                             }
                                                         }
@@ -668,7 +668,7 @@ namespace Contensive.Core.Controllers {
                     //---------------------------------------------------------------------
                     //
                     cpcore.cache.invalidateAll();
-                    logController.appendInstallLog(cpcore, "Upgrade Complete");
+                    logController.appendLogInstall(cpcore, "Upgrade Complete");
                     cpcore.doc.upgradeInProgress = false;
                 }
             } catch (Exception ex) {
@@ -1296,7 +1296,7 @@ namespace Contensive.Core.Controllers {
                     for (var rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
                         FieldNew = genericController.encodeText(dt.Rows[rowptr]["name"]) + "." + genericController.encodeText(dt.Rows[rowptr]["parentid"]);
                         if (FieldNew == FieldLast) {
-                            FieldRecordID = genericController.EncodeInteger(dt.Rows[rowptr]["ID"]);
+                            FieldRecordID = genericController.encodeInteger(dt.Rows[rowptr]["ID"]);
                             cpCore.db.executeQuery("Update ccMenuEntries set active=0 where ID=" + FieldRecordID + ";");
                         }
                         FieldLast = FieldNew;
@@ -1385,7 +1385,7 @@ namespace Contensive.Core.Controllers {
                 dt = cpCore.db.executeQuery(SQL);
                 ptr = 0;
                 while (ptr < dt.Rows.Count) {
-                    IDVariant = genericController.EncodeInteger(dt.Rows[ptr]["DataSourceID"]);
+                    IDVariant = genericController.encodeInteger(dt.Rows[ptr]["DataSourceID"]);
                     if (IDVariant == 0) {
                         Active = true;
                         DataSourceName = "Default";
@@ -1613,7 +1613,7 @@ namespace Contensive.Core.Controllers {
                 //
                 rs = cpCore.db.executeQuery("Select ID from " + TableName + " where name=" + cpCore.db.encodeSQLText(RecordName));
                 if (isDataTableOk(rs)) {
-                    tempGetIDBYName = genericController.EncodeInteger(rs.Rows[0]["ID"]);
+                    tempGetIDBYName = genericController.encodeInteger(rs.Rows[0]["ID"]);
                 }
                 rs.Dispose();
             } catch (Exception ex) {
@@ -2184,7 +2184,7 @@ namespace Contensive.Core.Controllers {
         //===========================================================================
         //
         private static void appendUpgradeLog(coreClass cpCore, string appName, string Method, string Message) {
-            logController.appendInstallLog(cpCore, "app [" + appName + "], Method [" + Method + "], Message [" + Message + "]");
+            logController.appendLogInstall(cpCore, "app [" + appName + "], Method [" + Method + "], Message [" + Message + "]");
         }
         //
         //=============================================================================

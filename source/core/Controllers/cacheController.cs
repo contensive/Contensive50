@@ -23,7 +23,7 @@ namespace Contensive.Core.Controllers {
     /// -- 1) primary key -- cache key holding the content.
     /// -- 2) dependent key -- a dependent key holds content that the primary cache depends on. If the dependent cache is invalid, the primary cache is invalid
     /// -------- if an org cache includes a primary content person, then the org (org/id/10) is saved with a dependent key (ccmembers/id/99). The org content id valid only if both the primary and dependent keys are valid
-    /// -- 3) pointer key -- a cache entry that holds a primary key (or another pointer key). When read, the cache returns the primary value. (primary="ccmembers/id/10", pointer="ccmembers/ccguid/{1234}"
+    /// -- 3) alias (pointer) key -- a cache entry that holds a primary key (or another pointer key). When read, the cache returns the primary value. (primary="ccmembers/id/10", pointer="ccmembers/ccguid/{1234}"
     /// ------- pointer keys are read-only, as the content is saved in the primary key
     /// 
     /// three  types of cache entries:
@@ -75,6 +75,508 @@ namespace Contensive.Core.Controllers {
         //
         private bool remoteCacheInitialized;
         //
+        //========================================================================
+        /// <summary>
+        /// get an object from cache. If the cache misses or is invalidated, nothing object is returned
+        /// </summary>
+        /// <typeparam name="objectClass"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public objectClass getObject<objectClass>(string key) {
+            objectClass result = default(objectClass);
+            try {
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                if (!(string.IsNullOrEmpty(key))) {
+                    //
+                    // -- read cacheWrapper
+                    cacheWrapperClass wrappedContent = getWrappedContent(key);
+                    if (wrappedContent != null) {
+                        //
+                        // -- test for global invalidation
+                        int dateCompare = globalInvalidationDate.CompareTo(wrappedContent.saveDate);
+                        if (dateCompare >= 0) {
+                            //
+                            // -- global invalidation
+                            logController.appendLogCache( cpCore,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "] is after the globalInvalidationDate [" + globalInvalidationDate + "]");
+                        } else {
+                            //
+                            // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
+                            bool cacheMiss = false;
+                            foreach (string dependentKey in wrappedContent.dependentKeyList) {
+                                cacheWrapperClass dependantObject = getWrappedContent(dependentKey);
+                                if (dependantObject == null) {
+                                    // create dummy cache to validate future cache requests, fake saveDate as last globalinvalidationdate
+                                    setWrappedContent(dependentKey, new cacheWrapperClass() {
+                                        aliasPointsToKey = null,
+                                        content = "",
+                                        saveDate = globalInvalidationDate
+                                    });
+                                } else {
+                                    dateCompare = dependantObject.saveDate.CompareTo(wrappedContent.saveDate);
+                                    if (dateCompare >= 0) {
+                                        cacheMiss = true;
+                                        logController.appendLogCache(cpCore, "GetObject(" + key + "), invalidated because the dependantobject [" + dependentKey + "] has a saveDate [" + dependantObject.saveDate.ToString() + "] after the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "]");
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!cacheMiss) {
+                                if (!string.IsNullOrEmpty(wrappedContent.aliasPointsToKey)) {
+                                    //
+                                    // -- this is a pointer key, load the primary
+                                    result = getObject<objectClass>(wrappedContent.aliasPointsToKey);
+                                } else if (wrappedContent.content is Newtonsoft.Json.Linq.JObject) {
+                                    //
+                                    // -- newtonsoft types
+                                    Newtonsoft.Json.Linq.JObject data = (Newtonsoft.Json.Linq.JObject)wrappedContent.content;
+                                    result = data.ToObject<objectClass>();
+                                } else if (wrappedContent.content is Newtonsoft.Json.Linq.JArray) {
+                                    //
+                                    // -- newtonsoft types
+                                    Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)wrappedContent.content;
+                                    result = data.ToObject<objectClass>();
+                                } else if (wrappedContent.content==null) {
+                                    //} else if ((wrappedContent.content is string) && (!(typeof(objectClass) is string))) {
+                                    //
+                                    // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
+                                    result = default(objectClass);
+                                } else {
+                                    //
+                                    // -- all worked
+                                    result = (objectClass)wrappedContent.content;
+                                }
+                            }
+                        }
+                    }
+                    //logController.appendCacheLog(cpCore,"getObject(" + key + "), exit(" + sw.ElapsedMilliseconds + "ms)");
+                    //sw.Stop();
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                // 20171222 
+                // -- cache errors should be warnings, not critical errors. Dont take down the application over a cache issue.
+                // -- cache errors likely did not original above the cache api, so failing the caller would not be productive
+                //throw;
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// get a cache object from the cache. returns the cacheObject that wraps the object
+        /// </summary>
+        /// <typeparam name="returnType"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private cacheWrapperClass getWrappedContent(string key) {
+            cacheWrapperClass result = null;
+            try {
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                if (string.IsNullOrEmpty(key)) {
+                    throw new ArgumentException("key cannot be blank");
+                } else {
+                    string wrapperKey = getWrapperKey(key);
+                    if (remoteCacheInitialized) {
+                        //
+                        // -- use remote cache
+                        try {
+                            result = cacheClient.Get<cacheWrapperClass>(wrapperKey);
+                        } catch (Exception ex) {
+                            //
+                            // --client does not throw its own errors, so try to differentiate by message
+                            if (ex.Message.ToLower().IndexOf("unable to load type") >= 0) {
+                                //
+                                // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
+                                cacheClient.Remove(wrapperKey);
+                                result = null;
+                            } else {
+                                //
+                                // -- some other error
+                                cpCore.handleException(ex);
+                                throw;
+                            }
+                        }
+                        if (result != null) {
+                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), remoteCache hit");
+                        } else {
+                            logController.appendLogCache(cpCore,"getCacheWrapper(" + key + "), remoteCache miss");
+                        }
+                    }
+                    if ((result == null) && cpCore.serverConfig.enableLocalMemoryCache) {
+                        //
+                        // -- local memory cache
+                        //Dim cache As ObjectCache = MemoryCache.Default
+                        result = (cacheWrapperClass)MemoryCache.Default[wrapperKey];
+                        if (result != null) {
+                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), memoryCache hit");
+                        } else {
+                            logController.appendLogCache(cpCore,"getCacheWrapper(" + key + "), memoryCache miss");
+                        }
+                    }
+                    if ((result == null) && cpCore.serverConfig.enableLocalFileCache) {
+                        //
+                        // -- local file cache
+                        string serializedDataObject = null;
+                        using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, wrapperKey)) {
+                            mutex.WaitOne();
+                            serializedDataObject = cpCore.privateFiles.readFile("appCache\\" + genericController.encodeFilename(wrapperKey + ".txt"));
+                            mutex.ReleaseMutex();
+                        }
+                        if (string.IsNullOrEmpty(serializedDataObject)) {
+                            logController.appendLogCache(cpCore,"getCacheWrapper(" + key + "), file miss");
+                        } else {
+                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), file hit, write to memory cache");
+                            result = Newtonsoft.Json.JsonConvert.DeserializeObject<cacheWrapperClass>(serializedDataObject);
+                            setWrappedContent_MemoryCache(wrapperKey, result);
+                        }
+                        if (result != null) {
+                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), fileCache hit");
+                        } else {
+                            logController.appendLogCache(cpCore,"getCacheWrapper(" + key + "), fileCache miss");
+                        }
+                    }
+                    if (result != null) {
+                        //
+                        // -- empty objects return nothing, empty lists return count=0
+                        if (result.dependentKeyList == null) {
+                            result.dependentKeyList = new List<string>();
+                        }
+                    }
+                }
+                //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), exit ");
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save a string to cache, for compatibility with existing site. (no objects, no invalidation, yet)
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="content"></param>
+        /// <remarks></remarks>
+        public void setObject(string key, object content) {
+            try {
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                cacheWrapperClass wrappedContent = new cacheWrapperClass {
+                    content = content,
+                    saveDate = DateTime.Now,
+                    invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
+                    dependentKeyList = null
+                };
+                setWrappedContent(key, wrappedContent);
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save an object to cache, with invalidation date
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="content"></param>
+        /// <param name="invalidationDate"></param>
+        /// <param name="dependentKeyList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
+        /// <remarks></remarks>
+        public void setObject(string key, object content, DateTime invalidationDate) {
+            try {
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                cacheWrapperClass wrappedContent = new cacheWrapperClass {
+                    content = content,
+                    saveDate = DateTime.Now,
+                    invalidationDate = invalidationDate
+                };
+                setWrappedContent(key, wrappedContent);
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save an object to cache, with invalidation date and dependentKeyList
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="content"></param>
+        /// <param name="invalidationDate"></param>
+        /// <param name="dependentKeyList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
+        /// <remarks></remarks>
+        public void setObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
+            try {
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                cacheWrapperClass wrappedContent = new cacheWrapperClass {
+                    content = content,
+                    saveDate = DateTime.Now,
+                    invalidationDate = invalidationDate,
+                    dependentKeyList = dependentKeyList
+                };
+                setWrappedContent(key, wrappedContent);
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save an object to cache, with invalidation date and dependentKey
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="content"></param>
+        /// <param name="invalidationDate"></param>
+        /// <param name="dependantKey">The cache name of an object that .</param>
+        /// <remarks></remarks>
+        public void setObject(string key, object content, DateTime invalidationDate, string dependantKey) {
+            try {
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                cacheWrapperClass cacheWrapper = new cacheWrapperClass {
+                    content = content,
+                    saveDate = DateTime.Now,
+                    invalidationDate = invalidationDate,
+                    dependentKeyList = new List<string> { dependantKey }
+                };
+                setWrappedContent(key, cacheWrapper);
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save a cache value, compatible with legacy method signature.
+        /// </summary>
+        /// <param name="CP"></param>
+        /// <param name="key"></param>
+        /// <param name="content"></param>
+        /// <param name="dependentKeyList">List of dependent keys.</param>
+        /// <remarks>If a dependent key is invalidated, it's parent key is also invalid. 
+        /// ex - org/id/10 has primary contact person/id/99. if org/id/10 object includes person/id/99 object, then org/id/10 depends on person/id/99,
+        /// and "person/id/99" is a dependent key for "org/id/10". When "org/id/10" is read, it checks all its dependent keys (person/id/99) and
+        /// invalidates if any dependent key is invalid.</remarks>
+        public void setObject(string key, object content, List<string> dependentKeyList) {
+            try {
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                cacheWrapperClass cacheWrapper = new cacheWrapperClass {
+                    content = content,
+                    saveDate = DateTime.Now,
+                    invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
+                    dependentKeyList = dependentKeyList
+                };
+                setWrappedContent(key, cacheWrapper);
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save a cache value, compatible with legacy method signature.
+        /// </summary>
+        /// <param name="CP"></param>
+        /// <param name="key"></param>
+        /// <param name="content"></param>
+        /// <param name="dependantKey"></param>
+        /// <remarks></remarks>
+        public void setObject(string key, object content, string dependantKey) {
+            try {
+                setObject(key, content, new List<string> { dependantKey });
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set a key alias. An alias points to a normal key, creating an altername way to get/invalidate a cache.
+        /// ex - image with id=10, guid={999}. The normal key="image/id/10", the alias Key="image/ccguid/{9999}"
+        /// </summary>
+        /// <param name="CP"></param>
+        /// <param name="keyAlias"></param>
+        /// <param name="data"></param>
+        /// <param name="dependantObject"></param>
+        /// <remarks></remarks>
+        public void setAlias(string keyAlias, string key) {
+            try {
+                keyAlias = Regex.Replace(keyAlias, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                cacheWrapperClass cacheWrapper = new cacheWrapperClass {
+                    saveDate = DateTime.Now,
+                    invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
+                    aliasPointsToKey = key
+                };
+                setWrappedContent(keyAlias, cacheWrapper);
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// invalidates the entire cache (except those entires written with saveRaw)
+        /// </summary>
+        /// <remarks></remarks>
+        public void invalidateAll() {
+            try {
+                string key = Regex.Replace(cacheNameGlobalInvalidationDate, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                setWrappedContent(key, new cacheWrapperClass { saveDate = DateTime.Now });
+                _globalInvalidationDate = null;
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        // <summary>
+        // invalidates a tag
+        // </summary>
+        // <param name="tag"></param>
+        // <remarks></remarks>
+        public void invalidate(string key, int recursionLimit = 5) {
+            try {
+                if ((recursionLimit>0) && (!string.IsNullOrWhiteSpace(key.Trim()))) {
+                    key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                    // if key is an alias, we need to invalidate the real key
+                    cacheWrapperClass wrapper = getWrappedContent(key);
+                    if (wrapper == null) {
+                        // no cache for this key, if this is a dependency for another key, save invalidated
+                        setWrappedContent(key, new cacheWrapperClass { saveDate = DateTime.Now });
+                    } else { 
+                        if (!string.IsNullOrWhiteSpace(wrapper.aliasPointsToKey)) {
+                            // this key is an alias, invalidate it's parent key
+                            invalidate(wrapper.aliasPointsToKey, --recursionLimit);
+                        } else {
+                            // key is a valid cache, invalidate it
+                            setWrappedContent(key, new cacheWrapperClass { saveDate = DateTime.Now });
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// update the dbTablename cache entry. Do this anytime any record is updated in the table
+        /// </summary>
+        /// <param name="ContentName"></param>
+        public void invalidateAllInContent(string ContentName) {
+            try {
+                //
+                logController.appendLogCache(cpCore,"invalidateAllObjectsInContent(" + ContentName + ")");
+                //
+                // -- save the cache key that represents any record in the content, set as a dependent key for saves
+                invalidate(ContentName);
+                invalidate(Models.Complex.cdefModel.getContentTablename(cpCore, ContentName));
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// invalidate all cache entries to this table. "dbTableName"
+        /// when any cache is saved, it should include a dependancy on a cachename=dbtablename
+        /// </summary>
+        /// <param name="dbTableName"></param>
+        public void invalidateAllInTable(string dbTableName) {
+            try {
+                string key = Regex.Replace(dbTableName, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                invalidate(key);
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// invalidates a list of tags 
+        /// </summary>
+        /// <param name="keyList"></param>
+        /// <remarks></remarks>
+        public void invalidate(List<string> keyList) {
+            try {
+                foreach (var key in keyList) {
+                    invalidate(key);
+                }
+            } catch (Exception ex) {
+                cpCore.handleException(ex);
+                throw;
+            }
+        }
+        //
+        //=======================================================================
+        /// <summary>
+        /// Encode a string to be memCacheD compatible, removing 0x00-0x20 and space
+        /// </summary>
+        private string getWrapperKey(string key) {
+            string result = cpCore.serverConfig.appConfig.name + "-" + cpCore.codeVersion() + "-" + key;
+            result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a cache key for an entity model (based on the Db)
+        /// </summary>
+        public static string getCacheKey_Entity(string tableName, string fieldName, string fieldValue) {
+            string key = tableName + "/" + fieldName + "/" + fieldValue;
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            return key;
+        }
+        //
+        public static string getCacheKey_Entity(string tableName, int recordId) {
+            string key = tableName + "/id/" + recordId.ToString();
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            return key;
+        }
+        //
+        public static string getCacheKey_Entity(string tableName, string field1Name, int field1Value, string field2Name, int field2Value) {
+            string key = tableName + "/" + field1Name + "/" + field1Value + "/" + field2Name + "/" + field2Value;
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            return key;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a cache name for an object composed of data not from a signel record
+        /// </summary>
+        public static string getCacheKey_ComplexObject(string objectName, string uniqueObjectIdentifier) {
+            string key = "complexobject/" + objectName + "/" + uniqueObjectIdentifier;
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            return key;
+        }
+        //
+        //====================================================================================================
+        //
+        public void invalidateContent_Entity(coreClass cpcore, string tableName, int recordId) {
+            //
+            invalidate(getCacheKey_Entity(tableName, recordId));
+            if (tableName.ToLower() == linkAliasModel.contentTableName.ToLower()) {
+                //
+                Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
+            } else if (tableName.ToLower() == linkForwardModel.contentTableName.ToLower()) {
+                //
+                Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
+            } else if (tableName.ToLower() == addonModel.contentTableName.ToLower()) {
+                //
+                Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
+            }
+        }
+        //
         //====================================================================================================
         /// <summary>
         /// cache data wrapper to include tags and save datetime
@@ -83,7 +585,7 @@ namespace Contensive.Core.Controllers {
         public class cacheWrapperClass {
             //
             // if populated, all other properties are ignored and the primary tag b
-            public string keyPtr;
+            public string aliasPointsToKey;
             //
             // this object is invalidated if any of these objects are invalidated
             public List<string> dependentKeyList = new List<string>();
@@ -109,7 +611,7 @@ namespace Contensive.Core.Controllers {
             get {
                 bool setDefault = false;
                 if (_globalInvalidationDate == null) {
-                    cacheWrapperClass dataObject = getWrappedContent("globalInvalidationDate");
+                    cacheWrapperClass dataObject = getWrappedContent(cacheNameGlobalInvalidationDate);
                     if (dataObject != null) {
                         _globalInvalidationDate = dataObject.saveDate;
                     }
@@ -120,15 +622,15 @@ namespace Contensive.Core.Controllers {
                 if (!_globalInvalidationDate.HasValue) {
                     setDefault = true;
                 } else {
-                    if ((EncodeDate(_globalInvalidationDate)).CompareTo(new DateTime(1990, 8, 7)) < 0) {
+                    if ((encodeDate(_globalInvalidationDate)).CompareTo(new DateTime(1990, 8, 7)) < 0) {
                         setDefault = true;
                     }
                 }
-                if ( setDefault) {
+                if (setDefault) {
                     _globalInvalidationDate = new DateTime(1990, 8, 7);
-                    setWrappedContent("globalInvalidationDate", new cacheWrapperClass { saveDate = EncodeDate(_globalInvalidationDate) });
+                    setWrappedContent(cacheNameGlobalInvalidationDate, new cacheWrapperClass { saveDate = encodeDate(_globalInvalidationDate) });
                 }
-                return EncodeDate(_globalInvalidationDate);
+                return encodeDate(_globalInvalidationDate);
             }
         }
         private DateTime? _globalInvalidationDate;
@@ -150,7 +652,7 @@ namespace Contensive.Core.Controllers {
                         string[] cacheEndpointSplit = cacheEndpoint.Split(':');
                         int cacheEndpointPort = 11211;
                         if (cacheEndpointSplit.GetUpperBound(0) > 1) {
-                            cacheEndpointPort = genericController.EncodeInteger(cacheEndpointSplit[1]);
+                            cacheEndpointPort = genericController.encodeInteger(cacheEndpointSplit[1]);
                         }
                         Amazon.ElastiCacheCluster.ElastiCacheClusterConfig cacheConfig = new Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(cacheEndpointSplit[0], cacheEndpointPort);
                         cacheConfig.Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary;
@@ -223,479 +725,6 @@ namespace Contensive.Core.Controllers {
             CacheItemPolicy policy = new CacheItemPolicy();
             policy.AbsoluteExpiration = wrappedContent.invalidationDate; // DateTime.Now.AddMinutes(100);
             cache.Set(wrapperKey, wrappedContent, policy);
-        }
-        //
-        //========================================================================
-        /// <summary>
-        /// get an object from cache. If the cache misses or is invalidated, nothing object is returned
-        /// </summary>
-        /// <typeparam name="objectClass"></typeparam>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public objectClass getObject<objectClass>(string key) {
-            objectClass result = default(objectClass);
-            try {
-                cacheWrapperClass wrappedContent = null;
-                bool cacheMiss = false;
-                int dateCompare = 0;
-                //
-                if (!(string.IsNullOrEmpty(key))) {
-                    //
-                    // -- read cacheWrapper
-                    //logController.appendCacheLog(cpCore, "getObject(" + key + "), enter");
-                    //Stopwatch sw = Stopwatch.StartNew();
-                    wrappedContent = getWrappedContent(key);
-                    if (wrappedContent != null) {
-                        //
-                        // -- test for global invalidation
-                        dateCompare = globalInvalidationDate.CompareTo(wrappedContent.saveDate);
-                        if (dateCompare >= 0) {
-                            //
-                            // -- global invalidation
-                            logController.appendCacheLog( cpCore,"GetObject(" + key + "), invalidated because the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "] is after the globalInvalidationDate [" + globalInvalidationDate + "]");
-                        } else {
-                            //
-                            // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
-                            if (wrappedContent.dependentKeyList.Count == 0) {
-                                //
-                                // -- no dependent objects
-                                //logController.appendCacheLog(cpCore,"GetObject(" + key + "), no dependentKeyList");
-                            } else {
-                                foreach (string dependentKey in wrappedContent.dependentKeyList) {
-                                    cacheWrapperClass dependantObject = getWrappedContent(dependentKey);
-                                    if (dependantObject != null) {
-                                        dateCompare = dependantObject.saveDate.CompareTo(wrappedContent.saveDate);
-                                        if (dateCompare >= 0) {
-                                            cacheMiss = true;
-                                            logController.appendCacheLog(cpCore,"GetObject(" + key + "), invalidated because the dependantobject [" + dependentKey + "] has a saveDate [" + dependantObject.saveDate.ToString() + "] after the cacheObject's saveDate [" + wrappedContent.saveDate.ToString() + "]");
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            if (!cacheMiss) {
-                                if (!string.IsNullOrEmpty(wrappedContent.keyPtr)) {
-                                    //
-                                    // -- this is a pointer key, load the primary
-                                    result = getObject<objectClass>(wrappedContent.keyPtr);
-                                } else if (wrappedContent.content is Newtonsoft.Json.Linq.JObject) {
-                                    //
-                                    // -- newtonsoft types
-                                    Newtonsoft.Json.Linq.JObject data = (Newtonsoft.Json.Linq.JObject)wrappedContent.content;
-                                    result = data.ToObject<objectClass>();
-                                } else if (wrappedContent.content is Newtonsoft.Json.Linq.JArray) {
-                                    //
-                                    // -- newtonsoft types
-                                    Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)wrappedContent.content;
-                                    result = data.ToObject<objectClass>();
-                                } else if (wrappedContent.content==null) {
-                                    //} else if ((wrappedContent.content is string) && (!(typeof(objectClass) is string))) {
-                                    //
-                                    // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
-                                    result = default(objectClass);
-                                } else {
-                                    //
-                                    // -- all worked
-                                    result = (objectClass)wrappedContent.content;
-                                }
-                            }
-                        }
-                    }
-                    //logController.appendCacheLog(cpCore,"getObject(" + key + "), exit(" + sw.ElapsedMilliseconds + "ms)");
-                    //sw.Stop();
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                // 20171222 
-                // -- cache errors should be warnings, not critical errors. Dont take down the application over a cache issue.
-                // -- cache errors likely did not original above the cache api, so failing the caller would not be productive
-                //throw;
-            }
-            return result;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// get a cache object from the cache. returns the cacheObject that wraps the object
-        /// </summary>
-        /// <typeparam name="returnType"></typeparam>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        private cacheWrapperClass getWrappedContent(string key) {
-            cacheWrapperClass result = null;
-            try {
-                //logController.appendCacheLog(cpCore,"getWrappedContent(" + key + "), enter ");
-                if (string.IsNullOrEmpty(key)) {
-                    throw new ArgumentException("key cannot be blank");
-                } else {
-                    string wrapperKey = getWrapperKey(key);
-                    if (remoteCacheInitialized) {
-                        //
-                        // -- use remote cache
-                        try {
-                            result = cacheClient.Get<cacheWrapperClass>(wrapperKey);
-                        } catch (Exception ex) {
-                            //
-                            // --client does not throw its own errors, so try to differentiate by message
-                            if (ex.Message.ToLower().IndexOf("unable to load type") >= 0) {
-                                //
-                                // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
-                                cacheClient.Remove(wrapperKey);
-                                result = null;
-                            } else {
-                                //
-                                // -- some other error
-                                cpCore.handleException(ex);
-                                throw;
-                            }
-                        }
-                        if (result != null) {
-                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), remoteCache hit");
-                        } else {
-                            logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), remoteCache miss");
-                        }
-                    }
-                    if ((result == null) && cpCore.serverConfig.enableLocalMemoryCache) {
-                        //
-                        // -- local memory cache
-                        //Dim cache As ObjectCache = MemoryCache.Default
-                        result = (cacheWrapperClass)MemoryCache.Default[wrapperKey];
-                        if (result != null) {
-                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), memoryCache hit");
-                        } else {
-                            logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), memoryCache miss");
-                        }
-                    }
-                    if ((result == null) && cpCore.serverConfig.enableLocalFileCache) {
-                        //
-                        // -- local file cache
-                        string serializedDataObject = null;
-                        using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, wrapperKey)) {
-                            mutex.WaitOne();
-                            serializedDataObject = cpCore.privateFiles.readFile("appCache\\" + genericController.encodeFilename(wrapperKey + ".txt"));
-                            mutex.ReleaseMutex();
-                        }
-                        if (string.IsNullOrEmpty(serializedDataObject)) {
-                            logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), file miss");
-                        } else {
-                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), file hit, write to memory cache");
-                            result = Newtonsoft.Json.JsonConvert.DeserializeObject<cacheWrapperClass>(serializedDataObject);
-                            setWrappedContent_MemoryCache(wrapperKey, result);
-                        }
-                        if (result != null) {
-                            //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), fileCache hit");
-                        } else {
-                            logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), fileCache miss");
-                        }
-                    }
-                    if (result != null) {
-                        //
-                        // -- empty objects return nothing, empty lists return count=0
-                        if (result.dependentKeyList == null) {
-                            result.dependentKeyList = new List<string>();
-                        }
-                    }
-                }
-                //logController.appendCacheLog(cpCore,"getCacheWrapper(" + key + "), exit ");
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-            return result;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// save a string to cache, for compatibility with existing site. (no objects, no invalidation, yet)
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="content"></param>
-        /// <remarks></remarks>
-        public void setContent(string key, object content) {
-            try {
-                cacheWrapperClass wrappedContent = new cacheWrapperClass {
-                    content = content,
-                    saveDate = DateTime.Now,
-                    invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
-                    dependentKeyList = null
-                };
-                setWrappedContent(key, wrappedContent);
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// save an object to cache, with invalidation
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="content"></param>
-        /// <param name="invalidationDate"></param>
-        /// <param name="dependentKeyList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
-        /// <remarks></remarks>
-        public void setContent(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
-            try {
-                cacheWrapperClass wrappedContent = new cacheWrapperClass {
-                    content = content,
-                    saveDate = DateTime.Now,
-                    invalidationDate = invalidationDate,
-                    dependentKeyList = dependentKeyList
-                };
-                setWrappedContent(key, wrappedContent);
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// save an object to cache, with invalidation
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="content"></param>
-        /// <param name="invalidationDate"></param>
-        /// <param name="dependantKey">The cache name of an object that .</param>
-        /// <remarks></remarks>
-        public void setContent(string key, object content, DateTime invalidationDate, string dependantKey) {
-            try {
-                cacheWrapperClass cacheWrapper = new cacheWrapperClass {
-                    content = content,
-                    saveDate = DateTime.Now,
-                    invalidationDate = invalidationDate,
-                    dependentKeyList = new List<string> { dependantKey }
-                };
-                setWrappedContent(key, cacheWrapper);
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// save a cache value, compatible with legacy method signature.
-        /// </summary>
-        /// <param name="CP"></param>
-        /// <param name="key"></param>
-        /// <param name="content"></param>
-        /// <param name="dependentKeyList">List of dependent keys.</param>
-        /// <remarks>If a dependent key is invalidated, it's parent key is also invalid. 
-        /// ex - org/id/10 has primary contact person/id/99. if org/id/10 object includes person/id/99 object, then org/id/10 depends on person/id/99,
-        /// and "person/id/99" is a dependent key for "org/id/10". When "org/id/10" is read, it checks all its dependent keys (person/id/99) and
-        /// invalidates if any dependent key is invalid.</remarks>
-        public void setContent(string key, object content, List<string> dependentKeyList) {
-            try {
-                cacheWrapperClass cacheWrapper = new cacheWrapperClass {
-                    content = content,
-                    saveDate = DateTime.Now,
-                    invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
-                    dependentKeyList = dependentKeyList
-                };
-                setWrappedContent(key, cacheWrapper);
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// save a cache value, compatible with legacy method signature.
-        /// </summary>
-        /// <param name="CP"></param>
-        /// <param name="key"></param>
-        /// <param name="content"></param>
-        /// <param name="dependantKey"></param>
-        /// <remarks></remarks>
-        public void setContent(string key, object content, string dependantKey) {
-            try {
-                //Dim dependantObjectList As New List(Of String)
-                //dependantObjectList.Add(dependantObject)
-                setContent(key, content, new List<string> { dependantKey });
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// set a pointer key. A pointer key just points to a cache key, creating an altername way to get/invalidate a cache.
-        /// ex - image with id=10, guid={999}. The cache key="image/id/10", the pointerKey="image/ccguid/{9999}"
-        /// </summary>
-        /// <param name="CP"></param>
-        /// <param name="pointerKey"></param>
-        /// <param name="data"></param>
-        /// <param name="dependantObject"></param>
-        /// <remarks></remarks>
-        public void setPointer(string pointerKey, string key) {
-            try {
-                cacheWrapperClass cacheWrapper = new cacheWrapperClass {
-                    saveDate = DateTime.Now,
-                    invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
-                    keyPtr = key
-                };
-                setWrappedContent(pointerKey, cacheWrapper);
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// invalidates the entire cache (except those entires written with saveRaw)
-        /// </summary>
-        /// <remarks></remarks>
-        public void invalidateAll() {
-            try {
-                setWrappedContent("globalInvalidationDate", new cacheWrapperClass { saveDate = DateTime.Now });
-                _globalInvalidationDate = null;
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        // <summary>
-        // invalidates a tag
-        // </summary>
-        // <param name="tag"></param>
-        // <remarks></remarks>
-        public void invalidateContent(string key) {
-            try {
-                if (!string.IsNullOrEmpty(key.Trim())) {
-                    setWrappedContent(key, new cacheWrapperClass { saveDate = DateTime.Now });
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-        }
-        //
-        //========================================================================
-        /// <summary>
-        /// update the dbTablename cache entry. Do this anytime any record is updated in the table
-        /// </summary>
-        /// <param name="ContentName"></param>
-        public void invalidateAllObjectsInContent(string ContentName) {
-            try {
-                //
-                logController.appendCacheLog(cpCore,"invalidateAllObjectsInContent(" + ContentName + ")");
-                //
-                // -- save the cache key that represents any record in the content, set as a dependent key for saves
-                setContent(ContentName, "");
-                //invalidateContent(ContentName.ToLower().Replace(" ", "_"));
-                //
-                // -- invalidate the cache key that represents any record in the table
-                setContent(Models.Complex.cdefModel.getContentTablename(cpCore, ContentName), "");
-                //invalidateAllObjectsInTable(Models.Complex.cdefModel.getContentTablename(cpCore, ContentName));
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-        }
-        //
-        //========================================================================
-        /// <summary>
-        /// invalidate all cache entries to this table. "dbTableName"
-        /// when any cache is saved, it should include a dependancy on a cachename=dbtablename
-        /// </summary>
-        /// <param name="dbTableName"></param>
-        public void invalidateAllObjectsInTable(string dbTableName) {
-            try {
-                invalidateContent(dbTableName.ToLower().Replace(" ", "_"));
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// invalidates a list of tags 
-        /// </summary>
-        /// <param name="keyList"></param>
-        /// <remarks></remarks>
-        public void invalidateContent(List<string> keyList) {
-            try {
-                foreach (var key in keyList) {
-                    invalidateContent(key);
-                }
-            } catch (Exception ex) {
-                cpCore.handleException(ex);
-                throw;
-            }
-        }
-        //
-        //=======================================================================
-        /// <summary>
-        /// Encode a string to be memCacheD compatible, removing 0x00-0x20 and space
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        private string getWrapperKey(string key) {
-            string result = cpCore.serverConfig.appConfig.name + "-" + cpCore.codeVersion() + "-" + key;
-            result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_");
-            result = result.Replace(" ", "_");
-            //
-            // -- 20170515 JK tmp - makes it harder to debug. add back to ensure filenames use valid characters.
-            //returnKey = coreEncodingBase64Class.UTF8ToBase64(returnKey)
-            return result;
-        }
-        //
-        //====================================================================================================
-        public string getString(string key) {
-            return genericController.encodeText(getObject<string>(key));
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// create a cache key for an entity model (based on the Db)
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="fieldName"></param>
-        /// <param name="fieldValue"></param>
-        /// <returns></returns>
-        public static string getCacheKey_Entity(string tableName, string fieldName, string fieldValue) {
-            return (tableName + "/" + fieldName + "/" + fieldValue).ToLower().Replace(" ", "_");
-        }
-        public static string getCacheKey_Entity(string tableName, int recordId) {
-            return (tableName + "/id/" + recordId.ToString()).ToLower().Replace(" ", "_");
-        }
-        //
-        public static string getCacheKey_Entity(string tableName, string field1Name, int field1Value, string field2Name, int field2Value) {
-            return (tableName + "/" + field1Name + "/" + field1Value + "/" + field2Name + "/" + field2Value).ToLower().Replace(" ", "_");
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// create a cache name for an object composed of data not from a signel record
-        /// </summary>
-        /// <param name="objectName"></param>
-        /// <param name="uniqueObjectIdentifier"></param>
-        /// <returns></returns>
-        public static string getCacheKey_ComplexObject(string objectName, string uniqueObjectIdentifier) {
-            return ("complexobject/" + objectName + "/" + uniqueObjectIdentifier).ToLower().Replace(" ", "_");
-        }
-        //
-        public void invalidateContent_Entity(coreClass cpcore, string tableName, int recordId) {
-            //
-            invalidateContent(getCacheKey_Entity(tableName, recordId));
-            if (tableName.ToLower() == linkAliasModel.contentTableName.ToLower()) {
-                //
-                Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
-            } else if (tableName.ToLower() == linkForwardModel.contentTableName.ToLower()) {
-                //
-                Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
-            } else if (tableName.ToLower() == addonModel.contentTableName.ToLower()) {
-                //
-                Models.Complex.routeDictionaryModel.invalidateCache(cpcore);
-            }
         }
         //
         //====================================================================================================

@@ -182,7 +182,7 @@ namespace Contensive.Core.Addons.Housekeeping {
             //
             // Get ArchiveAgeDays - use this as the oldest data they care about
             //
-            VisitArchiveAgeDays = genericController.EncodeInteger(cpCore.siteProperties.getText("ArchiveRecordAgeDays", "365"));
+            VisitArchiveAgeDays = genericController.encodeInteger(cpCore.siteProperties.getText("ArchiveRecordAgeDays", "365"));
             if (VisitArchiveAgeDays < 2) {
                 VisitArchiveAgeDays = 2;
                 cpCore.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
@@ -196,7 +196,7 @@ namespace Contensive.Core.Addons.Housekeeping {
             //
             // Get GuestArchiveAgeDays
             //
-            GuestArchiveAgeDays = genericController.EncodeInteger(cpCore.siteProperties.getText("ArchivePeopleAgeDays", "2"));
+            GuestArchiveAgeDays = genericController.encodeInteger(cpCore.siteProperties.getText("ArchivePeopleAgeDays", "2"));
             if (GuestArchiveAgeDays < 2) {
                 GuestArchiveAgeDays = 2;
                 cpCore.siteProperties.setProperty("ArchivePeopleAgeDays", GuestArchiveAgeDays.ToString());
@@ -204,7 +204,7 @@ namespace Contensive.Core.Addons.Housekeeping {
             //
             // Get EmailDropArchiveAgeDays
             //
-            EmailDropArchiveAgeDays = genericController.EncodeInteger(cpCore.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
+            EmailDropArchiveAgeDays = genericController.encodeInteger(cpCore.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
             if (EmailDropArchiveAgeDays < 2) {
                 EmailDropArchiveAgeDays = 2;
                 cpCore.siteProperties.setProperty("ArchiveEmailDropAgeDays", EmailDropArchiveAgeDays.ToString());
@@ -240,8 +240,8 @@ namespace Contensive.Core.Addons.Housekeeping {
                     //
                     if (NeedToClearCache) {
                         emptyData = null;
-                        cpCore.cache.invalidateContent("Page Content");
-                        cpCore.cache.setContent("PCC", emptyData);
+                        cpCore.cache.invalidate("Page Content");
+                        cpCore.cache.setObject("PCC", emptyData);
                     }
                 }
                 if (true) {
@@ -412,7 +412,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                 //INSTANT C# TODO TASK: The step increment was not confirmed to be positive - confirm that the stopping condition is appropriate:
                 //ORIGINAL LINE: For PeriodDatePtr = PeriodStartDate.ToOADate To OldestDateAdded.ToOADate Step PeriodStep
                 for (PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
-                    SQL = "select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + EncodeInteger(PeriodDatePtr) + " group by DateNumber";
+                    SQL = "select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber";
                     //SQL = "select count(id) as HoursPerDay from ccVisitSummary group by DateNumber having DateNumber=" & CLng(PeriodDatePtr)
                     CS = cpCore.db.csOpenSql_rev("default", SQL);
                     HoursPerDay = 0;
@@ -460,7 +460,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     AlarmTimeString = "12:00:00 AM";
                     cpCore.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                 }
-                AlarmTimeMinutesSinceMidnight = genericController.EncodeDate(AlarmTimeString).TimeOfDay.TotalMinutes;
+                AlarmTimeMinutesSinceMidnight = genericController.encodeDate(AlarmTimeString).TimeOfDay.TotalMinutes;
                 minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes;
                 LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes;
                 if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
@@ -738,7 +738,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                     AppendClassLog(cpCore, appName, "HouseKeep_App_Daily(" + appName + ")", "No records were removed because Housekeep ArchiveRecordAgeDays is 0.");
                 } else {
                     ArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date;
-                    DaystoRemove = EncodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
+                    DaystoRemove = encodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
                     if (DaystoRemove > 30) {
                         ArchiveDate = OldestVisitDate.AddDays(30);
                     }
@@ -1855,8 +1855,8 @@ namespace Contensive.Core.Addons.Housekeeping {
                     PeriodDatePtr = PeriodStart;
                     while (PeriodDatePtr < EndTimeDate) {
                         //
-                        DateNumber = EncodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
-                        TimeNumber = EncodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
+                        DateNumber = encodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
+                        TimeNumber = encodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
                         DateStart = PeriodDatePtr.Date;
                         DateEnd = PeriodDatePtr.AddHours(HourDuration).Date;
                         //
@@ -2016,7 +2016,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                             }
                             //
                             if ((MultiPageHitCnt > MultiPageVisitCnt) && (HitCnt > 0)) {
-                                AveReadTime = EncodeInteger(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt));
+                                AveReadTime = encodeInteger(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt));
                                 TotalTimeOnSite = MultiPageTimetoLastHitSum + (AveReadTime * VisitCnt);
                                 AveTimeOnSite = TotalTimeOnSite / VisitCnt;
                             }
@@ -2294,8 +2294,8 @@ namespace Contensive.Core.Addons.Housekeeping {
                     PeriodStep = (double)HourDuration / 24.0F;
                     while (PeriodDatePtr < EndTimeDate) {
                         //
-                        DateNumber = EncodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
-                        TimeNumber = EncodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
+                        DateNumber = encodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
+                        TimeNumber = encodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
                         DateStart = PeriodDatePtr.Date;
                         DateEnd = PeriodDatePtr.AddHours(HourDuration).Date;
                         //
@@ -2572,7 +2572,7 @@ namespace Contensive.Core.Addons.Housekeeping {
                                                     CollectionPath = genericController.vbLCase(CollectionNode.InnerText);
                                                     break;
                                                 case "lastchangedate":
-                                                    LastChangeDate = genericController.EncodeDate(CollectionNode.InnerText);
+                                                    LastChangeDate = genericController.encodeDate(CollectionNode.InnerText);
                                                     break;
                                             }
                                         }

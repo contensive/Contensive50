@@ -10,7 +10,7 @@ namespace Contensive.Core.Controllers.Tests {
     [TestClass()]
     public class contentCmdControllerTests {
         [TestMethod()]
-        public void ExecuteCmd_simpleAddonTest() {
+        public void Controllers_ContentCmd_ExecuteCmd_simpleAddonTest() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
                 // arrange
                 Models.Entity.addonModel addon = Models.Entity.addonModel.add(cp.core);
@@ -27,7 +27,7 @@ namespace Contensive.Core.Controllers.Tests {
             }
         }
         [TestMethod()]
-        public void ExecuteCmd_executeAddonTest() {
+        public void Controllers_ContentCmd_ExecuteCmd_executeAddonTest() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
                 // arrange
                 Models.Entity.addonModel addon = Models.Entity.addonModel.add(cp.core);
@@ -44,7 +44,7 @@ namespace Contensive.Core.Controllers.Tests {
             }
         }
         [TestMethod()]
-        public void ExecuteCmd_executeAddonTest2() {
+        public void Controllers_ContentCmd_ExecuteCmd_executeAddonTest2() {
             using (Contensive.Core.CPClass cp = new Contensive.Core.CPClass("testapp")) {
                 // arrange
                 Models.Entity.addonModel addon = Models.Entity.addonModel.add(cp.core);

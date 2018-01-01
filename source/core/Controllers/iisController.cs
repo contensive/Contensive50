@@ -268,7 +268,7 @@ namespace Contensive.Core.Controllers {
                             prop.tempfilename = instanceId + "-" + filePtr.ToString() + ".bin";
                             file.SaveAs(cpCore.tempFiles.joinPath(cpCore.tempFiles.rootLocalPath, prop.tempfilename));
                             cpCore.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename);
-                            prop.FileSize = EncodeInteger(file.ContentLength);
+                            prop.FileSize = encodeInteger(file.ContentLength);
                             cpCore.docProperties.setProperty(formName, prop);
                             filePtr += 1;
                         }
@@ -466,7 +466,7 @@ namespace Contensive.Core.Controllers {
                         // set visited true
                         //
                         cpCore.db.executeQuery("update ccdomains set visited=1 where name=" + cpCore.db.encodeSQLText(requestDomain));
-                        cpCore.cache.setContent("domainContentList", "", "domains");
+                        cpCore.cache.setObject("domainContentList", "", "domains");
                     }
                     if (cpCore.domainLegacyCache.domainDetails.typeId == 1) {
                         //
@@ -509,7 +509,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // if there was a change, update the cache
                         //
-                        cpCore.cache.setContent("domainContentList", cpCore.domainLegacyCache.domainDetailsList, "domains");
+                        cpCore.cache.setObject("domainContentList", cpCore.domainLegacyCache.domainDetailsList, "domains");
                         //domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
                         //Call cpCore.cache.setObject("domainContentList", domainDetailsListText, "domains")
                     }
@@ -857,7 +857,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Do a PageNotFound then redirect
                         //
-                        logController.log_appendLogPageNotFound(cpCore, requestUrlSource);
+                        logController.appendLogPageNotFound(cpCore, requestUrlSource);
                         if (!string.IsNullOrEmpty(ShortLink)) {
                             cpCore.db.executeQuery("Update ccContentWatch set link=null where link=" + cpCore.db.encodeSQLText(ShortLink));
                         }
@@ -1126,7 +1126,7 @@ namespace Contensive.Core.Controllers {
             string NonEncodedLink = "";
             //
             iContentName = genericController.encodeText(ContentName);
-            iRecordID = genericController.EncodeInteger(RecordID);
+            iRecordID = genericController.encodeInteger(RecordID);
             iFieldName = genericController.encodeEmptyText(FieldName, "link");
             //
             MethodName = "main_RedirectByRecord_ReturnStatus( " + iContentName + ", " + iRecordID + ", " + genericController.encodeEmptyText(FieldName, "(fieldname empty)") + ")";

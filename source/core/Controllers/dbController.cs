@@ -432,7 +432,7 @@ namespace Contensive.Core.Controllers {
             try {
                 using (DataTable dt = insertTableRecordGetDataTable(DataSourceName, TableName, MemberID)) {
                     if (dt.Rows.Count > 0) {
-                        returnId = genericController.EncodeInteger(dt.Rows[0]["id"]);
+                        returnId = genericController.encodeInteger(dt.Rows[0]["id"]);
                     }
                 }
             } catch (Exception ex) {
@@ -1485,7 +1485,7 @@ namespace Contensive.Core.Controllers {
                         deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName);
                         //
                         // -- invalidate the special cache name used to detect a change in any record
-                        cpCore.cache.invalidateAllObjectsInContent(ContentName);
+                        cpCore.cache.invalidateAllInContent(ContentName);
                         //if (workflowController.csv_AllowAutocsv_ClearContentTimeStamp) {
                         //    cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(ContentTableName, "id", LiveRecordID.ToString()));
                         //    //Call cpCore.cache.invalidateObject(ContentName)
@@ -1526,7 +1526,7 @@ namespace Contensive.Core.Controllers {
         public int csOpenSql(string SQL, string DataSourceName = "", int PageSize = 9999, int PageNumber = 1) {
             int returnCs = -1;
             try {
-                returnCs = cs_init(cpCore.doc.authContext.user.id);
+                returnCs = cs_init(cpCore.doc.sessionContext.user.id);
                 {
                     Contensive.Core.Controllers.dbController.ContentSetClass tmp = contentSetStore[returnCs];
                     tmp.Updateable = false;
@@ -2054,19 +2054,19 @@ namespace Contensive.Core.Controllers {
         //   genericController.EncodeInteger( csv_cs_getField )
         //
         public int csGetInteger(int CSPointer, string FieldName) {
-            return genericController.EncodeInteger(cs_getValue(CSPointer, FieldName));
+            return genericController.encodeInteger(cs_getValue(CSPointer, FieldName));
         }
         //
         //   encodeNumber( csv_cs_getField )
         //
         public double csGetNumber(int CSPointer, string FieldName) {
-            return genericController.EncodeNumber(cs_getValue(CSPointer, FieldName));
+            return genericController.encodeNumber(cs_getValue(CSPointer, FieldName));
         }
         //
         //    genericController.EncodeDate( csv_cs_getField )
         //
         public DateTime csGetDate(int CSPointer, string FieldName) {
-            return genericController.EncodeDate(cs_getValue(CSPointer, FieldName));
+            return genericController.encodeDate(cs_getValue(CSPointer, FieldName));
         }
         //
         //   genericController.EncodeBoolean( csv_cs_getField )
@@ -2244,7 +2244,7 @@ namespace Contensive.Core.Controllers {
                             csGoNext(CSPointer);
                         }
                         csClose(ref CSPointer);
-                        cpCore.cache.invalidateContent(invaldiateObjectList);
+                        cpCore.cache.invalidate(invaldiateObjectList);
 
                         //    ElseIf cpCore.siteProperties.allowWorkflowAuthoring And (false) Then
                         //    '
@@ -2307,7 +2307,7 @@ namespace Contensive.Core.Controllers {
                         throw new ApplicationException("content [" + ContentName + "] could Not be found.");
                     } else {
                         if (MemberID == -1) {
-                            MemberID = cpCore.doc.authContext.user.id;
+                            MemberID = cpCore.doc.sessionContext.user.id;
                         }
                         //
                         // no authoring, create default record in Live table
@@ -2350,14 +2350,14 @@ namespace Contensive.Core.Controllers {
                                                     break;
                                                 case constants.FieldTypeIdCurrency:
                                                 case constants.FieldTypeIdFloat:
-                                                    sqlList.add(FieldName, encodeSQLNumber(genericController.EncodeNumber(field.defaultValue)));
+                                                    sqlList.add(FieldName, encodeSQLNumber(genericController.encodeNumber(field.defaultValue)));
                                                     break;
                                                 case constants.FieldTypeIdInteger:
                                                 case constants.FieldTypeIdMemberSelect:
-                                                    sqlList.add(FieldName, encodeSQLNumber(genericController.EncodeInteger(field.defaultValue)));
+                                                    sqlList.add(FieldName, encodeSQLNumber(genericController.encodeInteger(field.defaultValue)));
                                                     break;
                                                 case constants.FieldTypeIdDate:
-                                                    sqlList.add(FieldName, encodeSQLDate(genericController.EncodeDate(field.defaultValue)));
+                                                    sqlList.add(FieldName, encodeSQLDate(genericController.encodeDate(field.defaultValue)));
                                                     break;
                                                 case constants.FieldTypeIdLookup:
                                                     //
@@ -2416,7 +2416,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- Clear Time Stamp because a record changed
                         // 20171213 added back for integration test (had not noted why it was commented out
-                        cpCore.cache.invalidateAllObjectsInContent(ContentName);
+                        cpCore.cache.invalidateAllInContent(ContentName);
                         //If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
                         //    Call cpCore.cache.invalidateObject(ContentName)
                         //End If
@@ -2653,7 +2653,7 @@ namespace Contensive.Core.Controllers {
                                 string SQL = null;
                                 DataTable rs = null;
                                 if (tempVar.CDef.fields.ContainsKey("id")) {
-                                    RecordID = genericController.EncodeInteger(cs_getValue(CSPointer, "id"));
+                                    RecordID = genericController.encodeInteger(cs_getValue(CSPointer, "id"));
                                     ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, field.manyToManyRuleContentID);
                                     DbTable = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
                                     SQL = "Select " + field.ManyToManyRuleSecondaryField + " from " + DbTable + " where " + field.ManyToManyRulePrimaryField + "=" + RecordID;
@@ -2696,7 +2696,7 @@ namespace Contensive.Core.Controllers {
                                                 //
                                                 // formatdatetime returns 'wednesday june 5, 1990', which fails IsDate()!!
                                                 //
-                                                fieldValue = genericController.EncodeDate(FieldValueVariant).ToString();
+                                                fieldValue = genericController.encodeDate(FieldValueVariant).ToString();
                                             }
                                             break;
                                         case FieldTypeIdLookup:
@@ -2710,7 +2710,7 @@ namespace Contensive.Core.Controllers {
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                                     //
                                                     // -- First try Lookup Content
-                                                    CSLookup = csOpen(LookupContentName, "ID=" + encodeSQLNumber(genericController.EncodeInteger(FieldValueVariant)),"",true, 0,false,false, "name", 1);
+                                                    CSLookup = csOpen(LookupContentName, "ID=" + encodeSQLNumber(genericController.encodeInteger(FieldValueVariant)),"",true, 0,false,false, "name", 1);
                                                     if (csOk(CSLookup)) {
                                                         fieldValue = csGetText(CSLookup, "name");
                                                     }
@@ -2718,7 +2718,7 @@ namespace Contensive.Core.Controllers {
                                                 } else if (!string.IsNullOrEmpty(LookupList)) {
                                                     //
                                                     // -- Next try lookup list
-                                                    FieldValueInteger = genericController.EncodeInteger(FieldValueVariant) - 1;
+                                                    FieldValueInteger = genericController.encodeInteger(FieldValueVariant) - 1;
                                                     if (FieldValueInteger >= 0) {
                                                         lookups = LookupList.Split(',');
                                                         if (lookups.GetUpperBound(0) >= FieldValueInteger) {
@@ -2733,7 +2733,7 @@ namespace Contensive.Core.Controllers {
                                             //
                                             //
                                             if (FieldValueVariant.IsNumeric()) {
-                                                fieldValue = getRecordName("people", genericController.EncodeInteger(FieldValueVariant));
+                                                fieldValue = getRecordName("people", genericController.encodeInteger(FieldValueVariant));
                                             }
                                             break;
                                         case FieldTypeIdCurrency:
@@ -2942,7 +2942,7 @@ namespace Contensive.Core.Controllers {
                                                         if (!fileNameNoExt.IsNumeric()) {
                                                             Pos = genericController.vbInstr(1, fileNameNoExt, ".r", 1);
                                                             if (Pos > 0) {
-                                                                FilenameRev = genericController.EncodeInteger(fileNameNoExt.Substring(Pos + 1));
+                                                                FilenameRev = genericController.encodeInteger(fileNameNoExt.Substring(Pos + 1));
                                                                 FilenameRev = FilenameRev + 1;
                                                                 fileNameNoExt = fileNameNoExt.Left( Pos - 1);
                                                             }
@@ -3167,13 +3167,13 @@ namespace Contensive.Core.Controllers {
                             // capture and block it - it is hardcoded in sql
                             //
                             AuthorableFieldUpdate = true;
-                            sqlModifiedBy = genericController.EncodeInteger(writeCacheValue);
+                            sqlModifiedBy = genericController.encodeInteger(writeCacheValue);
                         } else if (UcaseFieldName == "MODIFIEDDATE") {
                             //
                             // capture and block it - it is hardcoded in sql
                             //
                             AuthorableFieldUpdate = true;
-                            sqlModifiedDate = genericController.EncodeDate(writeCacheValue);
+                            sqlModifiedDate = genericController.encodeDate(writeCacheValue);
                         } else {
                             //
                             // let these field be added to the sql
@@ -3195,17 +3195,17 @@ namespace Contensive.Core.Controllers {
                                 case FieldTypeIdLookup:
                                 case FieldTypeIdAutoIdIncrement:
                                 case FieldTypeIdMemberSelect:
-                                    SQLSetPair = FieldName + "=" + encodeSQLNumber(EncodeInteger(writeCacheValue));
+                                    SQLSetPair = FieldName + "=" + encodeSQLNumber(encodeInteger(writeCacheValue));
                                     break;
                                 case FieldTypeIdCurrency:
                                 case FieldTypeIdFloat:
-                                    SQLSetPair = FieldName + "=" + encodeSQLNumber(EncodeNumber(writeCacheValue));
+                                    SQLSetPair = FieldName + "=" + encodeSQLNumber(encodeNumber(writeCacheValue));
                                     break;
                                 case FieldTypeIdBoolean:
                                     SQLSetPair = FieldName + "=" + encodeSQLBoolean(encodeBoolean(writeCacheValue));
                                     break;
                                 case FieldTypeIdDate:
-                                    SQLSetPair = FieldName + "=" + encodeSQLDate(EncodeDate(writeCacheValue));
+                                    SQLSetPair = FieldName + "=" + encodeSQLDate(encodeDate(writeCacheValue));
                                     break;
                                 case FieldTypeIdText:
                                     Copy = encodeText(writeCacheValue);
@@ -3290,6 +3290,9 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     //
+                    // -- clear write cache
+                    tempVar.writeCache = new Dictionary<string, string>();
+                    //
                     // ----- Set ModifiedBy,ModifiedDate Fields if an admin visible field has changed
                     //
                     if (AuthorableFieldUpdate) {
@@ -3338,7 +3341,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // ----- reset the ContentTimeStamp to csv_ClearBake
                             //
-                            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(LiveTableName, "id", LiveRecordID.ToString()));
+                            cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(LiveTableName, "id", LiveRecordID.ToString()));
                             //
                             // ----- mark the record NOT UpToDate for SpiderDocs
                             //
@@ -3353,7 +3356,7 @@ namespace Contensive.Core.Controllers {
                     tempVar.LastUsed = DateTime.Now;
                     //
                     // -- invalidate the special cache name used to detect a change in any record
-                    cpCore.cache.invalidateAllObjectsInContent(ContentName);
+                    cpCore.cache.invalidateAllInContent(ContentName);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -3435,16 +3438,16 @@ namespace Contensive.Core.Controllers {
                         break;
                     case FieldTypeIdCurrency:
                     case FieldTypeIdFloat:
-                        returnResult = encodeSQLNumber(genericController.EncodeNumber(expression));
+                        returnResult = encodeSQLNumber(genericController.encodeNumber(expression));
                         break;
                     case FieldTypeIdAutoIdIncrement:
                     case FieldTypeIdInteger:
                     case FieldTypeIdLookup:
                     case FieldTypeIdMemberSelect:
-                        returnResult = encodeSQLNumber(genericController.EncodeInteger(expression));
+                        returnResult = encodeSQLNumber(genericController.encodeInteger(expression));
                         break;
                     case FieldTypeIdDate:
-                        returnResult = encodeSQLDate(genericController.EncodeDate(expression));
+                        returnResult = encodeSQLDate(genericController.encodeDate(expression));
                         break;
                     case FieldTypeIdLongText:
                     case FieldTypeIdHTML:
@@ -3513,7 +3516,7 @@ namespace Contensive.Core.Controllers {
                 if (Convert.IsDBNull(expression)) {
                     returnResult = "null";
                 } else {
-                    DateTime expressionDate = genericController.EncodeDate(expression);
+                    DateTime expressionDate = genericController.encodeDate(expression);
                     if (expressionDate == DateTime.MinValue) {
                         returnResult = "null";
                     } else {
@@ -3718,7 +3721,7 @@ namespace Contensive.Core.Controllers {
                 if (!genericController.isDataTableOk(dt)) {
                     throw new ApplicationException("Content [" + ContentName + "] was not found in ccContent table");
                 } else {
-                    returnResult = genericController.EncodeInteger(dt.Rows[0]["ContentTableID"]);
+                    returnResult = genericController.encodeInteger(dt.Rows[0]["ContentTableID"]);
                 }
                 dt.Dispose();
             } catch (Exception ex) {
@@ -4532,7 +4535,7 @@ namespace Contensive.Core.Controllers {
             try {
                 DataTable dt = executeQuery("Select ID from ccContent where name=" + encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
-                    returnContentId = genericController.EncodeInteger(dt.Rows[0]["id"]);
+                    returnContentId = genericController.encodeInteger(dt.Rows[0]["id"]);
                 }
                 dt.Dispose();
             } catch (Exception ex) {
@@ -4618,9 +4621,9 @@ namespace Contensive.Core.Controllers {
                     //
                     // --- no records were found, add a blank if we can
                     //
-                    dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.doc.authContext.user.id);
+                    dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.doc.sessionContext.user.id);
                     if (dt.Rows.Count > 0) {
-                        RecordID = genericController.EncodeInteger(dt.Rows[0]["ID"]);
+                        RecordID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                         cpCore.db.executeQuery("Update " + TableName + " Set active=0 where id=" + RecordID + ";", DataSource.Name);
                     }
                 }
@@ -4645,7 +4648,7 @@ namespace Contensive.Core.Controllers {
                         if (dt.Rows.Count == 0) {
                             throw new ApplicationException("Content Definition [" + ContentName + "] could Not be selected by name after it was inserted");
                         } else {
-                            ContentID = genericController.EncodeInteger(dt.Rows[0]["ID"]);
+                            ContentID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                             cpCore.db.executeQuery("update ccContent Set CreateKey=0 where id=" + ContentID);
                         }
                         dt.Dispose();
@@ -4680,7 +4683,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // create the content field
                             //
-                            createContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, genericController.EncodeInteger(dcTableColumns.DataType));
+                            createContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, genericController.encodeInteger(dcTableColumns.DataType));
                         } else {
                             //
                             // touch field so upgrade does not delete it
@@ -4995,7 +4998,7 @@ namespace Contensive.Core.Controllers {
                 SQL = "select count(*) as RecordCount from " + TableName + " where " + Criteria;
                 DataTable dt = executeQuery(SQL);
                 if (dt.Rows.Count > 0) {
-                    CurrentCount = genericController.EncodeInteger(dt.Rows[0][0]);
+                    CurrentCount = genericController.encodeInteger(dt.Rows[0][0]);
                 }
                 while ((CurrentCount != 0) & (PreviousCount != CurrentCount) && (LoopCount < iChunkCount)) {
                     if (getDataSourceType(DataSourceName) == DataSourceTypeODBCMySQL) {
@@ -5008,7 +5011,7 @@ namespace Contensive.Core.Controllers {
                     SQL = "select count(*) as RecordCount from " + TableName + " where " + Criteria;
                     dt = executeQuery(SQL);
                     if (dt.Rows.Count > 0) {
-                        CurrentCount = genericController.EncodeInteger(dt.Rows[0][0]);
+                        CurrentCount = genericController.encodeInteger(dt.Rows[0][0]);
                     }
                     LoopCount = LoopCount + 1;
                 }
@@ -5063,10 +5066,10 @@ namespace Contensive.Core.Controllers {
                         //
                         KeySplit = ContentRecordKey.Split('.');
                         if (KeySplit.GetUpperBound(0) == 1) {
-                            ContentID = genericController.EncodeInteger(KeySplit[0]);
+                            ContentID = genericController.encodeInteger(KeySplit[0]);
                             if (ContentID != 0) {
                                 ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID);
-                                RecordID = genericController.EncodeInteger(KeySplit[1]);
+                                RecordID = genericController.encodeInteger(KeySplit[1]);
                                 if (!string.IsNullOrEmpty(ContentName) & RecordID != 0) {
                                     if (Models.Complex.cdefModel.getContentTablename(cpCore, ContentName) == "ccPageContent") {
                                         CSPointer = cpCore.db.csOpenRecord(ContentName, RecordID,false,false, "TemplateID,ParentID");
@@ -5096,7 +5099,7 @@ namespace Contensive.Core.Controllers {
                                                 DataSource = Models.Complex.cdefModel.getContentDataSource(cpCore, ContentName);
                                                 CSPointer = csOpenSql_rev(DataSource, "Select ContentControlID from " + TableName + " where ID=" + RecordID);
                                                 if (csOk(CSPointer)) {
-                                                    ParentContentID = genericController.EncodeInteger(csGetText(CSPointer, "ContentControlID"));
+                                                    ParentContentID = genericController.encodeInteger(csGetText(CSPointer, "ContentControlID"));
                                                 }
                                                 csClose(ref CSPointer);
                                                 if (ParentContentID != 0) {
@@ -5193,13 +5196,13 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public int csOpenRecord(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(genericController.encodeText(ContentName), "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")","", false, cpCore.doc.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(genericController.encodeText(ContentName), "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")","", false, cpCore.doc.sessionContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         //========================================================================
         //
         public int cs_open2(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(ContentName, "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")","", false, cpCore.doc.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(ContentName, "(ID=" + cpCore.db.encodeSQLNumber(RecordID) + ")","", false, cpCore.doc.sessionContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         //========================================================================
@@ -5239,7 +5242,7 @@ namespace Contensive.Core.Controllers {
             int ContentControlID = 0;
             int iCSPointer;
             //
-            iCSPointer = genericController.EncodeInteger(CSPointer);
+            iCSPointer = genericController.encodeInteger(CSPointer);
             if (iCSPointer == -1) {
                 throw (new ApplicationException("main_cs_getRecordEditLink called with invalid iCSPointer")); // handleLegacyError14(MethodName, "")
             } else {
@@ -5254,7 +5257,7 @@ namespace Contensive.Core.Controllers {
                     ContentControlID = (cpCore.db.csGetInteger(iCSPointer, "contentcontrolid"));
                     ContentName = Models.Complex.cdefModel.getContentNameByID(cpCore, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        result = cpCore.html.getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, cpCore.doc.authContext.isEditing(ContentName));
+                        result = cpCore.html.getRecordEditLink2(ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, cpCore.doc.sessionContext.isEditing(ContentName));
                     }
                 }
             }

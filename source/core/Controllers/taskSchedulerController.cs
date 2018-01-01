@@ -29,7 +29,7 @@ namespace Contensive.Core.Controllers {
         //
         private System.Timers.Timer processTimer;
         private int ProcessTimerTickCnt;
-        private const int ProcessTimerMsecPerTick = 5100; // Check processs every 5 seconds
+        private const int ProcessTimerMsecPerTick = 5000;
         private bool ProcessTimerInProcess;
         private int ProcessTimerProcessCount;
         //
@@ -38,16 +38,6 @@ namespace Contensive.Core.Controllers {
         public bool StartServiceInProgress;
         //
         protected bool disposed = false;
-        //
-        //========================================================================================================
-        // <summary>
-        // constructor
-        // </summary>
-        // <param name="cpCore"></param>
-        // <remarks></remarks>
-        //Public Sub New()
-        //    MyBase.New
-        //End Sub
         //
         //========================================================================================================
         /// <summary>
@@ -77,8 +67,10 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         public void stopTimerEvents() {
             try {
-                //appendLog("taskScheduleServiceClass.stopService")
                 processTimer.Enabled = false;
+                using (CPClass cp = new CPClass()) {
+                    logController.appendLogTasks(cp.core,"stopTimerEvents");
+                }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
                     cp.core.handleException(ex);
@@ -96,18 +88,17 @@ namespace Contensive.Core.Controllers {
         public bool startTimerEvents(bool setVerbose, bool singleThreaded) {
             bool returnStartedOk = false;
             try {
-                //appendLog("taskScheduleServiceClass.startService")
-                //
-                if (StartServiceInProgress) {
-                    //appendLog("taskScheduleServiceClass.startService, startServiceInProgress true, skip.")
-                } else {
+                if (!StartServiceInProgress) {
                     StartServiceInProgress = true;
-                    processTimer = new System.Timers.Timer(5000);
+                    processTimer = new System.Timers.Timer(ProcessTimerMsecPerTick);
                     processTimer.Elapsed += processTimerTick;
-                    processTimer.Interval = ProcessTimerMsecPerTick;
+                    //processTimer.Interval = ProcessTimerMsecPerTick;
                     processTimer.Enabled = true;
                     returnStartedOk = true;
                     StartServiceInProgress = false;
+                }
+                using (CPClass cp = new CPClass()) {
+                    logController.appendLogTasks(cp.core, "stopTimerEvents");
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
@@ -123,31 +114,22 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         public void processTimerTick(object sender, EventArgs e) {
             try {
-                Console.WriteLine("taskScheduleServiceClass.processTimerTick");
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-                if (ProcessTimerInProcess) {
-                    Console.WriteLine("tmp-taskScheduleServiceClass.processTimerTick, skipped because timerInProcess");
-                } else {
-                    //
-                    // -- schedule tasks
+                if (!ProcessTimerInProcess) {
                     ProcessTimerInProcess = true;
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
                     using (CPClass cp = new CPClass()) {
-                        if (!cp.core.serverConfig.allowTaskSchedulerService) {
-                            Console.WriteLine("taskScheduleServiceClass.processTimerTick, skipped because serviceConfig.allowTaskSchedulerService false.");
-                        } else {
-                            Console.WriteLine("taskScheduleServiceClass.processTimerTick, call scheduleTasks.");
+                        if (cp.core.serverConfig.allowTaskSchedulerService) {
                             scheduleTasks(cp.core);
                         }
-                        //End Using
                     }
-                    ProcessTimerInProcess = false;
                 }
-                Console.WriteLine("taskScheduleServiceClass.processTimerTick exit (" + sw.ElapsedMilliseconds + "ms)");
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
                     cp.core.handleException(ex);
                 }
+            } finally {
+                ProcessTimerInProcess = false;
             }
         }
         //
@@ -155,37 +137,26 @@ namespace Contensive.Core.Controllers {
         /// <summary>
         /// Iterate through all apps, find addosn that need to run and add them to the task queue
         /// </summary>
-        private void scheduleTasks(coreClass cpClusterCore) {
-            string hint = "";
+        private void scheduleTasks(coreClass cpcoreServer) {
             try {
                 //
-                logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks");
-                //
-                foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> kvp in cpClusterCore.serverConfig.apps) {
-                    //
-                    // schedule tasks for this app
-                    //
-                    logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" + kvp.Value.name + "]");
-                    //
-                    using (CPClass cpSite = new CPClass(kvp.Value.name)) {
-                        if (!(cpSite.core.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
+                // -- run tasks for each app
+                foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> appKvp in cpcoreServer.serverConfig.apps) {
+                    logController.appendLogTasks(cpcoreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
+                    using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
+                        coreClass cpcoreApp = cpApp.core;
+                        if (!(cpcoreApp.serverConfig.appConfig.appStatus == Models.Context.serverConfigModel.appStatusEnum.OK)) {
                             //
-                            logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app status not ok");
+                            logController.appendLogTasks(cpcoreServer, "scheduleTasks, app status not ok");
+                        } else if (!(cpcoreApp.serverConfig.appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
                             //
-                        } else if (!(cpSite.core.serverConfig.appConfig.appMode == Models.Context.serverConfigModel.appModeEnum.normal)) {
-                            //
-                            logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app mode not normal");
-                            //
+                            logController.appendLogTasks(cpcoreServer, "scheduleTasks, app mode not normal");
                         } else {
                             //
                             // Execute Processes
-                            //
                             try {
-                                //
-                                logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, search for addons to run");
-                                //
                                 DateTime RightNow = DateTime.Now;
-                                string SQLNow = cpSite.core.db.encodeSQLDate(RightNow);
+                                string SQLNow = cpcoreApp.db.encodeSQLDate(RightNow);
                                 string sqlAddonsCriteria = ""
                                     + "(Active<>0)"
                                     + " and(name<>'')"
@@ -194,57 +165,55 @@ namespace Contensive.Core.Controllers {
                                     + "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))"
                                     + "  or(ProcessNextRun<" + SQLNow + ")"
                                     + " )";
-                                int CS = cpSite.core.db.csOpen(cnAddons, sqlAddonsCriteria);
-                                while (cpSite.core.db.csOk(CS)) {
-                                    int addonProcessInterval = cpSite.core.db.csGetInteger(CS, "ProcessInterval");
-                                    string addonName = cpSite.core.db.csGetText(CS, "name");
-                                    bool addonProcessRunOnce = cpSite.core.db.csGetBoolean(CS, "ProcessRunOnce");
-                                    DateTime addonProcessNextRun = cpSite.core.db.csGetDate(CS, "ProcessNextRun");
-                                    DateTime NextRun = DateTime.MinValue;
-                                    hint += ",run addon " + addonName;
+                                int CS = cpcoreApp.db.csOpen(cnAddons, sqlAddonsCriteria);
+                                while (cpcoreApp.db.csOk(CS)) {
+                                    int addonProcessInterval = cpcoreApp.db.csGetInteger(CS, "ProcessInterval");
+                                    string addonName = cpcoreApp.db.csGetText(CS, "name");
+                                    bool addonProcessRunOnce = cpcoreApp.db.csGetBoolean(CS, "ProcessRunOnce");
+                                    DateTime addonProcessNextRun = cpcoreApp.db.csGetDate(CS, "ProcessNextRun");
+                                    DateTime nextRun = DateTime.MinValue;
                                     if (addonProcessInterval > 0) {
-                                        NextRun = RightNow.AddMinutes(addonProcessInterval);
+                                        nextRun = RightNow.AddMinutes(addonProcessInterval);
                                     }
                                     if ((addonProcessNextRun < RightNow) || (addonProcessRunOnce)) {
                                         //
-                                        logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, add task for addon [" + addonName + "], addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
+                                        logController.appendLogTasks(cpcoreServer, "scheduleTasks, addon [" + addonName + "], add task, addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
                                         //
                                         // -- resolve triggering state
-                                        cpSite.core.db.csSet(CS, "ProcessRunOnce", false);
+                                        cpcoreApp.db.csSet(CS, "ProcessRunOnce", false);
                                         if (addonProcessNextRun < RightNow) {
-                                            cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun);
+                                            cpcoreApp.db.csSet(CS, "ProcessNextRun", nextRun);
                                         }
-                                        cpSite.core.db.csSave2(CS);
+                                        cpcoreApp.db.csSave2(CS);
                                         //
                                         // -- add task to queue for runner
                                         cmdDetailClass cmdDetail = new cmdDetailClass();
-                                        cmdDetail.addonId = cpSite.core.db.csGetInteger(CS, "ID");
+                                        cmdDetail.addonId = cpcoreApp.db.csGetInteger(CS, "ID");
                                         cmdDetail.addonName = addonName;
-                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpSite.core, cpSite.core.db.csGetText(CS, "argumentlist"));
-                                        addTaskToQueue(cpSite.core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
-                                    } else if (cpSite.core.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
+                                        cmdDetail.docProperties = genericController.convertAddonArgumentstoDocPropertiesList(cpcoreApp, cpcoreApp.db.csGetText(CS, "argumentlist"));
+                                        addTaskToQueue(cpcoreApp, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                                    } else if (cpcoreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
                                         //
-                                        logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, addon [" + addonName + "], ProcessInterval set but no processNextRun, set processNextRun [" + NextRun + "]");
+                                        logController.appendLogTasks(cpcoreServer, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
                                         //
                                         // -- Interval is OK but NextRun is 0, just set next run
-                                        cpSite.core.db.csSet(CS, "ProcessNextRun", NextRun);
-                                        cpSite.core.db.csSave2(CS);
+                                        cpcoreApp.db.csSet(CS, "ProcessNextRun", nextRun);
+                                        cpcoreApp.db.csSave2(CS);
                                     }
-                                    cpSite.core.db.csGoNext(CS);
+                                    cpcoreApp.db.csGoNext(CS);
                                 }
-                                cpSite.core.db.csClose(ref CS);
+                                cpcoreApp.db.csClose(ref CS);
                             } catch (Exception ex) {
                                 //
-                                logController.appendLog(cpClusterCore, "taskScheduler.scheduleTasks, execption scheduling addon");
-                                //
-                                cpClusterCore.handleException(ex);
+                                logController.appendLogTasks(cpcoreServer, "scheduleTasks, exception [" + ex.ToString() + "]");
+                                cpcoreServer.handleException(ex);
                             }
                         }
                     }
-                    hint += ",app done";
                 }
             } catch (Exception ex) {
-                cpClusterCore.handleException(ex);
+                logController.appendLogTasks(cpcoreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
+                cpcoreServer.handleException(ex);
             }
         }
         //
@@ -253,93 +222,43 @@ namespace Contensive.Core.Controllers {
         /// Add a command task to the taskQueue to be run by the taskRunner. Returns false if the task was already there (dups fround by command name and cmdDetailJson)
         /// </summary>
         /// <param name="cpSiteCore"></param>
-        /// <param name="Command"></param>
+        /// <param name="command"></param>
         /// <param name="cmdDetail"></param>
         /// <param name="BlockDuplicates"></param>
         /// <returns></returns>
-        static public bool addTaskToQueue(coreClass cpSiteCore, string Command, cmdDetailClass cmdDetail, bool BlockDuplicates) {
+        static public bool addTaskToQueue(coreClass cpSiteCore, string command, cmdDetailClass cmdDetail, bool BlockDuplicates) {
             bool returnTaskAdded = true;
             try {
-                string LcaseCommand = null;
-                string sql = null;
                 string cmdDetailJson = cpSiteCore.json.Serialize(cmdDetail);
-                int cs = 0;
-                //
-                logController.appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" + cpSiteCore.serverConfig.appConfig.name + "], command=[" + Command + "], cmdDetail=[" + cmdDetailJson + "]");
-                //
-                returnTaskAdded = true;
-                LcaseCommand = genericController.vbLCase(Command);
                 if (BlockDuplicates) {
                     //
-                    // Search for a duplicate
-                    //
-                    sql = "select top 1 id from cctasks where ((command=" + cpSiteCore.db.encodeSQLText(Command) + ")and(cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
-                    cs = cpSiteCore.db.csOpenSql(sql);
-                    if (cpSiteCore.db.csOk(cs)) {
-                        returnTaskAdded = false;
-                    }
+                    // -- Search for a duplicate
+                    string sql = "select top 1 id from cctasks where ((command=" + cpSiteCore.db.encodeSQLText(command) + ")and(cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
+                    int cs = cpSiteCore.db.csOpenSql(sql);
+                    returnTaskAdded = !cpSiteCore.db.csOk(cs);
                     cpSiteCore.db.csClose(ref cs);
                 }
                 //
-                // Add it to the queue and shell out to the command
-                //
-                if (!returnTaskAdded) {
-                    //
-                    logController.appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, command skipped because the unstarted command and details were already in the queue.");
-                    //
-                } else {
-                    //
-                    logController.appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" + cpSiteCore.serverConfig.appConfig.name + "], command=[" + Command + "], cmdDetail=[" + cmdDetailJson + "]");
-                    //
-                    cs = cpSiteCore.db.csInsertRecord("tasks");
+                // -- add it to the queue and shell out to the command
+                if (returnTaskAdded) {
+                    int cs = cpSiteCore.db.csInsertRecord("tasks");
                     if (cpSiteCore.db.csOk(cs)) {
-                        cpSiteCore.db.csSet(cs, "name", "command [" + Command + "], addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]");
-                        cpSiteCore.db.csSet(cs, "command", Command);
+                        cpSiteCore.db.csSet(cs, "name", "command [" + command + "], addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]");
+                        cpSiteCore.db.csSet(cs, "command", command);
                         cpSiteCore.db.csSet(cs, "cmdDetail", cmdDetailJson);
-                        returnTaskAdded = true;
                     }
                     cpSiteCore.db.csClose(ref cs);
+                    logController.appendLogTasks(cpSiteCore, "addTaskToQueue, command [" + command + "], cmdDetailJson [" + cmdDetailJson + "]");
                 }
             } catch (Exception ex) {
+                logController.appendLogTasks(cpSiteCore, "addTaskToQueue, exeception [" + ex.ToString() + "]");
                 cpSiteCore.handleException(ex);
-                throw;
             }
             return returnTaskAdded;
         }
         //
-        //Private Sub appendLog(cpCore As coreClass, ByVal logText As String, Optional isImportant As Boolean = False)
-        //    If (isImportant Or allowVerboseLogging) Then
-        //        logController.appendLog(cpCore, logText, "", "trace")
-        //    End If
-        //    If (allowConsoleWrite) Then
-        //        Console.WriteLine(logText)
-        //    End If
-        //End Sub
+        //====================================================================================================
         //
-        //
-        //
-        public static void tasks_RequestTask(coreClass cpCore, string Command, string SQL, string ExportName, string Filename, int RequestedByMemberID) {
-            int CS = 0;
-            string TaskName = null;
-            //
-            if (string.IsNullOrEmpty(ExportName)) {
-                TaskName = encodeText(DateTime.Now) + " snapshot of unnamed data";
-            } else {
-                TaskName = encodeText(DateTime.Now) + " snapshot of " + genericController.vbLCase(ExportName);
-            }
-            CS = cpCore.db.csInsertRecord("Tasks", RequestedByMemberID);
-            if (cpCore.db.csOk(CS)) {
-                cpCore.db.csGetFilename(CS, "Filename", Filename);
-                cpCore.db.csSet(CS, "Name", TaskName);
-                cpCore.db.csSet(CS, "Command", Command);
-                cpCore.db.csSet(CS, "SQLQuery", SQL);
-            }
-            cpCore.db.csClose(ref CS);
-        }
-        public static void main_RequestTask(coreClass cpCore, string Command, string SQL, string ExportName, string Filename) {
-            tasks_RequestTask(cpCore, genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(cpCore.doc.authContext.user.id));
-        }
-
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
@@ -354,5 +273,4 @@ namespace Contensive.Core.Controllers {
         }
         #endregion
     }
-
 }

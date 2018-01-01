@@ -18,40 +18,39 @@ namespace Contensive.BaseClasses
 {
 	public abstract class CPRequestBaseClass
 	{
-		//Public Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
-		public abstract string Browser {get;} //Implements BaseClasses.CPRequestBaseClass.Browser
-		public abstract bool BrowserIsIE {get;} //Implements BaseClasses.CPRequestBaseClass.BrowserIsIE
-		public abstract bool BrowserIsMac {get;} //Implements BaseClasses.CPRequestBaseClass.BrowserIsMac
-		public abstract bool BrowserIsMobile {get;} //Implements BaseClasses.CPRequestBaseClass.BrowserIsMobile
-		public abstract bool BrowserIsWindows {get;} //Implements BaseClasses.CPRequestBaseClass.BrowserIsWindows
-		public abstract string BrowserVersion {get;} //Implements BaseClasses.CPRequestBaseClass.BrowserVersion
-		public abstract string Cookie(string CookieName); //Implements BaseClasses.CPRequestBaseClass.Cookie
-		public abstract string CookieString {get;} //Implements BaseClasses.CPRequestBaseClass.CookieString
-		public abstract string Form {get;} //Implements BaseClasses.CPRequestBaseClass.Form
-		public abstract string FormAction {get;} //Implements BaseClasses.CPRequestBaseClass.FormAction
-		public abstract bool GetBoolean(string RequestName); //Implements BaseClasses.CPRequestBaseClass.GetBoolean
-		public abstract DateTime GetDate(string RequestName); //Implements BaseClasses.CPRequestBaseClass.GetDate
-		public abstract int GetInteger(string RequestName); //Implements BaseClasses.CPRequestBaseClass.GetInteger
-		public abstract double GetNumber(string RequestName); //Implements BaseClasses.CPRequestBaseClass.GetNumber
-		public abstract string GetText(string RequestName); //Implements BaseClasses.CPRequestBaseClass.GetText
-		public abstract string Host {get;} //Implements BaseClasses.CPRequestBaseClass.Host
-		public abstract string HTTPAccept {get;} //Implements BaseClasses.CPRequestBaseClass.HTTPAccept
-		public abstract string HTTPAcceptCharset {get;} //Implements BaseClasses.CPRequestBaseClass.HTTPAcceptCharset
-		public abstract string HTTPProfile {get;} //Implements BaseClasses.CPRequestBaseClass.HTTPProfile
-		public abstract string HTTPXWapProfile {get;} //Implements BaseClasses.CPRequestBaseClass.HTTPXWapProfile
-		public abstract string Language {get;} //Implements BaseClasses.CPRequestBaseClass.Language
-		public abstract string Link {get;} //Implements BaseClasses.CPRequestBaseClass.Link
-		public abstract string LinkForwardSource {get;} //Implements BaseClasses.CPRequestBaseClass.LinkForwardSource
-		public abstract string LinkSource {get;} //Implements BaseClasses.CPRequestBaseClass.LinkSource
-		public abstract string Page {get;} //Implements BaseClasses.CPRequestBaseClass.Page
-		public abstract string Path {get;} //Implements BaseClasses.CPRequestBaseClass.Path
-		public abstract string PathPage {get;} //Implements BaseClasses.CPRequestBaseClass.PathPage
-		public abstract string Protocol {get;} //Implements BaseClasses.CPRequestBaseClass.Protocol
-		public abstract string QueryString {get;} //Implements BaseClasses.CPRequestBaseClass.QueryString
-		public abstract string Referer {get;} //Implements BaseClasses.CPRequestBaseClass.Referer
-		public abstract string RemoteIP {get;} //Implements BaseClasses.CPRequestBaseClass.RemoteIP
-		public abstract bool Secure {get;} //Implements BaseClasses.CPRequestBaseClass.Secure
-		public abstract bool OK(string RequestName); //Implements BaseClasses.CPRequestBaseClass.OK
+		public abstract string Browser {get;}
+        [Obsolete("Deprecated",false)] public abstract bool BrowserIsIE {get;}
+		[Obsolete("Deprecated",false)] public abstract bool BrowserIsMac {get;}
+		public abstract bool BrowserIsMobile {get;}
+        [Obsolete("Deprecated", false)] public abstract bool BrowserIsWindows {get;}
+        [Obsolete("Deprecated", false)] public abstract string BrowserVersion {get;}
+		public abstract string Cookie(string CookieName); 
+		public abstract string CookieString {get;} 
+		public abstract string Form {get;} 
+		public abstract string FormAction {get;} 
+		public abstract bool GetBoolean(string RequestName); 
+		public abstract DateTime GetDate(string RequestName);
+		public abstract int GetInteger(string RequestName);
+		public abstract double GetNumber(string RequestName);
+		public abstract string GetText(string RequestName);
+		public abstract string Host {get;}
+		public abstract string HTTPAccept {get;}
+		public abstract string HTTPAcceptCharset {get;}
+		public abstract string HTTPProfile {get;} 
+		public abstract string HTTPXWapProfile {get;}
+		public abstract string Language {get;}
+		public abstract string Link {get;}
+		public abstract string LinkForwardSource {get;}
+		public abstract string LinkSource {get;}
+		public abstract string Page {get;}
+		public abstract string Path {get;}
+		public abstract string PathPage {get;}
+		public abstract string Protocol {get;}
+		public abstract string QueryString {get;}
+		public abstract string Referer {get;}
+		public abstract string RemoteIP {get;}
+		public abstract bool Secure {get;}
+		public abstract bool OK(string RequestName);
 	}
 
 }

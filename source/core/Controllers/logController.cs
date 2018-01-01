@@ -57,35 +57,41 @@ namespace Contensive.Core.Controllers {
                     int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
                     string threadName = threadId.ToString("00000000");
                     string absContent = LogFileCopyPrep(DateTime.Now.ToString("")) + "\tthread:" + threadName + "\t" + LogLine;
+                    fileController fileSystem = null;
+                    if (cpCore.serverConfig != null) {
+                        if (cpCore.serverConfig.appConfig != null) {
+                            //
+                            // -- use app log space
+                            fileSystem = cpCore.privateFiles;
+                        }
+                    }
+                    if (fileSystem == null) {
+                        //
+                        // -- no app or no server, use program data files
+                        fileSystem = cpCore.programDataFiles;
+                    }
                     //
                     if (useMicrosoftTraceLogging) {
-                        string logName = (cpCore.serverConfig.appConfig.name + "/log/" + LogFolder).ToLower();
+                        string logName;
+                        if (cpCore.serverConfig.appConfig == null) {
+                            // -- no app, log to server
+                            logName = ("server/log/" + LogFolder).ToLower();
+                        } else {
+                            // -- use app log
+                            logName = (cpCore.serverConfig.appConfig.name + "/log/" + LogFolder).ToLower();
+                        }
                         if (!cpCore.doc.logList.ContainsKey(logName)) {
-                            string logPathFile = cpCore.privateFiles.rootLocalPath + "logs\\" + LogFolder.ToLower() + "\\" + getDateString(DateTime.Now) + ".log";
-                            if (!cpCore.privateFiles.fileExists(logPathFile)) {
-                                cpCore.privateFiles.appendFile(logPathFile, "");
+                            string logPathFile = fileSystem.rootLocalPath + "logs\\" + LogFolder.ToLower() + "\\" + getDateString(DateTime.Now) + ".log";
+                            if (!fileSystem.fileExists(logPathFile)) {
+                                fileSystem.appendFile(logPathFile, "");
                             }
                             cpCore.doc.logList.Add(logName, new TextWriterTraceListener(logPathFile, logName));
-                            //Console.WriteLine("createLog [" + logPathFile + "]");
                         }
                         cpCore.doc.logList[logName].WriteLine(absContent);
                     } else {
                         //
                         // -- until trace works
                         try {
-                            fileController fileSystem = null;
-                            if (cpCore.serverConfig != null) {
-                                if (cpCore.serverConfig.appConfig != null) {
-                                    //
-                                    // -- use app log space
-                                    fileSystem = cpCore.privateFiles;
-                                }
-                            }
-                            if (fileSystem == null) {
-                                //
-                                // -- no app or no server, use program data files
-                                fileSystem = cpCore.programDataFiles;
-                            }
                             string FilenameNoExt = getDateString(DateTime.Now);
                             string logPath = LogFolder;
                             if (!string.IsNullOrEmpty(logPath)) {
@@ -231,12 +237,12 @@ namespace Contensive.Core.Controllers {
         //
         //
         public static void logActivity2(coreClass cpcore, string Message, int SubjectMemberID, int SubjectOrganizationID) {
-            logActivity(cpcore, Message, cpcore.doc.authContext.user.id, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.requestUrl, cpcore.doc.authContext.visitor.ID, cpcore.doc.authContext.visit.id);
+            logActivity(cpcore, Message, cpcore.doc.sessionContext.user.id, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.requestUrl, cpcore.doc.sessionContext.visitor.ID, cpcore.doc.sessionContext.visit.id);
         }
         //
         //
         //
-        internal static void log_appendLogPageNotFound(coreClass cpCore, string PageNotFoundLink) {
+        internal static void appendLogPageNotFound(coreClass cpCore, string PageNotFoundLink) {
             appendLog(cpCore, "bad link [" + PageNotFoundLink + "], referrer [" + cpCore.webServer.requestReferrer + "]", "BadLink");
         }
         //
@@ -276,7 +282,7 @@ namespace Contensive.Core.Controllers {
                 + "";
             DataTable dt = cpcore.db.executeQuery(SQL);
             if (dt.Rows.Count > 0) {
-                warningId = genericController.EncodeInteger(dt.Rows[0]["id"]);
+                warningId = genericController.encodeInteger(dt.Rows[0]["id"]);
             }
             //
             if (warningId != 0) {
@@ -309,19 +315,27 @@ namespace Contensive.Core.Controllers {
         }
         //
         //====================================================================================================
-        public static void appendCacheLog(coreClass cpCore, string message) {
+        //
+        public static void appendLogCache(coreClass cpCore, string message) {
             appendLog(cpCore, message, "cache");
         }
         //
         //====================================================================================================
-        public static void appendDebugLog(coreClass cpCore, string message) {
+        //
+        public static void appendLogDebug(coreClass cpCore, string message) {
             appendLog(cpCore, message, "debug");
         }
         //
         //====================================================================================================
         //
-        public static void appendInstallLog(coreClass cpCore, string message) {
+        public static void appendLogInstall(coreClass cpCore, string message) {
             appendLog(cpCore, message, "install");
+        }
+        //
+        //====================================================================================================
+        //
+        public static void appendLogTasks(coreClass cpCore, string message) {
+            appendLog(cpCore, message, "tasks");
         }
         //
         //====================================================================================================
@@ -349,7 +363,5 @@ namespace Contensive.Core.Controllers {
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception");
         }
-
-
     }
 }

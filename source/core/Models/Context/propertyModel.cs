@@ -88,13 +88,13 @@ namespace Contensive.Core.Models.Context {
         public void setProperty(string propertyName, string PropertyValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    setProperty(propertyName, PropertyValue, cpCore.doc.authContext.visit.id);
+                    setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.visit.id);
                     break;
                 case PropertyTypeVisitor:
-                    setProperty(propertyName, PropertyValue, cpCore.doc.authContext.visitor.ID);
+                    setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.visitor.ID);
                     break;
                 case PropertyTypeMember:
-                    setProperty(propertyName, PropertyValue, cpCore.doc.authContext.user.id);
+                    setProperty(propertyName, PropertyValue, cpCore.doc.sessionContext.user.id);
                     break;
             }
         }
@@ -155,7 +155,7 @@ namespace Contensive.Core.Models.Context {
                     db.csClose(ref CS);
                 } else if (propertyCache[1, Ptr] != PropertyValue) {
                     propertyCache[1, Ptr] = PropertyValue;
-                    RecordID = genericController.EncodeInteger(propertyCache[2, Ptr]);
+                    RecordID = genericController.encodeInteger(propertyCache[2, Ptr]);
                     SQLNow = db.encodeSQLDate(DateTime.Now);
                     //
                     // save the value in the property that was found
@@ -199,11 +199,11 @@ namespace Contensive.Core.Models.Context {
         public DateTime getDate(string propertyName, DateTime defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getDate(propertyName, defaultValue, cpCore.doc.authContext.visit.id);
+                    return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getDate(propertyName, defaultValue, cpCore.doc.authContext.visitor.ID);
+                    return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
                 case PropertyTypeMember:
-                    return getDate(propertyName, defaultValue, cpCore.doc.authContext.user.id);
+                    return getDate(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }
             return DateTime.MinValue;
         }
@@ -217,7 +217,7 @@ namespace Contensive.Core.Models.Context {
         /// <param name="keyId"></param>
         /// <returns></returns>
         public DateTime getDate(string propertyName, DateTime defaultValue, int keyId) {
-            return genericController.EncodeDate(getText(propertyName, genericController.encodeText(defaultValue), keyId));
+            return genericController.encodeDate(getText(propertyName, genericController.encodeText(defaultValue), keyId));
         }
         //
         //====================================================================================================
@@ -243,11 +243,11 @@ namespace Contensive.Core.Models.Context {
         public double getNumber(string propertyName, double defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getNumber(propertyName, defaultValue, cpCore.doc.authContext.visit.id);
+                    return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getNumber(propertyName, defaultValue, cpCore.doc.authContext.visitor.ID);
+                    return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
                 case PropertyTypeMember:
-                    return getNumber(propertyName, defaultValue, cpCore.doc.authContext.user.id);
+                    return getNumber(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }
             return 0;
         }
@@ -261,7 +261,7 @@ namespace Contensive.Core.Models.Context {
         /// <param name="keyId"></param>
         /// <returns></returns>
         public double getNumber(string propertyName, double defaultValue, int keyId) {
-            return EncodeNumber(getText(propertyName, genericController.encodeText(defaultValue), keyId));
+            return encodeNumber(getText(propertyName, genericController.encodeText(defaultValue), keyId));
         }
         //
         //====================================================================================================
@@ -287,11 +287,11 @@ namespace Contensive.Core.Models.Context {
         public bool getBoolean(string propertyName, bool defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getBoolean(propertyName, defaultValue, cpCore.doc.authContext.visit.id);
+                    return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getBoolean(propertyName, defaultValue, cpCore.doc.authContext.visitor.ID);
+                    return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
                 case PropertyTypeMember:
-                    return getBoolean(propertyName, defaultValue, cpCore.doc.authContext.user.id);
+                    return getBoolean(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }
             return false;
         }
@@ -331,11 +331,11 @@ namespace Contensive.Core.Models.Context {
         public int getInteger(string propertyName, int defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getInteger(propertyName, defaultValue, cpCore.doc.authContext.visit.id);
+                    return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getInteger(propertyName, defaultValue, cpCore.doc.authContext.visitor.ID);
+                    return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
                 case PropertyTypeMember:
-                    return getInteger(propertyName, defaultValue, cpCore.doc.authContext.user.id);
+                    return getInteger(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }
             return 0;
         }
@@ -349,7 +349,7 @@ namespace Contensive.Core.Models.Context {
         /// <param name="keyId"></param>
         /// <returns></returns>
         public int getInteger(string propertyName, int defaultValue, int keyId) {
-            return genericController.EncodeInteger(getText(propertyName, genericController.encodeText(defaultValue), keyId));
+            return genericController.encodeInteger(getText(propertyName, genericController.encodeText(defaultValue), keyId));
         }
         //
         //====================================================================================================
@@ -375,11 +375,11 @@ namespace Contensive.Core.Models.Context {
         public string getText(string propertyName, string defaultValue) {
             switch (propertyTypeId) {
                 case PropertyTypeVisit:
-                    return getText(propertyName, defaultValue, cpCore.doc.authContext.visit.id);
+                    return getText(propertyName, defaultValue, cpCore.doc.sessionContext.visit.id);
                 case PropertyTypeVisitor:
-                    return getText(propertyName, defaultValue, cpCore.doc.authContext.visitor.ID);
+                    return getText(propertyName, defaultValue, cpCore.doc.sessionContext.visitor.ID);
                 case PropertyTypeMember:
-                    return getText(propertyName, defaultValue, cpCore.doc.authContext.user.id);
+                    return getText(propertyName, defaultValue, cpCore.doc.sessionContext.user.id);
             }
             return "";
         }
@@ -441,7 +441,7 @@ namespace Contensive.Core.Models.Context {
                             Name = genericController.encodeText(dr[0]);
                             propertyCache[0, propertyCacheCnt] = Name;
                             propertyCache[1, propertyCacheCnt] = genericController.encodeText(dr[1]);
-                            propertyCache[2, propertyCacheCnt] = genericController.EncodeInteger(dr[2]).ToString();
+                            propertyCache[2, propertyCacheCnt] = genericController.encodeInteger(dr[2]).ToString();
                             propertyCache_nameIndex.setPtr(Name.ToLower(), propertyCacheCnt);
                             propertyCacheCnt += 1;
                         }

@@ -71,7 +71,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- People and member content export
                         //
-                        if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                        if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                             sb.Append("Warning: You must be a site administrator to export this information.");
                         } else {
                             CSPointer = cpCore.db.csOpen(iContentName, "", "ID", false, 0, false, false, "", PageSize, PageNumber);
@@ -130,7 +130,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- All other content
                         //
-                        if (!cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, iContentName)) {
+                        if (!cpCore.doc.sessionContext.isAuthenticatedContentManager(cpCore, iContentName)) {
                             sb.Append("Error: You must be a content manager to export this data.");
                         } else {
                             CSPointer = cpCore.db.csOpen(iContentName, "", "ID", false, 0, false, false, "", PageSize, PageNumber);

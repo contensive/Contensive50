@@ -99,8 +99,8 @@ namespace Contensive.Core.Controllers {
                 main_EditLockMemberName_Local = "";
                 main_EditLockStatus_Local = false;
                 //
-                main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), ref ReturnMemberID, ref ReturnDateExpires);
-                if (main_EditLockStatus_Local && (ReturnMemberID != cpCore.doc.authContext.user.id)) {
+                main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), ref ReturnMemberID, ref ReturnDateExpires);
+                if (main_EditLockStatus_Local && (ReturnMemberID != cpCore.doc.sessionContext.user.id)) {
                     main_EditLockStatus_Local = true;
                     main_EditLockDateExpires_Local = ReturnDateExpires;
                     main_EditLockMemberID_Local = ReturnMemberID;
@@ -172,7 +172,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public void SetEditLock(string ContentName, int RecordID) {
-            setEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id);
+            setEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), cpCore.doc.sessionContext.user.id);
         }
         //
         //========================================================================
@@ -180,7 +180,7 @@ namespace Contensive.Core.Controllers {
         //========================================================================
         //
         public void ClearEditLock(string ContentName, int RecordID) {
-            clearEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.doc.authContext.user.id);
+            clearEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), cpCore.doc.sessionContext.user.id);
         }
         //
         //========================================================================
@@ -783,7 +783,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // One content record
                     //
-                    result = "(ContentID=" + cpCore.db.encodeSQLNumber(EncodeInteger(Criteria.Substring(1))) + ")And(RecordID=" + cpCore.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + cpCore.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
+                    result = "(ContentID=" + cpCore.db.encodeSQLNumber(encodeInteger(Criteria.Substring(1))) + ")And(RecordID=" + cpCore.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + cpCore.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
                 } else {
                     //
                     // Multiple content records
@@ -849,7 +849,7 @@ namespace Contensive.Core.Controllers {
                     AuthoringCriteria = getAuthoringControlCriteria(ContentName, RecordID);
                     switch (AuthoringControl) {
                         case AuthoringControlsEditing:
-                            EditLockTimeoutMinutes = EncodeNumber(cpCore.siteProperties.getText("EditLockTimeout", "5"));
+                            EditLockTimeoutMinutes = encodeNumber(cpCore.siteProperties.getText("EditLockTimeout", "5"));
                             if (EditLockTimeoutMinutes != 0) {
                                 sqlCriteria = AuthoringCriteria + "And(ControlType=" + AuthoringControlsEditing + ")";
                                 EditLockTimeoutDays = (EditLockTimeoutMinutes / 60 / 24);
@@ -1059,7 +1059,7 @@ namespace Contensive.Core.Controllers {
                 if ((!string.IsNullOrEmpty(ContentName)) & (RecordID != 0)) {
                     EditLockKey2 = genericController.vbUCase(ContentName + "," + RecordID.ToString());
                     StringBuffer = cpCore.siteProperties.getText("EditLockTimeout", "5");
-                    EditLockTimeoutMinutes = EncodeNumber(StringBuffer);
+                    EditLockTimeoutMinutes = encodeNumber(StringBuffer);
                     EditLockDateExpires = DateTime.Now.AddMinutes(EditLockTimeoutMinutes);
                     if (EditLockCount > 0) {
                         for (SourcePointer = 0; SourcePointer < EditLockCount; SourcePointer++) {

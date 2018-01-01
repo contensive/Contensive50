@@ -81,7 +81,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Encode Template
                     //
-                    LocalTemplateBody = contentCmdController.executeContentCommands(cpCore, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
+                    LocalTemplateBody = contentCmdController.executeContentCommands(cpCore, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.doc.sessionContext.user.id, cpCore.doc.sessionContext.isAuthenticated, ref layoutError);
                     returnBody = returnBody + activeContentController.convertActiveContentToHtmlForWebRender(cpCore, LocalTemplateBody, "Page Templates", LocalTemplateID, 0, cpCore.webServer.requestProtocol + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextTemplate);
                     //
                     // If Content was not found, add it to the end
@@ -94,7 +94,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- Add tools Panel
                     //
-                    if (!cpCore.doc.authContext.isAuthenticated) {
+                    if (!cpCore.doc.sessionContext.isAuthenticated) {
                         //
                         // not logged in
                         //
@@ -102,8 +102,8 @@ namespace Contensive.Core.Controllers {
                         //
                         // Add template editing
                         //
-                        if (cpCore.visitProperty.getBoolean("AllowAdvancedEditor") & cpCore.doc.authContext.isEditing("Page Templates")) {
-                            returnBody = cpCore.html.getEditWrapper("Page Template [" + LocalTemplateName + "]", cpCore.html.getRecordEditLink2("Page Templates", LocalTemplateID, false, LocalTemplateName, cpCore.doc.authContext.isEditing("Page Templates")) + returnBody);
+                        if (cpCore.visitProperty.getBoolean("AllowAdvancedEditor") & cpCore.doc.sessionContext.isEditing("Page Templates")) {
+                            returnBody = cpCore.html.getEditWrapper("Page Template [" + LocalTemplateName + "]", cpCore.html.getRecordEditLink2("Page Templates", LocalTemplateID, false, LocalTemplateName, cpCore.doc.sessionContext.isEditing("Page Templates")) + returnBody);
                         }
                     }
                     //
@@ -152,7 +152,7 @@ namespace Contensive.Core.Controllers {
                 if (cpCore.doc.domain == null) {
                     //
                     // -- domain not listed, this is now an error
-                    logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource);
+                    logController.appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource);
                     return "<div style=\"width:300px; margin: 100px auto auto auto;text-align:center;\">The domain name is not configured for this site.</div>";
                 }
                 //
@@ -160,7 +160,7 @@ namespace Contensive.Core.Controllers {
                 if (cpCore.doc.page.id == 0) {
                     //
                     // -- landing page is not valid -- display error
-                    logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource);
+                    logController.appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource);
                     cpCore.doc.redirectBecausePageNotFound = true;
                     cpCore.doc.redirectReason = "Redirecting because the page selected could not be found.";
                     cpCore.doc.redirectLink = pageContentController.main_ProcessPageNotFound_GetLink(cpCore, cpCore.doc.redirectReason, "", "", PageID, 0);
@@ -248,7 +248,7 @@ namespace Contensive.Core.Controllers {
                 string styleOptionList = "";
                 string addonListJSON = null;
                 if (cpCore.doc.redirectLink == "" && (returnHtml.IndexOf(html_quickEdit_fpo)  != -1)) {
-                    FieldRows = genericController.EncodeInteger(cpCore.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"));
+                    FieldRows = genericController.encodeInteger(cpCore.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"));
                     if (FieldRows < 50) {
                         FieldRows = 50;
                         cpCore.userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50);
@@ -260,12 +260,12 @@ namespace Contensive.Core.Controllers {
                 }
                 //
                 // -- Add admin warning to the top of the content
-                if (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore) & cpCore.doc.adminWarning != "") {
+                if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore) & cpCore.doc.adminWarning != "") {
                     //
                     // Display Admin Warnings with Edits for record errors
                     //
                     if (cpCore.doc.adminWarningPageID != 0) {
-                        cpCore.doc.adminWarning = cpCore.doc.adminWarning + "</p>" + cpCore.html.getRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, true, "Page " + cpCore.doc.adminWarningPageID, cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) + "&nbsp;Edit the page<p>";
+                        cpCore.doc.adminWarning = cpCore.doc.adminWarning + "</p>" + cpCore.html.getRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, true, "Page " + cpCore.doc.adminWarningPageID, cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) + "&nbsp;Edit the page<p>";
                         cpCore.doc.adminWarningPageID = 0;
                     }
                     //
@@ -696,7 +696,7 @@ namespace Contensive.Core.Controllers {
                 //
                 // Add the Admin Message to the link
                 //
-                if (cpcore.doc.authContext.isAuthenticatedAdmin(cpcore)) {
+                if (cpcore.doc.sessionContext.isAuthenticatedAdmin(cpcore)) {
                     if (string.IsNullOrEmpty(PageNotFoundLink)) {
                         PageNotFoundLink = cpcore.webServer.requestUrl;
                     }
@@ -980,8 +980,8 @@ namespace Contensive.Core.Controllers {
                             recordId = cpCore.doc.page.id
                         },
                         isIncludeAddon = false,
-                        personalizationAuthenticated = cpCore.doc.authContext.visit.VisitAuthenticated,
-                        personalizationPeopleId = cpCore.doc.authContext.user.id
+                        personalizationAuthenticated = cpCore.doc.sessionContext.visit.VisitAuthenticated,
+                        personalizationPeopleId = cpCore.doc.sessionContext.user.id
                     };
 
                     //
@@ -1006,9 +1006,9 @@ namespace Contensive.Core.Controllers {
                     //
                     // todo move cookie test to htmlDoc controller
                     // -- Add cookie test
-                    bool AllowCookieTest = cpCore.siteProperties.allowVisitTracking && (cpCore.doc.authContext.visit.PageVisits == 1);
+                    bool AllowCookieTest = cpCore.siteProperties.allowVisitTracking && (cpCore.doc.sessionContext.visit.PageVisits == 1);
                     if (AllowCookieTest) {
-                        cpCore.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + cpCore.security.encodeToken(cpCore.doc.authContext.visit.id, cpCore.doc.profileStartTime) + "')};", "Cookie Test");
+                        cpCore.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + cpCore.security.encodeToken(cpCore.doc.sessionContext.visit.id, cpCore.doc.profileStartTime) + "')};", "Cookie Test");
                     }
                     //
                     //--------------------------------------------------------------------------
@@ -1031,7 +1031,7 @@ namespace Contensive.Core.Controllers {
                                 }
                             }
                             cpCore.db.csSet(cs, "copy", Copy);
-                            cpCore.db.csSet(cs, "VisitId", cpCore.doc.authContext.visit.id);
+                            cpCore.db.csSet(cs, "VisitId", cpCore.doc.sessionContext.visit.id);
                         }
                         cpCore.db.csClose(ref cs);
                     }
@@ -1090,8 +1090,8 @@ namespace Contensive.Core.Controllers {
                                     libraryFileLogModel log = libraryFileLogModel.add(cpCore);
                                     if (log != null) {
                                         log.FileID = file.id;
-                                        log.VisitID = cpCore.doc.authContext.visit.id;
-                                        log.MemberID = cpCore.doc.authContext.user.id;
+                                        log.VisitID = cpCore.doc.sessionContext.visit.id;
+                                        log.MemberID = cpCore.doc.sessionContext.user.id;
                                     }
                                     //
                                     // -- and go
@@ -1132,7 +1132,7 @@ namespace Contensive.Core.Controllers {
                         } else if (string.IsNullOrEmpty(ClipBoard)) {
                             // state not working...
                         } else {
-                            if (!cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, ClipParentContentName)) {
+                            if (!cpCore.doc.sessionContext.isAuthenticatedContentManager(cpCore, ClipParentContentName)) {
                                 errorController.addUserError(cpCore, "The paste operation failed because you are not a content manager of the Clip Parent");
                             } else {
                                 //
@@ -1146,8 +1146,8 @@ namespace Contensive.Core.Controllers {
                                     if (ClipBoardArray.GetUpperBound(0) == 0) {
                                         errorController.addUserError(cpCore, "The paste operation failed because the clipboard data is configured incorrectly.");
                                     } else {
-                                        ClipChildContentID = genericController.EncodeInteger(ClipBoardArray[0]);
-                                        ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray[1]);
+                                        ClipChildContentID = genericController.encodeInteger(ClipBoardArray[0]);
+                                        ClipChildRecordID = genericController.encodeInteger(ClipBoardArray[1]);
                                         if (!Models.Complex.cdefModel.isWithinContent(cpCore, ClipChildContentID, ClipParentContentID)) {
                                             errorController.addUserError(cpCore, "The paste operation failed because the destination location is not compatible with the clipboard data.");
                                         } else {
@@ -1227,8 +1227,8 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // Live Editing
                                                     //
-                                                    cpCore.cache.invalidateAllObjectsInContent(ClipChildContentName);
-                                                    cpCore.cache.invalidateAllObjectsInContent(ClipParentContentName);
+                                                    cpCore.cache.invalidateAllInContent(ClipChildContentName);
+                                                    cpCore.cache.invalidateAllInContent(ClipParentContentName);
                                                 }
                                             }
                                         }
@@ -1412,13 +1412,13 @@ namespace Contensive.Core.Controllers {
                     //
                     // ----- do anonymous access blocking
                     //
-                    if (!cpCore.doc.authContext.isAuthenticated) {
+                    if (!cpCore.doc.sessionContext.isAuthenticated) {
                         if ((cpCore.webServer.requestPath != "/") & genericController.vbInstr(1, "/" + cpCore.serverConfig.appConfig.adminRoute, cpCore.webServer.requestPath, 1) != 0) {
                             //
                             // admin page is excluded from custom blocking
                             //
                         } else {
-                            int AnonymousUserResponseID = genericController.EncodeInteger(cpCore.siteProperties.getText("AnonymousUserResponseID", "0"));
+                            int AnonymousUserResponseID = genericController.encodeInteger(cpCore.siteProperties.getText("AnonymousUserResponseID", "0"));
                             switch (AnonymousUserResponseID) {
                                 case 1:
                                     //
@@ -1431,7 +1431,7 @@ namespace Contensive.Core.Controllers {
                                     cpCore.doc.continueProcessing = false;
                                     cpCore.doc.setMetaContent(0, 0);
                                     cpCore.html.addScriptCode_onLoad("document.body.style.overflow='scroll'", "Anonymous User Block");
-                                    return cpCore.html.getHtmlDoc('\r' + cpCore.html.getContentCopy("AnonymousUserResponseCopy", "<p style=\"width:250px;margin:100px auto auto auto;\">The site is currently not available for anonymous access.</p>", cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated), TemplateDefaultBodyTag, true, true);
+                                    return cpCore.html.getHtmlDoc('\r' + cpCore.html.getContentCopy("AnonymousUserResponseCopy", "<p style=\"width:250px;margin:100px auto auto auto;\">The site is currently not available for anonymous access.</p>", cpCore.doc.sessionContext.user.id, true, cpCore.doc.sessionContext.isAuthenticated), TemplateDefaultBodyTag, true, true);
                             }
                         }
                     }
@@ -1594,11 +1594,11 @@ namespace Contensive.Core.Controllers {
                             //
                             // new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                             //
-                            logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource);
+                            logController.appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource);
                             cpCore.webServer.setResponseStatus("404 Not Found");
                             cpCore.docProperties.setProperty(rnPageId, getPageNotFoundPageId(cpCore));
                             //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
-                            if (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                            if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                                 cpCore.doc.adminWarning = PageNotFoundReason;
                                 cpCore.doc.adminWarningPageID = 0;
                             }
@@ -1661,11 +1661,11 @@ namespace Contensive.Core.Controllers {
                     // Load the instructions
                     //
                     f = loadFormPageInstructions(cpcore, FormInstructions, Formhtml);
-                    if (f.AuthenticateOnFormProcess & !cpcore.doc.authContext.isAuthenticated & cpcore.doc.authContext.isRecognized(cpcore)) {
+                    if (f.AuthenticateOnFormProcess & !cpcore.doc.sessionContext.isAuthenticated & cpcore.doc.sessionContext.isRecognized(cpcore)) {
                         //
                         // If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                         //
-                        cpcore.doc.authContext.logout(cpcore);
+                        cpcore.doc.sessionContext.logout(cpcore);
                     }
                     CSPeople = -1;
                     Success = true;
@@ -1693,7 +1693,7 @@ namespace Contensive.Core.Controllers {
                                     errorController.addUserError(cpcore, "The field [" + genericController.encodeHTML(tempVar.Caption) + "] is required.");
                                 } else {
                                     if (!cpcore.db.csOk(CSPeople)) {
-                                        CSPeople = cpcore.db.csOpenRecord("people", cpcore.doc.authContext.user.id);
+                                        CSPeople = cpcore.db.csOpenRecord("people", cpcore.doc.sessionContext.user.id);
                                     }
                                     if (cpcore.db.csOk(CSPeople)) {
                                         switch (genericController.vbUCase(tempVar.PeopleField)) {
@@ -1733,7 +1733,7 @@ namespace Contensive.Core.Controllers {
                                 // Group main_MemberShip
                                 //
                                 IsInGroup = cpcore.docProperties.getBoolean("Group" + tempVar.GroupName);
-                                WasInGroup = cpcore.doc.authContext.IsMemberOfGroup2(cpcore, tempVar.GroupName);
+                                WasInGroup = cpcore.doc.sessionContext.IsMemberOfGroup2(cpcore, tempVar.GroupName);
                                 if (WasInGroup && !IsInGroup) {
                                     groupController.group_DeleteGroupMember(cpcore, tempVar.GroupName);
                                 } else if (IsInGroup && !WasInGroup) {
@@ -1759,7 +1759,7 @@ namespace Contensive.Core.Controllers {
                         // Authenticate
                         //
                         if (f.AuthenticateOnFormProcess) {
-                            cpcore.doc.authContext.authenticateById(cpcore, cpcore.doc.authContext.user.id, cpcore.doc.authContext);
+                            cpcore.doc.sessionContext.authenticateById(cpcore, cpcore.doc.sessionContext.user.id, cpcore.doc.sessionContext);
                         }
                         //
                         // Join Group requested by page that created form
@@ -1859,7 +1859,7 @@ namespace Contensive.Core.Controllers {
                                             IArgs = i[IPtr + IStart].Split(',');
                                             if (IArgs.GetUpperBound(0) >= main_IPosMax) {
                                                 tempVar.Caption = IArgs[main_IPosCaption];
-                                                tempVar.Type = genericController.EncodeInteger(IArgs[main_IPosType]);
+                                                tempVar.Type = genericController.encodeInteger(IArgs[main_IPosType]);
                                                 tempVar.REquired = genericController.encodeBoolean(IArgs[main_IPosRequired]);
                                                 switch (tempVar.Type) {
                                                     case 1:
@@ -1953,7 +1953,7 @@ namespace Contensive.Core.Controllers {
                                 CaptionSpan = "<span>";
                             }
                             if (!cpcore.db.csOk(CSPeople)) {
-                                CSPeople = cpcore.db.csOpenRecord("people", cpcore.doc.authContext.user.id);
+                                CSPeople = cpcore.db.csOpenRecord("people", cpcore.doc.sessionContext.user.id);
                             }
                             Caption = tempVar.Caption;
                             if (tempVar.REquired | genericController.encodeBoolean(Models.Complex.cdefModel.GetContentFieldProperty(cpcore, "People", tempVar.PeopleField, "Required"))) {
@@ -1971,7 +1971,7 @@ namespace Contensive.Core.Controllers {
                             //
                             // Group main_MemberShip
                             //
-                            GroupValue = cpcore.doc.authContext.IsMemberOfGroup2(cpcore, tempVar.GroupName);
+                            GroupValue = cpcore.doc.sessionContext.IsMemberOfGroup2(cpcore, tempVar.GroupName);
                             Body = f.RepeatCell;
                             Body = genericController.vbReplace(Body, "{{CAPTION}}", cpcore.html.inputCheckbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
                             Body = genericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
@@ -2062,11 +2062,11 @@ namespace Contensive.Core.Controllers {
                 //
                 // ----- Content Blocking
                 if (!string.IsNullOrEmpty(BlockedRecordIDList)) {
-                    if (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                    if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                         //
                         // Administrators are never blocked
                         //
-                    } else if (!cpCore.doc.authContext.isAuthenticated) {
+                    } else if (!cpCore.doc.sessionContext.isAuthenticated) {
                         //
                         // non-authenticated are always blocked
                         //
@@ -2079,7 +2079,7 @@ namespace Contensive.Core.Controllers {
                             + " FROM (ccPageContentBlockRules"
                             + " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)"
                             + " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID"
-                            + " WHERE (((ccMemberRules.MemberID)=" + cpCore.db.encodeSQLNumber(cpCore.doc.authContext.user.id) + ")"
+                            + " WHERE (((ccMemberRules.MemberID)=" + cpCore.db.encodeSQLNumber(cpCore.doc.sessionContext.user.id) + ")"
                             + " AND ((ccPageContentBlockRules.RecordID) In (" + BlockedRecordIDList + "))"
                             + " AND ((ccPageContentBlockRules.Active)<>0)"
                             + " AND ((ccgroups.Active)<>0)"
@@ -2108,7 +2108,7 @@ namespace Contensive.Core.Controllers {
                                 + " AND ((ManagementGroups.Active)<>0)"
                                 + " AND ((ManagementMemberRules.Active)<>0)"
                                 + " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) + ")"
-                                + " AND ((ManagementMemberRules.MemberID)=" + cpCore.doc.authContext.user.id + " ));";
+                                + " AND ((ManagementMemberRules.MemberID)=" + cpCore.doc.sessionContext.user.id + " ));";
                             CS = cpCore.db.csOpenSql(SQL);
                             while (cpCore.db.csOk(CS)) {
                                 BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," + cpCore.db.csGetText(CS, "RecordID"), "");
@@ -2130,7 +2130,7 @@ namespace Contensive.Core.Controllers {
                     int BlockSourceID = main_BlockSourceDefaultMessage;
                     int ContentPadding = 20;
                     BlockedPages = BlockedRecordIDList.Split(',');
-                    BlockedPageRecordID = genericController.EncodeInteger(BlockedPages[BlockedPages.GetUpperBound(0)]);
+                    BlockedPageRecordID = genericController.encodeInteger(BlockedPages[BlockedPages.GetUpperBound(0)]);
                     if (BlockedPageRecordID != 0) {
                         CS = cpCore.db.csOpenRecord("Page Content", BlockedPageRecordID,false, false, "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
                         if (cpCore.db.csOk(CS)) {
@@ -2157,8 +2157,8 @@ namespace Contensive.Core.Controllers {
                                 // ----- Login page
                                 //
                                 string BlockForm = "";
-                                if (!cpCore.doc.authContext.isAuthenticated) {
-                                    if (!cpCore.doc.authContext.isRecognized(cpCore)) {
+                                if (!cpCore.doc.sessionContext.isAuthenticated) {
+                                    if (!cpCore.doc.sessionContext.isRecognized(cpCore)) {
                                         //
                                         // -- not recognized
                                         BlockForm = ""
@@ -2168,14 +2168,14 @@ namespace Contensive.Core.Controllers {
                                         //
                                         // -- recognized, not authenticated
                                         BlockForm = ""
-                                            + "<p>This content has limited access. You were recognized as \"<b>" + cpCore.doc.authContext.user.name + "</b>\", but you need to login to continue. To login to this account or another, please use this form.</p>"
+                                            + "<p>This content has limited access. You were recognized as \"<b>" + cpCore.doc.sessionContext.user.name + "</b>\", but you need to login to continue. To login to this account or another, please use this form.</p>"
                                             + cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext { addonType = CPUtilsBaseClass.addonContext.ContextPage }) + "";
                                     }
                                 } else {
                                     //
                                     // -- authenticated
                                     BlockForm = ""
-                                        + "<p>You are currently logged in as \"<b>" + cpCore.doc.authContext.user.name + "</b>\". If this is not you, please <a href=\"?" + cpCore.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
+                                        + "<p>You are currently logged in as \"<b>" + cpCore.doc.sessionContext.user.name + "</b>\". If this is not you, please <a href=\"?" + cpCore.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
                                         + "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>"
                                         + cpCore.addon.execute(addonModel.create(cpCore, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext { addonType = CPUtilsBaseClass.addonContext.ContextPage }) + "";
                                 }
@@ -2200,12 +2200,12 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // Register Form
                                     //
-                                    if (!cpCore.doc.authContext.isAuthenticated & cpCore.doc.authContext.isRecognized(cpCore)) {
+                                    if (!cpCore.doc.sessionContext.isAuthenticated & cpCore.doc.sessionContext.isRecognized(cpCore)) {
                                         //
                                         // -- Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
-                                        cpCore.doc.authContext.logout(cpCore);
+                                        cpCore.doc.sessionContext.logout(cpCore);
                                     }
-                                    if (!cpCore.doc.authContext.isAuthenticated) {
+                                    if (!cpCore.doc.sessionContext.isAuthenticated) {
                                         //
                                         // -- Not Authenticated
                                         cpCore.doc.verifyRegistrationFormPage(cpCore);
@@ -2218,7 +2218,7 @@ namespace Contensive.Core.Controllers {
                                         // -- Authenticated
                                         cpCore.doc.verifyRegistrationFormPage(cpCore);
                                         BlockCopy = ""
-                                            + "<p>You are currently logged in as \"<b>" + cpCore.doc.authContext.user.name + "</b>\". If this is not you, please <a href=\"?" + cpCore.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
+                                            + "<p>You are currently logged in as \"<b>" + cpCore.doc.sessionContext.user.name + "</b>\". If this is not you, please <a href=\"?" + cpCore.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
                                             + "<p>This account does not have access to this content. To view this content, please complete this form.</p>"
                                             + getFormPage(cpCore, "Registration Form", RegistrationGroupID) + "";
                                     }
@@ -2245,7 +2245,7 @@ namespace Contensive.Core.Controllers {
                     //
                     // Encode the copy
                     //
-                    returnHtml = contentCmdController.executeContentCommands(cpCore, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
+                    returnHtml = contentCmdController.executeContentCommands(cpCore, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.sessionContext.user.id, cpCore.doc.sessionContext.isAuthenticated, ref layoutError);
                     returnHtml = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (cpCore.doc.refreshQueryString != "") {
                         returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + cpCore.doc.refreshQueryString, 1, 99, 1);
@@ -2263,23 +2263,23 @@ namespace Contensive.Core.Controllers {
                         //
                     } else {
                         pageViewings = cpCore.doc.page.Viewings;
-                        if (cpCore.doc.authContext.isEditing(pageContentModel.contentName) | cpCore.visitProperty.getBoolean("AllowWorkflowRendering")) {
+                        if (cpCore.doc.sessionContext.isEditing(pageContentModel.contentName) | cpCore.visitProperty.getBoolean("AllowWorkflowRendering")) {
                             //
                             // Link authoring, workflow rendering -> do encoding, but no tracking
                             //
-                            returnHtml = contentCmdController.executeContentCommands(cpCore, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
+                            returnHtml = contentCmdController.executeContentCommands(cpCore, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.sessionContext.user.id, cpCore.doc.sessionContext.isAuthenticated, ref layoutError);
                             returnHtml = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
-                            returnHtml = contentCmdController.executeContentCommands(cpCore, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.authContext.user.id, cpCore.doc.authContext.isAuthenticated, ref layoutError);
+                            returnHtml = contentCmdController.executeContentCommands(cpCore, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpCore.doc.sessionContext.user.id, cpCore.doc.sessionContext.isAuthenticated, ref layoutError);
                             returnHtml = activeContentController.convertActiveContentToHtmlForWebRender(cpCore, returnHtml, pageContentModel.contentName, PageRecordID, cpCore.doc.page.ContactMemberID, "http://" + cpCore.webServer.requestDomain, cpCore.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             cpCore.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + cpCore.doc.page.id);
                         }
                         //
                         // Page Hit Notification
                         //
-                        if ((!cpCore.doc.authContext.visit.ExcludeFromAnalytics) & (cpCore.doc.page.ContactMemberID != 0) && (cpCore.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
+                        if ((!cpCore.doc.sessionContext.visit.ExcludeFromAnalytics) & (cpCore.doc.page.ContactMemberID != 0) && (cpCore.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
                             personModel person = personModel.create(cpCore, cpCore.doc.page.ContactMemberID);
                             if ( person != null ) {
                                 if (cpCore.doc.page.AllowHitNotification) {
@@ -2301,15 +2301,15 @@ namespace Contensive.Core.Controllers {
                                     Body = Body + getTableRow("Domain", cpCore.webServer.requestDomain, true);
                                     Body = Body + getTableRow("Link", cpCore.webServer.requestUrl, false);
                                     Body = Body + getTableRow("Page Name", PageName, true);
-                                    Body = Body + getTableRow("Member Name", cpCore.doc.authContext.user.name, false);
-                                    Body = Body + getTableRow("Member #", encodeText(cpCore.doc.authContext.user.id), true);
-                                    Body = Body + getTableRow("Visit Start Time", encodeText(cpCore.doc.authContext.visit.StartTime), false);
-                                    Body = Body + getTableRow("Visit #", encodeText(cpCore.doc.authContext.visit.id), true);
+                                    Body = Body + getTableRow("Member Name", cpCore.doc.sessionContext.user.name, false);
+                                    Body = Body + getTableRow("Member #", encodeText(cpCore.doc.sessionContext.user.id), true);
+                                    Body = Body + getTableRow("Visit Start Time", encodeText(cpCore.doc.sessionContext.visit.StartTime), false);
+                                    Body = Body + getTableRow("Visit #", encodeText(cpCore.doc.sessionContext.visit.id), true);
                                     Body = Body + getTableRow("Visit IP", cpCore.webServer.requestRemoteIP, false);
                                     Body = Body + getTableRow("Browser ", cpCore.webServer.requestBrowser, true);
-                                    Body = Body + getTableRow("Visitor #", encodeText(cpCore.doc.authContext.visitor.ID), false);
-                                    Body = Body + getTableRow("Visit Authenticated", encodeText(cpCore.doc.authContext.visit.VisitAuthenticated), true);
-                                    Body = Body + getTableRow("Visit Referrer", cpCore.doc.authContext.visit.HTTP_REFERER, false);
+                                    Body = Body + getTableRow("Visitor #", encodeText(cpCore.doc.sessionContext.visitor.ID), false);
+                                    Body = Body + getTableRow("Visit Authenticated", encodeText(cpCore.doc.sessionContext.visit.VisitAuthenticated), true);
+                                    Body = Body + getTableRow("Visit Referrer", cpCore.doc.sessionContext.visit.HTTP_REFERER, false);
                                     Body = Body + kmaEndTable;
                                     string queryStringForLinkAppend = "";
                                     string emailStatus = "";
@@ -2330,7 +2330,7 @@ namespace Contensive.Core.Controllers {
                                 // Always
                                 //
                                 if (SystemEMailID != 0) {
-                                    emailController.sendSystem(cpCore, cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id);
+                                    emailController.sendSystem(cpCore, cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.sessionContext.user.id);
                                 }
                                 if (main_AddGroupID != 0) {
                                     groupController.group_AddGroupMember(cpCore, groupController.group_GetGroupName(cpCore, main_AddGroupID));
@@ -2344,9 +2344,9 @@ namespace Contensive.Core.Controllers {
                                 // If in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (cpCore.doc.authContext.IsMemberOfGroup2(cpCore, groupController.group_GetGroupName(cpCore, ConditionGroupID))) {
+                                    if (cpCore.doc.sessionContext.IsMemberOfGroup2(cpCore, groupController.group_GetGroupName(cpCore, ConditionGroupID))) {
                                         if (SystemEMailID != 0) {
-                                            emailController.sendSystem(cpCore, cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id);
+                                            emailController.sendSystem(cpCore, cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.sessionContext.user.id);
                                         }
                                         if (main_AddGroupID != 0) {
                                             groupController.group_AddGroupMember(cpCore, groupController.group_GetGroupName(cpCore, main_AddGroupID));
@@ -2362,7 +2362,7 @@ namespace Contensive.Core.Controllers {
                                 // If not in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (!cpCore.doc.authContext.IsMemberOfGroup2(cpCore, groupController.group_GetGroupName(cpCore, ConditionGroupID))) {
+                                    if (!cpCore.doc.sessionContext.IsMemberOfGroup2(cpCore, groupController.group_GetGroupName(cpCore, ConditionGroupID))) {
                                         if (main_AddGroupID != 0) {
                                             groupController.group_AddGroupMember(cpCore, groupController.group_GetGroupName(cpCore, main_AddGroupID));
                                         }
@@ -2370,7 +2370,7 @@ namespace Contensive.Core.Controllers {
                                             groupController.group_DeleteGroupMember(cpCore, groupController.group_GetGroupName(cpCore, RemoveGroupID));
                                         }
                                         if (SystemEMailID != 0) {
-                                            emailController.sendSystem(cpCore, cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.authContext.user.id);
+                                            emailController.sendSystem(cpCore, cpCore.db.getRecordName("System Email", SystemEMailID), "", cpCore.doc.sessionContext.user.id);
                                         }
                                     }
                                 }
@@ -2453,7 +2453,7 @@ namespace Contensive.Core.Controllers {
                 if (cpCore.doc.adminWarning != "") {
                     //
                     if (cpCore.doc.adminWarningPageID != 0) {
-                        cpCore.doc.adminWarning = cpCore.doc.adminWarning + "</p>" + cpCore.html.getRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, true, "Page " + cpCore.doc.adminWarningPageID, cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) + "&nbsp;Edit the page<p>";
+                        cpCore.doc.adminWarning = cpCore.doc.adminWarning + "</p>" + cpCore.html.getRecordEditLink2("Page Content", cpCore.doc.adminWarningPageID, true, "Page " + cpCore.doc.adminWarningPageID, cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) + "&nbsp;Edit the page<p>";
                         cpCore.doc.adminWarningPageID = 0;
                     }
                     returnHtml = ""
@@ -2490,12 +2490,12 @@ namespace Contensive.Core.Controllers {
                 //
                 if (cpcore.doc.continueProcessing) {
                     if (cpcore.doc.redirectLink == "") {
-                        isEditing = cpcore.doc.authContext.isEditing(pageContentModel.contentName);
+                        isEditing = cpcore.doc.sessionContext.isEditing(pageContentModel.contentName);
                         //
                         // ----- Render the Body
                         LiveBody = getContentBox_content_Body(cpcore, OrderByClause, AllowChildPageList, false, cpcore.doc.pageToRootList.Last().id, AllowReturnLink, pageContentModel.contentName, ArchivePages);
                         bool isRootPage = (cpcore.doc.pageToRootList.Count == 1);
-                        if (cpcore.doc.authContext.isAdvancedEditing(cpcore, "")) {
+                        if (cpcore.doc.sessionContext.isAdvancedEditing(cpcore, "")) {
                             result = result + cpcore.html.getRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (!isRootPage)) + LiveBody;
                         } else if (isEditing) {
                             result = result + cpcore.html.getEditWrapper("", cpcore.html.getRecordEditLink(pageContentModel.contentName, cpcore.doc.page.id, (!isRootPage)) + LiveBody);
@@ -2552,7 +2552,7 @@ namespace Contensive.Core.Controllers {
                 //
                 if (true) {
                     string IconRow = "";
-                    if ((!cpcore.doc.authContext.visit.Bot) & (cpcore.doc.page.AllowPrinterVersion | cpcore.doc.page.AllowEmailPage)) {
+                    if ((!cpcore.doc.sessionContext.visit.Bot) & (cpcore.doc.page.AllowPrinterVersion | cpcore.doc.page.AllowEmailPage)) {
                         //
                         // not a bot, and either print or email allowed
                         //
@@ -2584,7 +2584,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Start Text Search
                 //
                 string Cell = "";
-                if (cpcore.doc.authContext.isQuickEditing(cpcore, pageContentModel.contentName)) {
+                if (cpcore.doc.sessionContext.isQuickEditing(cpcore, pageContentModel.contentName)) {
                     Cell = Cell + cpcore.doc.getQuickEditing(rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, cpcore.doc.page.ContactMemberID, cpcore.doc.page.ChildListSortMethodID, allowChildListComposite, ArchivePage);
                 } else {
                     //
@@ -2602,7 +2602,7 @@ namespace Contensive.Core.Controllers {
                     if (string.IsNullOrEmpty(bodyCopy)) {
                         //
                         // Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
-                        if (cpcore.doc.authContext.isEditing(pageContentModel.contentName)) {
+                        if (cpcore.doc.sessionContext.isEditing(pageContentModel.contentName)) {
                             bodyCopy = "\r<p><!-- Empty Content Placeholder --></p>";
                         }
                     } else {
@@ -2614,7 +2614,7 @@ namespace Contensive.Core.Controllers {
                         + genericController.htmlIndent(bodyCopy) + "\r<!-- ContentBoxBodyEnd -->";
                     //
                     // ----- Child pages
-                    if (allowChildListComposite || cpcore.doc.authContext.isEditingAnything()) {
+                    if (allowChildListComposite || cpcore.doc.sessionContext.isEditingAnything()) {
                         if (!allowChildListComposite) {
                             Cell = Cell + cpcore.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
                         }
@@ -2659,7 +2659,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Last Modified line
                 if ((cpcore.doc.page.ModifiedDate != DateTime.MinValue) & cpcore.doc.page.AllowLastModifiedFooter) {
                     result = result + "\r<p>This page was last modified " + cpcore.doc.page.ModifiedDate.ToString("G");
-                    if (cpcore.doc.authContext.isAuthenticatedAdmin(cpcore)) {
+                    if (cpcore.doc.sessionContext.isAuthenticatedAdmin(cpcore)) {
                         if (cpcore.doc.page.ModifiedBy == 0) {
                             result = result + " (admin only: modified by unknown)";
                         } else {
@@ -2677,7 +2677,7 @@ namespace Contensive.Core.Controllers {
                 // ----- Last Reviewed line
                 if ((cpcore.doc.page.DateReviewed != DateTime.MinValue) & cpcore.doc.page.AllowReviewedFooter) {
                     result = result + "\r<p>This page was last reviewed " + cpcore.doc.page.DateReviewed.ToString("");
-                    if (cpcore.doc.authContext.isAuthenticatedAdmin(cpcore)) {
+                    if (cpcore.doc.sessionContext.isAuthenticatedAdmin(cpcore)) {
                         if (cpcore.doc.page.ReviewedBy == 0) {
                             result = result + " (by unknown)";
                         } else {
@@ -2726,7 +2726,7 @@ namespace Contensive.Core.Controllers {
                 bool IsEditingLocal = false;
                 //
                 iContentName = genericController.encodeText(ContentName);
-                iRecordID = genericController.EncodeInteger(RecordID);
+                iRecordID = genericController.encodeInteger(RecordID);
                 //
                 MethodName = "result";
                 //
@@ -2737,7 +2737,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- Set authoring only for valid ContentName
                         //
-                        IsEditingLocal = cpcore.doc.authContext.isEditing(iContentName);
+                        IsEditingLocal = cpcore.doc.sessionContext.isEditing(iContentName);
                     } else {
                         //
                         // ----- if iContentName was bad, maybe they put table in, no authoring
@@ -2755,7 +2755,7 @@ namespace Contensive.Core.Controllers {
                                     SeeAlsoLink = cpcore.webServer.requestProtocol + SeeAlsoLink;
                                 }
                                 if (IsEditingLocal) {
-                                    result = result + cpcore.html.getRecordEditLink2("See Also", (cpcore.db.csGetInteger(CS, "ID")), false, "", cpcore.doc.authContext.isEditing("See Also"));
+                                    result = result + cpcore.html.getRecordEditLink2("See Also", (cpcore.db.csGetInteger(CS, "ID")), false, "", cpcore.doc.sessionContext.isEditing("See Also"));
                                 }
                                 result = result + "<a href=\"" + genericController.encodeHTML(SeeAlsoLink) + "\" target=\"_blank\">" + (cpcore.db.csGetText(CS, "Name")) + "</A>";
                                 Copy = (cpcore.db.csGetText(CS, "Brief"));
@@ -2796,7 +2796,7 @@ namespace Contensive.Core.Controllers {
             string tempmain_GetMoreInfo = null;
             string result = "";
             try {
-                tempmain_GetMoreInfo = getMoreInfoHtml(cpcore, genericController.EncodeInteger(contactMemberID));
+                tempmain_GetMoreInfo = getMoreInfoHtml(cpcore, genericController.encodeInteger(contactMemberID));
             } catch (Exception ex) {
                 cpcore.handleException(ex);
             }
@@ -2827,7 +2827,7 @@ namespace Contensive.Core.Controllers {
                 string iHeadline = null;
                 //
                 iContentName = genericController.encodeText(ContentName);
-                iRecordID = genericController.EncodeInteger(RecordID);
+                iRecordID = genericController.encodeInteger(RecordID);
                 iHeadline = genericController.encodeEmptyText(headline, "");
                 //
                 const string FeedbackButtonSubmit = "Submit";
@@ -2893,14 +2893,14 @@ namespace Contensive.Core.Controllers {
                         //
                         // ----- From Name
                         //
-                        Copy = cpCore.doc.authContext.user.name;
+                        Copy = cpCore.doc.sessionContext.user.name;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Name</p></td>";
                         Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + genericController.encodeHTML(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";
                         //
                         // ----- From Email address
                         //
-                        Copy = cpCore.doc.authContext.user.Email;
+                        Copy = cpCore.doc.sessionContext.user.Email;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
                         Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + genericController.encodeHTML(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";

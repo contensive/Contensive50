@@ -30,7 +30,7 @@ namespace Contensive.Core.Addons.Primitives {
                 coreClass cpCore = processor.core;
                 //
                 // -- logout the current member
-                cpCore.doc.authContext.logout(cpCore);
+                cpCore.doc.sessionContext.logout(cpCore);
                 return string.Empty;
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

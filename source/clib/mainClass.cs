@@ -97,33 +97,40 @@ namespace Contensive.CLI
                                     }
                                     else
                                     {
-                                        Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] found.");
+                                        Console.WriteLine("Configuration File [c:\\ProgramData\\Contensive\\config.json] found.");
                                         Console.WriteLine("ServerGroup name: " + cp.core.serverConfig.name);
-                                        Console.WriteLine("enableLocalMemoryCache: " + cp.core.serverConfig.enableLocalMemoryCache);
-                                        Console.WriteLine("enableLocalFileCache: " + cp.core.serverConfig.enableLocalFileCache);
-                                        Console.WriteLine("enableRemoteCache: " + cp.core.serverConfig.enableRemoteCache);
-                                        Console.WriteLine("ElastiCacheConfigurationEndpoint: " + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint);
-                                        Console.WriteLine("cdnFilesRemoteEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
-                                        Console.WriteLine("isLocal: " + cp.core.serverConfig.isLocalFileSystem.ToString());
-                                        Console.WriteLine("defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress.ToString());
-                                        Console.WriteLine("defaultDataSourceType: " + cp.core.serverConfig.defaultDataSourceType.ToString());
-                                        Console.WriteLine("defaultDataSourceUsername: " + cp.core.serverConfig.defaultDataSourceUsername.ToString());
-                                        Console.WriteLine("isLocalCache: " + cp.core.serverConfig.enableLocalMemoryCache.ToString());
-                                        Console.WriteLine("maxConcurrentTasksPerServer: " + cp.core.serverConfig.maxConcurrentTasksPerServer.ToString());
-                                        Console.WriteLine("apps.Count: " + cp.core.serverConfig.apps.Count);
+                                        Console.WriteLine("Cache: " + cp.core.serverConfig.name);
+                                        Console.WriteLine("    enableLocalMemoryCache: " + cp.core.serverConfig.enableLocalMemoryCache);
+                                        Console.WriteLine("    enableLocalFileCache: " + cp.core.serverConfig.enableLocalFileCache);
+                                        Console.WriteLine("    enableRemoteCache: " + cp.core.serverConfig.enableRemoteCache);
+                                        Console.WriteLine("    ElastiCacheConfigurationEndpoint: " + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint);
+                                        Console.WriteLine("File System:");
+                                        Console.WriteLine("    isLocal: " + cp.core.serverConfig.isLocalFileSystem.ToString());
+                                        Console.WriteLine("    cdnFilesRemoteEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
+                                        Console.WriteLine("Database:");
+                                        Console.WriteLine("    defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress.ToString());
+                                        Console.WriteLine("    defaultDataSourceType: " + cp.core.serverConfig.defaultDataSourceType.ToString());
+                                        Console.WriteLine("    defaultDataSourceUsername: " + cp.core.serverConfig.defaultDataSourceUsername.ToString());
+                                        Console.WriteLine("Services:");
+                                        Console.WriteLine("    TaskScheduler: " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
+                                        Console.WriteLine("    TaskRunner: " + cp.core.serverConfig.allowTaskRunnerService.ToString());
+                                        Console.WriteLine("    TaskRunner-MaxConcurrentTasksPerServer: " + cp.core.serverConfig.maxConcurrentTasksPerServer.ToString());
+                                        Console.WriteLine("Logging:");
+                                        Console.WriteLine("    enableLogging: " + cp.core.serverConfig.enableLogging.ToString());
+                                        Console.WriteLine("Applications: " + cp.core.serverConfig.apps.Count);
                                         foreach (KeyValuePair<string, serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
                                         {
                                             serverConfigModel.appConfigModel app = kvp.Value;
-                                            Console.WriteLine("----------app name: " + app.name);
-                                            Console.WriteLine("\tenabled: " + app.enabled);
-                                            Console.WriteLine("\tadminRoute: " + app.adminRoute);
-                                            Console.WriteLine("\tappRootPath: " + app.appRootFilesPath);
-                                            Console.WriteLine("\tprivateFilesPath: " + app.privateFilesPath);
-                                            Console.WriteLine("\tcdnFilesPath: " + app.cdnFilesPath);
-                                            Console.WriteLine("\tcdnFilesNetprefix: " + app.cdnFilesNetprefix);
+                                            Console.WriteLine("    name: " + app.name);
+                                            Console.WriteLine("        enabled: " + app.enabled);
+                                            Console.WriteLine("        adminRoute: " + app.adminRoute);
+                                            Console.WriteLine("        appRootPath: " + app.appRootFilesPath);
+                                            Console.WriteLine("        privateFilesPath: " + app.privateFilesPath);
+                                            Console.WriteLine("        cdnFilesPath: " + app.cdnFilesPath);
+                                            Console.WriteLine("        cdnFilesNetprefix: " + app.cdnFilesNetprefix);
                                             foreach (string domain in app.domainList)
                                             {
-                                                Console.WriteLine("\tdomain: " + domain);
+                                                Console.WriteLine("        domain: " + domain);
                                             }
                                         }
                                     }
@@ -266,6 +273,17 @@ namespace Contensive.CLI
                                         }
                                     }
                                     break;
+                                case "--enablelogging":
+                                    //
+                                    // -- logging
+                                    if (argPtr != (args.Length + 1)) {
+                                        argPtr++;
+                                        cp.core.serverConfig.enableLogging = genericController.encodeBoolean(args[argPtr].ToLower());
+                                        cp.core.serverConfig.saveObject(cp.core);
+                                        Console.WriteLine("enableLogging set " + cp.core.serverConfig.enableLogging.ToString());
+                                    }
+                                    break;
+
                                 default:
                                     Console.Write(helpText);
                                     exitArgumentProcessing = true;
@@ -285,34 +303,37 @@ namespace Contensive.CLI
             + "\r\nclib command line"
             + "\r\n"
             + "\r\n--newapp (-n)"
-            + "\r\n\tnew application wizard"
+            + "\r\n    new application wizard"
             + "\r\n"
             + "\r\n--upgrade appName (-u appname)"
-            + "\r\n\trun application upgrade"
+            + "\r\n    run application upgrade"
             + "\r\n"
             + "\r\n--upgradeall"
-            + "\r\n\trun application upgrade on all applications"
+            + "\r\n    run application upgrade on all applications"
             + "\r\n"
             + "\r\n--version (-v)"
-            + "\r\n\tdisplay code version"
+            + "\r\n    display code version"
             + "\r\n"
             + "\r\n--status (-s)"
-            + "\r\n\tdisplay configuration status"
+            + "\r\n    display configuration status"
             + "\r\n"
             + "\r\n--taskscheduler run"
-            + "\r\n\tRun the taskscheduler in the console (temporary)"
+            + "\r\n    Run the taskscheduler in the console (temporary)"
+            + "\r\n"
+            + "\r\n--enablelogging true|false"
+            + "\r\n    Enable or disable logging at the server level"
             + "\r\n"
             + "\r\n--taskscheduler on|off"
-            + "\r\n\tStart or stop the taskscheduler service"
+            + "\r\n    Start or stop the taskscheduler service"
             + "\r\n"
             + "\r\n--taskrunner run"
-            + "\r\n\tRun the taskrunner in the console (temporary)"
+            + "\r\n    Run the taskrunner in the console (temporary)"
             + "\r\n"
             + "\r\n--taskrunner on|off"
-            + "\r\n\tStart or stop the taskrunner service"
+            + "\r\n    Start or stop the taskrunner service"
             + "\r\n"
             + "\r\n--tasks run"
-            + "\r\n\tRun the taskscheduler and the taskrunner in the console (temporary)"
+            + "\r\n    Run the taskscheduler and the taskrunner in the console (temporary)"
             + "";
     }
 

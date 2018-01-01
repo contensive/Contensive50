@@ -205,7 +205,7 @@ namespace Contensive.WindowsServices {
                         LogFileStruct = cpCore.appRootFiles.getFileList(cp.core.serverConfig.programFilesPath + "logs");
                         foreach (System.IO.FileInfo logFile in LogFileStruct) {
                             if (logFile.Length > LargestLogSize) {
-                                LargestLogSize = genericController.EncodeInteger(logFile.Length);
+                                LargestLogSize = genericController.encodeInteger(logFile.Length);
                             }
                             if (logFile.Length > monitorConfig.LogFileSizeMax) {
                                 Array.Resize(ref errors, ErrorCount + 1);

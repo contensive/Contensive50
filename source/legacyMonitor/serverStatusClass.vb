@@ -189,7 +189,7 @@ Namespace Contensive.Core
                         LogFileStruct = cpCore.appRootFiles.getFileList(cp.core.serverConfig.programFilesPath & "logs")
                         For Each logFile As IO.FileInfo In LogFileStruct
                             If logFile.Length > LargestLogSize Then
-                                LargestLogSize = genericController.EncodeInteger(logFile.Length)
+                                LargestLogSize = genericController.encodeInteger(logFile.Length)
                             End If
                             If logFile.Length > monitorConfig.LogFileSizeMax Then
                                 ReDim Preserve errors(ErrorCount)

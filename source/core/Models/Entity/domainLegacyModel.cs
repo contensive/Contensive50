@@ -81,7 +81,7 @@ namespace Contensive.Core.Models.Entity {
                             foreach (DataRow dr in dt.Rows) {
                                 domainList_local.Add(dr[0].ToString());
                             }
-                            cpCore.cache.setContent(cacheName, domainList_local, "domains");
+                            cpCore.cache.setObject(cacheName, domainList_local, "domains");
                             dt.Dispose();
                         }
                         serverDomainList_localLoaded = true;

@@ -90,15 +90,15 @@ Namespace Contensive
                                 Case "STATUSMETHOD"
                                     StatusMethod = Trim(NameValue(1))
                                 Case "LISTENPORT"
-                                    ListenPort = genericController.EncodeInteger(Trim(NameValue(1)))
+                                    ListenPort = genericController.encodeInteger(Trim(NameValue(1)))
                                 Case "TIMERINTERVALSEC"
-                                    TimerIntervalSec = genericController.EncodeInteger(Trim(NameValue(1)))
+                                    TimerIntervalSec = genericController.encodeInteger(Trim(NameValue(1)))
                                 Case "ALLOWERRORRECOVERY"
                                     allowErrorRecovery = genericController.EncodeBoolean(Trim(NameValue(1)))
                                 Case "ALLOWIISRESET"
                                     allowIISReset = genericController.EncodeBoolean(Trim(NameValue(1)))
                                 Case "DISKSPACEMINMB"
-                                    DiskSpaceMinMb = genericController.EncodeInteger(Trim(NameValue(1)))
+                                    DiskSpaceMinMb = genericController.encodeInteger(Trim(NameValue(1)))
                                 Case "CLEARERRORSONMONITORHIT"
                                     ClearErrorsOnMonitorHit = genericController.EncodeBoolean(Trim(NameValue(1)))
                                 Case "ALARMEMAILLIST"
@@ -108,9 +108,9 @@ Namespace Contensive
                                 Case "SERVERNAME"
                                     ServerName = Trim(NameValue(1))
                                 Case "LOGFILESIZEMAX"
-                                    LogFileSizeMax = genericController.EncodeInteger(NameValue(1))
+                                    LogFileSizeMax = genericController.encodeInteger(NameValue(1))
                                 Case "SITETIMEOUT"
-                                    SiteTimeout = genericController.EncodeInteger(NameValue(1))
+                                    SiteTimeout = genericController.encodeInteger(NameValue(1))
                                 Case "SCHEDULE"
                                     scheduleList = Trim(NameValue(1))
                                 Case "HTTPSTATUSONERROR"
@@ -255,11 +255,11 @@ ErrorTrap:
                                 Ptr = schedulePeriodTimes(0).IndexOf(":")
                                 schedulePeriodStartTime = schedulePeriodTimes(0)
                                 If Ptr = -1 Then
-                                    timeHours = genericController.EncodeInteger(schedulePeriodStartTime)
+                                    timeHours = genericController.encodeInteger(schedulePeriodStartTime)
                                     timeMinutes = 0
                                 Else
-                                    timeHours = genericController.EncodeInteger(schedulePeriodStartTime.Substring(0, Ptr))
-                                    timeMinutes = genericController.EncodeInteger(schedulePeriodStartTime.Substring(Ptr))
+                                    timeHours = genericController.encodeInteger(schedulePeriodStartTime.Substring(0, Ptr))
+                                    timeMinutes = genericController.encodeInteger(schedulePeriodStartTime.Substring(Ptr))
                                 End If
                                 If timeHours >= 24 Then
                                     timeHours = 23
@@ -272,11 +272,11 @@ ErrorTrap:
                                     If schedulePeriodTimes.GetUpperBound(0) > 0 Then
                                         Ptr = schedulePeriodTimes(1).IndexOf(":")
                                         If Ptr = -1 Then
-                                            timeHours = genericController.EncodeInteger(schedulePeriodTimes(1))
+                                            timeHours = genericController.encodeInteger(schedulePeriodTimes(1))
                                             timeMinutes = 0
                                         Else
-                                            timeHours = genericController.EncodeInteger(schedulePeriodTimes(1).Substring(0, Ptr))
-                                            timeMinutes = genericController.EncodeInteger(schedulePeriodTimes(1).Substring(Ptr))
+                                            timeHours = genericController.encodeInteger(schedulePeriodTimes(1).Substring(0, Ptr))
+                                            timeMinutes = genericController.encodeInteger(schedulePeriodTimes(1).Substring(Ptr))
                                         End If
                                         If timeHours >= 24 Then
                                             timeHours = 23

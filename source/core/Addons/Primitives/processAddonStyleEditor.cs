@@ -30,7 +30,7 @@ namespace Contensive.Core.Addons.Primitives {
                 coreClass cpCore = processor.core;
                 //
                 // save custom styles
-                if (cpCore.doc.authContext.isAuthenticated & cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                if (cpCore.doc.sessionContext.isAuthenticated & cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                     int addonId = cpCore.docProperties.getInteger("AddonID");
                     if (addonId > 0) {
                        addonModel styleAddon =addonModel.create(cpCore, addonId);
@@ -40,7 +40,7 @@ namespace Contensive.Core.Addons.Primitives {
                             //
                             // Clear Caches
                             //
-                            cpCore.cache.invalidateAllObjectsInContent(addonModel.contentName);
+                            cpCore.cache.invalidateAllInContent(addonModel.contentName);
                         }
                     }
                 }

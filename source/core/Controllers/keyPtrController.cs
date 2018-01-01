@@ -114,7 +114,7 @@ namespace Contensive.Core.Controllers {
                     HighGuess = store.ArrayCount - 1;
                     while ((HighGuess - LowGuess) > 1) {
                         // 20150823 jk added to prevent implicit conversion
-                        PointerGuess = EncodeInteger(Math.Floor((HighGuess + LowGuess) / 2.0));
+                        PointerGuess = encodeInteger(Math.Floor((HighGuess + LowGuess) / 2.0));
                         //PointerGuess = (HighGuess + LowGuess) / 2
                         if (UcaseTargetKey == store.UcaseKeyArray[PointerGuess]) {
                             HighGuess = PointerGuess;
@@ -164,7 +164,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     store.ArrayPointer = store.ArrayPointer + 1;
-                    returnKey = genericController.EncodeInteger(store.PointerArray[store.ArrayPointer]);
+                    returnKey = genericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                 }
             } catch (Exception ex) {
                 throw new indexException("GetPointer error", ex);
@@ -213,7 +213,7 @@ namespace Contensive.Core.Controllers {
                     store.ArrayPointer = store.ArrayPointer + 1;
                     UcaseKey = genericController.vbUCase(Key);
                     if (store.UcaseKeyArray[store.ArrayPointer] == UcaseKey) {
-                        nextPointerMatch = genericController.EncodeInteger(store.PointerArray[store.ArrayPointer]);
+                        nextPointerMatch = genericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                     } else {
                         store.ArrayPointer = store.ArrayPointer - 1;
                     }
@@ -239,7 +239,7 @@ namespace Contensive.Core.Controllers {
                 // GetFirstPointer = -1
                 if (store.ArrayCount > 0) {
                     store.ArrayPointer = 0;
-                    firstPointer = genericController.EncodeInteger(store.PointerArray[store.ArrayPointer]);
+                    firstPointer = genericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                 }
                 //
             } catch (Exception ex) {
@@ -263,7 +263,7 @@ namespace Contensive.Core.Controllers {
                 //nextPointer = -1
                 if ((store.ArrayPointer + 1) < store.ArrayCount) {
                     store.ArrayPointer = store.ArrayPointer + 1;
-                    nextPointer = genericController.EncodeInteger(store.PointerArray[store.ArrayPointer]);
+                    nextPointer = genericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                 }
             } catch (Exception ex) {
                 throw new indexException("GetPointer error", ex);

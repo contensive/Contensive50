@@ -530,7 +530,7 @@ namespace Contensive.WindowsServices {
                                 //
                                 // Monitor site
                                 //
-                                AppStatus = EncodeInteger(AppDetails[AppList_Status]);
+                                AppStatus = encodeInteger(AppDetails[AppList_Status]);
                                 if (false) {
                                     //
                                     //ElseIf AppStatus = applicationStatusEnum.ApplicationStatusPaused Then

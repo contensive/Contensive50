@@ -106,7 +106,7 @@ namespace Contensive.Core.Controllers {
         //
         public double getNumber(string RequestName) {
             try {
-                return genericController.EncodeNumber(getProperty(RequestName).Value);
+                return genericController.encodeNumber(getProperty(RequestName).Value);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -117,7 +117,7 @@ namespace Contensive.Core.Controllers {
         //
         public int getInteger(string RequestName) {
             try {
-                return genericController.EncodeInteger(getProperty(RequestName).Value);
+                return genericController.encodeInteger(getProperty(RequestName).Value);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -163,7 +163,7 @@ namespace Contensive.Core.Controllers {
         //
         public DateTime getDate(string RequestName) {
             try {
-                return genericController.EncodeDate(getProperty(RequestName).Value);
+                return genericController.encodeDate(getProperty(RequestName).Value);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;

@@ -50,7 +50,7 @@ namespace Contensive.Core.Controllers {
                 iMessage = genericController.vbReplace(iMessage, "\r\n", " ");
                 iMessage = genericController.vbReplace(iMessage, "\r", " ");
                 iMessage = genericController.vbReplace(iMessage, "\n", " ");
-                iMessage = DateTime.Now.ToString("") + "\t" + (ElapsedTime).ToString("00.000") + "\t" + cpcore.doc.authContext.visit.id + "\t" + iMessage;
+                iMessage = DateTime.Now.ToString("") + "\t" + (ElapsedTime).ToString("00.000") + "\t" + cpcore.doc.sessionContext.visit.id + "\t" + iMessage;
                 //
                 logController.appendLog(cpcore, iMessage, "", "testPoints_" + cpcore.serverConfig.appConfig.name);
             }

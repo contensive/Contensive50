@@ -109,12 +109,9 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         protected void processTimerTick(object sender, EventArgs e) {
             try {
-                //
-                Console.WriteLine("taskRunnerService.processTimerTick");
-                //
                 if (ProcessTimerInProcess) {
                     //
-                    Console.WriteLine("taskRunnerService.processTimerTick, processTimerInProcess true, skip");
+                    Console.WriteLine("taskRunner.processTimerTick, skip -- processTimerInProcess true");
                 } else {
                     ProcessTimerInProcess = true;
                     //
@@ -122,7 +119,7 @@ namespace Contensive.Core.Controllers {
                     //
                     using (CPClass cpCluster = new CPClass()) {
                         if (!cpCluster.core.serverConfig.allowTaskRunnerService) {
-                            Console.WriteLine("taskRunnerService.processTimerTick, allowTaskRunnerService false, skip");
+                            logController.appendLogTasks(cpCluster.core, "taskRunner.processTimerTick, skip -- allowTaskRunnerService false");
                         } else {
                             runTasks(cpCluster.core);
                         }
@@ -142,7 +139,6 @@ namespace Contensive.Core.Controllers {
         /// </summary>
         private void runTasks(coreClass cpClusterCore) {
             try {
-                Console.WriteLine("taskRunnerController.runTasks");
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 //
@@ -150,18 +146,14 @@ namespace Contensive.Core.Controllers {
                 cmdDetailClass cmdDetail = null;
                 string cmdDetailText = null;
                 bool recordsRemaining = false;
-                //
-                //Dim SQLNow As String
                 int CS = 0;
                 string sql = null;
                 string AppName = null;
                 //
-                Console.WriteLine("taskRunnerService.runTasks");
-                //
                 foreach (KeyValuePair<string, Models.Context.serverConfigModel.appConfigModel> kvp in cpClusterCore.serverConfig.apps) {
                     AppName = kvp.Value.name;
                     //
-                    Console.WriteLine("taskRunnerService.runTasks, appname=[" + AppName + "]");
+                    logController.appendLogTasks(cpClusterCore, "runTasks, appname=[" + AppName + "]");
                     //
                     // query tasks that need to be run
                     //
@@ -180,8 +172,6 @@ namespace Contensive.Core.Controllers {
                                     CS = cpSite.core.db.csOpen("tasks", "(cmdRunner=" + cpSite.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id");
                                     if (cpSite.core.db.csOk(CS)) {
                                         //
-                                        Console.WriteLine("taskRunnerController.runTasks, execute task [" + cpSite.core.db.csGetText(CS, "name") + "]");
-                                        //
                                         // -- execute a task
                                         recordsRemaining = true;
                                         cpSite.core.db.csSet(CS, "datestarted", DateTime.Now);
@@ -191,7 +181,7 @@ namespace Contensive.Core.Controllers {
                                         cmdDetailText = cpSite.core.db.csGetText(CS, "cmdDetail");
                                         cmdDetail = cpSite.core.json.Deserialize<cmdDetailClass>(cmdDetailText);
                                         //
-                                        Console.WriteLine("taskRunnerService.runTasks, command=[" + command + "], cmdDetailText=[" + cmdDetailText + "]");
+                                        logController.appendLogTasks(cpClusterCore, "runTasks, task [" + cpSite.core.db.csGetText(CS, "name") + "], command=[" + command + "], cmdDetailText=[" + cmdDetailText + "]");
                                         //
                                         switch ((command.ToLower())) {
                                             case taskQueueCommandEnumModule.runAddon:
@@ -213,7 +203,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                 }
-                Console.WriteLine("taskRunnerController.runTasks, exit (" + sw.ElapsedMilliseconds + "ms)");
+                Console.WriteLine("runTasks, exit (" + sw.ElapsedMilliseconds + "ms)");
             } catch (Exception ex) {
                 cpClusterCore.handleException(ex);
             }

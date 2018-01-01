@@ -350,7 +350,7 @@ namespace Contensive.Core.Controllers {
                 }
 
                 // Convert size of hash from bits to bytes.
-                hashSizeInBytes = EncodeInteger(hashSizeInBits / 8.0);
+                hashSizeInBytes = encodeInteger(hashSizeInBits / 8.0);
 
                 // Make sure that the specified hash value is long enough.
                 if (hashWithSaltBytes.Length < hashSizeInBytes) {
@@ -449,8 +449,8 @@ namespace Contensive.Core.Controllers {
                 decodedString = twoWayDecrypt(token);
                 parts = decodedString.Split(Convert.ToChar("\t"));
                 if (parts.Length == 2) {
-                    returnNumber = genericController.EncodeInteger(parts[0]);
-                    returnDate = genericController.EncodeDate(parts[1]);
+                    returnNumber = genericController.encodeInteger(parts[0]);
+                    returnDate = genericController.encodeDate(parts[1]);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex, "DecodeToken failure. Returning blank result for token [" + token + "]");

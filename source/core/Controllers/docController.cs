@@ -166,7 +166,7 @@ namespace Contensive.Core.Controllers {
         public bool visitPropertyAllowDebugging { get; set; } = false; // if true, send main_TestPoint messages to the stream
         //
         // -- todo
-        public Models.Context.authContextModel authContext;
+        public Models.Context.sessionContextModel sessionContext;
         //
         // -- todo
         internal Stopwatch appStopWatch { get; set; } = Stopwatch.StartNew();
@@ -444,7 +444,7 @@ namespace Contensive.Core.Controllers {
                         this.cpCore.db.csGoNext(CS);
                     }
                     if (!string.IsNullOrEmpty(result)) {
-                        result = this.cpCore.html.getContentCopy("Watch List Caption: " + ListName, ListName, this.cpCore.doc.authContext.user.id, true, this.cpCore.doc.authContext.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
+                        result = this.cpCore.html.getContentCopy("Watch List Caption: " + ListName, ListName, this.cpCore.doc.sessionContext.user.id, true, this.cpCore.doc.sessionContext.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + htmlIndent(result) + "\r</ul>";
                     }
                 }
                 this.cpCore.db.csClose(ref CS);
@@ -518,7 +518,7 @@ namespace Contensive.Core.Controllers {
                 IsEditLocked = cpCore.workflow.GetEditLockStatus(LiveRecordContentName, page.id);
                 if (IsEditLocked) {
                     main_EditLockMemberName = cpCore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id);
-                    main_EditLockDateExpires = genericController.EncodeDate(cpCore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id));
+                    main_EditLockDateExpires = genericController.encodeDate(cpCore.workflow.GetEditLockMemberName(LiveRecordContentName, page.id));
                 }
                 bool IsModified = false;
                 bool IsSubmitted = false;
@@ -536,7 +536,7 @@ namespace Contensive.Core.Controllers {
                 bool tempVar4 = false;
                 getAuthoringPermissions(LiveRecordContentName, page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
                 AllowMarkReviewed = Models.Complex.cdefModel.isContentFieldSupported(cpCore, pageContentModel.contentName, "DateReviewed");
-                OptionsPanelAuthoringStatus = cpCore.doc.authContext.main_GetAuthoringStatusMessage(cpCore, false, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
+                OptionsPanelAuthoringStatus = cpCore.doc.sessionContext.main_GetAuthoringStatusMessage(cpCore, false, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
                 //
                 // Set Editing Authoring Control
                 //
@@ -742,9 +742,9 @@ namespace Contensive.Core.Controllers {
             RecordModified = false;
             RecordID = (cpCore.docProperties.getInteger("ID"));
             Button = cpCore.docProperties.getText("Button");
-            iIsAdmin = cpCore.doc.authContext.isAuthenticatedAdmin(cpCore);
+            iIsAdmin = cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore);
             //
-            if ((!string.IsNullOrEmpty(Button)) & (RecordID != 0) & (pageContentModel.contentName != "") & (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, pageContentModel.contentName))) {
+            if ((!string.IsNullOrEmpty(Button)) & (RecordID != 0) & (pageContentModel.contentName != "") & (cpCore.doc.sessionContext.isAuthenticatedContentManager(cpCore, pageContentModel.contentName))) {
                 // main_WorkflowSupport = cpcore.siteProperties.allowWorkflowAuthoring And cpcore.workflow.isWorkflowAuthoringCompatible(pageContentModel.contentName)
                 string SubmittedMemberName = "";
                 string ApprovedMemberName = "";
@@ -801,7 +801,7 @@ namespace Contensive.Core.Controllers {
                         //
                         if (!SaveButNoChanges) {
                             cpCore.doc.processAfterSave(false, pageContentModel.contentName, page.id, page.name, page.ParentID, false);
-                            cpCore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
+                            cpCore.cache.invalidateAllInContent(pageContentModel.contentName);
                         }
                     }
                 }
@@ -813,8 +813,8 @@ namespace Contensive.Core.Controllers {
                     if (cpCore.db.csOk(CSBlock)) {
                         cpCore.db.csSet(CSBlock, "active", true);
                         cpCore.db.csSet(CSBlock, "ParentID", RecordID);
-                        cpCore.db.csSet(CSBlock, "contactmemberid", cpCore.doc.authContext.user.id);
-                        cpCore.db.csSet(CSBlock, "name", "New Page added " + cpCore.doc.profileStartTime + " by " + cpCore.doc.authContext.user.name);
+                        cpCore.db.csSet(CSBlock, "contactmemberid", cpCore.doc.sessionContext.user.id);
+                        cpCore.db.csSet(CSBlock, "name", "New Page added " + cpCore.doc.profileStartTime + " by " + cpCore.doc.sessionContext.user.name);
                         cpCore.db.csSet(CSBlock, "copyFilename", "");
                         RecordID = cpCore.db.csGetInteger(CSBlock, "ID");
                         cpCore.db.csSave2(CSBlock);
@@ -831,7 +831,7 @@ namespace Contensive.Core.Controllers {
                     }
                     cpCore.db.csClose(ref CSBlock);
                     //
-                    cpCore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
+                    cpCore.cache.invalidateAllInContent(pageContentModel.contentName);
                 }
                 if (Button == ButtonAddSiblingPage) {
                     //
@@ -847,8 +847,8 @@ namespace Contensive.Core.Controllers {
                         if (cpCore.db.csOk(CSBlock)) {
                             cpCore.db.csSet(CSBlock, "active", true);
                             cpCore.db.csSet(CSBlock, "ParentID", ParentID);
-                            cpCore.db.csSet(CSBlock, "contactmemberid", cpCore.doc.authContext.user.id);
-                            cpCore.db.csSet(CSBlock, "name", "New Page added " + cpCore.doc.profileStartTime + " by " + cpCore.doc.authContext.user.name);
+                            cpCore.db.csSet(CSBlock, "contactmemberid", cpCore.doc.sessionContext.user.id);
+                            cpCore.db.csSet(CSBlock, "name", "New Page added " + cpCore.doc.profileStartTime + " by " + cpCore.doc.sessionContext.user.name);
                             cpCore.db.csSet(CSBlock, "copyFilename", "");
                             RecordID = cpCore.db.csGetInteger(CSBlock, "ID");
                             cpCore.db.csSave2(CSBlock);
@@ -858,7 +858,7 @@ namespace Contensive.Core.Controllers {
                         }
                         cpCore.db.csClose(ref CSBlock);
                     }
-                    cpCore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
+                    cpCore.cache.invalidateAllInContent(pageContentModel.contentName);
                 }
                 if (Button == ButtonDelete) {
                     CSBlock = cpCore.db.csOpenRecord(pageContentModel.contentName, RecordID);
@@ -871,7 +871,7 @@ namespace Contensive.Core.Controllers {
                     cpCore.db.deleteContentRecord(pageContentModel.contentName, RecordID);
                     //
                     if (!false) {
-                        cpCore.cache.invalidateAllObjectsInContent(pageContentModel.contentName);
+                        cpCore.cache.invalidateAllInContent(pageContentModel.contentName);
                     }
                     //
                     if (!false) {
@@ -920,7 +920,7 @@ namespace Contensive.Core.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     ContentName = pageContentModel.contentName;
                 }
-                bool isAuthoring = cpCore.doc.authContext.isEditing(ContentName);
+                bool isAuthoring = cpCore.doc.sessionContext.isEditing(ContentName);
                 //
                 int ChildListCount = 0;
                 string UcaseRequestedListName = genericController.vbUCase(RequestedListName);
@@ -947,7 +947,7 @@ namespace Contensive.Core.Controllers {
                         }
                     }
                     string pageEditLink = "";
-                    if (cpCore.doc.authContext.isEditing(ContentName)) {
+                    if (cpCore.doc.sessionContext.isEditing(ContentName)) {
                         pageEditLink = cpCore.html.getRecordEditLink2(ContentName, childPage.id, true, childPage.name, true);
                     }
                     //
@@ -1100,9 +1100,9 @@ namespace Contensive.Core.Controllers {
                 int CS = 0;
                 string SQL = null;
                 //
-                if (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                     tempbypassContentBlock = true;
-                } else if (cpCore.doc.authContext.isAuthenticatedContentManager(cpCore, Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID))) {
+                } else if (cpCore.doc.sessionContext.isAuthenticatedContentManager(cpCore, Models.Complex.cdefModel.getContentNameByID(cpCore, ContentID))) {
                     tempbypassContentBlock = true;
                 } else {
                     SQL = "SELECT ccMemberRules.MemberID"
@@ -1112,7 +1112,7 @@ namespace Contensive.Core.Controllers {
                         + " AND ((ccgroups.Active)<>0)"
                         + " AND ((ccMemberRules.Active)<>0)"
                         + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime) + ")"
-                        + " AND ((ccMemberRules.MemberID)=" + cpCore.doc.authContext.user.id + "));";
+                        + " AND ((ccMemberRules.MemberID)=" + cpCore.doc.sessionContext.user.id + "));";
                     CS = cpCore.db.csOpenSql(SQL);
                     tempbypassContentBlock = cpCore.db.csOk(CS);
                     cpCore.db.csClose(ref CS);
@@ -1172,7 +1172,7 @@ namespace Contensive.Core.Controllers {
                     IDCnt = IDs.GetUpperBound(0) + 1;
                     SingleEntry = (IDCnt == 1);
                     for (Ptr = 0; Ptr < IDCnt; Ptr++) {
-                        ChildList = deleteChildRecords(ContentName, genericController.EncodeInteger(IDs[Ptr]), true);
+                        ChildList = deleteChildRecords(ContentName, genericController.encodeInteger(IDs[Ptr]), true);
                         if (!string.IsNullOrEmpty(ChildList)) {
                             result = result + "," + ChildList;
                             SingleEntry = false;
@@ -1185,9 +1185,9 @@ namespace Contensive.Core.Controllers {
                         IDs = result.Split(',');
                         IDCnt = IDs.GetUpperBound(0) + 1;
                         SingleEntry = (IDCnt == 1);
-                        QuickEditing = cpCore.doc.authContext.isQuickEditing(cpCore, "page content");
+                        QuickEditing = cpCore.doc.sessionContext.isQuickEditing(cpCore, "page content");
                         for (Ptr = 0; Ptr < IDCnt; Ptr++) {
-                            cpCore.db.deleteContentRecord("page content", genericController.EncodeInteger(IDs[Ptr]));
+                            cpCore.db.deleteContentRecord("page content", genericController.encodeInteger(IDs[Ptr]));
                         }
                     }
                 }
@@ -1440,7 +1440,7 @@ namespace Contensive.Core.Controllers {
                 Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName);
                 Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString());
                 Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", cpCore.doc.profileStartTime.ToString());
-                Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpCore.doc.authContext.user.name);
+                Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", cpCore.doc.sessionContext.user.name);
                 //
                 emailController.sendGroup(cpCore, cpCore.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
                 //
@@ -1463,7 +1463,7 @@ namespace Contensive.Core.Controllers {
         public string getContentWatchLinkByName(string ContentName, int RecordID, string DefaultLink = "", bool IncrementClicks = true) {
             string result = "";
             try {
-                string ContentRecordKey = Models.Complex.cdefModel.getContentId(cpCore, genericController.encodeText(ContentName)) + "." + genericController.EncodeInteger(RecordID);
+                string ContentRecordKey = Models.Complex.cdefModel.getContentId(cpCore, genericController.encodeText(ContentName)) + "." + genericController.encodeInteger(RecordID);
                 result = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -1793,7 +1793,7 @@ namespace Contensive.Core.Controllers {
             cpCore.cache.invalidateContent_Entity(cpCore, TableName, RecordID);
             //
             // -- invalidate the tablename -- meaning any cache consumer that cannot itemize its entity records, can depend on this, which will invalidate anytime any record clears
-            cpCore.cache.invalidateContent(TableName);
+            cpCore.cache.invalidate(TableName);
             //
             switch (genericController.vbLCase(TableName)) {
                 case linkForwardModel.contentTableName:
@@ -1807,7 +1807,7 @@ namespace Contensive.Core.Controllers {
                 case addonModel.contentTableName:
                     //
                     Models.Complex.routeDictionaryModel.invalidateCache(cpCore);
-                    cpCore.cache.invalidateContent("addonCache");
+                    cpCore.cache.invalidate("addonCache");
                     cpCore.cache.invalidateContent_Entity(cpCore, TableName, RecordID);
                     break;
                 case personModel.contentTableName:
@@ -1844,13 +1844,13 @@ namespace Contensive.Core.Controllers {
                     //hint = hint & ",130"
                     switch (genericController.vbLCase(RecordName)) {
                         case "allowlinkalias":
-                            cpCore.cache.invalidateAllObjectsInContent("Page Content");
+                            cpCore.cache.invalidateAllInContent("Page Content");
                             break;
                         case "sectionlandinglink":
-                            cpCore.cache.invalidateAllObjectsInContent("Page Content");
+                            cpCore.cache.invalidateAllInContent("Page Content");
                             break;
                         case siteproperty_serverPageDefault_name:
-                            cpCore.cache.invalidateAllObjectsInContent("Page Content");
+                            cpCore.cache.invalidateAllInContent("Page Content");
                             break;
                     }
                     break;
@@ -1871,7 +1871,7 @@ namespace Contensive.Core.Controllers {
                         //
                         // Clear the Landing page and page not found site properties
                         //
-                        if (RecordID == genericController.EncodeInteger(cpCore.siteProperties.getText("PageNotFoundPageID", "0"))) {
+                        if (RecordID == genericController.encodeInteger(cpCore.siteProperties.getText("PageNotFoundPageID", "0"))) {
                             cpCore.siteProperties.setProperty("PageNotFoundPageID", "0");
                         }
                         if (RecordID == cpCore.siteProperties.landingPageID) {
@@ -1929,7 +1929,7 @@ namespace Contensive.Core.Controllers {
                                                 // Attempt to make 640x
                                                 //
                                                 if (sf.width >= 640) {
-                                                    sf.height = EncodeInteger(sf.height * (640 / sf.width));
+                                                    sf.height = encodeInteger(sf.height * (640 / sf.width));
                                                     sf.width = 640;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-640x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + "\r\n640x" + sf.height;
@@ -1938,7 +1938,7 @@ namespace Contensive.Core.Controllers {
                                                 // Attempt to make 320x
                                                 //
                                                 if (sf.width >= 320) {
-                                                    sf.height = EncodeInteger(sf.height * (320 / sf.width));
+                                                    sf.height = encodeInteger(sf.height * (320 / sf.width));
                                                     sf.width = 320;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-320x" + sf.height + "." + FilenameExt);
 
@@ -1948,7 +1948,7 @@ namespace Contensive.Core.Controllers {
                                                 // Attempt to make 160x
                                                 //
                                                 if (sf.width >= 160) {
-                                                    sf.height = EncodeInteger(sf.height * (160 / sf.width));
+                                                    sf.height = encodeInteger(sf.height * (160 / sf.width));
                                                     sf.width = 160;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-160x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + "\r\n160x" + sf.height;
@@ -1957,7 +1957,7 @@ namespace Contensive.Core.Controllers {
                                                 // Attempt to make 80x
                                                 //
                                                 if (sf.width >= 80) {
-                                                    sf.height = EncodeInteger(sf.height * (80 / sf.width));
+                                                    sf.height = encodeInteger(sf.height * (80 / sf.width));
                                                     sf.width = 80;
                                                     sf.save(cpCore.appRootFiles.rootLocalPath + FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt);
                                                     AltSizeList = AltSizeList + "\r\n80x" + sf.height;
@@ -2067,7 +2067,7 @@ namespace Contensive.Core.Controllers {
                     string TableName = Models.Complex.cdefModel.getContentTablename(cpCore, ContentName);
                     string SQL = "update " + TableName + " set DateReviewed=" + cpCore.db.encodeSQLDate(cpCore.doc.profileStartTime);
                     if (Models.Complex.cdefModel.isContentFieldSupported(cpCore, ContentName, "ReviewedBy")) {
-                        SQL += ",ReviewedBy=" + cpCore.doc.authContext.user.id;
+                        SQL += ",ReviewedBy=" + cpCore.doc.sessionContext.user.id;
                     }
                     //
                     // -- Mark the live record
@@ -2093,8 +2093,8 @@ namespace Contensive.Core.Controllers {
             int iRecordID = 0;
             int MetaContentID = 0;
             //
-            iContentID = genericController.EncodeInteger(ContentID);
-            iRecordID = genericController.EncodeInteger(RecordID);
+            iContentID = genericController.encodeInteger(ContentID);
+            iRecordID = genericController.encodeInteger(RecordID);
             if ((iContentID != 0) & (iRecordID != 0)) {
                 //
                 // main_Get ID, Description, Title

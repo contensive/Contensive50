@@ -52,7 +52,7 @@ namespace Contensive.Core.Controllers {
                 //
                 dt = cpCore.db.executeQuery("SELECT ID FROM CCGROUPS WHERE NAME=" + sqlGroupName + "");
                 if (dt.Rows.Count > 0) {
-                    returnGroupId = genericController.EncodeInteger(dt.Rows[0]["ID"]);
+                    returnGroupId = genericController.encodeInteger(dt.Rows[0]["ID"]);
                 } else {
                     cid = Models.Complex.cdefModel.getContentId(cpCore, "groups");
                     createkey = genericController.GetRandomInteger(cpCore);
@@ -62,7 +62,7 @@ namespace Contensive.Core.Controllers {
                     sql = "select top 1 id from ccgroups where createkey=" + createkey + " order by id desc";
                     dt = cpCore.db.executeQuery(sql);
                     if (dt.Rows.Count > 0) {
-                        returnGroupId = genericController.EncodeInteger(dt.Rows[0][0]);
+                        returnGroupId = genericController.encodeInteger(dt.Rows[0][0]);
                     }
                 }
                 dt.Dispose();
@@ -139,7 +139,7 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Could not find or create the group with id [" + groupId + "]"));
                     } else {
                         if (userid == 0) {
-                            userid = cpCore.doc.authContext.user.id;
+                            userid = cpCore.doc.sessionContext.user.id;
                         }
                         using (csController cs = new csController(cpCore)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + groupId.ToString() + ")", "", false);
@@ -188,7 +188,7 @@ namespace Contensive.Core.Controllers {
                         throw (new ApplicationException("Could not find or create the group [" + groupNameOrGuid + "]"));
                     } else {
                         if (userid == 0) {
-                            userid = cpCore.doc.authContext.user.id;
+                            userid = cpCore.doc.sessionContext.user.id;
                         }
                         using (csController cs = new csController(cpCore)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + GroupID.ToString() + ")", "", false);
@@ -241,7 +241,7 @@ namespace Contensive.Core.Controllers {
                 //
                 dt = cpcore.db.executeQuery("select top 1 id from ccGroups where name=" + cpcore.db.encodeSQLText(iGroupName));
                 if (dt.Rows.Count > 0) {
-                    tempgroup_GetGroupID = genericController.EncodeInteger(dt.Rows[0][0]);
+                    tempgroup_GetGroupID = genericController.encodeInteger(dt.Rows[0][0]);
                 }
             }
             return tempgroup_GetGroupID;
@@ -258,7 +258,7 @@ namespace Contensive.Core.Controllers {
             string MethodName = null;
             int iGroupID;
             //
-            iGroupID = genericController.EncodeInteger(GroupID);
+            iGroupID = genericController.encodeInteger(GroupID);
             //
             MethodName = "main_GetGroupByID";
             //
@@ -295,11 +295,11 @@ namespace Contensive.Core.Controllers {
             tempgroup_Add = -1;
             DataTable dt = cpcore.db.executeQuery("SELECT ID FROM ccgroups WHERE NAME=" + cpcore.db.encodeSQLText(iGroupName));
             if (dt.Rows.Count > 0) {
-                tempgroup_Add = genericController.EncodeInteger(dt.Rows[0][0]);
+                tempgroup_Add = genericController.encodeInteger(dt.Rows[0][0]);
             } else {
                 CS = cpcore.db.csInsertRecord("Groups", SystemMemberID);
                 if (cpcore.db.csOk(CS)) {
-                    tempgroup_Add = genericController.EncodeInteger(cpcore.db.cs_getValue(CS, "ID"));
+                    tempgroup_Add = genericController.encodeInteger(cpcore.db.cs_getValue(CS, "ID"));
                     cpcore.db.csSet(CS, "name", iGroupName);
                     cpcore.db.csSet(CS, "caption", iGroupCaption);
                     cpcore.db.csSet(CS, "active", true);

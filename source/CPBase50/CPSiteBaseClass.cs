@@ -43,22 +43,26 @@ namespace Contensive.BaseClasses
 		//====================================================================================================
 		//
 		public abstract bool GetBoolean(string PropertyName, string DefaultValue = "");
-		//
-		//====================================================================================================
-		//
-		public abstract DateTime GetDate(string PropertyName, string DefaultValue = "");
-		//
-		//====================================================================================================
-		//
-		public abstract int GetInteger(string PropertyName, string DefaultValue = "");
-		//
-		//====================================================================================================
-		//
-		public abstract double GetNumber(string PropertyName, string DefaultValue = "");
-		//
-		//====================================================================================================
-		//
-		public abstract bool MultiDomainMode {get;}
+        public abstract bool GetBoolean(string PropertyName, bool DefaultValue);
+        //
+        //====================================================================================================
+        //
+        public abstract DateTime GetDate(string PropertyName, string DefaultValue = "");
+        public abstract DateTime GetDate(string PropertyName, DateTime DefaultValue);
+        //
+        //====================================================================================================
+        //
+        public abstract int GetInteger(string PropertyName, string DefaultValue = "");
+        public abstract int GetInteger(string PropertyName, int DefaultValue);
+        //
+        //====================================================================================================
+        //
+        public abstract double GetNumber(string PropertyName, string DefaultValue = "");
+        public abstract double GetNumber(string PropertyName, double DefaultValue);
+        //
+        //====================================================================================================
+        //
+        public abstract bool MultiDomainMode {get;}
 		//
 		//====================================================================================================
 		//
@@ -134,7 +138,9 @@ namespace Contensive.BaseClasses
 		//Public MustOverride Sub ErrorReport(ByVal Err As Microsoft.VisualBasic.ErrObject, Optional ByVal Message As String = "")
 		//
 		//====================================================================================================
-		//
+		/// <summary>
+        /// Run an SQL query on the default datasource and save the data in a CSV file in the filename provided to a record in the tasks table.
+        /// </summary>
 		public abstract void RequestTask(string command, string SQL, string ExportName, string Filename);
 		//
 		//====================================================================================================

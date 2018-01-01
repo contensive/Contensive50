@@ -494,7 +494,7 @@ ErrorTrap:
                             '
                             ' Monitor site
                             '
-                            AppStatus = genericController.EncodeInteger(AppDetails(AppList_Status))
+                            AppStatus = genericController.encodeInteger(AppDetails(AppList_Status))
                             If False Then
                                 '
                                 'ElseIf AppStatus = applicationStatusEnum.ApplicationStatusPaused Then

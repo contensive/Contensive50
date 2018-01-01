@@ -140,7 +140,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                     //
                     addonManager = cpCore.webServer.redirect("/" + cpCore.serverConfig.appConfig.adminRoute, "Addon Manager, Cancel Button Pressed");
                 } else {
-                    if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                    if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                         //
                         // ----- Put up error message
                         //
@@ -460,7 +460,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                             // Reinstall core collection
                             //---------------------------------------------------------------------------------------------
                             //
-                            if (cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore) & cpCore.docProperties.getBoolean("InstallCore")) {
+                            if (cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore) & cpCore.docProperties.getBoolean("InstallCore")) {
                                 UpgradeOK = collectionController.installCollectionFromRemoteRepo(cpCore, "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ref ErrorMessage, "", false, ref nonCriticalErrorList);
                             }
                             //
@@ -812,7 +812,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                 ColSortable[1] = false;
                                 //
                                 DisplaySystem = false;
-                                if (!cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)) {
+                                if (!cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore)) {
                                     //
                                     // non-developers
                                     //
@@ -864,7 +864,7 @@ namespace Contensive.Core.Addons.SafeAddonManager {
                                     Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
                                 } else {
                                     Body.Add(Adminui.EditTableOpen);
-                                    if (cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)) {
+                                    if (cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore)) {
                                         Body.Add(Adminui.GetEditRow(cpCore.html.inputCheckbox("InstallCore"), "Reinstall Core Collection", "", false, false, ""));
                                     }
                                     Body.Add(Adminui.GetEditRow(cpCore.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, ""));

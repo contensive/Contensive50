@@ -77,7 +77,7 @@ namespace Contensive.Core.Models.Complex {
                 if (dt.Rows.Count == 0) {
                     _childIdList = new List<int>();
                     foreach (DataRow parentrow in dt.Rows) {
-                        _childIdList.Add(genericController.EncodeInteger( parentrow[0]));
+                        _childIdList.Add(genericController.encodeInteger( parentrow[0]));
                     }
                 }
                 dt.Dispose();
@@ -171,7 +171,7 @@ namespace Contensive.Core.Models.Complex {
                         result.DeveloperOnly = genericController.encodeBoolean(row[4]);
                         result.AdminOnly = genericController.encodeBoolean(row[5]);
                         result.AllowDelete = genericController.encodeBoolean(row[6]);
-                        result.parentID = genericController.EncodeInteger(row[7]);
+                        result.parentID = genericController.encodeInteger(row[7]);
                         result.DropDownFieldList = genericController.vbUCase(genericController.encodeText(row[9]));
                         result.ContentTableName = genericController.encodeText(contentTablename);
                         result.ContentDataSourceName = "default";
@@ -286,7 +286,7 @@ namespace Contensive.Core.Models.Complex {
                             foreach (DataRow rowWithinLoop in dt.Rows) {
                                 row = rowWithinLoop;
                                 string fieldName = genericController.encodeText(rowWithinLoop[13]);
-                                int fieldId = genericController.EncodeInteger(rowWithinLoop[12]);
+                                int fieldId = genericController.encodeInteger(rowWithinLoop[12]);
                                 string fieldNameLower = fieldName.ToLower();
                                 bool skipDuplicateField = false;
                                 if (usedFields.Contains(fieldNameLower)) {
@@ -317,9 +317,9 @@ namespace Contensive.Core.Models.Complex {
                                     }
                                     Models.Complex.cdefFieldModel field = new Models.Complex.cdefFieldModel();
                                     int fieldIndexColumn = -1;
-                                    int fieldTypeId = genericController.EncodeInteger(rowWithinLoop[15]);
+                                    int fieldTypeId = genericController.encodeInteger(rowWithinLoop[15]);
                                     if (genericController.encodeText(rowWithinLoop[4]) != "") {
-                                        fieldIndexColumn = genericController.EncodeInteger(rowWithinLoop[4]);
+                                        fieldIndexColumn = genericController.encodeInteger(rowWithinLoop[4]);
                                     }
                                     //
                                     // translate htmlContent to fieldtypehtml
@@ -343,35 +343,35 @@ namespace Contensive.Core.Models.Complex {
                                     field.contentId = contentId;
                                     field.defaultValue = genericController.encodeText(rowWithinLoop[22]);
                                     field.developerOnly = genericController.encodeBoolean(rowWithinLoop[0]);
-                                    field.editSortPriority = genericController.EncodeInteger(rowWithinLoop[10]);
+                                    field.editSortPriority = genericController.encodeInteger(rowWithinLoop[10]);
                                     field.editTabName = genericController.encodeText(rowWithinLoop[34]);
                                     field.fieldTypeId = fieldTypeId;
                                     field.htmlContent = fieldHtmlContent;
                                     field.id = fieldId;
                                     field.indexColumn = fieldIndexColumn;
-                                    field.indexSortDirection = genericController.EncodeInteger(rowWithinLoop[7]);
-                                    field.indexSortOrder = genericController.EncodeInteger(rowWithinLoop[6]);
-                                    field.indexWidth = genericController.encodeText(genericController.EncodeInteger(genericController.encodeText(rowWithinLoop[5]).Replace("%", "")));
+                                    field.indexSortDirection = genericController.encodeInteger(rowWithinLoop[7]);
+                                    field.indexSortOrder = genericController.encodeInteger(rowWithinLoop[6]);
+                                    field.indexWidth = genericController.encodeText(genericController.encodeInteger(genericController.encodeText(rowWithinLoop[5]).Replace("%", "")));
                                     field.inherited = false;
                                     field.installedByCollectionGuid = genericController.encodeText(rowWithinLoop[39]);
                                     field.isBaseField = genericController.encodeBoolean(rowWithinLoop[38]);
                                     field.isModifiedSinceInstalled = false;
-                                    field.lookupContentID = genericController.EncodeInteger(rowWithinLoop[18]);
+                                    field.lookupContentID = genericController.encodeInteger(rowWithinLoop[18]);
                                     //.lookupContentName = ""
                                     field.lookupList = genericController.encodeText(rowWithinLoop[37]);
-                                    field.manyToManyContentID = genericController.EncodeInteger(rowWithinLoop[28]);
-                                    field.manyToManyRuleContentID = genericController.EncodeInteger(rowWithinLoop[29]);
+                                    field.manyToManyContentID = genericController.encodeInteger(rowWithinLoop[28]);
+                                    field.manyToManyRuleContentID = genericController.encodeInteger(rowWithinLoop[29]);
                                     field.ManyToManyRulePrimaryField = genericController.encodeText(rowWithinLoop[30]);
                                     field.ManyToManyRuleSecondaryField = genericController.encodeText(rowWithinLoop[31]);
                                     //.ManyToManyContentName(cpCore) = ""
                                     //.ManyToManyRuleContentName(cpCore) = ""
-                                    field.MemberSelectGroupID = genericController.EncodeInteger(rowWithinLoop[36]);
+                                    field.MemberSelectGroupID = genericController.encodeInteger(rowWithinLoop[36]);
                                     //.MemberSelectGroupName(cpCore) = ""
                                     field.nameLc = fieldNameLower;
                                     field.NotEditable = genericController.encodeBoolean(rowWithinLoop[26]);
                                     field.Password = genericController.encodeBoolean(rowWithinLoop[3]);
                                     field.ReadOnly = genericController.encodeBoolean(rowWithinLoop[17]);
-                                    field.RedirectContentID = genericController.EncodeInteger(rowWithinLoop[19]);
+                                    field.RedirectContentID = genericController.encodeInteger(rowWithinLoop[19]);
                                     //.RedirectContentName(cpCore) = ""
                                     field.RedirectID = genericController.encodeText(rowWithinLoop[21]);
                                     field.RedirectPath = genericController.encodeText(rowWithinLoop[20]);
@@ -432,13 +432,13 @@ namespace Contensive.Core.Models.Complex {
                     foreach (KeyValuePair<string, Models.Complex.cdefFieldModel> keyValuePair in cdef.fields) {
                         Models.Complex.cdefFieldModel field = keyValuePair.Value;
                         FieldActive = field.active;
-                        FieldWidth = genericController.EncodeInteger(field.indexWidth);
+                        FieldWidth = genericController.encodeInteger(field.indexWidth);
                         if (FieldActive && (FieldWidth > 0)) {
                             FieldWidthTotal = FieldWidthTotal + FieldWidth;
                             adminColumn = new Models.Complex.cdefModel.CDefAdminColumnClass();
                             adminColumn.Name = field.nameLc;
                             adminColumn.SortDirection = field.indexSortDirection;
-                            adminColumn.SortPriority = genericController.EncodeInteger(field.indexSortOrder);
+                            adminColumn.SortPriority = genericController.encodeInteger(field.indexSortOrder);
                             adminColumn.Width = FieldWidth;
                             FieldWidthTotal = FieldWidthTotal + adminColumn.Width;
                             string key = (cnt + (adminColumn.SortPriority * 1000)).ToString().PadLeft(6, '0');
@@ -470,7 +470,7 @@ namespace Contensive.Core.Models.Complex {
                         //
                         foreach (var keyvaluepair in cdef.adminColumns) {
                             adminColumn = keyvaluepair.Value;
-                            adminColumn.Width = EncodeInteger(100 * ((double)adminColumn.Width / (double)FieldWidthTotal));
+                            adminColumn.Width = encodeInteger(100 * ((double)adminColumn.Width / (double)FieldWidthTotal));
                         }
                     }
                 }
@@ -648,14 +648,14 @@ namespace Contensive.Core.Models.Complex {
                 + " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)"
                 + " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)"
                 + " WHERE"
-                    + " (ccMemberRules.MemberID=" + cpcore.doc.authContext.user.id + ")"
+                    + " (ccMemberRules.MemberID=" + cpcore.doc.sessionContext.user.id + ")"
                     + " AND(ccGroupRules.Active<>0)"
                     + " AND(ccContent.Active<>0)"
                     + " AND(ccMemberRules.Active<>0)";
                 cidDataTable = cpcore.db.executeQuery(SQL);
                 CIDCount = cidDataTable.Rows.Count;
                 for (CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
-                    ContentID = genericController.EncodeInteger(cidDataTable.Rows[CIDPointer][0]);
+                    ContentID = genericController.encodeInteger(cidDataTable.Rows[CIDPointer][0]);
                     returnList.Add(ContentID);
                     CDef = getCdef(cpcore, ContentID);
                     if (CDef != null) {
@@ -705,7 +705,7 @@ namespace Contensive.Core.Models.Complex {
                 SQL = "select ID from ccContent where name=" + cpcore.db.encodeSQLText(ChildContentName) + ";";
                 rs = cpcore.db.executeQuery(SQL);
                 if (isDataTableOk(rs)) {
-                    ChildContentID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                    ChildContentID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     //
                     // mark the record touched so upgrade will not delete it
                     //
@@ -725,7 +725,7 @@ namespace Contensive.Core.Models.Complex {
                     SQL = "select ID from ccContent where name=" + cpcore.db.encodeSQLText(ParentContentName) + ";";
                     rs = cpcore.db.executeQuery(SQL, DataSourceName);
                     if (isDataTableOk(rs)) {
-                        ParentContentID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                        ParentContentID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
                         //
                         // mark the record touched so upgrade will not delete it
                         //
@@ -919,7 +919,7 @@ namespace Contensive.Core.Models.Complex {
                         SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" + cpcore.db.encodeSQLText(contentName) + ") order by id;";
                         dt = cpcore.db.executeQuery(SQL);
                         if (dt.Rows.Count > 0) {
-                            returnContentId = genericController.EncodeInteger(dt.Rows[0]["ID"]);
+                            returnContentId = genericController.encodeInteger(dt.Rows[0]["ID"]);
                             LcContentGuid = genericController.vbLCase(genericController.encodeText(dt.Rows[0]["ccguid"]));
                             ContentIsBaseContent = genericController.encodeBoolean(dt.Rows[0]["IsBaseContent"]);
                         }
@@ -934,7 +934,7 @@ namespace Contensive.Core.Models.Complex {
                             SQL = "select ID from ccContent where (name='content') order by id;";
                             dt = cpcore.db.executeQuery(SQL);
                             if (dt.Rows.Count > 0) {
-                                ContentIDofContent = genericController.EncodeInteger(dt.Rows[0]["ID"]);
+                                ContentIDofContent = genericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
                             dt.Dispose();
                         }
@@ -945,7 +945,7 @@ namespace Contensive.Core.Models.Complex {
                             SQL = "select id from ccContent where (name=" + cpcore.db.encodeSQLText(ParentName) + ") order by id;";
                             dt = cpcore.db.executeQuery(SQL);
                             if (dt.Rows.Count > 0) {
-                                parentId = genericController.EncodeInteger(dt.Rows[0][0]);
+                                parentId = genericController.encodeInteger(dt.Rows[0][0]);
                             }
                             dt.Dispose();
                         }
@@ -957,7 +957,7 @@ namespace Contensive.Core.Models.Complex {
                             SQL = "select id from ccAddonCollections where ccGuid=" + cpcore.db.encodeSQLText(installedByCollectionGuid);
                             dt = cpcore.db.executeQuery(SQL);
                             if (dt.Rows.Count > 0) {
-                                InstalledByCollectionID = genericController.EncodeInteger(dt.Rows[0]["ID"]);
+                                InstalledByCollectionID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
                         }
                         //
@@ -1002,7 +1002,7 @@ namespace Contensive.Core.Models.Complex {
                                 //
                                 cpcore.db.updateTableRecord("Default", "ccTables", "ID=" + TableID, sqlList);
                             } else {
-                                TableID = genericController.EncodeInteger(dt.Rows[0]["ID"]);
+                                TableID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
                             //
                             // ----- Get Sort Method ID from SortMethod
@@ -1016,7 +1016,7 @@ namespace Contensive.Core.Models.Complex {
                             } else {
                                 dt = cpcore.db.openTable("Default", "ccSortMethods", "(name=" + cpcore.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
                                 if (dt.Rows.Count > 0) {
-                                    DefaultSortMethodID = genericController.EncodeInteger(dt.Rows[0]["ID"]);
+                                    DefaultSortMethodID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                                 }
                             }
                             if (DefaultSortMethodID == 0) {
@@ -1025,7 +1025,7 @@ namespace Contensive.Core.Models.Complex {
                                 //
                                 dt = cpcore.db.openTable("Default", "ccSortMethods", "(OrderByClause=" + cpcore.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
                                 if (dt.Rows.Count > 0) {
-                                    DefaultSortMethodID = genericController.EncodeInteger(dt.Rows[0]["ID"]);
+                                    DefaultSortMethodID = genericController.encodeInteger(dt.Rows[0]["ID"]);
                                 }
                             }
                             //
@@ -1242,8 +1242,8 @@ namespace Contensive.Core.Models.Complex {
                             // ----- Load CDef
                             //
                             if (clearMetaCache) {
-                                cpcore.cache.invalidateAllObjectsInContent(Models.Entity.contentModel.contentName.ToLower());
-                                cpcore.cache.invalidateAllObjectsInContent(Models.Entity.contentFieldModel.contentName.ToLower());
+                                cpcore.cache.invalidateAllInContent(Models.Entity.contentModel.contentName.ToLower());
+                                cpcore.cache.invalidateAllInContent(Models.Entity.contentFieldModel.contentName.ToLower());
                                 cpcore.doc.clearMetaData();
                             }
                         }
@@ -1332,8 +1332,8 @@ namespace Contensive.Core.Models.Complex {
                 SQL = "select ID,ContentTableID from ccContent where name=" + cpcore.db.encodeSQLText(ContentName) + ";";
                 rs = cpcore.db.executeQuery(SQL);
                 if (isDataTableOk(rs)) {
-                    ContentID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                    TableID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
+                    ContentID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                    TableID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
                 }
                 //
                 // test if field definition found or not
@@ -1344,7 +1344,7 @@ namespace Contensive.Core.Models.Complex {
                 rs = cpcore.db.executeQuery(SQL);
                 if (isDataTableOk(rs)) {
                     isNewFieldRecord = false;
-                    RecordID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                    RecordID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     RecordIsBaseField = genericController.encodeBoolean(cpcore.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
                 }
                 //
@@ -1411,7 +1411,7 @@ namespace Contensive.Core.Models.Complex {
                         if (!isDataTableOk(rs)) {
                             throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was Not found."));
                         } else {
-                            DataSourceID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
+                            DataSourceID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
                             TableName = genericController.encodeText(cpcore.db.getDataRowColumnName(rs.Rows[0], "Name"));
                         }
                         rs.Dispose();
@@ -1442,7 +1442,7 @@ namespace Contensive.Core.Models.Complex {
                             if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
                                 rs = cpcore.db.executeQuery("Select id from ccAddonCollections where ccguid=" + cpcore.db.encodeSQLText(installedByCollectionGuid) + ";");
                                 if (isDataTableOk(rs)) {
-                                    InstalledByCollectionID = genericController.EncodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "Id"));
+                                    InstalledByCollectionID = genericController.encodeInteger(cpcore.db.getDataRowColumnName(rs.Rows[0], "Id"));
                                 }
                                 rs.Dispose();
                             }
@@ -1866,20 +1866,20 @@ namespace Contensive.Core.Models.Complex {
             // -- make it dependant on cacheNameInvalidateAll. If invalidated, all cdef will invalidate
             List<string> dependantList = new List<string>();
             dependantList.Add(cacheNameInvalidateAll);
-            cpcore.cache.setContent(cacheName, cdef, dependantList);
+            cpcore.cache.setObject(cacheName, cdef, dependantList);
         }
         //
         //====================================================================================================
         //
         public static void invalidateCache(coreClass cpCore, int contentId) {
             string cacheName = Controllers.cacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
-            cpCore.cache.invalidateContent(cacheName);
+            cpCore.cache.invalidate(cacheName);
         }
         //
         //====================================================================================================
         //
         public static void invalidateCacheAll(coreClass cpCore) {
-            cpCore.cache.invalidateContent(cacheNameInvalidateAll);
+            cpCore.cache.invalidate(cacheNameInvalidateAll);
         }
     }
 }

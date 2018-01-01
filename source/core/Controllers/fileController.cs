@@ -18,6 +18,7 @@ using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
 using Contensive.Core.Models;
 using Contensive.Core.Models.Context;
+using System.Threading.Tasks;
 //
 namespace Contensive.Core.Controllers {
     //
@@ -250,37 +251,38 @@ namespace Contensive.Core.Controllers {
         //           - rename this appendLocalFile + add syncLocalFile (moves it to s3)
         //========================================================================
         //
-        public void appendFile(string PathFilename, string FileContent) {
+        public void appendFile(string PathFilename, string fileContent) {
             try {
-                string path = "";
-                string filename = "";
-                string absFile = convertToAbsPath(PathFilename);
-                //
                 if (string.IsNullOrEmpty(PathFilename)) {
                     throw new ArgumentException("appendFile called with blank pathname.");
                 } else {
-                    splitPathFilename(PathFilename, ref path, ref filename);
-                    if (!pathExists(path)) {
-                        createPath(path);
-                    }
-                    if (!File.Exists(absFile)) {
-                        using (StreamWriter sw =File.CreateText(absFile)) {
-                            sw.Write(FileContent);
-                        }
-                    } else {
-                        using (StreamWriter sw = File.AppendText(absFile)) {
-                            sw.Write(FileContent);
-                        }
-                    }
-                    //File.AppendAllText(getFullPath(PathFilename), FileContent)
+                    Task t = Task.Run(() => appendFileBackground(PathFilename, fileContent));
                 }
-                //If Not clusterConfig.isLocal Then
-                //    ' s3 transfer
-                //End If
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
             }
+        }
+        private void appendFileBackground( string PathFilename, string fileContent) {
+            string absFilename = convertToAbsPath(PathFilename);
+            string path = "";
+            string filename = "";
+            splitPathFilename(PathFilename, ref path, ref filename);
+            if (!pathExists(path)) {
+                createPath(path);
+            }
+            if (!File.Exists(absFilename)) {
+                using (StreamWriter sw = File.CreateText(absFilename)) {
+                    sw.Write(fileContent);
+                }
+            } else {
+                using (StreamWriter sw = File.AppendText(absFilename)) {
+                    sw.Write(fileContent);
+                }
+            }
+            //If Not clusterConfig.isLocal Then
+            //    ' s3 transfer
+            //End If
         }
         //
         //==============================================================================================================

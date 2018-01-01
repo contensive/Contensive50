@@ -99,10 +99,10 @@ namespace Contensive.WindowsServices {
                                         StatusMethod = NameValue[1].Trim(' ');
                                         break;
                                     case "LISTENPORT":
-                                        ListenPort = EncodeInteger(NameValue[1].Trim(' '));
+                                        ListenPort = encodeInteger(NameValue[1].Trim(' '));
                                         break;
                                     case "TIMERINTERVALSEC":
-                                        TimerIntervalSec = EncodeInteger(NameValue[1].Trim(' '));
+                                        TimerIntervalSec = encodeInteger(NameValue[1].Trim(' '));
                                         break;
                                     case "ALLOWERRORRECOVERY":
                                         allowErrorRecovery = encodeBoolean(NameValue[1].Trim(' '));
@@ -111,7 +111,7 @@ namespace Contensive.WindowsServices {
                                         allowIISReset = encodeBoolean(NameValue[1].Trim(' '));
                                         break;
                                     case "DISKSPACEMINMB":
-                                        DiskSpaceMinMb = EncodeInteger(NameValue[1].Trim(' '));
+                                        DiskSpaceMinMb = encodeInteger(NameValue[1].Trim(' '));
                                         break;
                                     case "CLEARERRORSONMONITORHIT":
                                         ClearErrorsOnMonitorHit = encodeBoolean(NameValue[1].Trim(' '));
@@ -126,10 +126,10 @@ namespace Contensive.WindowsServices {
                                         ServerName = NameValue[1].Trim(' ');
                                         break;
                                     case "LOGFILESIZEMAX":
-                                        LogFileSizeMax = EncodeInteger(NameValue[1]);
+                                        LogFileSizeMax = encodeInteger(NameValue[1]);
                                         break;
                                     case "SITETIMEOUT":
-                                        SiteTimeout = EncodeInteger(NameValue[1]);
+                                        SiteTimeout = encodeInteger(NameValue[1]);
                                         break;
                                     case "SCHEDULE":
                                         scheduleList = NameValue[1].Trim(' ');
@@ -276,13 +276,13 @@ namespace Contensive.WindowsServices {
 								schedulePeriodStartTime = schedulePeriodTimes[0];
 								if (Ptr == -1)
 								{
-									timeHours = EncodeInteger(schedulePeriodStartTime);
+									timeHours = encodeInteger(schedulePeriodStartTime);
 									timeMinutes = 0;
 								}
 								else
 								{
-									timeHours = EncodeInteger(schedulePeriodStartTime.Substring(0, Ptr));
-									timeMinutes = EncodeInteger(schedulePeriodStartTime.Substring(Ptr));
+									timeHours = encodeInteger(schedulePeriodStartTime.Substring(0, Ptr));
+									timeMinutes = encodeInteger(schedulePeriodStartTime.Substring(Ptr));
 								}
 								if (timeHours >= 24)
 								{
@@ -301,13 +301,13 @@ namespace Contensive.WindowsServices {
 										Ptr = schedulePeriodTimes[1].IndexOf(":");
 										if (Ptr == -1)
 										{
-											timeHours = EncodeInteger(schedulePeriodTimes[1]);
+											timeHours = encodeInteger(schedulePeriodTimes[1]);
 											timeMinutes = 0;
 										}
 										else
 										{
-											timeHours = EncodeInteger(schedulePeriodTimes[1].Substring(0, Ptr));
-											timeMinutes = EncodeInteger(schedulePeriodTimes[1].Substring(Ptr));
+											timeHours = encodeInteger(schedulePeriodTimes[1].Substring(0, Ptr));
+											timeMinutes = encodeInteger(schedulePeriodTimes[1].Substring(Ptr));
 										}
 										if (timeHours >= 24)
 										{

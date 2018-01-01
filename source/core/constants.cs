@@ -67,6 +67,8 @@ namespace Contensive.Core {
         // -- Login Form, this is the addonGuid of the default login form. Login Page calls the addon
         public const string addonGuidLoginForm = "{E23C5941-19C2-4164-BCFD-83D6DD42F651}";
         public const string addonGuidPageManager = "{3a01572e-0f08-4feb-b189-18371752a3c3}";
+        public const string addonGuidExportCSV = "{5C25F35D-A2A8-4791-B510-B1FFE0645004}";
+        public const string addonGuidExportXML = "{DC7EF1EE-20EE-4468-BEB1-0DC30AC8DAD6}";
         //
         // -- content
         public const string DefaultLandingPageGuid = "{925F4A57-32F7-44D9-9027-A91EF966FB0D}";
@@ -1528,7 +1530,8 @@ namespace Contensive.Core {
         public const bool ALLOWLEGACYAPI = false;
         public const bool ALLOWPROFILING = false;
         //
-        public const string cacheNameAssemblySkipList = "cacheNameAssemblySkipList";
+        public const string cacheNameAssemblySkipList = "assembly-skip-list";
+        public const string cacheNameGlobalInvalidationDate = "global-invalidation-date";
         //
         // put content definitions here
         //
@@ -1943,7 +1946,10 @@ namespace Contensive.Core {
             public string content; // the description, title, etc.
             public string addedByMessage; // message used during debug to show where the asset came from
         }
-
+        //
+        // -- tasks
+        public const string taskCommandBuildCsv = "buildcsv";
+        public const string taskCommandBuildXml = "buildxml";
     }
     public static class taskQueueCommandEnumModule {
         public const string runAddon = "runaddon";

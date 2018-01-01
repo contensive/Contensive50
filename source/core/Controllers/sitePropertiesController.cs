@@ -53,7 +53,7 @@ namespace Contensive.Core.Controllers {
                 // -- load local store 
                 localStore = getInteger(propertyName, defaultValue);
             }
-            return EncodeInteger(localStore);
+            return encodeInteger(localStore);
         }
         //
         //====================================================================================================
@@ -232,7 +232,7 @@ namespace Contensive.Core.Controllers {
                     cpCore.handleException(ex);
                     throw;
                 }
-                return EncodeInteger(_childListAddonID);
+                return encodeInteger(_childListAddonID);
             }
         }
         private int? _childListAddonID = null;
@@ -515,7 +515,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public int getInteger(string PropertyName, int DefaultValue = 0) {
-            return genericController.EncodeInteger(getText(PropertyName, DefaultValue.ToString()));
+            return genericController.encodeInteger(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================
@@ -526,7 +526,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public double getNumber(string PropertyName, double DefaultValue = 0) {
-            return genericController.EncodeNumber(getText(PropertyName, DefaultValue.ToString()));
+            return genericController.encodeNumber(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================
@@ -548,7 +548,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public DateTime getDate(string PropertyName, DateTime DefaultValue = default(DateTime)) {
-            return genericController.EncodeDate(getText(PropertyName, DefaultValue.ToString()));
+            return genericController.encodeDate(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //====================================================================================================

@@ -237,7 +237,7 @@ namespace Contensive.Core.Models.Entity {
                 } else {
                     Type instanceType = typeof(T);
                     string contentName = derivedContentName(instanceType);
-                    result = create<T>(cpCore, cpCore.db.insertContentRecordGetID(contentName, cpCore.doc.authContext.user.id), ref callersCacheNameList);
+                    result = create<T>(cpCore, cpCore.db.insertContentRecordGetID(contentName, cpCore.doc.sessionContext.user.id), ref callersCacheNameList);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -524,11 +524,11 @@ namespace Contensive.Core.Models.Entity {
                         if (baseInstance != null) {
                             string cacheName0 = Controllers.cacheController.getCacheKey_Entity(tableName, "id", baseInstance.id.ToString());
                             callersCacheNameList.Add(cacheName0);
-                            cpCore.cache.setContent(cacheName0, modelInstance);
+                            cpCore.cache.setObject(cacheName0, modelInstance);
                             //
                             string cacheName1 = Controllers.cacheController.getCacheKey_Entity(tableName, "ccguid", baseInstance.ccguid);
                             callersCacheNameList.Add(cacheName1);
-                            cpCore.cache.setPointer(cacheName1, cacheName0);
+                            cpCore.cache.setAlias(cacheName1, cacheName0);
                         }
                     }
                 }
@@ -758,7 +758,7 @@ namespace Contensive.Core.Models.Entity {
                     //cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                     //
                     // -- object is here, but the cache was invalidated, setting
-                    cpCore.cache.setContent(Controllers.cacheController.getCacheKey_Entity(tableName, "id", this.id.ToString()), this);
+                    cpCore.cache.setObject(Controllers.cacheController.getCacheKey_Entity(tableName, "id", this.id.ToString()), this);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -789,7 +789,7 @@ namespace Contensive.Core.Models.Entity {
                         string contentName = derivedContentName(instanceType);
                         string tableName = derivedContentTableName(instanceType);
                         cpCore.db.deleteContentRecords(contentName, "id=" + recordId.ToString());
-                        cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
+                        cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
                     }
                 }
             } catch (Exception ex) {
@@ -905,10 +905,10 @@ namespace Contensive.Core.Models.Entity {
                 } else {
                     object instanceType = typeof(T);
                     string tableName = derivedContentTableName((Type)instanceType);
-                    cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
+                    cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, recordId));
                     //
                     // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-                    cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(tableName, "id", "0"));
+                    cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(tableName, "id", "0"));
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -1048,16 +1048,16 @@ namespace Contensive.Core.Models.Entity {
                                 default:
                                     switch (resultProperty.PropertyType.Name) {
                                         case "Int32":
-                                            resultProperty.SetValue(instance, genericController.EncodeInteger(CDef.fields[resultProperty.Name].defaultValue), null);
+                                            resultProperty.SetValue(instance, genericController.encodeInteger(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         case "Boolean":
                                             resultProperty.SetValue(instance, genericController.encodeBoolean(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         case "DateTime":
-                                            resultProperty.SetValue(instance, genericController.EncodeDate(CDef.fields[resultProperty.Name].defaultValue), null);
+                                            resultProperty.SetValue(instance, genericController.encodeDate(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         case "Double":
-                                            resultProperty.SetValue(instance, genericController.EncodeNumber(CDef.fields[resultProperty.Name].defaultValue), null);
+                                            resultProperty.SetValue(instance, genericController.encodeNumber(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         default:
                                             resultProperty.SetValue(instance, CDef.fields[resultProperty.Name].defaultValue, null);

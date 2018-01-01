@@ -51,7 +51,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 if (dt.Rows.Count > 0) {
                     foreach (DataRow rsDr in dt.Rows) {
                         addonDefaultEditorName = "&nbsp;(" + genericController.encodeText(rsDr["name"]) + ")";
-                        addonDefaultEditorId = genericController.EncodeInteger(rsDr["id"]);
+                        addonDefaultEditorId = genericController.encodeInteger(rsDr["id"]);
                     }
                 }
                 //
@@ -68,7 +68,7 @@ namespace Contensive.Core.Addons.AdminSite {
                 dt = cpCore.db.executeQuery(Sql);
                 if (dt.Rows.Count > 0) {
                     foreach (DataRow rsDr in dt.Rows) {
-                        int addonId = genericController.EncodeInteger(rsDr["addonid"]);
+                        int addonId = genericController.encodeInteger(rsDr["addonid"]);
                         if ((addonId != 0) & (addonId != addonDefaultEditorId)) {
                             result = result + "\r\n\t<div class=\"radioCon\">" + cpCore.html.inputRadio(radioGroupName, genericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + genericController.encodeText(rsDr["addonName"]) + "</div>";
                         }

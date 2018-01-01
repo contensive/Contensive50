@@ -8,7 +8,7 @@ namespace coreTests {
     [TestClass]
     public class iisControllerUnitTests {
         [TestMethod]
-        public void verifyAppPool_test1() {
+        public void Controllers_iis_verifyAppPool_test1() {
             // arrange
             string appPoolName = "testAppPool";
             using (ServerManager serverManager = new ServerManager()) {

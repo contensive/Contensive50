@@ -596,7 +596,7 @@ namespace Contensive.Core.Controllers {
             //
             if (NewWay) {
                 if (!(LocalElements[ElementPtr].Loaded)) {
-                    SplitPtr = EncodeInteger(ElementPtr / 2.0);
+                    SplitPtr = encodeInteger(ElementPtr / 2.0);
                     ElementBasePtr = SplitPtr * 2;
                     SplitSrc = SplitStore[SplitPtr];
                     Ptr = genericController.vbInstr(1, SplitSrc, ">");

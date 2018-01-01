@@ -7,7 +7,7 @@ namespace coreTests {
     [TestClass]
     public class extensionMethodsUnitTests {
         [TestMethod]
-        public void String_Left_test1() {
+        public void Extensions_String_Left_test1() {
             // arrange
             string arg1 = "1234567890";
             string arg2 = "";
@@ -28,7 +28,7 @@ namespace coreTests {
             Assert.AreEqual("", result3);
         }
         [TestMethod]
-        public void String_Right_Test1() {
+        public void Extensions_String_Right_Test1() {
             // arrange
             string arg1 = "1234567890";
             string arg2 = "";
@@ -49,7 +49,7 @@ namespace coreTests {
             Assert.AreEqual("", result3);
         }
         [TestMethod]
-        public void String_IsNumeric_Test1() {
+        public void Extensions_String_IsNumeric_Test1() {
             // arrange
             string arg1 = "1234567890";
             string arg2 = "";
@@ -75,7 +75,7 @@ namespace coreTests {
             Assert.AreEqual(false, arg10.IsNumeric());
         }
         [TestMethod]
-        public void DateTime_IsOld_Test1() {
+        public void Extensions_DateTime_IsOld_Test1() {
             // arrange
             var arg1 = new DateTime(1, 1, 1);
             var arg2 = new DateTime(2017, 1, 1);
@@ -89,7 +89,7 @@ namespace coreTests {
             Assert.AreEqual(false, arg4.isOld());
         }
         [TestMethod]
-        public void DateTime_MinDateIfOld_Test1() {
+        public void Extensions_DateTime_MinDateIfOld_Test1() {
             // arrange
             var arg1 = new DateTime(1, 1, 1);
             var arg2 = new DateTime(2017, 1, 1);

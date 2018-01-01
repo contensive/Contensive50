@@ -192,7 +192,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 // ----- Check permissions
                 //
-                if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                     //
                     // You must be admin to use this feature
                     //
@@ -547,7 +547,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 SQLFilename = cpCore.userProperty.getText("SQLArchive");
                 if (string.IsNullOrEmpty(SQLFilename)) {
-                    SQLFilename = "SQLArchive" + cpCore.doc.authContext.user.id.ToString("000000000") + ".txt";
+                    SQLFilename = "SQLArchive" + cpCore.doc.sessionContext.user.id.ToString("000000000") + ".txt";
                     cpCore.userProperty.setProperty("SQLArchive", SQLFilename);
                 }
                 SQLArchive = cpCore.cdnFiles.readFile(SQLFilename);
@@ -1284,7 +1284,7 @@ namespace Contensive.Core.Addons.Tools {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
-                                ColumnWidth = EncodeInteger(100 * (kvp.Value.Width / (double)ColumnWidthTotal));
+                                ColumnWidth = encodeInteger(100 * (kvp.Value.Width / (double)ColumnWidthTotal));
                                 FieldName = kvp.Value.Name;
                                 var tempVar = CDef.fields[FieldName.ToLower()];
                                 fieldId = tempVar.id;
@@ -1500,7 +1500,7 @@ namespace Contensive.Core.Addons.Tools {
                     for (DiagActionPointer = 0; DiagActionPointer <= iDiagActionCount; DiagActionPointer++) {
                         DiagAction = cpCore.docProperties.getText("DiagAction" + DiagActionPointer);
                         Stream.Add("Perform Action " + DiagActionPointer + " - " + DiagAction + "<br>");
-                        switch (genericController.EncodeInteger(DiagArgument(DiagAction, 0))) {
+                        switch (genericController.encodeInteger(DiagArgument(DiagAction, 0))) {
                             case DiagActionSetFieldType:
                                 //
                                 // ----- Set Field Type
@@ -1530,7 +1530,7 @@ namespace Contensive.Core.Addons.Tools {
                                 // ----- Delete Record
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
-                                RecordID = genericController.EncodeInteger(DiagArgument(DiagAction, 2));
+                                RecordID = genericController.encodeInteger(DiagArgument(DiagAction, 2));
                                 cpCore.db.deleteContentRecord(ContentName, RecordID);
                                 //end case
                                 break;
@@ -1552,7 +1552,7 @@ namespace Contensive.Core.Addons.Tools {
                                 // ----- Set Field Inactive
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
-                                RecordID = genericController.EncodeInteger(DiagArgument(DiagAction, 2));
+                                RecordID = genericController.encodeInteger(DiagArgument(DiagAction, 2));
                                 CS = cpCore.db.csOpen(ContentName, "(ID=" + RecordID + ")");
                                 if (cpCore.db.csOk(CS)) {
                                     cpCore.db.csSet(CS, "active", 0);
@@ -1565,7 +1565,7 @@ namespace Contensive.Core.Addons.Tools {
                                 // ----- Set Field not-required
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
-                                RecordID = genericController.EncodeInteger(DiagArgument(DiagAction, 2));
+                                RecordID = genericController.encodeInteger(DiagArgument(DiagAction, 2));
                                 CS = cpCore.db.csOpen(ContentName, "(ID=" + RecordID + ")");
                                 if (cpCore.db.csOk(CS)) {
                                     cpCore.db.csSet(CS, "required", 0);
@@ -1935,7 +1935,7 @@ namespace Contensive.Core.Addons.Tools {
                         cpCore.db.cs_goFirst(CSPointer);
                         while (cpCore.db.csOk(CSPointer)) {
                             ColumnWidth = cpCore.db.csGetInteger(CSPointer, "IndexWidth");
-                            ColumnWidth = EncodeInteger((ColumnWidth * 100) / (double)ColumnWidthTotal);
+                            ColumnWidth = encodeInteger((ColumnWidth * 100) / (double)ColumnWidthTotal);
                             cpCore.db.csSet(CSPointer, "IndexWidth", ColumnWidth);
                             cpCore.db.csGoNext(CSPointer);
                         }
@@ -2023,7 +2023,7 @@ namespace Contensive.Core.Addons.Tools {
                         // Create Definition
                         //
                         Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        Models.Complex.cdefModel.createContentChild(cpCore, ChildContentName, ParentContentName, cpCore.doc.authContext.user.id);
+                        Models.Complex.cdefModel.createContentChild(cpCore, ChildContentName, ParentContentName, cpCore.doc.sessionContext.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         cpCore.cache.invalidateAll();
@@ -2417,7 +2417,7 @@ namespace Contensive.Core.Addons.Tools {
                 tempLocal_GetContentID = 0;
                 DataTable dt = cpCore.db.executeQuery("Select ID from ccContent where name=" + cpCore.db.encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
-                    tempLocal_GetContentID = genericController.EncodeInteger(dt.Rows[0][0]);
+                    tempLocal_GetContentID = genericController.encodeInteger(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -2849,13 +2849,13 @@ namespace Contensive.Core.Addons.Tools {
                             //
                             // ----- Save the input
                             //
-                            RecordCount = genericController.EncodeInteger(cp.Doc.GetInteger("dtfaRecordCount"));
+                            RecordCount = genericController.encodeInteger(cp.Doc.GetInteger("dtfaRecordCount"));
                             if (RecordCount > 0) {
                                 for (RecordPointer = 0; RecordPointer < RecordCount; RecordPointer++) {
                                     //
                                     formFieldName = cp.Doc.GetText("dtfaName." + RecordPointer);
                                     formFieldTypeId = cp.Doc.GetInteger("dtfaType." + RecordPointer);
-                                    formFieldId = genericController.EncodeInteger(cp.Doc.GetInteger("dtfaID." + RecordPointer));
+                                    formFieldId = genericController.encodeInteger(cp.Doc.GetInteger("dtfaID." + RecordPointer));
                                     formFieldInherited = cp.Doc.GetBoolean("dtfaInherited." + RecordPointer);
                                     //
                                     // problem - looking for the name in the Db using the form's name, but it could have changed.
@@ -2937,10 +2937,10 @@ namespace Contensive.Core.Addons.Tools {
                                                     }
                                                     SQL = "Update ccFields"
                                                 + " Set name=" + cpCore.db.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + cpCore.db.encodeSQLText(genericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
-                                                    if (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                                                    if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                                                         SQL += ",adminonly=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
                                                     }
-                                                    if (cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)) {
+                                                    if (cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore)) {
                                                         SQL += ",DeveloperOnly=" + cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." + RecordPointer));
                                                     }
                                                     SQL += " where ID=" + formFieldId;
@@ -3269,13 +3269,13 @@ namespace Contensive.Core.Addons.Tools {
                             //
                             // Admin Only
                             //
-                            if (cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                            if (cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, genericController.encodeText(fieldsort.field.adminOnly), fieldsort.field.inherited));
                             }
                             //
                             // Developer Only
                             //
-                            if (cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore)) {
+                            if (cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore)) {
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, genericController.encodeText(fieldsort.field.developerOnly), fieldsort.field.inherited));
                             }
                             //
@@ -3832,7 +3832,7 @@ namespace Contensive.Core.Addons.Tools {
                 ButtonList = ButtonCancel + "," + ButtonRestartContensiveApplication;
                 Stream.Add(GetTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."));
                 //
-                if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                     //
                     tempGetForm_Restart = "<P>You must be an administrator to use this tool.</P>";
                     //
@@ -3843,7 +3843,7 @@ namespace Contensive.Core.Addons.Tools {
                 } else {
                     //
                     // Restart
-                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " + cpCore.doc.authContext.user.name + " (" + cpCore.doc.authContext.user.id + ") restarted using the Restart tool", false, true, cpCore.webServer.requestUrl, "", "");
+                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " + cpCore.doc.sessionContext.user.name + " (" + cpCore.doc.sessionContext.user.id + ") restarted using the Restart tool", false, true, cpCore.webServer.requestUrl, "", "");
                     cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
                     //
@@ -4306,7 +4306,7 @@ namespace Contensive.Core.Addons.Tools {
                 //
                 Button = cpCore.docProperties.getText("button");
                 //
-                IsDeveloper = cpCore.doc.authContext.isAuthenticatedDeveloper(cpCore);
+                IsDeveloper = cpCore.doc.sessionContext.isAuthenticatedDeveloper(cpCore);
                 if (Button == ButtonFindAndReplace) {
                     RowCnt = cpCore.docProperties.getInteger("CDefRowCnt");
                     if (RowCnt > 0) {
@@ -4407,7 +4407,7 @@ namespace Contensive.Core.Addons.Tools {
                     //
                     //
                     //
-                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " + cpCore.doc.authContext.user.name + " (" + cpCore.doc.authContext.user.id + ") executed an IISReset using the IISReset tool", false, true, cpCore.webServer.requestUrl, "", "");
+                    logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " + cpCore.doc.sessionContext.user.name + " (" + cpCore.doc.sessionContext.user.id + ") executed an IISReset using the IISReset tool", false, true, cpCore.webServer.requestUrl, "", "");
                     //runAtServer = New runAtServerClass(cpCore)
                     cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);

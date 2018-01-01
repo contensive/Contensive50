@@ -164,7 +164,7 @@ namespace Contensive.Core.Controllers {
                         + "\r<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">"
                         + htmlIndent(loginForm) + "\r</table>"
                         + "";
-                    loginForm = loginForm + cpcore.html.inputHidden("Type", FormTypeLogin) + cpcore.html.inputHidden("email", cpcore.doc.authContext.user.Email) + cpcore.html.getPanelButtons(ButtonLogin, "Button") + "";
+                    loginForm = loginForm + cpcore.html.inputHidden("Type", FormTypeLogin) + cpcore.html.inputHidden("email", cpcore.doc.sessionContext.user.Email) + cpcore.html.getPanelButtons(ButtonLogin, "Button") + "";
                     loginForm = ""
                         + cpcore.html.formStart(QueryString) + htmlIndent(loginForm) + "\r</form>"
                         + "";
@@ -252,7 +252,7 @@ namespace Contensive.Core.Controllers {
                     + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                     + cr2 + "<tr>"
                     + cr3 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + "Email</span></td>"
-                    + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + genericController.encodeHTML(cpcore.doc.authContext.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
+                    + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"email\" VALUE=\"" + genericController.encodeHTML(cpcore.doc.sessionContext.user.Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>"
                     + cr2 + "</tr>"
                     + cr2 + "<tr>"
                     + cr3 + "<td colspan=\"2\">&nbsp;</td>"
@@ -326,17 +326,17 @@ namespace Contensive.Core.Controllers {
                     loginForm_Password = cpcore.docProperties.getText("password");
                     loginForm_AutoLogin = cpcore.docProperties.getBoolean("autologin");
                     //
-                    if ((cpcore.doc.authContext.visit.LoginAttempts < cpcore.siteProperties.maxVisitLoginAttempts) && cpcore.doc.authContext.visit.CookieSupport) {
-                        LocalMemberID = cpcore.doc.authContext.authenticateGetId(cpcore, loginForm_Username, loginForm_Password);
+                    if ((cpcore.doc.sessionContext.visit.LoginAttempts < cpcore.siteProperties.maxVisitLoginAttempts) && cpcore.doc.sessionContext.visit.CookieSupport) {
+                        LocalMemberID = cpcore.doc.sessionContext.authenticateGetId(cpcore, loginForm_Username, loginForm_Password);
                         if (LocalMemberID == 0) {
-                            cpcore.doc.authContext.visit.LoginAttempts = cpcore.doc.authContext.visit.LoginAttempts + 1;
-                            cpcore.doc.authContext.visit.saveObject(cpcore);
+                            cpcore.doc.sessionContext.visit.LoginAttempts = cpcore.doc.sessionContext.visit.LoginAttempts + 1;
+                            cpcore.doc.sessionContext.visit.save(cpcore);
                         } else {
-                            returnREsult = cpcore.doc.authContext.authenticateById(cpcore, LocalMemberID, cpcore.doc.authContext);
+                            returnREsult = cpcore.doc.sessionContext.authenticateById(cpcore, LocalMemberID, cpcore.doc.sessionContext);
                             if (returnREsult) {
-                                logController.logActivity2(cpcore, "successful username/password login", cpcore.doc.authContext.user.id, cpcore.doc.authContext.user.OrganizationID);
+                                logController.logActivity2(cpcore, "successful username/password login", cpcore.doc.sessionContext.user.id, cpcore.doc.sessionContext.user.OrganizationID);
                             } else {
-                                logController.logActivity2(cpcore, "bad username/password login", cpcore.doc.authContext.user.id, cpcore.doc.authContext.user.OrganizationID);
+                                logController.logActivity2(cpcore, "bad username/password login", cpcore.doc.sessionContext.user.id, cpcore.doc.sessionContext.user.OrganizationID);
                             }
                         }
                     }
@@ -410,7 +410,7 @@ namespace Contensive.Core.Controllers {
                         //hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1);
                         //
-                        logController.logActivity2(cpCore, "password request for email " + workingEmail, cpCore.doc.authContext.user.id, cpCore.doc.authContext.user.OrganizationID);
+                        logController.logActivity2(cpCore, "password request for email " + workingEmail, cpCore.doc.sessionContext.user.id, cpCore.doc.sessionContext.user.OrganizationID);
                         //
                         allowEmailLogin = cpCore.siteProperties.getBoolean("allowEmailLogin", false);
                         recordCnt = 0;
@@ -494,8 +494,8 @@ namespace Contensive.Core.Controllers {
                                         Ptr = 0;
                                         while (!usernameOK && (Ptr < 100)) {
                                             //hint = "240"
-                                            Username = EMailName + EncodeInteger(Math.Floor(EncodeNumber(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
-                                            usernameOK = !cpCore.doc.authContext.isLoginOK(cpCore, Username, "test");
+                                            Username = EMailName + encodeInteger(Math.Floor(encodeNumber(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
+                                            usernameOK = !cpCore.doc.sessionContext.isLoginOK(cpCore, Username, "test");
                                             Ptr = Ptr + 1;
                                         }
                                         //hint = "250"
@@ -523,7 +523,7 @@ namespace Contensive.Core.Controllers {
                                         //hint = "310"
                                         for (Ptr = 0; Ptr <= 8; Ptr++) {
                                             //hint = "320"
-                                            Index = EncodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
+                                            Index = encodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
                                             Password = Password + vbMid(passwordChrs, Index, 1);
                                         }
                                         //hint = "330"
@@ -580,11 +580,11 @@ namespace Contensive.Core.Controllers {
                 if (!genericController.encodeBoolean(cpcore.siteProperties.getBoolean("AllowMemberJoin", false))) {
                     errorController.addUserError(cpcore, "This site does not accept public main_MemberShip.");
                 } else {
-                    if (!cpcore.doc.authContext.isNewLoginOK(cpcore, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
+                    if (!cpcore.doc.sessionContext.isNewLoginOK(cpcore, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
                         errorController.addUserError(cpcore, ErrorMessage);
                     } else {
                         if (!(cpcore.doc.debug_iUserError != "")) {
-                            CS = cpcore.db.csOpen("people", "ID=" + cpcore.db.encodeSQLNumber(cpcore.doc.authContext.user.id));
+                            CS = cpcore.db.csOpen("people", "ID=" + cpcore.db.encodeSQLNumber(cpcore.doc.sessionContext.user.id));
                             if (!cpcore.db.csOk(CS)) {
                                 cpcore.handleException(new Exception("Could not open the current members account to set the username and password."));
                             } else {
@@ -592,7 +592,7 @@ namespace Contensive.Core.Controllers {
                                     //
                                     // if the current account can be logged into, you can not join 'into' it
                                     //
-                                    cpcore.doc.authContext.logout(cpcore);
+                                    cpcore.doc.sessionContext.logout(cpcore);
                                 }
                                 FirstName = cpcore.docProperties.getText("firstname");
                                 LastName = cpcore.docProperties.getText("firstname");
@@ -603,13 +603,13 @@ namespace Contensive.Core.Controllers {
                                 cpcore.db.csSet(CS, "Name", FullName);
                                 cpcore.db.csSet(CS, "username", loginForm_Username);
                                 cpcore.db.csSet(CS, "password", loginForm_Password);
-                                cpcore.doc.authContext.authenticateById(cpcore, cpcore.doc.authContext.user.id, cpcore.doc.authContext);
+                                cpcore.doc.sessionContext.authenticateById(cpcore, cpcore.doc.sessionContext.user.id, cpcore.doc.sessionContext);
                             }
                             cpcore.db.csClose(ref CS);
                         }
                     }
                 }
-                cpcore.cache.invalidateAllObjectsInContent("People");
+                cpcore.cache.invalidateAllInContent("People");
             } catch (Exception ex) {
                 cpcore.handleException(ex);
                 throw;

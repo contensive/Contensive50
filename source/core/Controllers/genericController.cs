@@ -58,11 +58,11 @@ namespace Contensive.Core.Controllers {
             return returnText;
         }
         //
-        public static int encodeEmptyInteger(string sourceText, int DefaultInteger) => EncodeInteger(encodeEmptyText(sourceText, DefaultInteger.ToString()));
+        public static int encodeEmptyInteger(string sourceText, int DefaultInteger) => encodeInteger(encodeEmptyText(sourceText, DefaultInteger.ToString()));
         //
-        public static DateTime encodeEmptyDate(string sourceText, DateTime DefaultDate) => EncodeDate(encodeEmptyText(sourceText, DefaultDate.ToString()));
+        public static DateTime encodeEmptyDate(string sourceText, DateTime DefaultDate) => encodeDate(encodeEmptyText(sourceText, DefaultDate.ToString()));
         //
-        public static double encodeEmptyNumber(string sourceText, double DefaultNumber) => EncodeNumber(encodeEmptyText(sourceText, DefaultNumber.ToString()));
+        public static double encodeEmptyNumber(string sourceText, double DefaultNumber) => encodeNumber(encodeEmptyText(sourceText, DefaultNumber.ToString()));
         //
         public static bool encodeEmptyBoolean(string sourceText, bool DefaultState) => encodeBoolean(encodeEmptyText(sourceText, DefaultState.ToString()));
         //
@@ -424,7 +424,7 @@ namespace Contensive.Core.Controllers {
                     }
                     if (!string.IsNullOrEmpty(CharCodeString)) {
                         if (CharCodeString.IsNumeric()) {
-                            CharCode = EncodeInteger(CharCodeString);
+                            CharCode = encodeInteger(CharCodeString);
                             s = s.Left( Pos - 1) + Convert.ToChar(CharCode) + s.Substring(posEnd - 1);
                         }
                     }
@@ -2092,9 +2092,9 @@ namespace Contensive.Core.Controllers {
             //
             tempDecodeGMTDate = Convert.ToDateTime("12:00:00 AM");
             if (!string.IsNullOrEmpty(GMTDate)) {
-                HourPart = EncodeNumber(GMTDate.Substring(5, 11));
+                HourPart = encodeNumber(GMTDate.Substring(5, 11));
                 if (dateController.IsDate(HourPart)) {
-                    YearPart = EncodeNumber(GMTDate.Substring(17, 8));
+                    YearPart = encodeNumber(GMTDate.Substring(17, 8));
                     if (dateController.IsDate(YearPart)) {
                         tempDecodeGMTDate = DateTime.FromOADate(YearPart + (HourPart + 4) / 24);
                     }
@@ -2178,7 +2178,7 @@ namespace Contensive.Core.Controllers {
         //
         public static int GetRandomInteger(coreClass cpCore) {
             int RandomBase = 1; ;
-            int RandomLimit = EncodeInteger( (Math.Pow(2, 31)) - RandomBase - 1);
+            int RandomLimit = encodeInteger( (Math.Pow(2, 31)) - RandomBase - 1);
             return cpCore.random.Next(RandomBase, RandomLimit);
         }
         //
@@ -3200,7 +3200,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public static int EncodeInteger(object expression) {
+        public static int encodeInteger(object expression) {
             int result = 0;
             if (expression == null) {
                 return 0;
@@ -3270,7 +3270,7 @@ namespace Contensive.Core.Controllers {
         //
         //
         //
-        public static double EncodeNumber(object Expression) {
+        public static double encodeNumber(object Expression) {
             double tempEncodeNumber = 0;
             tempEncodeNumber = 0;
             if (Expression.IsNumeric()) {
@@ -3319,7 +3319,7 @@ namespace Contensive.Core.Controllers {
         //
         //====================================================================================================
         //
-        public static DateTime EncodeDate(object Expression) {
+        public static DateTime encodeDate(object Expression) {
             DateTime tempEncodeDate = default(DateTime);
             tempEncodeDate = DateTime.MinValue;
             if (dateController.IsDate(Expression)) {
@@ -3742,7 +3742,7 @@ namespace Contensive.Core.Controllers {
             int returnSeconds = 0;
             DateTime oldDate = new DateTime(1900, 1, 1);
             if (sourceDate.CompareTo(oldDate) > 0) {
-                returnSeconds = EncodeInteger(sourceDate.Subtract(oldDate).TotalSeconds);
+                returnSeconds = encodeInteger(sourceDate.Subtract(oldDate).TotalSeconds);
             }
             return returnSeconds;
         }
@@ -4113,7 +4113,7 @@ namespace Contensive.Core.Controllers {
         /// <param name="srcDate"></param>
         /// <returns></returns>
         public static int convertDateToDayPtr(DateTime srcDate) {
-            return EncodeInteger(dateController.DateDiff(dateController.DateInterval.Day, srcDate, DateTime.MinValue));
+            return encodeInteger(dateController.DateDiff(dateController.DateInterval.Day, srcDate, DateTime.MinValue));
         }
         //
         //====================================================================================================

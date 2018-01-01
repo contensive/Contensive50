@@ -69,7 +69,7 @@ namespace Contensive.Core.Controllers {
                 dataStore.loaded = false;
                 dataStore.dataList.Clear();
                 dataStore.keyPtrIndex = new keyPtrController();
-                cpCore.cache.setContent(cacheName + "-dataList", dataStore.dataList);
+                cpCore.cache.setObject(cacheName + "-dataList", dataStore.dataList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -246,7 +246,7 @@ namespace Contensive.Core.Controllers {
             try {
                 if (dataStore.loaded) {
                     dataStore.keyPtrIndex.getPtr("test");
-                    cpCore.cache.setContent(cacheName, dataStore, cacheInvalidationTagCommaList);
+                    cpCore.cache.setObject(cacheName, dataStore, cacheInvalidationTagCommaList);
                 }
             } catch (Exception ex) {
                 throw new ApplicationException("Exception in cacheKeyPtrClass.save", ex);

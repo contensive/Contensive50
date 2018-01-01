@@ -188,6 +188,7 @@
     <Compile Include="Models\Entity\groupEmailModel.cs" />
     <Compile Include="Models\Entity\systemEmailModel.cs" />
     <Compile Include="Models\Entity\emailTemplateModel.cs" />
+    <Compile Include="Models\Entity\visitModel.cs" />
     <Compile Include="Views\coreClass.cs" />
     <Compile Include="Views\cpApi\CPAddonClass.cs" />
     <Compile Include="Views\cpApi\CPBlockClass.cs" />
@@ -217,7 +218,7 @@
     <Compile Include="Models\Complex\cdefModel.cs" />
     <Compile Include="Models\Complex\routeDictionaryModel.cs" />
     <Compile Include="Models\Complex\tableSchemeModel.cs" />
-    <Compile Include="Models\Context\authContextModel.cs" />
+    <Compile Include="Models\Context\sessionContextModel.cs" />
     <Compile Include="Models\Complex\miniCollectionModel.cs" />
     <Compile Include="Models\Context\propertyModel.cs" />
     <Compile Include="Models\Context\stylesheetContextModel.cs" />
@@ -252,7 +253,7 @@
     <Compile Include="Models\Entity\sortMethodModel.cs" />
     <Compile Include="Models\Entity\tableModel.cs" />
     <Compile Include="Models\Entity\TemplateDomainRuleModel.cs" />
-    <Compile Include="Models\Entity\visitModel.cs" />
+    <Compile Include="Models\Entity\visitModelx.cs" />
     <Compile Include="Models\Entity\visitorModel.cs" />
     <Compile Include="Models\Entity\copyContentModel.cs" />
     <Compile Include="Models\Entity\layoutModel.cs" />

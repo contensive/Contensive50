@@ -270,7 +270,7 @@ namespace Contensive.Core.Controllers {
             get {
                 int returnTimeout = 0;
                 try {
-                    returnTimeout = EncodeInteger(http.Timeout / 1000);
+                    returnTimeout = encodeInteger(http.Timeout / 1000);
                 } catch {
                     throw new ApplicationException("Error in Timeout Property, get Method");
                 }

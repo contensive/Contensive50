@@ -568,7 +568,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = cpCore.html.getContentCopy(ArgName, "copy content", cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated);
+                                        CmdAccumulator = cpCore.html.getContentCopy(ArgName, "copy content", cpCore.doc.sessionContext.user.id, true, cpCore.doc.sessionContext.isAuthenticated);
                                     }
                                     break;
                                 }
@@ -592,7 +592,7 @@ namespace Contensive.Core.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = cpCore.html.getContentCopy(ArgName, "copy content", cpCore.doc.authContext.user.id, true, cpCore.doc.authContext.isAuthenticated);
+                                        CmdAccumulator = cpCore.html.getContentCopy(ArgName, "copy content", cpCore.doc.sessionContext.user.id, true, cpCore.doc.sessionContext.isAuthenticated);
                                     }
                                     break;
                                 }
@@ -853,7 +853,7 @@ namespace Contensive.Core.Controllers {
                                     //ArgGuid = ""
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (EncodeInteger(kvp.Key.ToLower())) {
+                                        switch (encodeInteger(kvp.Key.ToLower())) {
                                             //Case "instanceid"
                                             //    ArgInstanceId = kvp.Value.ToString()
                                             //Case "guid"

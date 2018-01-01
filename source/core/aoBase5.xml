@@ -1304,7 +1304,12 @@
     <DotNetClass><![CDATA[Contensive.Core.Addons.Email.processEmailClass]]></DotNetClass>
 		<ProcessInterval>1</ProcessInterval>
   </Addon>
-
+  <Addon name="Export SQL To Csv" guid="{5C25F35D-A2A8-4791-B510-B1FFE0645004}" type="Add-on">
+    <DotNetClass><![CDATA[Contensive.Core.Addons.ExportSql.exportCsvClass]]></DotNetClass>
+  </Addon>
+  <Addon name="Export SQL To Xml" guid="{DC7EF1EE-20EE-4468-BEB1-0DC30AC8DAD6}" type="Add-on">
+    <DotNetClass><![CDATA[Contensive.Core.Addons.ExportSql.exportXmlClass]]></DotNetClass>
+  </Addon>
   <SQLIndex IndexName="ccContentContentTableID" DataSourceName="Default" TableName="ccContent" FieldNameList="ContentTableID"  />
 	<SQLIndex IndexName="ccGroupRulesGroupID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="GroupID"  />
 	<SQLIndex IndexName="ccGroupRulesContentID" DataSourceName="Default" TableName="ccGroupRules" FieldNameList="ContentID"  />

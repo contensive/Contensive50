@@ -100,7 +100,7 @@ namespace Contensive.Core {
                 //   if the is no CollectionDst for the CollectionSrc, add it and set okToUpdateDstFromSrc
                 // -------------------------------------------------------------------------------------------------
                 //
-                logController.appendInstallLog(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_AddSrcToDst");
+                logController.appendLogInstall(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_AddSrcToDst");
                 //
                 foreach (var srcKeyValuePair in srcCollection.CDef) {
                     srcCollectionCdef = srcKeyValuePair.Value;
@@ -272,14 +272,14 @@ namespace Contensive.Core {
                                     // Dst is a base CDef, Src is not. This update is not allowed. Log it and skip the Add
                                     //
                                     Copy = "An attempt was made to update a Base Content Definition [" + dstName + "] from a collection that is not the Base Collection. This is not allowed.";
-                                    logController.appendInstallLog(cpCore, "UpgradeCDef_AddSrcToDst, " + Copy);
+                                    logController.appendLogInstall(cpCore, "UpgradeCDef_AddSrcToDst, " + Copy);
                                     throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, Copy, "dll", "builderClass", "UpgradeCDef_AddSrcToDst", 0, "", "", False, True, "")
                                     okToUpdateDstFromSrc = false;
                                 } else {
                                     //
                                     // Just log the change for tracking
                                     //
-                                    logController.appendInstallLog(cpCore, "UpgradeCDef_AddSrcToDst, (Logging only) While merging two collections (probably application and an upgrade), one or more attributes for a content definition or field were different, first change was CDef=" + srcName + ", field=" + n);
+                                    logController.appendLogInstall(cpCore, "UpgradeCDef_AddSrcToDst, (Logging only) While merging two collections (probably application and an upgrade), one or more attributes for a content definition or field were different, first change was CDef=" + srcName + ", field=" + n);
                                 }
                             }
                         }
@@ -415,7 +415,7 @@ namespace Contensive.Core {
                                     if (!okToUpdateDstFromSrc) {
                                         n = "IndexSortOrder";
                                     }
-                                    okToUpdateDstFromSrc = okToUpdateDstFromSrc || (EncodeInteger(srcCollectionCdefField.indexSortOrder) != genericController.EncodeInteger(dstCollectionCdefField.indexSortOrder));
+                                    okToUpdateDstFromSrc = okToUpdateDstFromSrc || (encodeInteger(srcCollectionCdefField.indexSortOrder) != genericController.encodeInteger(dstCollectionCdefField.indexSortOrder));
                                     //
                                     if (!okToUpdateDstFromSrc) {
                                         n = "IndexWidth";
@@ -985,7 +985,7 @@ namespace Contensive.Core {
         //========================================================================
         //
         private static double GetXMLAttributeNumber(coreClass cpCore, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
-            return EncodeNumber(GetXMLAttribute(cpCore, Found, Node, Name, DefaultIfNotFound));
+            return encodeNumber(GetXMLAttribute(cpCore, Found, Node, Name, DefaultIfNotFound));
         }
         //
         //========================================================================
@@ -1001,7 +1001,7 @@ namespace Contensive.Core {
         //========================================================================
         //
         private static int GetXMLAttributeInteger(coreClass cpCore, bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
-            return genericController.EncodeInteger(GetXMLAttribute(cpCore, Found, Node, Name, DefaultIfNotFound.ToString()));
+            return genericController.encodeInteger(GetXMLAttribute(cpCore, Found, Node, Name, DefaultIfNotFound.ToString()));
         }
         //
         //==================================================================================================================
@@ -1074,7 +1074,7 @@ namespace Contensive.Core {
                     //
                     // update sort method
                     //
-                    cpCore.db.updateTableRecord("Default", "ccSortMethods", "ID=" + genericController.EncodeInteger(dt.Rows[0]["ID"]).ToString(), sqlList);
+                    cpCore.db.updateTableRecord("Default", "ccSortMethods", "ID=" + genericController.encodeInteger(dt.Rows[0]["ID"]).ToString(), sqlList);
                 } else {
                     //
                     // Create the new sort method
@@ -1094,7 +1094,7 @@ namespace Contensive.Core {
         public static void VerifySortMethods(coreClass cpCore) {
             try {
                 //
-                logController.appendInstallLog(cpCore, "Verify Sort Records");
+                logController.appendLogInstall(cpCore, "Verify Sort Records");
                 //
                 VerifySortMethod(cpCore, "By Name", "Name");
                 VerifySortMethod(cpCore, "By Alpha Sort Order Field", "SortOrder");
@@ -1136,7 +1136,7 @@ namespace Contensive.Core {
                         RowsFound = 0;
                         foreach (DataRow dr in rs.Rows) {
                             RowsFound = RowsFound + 1;
-                            if (RowsFound != genericController.EncodeInteger(dr["ID"])) {
+                            if (RowsFound != genericController.encodeInteger(dr["ID"])) {
                                 //
                                 // Bad Table
                                 //
@@ -1382,7 +1382,7 @@ namespace Contensive.Core {
                 int downloadRetry = 0;
                 const int downloadRetryMax = 3;
                 //
-                logController.appendInstallLog(cpCore, "downloading collection [" + CollectionGuid + "]");
+                logController.appendLogInstall(cpCore, "downloading collection [" + CollectionGuid + "]");
                 //
                 //---------------------------------------------------------------------------------------------------------------
                 // Request the Download file for this collection
@@ -1417,7 +1417,7 @@ namespace Contensive.Core {
                         downloadDelay += 2000;
                         return_ErrorMessage = "There was an error while requesting the download details for collection [" + CollectionGuid + "]";
                         tempDownloadCollectionFiles = false;
-                        logController.appendInstallLog(cpCore, errorPrefix + "There was a parse error reading the response [" + ex.ToString() + "]");
+                        logController.appendLogInstall(cpCore, errorPrefix + "There was a parse error reading the response [" + ex.ToString() + "]");
                     }
                     downloadRetry += 1;
                 } while (downloadRetry < downloadRetryMax);
@@ -1428,7 +1428,7 @@ namespace Contensive.Core {
                     if (Doc.DocumentElement.Name.ToLower() != genericController.vbLCase(DownloadFileRootNode)) {
                         return_ErrorMessage = "The collection file from the server was Not valid for collection [" + CollectionGuid + "]";
                         tempDownloadCollectionFiles = false;
-                        logController.appendInstallLog(cpCore, errorPrefix + "The response has a basename [" + Doc.DocumentElement.Name + "] but [" + DownloadFileRootNode + "] was expected.");
+                        logController.appendLogInstall(cpCore, errorPrefix + "The response has a basename [" + Doc.DocumentElement.Name + "] but [" + DownloadFileRootNode + "] was expected.");
                     } else {
                         //
                         //------------------------------------------------------------------
@@ -1437,7 +1437,7 @@ namespace Contensive.Core {
                         //
                         if (Doc.DocumentElement.ChildNodes.Count == 0) {
                             return_ErrorMessage = "The collection library status file from the server has a valid basename, but no childnodes.";
-                            logController.appendInstallLog(cpCore, errorPrefix + "The collection library status file from the server has a valid basename, but no childnodes. The collection was probably Not found");
+                            logController.appendLogInstall(cpCore, errorPrefix + "The collection library status file from the server has a valid basename, but no childnodes. The collection was probably Not found");
                             tempDownloadCollectionFiles = false;
                         } else {
                             foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
@@ -1465,7 +1465,7 @@ namespace Contensive.Core {
                                                     CollectionGuid = CDefInterfaces.InnerText;
                                                     break;
                                                 case "lastchangedate":
-                                                    return_CollectionLastChangeDate = genericController.EncodeDate(CDefInterfaces.InnerText);
+                                                    return_CollectionLastChangeDate = genericController.encodeDate(CDefInterfaces.InnerText);
                                                     break;
                                                 case "version":
                                                     CollectionVersion = CDefInterfaces.InnerText;
@@ -1479,7 +1479,7 @@ namespace Contensive.Core {
                                                             //
                                                             // Skip this file because the collecion file link has no slash (no file)
                                                             //
-                                                            logController.appendInstallLog(cpCore, errorPrefix + "Collection [" + Collectionname + "] was Not installed because the Collection File Link does Not point to a valid file [" + CollectionFileLink + "]");
+                                                            logController.appendLogInstall(cpCore, errorPrefix + "Collection [" + Collectionname + "] was Not installed because the Collection File Link does Not point to a valid file [" + CollectionFileLink + "]");
                                                         } else {
                                                             CollectionFilePath = workingPath + CollectionFileLink.Substring(Pos);
                                                             cpCore.privateFiles.SaveRemoteFile(CollectionFileLink, CollectionFilePath);
@@ -1510,7 +1510,7 @@ namespace Contensive.Core {
                                                     }
                                                     if (string.IsNullOrEmpty(ResourceLink)) {
                                                         UserError = "There was an error processing a collection in the download file [" + Collectionname + "]. An ActiveXDll node with filename [" + ResourceFilename + "] contained no 'Link' attribute.";
-                                                        logController.appendInstallLog(cpCore, errorPrefix + UserError);
+                                                        logController.appendLogInstall(cpCore, errorPrefix + UserError);
                                                     } else {
                                                         if (string.IsNullOrEmpty(ResourceFilename)) {
                                                             //
@@ -1523,7 +1523,7 @@ namespace Contensive.Core {
                                                         }
                                                         if (string.IsNullOrEmpty(ResourceFilename)) {
                                                             UserError = "There was an error processing a collection in the download file [" + Collectionname + "]. The ActiveX filename attribute was empty, and the filename could not be read from the link [" + ResourceLink + "].";
-                                                            logController.appendInstallLog(cpCore, errorPrefix + UserError);
+                                                            logController.appendLogInstall(cpCore, errorPrefix + UserError);
                                                         } else {
                                                             cpCore.privateFiles.SaveRemoteFile(ResourceLink, workingPath + ResourceFilename);
                                                         }
@@ -1535,7 +1535,7 @@ namespace Contensive.Core {
                                 }
                             }
                             if (CollectionFileCnt == 0) {
-                                logController.appendInstallLog(cpCore, errorPrefix + "The collection was requested and downloaded, but was not installed because the download file did not have a collection root node.");
+                                logController.appendLogInstall(cpCore, errorPrefix + "The collection was requested and downloaded, but was not installed because the download file did not have a collection root node.");
                             }
                         }
                     }
@@ -1696,7 +1696,7 @@ namespace Contensive.Core {
                             logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), parse error reading collections.xml");
                         }
                         Copy = "Error loading privateFiles\\addons\\Collections.xml";
-                        logController.appendInstallLog(cpCore, Copy);
+                        logController.appendLogInstall(cpCore, Copy);
                         return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
                         returnOk = false;
                     }
@@ -1707,7 +1707,7 @@ namespace Contensive.Core {
                             }
                             Copy = "The addons\\Collections.xml has an invalid root node, [" + LocalCollections.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.";
                             //Copy = "The LocalCollections file [" & App.Path & "\Addons\Collections.xml] has an invalid root node, [" & LocalCollections.DocumentElement.name & "] was received and [" & CollectionListRootNode & "] was expected."
-                            logController.appendInstallLog(cpCore, Copy);
+                            logController.appendLogInstall(cpCore, Copy);
                             return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
                             returnOk = false;
                         } else {
@@ -1775,7 +1775,7 @@ namespace Contensive.Core {
                                                 logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Error downloading or loading GetCollectionList from Support.");
                                             }
                                             Copy = "Error downloading or loading GetCollectionList from Support.";
-                                            logController.appendInstallLog(cpCore, Copy + ", the request was [" + SupportURL + "]");
+                                            logController.appendLogInstall(cpCore, Copy + ", the request was [" + SupportURL + "]");
                                             return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
                                             returnOk = false;
                                             loadOK = false;
@@ -1787,7 +1787,7 @@ namespace Contensive.Core {
                                                     if (allowLogging) {
                                                         logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), " + Copy);
                                                     }
-                                                    logController.appendInstallLog(cpCore, Copy + ", the request was [" + SupportURL + "]");
+                                                    logController.appendLogInstall(cpCore, Copy + ", the request was [" + SupportURL + "]");
                                                     return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
                                                     returnOk = false;
                                                 } else {
@@ -1830,7 +1830,7 @@ namespace Contensive.Core {
                                                                         if (!dateController.IsDate(LocalLastChangeDateStr)) {
                                                                             LocalLastChangeDate = DateTime.MinValue;
                                                                         } else {
-                                                                            LocalLastChangeDate = genericController.EncodeDate(LocalLastChangeDateStr);
+                                                                            LocalLastChangeDate = genericController.encodeDate(LocalLastChangeDateStr);
                                                                         }
                                                                     }
                                                                     if (allowLogging) {
@@ -1893,7 +1893,7 @@ namespace Contensive.Core {
                                                                                         if (!dateController.IsDate(LibLastChangeDateStr)) {
                                                                                             LibLastChangeDate = DateTime.MinValue;
                                                                                         } else {
-                                                                                            LibLastChangeDate = genericController.EncodeDate(LibLastChangeDateStr);
+                                                                                            LibLastChangeDate = genericController.encodeDate(LibLastChangeDateStr);
                                                                                         }
                                                                                         // TestPoint 1.1 - Test each collection for upgrade
                                                                                         if (LibLastChangeDate > LocalLastChangeDate) {
@@ -1904,7 +1904,7 @@ namespace Contensive.Core {
                                                                                             if (allowLogging) {
                                                                                                 logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" + workingPath + "].");
                                                                                             }
-                                                                                            logController.appendInstallLog(cpCore, "Upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], because LocalChangeDate [" + LocalLastChangeDate + "] < LibraryChangeDate [" + LibLastChangeDate + "]");
+                                                                                            logController.appendLogInstall(cpCore, "Upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], because LocalChangeDate [" + LocalLastChangeDate + "] < LibraryChangeDate [" + LibLastChangeDate + "]");
                                                                                             //
                                                                                             // Upgrade Needed
                                                                                             //
@@ -1943,7 +1943,7 @@ namespace Contensive.Core {
                                                                                                 if (allowLogging) {
                                                                                                     logController.appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), for this local collection, process returned " + returnOk);
                                                                                                 }
-                                                                                                logController.appendInstallLog(cpCore, "There was a problem upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], error message [" + return_ErrorMessage + "], will clear error and continue with the next collection, the request was [" + SupportURL + "]");
+                                                                                                logController.appendLogInstall(cpCore, "There was a problem upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], error message [" + return_ErrorMessage + "], will clear error and continue with the next collection, the request was [" + SupportURL + "]");
                                                                                                 returnOk = true;
                                                                                             }
                                                                                         }
@@ -1953,7 +1953,7 @@ namespace Contensive.Core {
                                                                                         localCollectionUpToDate = true;
                                                                                         //
                                                                                         if (!returnOk) {
-                                                                                            logController.appendInstallLog(cpCore, "There was a problem upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], error message [" + return_ErrorMessage + "], will clear error and continue with the next collection");
+                                                                                            logController.appendLogInstall(cpCore, "There was a problem upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], error message [" + return_ErrorMessage + "], will clear error and continue with the next collection");
                                                                                             returnOk = true;
                                                                                         }
                                                                                     }
@@ -2001,7 +2001,7 @@ namespace Contensive.Core {
             bool success = false;
             try {
                 if (cpCore.privateFiles.pathExists(sourcePrivateFolderPath)) {
-                    logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, processing files in private folder [" + sourcePrivateFolderPath + "]");
+                    logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, processing files in private folder [" + sourcePrivateFolderPath + "]");
                     FileInfo[] SrcFileNamelist = cpCore.privateFiles.getFileList(sourcePrivateFolderPath);
                     foreach (FileInfo file in SrcFileNamelist) {
                         if ((file.Extension == ".zip") || (file.Extension == ".xml")) {
@@ -2074,9 +2074,9 @@ namespace Contensive.Core {
                     if (allowLogging) {
                         logController.appendLog(cpCore, "BuildLocalCollectionFolder(), " + return_ErrorMessage);
                     }
-                    logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" + collectionPath + "]");
+                    logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" + collectionPath + "]");
                 } else {
-                    logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, processing files in private folder [" + collectionPath + "]");
+                    logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, processing files in private folder [" + collectionPath + "]");
                     //
                     // move collection file to a temp directory
                     //
@@ -2096,10 +2096,10 @@ namespace Contensive.Core {
                         //
                         foreach (FileInfo file in SrcFileNamelist) {
                             Filename = file.Name;
-                            logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, processing files, filename=[" + Filename + "]");
+                            logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, processing files, filename=[" + Filename + "]");
                             if (genericController.vbLCase(Filename.Substring(Filename.Length - 4)) == ".xml") {
                                 //
-                                logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, processing xml file [" + Filename + "]");
+                                logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, processing xml file [" + Filename + "]");
                                 //hint = hint & ",320"
                                 CollectionFile = new XmlDocument();
                                 bool loadOk = true;
@@ -2112,7 +2112,7 @@ namespace Contensive.Core {
                                     //
                                     //hint = hint & ",330"
                                     return_ErrorMessage = "There was a problem installing the Collection File [" + tmpInstallPath + Filename + "]. The error reported was [" + ex.Message + "].";
-                                    logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, error reading collection [" + collectionPathFilename + "]");
+                                    logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, error reading collection [" + collectionPathFilename + "]");
                                     //StatusOK = False
                                     loadOk = false;
                                 }
@@ -2123,7 +2123,7 @@ namespace Contensive.Core {
                                         //
                                         // Not a problem, this is just not a collection file
                                         //
-                                        logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, xml base name wrong [" + CollectionFileBaseName + "]");
+                                        logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, xml base name wrong [" + CollectionFileBaseName + "]");
                                     } else {
                                         //
                                         // Collection File
@@ -2136,7 +2136,7 @@ namespace Contensive.Core {
                                             //
                                             result = false;
                                             return_ErrorMessage = "<p>There was a problem with this Collection. The collection file does not have a collection name.</p>";
-                                            logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, collection has no name");
+                                            logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, collection has no name");
                                         } else {
                                             //
                                             //------------------------------------------------------------------
@@ -2299,16 +2299,16 @@ namespace Contensive.Core {
                                                             ChildCollectionGUID = CDefSection.InnerText;
                                                         }
                                                         string statusMsg = "Installing collection [" + ChildCollectionName + ", " + ChildCollectionGUID + "] referenced from collection [" + Collectionname + "]";
-                                                        logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" + ChildCollectionName + "], childCollectionGuid [" + ChildCollectionGUID + "]");
+                                                        logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" + ChildCollectionName + "], childCollectionGuid [" + ChildCollectionGUID + "]");
                                                         if (genericController.vbInstr(1, CollectionVersionPath, ChildCollectionGUID, 1) == 0) {
                                                             if (string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                 //
                                                                 // -- Needs a GUID to install
                                                                 result = false;
                                                                 return_ErrorMessage = statusMsg + ". The installation can not continue because an imported collection could not be downloaded because it does not include a valid GUID.";
-                                                                logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, return message [" + return_ErrorMessage + "]");
+                                                                logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, return message [" + return_ErrorMessage + "]");
                                                             } else if (GetCollectionPath(cpCore, ChildCollectionGUID) == "") {
-                                                                logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], not found so needs to be installed");
+                                                                logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], not found so needs to be installed");
                                                                 //
                                                                 // If it is not already installed, download and install it also
                                                                 //
@@ -2319,21 +2319,21 @@ namespace Contensive.Core {
                                                                 StatusOK = downloadCollectionFiles(cpCore, ChildWorkingPath, ChildCollectionGUID, ref ChildCollectionLastChangeDate, ref return_ErrorMessage);
                                                                 if (!StatusOK) {
 
-                                                                    logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
+                                                                    logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
                                                                     if (string.IsNullOrEmpty(return_ErrorMessage)) {
                                                                         return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error while downloading the necessary collection file, [" + ChildCollectionGUID + "].";
                                                                     } else {
                                                                         return_ErrorMessage = statusMsg + ". The installation can not continue because there was an error while downloading the necessary collection file, guid [" + ChildCollectionGUID + "]. The error was [" + return_ErrorMessage + "]";
                                                                     }
                                                                 } else {
-                                                                    logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], downloadCollectionFiles returned OK");
+                                                                    logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], downloadCollectionFiles returned OK");
                                                                     //
                                                                     // install the downloaded file
                                                                     //
                                                                     List<string> ChildCollectionGUIDList = new List<string>();
                                                                     StatusOK = buildLocalCollectionReposFromFolder(cpCore, ChildWorkingPath, ChildCollectionLastChangeDate, ref ChildCollectionGUIDList, ref return_ErrorMessage, allowLogging);
                                                                     if (!StatusOK) {
-                                                                        logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
+                                                                        logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
                                                                         if (string.IsNullOrEmpty(return_ErrorMessage)) {
                                                                             return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "].";
                                                                         } else {
@@ -2348,7 +2348,7 @@ namespace Contensive.Core {
                                                                 //
                                                                 //
                                                                 //
-                                                                logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], already installed");
+                                                                logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, [" + ChildCollectionGUID + "], already installed");
                                                             }
                                                         }
                                                         break;
@@ -2406,10 +2406,10 @@ namespace Contensive.Core {
                     // there was an error processing the collection, be sure to save description in the log
                     //
                     result = false;
-                    logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" + return_ErrorMessage + "]");
+                    logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" + return_ErrorMessage + "]");
                 }
                 //
-                logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder, Exiting with ErrorMessage [" + return_ErrorMessage + "]");
+                logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder, Exiting with ErrorMessage [" + return_ErrorMessage + "]");
                 //
                 tempBuildLocalCollectionRepoFromFile = (string.IsNullOrEmpty(return_ErrorMessage));
                 return_CollectionGUID = CollectionGuid;
@@ -2476,7 +2476,7 @@ namespace Contensive.Core {
                                     //
                                     // error - Need a way to reach the user that submitted the file
                                     //
-                                    logController.appendInstallLog(cpCore, "There was an error reading the Meta data file [" + cpCore.privateFiles.rootLocalPath + CollectionVersionFolder + file.Name + "].");
+                                    logController.appendLogInstall(cpCore, "There was an error reading the Meta data file [" + cpCore.privateFiles.rootLocalPath + CollectionVersionFolder + file.Name + "].");
                                     result = false;
                                     return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the xml collection file has an error</P>";
                                     loadOK = false;
@@ -2495,7 +2495,7 @@ namespace Contensive.Core {
                                             // ----- Error condition -- it must have a collection name
                                             //
                                             //Call AppendAddonLog("UpgradeAppFromLocalCollection, collection has no name")
-                                            logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, collection has no name");
+                                            logController.appendLogInstall(cpCore, "UpgradeAppFromLocalCollection, collection has no name");
                                             result = false;
                                             return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the collection name in the xml collection file is blank</P>";
                                         } else {
@@ -2515,7 +2515,7 @@ namespace Contensive.Core {
                                                 //
                                                 //
                                                 result = false;
-                                                logController.appendInstallLog(cpCore, "Local Collection file contains a different GUID for [" + Collectionname + "] then Collections.xml");
+                                                logController.appendLogInstall(cpCore, "Local Collection file contains a different GUID for [" + Collectionname + "] then Collections.xml");
                                                 return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>";
                                             } else {
                                                 if (string.IsNullOrEmpty(CollectionGuid)) {
@@ -2534,7 +2534,7 @@ namespace Contensive.Core {
                                                 //-------------------------------------------------------------------------------
                                                 //
                                                 //CollectionAddOnCnt = 0
-                                                logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], pass 1");
+                                                logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], pass 1");
                                                 string wwwFileList = "";
                                                 string ContentFileList = "";
                                                 string ExecFileList = "";
@@ -2548,7 +2548,7 @@ namespace Contensive.Core {
                                                             string resourcePath = GetXMLAttribute(cpCore, IsFound, CDefSection, "path", "");
                                                             string filename = GetXMLAttribute(cpCore, IsFound, CDefSection, "name", "");
                                                             //
-                                                            logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], pass 1, resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
+                                                            logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], pass 1, resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
                                                             //
                                                             filename = genericController.convertToDosSlash(filename);
                                                             string SrcPath = "";
@@ -2589,11 +2589,11 @@ namespace Contensive.Core {
                                                             switch (resourceType.ToLower()) {
                                                                 case "www":
                                                                     wwwFileList = wwwFileList + "\r\n" + DstFilePath + filename;
-                                                                    logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + cpCore.serverConfig.appConfig.appRootFilesPath + DstFilePath + "].");
+                                                                    logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + cpCore.serverConfig.appConfig.appRootFilesPath + DstFilePath + "].");
                                                                     //Call logcontroller.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & "].")
                                                                     cpCore.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, DstFilePath + filename, cpCore.appRootFiles);
                                                                     if (genericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                        logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + cpCore.serverConfig.appConfig.appRootFilesPath + DstFilePath + filename + "].");
+                                                                        logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + cpCore.serverConfig.appConfig.appRootFilesPath + DstFilePath + filename + "].");
                                                                         //Call logcontroller.appendInstallLog(cpCore, "install collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
                                                                         cpCore.appRootFiles.UnzipFile(DstFilePath + filename);
                                                                     }
@@ -2601,10 +2601,10 @@ namespace Contensive.Core {
                                                                 case "file":
                                                                 case "content":
                                                                     ContentFileList = ContentFileList + "\r\n" + DstFilePath + filename;
-                                                                    logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + DstFilePath + "].");
+                                                                    logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + DstFilePath + "].");
                                                                     cpCore.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, DstFilePath + filename, cpCore.cdnFiles);
                                                                     if (genericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                        logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping content file [" + DstFilePath + filename + "].");
+                                                                        logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping content file [" + DstFilePath + filename + "].");
                                                                         cpCore.cdnFiles.UnzipFile(DstFilePath + filename);
                                                                     }
                                                                     break;
@@ -2631,9 +2631,9 @@ namespace Contensive.Core {
                                                                 //
                                                                 // circular import detected, this collection is already imported
                                                                 //
-                                                                logController.appendInstallLog(cpCore, "Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUID + "]");
+                                                                logController.appendLogInstall(cpCore, "Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUID + "]");
                                                             } else {
-                                                                logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], pass 1, import collection found, name [" + ChildCollectionName + "], guid [" + ChildCollectionGUID + "]");
+                                                                logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], pass 1, import collection found, name [" + ChildCollectionName + "], guid [" + ChildCollectionGUID + "]");
                                                                 installCollectionFromRemoteRepo(cpCore, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, ref nonCriticalErrorList);
                                                                 //if (true) {
                                                                 //    installCollectionFromRemoteRepo(cpCore, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, ref nonCriticalErrorList);
@@ -2676,20 +2676,20 @@ namespace Contensive.Core {
                                                 //-------------------------------------------------------------------------------
                                                 //
                                                 bool OKToInstall = false;
-                                                logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], pass 1 done, create collection record.");
+                                                logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], pass 1 done, create collection record.");
                                                 AddonCollectionModel collection = AddonCollectionModel.create(cpCore, CollectionGuid);
                                                 if (collection != null) {
                                                     //
                                                     // Upgrade addon
                                                     //
                                                     if (CollectionLastChangeDate == DateTime.MinValue) {
-                                                        logController.appendInstallLog(cpCore, "collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.");
+                                                        logController.appendLogInstall(cpCore, "collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.");
                                                         OKToInstall = true;
                                                     } else if (collection.LastChangeDate < CollectionLastChangeDate) {
-                                                        logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an older version of collection. It will be upgraded.");
+                                                        logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an older version of collection. It will be upgraded.");
                                                         OKToInstall = true;
                                                     } else {
-                                                        logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an up-to-date version of collection. It will not be upgraded, but all imports in the new version will be checked.");
+                                                        logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an up-to-date version of collection. It will not be upgraded, but all imports in the new version will be checked.");
                                                         OKToInstall = false;
                                                     }
                                                 } else {
@@ -2697,7 +2697,7 @@ namespace Contensive.Core {
                                                     // Install new on this application
                                                     //
                                                     collection = AddonCollectionModel.add(cpCore);
-                                                    logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App does not have this collection so it will be installed.");
+                                                    logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App does not have this collection so it will be installed.");
                                                     OKToInstall = true;
                                                 }
                                                 string DataRecordList = "";
@@ -2758,7 +2758,7 @@ namespace Contensive.Core {
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     string CollectionWrapper = "";
-                                                    logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], pass 2");
+                                                    logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], pass 2");
                                                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                                                         switch (genericController.vbLCase(CDefSection.Name)) {
                                                             case "contensivecdef":
@@ -2805,7 +2805,7 @@ namespace Contensive.Core {
                                                             //
                                                             // error - Need a way to reach the user that submitted the file
                                                             //
-                                                            logController.appendInstallLog(cpCore, "Creating navigator entries, there was an error parsing the portion of the collection that contains cdef. Navigator entry creation was aborted. [There was an error reading the Meta data file.]");
+                                                            logController.appendLogInstall(cpCore, "Creating navigator entries, there was an error parsing the portion of the collection that contains cdef. Navigator entry creation was aborted. [There was an error reading the Meta data file.]");
                                                             result = false;
                                                             return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the xml collection file has an error.</P>";
                                                             loadOK = false;
@@ -2841,7 +2841,7 @@ namespace Contensive.Core {
                                                     //   process seperate so another pass can create any lookup data from these records
                                                     //-------------------------------------------------------------------------------
                                                     //
-                                                    logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], pass 3");
+                                                    logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], pass 3");
                                                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                                                         switch (genericController.vbLCase(CDefSection.Name)) {
                                                             case "data":
@@ -2856,14 +2856,14 @@ namespace Contensive.Core {
                                                                         //
                                                                         string ContentName = GetXMLAttribute(cpCore, IsFound, ContentNode, "content", "");
                                                                         if (string.IsNullOrEmpty(ContentName)) {
-                                                                            logController.appendInstallLog(cpCore, "install collection file contains a data.record node with a blank content attribute.");
+                                                                            logController.appendLogInstall(cpCore, "install collection file contains a data.record node with a blank content attribute.");
                                                                             result = false;
                                                                             return_ErrorMessage = return_ErrorMessage + "<P>Collection file contains a data.record node with a blank content attribute.</P>";
                                                                         } else {
                                                                             string ContentRecordGuid = GetXMLAttribute(cpCore, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName = GetXMLAttribute(cpCore, IsFound, ContentNode, "name", "");
                                                                             if ((string.IsNullOrEmpty(ContentRecordGuid)) && (string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                logController.appendInstallLog(cpCore, "install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
+                                                                                logController.appendLogInstall(cpCore, "install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
                                                                                 result = false;
                                                                                 return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" + ContentName + "].</P>";
                                                                             } else {
@@ -2923,7 +2923,7 @@ namespace Contensive.Core {
                                                     // ----- Pass 4, process fields in data nodes
                                                     //-------------------------------------------------------------------------------
                                                     //
-                                                    logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], pass 4");
+                                                    logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], pass 4");
                                                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                                                         switch (genericController.vbLCase(CDefSection.Name)) {
                                                             case "data":
@@ -2940,7 +2940,7 @@ namespace Contensive.Core {
                                                                         //
                                                                         string ContentName = GetXMLAttribute(cpCore, IsFound, ContentNode, "content", "");
                                                                         if (string.IsNullOrEmpty(ContentName)) {
-                                                                            logController.appendInstallLog(cpCore, "install collection file contains a data.record node with a blank content attribute.");
+                                                                            logController.appendLogInstall(cpCore, "install collection file contains a data.record node with a blank content attribute.");
                                                                             result = false;
                                                                             return_ErrorMessage = return_ErrorMessage + "<P>Collection file contains a data.record node with a blank content attribute.</P>";
                                                                         } else {
@@ -3002,7 +3002,7 @@ namespace Contensive.Core {
                                                                                                                         //
                                                                                                                         // Lookup by guid
                                                                                                                         //
-                                                                                                                        int fieldLookupId = genericController.EncodeInteger(cpCore.db.GetRecordIDByGuid(FieldLookupContentName, FieldValue));
+                                                                                                                        int fieldLookupId = genericController.encodeInteger(cpCore.db.GetRecordIDByGuid(FieldLookupContentName, FieldValue));
                                                                                                                         if (fieldLookupId <= 0) {
                                                                                                                             return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                         } else {
@@ -3055,7 +3055,7 @@ namespace Contensive.Core {
                                                     // Process all non-import <Collection> nodes
                                                     //-------------------------------------------------------------------------------
                                                     //
-                                                    logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], pass 5");
+                                                    logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], pass 5");
                                                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                                                         switch (genericController.vbLCase(CDefSection.Name)) {
                                                             case "cdef":
@@ -3273,7 +3273,7 @@ namespace Contensive.Core {
                                                     // process include add-on node of add-on nodes
                                                     //-------------------------------------------------------------------------------
                                                     //
-                                                    logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], pass 6");
+                                                    logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], pass 6");
                                                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                                                         switch (genericController.vbLCase(CDefSection.Name)) {
                                                             case "addon":
@@ -3308,7 +3308,7 @@ namespace Contensive.Core {
                                                 collection.save(cpCore);
                                             }
                                             //
-                                            logController.appendInstallLog(cpCore, "install collection [" + Collectionname + "], upgrade complete, flush cache");
+                                            logController.appendLogInstall(cpCore, "install collection [" + Collectionname + "], upgrade complete, flush cache");
                                             //
                                             // -- import complete, flush caches
                                             cpCore.cache.invalidateAll();
@@ -3414,11 +3414,11 @@ namespace Contensive.Core {
                 try {
                     Doc.LoadXml(getCollectionListFile(cpCore));
                 } catch (Exception ex) {
-                    logController.appendInstallLog(cpCore, "UpdateConfig, Error loading Collections.xml file.");
+                    logController.appendLogInstall(cpCore, "UpdateConfig, Error loading Collections.xml file.");
                 }
                 if (loadOK) {
                     if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
-                        logController.appendInstallLog(cpCore, "UpdateConfig, The Collections.xml file has an invalid root node, [" + Doc.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.");
+                        logController.appendLogInstall(cpCore, "UpdateConfig, The Collections.xml file has an invalid root node, [" + Doc.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.");
                     } else {
                         if (genericController.vbLCase(Doc.DocumentElement.Name) == "collectionlist") {
                             CollectionFound = false;
@@ -3544,12 +3544,12 @@ namespace Contensive.Core {
                     Doc.LoadXml(getCollectionListFile(cpCore));
                 } catch (Exception ex) {
                     //hint = hint & ",parse error"
-                    logController.appendInstallLog(cpCore, "GetCollectionConfig, Hint=[" + hint + "], Error loading Collections.xml file.");
+                    logController.appendLogInstall(cpCore, "GetCollectionConfig, Hint=[" + hint + "], Error loading Collections.xml file.");
                     loadOK = false;
                 }
                 if (loadOK) {
                     if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
-                        logController.appendInstallLog(cpCore, "Hint=[" + hint + "], The Collections.xml file has an invalid root node");
+                        logController.appendLogInstall(cpCore, "Hint=[" + hint + "], The Collections.xml file has an invalid root node");
                     } else {
                         if (true) {
                             //If genericController.vbLCase(.name) <> "collectionlist" Then
@@ -3578,7 +3578,7 @@ namespace Contensive.Core {
                                                     CollectionPath = genericController.vbLCase(CollectionNode.InnerText);
                                                     break;
                                                 case "lastchangedate":
-                                                    LastChangeDate = genericController.EncodeDate(CollectionNode.InnerText);
+                                                    LastChangeDate = genericController.encodeDate(CollectionNode.InnerText);
                                                     break;
                                             }
                                         }
@@ -3618,11 +3618,11 @@ namespace Contensive.Core {
                     //
                     // BuildLocal failed, log it and do not upgrade
                     //
-                    logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
+                    logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
                     foreach (string collectionGuid in return_CollectionGUIDList) {
                         if (!installCollectionFromLocalRepo(cpCore, collectionGuid, cpCore.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, ref nonCriticalErrorList)) {
-                            logController.appendInstallLog(cpCore, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
+                            logController.appendLogInstall(cpCore, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                             break;
                         }
                     }
@@ -3652,14 +3652,14 @@ namespace Contensive.Core {
                     //
                     // BuildLocal failed, log it and do not upgrade
                     //
-                    logController.appendInstallLog(cpCore, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
+                    logController.appendLogInstall(cpCore, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
                     returnSuccess = installCollectionFromLocalRepo(cpCore, return_CollectionGUID, cpCore.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, ref nonCriticalErrorList);
                     if (!returnSuccess) {
                         //
                         // Upgrade all apps failed
                         //
-                        logController.appendInstallLog(cpCore, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
+                        logController.appendLogInstall(cpCore, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                     } else {
                         returnSuccess = true;
                     }
@@ -3863,7 +3863,7 @@ namespace Contensive.Core {
                         //
                         // Update the Addon
                         //
-                        logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                        logController.appendLogInstall(cpCore, "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                     } else {
                         //
                         // not found by GUID - search name against name to update legacy Add-ons
@@ -3872,7 +3872,7 @@ namespace Contensive.Core {
                         Criteria = "(name=" + cpCore.db.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
                         CS = cpCore.db.csOpen(cnAddons, Criteria,"", false);
                         if (cpCore.db.csOk(CS)) {
-                            logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                            logController.appendLogInstall(cpCore, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                         }
                     }
                     if (!cpCore.db.csOk(CS)) {
@@ -3882,14 +3882,14 @@ namespace Contensive.Core {
                         cpCore.db.csClose(ref CS);
                         CS = cpCore.db.csInsertRecord(cnAddons, 0);
                         if (cpCore.db.csOk(CS)) {
-                            logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                            logController.appendLogInstall(cpCore, "UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                         }
                     }
                     if (!cpCore.db.csOk(CS)) {
                         //
                         // Could not create new Add-on
                         //
-                        logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                        logController.appendLogInstall(cpCore, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                     } else {
                         addonId = cpCore.db.csGetInteger(CS, "ID");
                         //
@@ -4009,7 +4009,7 @@ namespace Contensive.Core {
                                         cpCore.db.csSet(CS, "scriptinglanguageid", scriptinglanguageid);
                                         ScriptingEntryPoint = GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
                                         cpCore.db.csSet(CS, "ScriptingEntryPoint", ScriptingEntryPoint);
-                                        ScriptingTimeout = genericController.EncodeInteger(GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
+                                        ScriptingTimeout = genericController.encodeInteger(GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
                                         cpCore.db.csSet(CS, "ScriptingTimeout", ScriptingTimeout);
                                         ScriptingCode = "";
                                         //Call cpCore.app.csv_SetCS(CS, "ScriptingCode", ScriptingCode)
@@ -4219,9 +4219,9 @@ namespace Contensive.Core {
                                             }
                                             cpCore.db.csSet(CS, "IconFilename", FieldValue);
                                             if (true) {
-                                                cpCore.db.csSet(CS, "IconWidth", genericController.EncodeInteger(GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "width", "0")));
-                                                cpCore.db.csSet(CS, "IconHeight", genericController.EncodeInteger(GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "height", "0")));
-                                                cpCore.db.csSet(CS, "IconSprites", genericController.EncodeInteger(GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
+                                                cpCore.db.csSet(CS, "IconWidth", genericController.encodeInteger(GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "width", "0")));
+                                                cpCore.db.csSet(CS, "IconHeight", genericController.encodeInteger(GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "height", "0")));
+                                                cpCore.db.csSet(CS, "IconSprites", genericController.encodeInteger(GetXMLAttribute(cpCore, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
                                             }
                                         }
                                         break;
@@ -4447,7 +4447,7 @@ namespace Contensive.Core {
                         //
                         // Update the Addon
                         //
-                        logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" + AOName + "], Guid [" + AOGuid + "]");
+                        logController.appendLogInstall(cpCore, "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" + AOName + "], Guid [" + AOGuid + "]");
                     } else {
                         //
                         // not found by GUID - search name against name to update legacy Add-ons
@@ -4460,7 +4460,7 @@ namespace Contensive.Core {
                         //
                         // Could not find add-on
                         //
-                        logController.appendInstallLog(cpCore, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + AOName + "], Guid [" + AOGuid + "]");
+                        logController.appendLogInstall(cpCore, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + AOName + "], Guid [" + AOGuid + "]");
                     } else {
                         addonId = cpCore.db.csGetInteger(CS, "ID");
                         ArgumentList = "";
@@ -4499,7 +4499,7 @@ namespace Contensive.Core {
                                                 AddRule = false;
                                                 if (IncludeAddonID == 0) {
                                                     UserError = "The include add-on [" + IncludeAddonName + "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it.";
-                                                    logController.appendInstallLog(cpCore, "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" + UserError + "]");
+                                                    logController.appendLogInstall(cpCore, "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" + UserError + "]");
                                                     ReturnUpgradeOK = false;
                                                     ReturnErrorMessage = ReturnErrorMessage + "<P>The collection was not installed because the add-on [" + AOName + "] requires an included add-on [" + IncludeAddonName + "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>";
                                                 } else {
@@ -5047,7 +5047,7 @@ namespace Contensive.Core {
                     // -- base collection notfound
                     throw new ApplicationException("Cannot load aoBase5.xml [" + cpCore.programFiles.rootLocalPath + "aoBase5.xml]");
                 } else {
-                    logController.appendInstallLog(cpCore, "Verify base collection -- new build");
+                    logController.appendLogInstall(cpCore, "Verify base collection -- new build");
                     miniCollectionModel baseCollection = installCollection_LoadXmlToMiniCollection(cpCore, baseCollectionXml, true, true, isNewBuild, new miniCollectionModel());
                     installCollection_BuildDbFromMiniCollection(cpCore, baseCollection, cpCore.siteProperties.dataBuildVersion, isNewBuild, ref nonCriticalErrorList);
                     //If isNewBuild Then
@@ -5090,7 +5090,7 @@ namespace Contensive.Core {
         public static void installCollectionFromLocalRepo_BuildDbFromXmlData(coreClass cpCore, string XMLText, bool isNewBuild, bool isBaseCollection, ref List<string> nonCriticalErrorList) {
             try {
                 //
-                logController.appendInstallLog(cpCore, "Application: " + cpCore.serverConfig.appConfig.name);
+                logController.appendLogInstall(cpCore, "Application: " + cpCore.serverConfig.appConfig.name);
                 //
                 // ----- Import any CDef files, allowing for changes
                 miniCollectionModel miniCollectionToAdd = new miniCollectionModel();
@@ -5167,7 +5167,7 @@ namespace Contensive.Core {
                 //INSTANT C# NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
                 //				XmlNode FieldChildNode = null;
                 //
-                logController.appendInstallLog(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_LoadDataToCollection");
+                logController.appendLogInstall(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_LoadDataToCollection");
                 //
                 result = new miniCollectionModel();
                 //
@@ -5196,7 +5196,7 @@ namespace Contensive.Core {
                         //hint = "get collection name"
                         Collectionname = GetXMLAttribute(cpCore, Found, srcXmlDom.DocumentElement, "name", "");
                         if (string.IsNullOrEmpty(Collectionname)) {
-                            logController.appendInstallLog(cpCore, "UpgradeCDef_LoadDataToCollection, Application: " + cpCore.serverConfig.appConfig.name + ", Collection has no name");
+                            logController.appendLogInstall(cpCore, "UpgradeCDef_LoadDataToCollection, Application: " + cpCore.serverConfig.appConfig.name + ", Collection has no name");
                         } else {
                             //Call AppendClassLogFile(cpcore.app.config.name,"UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & cpcore.app.appEnvironment.name & ", Collection: " & Collectionname)
                         }
@@ -5666,16 +5666,16 @@ namespace Contensive.Core {
                 bool RequireReload = false;
                 bool Found = false;
                                                    //
-                logController.appendInstallLog(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
+                logController.appendLogInstall(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 0.5: verify core sql tables");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 1: verify core sql tables");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 appBuilderController.VerifyBasicTables(cpCore);
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 1: create SQL tables in default datasource");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 2: create SQL tables in default datasource");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 if (true) {
@@ -5684,7 +5684,7 @@ namespace Contensive.Core {
                         Models.Complex.cdefModel workingCdef = keypairvalue.Value;
                         ContentName = workingCdef.Name;
                         if (workingCdef.dataChanged) {
-                            logController.appendInstallLog(cpCore, "creating sql table [" + workingCdef.ContentTableName + "], datasource [" + workingCdef.ContentDataSourceName + "]");
+                            logController.appendLogInstall(cpCore, "creating sql table [" + workingCdef.ContentTableName + "], datasource [" + workingCdef.ContentDataSourceName + "]");
                             if (genericController.vbLCase(workingCdef.ContentDataSourceName) == "default" || workingCdef.ContentDataSourceName == "") {
                                 TableName = workingCdef.ContentTableName;
                                 if (genericController.vbInstr(1, "," + UsedTables + ",", "," + TableName + ",", 1) != 0) {
@@ -5701,7 +5701,7 @@ namespace Contensive.Core {
                 }
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 2: Verify all CDef names in ccContent so GetContentID calls will succeed");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 3: Verify all CDef names in ccContent so GetContentID calls will succeed");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 NodeCount = 0;
@@ -5714,7 +5714,7 @@ namespace Contensive.Core {
                 //
                 foreach (var keypairvalue in Collection.CDef) {
                     if (keypairvalue.Value.dataChanged) {
-                        logController.appendInstallLog(cpCore, "adding cdef name [" + keypairvalue.Value.Name + "]");
+                        logController.appendLogInstall(cpCore, "adding cdef name [" + keypairvalue.Value.Name + "]");
                         if (!installedContentList.Contains(keypairvalue.Value.Name.ToLower())) {
                             SQL = "Insert into ccContent (name,ccguid,active,createkey)values(" + cpCore.db.encodeSQLText(keypairvalue.Value.Name) + "," + cpCore.db.encodeSQLText(keypairvalue.Value.guid) + ",1,0);";
                             cpCore.db.executeQuery(SQL);
@@ -5727,7 +5727,7 @@ namespace Contensive.Core {
                 cpCore.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 4: Verify content records required for Content Server");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 4: Verify content records required for Content Server");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 VerifySortMethods(cpCore);
@@ -5736,12 +5736,11 @@ namespace Contensive.Core {
                 cpCore.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 5: verify 'Content' content definition");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 5: verify 'Content' content definition");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var keypairvalue in Collection.CDef) {
                     if (keypairvalue.Value.Name.ToLower() == "content") {
-                        logController.appendInstallLog(cpCore, "adding cdef [" + keypairvalue.Value.Name + "]");
                         installCollection_BuildDbFromCollection_AddCDefToDb(cpCore, keypairvalue.Value, BuildVersion);
                         RequireReload = true;
                         break;
@@ -5751,7 +5750,7 @@ namespace Contensive.Core {
                 cpCore.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 6.1: Verify all definitions and fields");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 6: Verify all definitions and fields");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 RequireReload = false;
@@ -5761,7 +5760,6 @@ namespace Contensive.Core {
                     if (true) // If .dataChanged Or .includesAFieldChange Then
                     {
                         if (keypairvalue.Value.Name.ToLower() != "content") {
-                            logController.appendInstallLog(cpCore, "adding cdef [" + keypairvalue.Value.Name + "]");
                             installCollection_BuildDbFromCollection_AddCDefToDb(cpCore, keypairvalue.Value, BuildVersion);
                             RequireReload = true;
                         }
@@ -5771,7 +5769,7 @@ namespace Contensive.Core {
                 cpCore.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 6.2: Verify all field help");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 7: Verify all field help");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 FieldHelpCID = cpCore.db.getRecordID("content", "Content Field Help");
@@ -5787,7 +5785,7 @@ namespace Contensive.Core {
                             SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + cpCore.db.encodeSQLText(FieldName) + ")and(c.name=" + cpCore.db.encodeSQLText(ContentName) + ") order by f.id";
                             rs = cpCore.db.executeQuery(SQL);
                             if (isDataTableOk(rs)) {
-                                fieldId = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows[0], "id"));
+                                fieldId = genericController.encodeInteger(cpCore.db.getDataRowColumnName(rs.Rows[0], "id"));
                             }
                             rs.Dispose();
                             if (fieldId == 0) {
@@ -5796,7 +5794,7 @@ namespace Contensive.Core {
                                 SQL = "select id from ccfieldhelp where fieldid=" + fieldId + " order by id";
                                 rs = cpCore.db.executeQuery(SQL);
                                 if (isDataTableOk(rs)) {
-                                    FieldHelpID = genericController.EncodeInteger(rs.Rows[0]["id"]);
+                                    FieldHelpID = genericController.encodeInteger(rs.Rows[0]["id"]);
                                 } else {
                                     FieldHelpID = cpCore.db.insertTableRecordGetId("default", "ccfieldhelp", 0);
                                 }
@@ -5820,12 +5818,12 @@ namespace Contensive.Core {
                 cpCore.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 7: create SQL indexes");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 8: create SQL indexes");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (miniCollectionModel.collectionSQLIndexModel index in Collection.SQLIndexes) {
                     if (index.dataChanged) {
-                        logController.appendInstallLog(cpCore, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
+                        logController.appendLogInstall(cpCore, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
                         cpCore.db.createSQLIndex(index.DataSourceName, index.TableName, index.IndexName, index.FieldNameList);
                     }
                 }
@@ -5833,30 +5831,29 @@ namespace Contensive.Core {
                 cpCore.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 8a: Verify All Menu Names, then all Menus");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 9: Verify All Menu Names, then all Menus");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var kvp in Collection.Menus) {
                     var menu = kvp.Value;
                     if (menu.dataChanged) {
-                        logController.appendInstallLog(cpCore, "creating navigator entry [" + menu.Name + "], namespace [" + menu.menuNameSpace + "], guid [" + menu.Guid + "]");
+                        logController.appendLogInstall(cpCore, "creating navigator entry [" + menu.Name + "], namespace [" + menu.menuNameSpace + "], guid [" + menu.Guid + "]");
                         appBuilderController.verifyNavigatorEntry(cpCore, menu.Guid, menu.menuNameSpace, menu.Name, menu.ContentName, menu.LinkPage, menu.SortOrder, menu.AdminOnly, menu.DeveloperOnly, menu.NewWindow, menu.Active, menu.AddonName, menu.NavIconType, menu.NavIconTitle, 0);
                     }
                 }
                 //
-                //---------------------------------------------------------------------
-                // ----- Upgrade collections added during upgrade process
-                //---------------------------------------------------------------------
+                //----------------------------------------------------------------------------------------------------------------------
+                logController.appendLogInstall(cpCore, "CDef Load, Upgrade collections added during upgrade process");
+                //----------------------------------------------------------------------------------------------------------------------
                 //
-                string errorMessage = "";
-                string Guid = null;
-                string CollectionPath = "";
-                DateTime lastChangeDate = new DateTime();
-                logController.appendInstallLog(cpCore, "Installing Add-on Collections gathered during upgrade");
+                logController.appendLogInstall(cpCore, "Installing Add-on Collections gathered during upgrade");
                 foreach( var import in Collection.collectionImports) {
-                    errorMessage = "";
-                    String emptyString = "";
+                    string CollectionPath = "";
+                    DateTime lastChangeDate = new DateTime();
+                    string emptyString = "";
                     GetCollectionConfig(cpCore, import.Guid , ref CollectionPath, ref lastChangeDate, ref emptyString);
+                    string Guid = "";
+                    string errorMessage = "";
                     if (!string.IsNullOrEmpty(CollectionPath)) {
                         //
                         // This collection is installed locally, install from local collections
@@ -5870,12 +5867,11 @@ namespace Contensive.Core {
                         if (!addonInstallOk) {
                             throw (new ApplicationException("Failure to install addon collection from remote repository. Collection [" + Guid + "] was referenced in collection [" + Collection.name + "]")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                         }
-
                     }
                 }
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                logController.appendInstallLog(cpCore, "CDef Load, stage 9: Verify Styles");
+                logController.appendLogInstall(cpCore, "CDef Load, stage 9: Verify Styles");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 NodeCount = 0;
@@ -5932,41 +5928,16 @@ namespace Contensive.Core {
                     }
                     SiteStyles = string.Join("}", SiteStyleSplit);
                     if (!string.IsNullOrEmpty(StyleSheetAdd)) {
-                        SiteStyles = SiteStyles + "\r\n\r\n/*"
-                        + "\r\nStyles added " + DateTime.Now + "\r\n*/"
-                        + "\r\n" + StyleSheetAdd;
+                        SiteStyles = SiteStyles 
+                            + "\r\n\r\n/*"
+                            + "\r\nStyles added " + DateTime.Now + "\r\n*/"
+                            + "\r\n" + StyleSheetAdd;
                     }
                     cpCore.appRootFiles.saveFile("templates/styles.css", SiteStyles);
                     //
-                    // Update stylesheet cache
-                    //
+                    // -- Update stylesheet cache
                     cpCore.siteProperties.setProperty("StylesheetSerialNumber", "-1");
                 }
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Page Templates
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Site Sections
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Dynamic Menus
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Page Content
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Copy Content
-                //-------------------------------------------------------------------------------------------------
-                //
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -5980,140 +5951,100 @@ namespace Contensive.Core {
         private static void installCollection_BuildDbFromCollection_AddCDefToDb(coreClass cpCore, Models.Complex.cdefModel cdef, string BuildVersion) {
             try {
                 //
-                int FieldHelpCID = 0;
-                int FieldHelpID = 0;
-                int fieldId = 0;
+                logController.appendLogInstall(cpCore, "Update db cdef [" + cdef.Name + "]");
+                //
                 int ContentID = 0;
-                DataTable rs = null;
-                int EditorGroupID = 0;
-                int FieldCount = 0;
-                int FieldSize = 0;
-                string ContentName = null;
-                //Dim DataSourceName As String
-                string SQL = null;
                 bool ContentIsBaseContent = false;
-                //
-                logController.appendInstallLog(cpCore, "Application: " + cpCore.serverConfig.appConfig.name + ", UpgradeCDef_BuildDbFromCollection_AddCDefToDb");
-                //
-                if (!(false)) {
+                int FieldHelpCID = Models.Complex.cdefModel.getContentId(cpCore, "Content Field Help");
+                var tmpList = new List<string> { };
+                Contensive.Core.Models.Entity.dataSourceModel datasource = dataSourceModel.createByName(cpCore, cdef.ContentDataSourceName, ref tmpList);
+                {
                     //
-                    logController.appendInstallLog(cpCore, "Upgrading CDef [" + cdef.Name + "]");
-                    //
-                    ContentID = 0;
-                    ContentName = cdef.Name;
-                    ContentIsBaseContent = false;
-                    FieldHelpCID = Models.Complex.cdefModel.getContentId(cpCore, "Content Field Help");
-                    var tmpList = new List<string> { };
-                    Contensive.Core.Models.Entity.dataSourceModel datasource = dataSourceModel.createByName(cpCore, cdef.ContentDataSourceName, ref tmpList);
-                    //
-                    // get contentid and protect content with IsBaseContent true
-                    //
-                    SQL = cpCore.db.GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" + cpCore.db.encodeSQLText(ContentName), "ID","", 1);
-                    rs = cpCore.db.executeQuery(SQL);
-                    if (isDataTableOk(rs)) {
-                        if (rs.Rows.Count > 0) {
-                            //EditorGroupID = cpcore.app.getDataRowColumnName(RS.rows(0), "ID")
-                            ContentID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                            ContentIsBaseContent = genericController.encodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows[0], "IsBaseContent"));
+                    // -- get contentid and protect content with IsBaseContent true
+                    string SQL = cpCore.db.GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" + cpCore.db.encodeSQLText(cdef.Name), "ID", "", 1);
+                    DataTable dt = cpCore.db.executeQuery(SQL);
+                    if (isDataTableOk(dt)) {
+                        if (dt.Rows.Count > 0) {
+                            ContentID = genericController.encodeInteger(cpCore.db.getDataRowColumnName(dt.Rows[0], "ID"));
+                            ContentIsBaseContent = genericController.encodeBoolean(cpCore.db.getDataRowColumnName(dt.Rows[0], "IsBaseContent"));
                         }
                     }
-                    rs.Dispose();
+                    dt.Dispose();
+                }
+                //
+                // -- Update Content Record
+                if (cdef.dataChanged) {
                     //
-                    // ----- Update Content Record
-                    //
-                    if (cdef.dataChanged) {
+                    // -- Content needs to be updated
+                    if (ContentIsBaseContent && !cdef.IsBaseContent) {
                         //
-                        // Content needs to be updated
-                        //
-                        if (ContentIsBaseContent && !cdef.IsBaseContent) {
-                            //
-                            // Can not update a base content with a non-base content
-                            //
-                            cpCore.handleException(new ApplicationException("Warning: An attempt was made to update Content Definition [" + cdef.Name + "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."));
-                            cdef.IsBaseContent = ContentIsBaseContent;
-                            //cpCore.handleLegacyError3( "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
-                        }
-                        //
-                        // ----- update definition (use SingleRecord as an update flag)
-                        //
-                        Models.Complex.cdefModel.addContent(cpCore, true, datasource, cdef.ContentTableName, ContentName, cdef.AdminOnly, cdef.DeveloperOnly, cdef.AllowAdd, cdef.AllowDelete, cdef.parentName, cdef.DefaultSortMethod, cdef.DropDownFieldList, false, cdef.AllowCalendarEvents, cdef.AllowContentTracking, cdef.AllowTopicRules, cdef.AllowContentChildTool, false, cdef.IconLink, cdef.IconWidth, cdef.IconHeight, cdef.IconSprites, cdef.guid, cdef.IsBaseContent, cdef.installedByCollectionGuid);
-                        if (ContentID == 0) {
-                            logController.appendInstallLog(cpCore, "Could not determine contentid after createcontent3 for [" + ContentName + "], upgrade for this cdef aborted.");
-                        } else {
-                            //
-                            // ----- Other fields not in the csv call
-                            //
-                            EditorGroupID = 0;
-                            if (cdef.EditorGroupName != "") {
-                                rs = cpCore.db.executeQuery("select ID from ccGroups where name=" + cpCore.db.encodeSQLText(cdef.EditorGroupName));
-                                if (isDataTableOk(rs)) {
-                                    if (rs.Rows.Count > 0) {
-                                        EditorGroupID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                                    }
-                                }
-                                rs.Dispose();
-                            }
-                            SQL = "update ccContent"
-                                + " set EditorGroupID=" + EditorGroupID + ",isbasecontent=" + cpCore.db.encodeSQLBoolean(cdef.IsBaseContent) + " where id=" + ContentID + "";
-                            cpCore.db.executeQuery(SQL);
-                        }
+                        // -- Can not update a base content with a non-base content
+                        cpCore.handleException(new ApplicationException("Warning: An attempt was made to update Content Definition [" + cdef.Name + "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."));
+                        cdef.IsBaseContent = ContentIsBaseContent;
                     }
                     //
-                    // ----- update Content Field Records and Content Field Help records
-                    //
-                    if (ContentID == 0 && (cdef.fields.Count > 0)) {
-                        //
-                        // CAn not add fields if there is no content record
-                        //
-                        throw (new ApplicationException("Unexpected exception")); //cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Can not add field records to content [" & ContentName & "] because the content definition was not found", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
+                    // -- update definition (use SingleRecord as an update flag)
+                    Models.Complex.cdefModel.addContent(cpCore, true, datasource, cdef.ContentTableName, cdef.Name, cdef.AdminOnly, cdef.DeveloperOnly, cdef.AllowAdd, cdef.AllowDelete, cdef.parentName, cdef.DefaultSortMethod, cdef.DropDownFieldList, false, cdef.AllowCalendarEvents, cdef.AllowContentTracking, cdef.AllowTopicRules, cdef.AllowContentChildTool, false, cdef.IconLink, cdef.IconWidth, cdef.IconHeight, cdef.IconSprites, cdef.guid, cdef.IsBaseContent, cdef.installedByCollectionGuid);
+                    if (ContentID == 0) {
+                        logController.appendLogInstall(cpCore, "Could not determine contentid after createcontent3 for [" + cdef.Name + "], upgrade for this cdef aborted.");
                     } else {
                         //
-                        //
-                        //
-                        FieldSize = 0;
-                        FieldCount = 0;
-                        foreach (var nameValuePair in cdef.fields) {
-                            Models.Complex.cdefFieldModel field = nameValuePair.Value;
-                            if (field.dataChanged) {
-                                fieldId = Models.Complex.cdefModel.verifyCDefField_ReturnID(cpCore, ContentName, field);
-                            }
-                            //
-                            // ----- update content field help records
-                            //
-                            if (field.HelpChanged) {
-                                rs = cpCore.db.executeQuery("select ID from ccFieldHelp where fieldid=" + fieldId);
-                                if (isDataTableOk(rs)) {
-                                    if (rs.Rows.Count > 0) {
-                                        FieldHelpID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                                    }
-                                }
-                                rs.Dispose();
-                                //
-                                if (FieldHelpID == 0) {
-                                    FieldHelpID = cpCore.db.insertTableRecordGetId("default", "ccFieldHelp", 0);
-                                }
-                                if (FieldHelpID != 0) {
-                                    SQL = "update ccfieldhelp"
-                                        + " set fieldid=" + fieldId + ",active=1"
-                                        + ",contentcontrolid=" + FieldHelpCID + ",helpdefault=" + cpCore.db.encodeSQLText(field.HelpDefault) + ",helpcustom=" + cpCore.db.encodeSQLText(field.HelpCustom) + " where id=" + FieldHelpID;
-                                    cpCore.db.executeQuery(SQL);
+                        // -- Other fields not in the csv call
+                        int EditorGroupID = 0;
+                        if (cdef.EditorGroupName != "") {
+                            DataTable dt = cpCore.db.executeQuery("select ID from ccGroups where name=" + cpCore.db.encodeSQLText(cdef.EditorGroupName));
+                            if (isDataTableOk(dt)) {
+                                if (dt.Rows.Count > 0) {
+                                    EditorGroupID = genericController.encodeInteger(cpCore.db.getDataRowColumnName(dt.Rows[0], "ID"));
                                 }
                             }
+                            dt.Dispose();
+                        }
+                        string SQL = "update ccContent"
+                            + " set EditorGroupID=" + EditorGroupID + ",isbasecontent=" + cpCore.db.encodeSQLBoolean(cdef.IsBaseContent) + " where id=" + ContentID + "";
+                        cpCore.db.executeQuery(SQL);
+                    }
+                }
+                //
+                // -- update Content Field Records and Content Field Help records
+                if (ContentID == 0 && (cdef.fields.Count > 0)) {
+                    //
+                    // -- cannot add fields if there is no content record
+                    throw (new ApplicationException("Unexpected exception"));
+                } else {
+                    foreach (var nameValuePair in cdef.fields) {
+                        Models.Complex.cdefFieldModel field = nameValuePair.Value;
+                        int fieldId = 0;
+                        if (field.dataChanged) {
+                            fieldId = Models.Complex.cdefModel.verifyCDefField_ReturnID(cpCore, cdef.Name, field);
                         }
                         //
-                        // started doing something here -- research it.!!!!!
-                        //
-                        //For FieldPtr = 0 To .fields.Count - 1
-                        //    fieldId = 0
-                        //    With .fields(FieldPtr)
-                        //    End With
-                        //Next
-                        //
-                        // clear the cdef cache and list
-                        //
-                        cpCore.doc.clearMetaData();
-                        cpCore.cache.invalidateAll();
+                        // -- update content field help records
+                        if (field.HelpChanged) {
+                            int FieldHelpID = 0;
+                            DataTable dt = cpCore.db.executeQuery("select ID from ccFieldHelp where fieldid=" + fieldId);
+                            if (isDataTableOk(dt)) {
+                                if (dt.Rows.Count > 0) {
+                                    FieldHelpID = genericController.encodeInteger(cpCore.db.getDataRowColumnName(dt.Rows[0], "ID"));
+                                }
+                            }
+                            dt.Dispose();
+                            //
+                            if (FieldHelpID == 0) {
+                                FieldHelpID = cpCore.db.insertTableRecordGetId("default", "ccFieldHelp", 0);
+                            }
+                            if (FieldHelpID != 0) {
+                                string SQL = "update ccfieldhelp"
+                                    + " set fieldid=" + fieldId + ",active=1"
+                                    + ",contentcontrolid=" + FieldHelpCID + ",helpdefault=" + cpCore.db.encodeSQLText(field.HelpDefault) + ",helpcustom=" + cpCore.db.encodeSQLText(field.HelpCustom) + " where id=" + FieldHelpID;
+                                cpCore.db.executeQuery(SQL);
+                            }
+                        }
                     }
+                    //
+                    // clear the cdef cache and list
+                    cpCore.doc.clearMetaData();
+                    cpCore.cache.invalidateAll();
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);

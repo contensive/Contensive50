@@ -185,7 +185,7 @@ namespace Contensive.Core.Controllers {
                 // Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
                 //
                 if (AddLinkEID && (personalizationPeopleId != 0)) {
-                    AnchorQuery = AnchorQuery + "&EID=" + cpCore.security.encodeToken(genericController.EncodeInteger(personalizationPeopleId), DateTime.Now);
+                    AnchorQuery = AnchorQuery + "&EID=" + cpCore.security.encodeToken(genericController.encodeInteger(personalizationPeopleId), DateTime.Now);
                 }
                 //
                 if (!string.IsNullOrEmpty(AddAnchorQuery)) {
@@ -645,7 +645,7 @@ namespace Contensive.Core.Controllers {
                                                                     //
                                                                     Copy = "";
                                                                     GroupIDList = htmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
-                                                                    if (!cpCore.doc.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, true, GroupIDList, true)) {
+                                                                    if (!cpCore.doc.sessionContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, true, GroupIDList, true)) {
                                                                         //
                                                                         // Block content if not allowed
                                                                         //
@@ -840,14 +840,14 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     if (EncodeImages) {
                                                         Copy = "";
-                                                        ACAttrRecordID = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
-                                                        ACAttrWidth = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "WIDTH"));
-                                                        ACAttrHeight = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HEIGHT"));
+                                                        ACAttrRecordID = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
+                                                        ACAttrWidth = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "WIDTH"));
+                                                        ACAttrHeight = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HEIGHT"));
                                                         ACAttrAlt = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"));
-                                                        ACAttrBorder = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "BORDER"));
-                                                        ACAttrLoop = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "LOOP"));
-                                                        ACAttrVSpace = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "VSPACE"));
-                                                        ACAttrHSpace = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"));
+                                                        ACAttrBorder = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "BORDER"));
+                                                        ACAttrLoop = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "LOOP"));
+                                                        ACAttrVSpace = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "VSPACE"));
+                                                        ACAttrHSpace = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"));
                                                         ACAttrAlign = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"));
                                                         //
                                                         libraryFilesModel file = libraryFilesModel.create(cpCore, ACAttrRecordID);
@@ -917,7 +917,7 @@ namespace Contensive.Core.Controllers {
                                                     //
                                                     // ----- substitute and anchored download image for the AC-Download tag
                                                     //
-                                                    ACAttrRecordID = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
+                                                    ACAttrRecordID = genericController.encodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"));
                                                     ACAttrAlt = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"));
                                                     //
                                                     if (EncodeEditIcons) {
@@ -1317,12 +1317,12 @@ namespace Contensive.Core.Controllers {
                                                                     // ----- AC Image, Decode Active Images to Resource Library references
                                                                     //
                                                                     if (ImageIDArrayCount >= 4) {
-                                                                        RecordID = genericController.EncodeInteger(ACInstanceName);
+                                                                        RecordID = genericController.encodeInteger(ACInstanceName);
                                                                         ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH");
                                                                         ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT");
                                                                         ImageAlt = genericController.encodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"));
-                                                                        ImageVSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"));
-                                                                        ImageHSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"));
+                                                                        ImageVSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"));
+                                                                        ImageHSpace = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"));
                                                                         ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align");
                                                                         ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER");
                                                                         ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP");
@@ -1363,7 +1363,7 @@ namespace Contensive.Core.Controllers {
                                                                     // AC Download
                                                                     //
                                                                     if (ImageIDArrayCount >= 4) {
-                                                                        RecordID = genericController.EncodeInteger(ACInstanceName);
+                                                                        RecordID = genericController.encodeInteger(ACInstanceName);
                                                                         ElementText = "<AC type=\"DOWNLOAD\" ACInstanceID=\"" + ACInstanceID + "\" RecordID=\"" + RecordID + "\">";
                                                                     }
                                                                     break;
@@ -1504,7 +1504,7 @@ namespace Contensive.Core.Controllers {
                                                             Paths = ImageVirtualFilename.Split('/');
                                                             if (Paths.GetUpperBound(0) > 2) {
                                                                 if (genericController.vbLCase(Paths[1]) == "filename") {
-                                                                    RecordID = genericController.EncodeInteger(Paths[2]);
+                                                                    RecordID = genericController.encodeInteger(Paths[2]);
                                                                     if (RecordID != 0) {
                                                                         ImageFilename = Paths[3];
                                                                         ImageVirtualFilePath = genericController.vbReplace(ImageVirtualFilename, ImageFilename, "");
@@ -1541,8 +1541,8 @@ namespace Contensive.Core.Controllers {
                                                                                 // Determine ImageWidth and ImageHeight
                                                                                 //
                                                                                 ImageStyle = DHTML.ElementAttribute(ElementPointer, "style");
-                                                                                ImageWidth = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "width"));
-                                                                                ImageHeight = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "height"));
+                                                                                ImageWidth = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "width"));
+                                                                                ImageHeight = genericController.encodeInteger(DHTML.ElementAttribute(ElementPointer, "height"));
                                                                                 if (!string.IsNullOrEmpty(ImageStyle)) {
                                                                                     Styles = ImageStyle.Split(';');
                                                                                     for (Ptr = 0; Ptr <= Styles.GetUpperBound(0); Ptr++) {
@@ -1552,14 +1552,14 @@ namespace Contensive.Core.Controllers {
                                                                                             if (StyleName == "width") {
                                                                                                 StyleValue = genericController.vbLCase(Style[1].Trim(' '));
                                                                                                 StyleValue = genericController.vbReplace(StyleValue, "px", "");
-                                                                                                StyleValueInt = genericController.EncodeInteger(StyleValue);
+                                                                                                StyleValueInt = genericController.encodeInteger(StyleValue);
                                                                                                 if (StyleValueInt > 0) {
                                                                                                     ImageWidth = StyleValueInt;
                                                                                                 }
                                                                                             } else if (StyleName == "height") {
                                                                                                 StyleValue = genericController.vbLCase(Style[1].Trim(' '));
                                                                                                 StyleValue = genericController.vbReplace(StyleValue, "px", "");
-                                                                                                StyleValueInt = genericController.EncodeInteger(StyleValue);
+                                                                                                StyleValueInt = genericController.encodeInteger(StyleValue);
                                                                                                 if (StyleValueInt > 0) {
                                                                                                     ImageHeight = StyleValueInt;
                                                                                                 }
@@ -1633,8 +1633,8 @@ namespace Contensive.Core.Controllers {
                                                                                             if ((ImageHeight == 0) && (ImageWidth == 0) && (!string.IsNullOrEmpty(ImageFilenameAltSize))) {
                                                                                                 Pos = genericController.vbInstr(1, ImageFilenameAltSize, "x");
                                                                                                 if (Pos != 0) {
-                                                                                                    ImageWidth = genericController.EncodeInteger(ImageFilenameAltSize.Left(Pos - 1));
-                                                                                                    ImageHeight = genericController.EncodeInteger(ImageFilenameAltSize.Substring(Pos));
+                                                                                                    ImageWidth = genericController.encodeInteger(ImageFilenameAltSize.Left(Pos - 1));
+                                                                                                    ImageHeight = genericController.encodeInteger(ImageFilenameAltSize.Substring(Pos));
                                                                                                 }
                                                                                             }
                                                                                             if (ImageHeight == 0 && ImageWidth == 0) {
@@ -1833,7 +1833,7 @@ namespace Contensive.Core.Controllers {
                 //
                 int iPersonalizationPeopleId = personalizationPeopleId;
                 if (iPersonalizationPeopleId == 0) {
-                    iPersonalizationPeopleId = cpCore.doc.authContext.user.id;
+                    iPersonalizationPeopleId = cpCore.doc.sessionContext.user.id;
                 }
                 //
 
@@ -2267,7 +2267,7 @@ namespace Contensive.Core.Controllers {
                             if (TableSplit.GetUpperBound(0) > 2) {
                                 TableName = TableSplit[0];
                                 FieldName = TableSplit[1];
-                                RecordID = genericController.EncodeInteger(TableSplit[2]);
+                                RecordID = genericController.encodeInteger(TableSplit[2]);
                                 FilenameSegment = TableSplit[3];
                                 if ((TableName.ToLower() == "cclibraryfiles") && (FieldName.ToLower() == "filename") && (RecordID != 0)) {
                                     libraryFilesModel file = libraryFilesModel.create(cpCore, RecordID);
@@ -2560,14 +2560,14 @@ namespace Contensive.Core.Controllers {
         //====================================================================================================
         //
         public static string convertActiveContentToJsonForRemoteMethod(coreClass cpCore, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
-            return convertActiveContent_internal(cpCore, Source, cpCore.doc.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.doc.authContext.isAuthenticated, null, cpCore.doc.authContext.isEditingAnything());
+            return convertActiveContent_internal(cpCore, Source, cpCore.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.doc.sessionContext.isAuthenticated, null, cpCore.doc.sessionContext.isEditingAnything());
             //False, False, True, True, False, True, ""
         }
         //
         //====================================================================================================
         //
         public static string convertActiveContentToHtmlForWebRender(coreClass cpCore, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, CPUtilsBaseClass.addonContext addonContext) {
-            return convertActiveContent_internal(cpCore, Source, cpCore.doc.authContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, cpCore.doc.authContext.isAuthenticated, null, cpCore.doc.authContext.isEditingAnything());
+            return convertActiveContent_internal(cpCore, Source, cpCore.doc.sessionContext.user.id, ContextContentName, ContextRecordID, ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, "", addonContext, cpCore.doc.sessionContext.isAuthenticated, null, cpCore.doc.sessionContext.isEditingAnything());
             //False, False, True, True, False, True, ""
         }
         //

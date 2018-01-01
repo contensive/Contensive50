@@ -41,7 +41,7 @@ namespace Contensive.Core.Addons.PageManager {
                         // -- parent page is not valid
                         cp.Site.ErrorReport(new ArgumentException("pageResort requires first value to identify the parent page"));
                     } else {
-                        int parentPageId = EncodeInteger(ParentPageValues[1]);
+                        int parentPageId = encodeInteger(ParentPageValues[1]);
                         if (parentPageId == 0) {
                             //
                             // -- parent page is not valid
@@ -52,7 +52,7 @@ namespace Contensive.Core.Addons.PageManager {
                             //Dim childListName As String = ParentPageValues(2)
                             List<int> childPageIdList = new List<int>();
                             foreach (string PageIDText in pageList) {
-                                int pageId = EncodeInteger(PageIDText.Replace("page", ""));
+                                int pageId = encodeInteger(PageIDText.Replace("page", ""));
                                 if (pageId > 0) {
                                     childPageIdList.Add(pageId);
                                 }

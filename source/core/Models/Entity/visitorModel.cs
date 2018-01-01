@@ -169,11 +169,11 @@ namespace Contensive.Core.Models.Entity {
                         // -- add all cachenames to the injected cachenamelist
                         string cacheName0 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", result.ID.ToString());
                         callersCacheNameList.Add(cacheName0);
-                        cpCore.cache.setContent(cacheName0, result);
+                        cpCore.cache.setObject(cacheName0, result);
                         //
                         string cacheName1 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", result.ccGuid);
                         callersCacheNameList.Add(cacheName1);
-                        cpCore.cache.setPointer(cacheName1, cacheName0);
+                        cpCore.cache.setAlias(cacheName1, cacheName0);
                     }
                 }
                 cs.Close();
@@ -243,7 +243,7 @@ namespace Contensive.Core.Models.Entity {
                 //cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                 //
                 // -- object is here, but the cache was invalidated, setting
-                cpCore.cache.setContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.ID.ToString()), this);
+                cpCore.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.ID.ToString()), this);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -325,7 +325,7 @@ namespace Contensive.Core.Models.Entity {
         /// <param name="cpCore"></param>
         /// <param name="recordId"></param>
         public static void invalidateIdCache(coreClass cpCore, int recordId) {
-            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
+            cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
             //
             // -- always clear the cache with the content name
             //?? cpCore.cache.invalidateObject(primaryContentName)
@@ -338,7 +338,7 @@ namespace Contensive.Core.Models.Entity {
         /// <param name="cpCore"></param>
         /// <param name="guid"></param>
         public static void invalidateGuidCache(coreClass cpCore, string guid) {
-            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", guid));
+            cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", guid));
             //
             // -- always clear the cache with the content name
             //?? cpCore.cache.invalidateObject(primaryContentName)
@@ -368,16 +368,16 @@ namespace Contensive.Core.Models.Entity {
                 } else {
                     instance.Active = genericController.encodeBoolean(CDef.fields["Active"].defaultValue);
                     instance.ccGuid = genericController.encodeText(CDef.fields["ccGuid"].defaultValue);
-                    instance.ContentControlID = genericController.EncodeInteger(CDef.fields["ContentControlID"].defaultValue);
-                    instance.CreatedBy = genericController.EncodeInteger(CDef.fields["CreatedBy"].defaultValue);
-                    instance.CreateKey = genericController.EncodeInteger(CDef.fields["CreateKey"].defaultValue);
-                    instance.DateAdded = genericController.EncodeDate(CDef.fields["DateAdded"].defaultValue);
-                    instance.ForceBrowserMobile = genericController.EncodeInteger(CDef.fields["ForceBrowserMobile"].defaultValue);
-                    instance.MemberID = genericController.EncodeInteger(CDef.fields["MemberID"].defaultValue);
-                    instance.ModifiedBy = genericController.EncodeInteger(CDef.fields["ModifiedBy"].defaultValue);
-                    instance.ModifiedDate = genericController.EncodeDate(CDef.fields["ModifiedDate"].defaultValue);
+                    instance.ContentControlID = genericController.encodeInteger(CDef.fields["ContentControlID"].defaultValue);
+                    instance.CreatedBy = genericController.encodeInteger(CDef.fields["CreatedBy"].defaultValue);
+                    instance.CreateKey = genericController.encodeInteger(CDef.fields["CreateKey"].defaultValue);
+                    instance.DateAdded = genericController.encodeDate(CDef.fields["DateAdded"].defaultValue);
+                    instance.ForceBrowserMobile = genericController.encodeInteger(CDef.fields["ForceBrowserMobile"].defaultValue);
+                    instance.MemberID = genericController.encodeInteger(CDef.fields["MemberID"].defaultValue);
+                    instance.ModifiedBy = genericController.encodeInteger(CDef.fields["ModifiedBy"].defaultValue);
+                    instance.ModifiedDate = genericController.encodeDate(CDef.fields["ModifiedDate"].defaultValue);
                     instance.Name = genericController.encodeText(CDef.fields["Name"].defaultValue);
-                    instance.OrderID = genericController.EncodeInteger(CDef.fields["OrderID"].defaultValue);
+                    instance.OrderID = genericController.encodeInteger(CDef.fields["OrderID"].defaultValue);
                     instance.SortOrder = genericController.encodeText(CDef.fields["SortOrder"].defaultValue);
                 }
             } catch (Exception ex) {

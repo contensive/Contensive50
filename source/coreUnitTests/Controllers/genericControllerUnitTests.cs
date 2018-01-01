@@ -7,7 +7,7 @@ namespace coreTests {
     [TestClass]
     public class genericControllerUnitTests {
         [TestMethod]
-        public void AddSpan_test1() {
+        public void Controllers_AddSpan_test1() {
             // arrange
             // act
             string result = genericController.AddSpan("test", "testClass");

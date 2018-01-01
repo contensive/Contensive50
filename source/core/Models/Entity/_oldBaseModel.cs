@@ -60,7 +60,7 @@ namespace Contensive.Core.Models.Entity {
         public static oldBaseModel add(coreClass cpCore, ref List<string> callersCacheNameList) {
             oldBaseModel result = null;
             try {
-                result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.doc.authContext.user.id), ref callersCacheNameList);
+                result = create(cpCore, cpCore.db.insertContentRecordGetID(primaryContentName, cpCore.doc.sessionContext.user.id), ref callersCacheNameList);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -236,11 +236,11 @@ namespace Contensive.Core.Models.Entity {
                         // -- add all cachenames to the injected cachenamelist
                         string cacheName0 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", instance.id.ToString());
                         callersCacheNameList.Add(cacheName0);
-                        cpCore.cache.setContent(cacheName0, instance);
+                        cpCore.cache.setObject(cacheName0, instance);
                         //
                         string cacheName1 = Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "ccguid", instance.ccguid);
                         callersCacheNameList.Add(cacheName1);
-                        cpCore.cache.setPointer(cacheName1, cacheName0);
+                        cpCore.cache.setAlias(cacheName1, cacheName0);
                         //
                         //Dim cacheName2 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", result.foreignKey1Id.ToString(), "foreignKey2", result.foreignKey2Id.ToString())
                         //callersCacheNameList.Add(cacheName2)
@@ -328,7 +328,7 @@ namespace Contensive.Core.Models.Entity {
                 //cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                 //
                 // -- object is here, but the cache was invalidated, setting
-                cpCore.cache.setContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.id.ToString()), this);
+                cpCore.cache.setObject(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", this.id.ToString()), this);
             } catch (Exception ex) {
                 cpCore.handleException(ex);
                 throw;
@@ -347,7 +347,7 @@ namespace Contensive.Core.Models.Entity {
             try {
                 if (recordId > 0) {
                     cpCore.db.deleteContentRecords(primaryContentName, "id=" + recordId.ToString());
-                    cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
+                    cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);
@@ -438,10 +438,10 @@ namespace Contensive.Core.Models.Entity {
         /// <param name="cpCore"></param>
         /// <param name="recordId"></param>
         public static void invalidatePrimaryCache(coreClass cpCore, int recordId) {
-            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
+            cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, recordId));
             //
             // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-            cpCore.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
+            cpCore.cache.invalidate(Controllers.cacheController.getCacheKey_Entity(primaryContentTableName, "id", "0"));
         }
         //
         //====================================================================================================
@@ -514,16 +514,16 @@ namespace Contensive.Core.Models.Entity {
                             default:
                                 switch (resultProperty.PropertyType.Name) {
                                     case "Int32":
-                                        resultProperty.SetValue(instance, genericController.EncodeInteger(CDef.fields[resultProperty.Name].defaultValue), null);
+                                        resultProperty.SetValue(instance, genericController.encodeInteger(CDef.fields[resultProperty.Name].defaultValue), null);
                                         break;
                                     case "Boolean":
                                         resultProperty.SetValue(instance, genericController.encodeBoolean(CDef.fields[resultProperty.Name].defaultValue), null);
                                         break;
                                     case "DateTime":
-                                        resultProperty.SetValue(instance, genericController.EncodeDate(CDef.fields[resultProperty.Name].defaultValue), null);
+                                        resultProperty.SetValue(instance, genericController.encodeDate(CDef.fields[resultProperty.Name].defaultValue), null);
                                         break;
                                     case "Double":
-                                        resultProperty.SetValue(instance, genericController.EncodeNumber(CDef.fields[resultProperty.Name].defaultValue), null);
+                                        resultProperty.SetValue(instance, genericController.encodeNumber(CDef.fields[resultProperty.Name].defaultValue), null);
                                         break;
                                     default:
                                         resultProperty.SetValue(instance, CDef.fields[resultProperty.Name].defaultValue, null);

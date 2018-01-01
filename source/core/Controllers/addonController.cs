@@ -135,7 +135,7 @@ namespace Contensive.Core.Controllers {
                     foreach (var kvp in executeContext.instanceArguments) {
                         switch (kvp.Key.ToLower()) {
                             case "wrapper":
-                                executeContext.wrapperID = genericController.EncodeInteger(kvp.Value);
+                                executeContext.wrapperID = genericController.encodeInteger(kvp.Value);
                                 break;
                             case "as ajax":
                                 addon.AsAjax = genericController.encodeBoolean(kvp.Value);
@@ -391,7 +391,7 @@ namespace Contensive.Core.Controllers {
                                 ScriptingLanguage = "VBScript";
                             }
                             try {
-                                result += execute_Script(ref addon, ScriptingLanguage, addon.ScriptingCode, addon.ScriptingEntryPoint, EncodeInteger(addon.ScriptingTimeout), "Addon [" + addon.name + "]");
+                                result += execute_Script(ref addon, ScriptingLanguage, addon.ScriptingCode, addon.ScriptingEntryPoint, encodeInteger(addon.ScriptingTimeout), "Addon [" + addon.name + "]");
                             } catch (Exception ex) {
                                 string addonDescription = getAddonDescription(cpCore, addon);
                                 throw new ApplicationException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
@@ -529,7 +529,7 @@ namespace Contensive.Core.Controllers {
                         // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
                         bool IncludeEditWrapper = (!addon.BlockEditTools) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) & (!executeContext.isIncludeAddon);
                         if (IncludeEditWrapper) {
-                            IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || cpCore.doc.authContext.isEditing(executeContext.hostRecord.contentName)));
+                            IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || cpCore.doc.sessionContext.isEditing(executeContext.hostRecord.contentName)));
                             if (IncludeEditWrapper) {
                                 //
                                 // Edit Icon
@@ -657,7 +657,7 @@ namespace Contensive.Core.Controllers {
                     //
                     return_ExitAddonBlankWithResponse = true;
                     return string.Empty;
-                } else if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                } else if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                     //
                     // Not Admin Error
                     //
@@ -702,7 +702,7 @@ namespace Contensive.Core.Controllers {
                                                                 case "integer":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = genericController.EncodeInteger(FieldValue).ToString();
+                                                                        FieldValue = genericController.encodeInteger(FieldValue).ToString();
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -716,14 +716,14 @@ namespace Contensive.Core.Controllers {
                                                                 case "float":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString();
+                                                                        FieldValue = encodeNumber(FieldValue).ToString();
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "date":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = genericController.EncodeDate(FieldValue).ToString();
+                                                                        FieldValue = genericController.encodeDate(FieldValue).ToString();
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -773,7 +773,7 @@ namespace Contensive.Core.Controllers {
                                                                 case "currency":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString();
+                                                                        FieldValue = encodeNumber(FieldValue).ToString();
                                                                         FieldValue = String.Format("C", FieldValue);
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
@@ -806,7 +806,7 @@ namespace Contensive.Core.Controllers {
                                                                 CS = cpCore.db.csOpen("Copy Content", "name=" + cpCore.db.encodeSQLText(FieldName), "ID");
                                                                 if (!cpCore.db.csOk(CS)) {
                                                                     cpCore.db.csClose(ref CS);
-                                                                    CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.authContext.user.id);
+                                                                    CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.sessionContext.user.id);
                                                                 }
                                                                 if (cpCore.db.csOk(CS)) {
                                                                     cpCore.db.csSet(CS, "name", FieldName);
@@ -1066,7 +1066,7 @@ namespace Contensive.Core.Controllers {
                                                             CS = cpCore.db.csOpen("Copy Content", "Name=" + cpCore.db.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
                                                             if (!cpCore.db.csOk(CS)) {
                                                                 cpCore.db.csClose(ref CS);
-                                                                CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.authContext.user.id);
+                                                                CS = cpCore.db.csInsertRecord("Copy Content", cpCore.doc.sessionContext.user.id);
                                                                 if (cpCore.db.csOk(CS)) {
                                                                     RecordID = cpCore.db.csGetInteger(CS, "ID");
                                                                     cpCore.db.csSet(CS, "name", FieldName);
@@ -1133,7 +1133,7 @@ namespace Contensive.Core.Controllers {
                                                         FieldSQL = TabNode.InnerText;
                                                         FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
                                                         FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                        SQLPageSize = genericController.EncodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""));
+                                                        SQLPageSize = genericController.encodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""));
                                                         if (SQLPageSize == 0) {
                                                             SQLPageSize = 100;
                                                         }
@@ -1922,8 +1922,8 @@ namespace Contensive.Core.Controllers {
             string result = "";
             try {
                 addonModel addon = null;
-                if (EncodeInteger(AddonIDGuidOrName) > 0) {
-                    addon = cpCore.addonCache.getAddonById(EncodeInteger(AddonIDGuidOrName));
+                if (encodeInteger(AddonIDGuidOrName) > 0) {
+                    addon = cpCore.addonCache.getAddonById(encodeInteger(AddonIDGuidOrName));
                 } else if (genericController.isGuid(AddonIDGuidOrName)) {
                     addon = cpCore.addonCache.getAddonByGuid(AddonIDGuidOrName);
                 } else {
@@ -1982,8 +1982,8 @@ namespace Contensive.Core.Controllers {
                 int Ptr = 0;
                 int Pos = 0;
                 //
-                if (cpCore.doc.authContext.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
-                    if (cpCore.doc.authContext.isEditingAnything()) {
+                if (cpCore.doc.sessionContext.isAuthenticated & ((ACInstanceID == "-2") || (ACInstanceID == "-1") || (ACInstanceID == "0") || (RecordID != 0))) {
+                    if (cpCore.doc.sessionContext.isEditingAnything()) {
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
@@ -2226,8 +2226,8 @@ namespace Contensive.Core.Controllers {
                 string BubbleJS = null;
                 //Dim AddonName As String = ""
                 //
-                if (cpCore.doc.authContext.isAuthenticated && true) {
-                    if (cpCore.doc.authContext.isEditingAnything()) {
+                if (cpCore.doc.sessionContext.isAuthenticated && true) {
+                    if (cpCore.doc.sessionContext.isEditingAnything()) {
                         addonModel addon = addonModel.create(cpCore, addonId);
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
@@ -2296,9 +2296,9 @@ namespace Contensive.Core.Controllers {
             string InnerCopy = null;
             string CollectionCopy = "";
             //
-            if (cpCore.doc.authContext.isAuthenticated) {
-                if (cpCore.doc.authContext.isEditingAnything()) {
-                    StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"));
+            if (cpCore.doc.sessionContext.isAuthenticated) {
+                if (cpCore.doc.sessionContext.isEditingAnything()) {
+                    StyleSN = genericController.encodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"));
                     //cpCore.html.html_HelpViewerButtonID = "HelpBubble" & doccontroller.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy;
                     if (string.IsNullOrEmpty(InnerCopy)) {
@@ -2394,9 +2394,9 @@ namespace Contensive.Core.Controllers {
                 int StyleSN = 0;
                 string HTMLViewerBubbleID = null;
                 //
-                if (cpCore.doc.authContext.isAuthenticated) {
-                    if (cpCore.doc.authContext.isEditingAnything()) {
-                        StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"));
+                if (cpCore.doc.sessionContext.isAuthenticated) {
+                    if (cpCore.doc.sessionContext.isEditingAnything()) {
+                        StyleSN = genericController.encodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"));
                         HTMLViewerBubbleID = "HelpBubble" + cpCore.doc.helpCodes.Count;
                         //
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
@@ -2508,7 +2508,7 @@ namespace Contensive.Core.Controllers {
                     //
                     return_ExitRequest = true;
                     return string.Empty;
-                } else if (!cpCore.doc.authContext.isAuthenticatedAdmin(cpCore)) {
+                } else if (!cpCore.doc.sessionContext.isAuthenticatedAdmin(cpCore)) {
                     //
                     // Not Admin Error
                     //
@@ -2568,7 +2568,7 @@ namespace Contensive.Core.Controllers {
                                                                 case "integer":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = genericController.EncodeInteger(FieldValue).ToString();
+                                                                        FieldValue = genericController.encodeInteger(FieldValue).ToString();
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -2582,14 +2582,14 @@ namespace Contensive.Core.Controllers {
                                                                 case "float":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString();
+                                                                        FieldValue = encodeNumber(FieldValue).ToString();
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "date":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = genericController.EncodeDate(FieldValue).ToString();
+                                                                        FieldValue = genericController.encodeDate(FieldValue).ToString();
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -2639,7 +2639,7 @@ namespace Contensive.Core.Controllers {
                                                                 case "currency":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString();
+                                                                        FieldValue = encodeNumber(FieldValue).ToString();
                                                                         FieldValue = String.Format("C", FieldValue); 
                                                                     }
                                                                     cpCore.siteProperties.setProperty(FieldName, FieldValue);
@@ -3000,7 +3000,7 @@ namespace Contensive.Core.Controllers {
                                                         FieldSQL = TabNode.InnerText;
                                                         FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
                                                         FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                        SQLPageSize = genericController.EncodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""));
+                                                        SQLPageSize = genericController.encodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""));
                                                         if (SQLPageSize == 0) {
                                                             SQLPageSize = 100;
                                                         }

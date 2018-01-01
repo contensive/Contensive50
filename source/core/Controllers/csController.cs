@@ -30,7 +30,7 @@ namespace Contensive.Core {
         //
         public csController(coreClass cpCore) {
             this.cpCore = cpCore;
-            OpeningMemberID = cpCore.doc.authContext.user.id;
+            OpeningMemberID = cpCore.doc.sessionContext.user.id;
         }
         //
         //====================================================================================================
@@ -483,7 +483,7 @@ namespace Contensive.Core {
                 ContentName = Models.Complex.cdefModel.getContentNameByID(cpcore, cpcore.db.csGetInteger(CSPointer, "contentcontrolId"));
             }
             string source = cpcore.db.csGet(CSPointer, FieldName);
-            return activeContentController.convertActiveContentToHtmlForWebRender(cpcore, source, ContentName, RecordID, cpcore.doc.authContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
+            return activeContentController.convertActiveContentToHtmlForWebRender(cpcore, source, ContentName, RecordID, cpcore.doc.sessionContext.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
         }
         //
         //========================================================================
