@@ -37,7 +37,7 @@ namespace Contensive.BaseClasses
 		public abstract void AddOnLoadJavascript(string NewCode);
 		public abstract void AddTitle(string PageTitle);
 		public abstract void AddRefreshQueryString(string Name, string Value);
-		public abstract void AddBodyEnd(string NewCode);
+		public abstract void AddBodyEnd(string html);
 		public abstract string Body {get; set;}
 		public abstract string SiteStylesheet {get;}
 		public abstract void SetProperty(string FieldName, string FieldValue);

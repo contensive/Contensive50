@@ -52,14 +52,6 @@ namespace Contensive.Core.Controllers {
                     }
                 }
                 //
-                // -- Include any other close page
-                if (cpCore.doc.htmlForEndOfBody != "") {
-                    result.Add(cpCore.doc.htmlForEndOfBody);
-                }
-                if (cpCore.doc.testPointMessage != "") {
-                    result.Add("<div class=\"ccTestPointMessageCon\">" + cpCore.doc.testPointMessage + "</div>");
-                }
-                //
                 // TODO -- closing the menu attaches the flyout panels -- should be done when the menu is returned, not at page end
                 // -- output the menu system
                 if (cpCore.menuFlyout != null) {
@@ -93,6 +85,14 @@ namespace Contensive.Core.Controllers {
                         + "} ready(function(){" + string.Join("\r\n", scriptOnLoad) + "\r\n});"
                         + "</script>");
 
+                }
+                //
+                // -- Include any other close page
+                if (cpCore.doc.htmlForEndOfBody != "") {
+                    result.Add(cpCore.doc.htmlForEndOfBody);
+                }
+                if (cpCore.doc.testPointMessage != "") {
+                    result.Add("<div class=\"ccTestPointMessageCon\">" + cpCore.doc.testPointMessage + "</div>");
                 }
             } catch (Exception ex) {
                 cpCore.handleException(ex);

@@ -1245,15 +1245,16 @@
   </CDef>
  -->
   <Addon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}" type="Add-on">
+    <BlockEditTools>Yes</BlockEditTools>
     <jsheadscriptsrc>/contensiveBase/base.js</jsheadscriptsrc>
     <styleslinkhref>/contensiveBase/base.css</styleslinkhref>
+    <IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
+    <IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
   </Addon>
   <Addon name="Admin Site" guid="{c2de2acf-ca39-4668-b417-aa491e7d8460}" type="Add-on">
     <DotNetClass><![CDATA[Contensive.Core.Addons.AdminSite.getHtmlBodyClass]]></DotNetClass>
     <BlockEditTools>Yes</BlockEditTools>
     <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
-    <IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-    <IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
     <htmlDocument>Yes</htmlDocument>
   </Addon>
   <Addon name="setAdminSiteFieldHelp" guid="{a89a0a11-cbdd-4bb5-995e-0dfaaf3e3111}" type="Add-on">
@@ -1264,27 +1265,19 @@
   <Addon name="Child Page List" guid="{D291F133-AB50-4640-9A9A-18DB68FF363B}" type="Add-on">
 		<CopyText><![CDATA[<ac type="childlist" name="$list name$">]]></CopyText>
 		<ArgumentList><![CDATA[List Name]]></ArgumentList>
-		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-		<IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
 		<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
 		<Content>Yes</Content>
 		<Admin>Yes</Admin>
 	</Addon>
 	<Addon name="Login Page" guid="{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}" type="Add-on">
 		<DotNetClass><![CDATA[Contensive.Core.Addons.Login.getLoginPageClass]]></DotNetClass>
-    <jsheadscriptsrc>/contensiveBase/base.js</jsheadscriptsrc>
-    <styleslinkhref>/contensiveBase/base.css</styleslinkhref>
     <BlockEditTools>Yes</BlockEditTools>
-		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-		<IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+    <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
 	</Addon>
 	<Addon name="Page Manager" guid="{3a01572e-0f08-4feb-b189-18371752a3c3}" type="Add-on">
 		<DotNetClass><![CDATA[Contensive.Core.Addons.PageManager.getHtmlBodyClass]]></DotNetClass>
-    <jsheadscriptsrc>/contensiveBase/base.js</jsheadscriptsrc>
-    <styleslinkhref>/contensiveBase/base.css</styleslinkhref>
     <BlockEditTools>Yes</BlockEditTools>
-		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-		<IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+    <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
     <htmlDocument>Yes</htmlDocument>
   </Addon>
 	<Addon name="savePageManagerChildListSort" guid="{8429641A-03C9-4CD1-9369-5B9F2FA509E9}" type="Add-on">
@@ -1294,12 +1287,9 @@
 	</Addon>
   <Addon name="Login Form" guid="{E23C5941-19C2-4164-BCFD-83D6DD42F651}" type="Add-on">
     <DotNetClass><![CDATA[Contensive.Core.Addons.Login.getLoginFormClass]]></DotNetClass>
-    <jsheadscriptsrc>/contensiveBase/base.js</jsheadscriptsrc>
-    <styleslinkhref>/contensiveBase/base.css</styleslinkhref>
     <ArgumentList>Force Default Login=false</ArgumentList>
     <BlockEditTools>Yes</BlockEditTools>
-    <IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-    <IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+    <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
   </Addon>
   <Addon name="Housekeep" guid="{7208D069-8FE3-4BD1-AB76-B25C40C89A45}" type="Add-on">
     <DotNetClass><![CDATA[Contensive.Core.Addons.Housekeeping.houseKeepClass]]></DotNetClass>
